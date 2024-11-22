@@ -1,0 +1,11 @@
+{
+    "name": "afyaplus",
+    "version": "24.16.1",
+    "description": "afyaplus",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "private": true,
+    "dependencies": {},
+    "engines": {
+        "node": ">=18"
+    }
+}
