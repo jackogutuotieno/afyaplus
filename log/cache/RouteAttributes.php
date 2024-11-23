@@ -109,6 +109,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -210,6 +215,31 @@
     [
         'PHPMaker2024\\afyaplus\\Attributes\\Map' => [
             'methods' => [
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
                 [
                     'GET',
                     'POST',
@@ -1269,6 +1299,11 @@
                 '/expensesview[/{id}]',
                 '/expensesedit[/{id}]',
                 '/expensesdelete[/{id}]',
+                '/exportloglist[/{FileId:.*}]',
+                '/exportlogadd[/{FileId:.*}]',
+                '/exportlogview[/{FileId:.*}]',
+                '/exportlogedit[/{FileId:.*}]',
+                '/exportlogdelete[/{FileId:.*}]',
                 '/invoicedetailslist[/{id}]',
                 '/invoicedetailsadd[/{id}]',
                 '/invoicedetailsview[/{id}]',
@@ -1476,6 +1511,11 @@
                 'PHPMaker2024\\afyaplus\\ExpensesController:view',
                 'PHPMaker2024\\afyaplus\\ExpensesController:edit',
                 'PHPMaker2024\\afyaplus\\ExpensesController:delete',
+                'PHPMaker2024\\afyaplus\\ExportlogController:list',
+                'PHPMaker2024\\afyaplus\\ExportlogController:add',
+                'PHPMaker2024\\afyaplus\\ExportlogController:view',
+                'PHPMaker2024\\afyaplus\\ExportlogController:edit',
+                'PHPMaker2024\\afyaplus\\ExportlogController:delete',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:list',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:add',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:view',
@@ -1647,6 +1687,21 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2298,6 +2353,11 @@
                 'view.expenses',
                 'edit.expenses',
                 'delete.expenses',
+                'list.exportlog',
+                'add.exportlog',
+                'view.exportlog',
+                'edit.exportlog',
+                'delete.exportlog',
                 'list.invoice_details',
                 'add.invoice_details',
                 'view.invoice_details',
@@ -2469,6 +2529,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2883,6 +2948,11 @@
         $o[202],
         $o[203],
         $o[204],
+        $o[205],
+        $o[206],
+        $o[207],
+        $o[208],
+        $o[209],
     ],
     []
 );

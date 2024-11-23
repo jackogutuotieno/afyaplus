@@ -72,7 +72,7 @@ class VisitTypes extends DbTable
         // Update Table
         $this->UpdateTable = "visit_types";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF

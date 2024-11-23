@@ -12,6 +12,7 @@ C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesController.php
+C:\wamp64\www\afyaplus\controllers\ExportlogController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceDetailsController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceReportsController.php
 C:\wamp64\www\afyaplus\controllers\InvoicesController.php
@@ -107,6 +108,12 @@ C:\wamp64\www\afyaplus\models\ExpensesDelete.php
 C:\wamp64\www\afyaplus\models\ExpensesEdit.php
 C:\wamp64\www\afyaplus\models\ExpensesList.php
 C:\wamp64\www\afyaplus\models\ExpensesView.php
+C:\wamp64\www\afyaplus\models\Exportlog.php
+C:\wamp64\www\afyaplus\models\ExportlogAdd.php
+C:\wamp64\www\afyaplus\models\ExportlogDelete.php
+C:\wamp64\www\afyaplus\models\ExportlogEdit.php
+C:\wamp64\www\afyaplus\models\ExportlogList.php
+C:\wamp64\www\afyaplus\models\ExportlogView.php
 C:\wamp64\www\afyaplus\models\InvoiceDetails.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsAdd.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsDelete.php
@@ -369,6 +376,7 @@ C:\wamp64\www\afyaplus\src\Entity\Disease.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorCharge.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
 C:\wamp64\www\afyaplus\src\Entity\Expense.php
+C:\wamp64\www\afyaplus\src\Entity\Exportlog.php
 C:\wamp64\www\afyaplus\src\Entity\Invoice.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceDetail.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceReport.php
@@ -532,6 +540,11 @@ C:\wamp64\www\afyaplus\views\ExpensesDelete.php
 C:\wamp64\www\afyaplus\views\ExpensesEdit.php
 C:\wamp64\www\afyaplus\views\ExpensesList.php
 C:\wamp64\www\afyaplus\views\ExpensesView.php
+C:\wamp64\www\afyaplus\views\ExportlogAdd.php
+C:\wamp64\www\afyaplus\views\ExportlogDelete.php
+C:\wamp64\www\afyaplus\views\ExportlogEdit.php
+C:\wamp64\www\afyaplus\views\ExportlogList.php
+C:\wamp64\www\afyaplus\views\ExportlogView.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsAdd.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsDelete.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsEdit.php

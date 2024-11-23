@@ -126,4 +126,5 @@ return [
     "vaccinationsreport" => \DI\create(Vaccinationsreport::class),
     "visit_types" => \DI\create(VisitTypes::class),
     "vitalsreport" => \DI\create(Vitalsreport::class),
+    "exportlog" => \DI\create(Exportlog::class),
 ] + $definitions;

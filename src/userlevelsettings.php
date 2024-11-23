@@ -67,7 +67,8 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}users","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}vaccinationsreport","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}visit_types","-2","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}vitalsreport","-2","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}vitalsreport","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}exportlog","-2","0"]];
 
 /**
  * Tables
@@ -126,4 +127,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["users","users","users",true,"{32536B8D-F37B-4419-80D5-260932800712}","userslist"],
     ["vaccinationsreport","vaccinationsreport","vaccinationsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vaccinationsreportlist"],
     ["visit_types","visit_types","visit types",true,"{32536B8D-F37B-4419-80D5-260932800712}","visittypeslist"],
-    ["vitalsreport","vitalsreport","vitalsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vitalsreportlist"]];
+    ["vitalsreport","vitalsreport","vitalsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vitalsreportlist"],
+    ["exportlog","exportlog","exportlog",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"]];

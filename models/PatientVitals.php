@@ -78,7 +78,7 @@ class PatientVitals extends DbTable
         // Update Table
         $this->UpdateTable = "patient_vitals";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
