@@ -231,7 +231,7 @@
       </field>
     </table>
     <table id="designations">
-      <phrase id="tblcaption" value="designations" />
+      <phrase id="tblcaption" value="Designations" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
