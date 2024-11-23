@@ -227,7 +227,11 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}subscriptions","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}subscriptions","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}subscriptions","1","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}subscriptions","2","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}subscriptions","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Patients Appointments","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Patients Appointments","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Patients Appointments","1","2031"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Patients Appointments","2","840"]];
 
 /**
  * Tables
@@ -290,4 +294,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["visit_types","visit_types","visit types",true,"{32536B8D-F37B-4419-80D5-260932800712}","visittypeslist"],
     ["vitalsreport","vitalsreport","vitalsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vitalsreportlist"],
     ["exportlog","exportlog","exportlog",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"],
-    ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"]];
+    ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"],
+    ["Patients Appointments","Patients_Appointments","Patients Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsappointments"]];

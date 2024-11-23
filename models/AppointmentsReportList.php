@@ -149,8 +149,6 @@ class AppointmentsReportList extends AppointmentsReport
         $this->_title->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
-        $this->start_time->setVisibility();
-        $this->end_time->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
         $this->patient_name->setVisibility();
@@ -1062,8 +1060,6 @@ class AppointmentsReportList extends AppointmentsReport
         $filterList = Concat($filterList, $this->_title->AdvancedSearch->toJson(), ","); // Field title
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
-        $filterList = Concat($filterList, $this->start_time->AdvancedSearch->toJson(), ","); // Field start_time
-        $filterList = Concat($filterList, $this->end_time->AdvancedSearch->toJson(), ","); // Field end_time
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
@@ -1140,22 +1136,6 @@ class AppointmentsReportList extends AppointmentsReport
         $this->end_date->AdvancedSearch->SearchValue2 = @$filter["y_end_date"];
         $this->end_date->AdvancedSearch->SearchOperator2 = @$filter["w_end_date"];
         $this->end_date->AdvancedSearch->save();
-
-        // Field start_time
-        $this->start_time->AdvancedSearch->SearchValue = @$filter["x_start_time"];
-        $this->start_time->AdvancedSearch->SearchOperator = @$filter["z_start_time"];
-        $this->start_time->AdvancedSearch->SearchCondition = @$filter["v_start_time"];
-        $this->start_time->AdvancedSearch->SearchValue2 = @$filter["y_start_time"];
-        $this->start_time->AdvancedSearch->SearchOperator2 = @$filter["w_start_time"];
-        $this->start_time->AdvancedSearch->save();
-
-        // Field end_time
-        $this->end_time->AdvancedSearch->SearchValue = @$filter["x_end_time"];
-        $this->end_time->AdvancedSearch->SearchOperator = @$filter["z_end_time"];
-        $this->end_time->AdvancedSearch->SearchCondition = @$filter["v_end_time"];
-        $this->end_time->AdvancedSearch->SearchValue2 = @$filter["y_end_time"];
-        $this->end_time->AdvancedSearch->SearchOperator2 = @$filter["w_end_time"];
-        $this->end_time->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1329,8 +1309,6 @@ class AppointmentsReportList extends AppointmentsReport
             $this->updateSort($this->_title); // title
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
-            $this->updateSort($this->start_time); // start_time
-            $this->updateSort($this->end_time); // end_time
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->updateSort($this->patient_name); // patient_name
@@ -1365,8 +1343,6 @@ class AppointmentsReportList extends AppointmentsReport
                 $this->_title->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
-                $this->start_time->setSort("");
-                $this->end_time->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
                 $this->patient_name->setSort("");
@@ -1522,8 +1498,6 @@ class AppointmentsReportList extends AppointmentsReport
             $this->createColumnOption($option, "title");
             $this->createColumnOption($option, "start_date");
             $this->createColumnOption($option, "end_date");
-            $this->createColumnOption($option, "start_time");
-            $this->createColumnOption($option, "end_time");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
             $this->createColumnOption($option, "patient_name");
@@ -1972,8 +1946,6 @@ class AppointmentsReportList extends AppointmentsReport
         $this->_title->setDbValue($row['title']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
-        $this->start_time->setDbValue($row['start_time']);
-        $this->end_time->setDbValue($row['end_time']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
         $this->patient_name->setDbValue($row['patient_name']);
@@ -1990,8 +1962,6 @@ class AppointmentsReportList extends AppointmentsReport
         $row['title'] = $this->_title->DefaultValue;
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
-        $row['start_time'] = $this->start_time->DefaultValue;
-        $row['end_time'] = $this->end_time->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
@@ -2046,10 +2016,6 @@ class AppointmentsReportList extends AppointmentsReport
 
         // end_date
 
-        // start_time
-
-        // end_time
-
         // date_created
 
         // date_updated
@@ -2077,14 +2043,6 @@ class AppointmentsReportList extends AppointmentsReport
             // end_date
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
-
-            // start_time
-            $this->start_time->ViewValue = $this->start_time->CurrentValue;
-            $this->start_time->ViewValue = FormatDateTime($this->start_time->ViewValue, $this->start_time->formatPattern());
-
-            // end_time
-            $this->end_time->ViewValue = $this->end_time->CurrentValue;
-            $this->end_time->ViewValue = FormatDateTime($this->end_time->ViewValue, $this->end_time->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2122,14 +2080,6 @@ class AppointmentsReportList extends AppointmentsReport
             // end_date
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
-
-            // start_time
-            $this->start_time->HrefValue = "";
-            $this->start_time->TooltipValue = "";
-
-            // end_time
-            $this->end_time->HrefValue = "";
-            $this->end_time->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

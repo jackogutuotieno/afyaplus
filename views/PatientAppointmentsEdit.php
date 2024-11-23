@@ -35,8 +35,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["doctor_id", [fields.doctor_id.visible && fields.doctor_id.required ? ew.Validators.required(fields.doctor_id.caption) : null, ew.Validators.integer], fields.doctor_id.isInvalid],
             ["start_date", [fields.start_date.visible && fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(fields.start_date.clientFormatPattern)], fields.start_date.isInvalid],
             ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(fields.end_date.clientFormatPattern)], fields.end_date.isInvalid],
-            ["start_time", [fields.start_time.visible && fields.start_time.required ? ew.Validators.required(fields.start_time.caption) : null, ew.Validators.time(fields.start_time.clientFormatPattern)], fields.start_time.isInvalid],
-            ["end_time", [fields.end_time.visible && fields.end_time.required ? ew.Validators.required(fields.end_time.caption) : null, ew.Validators.time(fields.end_time.clientFormatPattern)], fields.end_time.isInvalid],
+            ["is_all_day", [fields.is_all_day.visible && fields.is_all_day.required ? ew.Validators.required(fields.is_all_day.caption) : null], fields.is_all_day.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
@@ -55,6 +54,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "is_all_day": <?= $Page->is_all_day->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -221,26 +221,16 @@ loadjs.ready(["fpatient_appointmentsedit", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->start_time->Visible) { // start_time ?>
-    <div id="r_start_time"<?= $Page->start_time->rowAttributes() ?>>
-        <label id="elh_patient_appointments_start_time" for="x_start_time" class="<?= $Page->LeftColumnClass ?>"><?= $Page->start_time->caption() ?><?= $Page->start_time->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->start_time->cellAttributes() ?>>
-<span id="el_patient_appointments_start_time">
-<input type="<?= $Page->start_time->getInputTextType() ?>" name="x_start_time" id="x_start_time" data-table="patient_appointments" data-field="x_start_time" value="<?= $Page->start_time->EditValue ?>" placeholder="<?= HtmlEncode($Page->start_time->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->start_time->formatPattern()) ?>"<?= $Page->start_time->editAttributes() ?> aria-describedby="x_start_time_help">
-<?= $Page->start_time->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->start_time->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->end_time->Visible) { // end_time ?>
-    <div id="r_end_time"<?= $Page->end_time->rowAttributes() ?>>
-        <label id="elh_patient_appointments_end_time" for="x_end_time" class="<?= $Page->LeftColumnClass ?>"><?= $Page->end_time->caption() ?><?= $Page->end_time->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->end_time->cellAttributes() ?>>
-<span id="el_patient_appointments_end_time">
-<input type="<?= $Page->end_time->getInputTextType() ?>" name="x_end_time" id="x_end_time" data-table="patient_appointments" data-field="x_end_time" value="<?= $Page->end_time->EditValue ?>" placeholder="<?= HtmlEncode($Page->end_time->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->end_time->formatPattern()) ?>"<?= $Page->end_time->editAttributes() ?> aria-describedby="x_end_time_help">
-<?= $Page->end_time->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->end_time->getErrorMessage() ?></div>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+    <div id="r_is_all_day"<?= $Page->is_all_day->rowAttributes() ?>>
+        <label id="elh_patient_appointments_is_all_day" class="<?= $Page->LeftColumnClass ?>"><?= $Page->is_all_day->caption() ?><?= $Page->is_all_day->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->is_all_day->cellAttributes() ?>>
+<span id="el_patient_appointments_is_all_day">
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" class="form-check-input<?= $Page->is_all_day->isInvalidClass() ?>" data-table="patient_appointments" data-field="x_is_all_day" data-boolean name="x_is_all_day" id="x_is_all_day" value="1"<?= ConvertToBool($Page->is_all_day->CurrentValue) ? " checked" : "" ?><?= $Page->is_all_day->editAttributes() ?> aria-describedby="x_is_all_day_help">
+    <div class="invalid-feedback"><?= $Page->is_all_day->getErrorMessage() ?></div>
+</div>
+<?= $Page->is_all_day->getCustomMessage() ?>
 </span>
 </div></div>
     </div>

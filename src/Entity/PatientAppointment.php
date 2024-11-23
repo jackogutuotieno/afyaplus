@@ -51,11 +51,8 @@ class PatientAppointment extends AbstractEntity
     #[Column(name: "end_date", type: "date")]
     private DateTime $endDate;
 
-    #[Column(name: "start_time", type: "time", nullable: true)]
-    private ?DateTime $startTime;
-
-    #[Column(name: "end_time", type: "time", nullable: true)]
-    private ?DateTime $endTime;
+    #[Column(name: "is_all_day", type: "boolean", nullable: true)]
+    private ?bool $isAllDay;
 
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
@@ -143,25 +140,14 @@ class PatientAppointment extends AbstractEntity
         return $this;
     }
 
-    public function getStartTime(): ?DateTime
+    public function getIsAllDay(): ?bool
     {
-        return $this->startTime;
+        return $this->isAllDay;
     }
 
-    public function setStartTime(?DateTime $value): static
+    public function setIsAllDay(?bool $value): static
     {
-        $this->startTime = $value;
-        return $this;
-    }
-
-    public function getEndTime(): ?DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function setEndTime(?DateTime $value): static
-    {
-        $this->endTime = $value;
+        $this->isAllDay = $value;
         return $this;
     }
 

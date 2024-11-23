@@ -128,8 +128,7 @@ class PatientAppointmentsDelete extends PatientAppointments
         $this->doctor_id->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
-        $this->start_time->setVisibility();
-        $this->end_time->setVisibility();
+        $this->is_all_day->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -421,6 +420,9 @@ class PatientAppointmentsDelete extends PatientAppointments
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->is_all_day);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -610,8 +612,7 @@ class PatientAppointmentsDelete extends PatientAppointments
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
-        $this->start_time->setDbValue($row['start_time']);
-        $this->end_time->setDbValue($row['end_time']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -628,8 +629,7 @@ class PatientAppointmentsDelete extends PatientAppointments
         $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
-        $row['start_time'] = $this->start_time->DefaultValue;
-        $row['end_time'] = $this->end_time->DefaultValue;
+        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -662,9 +662,7 @@ class PatientAppointmentsDelete extends PatientAppointments
 
         // end_date
 
-        // start_time
-
-        // end_time
+        // is_all_day
 
         // created_by_user_id
 
@@ -699,13 +697,12 @@ class PatientAppointmentsDelete extends PatientAppointments
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
-            // start_time
-            $this->start_time->ViewValue = $this->start_time->CurrentValue;
-            $this->start_time->ViewValue = FormatDateTime($this->start_time->ViewValue, $this->start_time->formatPattern());
-
-            // end_time
-            $this->end_time->ViewValue = $this->end_time->CurrentValue;
-            $this->end_time->ViewValue = FormatDateTime($this->end_time->ViewValue, $this->end_time->formatPattern());
+            // is_all_day
+            if (ConvertToBool($this->is_all_day->CurrentValue)) {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+            } else {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+            }
 
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
@@ -747,13 +744,9 @@ class PatientAppointmentsDelete extends PatientAppointments
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
 
-            // start_time
-            $this->start_time->HrefValue = "";
-            $this->start_time->TooltipValue = "";
-
-            // end_time
-            $this->end_time->HrefValue = "";
-            $this->end_time->TooltipValue = "";
+            // is_all_day
+            $this->is_all_day->HrefValue = "";
+            $this->is_all_day->TooltipValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -897,6 +890,8 @@ class PatientAppointmentsDelete extends PatientAppointments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_is_all_day":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

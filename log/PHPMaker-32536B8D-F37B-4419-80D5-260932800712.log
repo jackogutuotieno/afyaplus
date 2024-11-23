@@ -36,6 +36,7 @@ C:\wamp64\www\afyaplus\controllers\PatientAppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVaccinationsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVisitsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVitalsController.php
+C:\wamp64\www\afyaplus\controllers\PatientsAppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\PatientsvisitsreportController.php
@@ -239,6 +240,12 @@ C:\wamp64\www\afyaplus\models\PatientVitalsList.php
 C:\wamp64\www\afyaplus\models\PatientVitalsView.php
 C:\wamp64\www\afyaplus\models\Patients.php
 C:\wamp64\www\afyaplus\models\PatientsAdd.php
+C:\wamp64\www\afyaplus\models\PatientsAppointments.php
+C:\wamp64\www\afyaplus\models\PatientsAppointmentsAdd.php
+C:\wamp64\www\afyaplus\models\PatientsAppointmentsCalendar.php
+C:\wamp64\www\afyaplus\models\PatientsAppointmentsDelete.php
+C:\wamp64\www\afyaplus\models\PatientsAppointmentsEdit.php
+C:\wamp64\www\afyaplus\models\PatientsAppointmentsView.php
 C:\wamp64\www\afyaplus\models\PatientsDelete.php
 C:\wamp64\www\afyaplus\models\PatientsEdit.php
 C:\wamp64\www\afyaplus\models\PatientsList.php
@@ -666,6 +673,11 @@ C:\wamp64\www\afyaplus\views\PatientVitalsEdit.php
 C:\wamp64\www\afyaplus\views\PatientVitalsList.php
 C:\wamp64\www\afyaplus\views\PatientVitalsView.php
 C:\wamp64\www\afyaplus\views\PatientsAdd.php
+C:\wamp64\www\afyaplus\views\PatientsAppointmentsAdd.php
+C:\wamp64\www\afyaplus\views\PatientsAppointmentsCalendar.php
+C:\wamp64\www\afyaplus\views\PatientsAppointmentsDelete.php
+C:\wamp64\www\afyaplus\views\PatientsAppointmentsEdit.php
+C:\wamp64\www\afyaplus\views\PatientsAppointmentsView.php
 C:\wamp64\www\afyaplus\views\PatientsDelete.php
 C:\wamp64\www\afyaplus\views\PatientsEdit.php
 C:\wamp64\www\afyaplus\views\PatientsList.php

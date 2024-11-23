@@ -35,6 +35,9 @@
     <menu id="48">
       <phrase id="menutext" value="Patients List" />
     </menu>
+    <menu id="109">
+      <phrase id="menutext" value="Appointments" />
+    </menu>
     <menu id="22">
       <phrase id="menutext" value="Appointments" />
     </menu>
@@ -195,12 +198,6 @@
       </field>
       <field id="end_date">
         <phrase id="fldcaption" value="end date" />
-      </field>
-      <field id="start_time">
-        <phrase id="fldcaption" value="start time" />
-      </field>
-      <field id="end_time">
-        <phrase id="fldcaption" value="end time" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="date created" />
@@ -919,11 +916,12 @@
       <field id="end_date">
         <phrase id="fldcaption" value="end date" />
       </field>
-      <field id="start_time">
-        <phrase id="fldcaption" value="start time" />
-      </field>
-      <field id="end_time">
-        <phrase id="fldcaption" value="end time" />
+      <field id="is_all_day">
+        <phrase id="fldcaption" value="All Day?" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
@@ -1703,6 +1701,46 @@
       </field>
       <field id="contentencoding">
         <phrase id="fldcaption" value="Content Encoding" />
+      </field>
+    </table>
+    <table id="patients_appointments">
+      <phrase id="tblcaption" value="Patients Appointments" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="patient id" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="doctor_id">
+        <phrase id="fldcaption" value="doctor id" />
+      </field>
+      <field id="start_date">
+        <phrase id="fldcaption" value="start date" />
+      </field>
+      <field id="end_date">
+        <phrase id="fldcaption" value="end date" />
+      </field>
+      <field id="created_by_user_id">
+        <phrase id="fldcaption" value="created by user id" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="is_all_day">
+        <phrase id="fldcaption" value="is all day" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
     </table>
   </project>

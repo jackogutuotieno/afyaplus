@@ -222,6 +222,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -870,6 +875,30 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
                     'POST',
                     'OPTIONS',
                 ],
@@ -1462,6 +1491,11 @@
                 '/patientappointmentsview[/{id}]',
                 '/patientappointmentsedit[/{id}]',
                 '/patientappointmentsdelete[/{id}]',
+                '/patientsappointments',
+                '/patientsappointmentsadd[/{id}]',
+                '/patientsappointmentsview[/{id}]',
+                '/patientsappointmentsedit[/{id}]',
+                '/patientsappointmentsdelete[/{id}]',
                 '/patientslist[/{id}]',
                 '/patientsadd[/{id}]',
                 '/patientsview[/{id}]',
@@ -1686,6 +1720,11 @@
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:view',
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:edit',
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:delete',
+                'PHPMaker2024\\afyaplus\\PatientsAppointmentsController:calendar',
+                'PHPMaker2024\\afyaplus\\PatientsAppointmentsController:add',
+                'PHPMaker2024\\afyaplus\\PatientsAppointmentsController:view',
+                'PHPMaker2024\\afyaplus\\PatientsAppointmentsController:edit',
+                'PHPMaker2024\\afyaplus\\PatientsAppointmentsController:delete',
                 'PHPMaker2024\\afyaplus\\PatientsController:list',
                 'PHPMaker2024\\afyaplus\\PatientsController:add',
                 'PHPMaker2024\\afyaplus\\PatientsController:view',
@@ -2447,6 +2486,21 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'list.appointments_report',
@@ -2576,6 +2630,11 @@
                 'view.patient_appointments',
                 'edit.patient_appointments',
                 'delete.patient_appointments',
+                'calendar.Patients_Appointments',
+                'add.Patients_Appointments',
+                'view.Patients_Appointments',
+                'edit.Patients_Appointments',
+                'delete.Patients_Appointments',
                 'list.patients',
                 'add.patients',
                 'view.patients',
@@ -2673,6 +2732,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3121,6 +3185,11 @@
         $o[219],
         $o[220],
         $o[221],
+        $o[222],
+        $o[223],
+        $o[224],
+        $o[225],
+        $o[226],
     ],
     []
 );

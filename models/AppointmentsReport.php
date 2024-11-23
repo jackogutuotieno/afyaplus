@@ -50,8 +50,6 @@ class AppointmentsReport extends DbTable
     public $_title;
     public $start_date;
     public $end_date;
-    public $start_time;
-    public $end_time;
     public $date_created;
     public $date_updated;
     public $patient_name;
@@ -206,54 +204,6 @@ class AppointmentsReport extends DbTable
         $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['end_date'] = &$this->end_date;
-
-        // start_time
-        $this->start_time = new DbField(
-            $this, // Table
-            'x_start_time', // Variable name
-            'start_time', // Name
-            '`start_time`', // Expression
-            CastDateFieldForLike("`start_time`", 4, "DB"), // Basic search expression
-            134, // Type
-            40, // Size
-            4, // Date/Time format
-            false, // Is upload field
-            '`start_time`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->start_time->InputTextType = "text";
-        $this->start_time->Raw = true;
-        $this->start_time->DefaultErrorMessage = str_replace("%s", DateFormat(4), $Language->phrase("IncorrectTime"));
-        $this->start_time->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['start_time'] = &$this->start_time;
-
-        // end_time
-        $this->end_time = new DbField(
-            $this, // Table
-            'x_end_time', // Variable name
-            'end_time', // Name
-            '`end_time`', // Expression
-            CastDateFieldForLike("`end_time`", 4, "DB"), // Basic search expression
-            134, // Type
-            40, // Size
-            4, // Date/Time format
-            false, // Is upload field
-            '`end_time`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->end_time->InputTextType = "text";
-        $this->end_time->Raw = true;
-        $this->end_time->DefaultErrorMessage = str_replace("%s", DateFormat(4), $Language->phrase("IncorrectTime"));
-        $this->end_time->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['end_time'] = &$this->end_time;
 
         // date_created
         $this->date_created = new DbField(
@@ -923,8 +873,6 @@ class AppointmentsReport extends DbTable
         $this->_title->DbValue = $row['title'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
-        $this->start_time->DbValue = $row['start_time'];
-        $this->end_time->DbValue = $row['end_time'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
         $this->patient_name->DbValue = $row['patient_name'];
@@ -1287,8 +1235,6 @@ class AppointmentsReport extends DbTable
         $this->_title->setDbValue($row['title']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
-        $this->start_time->setDbValue($row['start_time']);
-        $this->end_time->setDbValue($row['end_time']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
         $this->patient_name->setDbValue($row['patient_name']);
@@ -1333,10 +1279,6 @@ class AppointmentsReport extends DbTable
 
         // end_date
 
-        // start_time
-
-        // end_time
-
         // date_created
 
         // date_updated
@@ -1362,14 +1304,6 @@ class AppointmentsReport extends DbTable
         // end_date
         $this->end_date->ViewValue = $this->end_date->CurrentValue;
         $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
-
-        // start_time
-        $this->start_time->ViewValue = $this->start_time->CurrentValue;
-        $this->start_time->ViewValue = FormatDateTime($this->start_time->ViewValue, $this->start_time->formatPattern());
-
-        // end_time
-        $this->end_time->ViewValue = $this->end_time->CurrentValue;
-        $this->end_time->ViewValue = FormatDateTime($this->end_time->ViewValue, $this->end_time->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1407,14 +1341,6 @@ class AppointmentsReport extends DbTable
         // end_date
         $this->end_date->HrefValue = "";
         $this->end_date->TooltipValue = "";
-
-        // start_time
-        $this->start_time->HrefValue = "";
-        $this->start_time->TooltipValue = "";
-
-        // end_time
-        $this->end_time->HrefValue = "";
-        $this->end_time->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1476,16 +1402,6 @@ class AppointmentsReport extends DbTable
         $this->end_date->setupEditAttributes();
         $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
         $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
-
-        // start_time
-        $this->start_time->setupEditAttributes();
-        $this->start_time->EditValue = FormatDateTime($this->start_time->CurrentValue, $this->start_time->formatPattern());
-        $this->start_time->PlaceHolder = RemoveHtml($this->start_time->caption());
-
-        // end_time
-        $this->end_time->setupEditAttributes();
-        $this->end_time->EditValue = FormatDateTime($this->end_time->CurrentValue, $this->end_time->formatPattern());
-        $this->end_time->PlaceHolder = RemoveHtml($this->end_time->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1558,8 +1474,6 @@ class AppointmentsReport extends DbTable
                     $doc->exportCaption($this->_title);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
-                    $doc->exportCaption($this->start_time);
-                    $doc->exportCaption($this->end_time);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                     $doc->exportCaption($this->patient_name);
@@ -1571,8 +1485,6 @@ class AppointmentsReport extends DbTable
                     $doc->exportCaption($this->_title);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
-                    $doc->exportCaption($this->start_time);
-                    $doc->exportCaption($this->end_time);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                     $doc->exportCaption($this->patient_name);
@@ -1609,8 +1521,6 @@ class AppointmentsReport extends DbTable
                         $doc->exportField($this->_title);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
-                        $doc->exportField($this->start_time);
-                        $doc->exportField($this->end_time);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                         $doc->exportField($this->patient_name);
@@ -1622,8 +1532,6 @@ class AppointmentsReport extends DbTable
                         $doc->exportField($this->_title);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
-                        $doc->exportField($this->start_time);
-                        $doc->exportField($this->end_time);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                         $doc->exportField($this->patient_name);

@@ -53,8 +53,7 @@ class PatientAppointments extends DbTable
     public $doctor_id;
     public $start_date;
     public $end_date;
-    public $start_time;
-    public $end_time;
+    public $is_all_day;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
@@ -281,53 +280,32 @@ class PatientAppointments extends DbTable
         $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['end_date'] = &$this->end_date;
 
-        // start_time
-        $this->start_time = new DbField(
+        // is_all_day
+        $this->is_all_day = new DbField(
             $this, // Table
-            'x_start_time', // Variable name
-            'start_time', // Name
-            '`start_time`', // Expression
-            CastDateFieldForLike("`start_time`", 4, "DB"), // Basic search expression
-            134, // Type
-            10, // Size
-            4, // Date/Time format
+            'x_is_all_day', // Variable name
+            'is_all_day', // Name
+            '`is_all_day`', // Expression
+            '`is_all_day`', // Basic search expression
+            16, // Type
+            1, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`start_time`', // Virtual expression
+            '`is_all_day`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'CHECKBOX' // Edit Tag
         );
-        $this->start_time->InputTextType = "text";
-        $this->start_time->Raw = true;
-        $this->start_time->DefaultErrorMessage = str_replace("%s", DateFormat(4), $Language->phrase("IncorrectTime"));
-        $this->start_time->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['start_time'] = &$this->start_time;
-
-        // end_time
-        $this->end_time = new DbField(
-            $this, // Table
-            'x_end_time', // Variable name
-            'end_time', // Name
-            '`end_time`', // Expression
-            CastDateFieldForLike("`end_time`", 4, "DB"), // Basic search expression
-            134, // Type
-            10, // Size
-            4, // Date/Time format
-            false, // Is upload field
-            '`end_time`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->end_time->InputTextType = "text";
-        $this->end_time->Raw = true;
-        $this->end_time->DefaultErrorMessage = str_replace("%s", DateFormat(4), $Language->phrase("IncorrectTime"));
-        $this->end_time->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['end_time'] = &$this->end_time;
+        $this->is_all_day->InputTextType = "text";
+        $this->is_all_day->Raw = true;
+        $this->is_all_day->setDataType(DataType::BOOLEAN);
+        $this->is_all_day->Lookup = new Lookup($this->is_all_day, 'patient_appointments', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->is_all_day->OptionCount = 2;
+        $this->is_all_day->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->is_all_day->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->Fields['is_all_day'] = &$this->is_all_day;
 
         // created_by_user_id
         $this->created_by_user_id = new DbField(
@@ -932,8 +910,7 @@ class PatientAppointments extends DbTable
         $this->doctor_id->DbValue = $row['doctor_id'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
-        $this->start_time->DbValue = $row['start_time'];
-        $this->end_time->DbValue = $row['end_time'];
+        $this->is_all_day->DbValue = $row['is_all_day'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1296,8 +1273,7 @@ class PatientAppointments extends DbTable
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
-        $this->start_time->setDbValue($row['start_time']);
-        $this->end_time->setDbValue($row['end_time']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1345,9 +1321,7 @@ class PatientAppointments extends DbTable
 
         // end_date
 
-        // start_time
-
-        // end_time
+        // is_all_day
 
         // created_by_user_id
 
@@ -1380,13 +1354,12 @@ class PatientAppointments extends DbTable
         $this->end_date->ViewValue = $this->end_date->CurrentValue;
         $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
-        // start_time
-        $this->start_time->ViewValue = $this->start_time->CurrentValue;
-        $this->start_time->ViewValue = FormatDateTime($this->start_time->ViewValue, $this->start_time->formatPattern());
-
-        // end_time
-        $this->end_time->ViewValue = $this->end_time->CurrentValue;
-        $this->end_time->ViewValue = FormatDateTime($this->end_time->ViewValue, $this->end_time->formatPattern());
+        // is_all_day
+        if (ConvertToBool($this->is_all_day->CurrentValue)) {
+            $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+        } else {
+            $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+        }
 
         // created_by_user_id
         $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
@@ -1428,13 +1401,9 @@ class PatientAppointments extends DbTable
         $this->end_date->HrefValue = "";
         $this->end_date->TooltipValue = "";
 
-        // start_time
-        $this->start_time->HrefValue = "";
-        $this->start_time->TooltipValue = "";
-
-        // end_time
-        $this->end_time->HrefValue = "";
-        $this->end_time->TooltipValue = "";
+        // is_all_day
+        $this->is_all_day->HrefValue = "";
+        $this->is_all_day->TooltipValue = "";
 
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
@@ -1509,15 +1478,9 @@ class PatientAppointments extends DbTable
         $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
         $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
-        // start_time
-        $this->start_time->setupEditAttributes();
-        $this->start_time->EditValue = FormatDateTime($this->start_time->CurrentValue, $this->start_time->formatPattern());
-        $this->start_time->PlaceHolder = RemoveHtml($this->start_time->caption());
-
-        // end_time
-        $this->end_time->setupEditAttributes();
-        $this->end_time->EditValue = FormatDateTime($this->end_time->CurrentValue, $this->end_time->formatPattern());
-        $this->end_time->PlaceHolder = RemoveHtml($this->end_time->caption());
+        // is_all_day
+        $this->is_all_day->EditValue = $this->is_all_day->options(false);
+        $this->is_all_day->PlaceHolder = RemoveHtml($this->is_all_day->caption());
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
@@ -1572,8 +1535,7 @@ class PatientAppointments extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
-                    $doc->exportCaption($this->start_time);
-                    $doc->exportCaption($this->end_time);
+                    $doc->exportCaption($this->is_all_day);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1585,8 +1547,7 @@ class PatientAppointments extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
-                    $doc->exportCaption($this->start_time);
-                    $doc->exportCaption($this->end_time);
+                    $doc->exportCaption($this->is_all_day);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1623,8 +1584,7 @@ class PatientAppointments extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
-                        $doc->exportField($this->start_time);
-                        $doc->exportField($this->end_time);
+                        $doc->exportField($this->is_all_day);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
@@ -1636,8 +1596,7 @@ class PatientAppointments extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
-                        $doc->exportField($this->start_time);
-                        $doc->exportField($this->end_time);
+                        $doc->exportField($this->is_all_day);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);

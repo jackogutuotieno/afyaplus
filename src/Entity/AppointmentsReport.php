@@ -42,12 +42,6 @@ class AppointmentsReport extends AbstractEntity
     #[Column(name: "end_date", type: "date")]
     private DateTime $endDate;
 
-    #[Column(name: "start_time", type: "time", nullable: true)]
-    private ?DateTime $startTime;
-
-    #[Column(name: "end_time", type: "time", nullable: true)]
-    private ?DateTime $endTime;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -107,28 +101,6 @@ class AppointmentsReport extends AbstractEntity
     public function setEndDate(DateTime $value): static
     {
         $this->endDate = $value;
-        return $this;
-    }
-
-    public function getStartTime(): ?DateTime
-    {
-        return $this->startTime;
-    }
-
-    public function setStartTime(?DateTime $value): static
-    {
-        $this->startTime = $value;
-        return $this;
-    }
-
-    public function getEndTime(): ?DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function setEndTime(?DateTime $value): static
-    {
-        $this->endTime = $value;
         return $this;
     }
 

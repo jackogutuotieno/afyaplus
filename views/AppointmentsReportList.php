@@ -169,12 +169,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->end_date->Visible) { // end_date ?>
         <th data-name="end_date" class="<?= $Page->end_date->headerCellClass() ?>"><div id="elh_appointments_report_end_date" class="appointments_report_end_date"><?= $Page->renderFieldHeader($Page->end_date) ?></div></th>
 <?php } ?>
-<?php if ($Page->start_time->Visible) { // start_time ?>
-        <th data-name="start_time" class="<?= $Page->start_time->headerCellClass() ?>"><div id="elh_appointments_report_start_time" class="appointments_report_start_time"><?= $Page->renderFieldHeader($Page->start_time) ?></div></th>
-<?php } ?>
-<?php if ($Page->end_time->Visible) { // end_time ?>
-        <th data-name="end_time" class="<?= $Page->end_time->headerCellClass() ?>"><div id="elh_appointments_report_end_time" class="appointments_report_end_time"><?= $Page->renderFieldHeader($Page->end_time) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_appointments_report_date_created" class="appointments_report_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -250,22 +244,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_end_date" class="el_appointments_report_end_date">
 <span<?= $Page->end_date->viewAttributes() ?>>
 <?= $Page->end_date->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->start_time->Visible) { // start_time ?>
-        <td data-name="start_time"<?= $Page->start_time->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_start_time" class="el_appointments_report_start_time">
-<span<?= $Page->start_time->viewAttributes() ?>>
-<?= $Page->start_time->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->end_time->Visible) { // end_time ?>
-        <td data-name="end_time"<?= $Page->end_time->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_end_time" class="el_appointments_report_end_time">
-<span<?= $Page->end_time->viewAttributes() ?>>
-<?= $Page->end_time->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

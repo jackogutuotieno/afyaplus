@@ -71,11 +71,8 @@ $Page->showMessage();
 <?php if ($Page->end_date->Visible) { // end_date ?>
         <th class="<?= $Page->end_date->headerCellClass() ?>"><span id="elh_patient_appointments_end_date" class="patient_appointments_end_date"><?= $Page->end_date->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->start_time->Visible) { // start_time ?>
-        <th class="<?= $Page->start_time->headerCellClass() ?>"><span id="elh_patient_appointments_start_time" class="patient_appointments_start_time"><?= $Page->start_time->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->end_time->Visible) { // end_time ?>
-        <th class="<?= $Page->end_time->headerCellClass() ?>"><span id="elh_patient_appointments_end_time" class="patient_appointments_end_time"><?= $Page->end_time->caption() ?></span></th>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+        <th class="<?= $Page->is_all_day->headerCellClass() ?>"><span id="elh_patient_appointments_is_all_day" class="patient_appointments_is_all_day"><?= $Page->is_all_day->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_patient_appointments_created_by_user_id" class="patient_appointments_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
@@ -163,19 +160,15 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->start_time->Visible) { // start_time ?>
-        <td<?= $Page->start_time->cellAttributes() ?>>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+        <td<?= $Page->is_all_day->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->start_time->viewAttributes() ?>>
-<?= $Page->start_time->getViewValue() ?></span>
+<span<?= $Page->is_all_day->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_all_day_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_all_day->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_all_day->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_all_day_<?= $Page->RowCount ?>"></label>
+</div>
 </span>
-</td>
-<?php } ?>
-<?php if ($Page->end_time->Visible) { // end_time ?>
-        <td<?= $Page->end_time->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->end_time->viewAttributes() ?>>
-<?= $Page->end_time->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -128,24 +128,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->start_time->Visible) { // start_time ?>
-    <tr id="r_start_time"<?= $Page->start_time->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_appointments_start_time"><?= $Page->start_time->caption() ?></span></td>
-        <td data-name="start_time"<?= $Page->start_time->cellAttributes() ?>>
-<span id="el_patient_appointments_start_time">
-<span<?= $Page->start_time->viewAttributes() ?>>
-<?= $Page->start_time->getViewValue() ?></span>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+    <tr id="r_is_all_day"<?= $Page->is_all_day->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_appointments_is_all_day"><?= $Page->is_all_day->caption() ?></span></td>
+        <td data-name="is_all_day"<?= $Page->is_all_day->cellAttributes() ?>>
+<span id="el_patient_appointments_is_all_day">
+<span<?= $Page->is_all_day->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_all_day_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_all_day->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_all_day->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_all_day_<?= $Page->RowCount ?>"></label>
+</div>
 </span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->end_time->Visible) { // end_time ?>
-    <tr id="r_end_time"<?= $Page->end_time->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_appointments_end_time"><?= $Page->end_time->caption() ?></span></td>
-        <td data-name="end_time"<?= $Page->end_time->cellAttributes() ?>>
-<span id="el_patient_appointments_end_time">
-<span<?= $Page->end_time->viewAttributes() ?>>
-<?= $Page->end_time->getViewValue() ?></span>
 </span>
 </td>
     </tr>
