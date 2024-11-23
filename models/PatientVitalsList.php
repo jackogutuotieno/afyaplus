@@ -2326,7 +2326,7 @@ class PatientVitalsList extends PatientVitals
 
         // Drop down button for export
         $this->ExportOptions->UseButtonGroup = true;
-        $this->ExportOptions->UseDropDownButton = true;
+        $this->ExportOptions->UseDropDownButton = false;
         if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
             $this->ExportOptions->UseDropDownButton = true;
         }
