@@ -123,10 +123,12 @@ class PatientsDelete extends Patients
     {
         $this->id->setVisibility();
         $this->photo->Visible = false;
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
+        $this->patient_name->setVisibility();
+        $this->first_name->Visible = false;
+        $this->last_name->Visible = false;
         $this->national_id->setVisibility();
         $this->date_of_birth->setVisibility();
+        $this->age->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
@@ -619,10 +621,12 @@ class PatientsDelete extends Patients
         if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
             $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
         }
+        $this->patient_name->setDbValue($row['patient_name']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
@@ -642,10 +646,12 @@ class PatientsDelete extends Patients
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['photo'] = $this->photo->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['first_name'] = $this->first_name->DefaultValue;
         $row['last_name'] = $this->last_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
@@ -676,6 +682,8 @@ class PatientsDelete extends Patients
 
         // photo
 
+        // patient_name
+
         // first_name
 
         // last_name
@@ -683,6 +691,8 @@ class PatientsDelete extends Patients
         // national_id
 
         // date_of_birth
+
+        // age
 
         // gender
 
@@ -711,19 +721,19 @@ class PatientsDelete extends Patients
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // age
+            $this->age->ViewValue = $this->age->CurrentValue;
+            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
 
             // gender
             if (strval($this->gender->CurrentValue) != "") {
@@ -780,13 +790,9 @@ class PatientsDelete extends Patients
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
             // national_id
             $this->national_id->HrefValue = "";
@@ -795,6 +801,10 @@ class PatientsDelete extends Patients
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
             $this->date_of_birth->TooltipValue = "";
+
+            // age
+            $this->age->HrefValue = "";
+            $this->age->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";

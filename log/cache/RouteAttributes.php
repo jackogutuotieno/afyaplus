@@ -217,6 +217,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1303,6 +1308,31 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointmentsreportlist[/{id}]',
@@ -1510,6 +1540,11 @@
                 '/servicesubcategoriesview[/{id}]',
                 '/servicesubcategoriesedit[/{id}]',
                 '/servicesubcategoriesdelete[/{id}]',
+                '/subscriptionslist[/{Id}]',
+                '/subscriptionsadd[/{Id}]',
+                '/subscriptionsview[/{Id}]',
+                '/subscriptionsedit[/{Id}]',
+                '/subscriptionsdelete[/{Id}]',
                 '/userslist[/{id}]',
                 '/usersadd[/{id}]',
                 '/usersview[/{id}]',
@@ -1729,6 +1764,11 @@
                 'PHPMaker2024\\afyaplus\\ServiceSubcategoriesController:view',
                 'PHPMaker2024\\afyaplus\\ServiceSubcategoriesController:edit',
                 'PHPMaker2024\\afyaplus\\ServiceSubcategoriesController:delete',
+                'PHPMaker2024\\afyaplus\\SubscriptionsController:list',
+                'PHPMaker2024\\afyaplus\\SubscriptionsController:add',
+                'PHPMaker2024\\afyaplus\\SubscriptionsController:view',
+                'PHPMaker2024\\afyaplus\\SubscriptionsController:edit',
+                'PHPMaker2024\\afyaplus\\SubscriptionsController:delete',
                 'PHPMaker2024\\afyaplus\\UsersController:list',
                 'PHPMaker2024\\afyaplus\\UsersController:add',
                 'PHPMaker2024\\afyaplus\\UsersController:view',
@@ -2392,6 +2432,21 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'list.appointments_report',
@@ -2599,6 +2654,11 @@
                 'view.service_subcategories',
                 'edit.service_subcategories',
                 'delete.service_subcategories',
+                'list.subscriptions',
+                'add.subscriptions',
+                'view.subscriptions',
+                'edit.subscriptions',
+                'delete.subscriptions',
                 'list.users',
                 'add.users',
                 'view.users',
@@ -2613,6 +2673,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3051,6 +3116,11 @@
         $o[214],
         $o[215],
         $o[216],
+        $o[217],
+        $o[218],
+        $o[219],
+        $o[220],
+        $o[221],
     ],
     []
 );

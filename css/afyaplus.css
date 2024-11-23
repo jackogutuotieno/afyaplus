@@ -20574,4 +20574,8 @@ td button, .btn-primary {
   color: #fff !important;
 }
 
+.users_photo {
+  border-radius: 50%;
+}
+
 /*END_USER_STYLES*/

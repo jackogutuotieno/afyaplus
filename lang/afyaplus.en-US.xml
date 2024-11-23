@@ -2,12 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="106">
-      <phrase id="menutext" value="laboratoryreports" />
-    </menu>
-    <menu id="107">
-      <phrase id="menutext" value="radiologyreportsdetails" />
-    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -22,6 +16,9 @@
     </menu>
     <menu id="105">
       <phrase id="menutext" value="Export Log" />
+    </menu>
+    <menu id="108">
+      <phrase id="menutext" value="Notifications" />
     </menu>
     <menu id="49">
       <phrase id="menutext" value="Human Resources" />
@@ -175,6 +172,12 @@
     </menu>
     <menu id="46">
       <phrase id="menutext" value="Vitals" />
+    </menu>
+    <menu id="106">
+      <phrase id="menutext" value="Laboratory" />
+    </menu>
+    <menu id="107">
+      <phrase id="menutext" value="Radiology" />
     </menu>
     <menu id="41">
       <phrase id="menutext" value="laboratory billing" />
@@ -960,7 +963,7 @@
       </field>
     </table>
     <table id="patient_visits">
-      <phrase id="tblcaption" value="patient visits" />
+      <phrase id="tblcaption" value="Visits" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -1036,6 +1039,9 @@
       <field id="photo">
         <phrase id="fldcaption" value="Photo" />
       </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="Name" />
+      </field>
       <field id="first_name">
         <phrase id="fldcaption" value="First Name" />
       </field>
@@ -1047,6 +1053,9 @@
       </field>
       <field id="date_of_birth">
         <phrase id="fldcaption" value="Date of Birth" />
+      </field>
+      <field id="age">
+        <phrase id="fldcaption" value="Age" />
       </field>
       <field id="gender">
         <phrase id="fldcaption" value="Gender" />
@@ -1541,6 +1550,8 @@
         <phrase id="fldtagcaption3" value="Default" />
         <phrase id="fldtagvalue4" value="1" />
         <phrase id="fldtagcaption4" value="Receptionist" />
+        <phrase id="fldtagvalue5" value="2" />
+        <phrase id="fldtagcaption5" value="Doctor" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="is verified" />
@@ -1671,6 +1682,27 @@
       </field>
       <field id="__request">
         <phrase id="fldcaption" value="Request" />
+      </field>
+    </table>
+    <table id="subscriptions">
+      <phrase id="tblcaption" value="subscriptions" />
+      <field id="id">
+        <phrase id="fldcaption" value="Id" />
+      </field>
+      <field id="user">
+        <phrase id="fldcaption" value="User" />
+      </field>
+      <field id="endpoint">
+        <phrase id="fldcaption" value="Endpoint" />
+      </field>
+      <field id="publickey">
+        <phrase id="fldcaption" value="Public Key" />
+      </field>
+      <field id="authenticationtoken">
+        <phrase id="fldcaption" value="Authentication Token" />
+      </field>
+      <field id="contentencoding">
+        <phrase id="fldcaption" value="Content Encoding" />
       </field>
     </table>
   </project>

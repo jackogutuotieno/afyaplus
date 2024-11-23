@@ -160,6 +160,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_users_id" class="users_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
+<?php if ($Page->photo->Visible) { // photo ?>
+        <th data-name="photo" class="<?= $Page->photo->headerCellClass() ?>"><div id="elh_users_photo" class="users_photo"><?= $Page->renderFieldHeader($Page->photo) ?></div></th>
+<?php } ?>
 <?php if ($Page->full_name->Visible) { // full_name ?>
         <th data-name="full_name" class="<?= $Page->full_name->headerCellClass() ?>"><div id="elh_users_full_name" class="users_full_name"><?= $Page->renderFieldHeader($Page->full_name) ?></div></th>
 <?php } ?>
@@ -229,6 +232,15 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_id" class="el_users_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->photo->Visible) { // photo ?>
+        <td data-name="photo"<?= $Page->photo->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_photo" class="el_users_photo">
+<span>
+<?= GetFileViewTag($Page->photo, $Page->photo->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>

@@ -129,6 +129,7 @@ return [
     "visit_types" => \DI\create(VisitTypes::class),
     "vitalsreport" => \DI\create(Vitalsreport::class),
     "exportlog" => \DI\create(Exportlog::class),
+    "subscriptions" => \DI\create(Subscriptions::class),
 
     // User table
     "usertable" => \DI\get("users"),

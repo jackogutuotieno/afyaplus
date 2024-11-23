@@ -931,14 +931,6 @@ class UsersView extends Users
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // photo
-            if (!EmptyValue($this->photo->Upload->DbValue)) {
-                $this->photo->ViewValue = $this->id->CurrentValue;
-                $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
-            } else {
-                $this->photo->ViewValue = "";
-            }
-
             // full_name
             $this->full_name->ViewValue = $this->full_name->CurrentValue;
 
@@ -1039,22 +1031,6 @@ class UsersView extends Users
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // photo
-            if (!empty($this->photo->Upload->DbValue)) {
-                $this->photo->HrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-                $this->photo->LinkAttrs["target"] = "";
-                if ($this->photo->IsBlobImage && empty($this->photo->LinkAttrs["target"])) {
-                    $this->photo->LinkAttrs["target"] = "_blank";
-                }
-                if ($this->isExport()) {
-                    $this->photo->HrefValue = FullUrl($this->photo->HrefValue, "href");
-                }
-            } else {
-                $this->photo->HrefValue = "";
-            }
-            $this->photo->ExportHrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-            $this->photo->TooltipValue = "";
 
             // full_name
             $this->full_name->HrefValue = "";

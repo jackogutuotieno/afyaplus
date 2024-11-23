@@ -7012,6 +7012,10 @@ function SetupLoginStatus()
     $LoginStatus["personalDataUrl"] = $personalDataUrl;
     $LoginStatus["personalDataText"] = $Language->phrase("PersonalDataBtn");
 
+    // Notifications
+    $LoginStatus["canSubscribe"] = Config("PUSH_ANONYMOUS") && !IsLoggedIn() || IsloggedIn() && !IsSysAdmin();
+    $LoginStatus["subscribeText"] = $Language->phrase("Notifications");
+
     // Dispatch login status event and return the event
     return DispatchEvent($LoginStatus, LoginStatusEvent::NAME);
 }

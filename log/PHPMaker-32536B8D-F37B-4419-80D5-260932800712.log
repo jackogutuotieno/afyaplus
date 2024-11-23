@@ -51,6 +51,7 @@ C:\wamp64\www\afyaplus\controllers\RolesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceSubcategoriesController.php
+C:\wamp64\www\afyaplus\controllers\SubscriptionsController.php
 C:\wamp64\www\afyaplus\controllers\UsersController.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsreportController.php
 C:\wamp64\www\afyaplus\controllers\VisitTypesController.php
@@ -227,6 +228,7 @@ C:\wamp64\www\afyaplus\models\PatientVisits.php
 C:\wamp64\www\afyaplus\models\PatientVisitsAdd.php
 C:\wamp64\www\afyaplus\models\PatientVisitsDelete.php
 C:\wamp64\www\afyaplus\models\PatientVisitsEdit.php
+C:\wamp64\www\afyaplus\models\PatientVisitsGrid.php
 C:\wamp64\www\afyaplus\models\PatientVisitsList.php
 C:\wamp64\www\afyaplus\models\PatientVisitsView.php
 C:\wamp64\www\afyaplus\models\PatientVitals.php
@@ -315,6 +317,12 @@ C:\wamp64\www\afyaplus\models\ServiceSubcategoriesDelete.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesEdit.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesList.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesView.php
+C:\wamp64\www\afyaplus\models\Subscriptions.php
+C:\wamp64\www\afyaplus\models\SubscriptionsAdd.php
+C:\wamp64\www\afyaplus\models\SubscriptionsDelete.php
+C:\wamp64\www\afyaplus\models\SubscriptionsEdit.php
+C:\wamp64\www\afyaplus\models\SubscriptionsList.php
+C:\wamp64\www\afyaplus\models\SubscriptionsView.php
 C:\wamp64\www\afyaplus\models\Users.php
 C:\wamp64\www\afyaplus\models\UsersAdd.php
 C:\wamp64\www\afyaplus\models\UsersDelete.php
@@ -425,6 +433,7 @@ C:\wamp64\www\afyaplus\src\Entity\Role.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceSubcategory.php
+C:\wamp64\www\afyaplus\src\Entity\Subscription.php
 C:\wamp64\www\afyaplus\src\Entity\User.php
 C:\wamp64\www\afyaplus\src\Entity\Vaccinationsreport.php
 C:\wamp64\www\afyaplus\src\Entity\VisitType.php
@@ -516,6 +525,7 @@ C:\wamp64\www\afyaplus\src\phpfn.php
 C:\wamp64\www\afyaplus\src\routes.php
 C:\wamp64\www\afyaplus\src\userfn.php
 C:\wamp64\www\afyaplus\src\userlevelsettings.php
+C:\wamp64\www\afyaplus\sw.js
 C:\wamp64\www\afyaplus\views\AppointmentsReportList.php
 C:\wamp64\www\afyaplus\views\ChangePassword.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php
@@ -647,6 +657,7 @@ C:\wamp64\www\afyaplus\views\PatientVaccinationsView.php
 C:\wamp64\www\afyaplus\views\PatientVisitsAdd.php
 C:\wamp64\www\afyaplus\views\PatientVisitsDelete.php
 C:\wamp64\www\afyaplus\views\PatientVisitsEdit.php
+C:\wamp64\www\afyaplus\views\PatientVisitsGrid.php
 C:\wamp64\www\afyaplus\views\PatientVisitsList.php
 C:\wamp64\www\afyaplus\views\PatientVisitsView.php
 C:\wamp64\www\afyaplus\views\PatientVitalsAdd.php
@@ -658,6 +669,7 @@ C:\wamp64\www\afyaplus\views\PatientsAdd.php
 C:\wamp64\www\afyaplus\views\PatientsDelete.php
 C:\wamp64\www\afyaplus\views\PatientsEdit.php
 C:\wamp64\www\afyaplus\views\PatientsList.php
+C:\wamp64\www\afyaplus\views\PatientsMaster.php
 C:\wamp64\www\afyaplus\views\PatientsReportList.php
 C:\wamp64\www\afyaplus\views\PatientsView.php
 C:\wamp64\www\afyaplus\views\PatientsvisitsreportList.php
@@ -719,6 +731,11 @@ C:\wamp64\www\afyaplus\views\ServiceSubcategoriesDelete.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesEdit.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesList.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesView.php
+C:\wamp64\www\afyaplus\views\SubscriptionsAdd.php
+C:\wamp64\www\afyaplus\views\SubscriptionsDelete.php
+C:\wamp64\www\afyaplus\views\SubscriptionsEdit.php
+C:\wamp64\www\afyaplus\views\SubscriptionsList.php
+C:\wamp64\www\afyaplus\views\SubscriptionsView.php
 C:\wamp64\www\afyaplus\views\UsersAdd.php
 C:\wamp64\www\afyaplus\views\UsersDelete.php
 C:\wamp64\www\afyaplus\views\UsersEdit.php
@@ -734,5 +751,6 @@ C:\wamp64\www\afyaplus\views\VitalsreportList.php
 C:\wamp64\www\afyaplus\views\email.php
 C:\wamp64\www\afyaplus\views\layout.php
 C:\wamp64\www\afyaplus\views\menu.php
+C:\wamp64\www\afyaplus\views\pushnotification.php
 C:\wamp64\www\afyaplus\views\swagger.php
 C:\wamp64\www\afyaplus\web.config

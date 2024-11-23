@@ -1045,6 +1045,10 @@ class UsersAdd extends Users
 
             // photo
             if (!EmptyValue($this->photo->Upload->DbValue)) {
+                $this->photo->ImageWidth = 50;
+                $this->photo->ImageHeight = 50;
+                $this->photo->ImageAlt = $this->photo->alt();
+                $this->photo->ImageCssClass = "ew-image";
                 $this->photo->ViewValue = $this->id->CurrentValue;
                 $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
             } else {
@@ -1230,6 +1234,10 @@ class UsersAdd extends Users
             // photo
             $this->photo->setupEditAttributes();
             if (!EmptyValue($this->photo->Upload->DbValue)) {
+                $this->photo->ImageWidth = 50;
+                $this->photo->ImageHeight = 50;
+                $this->photo->ImageAlt = $this->photo->alt();
+                $this->photo->ImageCssClass = "ew-image";
                 $this->photo->EditValue = $this->id->CurrentValue;
                 $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
             } else {

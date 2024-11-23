@@ -62,18 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->photo->Visible) { // photo ?>
-    <tr id="r_photo"<?= $Page->photo->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_photo"><?= $Page->photo->caption() ?></span></td>
-        <td data-name="photo"<?= $Page->photo->cellAttributes() ?>>
-<span id="el_users_photo">
-<span<?= $Page->photo->viewAttributes() ?>>
-<?= GetFileViewTag($Page->photo, $Page->photo->getViewValue(), false) ?>
-</span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->full_name->Visible) { // full_name ?>
     <tr id="r_full_name"<?= $Page->full_name->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_full_name"><?= $Page->full_name->caption() ?></span></td>

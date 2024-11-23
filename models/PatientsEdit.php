@@ -123,10 +123,12 @@ class PatientsEdit extends Patients
     {
         $this->id->setVisibility();
         $this->photo->setVisibility();
+        $this->patient_name->Visible = false;
         $this->first_name->setVisibility();
         $this->last_name->setVisibility();
         $this->national_id->setVisibility();
         $this->date_of_birth->setVisibility();
+        $this->age->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
@@ -610,6 +612,9 @@ class PatientsEdit extends Patients
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -636,9 +641,16 @@ class PatientsEdit extends Patients
                         $this->terminate("patientslist"); // No matching record, return to list
                         return;
                     }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "patientslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -677,6 +689,9 @@ class PatientsEdit extends Patients
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -771,6 +786,16 @@ class PatientsEdit extends Patients
                 $this->date_of_birth->setFormValue($val, true, $validate);
             }
             $this->date_of_birth->CurrentValue = UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
+        }
+
+        // Check field name 'age' first before field var 'x_age'
+        $val = $CurrentForm->hasValue("age") ? $CurrentForm->getValue("age") : $CurrentForm->getValue("x_age");
+        if (!$this->age->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->age->Visible = false; // Disable update for API request
+            } else {
+                $this->age->setFormValue($val, true, $validate);
+            }
         }
 
         // Check field name 'gender' first before field var 'x_gender'
@@ -875,6 +900,7 @@ class PatientsEdit extends Patients
         $this->national_id->CurrentValue = $this->national_id->FormValue;
         $this->date_of_birth->CurrentValue = $this->date_of_birth->FormValue;
         $this->date_of_birth->CurrentValue = UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
+        $this->age->CurrentValue = $this->age->FormValue;
         $this->gender->CurrentValue = $this->gender->FormValue;
         $this->phone->CurrentValue = $this->phone->FormValue;
         $this->email_address->CurrentValue = $this->email_address->FormValue;
@@ -929,10 +955,12 @@ class PatientsEdit extends Patients
         if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
             $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
         }
+        $this->patient_name->setDbValue($row['patient_name']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
@@ -952,10 +980,12 @@ class PatientsEdit extends Patients
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['photo'] = $this->photo->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['first_name'] = $this->first_name->DefaultValue;
         $row['last_name'] = $this->last_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
@@ -1007,6 +1037,9 @@ class PatientsEdit extends Patients
         // photo
         $this->photo->RowCssClass = "row";
 
+        // patient_name
+        $this->patient_name->RowCssClass = "row";
+
         // first_name
         $this->first_name->RowCssClass = "row";
 
@@ -1018,6 +1051,9 @@ class PatientsEdit extends Patients
 
         // date_of_birth
         $this->date_of_birth->RowCssClass = "row";
+
+        // age
+        $this->age->RowCssClass = "row";
 
         // gender
         $this->gender->RowCssClass = "row";
@@ -1065,6 +1101,9 @@ class PatientsEdit extends Patients
                 $this->photo->ViewValue = "";
             }
 
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
             // first_name
             $this->first_name->ViewValue = $this->first_name->CurrentValue;
 
@@ -1073,11 +1112,14 @@ class PatientsEdit extends Patients
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // age
+            $this->age->ViewValue = $this->age->CurrentValue;
+            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
 
             // gender
             if (strval($this->gender->CurrentValue) != "") {
@@ -1160,6 +1202,9 @@ class PatientsEdit extends Patients
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
 
+            // age
+            $this->age->HrefValue = "";
+
             // gender
             $this->gender->HrefValue = "";
 
@@ -1240,13 +1285,21 @@ class PatientsEdit extends Patients
             $this->national_id->EditValue = $this->national_id->CurrentValue;
             $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
             if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
-                $this->national_id->EditValue = FormatNumber($this->national_id->EditValue, null);
+                $this->national_id->EditValue = $this->national_id->EditValue;
             }
 
             // date_of_birth
             $this->date_of_birth->setupEditAttributes();
             $this->date_of_birth->EditValue = HtmlEncode(FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern()));
             $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
+
+            // age
+            $this->age->setupEditAttributes();
+            $this->age->EditValue = $this->age->CurrentValue;
+            $this->age->PlaceHolder = RemoveHtml($this->age->caption());
+            if (strval($this->age->EditValue) != "" && is_numeric($this->age->EditValue)) {
+                $this->age->EditValue = FormatNumber($this->age->EditValue, null);
+            }
 
             // gender
             $this->gender->EditValue = $this->gender->options(false);
@@ -1335,6 +1388,9 @@ class PatientsEdit extends Patients
 
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
+
+            // age
+            $this->age->HrefValue = "";
 
             // gender
             $this->gender->HrefValue = "";
@@ -1435,6 +1491,14 @@ class PatientsEdit extends Patients
             if (!CheckDate($this->date_of_birth->FormValue, $this->date_of_birth->formatPattern())) {
                 $this->date_of_birth->addErrorMessage($this->date_of_birth->getErrorMessage(false));
             }
+            if ($this->age->Visible && $this->age->Required) {
+                if (!$this->age->IsDetailKey && EmptyValue($this->age->FormValue)) {
+                    $this->age->addErrorMessage(str_replace("%s", $this->age->caption(), $this->age->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->age->FormValue)) {
+                $this->age->addErrorMessage($this->age->getErrorMessage(false));
+            }
             if ($this->gender->Visible && $this->gender->Required) {
                 if ($this->gender->FormValue == "") {
                     $this->gender->addErrorMessage(str_replace("%s", $this->gender->caption(), $this->gender->RequiredErrorMessage));
@@ -1481,6 +1545,14 @@ class PatientsEdit extends Patients
                 }
             }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PatientVisitsGrid");
+        if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1519,6 +1591,11 @@ class PatientsEdit extends Patients
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -1532,6 +1609,32 @@ class PatientsEdit extends Patients
                 $editRow = true; // No field to update
             }
             if ($editRow) {
+            }
+
+            // Update detail records
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("PatientVisitsGrid");
+            if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+
+            // Commit/Rollback transaction
+            if ($this->getCurrentDetailTable() != "") {
+                if ($editRow) {
+                    if ($this->UseTransaction) { // Commit transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->commit();
+                        }
+                    }
+                } else {
+                    if ($this->UseTransaction) { // Rollback transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->rollback();
+                        }
+                    }
+                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1590,6 +1693,9 @@ class PatientsEdit extends Patients
         // date_of_birth
         $this->date_of_birth->setDbValueDef($rsnew, UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern()), $this->date_of_birth->ReadOnly);
 
+        // age
+        $this->age->setDbValueDef($rsnew, $this->age->CurrentValue, $this->age->ReadOnly);
+
         // gender
         $this->gender->setDbValueDef($rsnew, $this->gender->CurrentValue, $this->gender->ReadOnly);
 
@@ -1640,6 +1746,9 @@ class PatientsEdit extends Patients
         if (isset($row['date_of_birth'])) { // date_of_birth
             $this->date_of_birth->CurrentValue = $row['date_of_birth'];
         }
+        if (isset($row['age'])) { // age
+            $this->age->CurrentValue = $row['age'];
+        }
         if (isset($row['gender'])) { // gender
             $this->gender->CurrentValue = $row['gender'];
         }
@@ -1666,6 +1775,36 @@ class PatientsEdit extends Patients
         }
         if (isset($row['marital_status'])) { // marital_status
             $this->marital_status->CurrentValue = $row['marital_status'];
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("patient_visits", $detailTblVar)) {
+                $detailPageObj = Container("PatientVisitsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
         }
     }
 

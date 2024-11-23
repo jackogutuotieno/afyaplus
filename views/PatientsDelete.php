@@ -53,17 +53,17 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_patients_id" class="patients_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th class="<?= $Page->first_name->headerCellClass() ?>"><span id="elh_patients_first_name" class="patients_first_name"><?= $Page->first_name->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th class="<?= $Page->last_name->headerCellClass() ?>"><span id="elh_patients_last_name" class="patients_last_name"><?= $Page->last_name->caption() ?></span></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th class="<?= $Page->patient_name->headerCellClass() ?>"><span id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->patient_name->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->national_id->Visible) { // national_id ?>
         <th class="<?= $Page->national_id->headerCellClass() ?>"><span id="elh_patients_national_id" class="patients_national_id"><?= $Page->national_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
         <th class="<?= $Page->date_of_birth->headerCellClass() ?>"><span id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->date_of_birth->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+        <th class="<?= $Page->age->headerCellClass() ?>"><span id="elh_patients_age" class="patients_age"><?= $Page->age->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th class="<?= $Page->gender->headerCellClass() ?>"><span id="elh_patients_gender" class="patients_gender"><?= $Page->gender->caption() ?></span></th>
@@ -127,19 +127,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <td<?= $Page->first_name->cellAttributes() ?>>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td<?= $Page->patient_name->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <td<?= $Page->last_name->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -156,6 +148,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_of_birth->viewAttributes() ?>>
 <?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+        <td<?= $Page->age->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->age->viewAttributes() ?>>
+<?= $Page->age->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

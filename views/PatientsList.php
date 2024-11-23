@@ -160,17 +160,17 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patients_id" class="patients_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_patients_first_name" class="patients_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_patients_last_name" class="patients_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->national_id->Visible) { // national_id ?>
         <th data-name="national_id" class="<?= $Page->national_id->headerCellClass() ?>"><div id="elh_patients_national_id" class="patients_national_id"><?= $Page->renderFieldHeader($Page->national_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
         <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+        <th data-name="age" class="<?= $Page->age->headerCellClass() ?>"><div id="elh_patients_age" class="patients_age"><?= $Page->renderFieldHeader($Page->age) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_patients_gender" class="patients_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
@@ -241,19 +241,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_first_name" class="el_patients_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->last_name->Visible) { // last_name ?>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_last_name" class="el_patients_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+    <?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_patient_name" class="el_patients_patient_name">
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -270,6 +262,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_of_birth" class="el_patients_date_of_birth">
 <span<?= $Page->date_of_birth->viewAttributes() ?>>
 <?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->age->Visible) { // age ?>
+        <td data-name="age"<?= $Page->age->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_age" class="el_patients_age">
+<span<?= $Page->age->viewAttributes() ?>>
+<?= $Page->age->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -27,6 +27,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["last_name", [fields.last_name.visible && fields.last_name.required ? ew.Validators.required(fields.last_name.caption) : null], fields.last_name.isInvalid],
             ["national_id", [fields.national_id.visible && fields.national_id.required ? ew.Validators.required(fields.national_id.caption) : null, ew.Validators.integer], fields.national_id.isInvalid],
             ["date_of_birth", [fields.date_of_birth.visible && fields.date_of_birth.required ? ew.Validators.required(fields.date_of_birth.caption) : null, ew.Validators.datetime(fields.date_of_birth.clientFormatPattern)], fields.date_of_birth.isInvalid],
+            ["age", [fields.age.visible && fields.age.required ? ew.Validators.required(fields.age.caption) : null, ew.Validators.integer], fields.age.isInvalid],
             ["gender", [fields.gender.visible && fields.gender.required ? ew.Validators.required(fields.gender.caption) : null], fields.gender.isInvalid],
             ["phone", [fields.phone.visible && fields.phone.required ? ew.Validators.required(fields.phone.caption) : null], fields.phone.isInvalid],
             ["email_address", [fields.email_address.visible && fields.email_address.required ? ew.Validators.required(fields.email_address.caption) : null], fields.email_address.isInvalid],
@@ -192,6 +193,18 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+    <div id="r_age"<?= $Page->age->rowAttributes() ?>>
+        <label id="elh_patients_age" for="x_age" class="<?= $Page->LeftColumnClass ?>"><?= $Page->age->caption() ?><?= $Page->age->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->age->cellAttributes() ?>>
+<span id="el_patients_age">
+<input type="<?= $Page->age->getInputTextType() ?>" name="x_age" id="x_age" data-table="patients" data-field="x_age" value="<?= $Page->age->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->age->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->age->formatPattern()) ?>"<?= $Page->age->editAttributes() ?> aria-describedby="x_age_help">
+<?= $Page->age->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->age->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -429,6 +442,14 @@ loadjs.ready("fpatientsadd", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("patient_visits", explode(",", $Page->getCurrentDetailTable())) && $patient_visits->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_visits", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientVisitsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatientsadd"><?= $Language->phrase("AddBtn") ?></button>

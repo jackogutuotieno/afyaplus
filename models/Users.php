@@ -151,7 +151,7 @@ class Users extends DbTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'FILE' // Edit Tag
         );
         $this->photo->InputTextType = "text";
@@ -471,7 +471,7 @@ class Users extends DbTable
         $this->user_role_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->user_role_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->user_role_id->OptionCount = 4;
+        $this->user_role_id->OptionCount = 5;
         $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_role_id'] = &$this->user_role_id;
@@ -1559,6 +1559,10 @@ class Users extends DbTable
 
         // photo
         if (!EmptyValue($this->photo->Upload->DbValue)) {
+            $this->photo->ImageWidth = 50;
+            $this->photo->ImageHeight = 50;
+            $this->photo->ImageAlt = $this->photo->alt();
+            $this->photo->ImageCssClass = "ew-image";
             $this->photo->ViewValue = $this->id->CurrentValue;
             $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
         } else {
@@ -1690,6 +1694,13 @@ class Users extends DbTable
         }
         $this->photo->ExportHrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
         $this->photo->TooltipValue = "";
+        if ($this->photo->UseColorbox) {
+            if (EmptyValue($this->photo->TooltipValue)) {
+                $this->photo->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->photo->LinkAttrs["data-rel"] = "users_x_photo";
+            $this->photo->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // full_name
         $this->full_name->HrefValue = "";
@@ -1793,6 +1804,10 @@ class Users extends DbTable
         // photo
         $this->photo->setupEditAttributes();
         if (!EmptyValue($this->photo->Upload->DbValue)) {
+            $this->photo->ImageWidth = 50;
+            $this->photo->ImageHeight = 50;
+            $this->photo->ImageAlt = $this->photo->alt();
+            $this->photo->ImageCssClass = "ew-image";
             $this->photo->EditValue = $this->id->CurrentValue;
             $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
         } else {
@@ -1924,7 +1939,6 @@ class Users extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->photo);
                     $doc->exportCaption($this->full_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->gender);
@@ -1979,7 +1993,6 @@ class Users extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->photo);
                         $doc->exportField($this->full_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->gender);

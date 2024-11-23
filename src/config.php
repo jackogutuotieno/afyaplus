@@ -405,6 +405,21 @@ $CONFIG = [
     "EXPORT_LOG_ARCHIVE_PREFIX" => "export", // Export log archive prefix
     "LOG_ALL_EXPORT_REQUESTS" => false, // Log all export requests
 
+    // Push Notification keys
+    "PUSH_SERVER_PUBLIC_KEY" => "BO9T6fw3iOr0BLwUNbG71rYCDJECCnkhgUnxvdDmwD8xYANVwe5NtqKWnphJo6rpv8dqe2DD2IVju_OTwPYZ-hg", // Public Key
+    "PUSH_SERVER_PRIVATE_KEY" => "aRR2WL1km3tlo3mCdBRGW0AFPwU80ZuP2Hy4noIrq2A", // Private Key
+    // Subscription table for Push Notification
+    "SUBSCRIPTION_DBID" => "DB", // Subscription DBID
+    "SUBSCRIPTION_TABLE" => "subscriptions", // Subscription table
+    "SUBSCRIPTION_TABLE_NAME" => "subscriptions", // Subscription table name
+    "SUBSCRIPTION_TABLE_VAR" => "subscriptions", // Subscription table var
+    "SUBSCRIPTION_FIELD_NAME_ID" => "Id", // Subscription Id field name
+    "SUBSCRIPTION_FIELD_NAME_USER" => "User", // Subscription User field name
+    "SUBSCRIPTION_FIELD_NAME_ENDPOINT" => "Endpoint", // Subscription Endpoint field name
+    "SUBSCRIPTION_FIELD_NAME_PUBLIC_KEY" => "PublicKey", // Subscription Public Key field name
+    "SUBSCRIPTION_FIELD_NAME_AUTH_TOKEN" => "AuthenticationToken", // Subscription Auth Token field name
+    "SUBSCRIPTION_FIELD_NAME_CONTENT_ENCODING" => "ContentEncoding", // Subscription Content Encoding field name
+
     // Security
     "CSRF_PREFIX" => "csrf",
     "ENCRYPTION_ENABLED" => false, // Encryption enabled
