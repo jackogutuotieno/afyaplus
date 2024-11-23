@@ -136,8 +136,8 @@ class PatientsAdd extends Patients
         $this->next_of_kin->setVisibility();
         $this->next_of_kin_phone->setVisibility();
         $this->marital_status->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -516,6 +516,12 @@ class PatientsAdd extends Patients
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->employment_status);
+        $this->setupLookupOptions($this->religion);
+        $this->setupLookupOptions($this->marital_status);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -805,28 +811,6 @@ class PatientsAdd extends Patients
             }
         }
 
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         $this->getUploadFiles(); // Get upload files
@@ -850,10 +834,6 @@ class PatientsAdd extends Patients
         $this->next_of_kin->CurrentValue = $this->next_of_kin->FormValue;
         $this->next_of_kin_phone->CurrentValue = $this->next_of_kin_phone->FormValue;
         $this->marital_status->CurrentValue = $this->marital_status->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1050,7 +1030,11 @@ class PatientsAdd extends Patients
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
             // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
+            if (strval($this->gender->CurrentValue) != "") {
+                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+            } else {
+                $this->gender->ViewValue = null;
+            }
 
             // phone
             $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -1062,10 +1046,18 @@ class PatientsAdd extends Patients
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
             // employment_status
-            $this->employment_status->ViewValue = $this->employment_status->CurrentValue;
+            if (strval($this->employment_status->CurrentValue) != "") {
+                $this->employment_status->ViewValue = $this->employment_status->optionCaption($this->employment_status->CurrentValue);
+            } else {
+                $this->employment_status->ViewValue = null;
+            }
 
             // religion
-            $this->religion->ViewValue = $this->religion->CurrentValue;
+            if (strval($this->religion->CurrentValue) != "") {
+                $this->religion->ViewValue = $this->religion->optionCaption($this->religion->CurrentValue);
+            } else {
+                $this->religion->ViewValue = null;
+            }
 
             // next_of_kin
             $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
@@ -1074,7 +1066,11 @@ class PatientsAdd extends Patients
             $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
 
             // marital_status
-            $this->marital_status->ViewValue = $this->marital_status->CurrentValue;
+            if (strval($this->marital_status->CurrentValue) != "") {
+                $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
+            } else {
+                $this->marital_status->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1115,10 +1111,26 @@ class PatientsAdd extends Patients
             $this->gender->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
@@ -1137,12 +1149,6 @@ class PatientsAdd extends Patients
 
             // marital_status
             $this->marital_status->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // photo
             $this->photo->setupEditAttributes();
@@ -1189,11 +1195,7 @@ class PatientsAdd extends Patients
             $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
 
             // gender
-            $this->gender->setupEditAttributes();
-            if (!$this->gender->Raw) {
-                $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
-            }
-            $this->gender->EditValue = HtmlEncode($this->gender->CurrentValue);
+            $this->gender->EditValue = $this->gender->options(false);
             $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
             // phone
@@ -1214,26 +1216,17 @@ class PatientsAdd extends Patients
 
             // physical_address
             $this->physical_address->setupEditAttributes();
-            if (!$this->physical_address->Raw) {
-                $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-            }
             $this->physical_address->EditValue = HtmlEncode($this->physical_address->CurrentValue);
             $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
 
             // employment_status
             $this->employment_status->setupEditAttributes();
-            if (!$this->employment_status->Raw) {
-                $this->employment_status->CurrentValue = HtmlDecode($this->employment_status->CurrentValue);
-            }
-            $this->employment_status->EditValue = HtmlEncode($this->employment_status->CurrentValue);
+            $this->employment_status->EditValue = $this->employment_status->options(true);
             $this->employment_status->PlaceHolder = RemoveHtml($this->employment_status->caption());
 
             // religion
             $this->religion->setupEditAttributes();
-            if (!$this->religion->Raw) {
-                $this->religion->CurrentValue = HtmlDecode($this->religion->CurrentValue);
-            }
-            $this->religion->EditValue = HtmlEncode($this->religion->CurrentValue);
+            $this->religion->EditValue = $this->religion->options(true);
             $this->religion->PlaceHolder = RemoveHtml($this->religion->caption());
 
             // next_of_kin
@@ -1254,21 +1247,8 @@ class PatientsAdd extends Patients
 
             // marital_status
             $this->marital_status->setupEditAttributes();
-            if (!$this->marital_status->Raw) {
-                $this->marital_status->CurrentValue = HtmlDecode($this->marital_status->CurrentValue);
-            }
-            $this->marital_status->EditValue = HtmlEncode($this->marital_status->CurrentValue);
+            $this->marital_status->EditValue = $this->marital_status->options(true);
             $this->marital_status->PlaceHolder = RemoveHtml($this->marital_status->caption());
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
@@ -1303,10 +1283,26 @@ class PatientsAdd extends Patients
             $this->gender->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
@@ -1325,12 +1321,6 @@ class PatientsAdd extends Patients
 
             // marital_status
             $this->marital_status->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1384,7 +1374,7 @@ class PatientsAdd extends Patients
                 $this->date_of_birth->addErrorMessage($this->date_of_birth->getErrorMessage(false));
             }
             if ($this->gender->Visible && $this->gender->Required) {
-                if (!$this->gender->IsDetailKey && EmptyValue($this->gender->FormValue)) {
+                if ($this->gender->FormValue == "") {
                     $this->gender->addErrorMessage(str_replace("%s", $this->gender->caption(), $this->gender->RequiredErrorMessage));
                 }
             }
@@ -1427,22 +1417,6 @@ class PatientsAdd extends Patients
                 if (!$this->marital_status->IsDetailKey && EmptyValue($this->marital_status->FormValue)) {
                     $this->marital_status->addErrorMessage(str_replace("%s", $this->marital_status->caption(), $this->marital_status->RequiredErrorMessage));
                 }
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1562,12 +1536,6 @@ class PatientsAdd extends Patients
 
         // marital_status
         $this->marital_status->setDbValueDef($rsnew, $this->marital_status->CurrentValue, false);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
         return $rsnew;
     }
 
@@ -1619,12 +1587,6 @@ class PatientsAdd extends Patients
         if (isset($row['marital_status'])) { // marital_status
             $this->marital_status->setFormValue($row['marital_status']);
         }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
-        }
     }
 
     // Set up Breadcrumb
@@ -1651,6 +1613,14 @@ class PatientsAdd extends Patients
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_gender":
+                    break;
+                case "x_employment_status":
+                    break;
+                case "x_religion":
+                    break;
+                case "x_marital_status":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

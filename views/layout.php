@@ -74,6 +74,14 @@ ew.ready("head", [
     ew.PATH_BASE + "js/ewdatetimepicker.min.js?v=24.16.0"
 ], "datetimepicker");
 </script>
+<script>
+ew.ready("head", [ew.PATH_BASE + "tinymce/tinymce.min.js?v=24.16.0", ew.PATH_BASE + "js/eweditor.js?v=24.16.0"], "editor");
+</script>
+<style>
+.tox-promotion, .tox-statusbar__branding {
+    display: none;
+}
+</style>
 <!-- Navbar -->
 <script type="text/html" id="navbar-menu-items" class="ew-js-template" data-name="navbar" data-seq="10" data-data="navbar" data-method="appendTo" data-target="#ew-navbar">
 {{if items}}

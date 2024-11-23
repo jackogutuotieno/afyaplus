@@ -702,6 +702,12 @@ class PatientsList extends Patients
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->employment_status);
+        $this->setupLookupOptions($this->religion);
+        $this->setupLookupOptions($this->marital_status);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fpatientsgrid";
@@ -2222,7 +2228,11 @@ class PatientsList extends Patients
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
             // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
+            if (strval($this->gender->CurrentValue) != "") {
+                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+            } else {
+                $this->gender->ViewValue = null;
+            }
 
             // phone
             $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -2234,10 +2244,18 @@ class PatientsList extends Patients
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
             // employment_status
-            $this->employment_status->ViewValue = $this->employment_status->CurrentValue;
+            if (strval($this->employment_status->CurrentValue) != "") {
+                $this->employment_status->ViewValue = $this->employment_status->optionCaption($this->employment_status->CurrentValue);
+            } else {
+                $this->employment_status->ViewValue = null;
+            }
 
             // religion
-            $this->religion->ViewValue = $this->religion->CurrentValue;
+            if (strval($this->religion->CurrentValue) != "") {
+                $this->religion->ViewValue = $this->religion->optionCaption($this->religion->CurrentValue);
+            } else {
+                $this->religion->ViewValue = null;
+            }
 
             // next_of_kin
             $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
@@ -2246,7 +2264,11 @@ class PatientsList extends Patients
             $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
 
             // marital_status
-            $this->marital_status->ViewValue = $this->marital_status->CurrentValue;
+            if (strval($this->marital_status->CurrentValue) != "") {
+                $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
+            } else {
+                $this->marital_status->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2281,11 +2303,27 @@ class PatientsList extends Patients
             $this->gender->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
             $this->email_address->TooltipValue = "";
 
             // physical_address
@@ -2574,6 +2612,14 @@ class PatientsList extends Patients
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_gender":
+                    break;
+                case "x_employment_status":
+                    break;
+                case "x_religion":
+                    break;
+                case "x_marital_status":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2746,7 +2792,10 @@ class PatientsList extends Patients
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "register patient");
     }
 
     // Page Unload event

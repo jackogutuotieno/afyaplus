@@ -274,12 +274,14 @@ class Patients extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'RADIO' // Edit Tag
         );
         $this->gender->InputTextType = "text";
         $this->gender->Nullable = false; // NOT NULL field
         $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->gender->Lookup = new Lookup($this->gender, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->gender->OptionCount = 2;
+        $this->gender->SearchOperators = ["=", "<>"];
         $this->Fields['gender'] = &$this->gender;
 
         // phone
@@ -300,6 +302,7 @@ class Patients extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
         $this->phone->InputTextType = "text";
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
@@ -324,6 +327,7 @@ class Patients extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->email_address->addMethod("getLinkPrefix", fn() => "mailto:");
         $this->email_address->InputTextType = "text";
         $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['email_address'] = &$this->email_address;
@@ -344,7 +348,7 @@ class Patients extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->physical_address->InputTextType = "text";
         $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
@@ -366,10 +370,15 @@ class Patients extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->employment_status->InputTextType = "text";
-        $this->employment_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->employment_status->setSelectMultiple(false); // Select one
+        $this->employment_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->employment_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->employment_status->Lookup = new Lookup($this->employment_status, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->employment_status->OptionCount = 2;
+        $this->employment_status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['employment_status'] = &$this->employment_status;
 
         // religion
@@ -388,10 +397,15 @@ class Patients extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->religion->InputTextType = "text";
-        $this->religion->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->religion->setSelectMultiple(false); // Select one
+        $this->religion->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->religion->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->religion->Lookup = new Lookup($this->religion, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->religion->OptionCount = 5;
+        $this->religion->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['religion'] = &$this->religion;
 
         // next_of_kin
@@ -458,12 +472,17 @@ class Patients extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->marital_status->InputTextType = "text";
         $this->marital_status->Nullable = false; // NOT NULL field
         $this->marital_status->Required = true; // Required field
-        $this->marital_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->marital_status->setSelectMultiple(false); // Select one
+        $this->marital_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->marital_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->marital_status->Lookup = new Lookup($this->marital_status, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->marital_status->OptionCount = 4;
+        $this->marital_status->SearchOperators = ["=", "<>"];
         $this->Fields['marital_status'] = &$this->marital_status;
 
         // date_created
@@ -472,10 +491,10 @@ class Patients extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -488,7 +507,7 @@ class Patients extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -498,10 +517,10 @@ class Patients extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -514,7 +533,7 @@ class Patients extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -1512,7 +1531,11 @@ class Patients extends DbTable
         $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
         // gender
-        $this->gender->ViewValue = $this->gender->CurrentValue;
+        if (strval($this->gender->CurrentValue) != "") {
+            $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+        } else {
+            $this->gender->ViewValue = null;
+        }
 
         // phone
         $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -1524,10 +1547,18 @@ class Patients extends DbTable
         $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
         // employment_status
-        $this->employment_status->ViewValue = $this->employment_status->CurrentValue;
+        if (strval($this->employment_status->CurrentValue) != "") {
+            $this->employment_status->ViewValue = $this->employment_status->optionCaption($this->employment_status->CurrentValue);
+        } else {
+            $this->employment_status->ViewValue = null;
+        }
 
         // religion
-        $this->religion->ViewValue = $this->religion->CurrentValue;
+        if (strval($this->religion->CurrentValue) != "") {
+            $this->religion->ViewValue = $this->religion->optionCaption($this->religion->CurrentValue);
+        } else {
+            $this->religion->ViewValue = null;
+        }
 
         // next_of_kin
         $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
@@ -1536,7 +1567,11 @@ class Patients extends DbTable
         $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
 
         // marital_status
-        $this->marital_status->ViewValue = $this->marital_status->CurrentValue;
+        if (strval($this->marital_status->CurrentValue) != "") {
+            $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
+        } else {
+            $this->marital_status->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1587,11 +1622,27 @@ class Patients extends DbTable
         $this->gender->TooltipValue = "";
 
         // phone
-        $this->phone->HrefValue = "";
+        if (!EmptyValue($this->phone->CurrentValue)) {
+            $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+            $this->phone->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+            }
+        } else {
+            $this->phone->HrefValue = "";
+        }
         $this->phone->TooltipValue = "";
 
         // email_address
-        $this->email_address->HrefValue = "";
+        if (!EmptyValue($this->email_address->CurrentValue)) {
+            $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+            $this->email_address->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+            }
+        } else {
+            $this->email_address->HrefValue = "";
+        }
         $this->email_address->TooltipValue = "";
 
         // physical_address
@@ -1684,11 +1735,7 @@ class Patients extends DbTable
         $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
 
         // gender
-        $this->gender->setupEditAttributes();
-        if (!$this->gender->Raw) {
-            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
-        }
-        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->EditValue = $this->gender->options(false);
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
         // phone
@@ -1709,26 +1756,17 @@ class Patients extends DbTable
 
         // physical_address
         $this->physical_address->setupEditAttributes();
-        if (!$this->physical_address->Raw) {
-            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-        }
         $this->physical_address->EditValue = $this->physical_address->CurrentValue;
         $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
 
         // employment_status
         $this->employment_status->setupEditAttributes();
-        if (!$this->employment_status->Raw) {
-            $this->employment_status->CurrentValue = HtmlDecode($this->employment_status->CurrentValue);
-        }
-        $this->employment_status->EditValue = $this->employment_status->CurrentValue;
+        $this->employment_status->EditValue = $this->employment_status->options(true);
         $this->employment_status->PlaceHolder = RemoveHtml($this->employment_status->caption());
 
         // religion
         $this->religion->setupEditAttributes();
-        if (!$this->religion->Raw) {
-            $this->religion->CurrentValue = HtmlDecode($this->religion->CurrentValue);
-        }
-        $this->religion->EditValue = $this->religion->CurrentValue;
+        $this->religion->EditValue = $this->religion->options(true);
         $this->religion->PlaceHolder = RemoveHtml($this->religion->caption());
 
         // next_of_kin
@@ -1749,10 +1787,7 @@ class Patients extends DbTable
 
         // marital_status
         $this->marital_status->setupEditAttributes();
-        if (!$this->marital_status->Raw) {
-            $this->marital_status->CurrentValue = HtmlDecode($this->marital_status->CurrentValue);
-        }
-        $this->marital_status->EditValue = $this->marital_status->CurrentValue;
+        $this->marital_status->EditValue = $this->marital_status->options(true);
         $this->marital_status->PlaceHolder = RemoveHtml($this->marital_status->caption());
 
         // date_created

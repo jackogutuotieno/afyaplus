@@ -35,9 +35,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["religion", [fields.religion.visible && fields.religion.required ? ew.Validators.required(fields.religion.caption) : null], fields.religion.isInvalid],
             ["next_of_kin", [fields.next_of_kin.visible && fields.next_of_kin.required ? ew.Validators.required(fields.next_of_kin.caption) : null], fields.next_of_kin.isInvalid],
             ["next_of_kin_phone", [fields.next_of_kin_phone.visible && fields.next_of_kin_phone.required ? ew.Validators.required(fields.next_of_kin_phone.caption) : null], fields.next_of_kin_phone.isInvalid],
-            ["marital_status", [fields.marital_status.visible && fields.marital_status.required ? ew.Validators.required(fields.marital_status.caption) : null], fields.marital_status.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["marital_status", [fields.marital_status.visible && fields.marital_status.required ? ew.Validators.required(fields.marital_status.caption) : null], fields.marital_status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -53,6 +51,10 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "gender": <?= $Page->gender->toClientList($Page) ?>,
+            "employment_status": <?= $Page->employment_status->toClientList($Page) ?>,
+            "religion": <?= $Page->religion->toClientList($Page) ?>,
+            "marital_status": <?= $Page->marital_status->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -196,10 +198,29 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
     <div id="r_gender"<?= $Page->gender->rowAttributes() ?>>
-        <label id="elh_patients_gender" for="x_gender" class="<?= $Page->LeftColumnClass ?>"><?= $Page->gender->caption() ?><?= $Page->gender->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_patients_gender" class="<?= $Page->LeftColumnClass ?>"><?= $Page->gender->caption() ?><?= $Page->gender->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->gender->cellAttributes() ?>>
 <span id="el_patients_gender">
-<input type="<?= $Page->gender->getInputTextType() ?>" name="x_gender" id="x_gender" data-table="patients" data-field="x_gender" value="<?= $Page->gender->EditValue ?>" size="30" maxlength="15" placeholder="<?= HtmlEncode($Page->gender->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->gender->formatPattern()) ?>"<?= $Page->gender->editAttributes() ?> aria-describedby="x_gender_help">
+<template id="tp_x_gender">
+    <div class="form-check">
+        <input type="radio" class="form-check-input" data-table="patients" data-field="x_gender" name="x_gender" id="x_gender"<?= $Page->gender->editAttributes() ?>>
+        <label class="form-check-label"></label>
+    </div>
+</template>
+<div id="dsl_x_gender" class="ew-item-list"></div>
+<selection-list hidden
+    id="x_gender"
+    name="x_gender"
+    value="<?= HtmlEncode($Page->gender->CurrentValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_gender"
+    data-target="dsl_x_gender"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->gender->isInvalidClass() ?>"
+    data-table="patients"
+    data-field="x_gender"
+    data-value-separator="<?= $Page->gender->displayValueSeparatorAttribute() ?>"
+    <?= $Page->gender->editAttributes() ?>></selection-list>
 <?= $Page->gender->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->gender->getErrorMessage() ?></div>
 </span>
@@ -232,12 +253,18 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
 <?php } ?>
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
     <div id="r_physical_address"<?= $Page->physical_address->rowAttributes() ?>>
-        <label id="elh_patients_physical_address" for="x_physical_address" class="<?= $Page->LeftColumnClass ?>"><?= $Page->physical_address->caption() ?><?= $Page->physical_address->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_patients_physical_address" class="<?= $Page->LeftColumnClass ?>"><?= $Page->physical_address->caption() ?><?= $Page->physical_address->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->physical_address->cellAttributes() ?>>
 <span id="el_patients_physical_address">
-<input type="<?= $Page->physical_address->getInputTextType() ?>" name="x_physical_address" id="x_physical_address" data-table="patients" data-field="x_physical_address" value="<?= $Page->physical_address->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->physical_address->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->physical_address->formatPattern()) ?>"<?= $Page->physical_address->editAttributes() ?> aria-describedby="x_physical_address_help">
+<?php $Page->physical_address->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients" data-field="x_physical_address" name="x_physical_address" id="x_physical_address" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->physical_address->getPlaceHolder()) ?>"<?= $Page->physical_address->editAttributes() ?> aria-describedby="x_physical_address_help"><?= $Page->physical_address->EditValue ?></textarea>
 <?= $Page->physical_address->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->physical_address->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatientsadd", "editor"], function() {
+    ew.createEditor("fpatientsadd", "x_physical_address", 0, 0, <?= $Page->physical_address->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -247,9 +274,42 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
         <label id="elh_patients_employment_status" for="x_employment_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->employment_status->caption() ?><?= $Page->employment_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->employment_status->cellAttributes() ?>>
 <span id="el_patients_employment_status">
-<input type="<?= $Page->employment_status->getInputTextType() ?>" name="x_employment_status" id="x_employment_status" data-table="patients" data-field="x_employment_status" value="<?= $Page->employment_status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->employment_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->employment_status->formatPattern()) ?>"<?= $Page->employment_status->editAttributes() ?> aria-describedby="x_employment_status_help">
-<?= $Page->employment_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->employment_status->getErrorMessage() ?></div>
+    <select
+        id="x_employment_status"
+        name="x_employment_status"
+        class="form-select ew-select<?= $Page->employment_status->isInvalidClass() ?>"
+        <?php if (!$Page->employment_status->IsNativeSelect) { ?>
+        data-select2-id="fpatientsadd_x_employment_status"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_employment_status"
+        data-value-separator="<?= $Page->employment_status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->employment_status->getPlaceHolder()) ?>"
+        <?= $Page->employment_status->editAttributes() ?>>
+        <?= $Page->employment_status->selectOptionListHtml("x_employment_status") ?>
+    </select>
+    <?= $Page->employment_status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->employment_status->getErrorMessage() ?></div>
+<?php if (!$Page->employment_status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatientsadd", function() {
+    var options = { name: "x_employment_status", selectId: "fpatientsadd_x_employment_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsadd.lists.employment_status?.lookupOptions.length) {
+        options.data = { id: "x_employment_status", form: "fpatientsadd" };
+    } else {
+        options.ajax = { id: "x_employment_status", form: "fpatientsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.employment_status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -259,9 +319,42 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
         <label id="elh_patients_religion" for="x_religion" class="<?= $Page->LeftColumnClass ?>"><?= $Page->religion->caption() ?><?= $Page->religion->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->religion->cellAttributes() ?>>
 <span id="el_patients_religion">
-<input type="<?= $Page->religion->getInputTextType() ?>" name="x_religion" id="x_religion" data-table="patients" data-field="x_religion" value="<?= $Page->religion->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->religion->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->religion->formatPattern()) ?>"<?= $Page->religion->editAttributes() ?> aria-describedby="x_religion_help">
-<?= $Page->religion->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->religion->getErrorMessage() ?></div>
+    <select
+        id="x_religion"
+        name="x_religion"
+        class="form-select ew-select<?= $Page->religion->isInvalidClass() ?>"
+        <?php if (!$Page->religion->IsNativeSelect) { ?>
+        data-select2-id="fpatientsadd_x_religion"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_religion"
+        data-value-separator="<?= $Page->religion->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->religion->getPlaceHolder()) ?>"
+        <?= $Page->religion->editAttributes() ?>>
+        <?= $Page->religion->selectOptionListHtml("x_religion") ?>
+    </select>
+    <?= $Page->religion->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->religion->getErrorMessage() ?></div>
+<?php if (!$Page->religion->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatientsadd", function() {
+    var options = { name: "x_religion", selectId: "fpatientsadd_x_religion" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsadd.lists.religion?.lookupOptions.length) {
+        options.data = { id: "x_religion", form: "fpatientsadd" };
+    } else {
+        options.ajax = { id: "x_religion", form: "fpatientsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.religion.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -295,88 +388,39 @@ loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
         <label id="elh_patients_marital_status" for="x_marital_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->marital_status->caption() ?><?= $Page->marital_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->marital_status->cellAttributes() ?>>
 <span id="el_patients_marital_status">
-<input type="<?= $Page->marital_status->getInputTextType() ?>" name="x_marital_status" id="x_marital_status" data-table="patients" data-field="x_marital_status" value="<?= $Page->marital_status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->marital_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->marital_status->formatPattern()) ?>"<?= $Page->marital_status->editAttributes() ?> aria-describedby="x_marital_status_help">
-<?= $Page->marital_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->marital_status->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_patients_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_patients_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="patients" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+    <select
+        id="x_marital_status"
+        name="x_marital_status"
+        class="form-select ew-select<?= $Page->marital_status->isInvalidClass() ?>"
+        <?php if (!$Page->marital_status->IsNativeSelect) { ?>
+        data-select2-id="fpatientsadd_x_marital_status"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_marital_status"
+        data-value-separator="<?= $Page->marital_status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->marital_status->getPlaceHolder()) ?>"
+        <?= $Page->marital_status->editAttributes() ?>>
+        <?= $Page->marital_status->selectOptionListHtml("x_marital_status") ?>
+    </select>
+    <?= $Page->marital_status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->marital_status->getErrorMessage() ?></div>
+<?php if (!$Page->marital_status->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatientsadd", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_patients_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_patients_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="patients" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatientsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatientsadd", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fpatientsadd", function() {
+    var options = { name: "x_marital_status", selectId: "fpatientsadd_x_marital_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsadd.lists.marital_status?.lookupOptions.length) {
+        options.data = { id: "x_marital_status", form: "fpatientsadd" };
+    } else {
+        options.ajax = { id: "x_marital_status", form: "fpatientsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.marital_status.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

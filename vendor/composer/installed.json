@@ -6553,6 +6553,68 @@
             "install-path": "../symfony/var-exporter"
         },
         {
+            "name": "tinymce/tinymce",
+            "version": "6.8.5",
+            "version_normalized": "6.8.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tinymce/tinymce-dist.git",
+                "reference": "2819a5e54764de177980ddc4180d9765b737f7f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/2819a5e54764de177980ddc4180d9765b737f7f5",
+                "reference": "2819a5e54764de177980ddc4180d9765b737f7f5",
+                "shasum": ""
+            },
+            "time": "2024-10-10T06:06:02+00:00",
+            "type": "component",
+            "extra": {
+                "component": {
+                    "scripts": [
+                        "tinymce.js",
+                        "plugins/*/plugin.js",
+                        "themes/*/theme.js",
+                        "models/*/model.js",
+                        "icons/*/icons.js"
+                    ],
+                    "files": [
+                        "tinymce.min.js",
+                        "plugins/*/plugin.min.js",
+                        "themes/*/theme.min.js",
+                        "models/*/model.min.js",
+                        "skins/**",
+                        "icons/*/icons.min.js"
+                    ]
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT-only"
+            ],
+            "description": "Web based JavaScript HTML WYSIWYG editor control.",
+            "homepage": "https://www.tiny.cloud/",
+            "keywords": [
+                "contenteditable",
+                "editing",
+                "html",
+                "javascript",
+                "rich editor",
+                "rich text",
+                "rich text editor",
+                "richtext",
+                "rte",
+                "text",
+                "tinymce",
+                "wysiwyg"
+            ],
+            "support": {
+                "source": "https://github.com/tinymce/tinymce-dist/tree/6.8.5"
+            },
+            "install-path": "../tinymce/tinymce"
+        },
+        {
             "name": "voku/portable-ascii",
             "version": "2.0.3",
             "version_normalized": "2.0.3.0",

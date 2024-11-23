@@ -559,8 +559,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0|3.0',
-                1 => '3.0.0',
+                0 => '3.0.0',
+                1 => '1.0|2.0|3.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -905,6 +905,15 @@
             'reference' => '0f605f72a363f8743001038a176eeb2a11223b51',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/var-exporter',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'tinymce/tinymce' => array(
+            'pretty_version' => '6.8.5',
+            'version' => '6.8.5.0',
+            'reference' => '2819a5e54764de177980ddc4180d9765b737f7f5',
+            'type' => 'component',
+            'install_path' => __DIR__ . '/../tinymce/tinymce',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

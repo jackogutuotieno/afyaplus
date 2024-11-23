@@ -110,7 +110,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["patient_vaccinations","patient_vaccinations","patient vaccinations",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvaccinationslist"],
     ["patient_visits","patient_visits","patient visits",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvisitslist"],
     ["patient_vitals","patient_vitals","patient vitals",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvitalslist"],
-    ["patients","patients","patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientslist"],
+    ["patients","patients","Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientslist"],
     ["patients_report","patients_report","patients report",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsreportlist"],
     ["patientsvisitsreport","patientsvisitsreport","patientsvisitsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsvisitsreportlist"],
     ["payment_methods","payment_methods","payment methods",true,"{32536B8D-F37B-4419-80D5-260932800712}","paymentmethodslist"],
