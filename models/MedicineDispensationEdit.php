@@ -135,7 +135,7 @@ class MedicineDispensationEdit extends MedicineDispensation
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'medicine_dispensation';
         $this->TableName = 'medicine_dispensation';
 
@@ -166,6 +166,9 @@ class MedicineDispensationEdit extends MedicineDispensation
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -484,6 +487,18 @@ class MedicineDispensationEdit extends MedicineDispensation
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Create form object
@@ -660,6 +675,9 @@ class MedicineDispensationEdit extends MedicineDispensation
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 

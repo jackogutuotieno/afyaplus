@@ -41,6 +41,73 @@ class PermissionMiddleware
             $GLOBALS["Table"] = Container($table);
         }
 
+        // Auto login
+        if (
+            !$Security->isLoggedIn() &&
+            !IsPasswordReset() &&
+            !IsPasswordExpired() &&
+            !IsLoggingIn2FA() &&
+            !IsRegistering() &&
+            !IsRegistering2FA()
+        ) {
+            $Security->autoLogin();
+        }
+
+        // Check permission
+        if ($table != "") { // Table level
+            $Security->loadTablePermissions($table);
+            if (
+                $pageAction == Config("VIEW_ACTION") && !$Security->canView() ||
+                in_array($pageAction, [Config("EDIT_ACTION"), Config("UPDATE_ACTION")]) && !$Security->canEdit() ||
+                $pageAction == Config("ADD_ACTION") && !$Security->canAdd() ||
+                $pageAction == Config("DELETE_ACTION") && !$Security->canDelete() ||
+                in_array($pageAction, [Config("SEARCH_ACTION"), Config("QUERY_ACTION")]) && !$Security->canSearch()
+            ) {
+                $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                if ($Security->canList()) { // Back to list
+                    $pageAction = Config("LIST_ACTION");
+                    $routeUrl = $GLOBALS["Table"]->getListUrl();
+                    return $this->redirect($table . "." . $pageAction);
+                } else {
+                    return $this->redirect();
+                }
+            } elseif (
+                $pageAction == Config("LIST_ACTION") && !$Security->canList() || // List Permission
+                in_array($pageAction, [
+                    Config("CUSTOM_REPORT_ACTION"),
+                    Config("SUMMARY_REPORT_ACTION"),
+                    Config("CROSSTAB_REPORT_ACTION"),
+                    Config("DASHBOARD_REPORT_ACTION"),
+                    Config("CALENDAR_REPORT_ACTION")
+                ]) && !$Security->canList()
+            ) { // No permission
+                $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                return $this->redirect();
+            }
+        } else { // Others
+            if ($pageAction == "changepassword") { // Change password
+                if (!IsPasswordReset() && !IsPasswordExpired()) {
+                    if (!$Security->isLoggedIn() || $Security->isSysAdmin()) {
+                        return $this->redirect();
+                    }
+                }
+            } elseif ($pageAction == "personaldata") { // Personal data
+                if (!$Security->isLoggedIn() || $Security->isSysAdmin()) {
+                    $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                    return $this->redirect();
+                }
+            } elseif ($pageAction == "userpriv") { // User priv
+                $table = "";
+                $pageAction = Config("LIST_ACTION");
+                $routeUrl = Container($table)->getListUrl();
+                $Security->loadTablePermissions($table);
+                if (!$Security->isLoggedIn() || !$Security->isAdmin()) {
+                    $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                    return $this->redirect($table . "." . $pageAction);
+                }
+            }
+        }
+
         // Validate CSRF
         if (Config("CHECK_TOKEN") && !IsSamlResponse() && !ValidateCsrf($request)) {
             throw new HttpBadRequestException($request, $Language->phrase("InvalidPostRequest"));

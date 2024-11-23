@@ -132,7 +132,7 @@ class VisitTypesAdd extends VisitTypes
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'visit_types';
         $this->TableName = 'visit_types';
 
@@ -163,6 +163,9 @@ class VisitTypesAdd extends VisitTypes
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -475,6 +478,18 @@ class VisitTypesAdd extends VisitTypes
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Create form object
@@ -624,6 +639,9 @@ class VisitTypesAdd extends VisitTypes
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 

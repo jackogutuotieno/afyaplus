@@ -1842,7 +1842,10 @@ function GetEntityClass($tablename)
  */
 function FindUserByUserName(?string $username, array $criteria = [])
 {
-    return null;
+    $criteria = array_merge(["email" => $username], $criteria);
+    return !EmptyValue($username)
+        ? GetUserRepository()->findOneBy($criteria)
+        : null; // Note: Use property name, not column name.
 }
 
 /**
@@ -6874,7 +6877,7 @@ function GlobalClientVars()
         "API_JWT_TOKEN" => GetJwtToken(), // API JWT token
         "IMAGE_FOLDER" => "images/", // Image folder
         "SESSION_TIMEOUT" => Config("SESSION_TIMEOUT") > 0 ? SessionTimeoutTime() : 0, // Session timeout time (seconds)
-        "TIMEOUT_URL" => GetUrl("index"), // Timeout URL // PHP
+        "TIMEOUT_URL" => GetUrl("logout"), // Timeout URL // PHP
         "SERVER_SEARCH_FILTER" => Config("SEARCH_FILTER_OPTION") == "Server",
         "CLIENT_SEARCH_FILTER" => Config("SEARCH_FILTER_OPTION") == "Client",
     ], $values);
@@ -6949,6 +6952,65 @@ function SetupLoginStatus()
     $LoginStatus["loginTitle"] = $Language->phrase("Login", true);
     $LoginStatus["loginText"] = $Language->phrase("Login");
     $LoginStatus["canLogin"] = $currentPage != $loginPage && $loginUrl && !IsLoggedIn() && !IsLoggingIn2FA();
+
+    // Reset password page
+    $resetPasswordPage = "resetpassword";
+    $resetPasswordUrl = GetUrl($resetPasswordPage);
+    if ($currentPage != $resetPasswordPage) {
+        if (Config("USE_MODAL_RESET_PASSWORD") && !IsMobile()) {
+            $LoginStatus["resetPassword"] = [
+                "ew-action" => "modal",
+                "footer" => false,
+                "caption" => $Language->phrase("ResetPassword"),
+                "size" => "modal-md",
+                "url" => $resetPasswordUrl
+            ];
+        } else {
+            $LoginStatus["resetPassword"] = [
+                "ew-action" => "redirect",
+                "url" => $resetPasswordUrl
+            ];
+        }
+    }
+    $LoginStatus["resetPasswordUrl"] = $resetPasswordUrl;
+    $LoginStatus["resetPasswordText"] = $Language->phrase("ResetPassword");
+    $LoginStatus["canResetPassword"] = $resetPasswordUrl && !IsLoggedIn();
+
+    // Change password page
+    $changePasswordPage = "changepassword";
+    $changePasswordUrl = GetUrl($changePasswordPage);
+    if ($currentPage != $changePasswordPage) {
+        if (Config("USE_MODAL_CHANGE_PASSWORD") && !IsMobile()) {
+            $LoginStatus["changePassword"] = [
+                "ew-action" => "modal",
+                "footer" => false,
+                "caption" => $Language->phrase("ChangePassword"),
+                "size" => "modal-md",
+                "url" => $changePasswordUrl
+            ];
+        } else {
+            $LoginStatus["changePassword"] = [
+                "ew-action" => "redirect",
+                "url" => $changePasswordUrl
+            ];
+        }
+    }
+    $LoginStatus["changePasswordUrl"] = $changePasswordUrl;
+    $LoginStatus["changePasswordText"] = $Language->phrase("ChangePassword");
+    $LoginStatus["canChangePassword"] = $changePasswordUrl && IsLoggedIn() && !IsSysAdmin();
+
+    // Personal data page
+    $personalDataPage = "personaldata";
+    $personalDataUrl = GetUrl($personalDataPage);
+    if ($currentPage != $personalDataPage) {
+        $LoginStatus["personalData"] = [
+            "ew-action" => "redirect",
+            "url" => $personalDataUrl
+        ];
+    }
+    $LoginStatus["hasPersonalData"] = $personalDataUrl && IsLoggedIn() && !IsSysAdmin();
+    $LoginStatus["personalDataUrl"] = $personalDataUrl;
+    $LoginStatus["personalDataText"] = $Language->phrase("PersonalDataBtn");
 
     // Dispatch login status event and return the event
     return DispatchEvent($LoginStatus, LoginStatusEvent::NAME);

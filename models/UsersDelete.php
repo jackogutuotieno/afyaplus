@@ -123,8 +123,9 @@ class UsersDelete extends Users
     {
         $this->id->setVisibility();
         $this->photo->Visible = false;
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
+        $this->full_name->setVisibility();
+        $this->first_name->Visible = false;
+        $this->last_name->Visible = false;
         $this->national_id->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
@@ -132,20 +133,19 @@ class UsersDelete extends Users
         $this->department_id->setVisibility();
         $this->designation_id->setVisibility();
         $this->physical_address->setVisibility();
-        $this->_password->setVisibility();
+        $this->_password->Visible = false;
         $this->user_role_id->setVisibility();
-        $this->account_status->setVisibility();
+        $this->is_verified->setVisibility();
+        $this->user_profile->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->otp_code->setVisibility();
-        $this->otp_date->setVisibility();
     }
 
     // Constructor
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'users';
         $this->TableName = 'users';
 
@@ -176,6 +176,9 @@ class UsersDelete extends Users
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -386,6 +389,18 @@ class UsersDelete extends Users
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
         $this->CurrentAction = Param("action"); // Set up current action
         $this->setVisibility();
@@ -412,6 +427,13 @@ class UsersDelete extends Users
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->department_id);
+        $this->setupLookupOptions($this->designation_id);
+        $this->setupLookupOptions($this->user_role_id);
+        $this->setupLookupOptions($this->is_verified);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -425,6 +447,25 @@ class UsersDelete extends Users
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAllAssociative($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("userslist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -480,6 +521,9 @@ class UsersDelete extends Users
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -596,6 +640,7 @@ class UsersDelete extends Users
         if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
             $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
         }
+        $this->full_name->setDbValue($row['full_name']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
@@ -607,11 +652,10 @@ class UsersDelete extends Users
         $this->physical_address->setDbValue($row['physical_address']);
         $this->_password->setDbValue($row['password']);
         $this->user_role_id->setDbValue($row['user_role_id']);
-        $this->account_status->setDbValue($row['account_status']);
+        $this->is_verified->setDbValue($row['is_verified']);
+        $this->user_profile->setDbValue($row['user_profile']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->otp_code->setDbValue($row['otp_code']);
-        $this->otp_date->setDbValue($row['otp_date']);
     }
 
     // Return a row with default values
@@ -620,6 +664,7 @@ class UsersDelete extends Users
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['photo'] = $this->photo->DefaultValue;
+        $row['full_name'] = $this->full_name->DefaultValue;
         $row['first_name'] = $this->first_name->DefaultValue;
         $row['last_name'] = $this->last_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
@@ -631,11 +676,10 @@ class UsersDelete extends Users
         $row['physical_address'] = $this->physical_address->DefaultValue;
         $row['password'] = $this->_password->DefaultValue;
         $row['user_role_id'] = $this->user_role_id->DefaultValue;
-        $row['account_status'] = $this->account_status->DefaultValue;
+        $row['is_verified'] = $this->is_verified->DefaultValue;
+        $row['user_profile'] = $this->user_profile->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['otp_code'] = $this->otp_code->DefaultValue;
-        $row['otp_date'] = $this->otp_date->DefaultValue;
         return $row;
     }
 
@@ -654,6 +698,8 @@ class UsersDelete extends Users
         // id
 
         // photo
+
+        // full_name
 
         // first_name
 
@@ -674,36 +720,36 @@ class UsersDelete extends Users
         // physical_address
 
         // password
+        $this->_password->CellCssStyle = "white-space: nowrap;";
 
         // user_role_id
 
-        // account_status
+        // is_verified
+
+        // user_profile
+        $this->user_profile->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
         // date_updated
-
-        // otp_code
-
-        // otp_date
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // full_name
+            $this->full_name->ViewValue = $this->full_name->CurrentValue;
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
+            if (strval($this->gender->CurrentValue) != "") {
+                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+            } else {
+                $this->gender->ViewValue = null;
+            }
 
             // phone
             $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -712,25 +758,71 @@ class UsersDelete extends Users
             $this->_email->ViewValue = $this->_email->CurrentValue;
 
             // department_id
-            $this->department_id->ViewValue = $this->department_id->CurrentValue;
-            $this->department_id->ViewValue = FormatNumber($this->department_id->ViewValue, $this->department_id->formatPattern());
+            $curVal = strval($this->department_id->CurrentValue);
+            if ($curVal != "") {
+                $this->department_id->ViewValue = $this->department_id->lookupCacheOption($curVal);
+                if ($this->department_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->department_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->department_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->department_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->department_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->department_id->ViewValue = $this->department_id->displayValue($arwrk);
+                    } else {
+                        $this->department_id->ViewValue = FormatNumber($this->department_id->CurrentValue, $this->department_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->department_id->ViewValue = null;
+            }
 
             // designation_id
-            $this->designation_id->ViewValue = $this->designation_id->CurrentValue;
-            $this->designation_id->ViewValue = FormatNumber($this->designation_id->ViewValue, $this->designation_id->formatPattern());
+            $curVal = strval($this->designation_id->CurrentValue);
+            if ($curVal != "") {
+                $this->designation_id->ViewValue = $this->designation_id->lookupCacheOption($curVal);
+                if ($this->designation_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->designation_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->designation_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->designation_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->designation_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->designation_id->ViewValue = $this->designation_id->displayValue($arwrk);
+                    } else {
+                        $this->designation_id->ViewValue = FormatNumber($this->designation_id->CurrentValue, $this->designation_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->designation_id->ViewValue = null;
+            }
 
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // password
-            $this->_password->ViewValue = $this->_password->CurrentValue;
-
             // user_role_id
-            $this->user_role_id->ViewValue = $this->user_role_id->CurrentValue;
-            $this->user_role_id->ViewValue = FormatNumber($this->user_role_id->ViewValue, $this->user_role_id->formatPattern());
+            if ($Security->canAdmin()) { // System admin
+                if (strval($this->user_role_id->CurrentValue) != "") {
+                    $this->user_role_id->ViewValue = $this->user_role_id->optionCaption($this->user_role_id->CurrentValue);
+                } else {
+                    $this->user_role_id->ViewValue = null;
+                }
+            } else {
+                $this->user_role_id->ViewValue = $Language->phrase("PasswordMask");
+            }
 
-            // account_status
-            $this->account_status->ViewValue = $this->account_status->CurrentValue;
+            // is_verified
+            if (ConvertToBool($this->is_verified->CurrentValue)) {
+                $this->is_verified->ViewValue = $this->is_verified->tagCaption(1) != "" ? $this->is_verified->tagCaption(1) : "Yes";
+            } else {
+                $this->is_verified->ViewValue = $this->is_verified->tagCaption(2) != "" ? $this->is_verified->tagCaption(2) : "No";
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -740,24 +832,13 @@ class UsersDelete extends Users
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // otp_code
-            $this->otp_code->ViewValue = $this->otp_code->CurrentValue;
-
-            // otp_date
-            $this->otp_date->ViewValue = $this->otp_date->CurrentValue;
-            $this->otp_date->ViewValue = FormatDateTime($this->otp_date->ViewValue, $this->otp_date->formatPattern());
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // full_name
+            $this->full_name->HrefValue = "";
+            $this->full_name->TooltipValue = "";
 
             // national_id
             $this->national_id->HrefValue = "";
@@ -768,11 +849,27 @@ class UsersDelete extends Users
             $this->gender->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email
-            $this->_email->HrefValue = "";
+            if (!EmptyValue($this->_email->CurrentValue)) {
+                $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+                $this->_email->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
+                }
+            } else {
+                $this->_email->HrefValue = "";
+            }
             $this->_email->TooltipValue = "";
 
             // department_id
@@ -787,17 +884,13 @@ class UsersDelete extends Users
             $this->physical_address->HrefValue = "";
             $this->physical_address->TooltipValue = "";
 
-            // password
-            $this->_password->HrefValue = "";
-            $this->_password->TooltipValue = "";
-
             // user_role_id
             $this->user_role_id->HrefValue = "";
             $this->user_role_id->TooltipValue = "";
 
-            // account_status
-            $this->account_status->HrefValue = "";
-            $this->account_status->TooltipValue = "";
+            // is_verified
+            $this->is_verified->HrefValue = "";
+            $this->is_verified->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -806,14 +899,6 @@ class UsersDelete extends Users
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // otp_code
-            $this->otp_code->HrefValue = "";
-            $this->otp_code->TooltipValue = "";
-
-            // otp_date
-            $this->otp_date->HrefValue = "";
-            $this->otp_date->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -826,6 +911,10 @@ class UsersDelete extends Users
     protected function deleteRows()
     {
         global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
         $sql = $this->getCurrentSql();
         $conn = $this->getConnection();
         $rows = $conn->fetchAllAssociative($sql);
@@ -917,6 +1006,16 @@ class UsersDelete extends Users
         return $deleteRows;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -941,6 +1040,16 @@ class UsersDelete extends Users
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_gender":
+                    break;
+                case "x_department_id":
+                    break;
+                case "x_designation_id":
+                    break;
+                case "x_user_role_id":
+                    break;
+                case "x_is_verified":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

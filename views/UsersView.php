@@ -74,24 +74,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-    <tr id="r_first_name"<?= $Page->first_name->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_first_name"><?= $Page->first_name->caption() ?></span></td>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el_users_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-    <tr id="r_last_name"<?= $Page->last_name->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_last_name"><?= $Page->last_name->caption() ?></span></td>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el_users_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+<?php if ($Page->full_name->Visible) { // full_name ?>
+    <tr id="r_full_name"<?= $Page->full_name->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_full_name"><?= $Page->full_name->caption() ?></span></td>
+        <td data-name="full_name"<?= $Page->full_name->cellAttributes() ?>>
+<span id="el_users_full_name">
+<span<?= $Page->full_name->viewAttributes() ?>>
+<?= $Page->full_name->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -124,7 +113,12 @@ loadjs.ready("head", function () {
         <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
 <span id="el_users_phone">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -135,7 +129,12 @@ loadjs.ready("head", function () {
         <td data-name="_email"<?= $Page->_email->cellAttributes() ?>>
 <span id="el_users__email">
 <span<?= $Page->_email->viewAttributes() ?>>
-<?= $Page->_email->getViewValue() ?></span>
+<?php if (!EmptyString($Page->_email->getViewValue()) && $Page->_email->linkAttributes() != "") { ?>
+<a<?= $Page->_email->linkAttributes() ?>><?= $Page->_email->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->_email->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -195,13 +194,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->account_status->Visible) { // account_status ?>
-    <tr id="r_account_status"<?= $Page->account_status->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_account_status"><?= $Page->account_status->caption() ?></span></td>
-        <td data-name="account_status"<?= $Page->account_status->cellAttributes() ?>>
-<span id="el_users_account_status">
-<span<?= $Page->account_status->viewAttributes() ?>>
-<?= $Page->account_status->getViewValue() ?></span>
+<?php if ($Page->is_verified->Visible) { // is_verified ?>
+    <tr id="r_is_verified"<?= $Page->is_verified->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_is_verified"><?= $Page->is_verified->caption() ?></span></td>
+        <td data-name="is_verified"<?= $Page->is_verified->cellAttributes() ?>>
+<span id="el_users_is_verified">
+<span<?= $Page->is_verified->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_verified_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_verified->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_verified->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_verified_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
 </span>
 </td>
     </tr>
@@ -224,28 +227,6 @@ loadjs.ready("head", function () {
 <span id="el_users_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->otp_code->Visible) { // otp_code ?>
-    <tr id="r_otp_code"<?= $Page->otp_code->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_otp_code"><?= $Page->otp_code->caption() ?></span></td>
-        <td data-name="otp_code"<?= $Page->otp_code->cellAttributes() ?>>
-<span id="el_users_otp_code">
-<span<?= $Page->otp_code->viewAttributes() ?>>
-<?= $Page->otp_code->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->otp_date->Visible) { // otp_date ?>
-    <tr id="r_otp_date"<?= $Page->otp_date->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_users_otp_date"><?= $Page->otp_date->caption() ?></span></td>
-        <td data-name="otp_date"<?= $Page->otp_date->cellAttributes() ?>>
-<span id="el_users_otp_date">
-<span<?= $Page->otp_date->viewAttributes() ?>>
-<?= $Page->otp_date->getViewValue() ?></span>
 </span>
 </td>
     </tr>

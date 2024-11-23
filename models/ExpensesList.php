@@ -159,7 +159,7 @@ class ExpensesList extends Expenses
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
@@ -214,6 +214,9 @@ class ExpensesList extends Expenses
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
@@ -638,6 +641,18 @@ class ExpensesList extends Expenses
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Get export parameters
@@ -823,6 +838,9 @@ class ExpensesList extends Expenses
         }
 
         // Build filter
+        if (!$Security->canList()) {
+            $this->Filter = "(0=1)"; // Filter all records
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
@@ -876,6 +894,9 @@ class ExpensesList extends Expenses
 
             // Set no record found message
             if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
+                if (!$Security->canList()) {
+                    $this->setWarningMessage(DeniedMessage());
+                }
                 if ($this->SearchWhere == "0=101") {
                     $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
                 } else {
@@ -943,6 +964,9 @@ class ExpensesList extends Expenses
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -1025,6 +1049,11 @@ class ExpensesList extends Expenses
         // Initialize
         $filterList = "";
         $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fexpensessrch");
+        }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->expense_title->AdvancedSearch->toJson(), ","); // Field expense_title
         $filterList = Concat($filterList, $this->description->AdvancedSearch->toJson(), ","); // Field description
@@ -1159,6 +1188,9 @@ class ExpensesList extends Expenses
     {
         global $Security;
         $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
 
         // Fields to search
         $searchFlds = [];
@@ -1302,25 +1334,25 @@ class ExpensesList extends Expenses
         // "view"
         $item = &$this->ListOptions->add("view");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
         // "edit"
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
         // "copy"
         $item = &$this->ListOptions->add("copy");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
         // List actions
@@ -1384,7 +1416,7 @@ class ExpensesList extends Expenses
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if (true) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"expenses\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1397,7 +1429,7 @@ class ExpensesList extends Expenses
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if (true) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"expenses\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1410,7 +1442,7 @@ class ExpensesList extends Expenses
             // "copy"
             $opt = $this->ListOptions["copy"];
             $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if (true) {
+            if ($Security->canAdd()) {
                 if ($this->ModalAdd && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"expenses\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
                 } else {
@@ -1422,7 +1454,7 @@ class ExpensesList extends Expenses
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if (true) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1505,7 +1537,7 @@ class ExpensesList extends Expenses
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
-        $item->Visible = $this->AddUrl != "";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -2212,6 +2244,9 @@ class ExpensesList extends Expenses
         $item = &$this->ExportOptions->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
     }
 
     // Set up search options
@@ -2249,6 +2284,10 @@ class ExpensesList extends Expenses
         // Hide search options
         if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
             $this->SearchOptions->hideAllOptions();
+        }
+        if (!$Security->canSearch()) {
+            $this->SearchOptions->hideAllOptions();
+            $this->FilterOptions->hideAllOptions();
         }
     }
 

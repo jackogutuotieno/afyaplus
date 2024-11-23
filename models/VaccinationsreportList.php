@@ -162,7 +162,7 @@ class VaccinationsreportList extends Vaccinationsreport
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
@@ -217,6 +217,9 @@ class VaccinationsreportList extends Vaccinationsreport
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
@@ -641,6 +644,18 @@ class VaccinationsreportList extends Vaccinationsreport
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Get export parameters
@@ -826,6 +841,9 @@ class VaccinationsreportList extends Vaccinationsreport
         }
 
         // Build filter
+        if (!$Security->canList()) {
+            $this->Filter = "(0=1)"; // Filter all records
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
@@ -879,6 +897,9 @@ class VaccinationsreportList extends Vaccinationsreport
 
             // Set no record found message
             if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
+                if (!$Security->canList()) {
+                    $this->setWarningMessage(DeniedMessage());
+                }
                 if ($this->SearchWhere == "0=101") {
                     $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
                 } else {
@@ -946,6 +967,9 @@ class VaccinationsreportList extends Vaccinationsreport
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -1028,6 +1052,11 @@ class VaccinationsreportList extends Vaccinationsreport
         // Initialize
         $filterList = "";
         $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fvaccinationsreportsrch");
+        }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
@@ -1198,6 +1227,9 @@ class VaccinationsreportList extends Vaccinationsreport
     {
         global $Security;
         $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
 
         // Fields to search
         $searchFlds = [];
@@ -2215,6 +2247,9 @@ class VaccinationsreportList extends Vaccinationsreport
         $item = &$this->ExportOptions->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
     }
 
     // Set up search options
@@ -2252,6 +2287,10 @@ class VaccinationsreportList extends Vaccinationsreport
         // Hide search options
         if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
             $this->SearchOptions->hideAllOptions();
+        }
+        if (!$Security->canSearch()) {
+            $this->SearchOptions->hideAllOptions();
+            $this->FilterOptions->hideAllOptions();
         }
     }
 

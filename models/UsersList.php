@@ -147,8 +147,9 @@ class UsersList extends Users
     {
         $this->id->setVisibility();
         $this->photo->Visible = false;
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
+        $this->full_name->setVisibility();
+        $this->first_name->Visible = false;
+        $this->last_name->Visible = false;
         $this->national_id->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
@@ -156,20 +157,19 @@ class UsersList extends Users
         $this->department_id->setVisibility();
         $this->designation_id->setVisibility();
         $this->physical_address->setVisibility();
-        $this->_password->setVisibility();
+        $this->_password->Visible = false;
         $this->user_role_id->setVisibility();
-        $this->account_status->setVisibility();
+        $this->is_verified->setVisibility();
+        $this->user_profile->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->otp_code->setVisibility();
-        $this->otp_date->setVisibility();
     }
 
     // Constructor
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
@@ -224,6 +224,9 @@ class UsersList extends Users
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
@@ -648,6 +651,18 @@ class UsersList extends Users
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Get export parameters
@@ -702,6 +717,13 @@ class UsersList extends Users
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->department_id);
+        $this->setupLookupOptions($this->designation_id);
+        $this->setupLookupOptions($this->user_role_id);
+        $this->setupLookupOptions($this->is_verified);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -833,6 +855,9 @@ class UsersList extends Users
         }
 
         // Build filter
+        if (!$Security->canList()) {
+            $this->Filter = "(0=1)"; // Filter all records
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
@@ -886,6 +911,9 @@ class UsersList extends Users
 
             // Set no record found message
             if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
+                if (!$Security->canList()) {
+                    $this->setWarningMessage(DeniedMessage());
+                }
                 if ($this->SearchWhere == "0=101") {
                     $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
                 } else {
@@ -953,6 +981,9 @@ class UsersList extends Users
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -1035,7 +1066,13 @@ class UsersList extends Users
         // Initialize
         $filterList = "";
         $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fuserssrch");
+        }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->full_name->AdvancedSearch->toJson(), ","); // Field full_name
         $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
         $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
         $filterList = Concat($filterList, $this->national_id->AdvancedSearch->toJson(), ","); // Field national_id
@@ -1047,11 +1084,10 @@ class UsersList extends Users
         $filterList = Concat($filterList, $this->physical_address->AdvancedSearch->toJson(), ","); // Field physical_address
         $filterList = Concat($filterList, $this->_password->AdvancedSearch->toJson(), ","); // Field password
         $filterList = Concat($filterList, $this->user_role_id->AdvancedSearch->toJson(), ","); // Field user_role_id
-        $filterList = Concat($filterList, $this->account_status->AdvancedSearch->toJson(), ","); // Field account_status
+        $filterList = Concat($filterList, $this->is_verified->AdvancedSearch->toJson(), ","); // Field is_verified
+        $filterList = Concat($filterList, $this->user_profile->AdvancedSearch->toJson(), ","); // Field user_profile
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->otp_code->AdvancedSearch->toJson(), ","); // Field otp_code
-        $filterList = Concat($filterList, $this->otp_date->AdvancedSearch->toJson(), ","); // Field otp_date
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1098,6 +1134,14 @@ class UsersList extends Users
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
+
+        // Field full_name
+        $this->full_name->AdvancedSearch->SearchValue = @$filter["x_full_name"];
+        $this->full_name->AdvancedSearch->SearchOperator = @$filter["z_full_name"];
+        $this->full_name->AdvancedSearch->SearchCondition = @$filter["v_full_name"];
+        $this->full_name->AdvancedSearch->SearchValue2 = @$filter["y_full_name"];
+        $this->full_name->AdvancedSearch->SearchOperator2 = @$filter["w_full_name"];
+        $this->full_name->AdvancedSearch->save();
 
         // Field first_name
         $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
@@ -1187,13 +1231,21 @@ class UsersList extends Users
         $this->user_role_id->AdvancedSearch->SearchOperator2 = @$filter["w_user_role_id"];
         $this->user_role_id->AdvancedSearch->save();
 
-        // Field account_status
-        $this->account_status->AdvancedSearch->SearchValue = @$filter["x_account_status"];
-        $this->account_status->AdvancedSearch->SearchOperator = @$filter["z_account_status"];
-        $this->account_status->AdvancedSearch->SearchCondition = @$filter["v_account_status"];
-        $this->account_status->AdvancedSearch->SearchValue2 = @$filter["y_account_status"];
-        $this->account_status->AdvancedSearch->SearchOperator2 = @$filter["w_account_status"];
-        $this->account_status->AdvancedSearch->save();
+        // Field is_verified
+        $this->is_verified->AdvancedSearch->SearchValue = @$filter["x_is_verified"];
+        $this->is_verified->AdvancedSearch->SearchOperator = @$filter["z_is_verified"];
+        $this->is_verified->AdvancedSearch->SearchCondition = @$filter["v_is_verified"];
+        $this->is_verified->AdvancedSearch->SearchValue2 = @$filter["y_is_verified"];
+        $this->is_verified->AdvancedSearch->SearchOperator2 = @$filter["w_is_verified"];
+        $this->is_verified->AdvancedSearch->save();
+
+        // Field user_profile
+        $this->user_profile->AdvancedSearch->SearchValue = @$filter["x_user_profile"];
+        $this->user_profile->AdvancedSearch->SearchOperator = @$filter["z_user_profile"];
+        $this->user_profile->AdvancedSearch->SearchCondition = @$filter["v_user_profile"];
+        $this->user_profile->AdvancedSearch->SearchValue2 = @$filter["y_user_profile"];
+        $this->user_profile->AdvancedSearch->SearchOperator2 = @$filter["w_user_profile"];
+        $this->user_profile->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1210,22 +1262,6 @@ class UsersList extends Users
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
-
-        // Field otp_code
-        $this->otp_code->AdvancedSearch->SearchValue = @$filter["x_otp_code"];
-        $this->otp_code->AdvancedSearch->SearchOperator = @$filter["z_otp_code"];
-        $this->otp_code->AdvancedSearch->SearchCondition = @$filter["v_otp_code"];
-        $this->otp_code->AdvancedSearch->SearchValue2 = @$filter["y_otp_code"];
-        $this->otp_code->AdvancedSearch->SearchOperator2 = @$filter["w_otp_code"];
-        $this->otp_code->AdvancedSearch->save();
-
-        // Field otp_date
-        $this->otp_date->AdvancedSearch->SearchValue = @$filter["x_otp_date"];
-        $this->otp_date->AdvancedSearch->SearchOperator = @$filter["z_otp_date"];
-        $this->otp_date->AdvancedSearch->SearchCondition = @$filter["v_otp_date"];
-        $this->otp_date->AdvancedSearch->SearchValue2 = @$filter["y_otp_date"];
-        $this->otp_date->AdvancedSearch->SearchOperator2 = @$filter["w_otp_date"];
-        $this->otp_date->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1259,18 +1295,19 @@ class UsersList extends Users
     {
         global $Security;
         $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->full_name;
         $searchFlds[] = &$this->first_name;
         $searchFlds[] = &$this->last_name;
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->phone;
         $searchFlds[] = &$this->_email;
         $searchFlds[] = &$this->physical_address;
-        $searchFlds[] = &$this->_password;
-        $searchFlds[] = &$this->account_status;
-        $searchFlds[] = &$this->otp_code;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1350,8 +1387,7 @@ class UsersList extends Users
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
+            $this->updateSort($this->full_name); // full_name
             $this->updateSort($this->national_id); // national_id
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->phone); // phone
@@ -1359,13 +1395,10 @@ class UsersList extends Users
             $this->updateSort($this->department_id); // department_id
             $this->updateSort($this->designation_id); // designation_id
             $this->updateSort($this->physical_address); // physical_address
-            $this->updateSort($this->_password); // password
             $this->updateSort($this->user_role_id); // user_role_id
-            $this->updateSort($this->account_status); // account_status
+            $this->updateSort($this->is_verified); // is_verified
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->otp_code); // otp_code
-            $this->updateSort($this->otp_date); // otp_date
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1391,6 +1424,7 @@ class UsersList extends Users
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
+                $this->full_name->setSort("");
                 $this->first_name->setSort("");
                 $this->last_name->setSort("");
                 $this->national_id->setSort("");
@@ -1402,11 +1436,10 @@ class UsersList extends Users
                 $this->physical_address->setSort("");
                 $this->_password->setSort("");
                 $this->user_role_id->setSort("");
-                $this->account_status->setSort("");
+                $this->is_verified->setSort("");
+                $this->user_profile->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
-                $this->otp_code->setSort("");
-                $this->otp_date->setSort("");
             }
 
             // Reset start position
@@ -1429,25 +1462,19 @@ class UsersList extends Users
         // "view"
         $item = &$this->ListOptions->add("view");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
         // "edit"
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
         // List actions
@@ -1511,7 +1538,7 @@ class UsersList extends Users
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if (true) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"users\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1524,7 +1551,7 @@ class UsersList extends Users
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if (true) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"users\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1534,22 +1561,9 @@ class UsersList extends Users
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if (true) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"users\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if (true) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1576,6 +1590,24 @@ class UsersList extends Users
                 if ($listAction->Select == ACTION_SINGLE && $allowed) {
                     $caption = $listAction->Caption;
                     $title = HtmlTitle($caption);
+                    $profile = UserProfile::create()->setUserName(strval($this->_email->CurrentValue))
+                        ->load(HtmlDecode($this->user_profile->CurrentValue));
+                    if ($action == "forcelogoutuser") {
+                        $totalCount = $profile->activeUserSessionCount(false);
+                        $activeCount = $profile->activeUserSessionCount();
+                        if ($totalCount == 0 && $activeCount == 0) { // Do not show link if no active sessions
+                            $action = ""; // Disable action
+                        } else {
+                            if ($profile->isForceLogout()) { // Being force logout
+                                $caption = $Language->phrase("ForceLogoutInProgress");
+                                $title = HtmlTitle($caption);
+                                $disabled = true;
+                            }
+                            // Show active session count next to user name
+                            $message = str_replace("%t", $totalCount, str_replace("%a", $activeCount, $Language->phrase("ActiveUserSessions")));
+                            $this->_email->ViewValue .= '&nbsp;<span class="badge rounded-pill text-bg-info">' . $message . '</span>';
+                        }
+                    }
                     if ($action != "") {
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
@@ -1632,7 +1664,7 @@ class UsersList extends Users
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
-        $item->Visible = $this->AddUrl != "";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1642,8 +1674,7 @@ class UsersList extends Users
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "first_name");
-            $this->createColumnOption($option, "last_name");
+            $this->createColumnOption($option, "full_name");
             $this->createColumnOption($option, "national_id");
             $this->createColumnOption($option, "gender");
             $this->createColumnOption($option, "phone");
@@ -1651,13 +1682,13 @@ class UsersList extends Users
             $this->createColumnOption($option, "department_id");
             $this->createColumnOption($option, "designation_id");
             $this->createColumnOption($option, "physical_address");
-            $this->createColumnOption($option, "password");
             $this->createColumnOption($option, "user_role_id");
-            $this->createColumnOption($option, "account_status");
+            $this->createColumnOption($option, "is_verified");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
-            $this->createColumnOption($option, "otp_code");
-            $this->createColumnOption($option, "otp_date");
+        }
+        if (UserProfile::$FORCE_LOGOUT_USER) {
+            $this->ListActions["forcelogoutuser"] = new ForceLogoutUserAction();
         }
 
         // Set up custom actions
@@ -1707,6 +1738,27 @@ class UsersList extends Users
         $item->Visible = false;
 
         // Show active user count from SQL
+        if (UserProfile::$FORCE_LOGOUT_USER) {
+            if (IsAdmin()) {
+                $activeUserCount = $this->getConnection()->fetchOne("SELECT COUNT(*) FROM " . $this->getSqlFrom() . " WHERE " . $this->activeUserFilter());
+                $showActiveUser = Param("activeuser", "");
+                if ($showActiveUser != "") {
+                    $_SESSION[SESSION_ACTIVE_USERS] = $showActiveUser;
+                } elseif (Session(SESSION_ACTIVE_USERS) != "") {
+                    $showActiveUser = Session(SESSION_ACTIVE_USERS);
+                }
+                if ($showActiveUser == "1" && $activeUserCount > 0) {
+                    AddFilter($this->Filter, $this->activeUserFilter());
+                }
+                $message = str_replace("%n", $activeUserCount, $Language->phrase("ShowActiveUsers"));
+                $item = &$this->HeaderOptions->add("activeuser");
+                $checked = $showActiveUser == "1" ? " checked" : "";
+                $item->Body = "<div class=\"form-check\"><input type=\"checkbox\" name=\"activeuser\" id=\"activeuser\" class=\"form-check-input\" data-ew-action=\"active-user\"{$checked}>" . $message . "</div>";
+                $item->Visible = $activeUserCount > 0;
+                $item->ShowInDropDown = false;
+                $item->ShowInButtonGroup = false;
+            }
+        }
     }
 
     // Active user filter
@@ -1828,7 +1880,8 @@ class UsersList extends Users
                         }
                     }
                     if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage($listAction->SuccessMessage);
+                        $userlist = implode(",", array_column($rows, Config("LOGIN_USERNAME_FIELD_NAME")));
+                        $this->setSuccessMessage(str_replace("%u", $userlist, $listAction->SuccessMessage));
                     }
                     if ($this->getSuccessMessage() == "") {
                         $this->setSuccessMessage(str_replace("%s", $actionCaption, $Language->phrase("CustomActionCompleted"))); // Set up success message
@@ -1840,7 +1893,8 @@ class UsersList extends Users
                         }
                     }
                     if ($this->getFailureMessage() == "") {
-                        $this->setFailureMessage($listAction->FailureMessage);
+                        $user = $row[Config("LOGIN_USERNAME_FIELD_NAME")];
+                        $this->setFailureMessage(str_replace("%u", $user, $listAction->FailureMessage));
                     }
 
                     // Set up error message
@@ -2101,6 +2155,7 @@ class UsersList extends Users
         if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
             $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
         }
+        $this->full_name->setDbValue($row['full_name']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
@@ -2112,11 +2167,10 @@ class UsersList extends Users
         $this->physical_address->setDbValue($row['physical_address']);
         $this->_password->setDbValue($row['password']);
         $this->user_role_id->setDbValue($row['user_role_id']);
-        $this->account_status->setDbValue($row['account_status']);
+        $this->is_verified->setDbValue($row['is_verified']);
+        $this->user_profile->setDbValue($row['user_profile']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->otp_code->setDbValue($row['otp_code']);
-        $this->otp_date->setDbValue($row['otp_date']);
     }
 
     // Return a row with default values
@@ -2125,6 +2179,7 @@ class UsersList extends Users
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['photo'] = $this->photo->DefaultValue;
+        $row['full_name'] = $this->full_name->DefaultValue;
         $row['first_name'] = $this->first_name->DefaultValue;
         $row['last_name'] = $this->last_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
@@ -2136,11 +2191,10 @@ class UsersList extends Users
         $row['physical_address'] = $this->physical_address->DefaultValue;
         $row['password'] = $this->_password->DefaultValue;
         $row['user_role_id'] = $this->user_role_id->DefaultValue;
-        $row['account_status'] = $this->account_status->DefaultValue;
+        $row['is_verified'] = $this->is_verified->DefaultValue;
+        $row['user_profile'] = $this->user_profile->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['otp_code'] = $this->otp_code->DefaultValue;
-        $row['otp_date'] = $this->otp_date->DefaultValue;
         return $row;
     }
 
@@ -2185,6 +2239,8 @@ class UsersList extends Users
 
         // photo
 
+        // full_name
+
         // first_name
 
         // last_name
@@ -2204,36 +2260,36 @@ class UsersList extends Users
         // physical_address
 
         // password
+        $this->_password->CellCssStyle = "white-space: nowrap;";
 
         // user_role_id
 
-        // account_status
+        // is_verified
+
+        // user_profile
+        $this->user_profile->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
         // date_updated
-
-        // otp_code
-
-        // otp_date
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // full_name
+            $this->full_name->ViewValue = $this->full_name->CurrentValue;
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
+            if (strval($this->gender->CurrentValue) != "") {
+                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+            } else {
+                $this->gender->ViewValue = null;
+            }
 
             // phone
             $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -2242,25 +2298,71 @@ class UsersList extends Users
             $this->_email->ViewValue = $this->_email->CurrentValue;
 
             // department_id
-            $this->department_id->ViewValue = $this->department_id->CurrentValue;
-            $this->department_id->ViewValue = FormatNumber($this->department_id->ViewValue, $this->department_id->formatPattern());
+            $curVal = strval($this->department_id->CurrentValue);
+            if ($curVal != "") {
+                $this->department_id->ViewValue = $this->department_id->lookupCacheOption($curVal);
+                if ($this->department_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->department_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->department_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->department_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->department_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->department_id->ViewValue = $this->department_id->displayValue($arwrk);
+                    } else {
+                        $this->department_id->ViewValue = FormatNumber($this->department_id->CurrentValue, $this->department_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->department_id->ViewValue = null;
+            }
 
             // designation_id
-            $this->designation_id->ViewValue = $this->designation_id->CurrentValue;
-            $this->designation_id->ViewValue = FormatNumber($this->designation_id->ViewValue, $this->designation_id->formatPattern());
+            $curVal = strval($this->designation_id->CurrentValue);
+            if ($curVal != "") {
+                $this->designation_id->ViewValue = $this->designation_id->lookupCacheOption($curVal);
+                if ($this->designation_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->designation_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->designation_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->designation_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->designation_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->designation_id->ViewValue = $this->designation_id->displayValue($arwrk);
+                    } else {
+                        $this->designation_id->ViewValue = FormatNumber($this->designation_id->CurrentValue, $this->designation_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->designation_id->ViewValue = null;
+            }
 
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // password
-            $this->_password->ViewValue = $this->_password->CurrentValue;
-
             // user_role_id
-            $this->user_role_id->ViewValue = $this->user_role_id->CurrentValue;
-            $this->user_role_id->ViewValue = FormatNumber($this->user_role_id->ViewValue, $this->user_role_id->formatPattern());
+            if ($Security->canAdmin()) { // System admin
+                if (strval($this->user_role_id->CurrentValue) != "") {
+                    $this->user_role_id->ViewValue = $this->user_role_id->optionCaption($this->user_role_id->CurrentValue);
+                } else {
+                    $this->user_role_id->ViewValue = null;
+                }
+            } else {
+                $this->user_role_id->ViewValue = $Language->phrase("PasswordMask");
+            }
 
-            // account_status
-            $this->account_status->ViewValue = $this->account_status->CurrentValue;
+            // is_verified
+            if (ConvertToBool($this->is_verified->CurrentValue)) {
+                $this->is_verified->ViewValue = $this->is_verified->tagCaption(1) != "" ? $this->is_verified->tagCaption(1) : "Yes";
+            } else {
+                $this->is_verified->ViewValue = $this->is_verified->tagCaption(2) != "" ? $this->is_verified->tagCaption(2) : "No";
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2270,24 +2372,13 @@ class UsersList extends Users
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // otp_code
-            $this->otp_code->ViewValue = $this->otp_code->CurrentValue;
-
-            // otp_date
-            $this->otp_date->ViewValue = $this->otp_date->CurrentValue;
-            $this->otp_date->ViewValue = FormatDateTime($this->otp_date->ViewValue, $this->otp_date->formatPattern());
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // full_name
+            $this->full_name->HrefValue = "";
+            $this->full_name->TooltipValue = "";
 
             // national_id
             $this->national_id->HrefValue = "";
@@ -2298,11 +2389,27 @@ class UsersList extends Users
             $this->gender->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email
-            $this->_email->HrefValue = "";
+            if (!EmptyValue($this->_email->CurrentValue)) {
+                $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+                $this->_email->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
+                }
+            } else {
+                $this->_email->HrefValue = "";
+            }
             $this->_email->TooltipValue = "";
 
             // department_id
@@ -2317,17 +2424,13 @@ class UsersList extends Users
             $this->physical_address->HrefValue = "";
             $this->physical_address->TooltipValue = "";
 
-            // password
-            $this->_password->HrefValue = "";
-            $this->_password->TooltipValue = "";
-
             // user_role_id
             $this->user_role_id->HrefValue = "";
             $this->user_role_id->TooltipValue = "";
 
-            // account_status
-            $this->account_status->HrefValue = "";
-            $this->account_status->TooltipValue = "";
+            // is_verified
+            $this->is_verified->HrefValue = "";
+            $this->is_verified->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2336,14 +2439,6 @@ class UsersList extends Users
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // otp_code
-            $this->otp_code->HrefValue = "";
-            $this->otp_code->TooltipValue = "";
-
-            // otp_date
-            $this->otp_date->HrefValue = "";
-            $this->otp_date->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2462,6 +2557,9 @@ class UsersList extends Users
         $item = &$this->ExportOptions->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
     }
 
     // Set up search options
@@ -2499,6 +2597,10 @@ class UsersList extends Users
         // Hide search options
         if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
             $this->SearchOptions->hideAllOptions();
+        }
+        if (!$Security->canSearch()) {
+            $this->SearchOptions->hideAllOptions();
+            $this->FilterOptions->hideAllOptions();
         }
     }
 
@@ -2576,6 +2678,16 @@ class UsersList extends Users
         $this->pageExported($doc);
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2599,6 +2711,16 @@ class UsersList extends Users
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_gender":
+                    break;
+                case "x_department_id":
+                    break;
+                case "x_designation_id":
+                    break;
+                case "x_user_role_id":
+                    break;
+                case "x_is_verified":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2771,7 +2893,10 @@ class UsersList extends Users
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add user");
     }
 
     // Page Unload event

@@ -164,7 +164,7 @@ class MedicineStockReportList extends MedicineStockReport
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
@@ -219,6 +219,9 @@ class MedicineStockReportList extends MedicineStockReport
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
@@ -643,6 +646,18 @@ class MedicineStockReportList extends MedicineStockReport
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Get export parameters
@@ -828,6 +843,9 @@ class MedicineStockReportList extends MedicineStockReport
         }
 
         // Build filter
+        if (!$Security->canList()) {
+            $this->Filter = "(0=1)"; // Filter all records
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
@@ -881,6 +899,9 @@ class MedicineStockReportList extends MedicineStockReport
 
             // Set no record found message
             if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
+                if (!$Security->canList()) {
+                    $this->setWarningMessage(DeniedMessage());
+                }
                 if ($this->SearchWhere == "0=101") {
                     $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
                 } else {
@@ -948,6 +969,9 @@ class MedicineStockReportList extends MedicineStockReport
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -1030,6 +1054,11 @@ class MedicineStockReportList extends MedicineStockReport
         // Initialize
         $filterList = "";
         $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fmedicine_stock_reportsrch");
+        }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
         $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
@@ -1218,6 +1247,9 @@ class MedicineStockReportList extends MedicineStockReport
     {
         global $Security;
         $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
 
         // Fields to search
         $searchFlds = [];
@@ -2265,6 +2297,9 @@ class MedicineStockReportList extends MedicineStockReport
         $item = &$this->ExportOptions->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
     }
 
     // Set up search options
@@ -2302,6 +2337,10 @@ class MedicineStockReportList extends MedicineStockReport
         // Hide search options
         if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
             $this->SearchOptions->hideAllOptions();
+        }
+        if (!$Security->canSearch()) {
+            $this->SearchOptions->hideAllOptions();
+            $this->FilterOptions->hideAllOptions();
         }
     }
 

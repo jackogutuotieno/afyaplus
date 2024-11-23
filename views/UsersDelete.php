@@ -53,11 +53,8 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_users_id" class="users_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th class="<?= $Page->first_name->headerCellClass() ?>"><span id="elh_users_first_name" class="users_first_name"><?= $Page->first_name->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th class="<?= $Page->last_name->headerCellClass() ?>"><span id="elh_users_last_name" class="users_last_name"><?= $Page->last_name->caption() ?></span></th>
+<?php if ($Page->full_name->Visible) { // full_name ?>
+        <th class="<?= $Page->full_name->headerCellClass() ?>"><span id="elh_users_full_name" class="users_full_name"><?= $Page->full_name->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->national_id->Visible) { // national_id ?>
         <th class="<?= $Page->national_id->headerCellClass() ?>"><span id="elh_users_national_id" class="users_national_id"><?= $Page->national_id->caption() ?></span></th>
@@ -80,26 +77,17 @@ $Page->showMessage();
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
         <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_users_physical_address" class="users_physical_address"><?= $Page->physical_address->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->_password->Visible) { // password ?>
-        <th class="<?= $Page->_password->headerCellClass() ?>"><span id="elh_users__password" class="users__password"><?= $Page->_password->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->user_role_id->Visible) { // user_role_id ?>
         <th class="<?= $Page->user_role_id->headerCellClass() ?>"><span id="elh_users_user_role_id" class="users_user_role_id"><?= $Page->user_role_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->account_status->Visible) { // account_status ?>
-        <th class="<?= $Page->account_status->headerCellClass() ?>"><span id="elh_users_account_status" class="users_account_status"><?= $Page->account_status->caption() ?></span></th>
+<?php if ($Page->is_verified->Visible) { // is_verified ?>
+        <th class="<?= $Page->is_verified->headerCellClass() ?>"><span id="elh_users_is_verified" class="users_is_verified"><?= $Page->is_verified->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_users_date_created" class="users_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_users_date_updated" class="users_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->otp_code->Visible) { // otp_code ?>
-        <th class="<?= $Page->otp_code->headerCellClass() ?>"><span id="elh_users_otp_code" class="users_otp_code"><?= $Page->otp_code->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->otp_date->Visible) { // otp_date ?>
-        <th class="<?= $Page->otp_date->headerCellClass() ?>"><span id="elh_users_otp_date" class="users_otp_date"><?= $Page->otp_date->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -130,19 +118,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <td<?= $Page->first_name->cellAttributes() ?>>
+<?php if ($Page->full_name->Visible) { // full_name ?>
+        <td<?= $Page->full_name->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <td<?= $Page->last_name->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+<span<?= $Page->full_name->viewAttributes() ?>>
+<?= $Page->full_name->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -166,7 +146,12 @@ while ($Page->fetch()) {
         <td<?= $Page->phone->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -174,7 +159,12 @@ while ($Page->fetch()) {
         <td<?= $Page->_email->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->_email->viewAttributes() ?>>
-<?= $Page->_email->getViewValue() ?></span>
+<?php if (!EmptyString($Page->_email->getViewValue()) && $Page->_email->linkAttributes() != "") { ?>
+<a<?= $Page->_email->linkAttributes() ?>><?= $Page->_email->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->_email->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -202,14 +192,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->_password->Visible) { // password ?>
-        <td<?= $Page->_password->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->_password->viewAttributes() ?>>
-<?= $Page->_password->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->user_role_id->Visible) { // user_role_id ?>
         <td<?= $Page->user_role_id->cellAttributes() ?>>
 <span id="">
@@ -218,11 +200,15 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->account_status->Visible) { // account_status ?>
-        <td<?= $Page->account_status->cellAttributes() ?>>
+<?php if ($Page->is_verified->Visible) { // is_verified ?>
+        <td<?= $Page->is_verified->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->account_status->viewAttributes() ?>>
-<?= $Page->account_status->getViewValue() ?></span>
+<span<?= $Page->is_verified->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_verified_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_verified->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_verified->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_verified_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -239,22 +225,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->otp_code->Visible) { // otp_code ?>
-        <td<?= $Page->otp_code->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->otp_code->viewAttributes() ?>>
-<?= $Page->otp_code->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->otp_date->Visible) { // otp_date ?>
-        <td<?= $Page->otp_date->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->otp_date->viewAttributes() ?>>
-<?= $Page->otp_date->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

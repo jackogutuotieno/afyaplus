@@ -1071,7 +1071,7 @@ class RadiologyRequests extends DbTable
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
         }
-        if ($this->PageID != "grid" && !$this->isExport() && $fld->UseFilter) {
+        if ($this->PageID != "grid" && !$this->isExport() && $fld->UseFilter && $Security->canSearch()) {
             $html .= '<div class="ew-filter-dropdown-btn" data-ew-action="filter" data-table="' . $fld->TableVar . '" data-field="' . $fld->FieldVar .
                 '"><div class="ew-table-header-filter" role="button" aria-haspopup="true">' . $Language->phrase("Filter") .
                 (is_array($fld->EditValue) ? str_replace("%c", count($fld->EditValue), $Language->phrase("FilterCount")) : '') .

@@ -134,7 +134,7 @@ class InvoiceDetailsAdd extends InvoiceDetails
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'invoice_details';
         $this->TableName = 'invoice_details';
 
@@ -165,6 +165,9 @@ class InvoiceDetailsAdd extends InvoiceDetails
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -477,6 +480,18 @@ class InvoiceDetailsAdd extends InvoiceDetails
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Create form object
@@ -626,6 +641,9 @@ class InvoiceDetailsAdd extends InvoiceDetails
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 

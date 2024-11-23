@@ -69,8 +69,11 @@ class User extends AbstractEntity
     #[Column(name: "user_role_id", type: "integer")]
     private int $userRoleId;
 
-    #[Column(name: "account_status", type: "string", nullable: true)]
-    private ?string $accountStatus;
+    #[Column(name: "is_verified", type: "boolean")]
+    private bool $isVerified;
+
+    #[Column(name: "user_profile", type: "text", nullable: true)]
+    private ?string $userProfile;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -78,16 +81,10 @@ class User extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
-    #[Column(name: "otp_code", type: "string", nullable: true)]
-    private ?string $otpCode;
-
-    #[Column(name: "otp_date", type: "datetime", nullable: true)]
-    private ?DateTime $otpDate;
-
     public function __construct()
     {
         $this->userRoleId = 0;
-        $this->accountStatus = "Pending";
+        $this->isVerified = false;
     }
 
     public function getId(): int
@@ -169,12 +166,12 @@ class User extends AbstractEntity
 
     public function getEmail(): string
     {
-        return HtmlDecode($this->email);
+        return $this->email;
     }
 
     public function setEmail(string $value): static
     {
-        $this->email = RemoveXss($value);
+        $this->email = $value;
         return $this;
     }
 
@@ -213,12 +210,12 @@ class User extends AbstractEntity
 
     public function getPassword(): string
     {
-        return HtmlDecode($this->password);
+        return $this->password;
     }
 
     public function setPassword(string $value): static
     {
-        $this->password = RemoveXss($value);
+        $this->password = EncryptPassword(Config("CASE_SENSITIVE_PASSWORD") ? $value : strtolower($value));
         return $this;
     }
 
@@ -233,14 +230,25 @@ class User extends AbstractEntity
         return $this;
     }
 
-    public function getAccountStatus(): ?string
+    public function getIsVerified(): bool
     {
-        return HtmlDecode($this->accountStatus);
+        return $this->isVerified;
     }
 
-    public function setAccountStatus(?string $value): static
+    public function setIsVerified(bool $value): static
     {
-        $this->accountStatus = RemoveXss($value);
+        $this->isVerified = $value;
+        return $this;
+    }
+
+    public function getUserProfile(): ?string
+    {
+        return HtmlDecode($this->userProfile);
+    }
+
+    public function setUserProfile(?string $value): static
+    {
+        $this->userProfile = RemoveXss($value);
         return $this;
     }
 
@@ -266,25 +274,15 @@ class User extends AbstractEntity
         return $this;
     }
 
-    public function getOtpCode(): ?string
+    // Get login arguments
+    public function getLoginArguments(): array
     {
-        return HtmlDecode($this->otpCode);
-    }
-
-    public function setOtpCode(?string $value): static
-    {
-        $this->otpCode = RemoveXss($value);
-        return $this;
-    }
-
-    public function getOtpDate(): ?DateTime
-    {
-        return $this->otpDate;
-    }
-
-    public function setOtpDate(?DateTime $value): static
-    {
-        $this->otpDate = $value;
-        return $this;
+        return [
+            "userName" => $this->get('email'),
+            "userId" => $this->get('id'),
+            "parentUserId" => null,
+            "userLevel" => $this->get('user_role_id') ?? AdvancedSecurity::ANONYMOUS_USER_LEVEL_ID,
+            "userPrimaryKey" => $this->get('id'),
+        ];
     }
 }

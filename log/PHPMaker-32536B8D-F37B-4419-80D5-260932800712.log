@@ -22,6 +22,7 @@ C:\wamp64\www\afyaplus\controllers\LabTestRequestsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingController.php
+C:\wamp64\www\afyaplus\controllers\LaboratoryreportsController.php
 C:\wamp64\www\afyaplus\controllers\MedicalSchemesController.php
 C:\wamp64\www\afyaplus\controllers\MedicineBrandsController.php
 C:\wamp64\www\afyaplus\controllers\MedicineCategoriesController.php
@@ -45,6 +46,7 @@ C:\wamp64\www\afyaplus\controllers\RadiologyReportsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsQueueController.php
+C:\wamp64\www\afyaplus\controllers\RadiologyreportsdetailsController.php
 C:\wamp64\www\afyaplus\controllers\RolesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
@@ -66,6 +68,7 @@ C:\wamp64\www\afyaplus\js\userfn.js
 C:\wamp64\www\afyaplus\log\index.html
 C:\wamp64\www\afyaplus\models\AppointmentsReport.php
 C:\wamp64\www\afyaplus\models\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\models\ChangePassword.php
 C:\wamp64\www\afyaplus\models\Departments.php
 C:\wamp64\www\afyaplus\models\DepartmentsAdd.php
 C:\wamp64\www\afyaplus\models\DepartmentsDelete.php
@@ -160,6 +163,10 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\models\LaboratoryBilling.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\models\Laboratoryreports.php
+C:\wamp64\www\afyaplus\models\LaboratoryreportsList.php
+C:\wamp64\www\afyaplus\models\Login.php
+C:\wamp64\www\afyaplus\models\Logout.php
 C:\wamp64\www\afyaplus\models\MedicalSchemes.php
 C:\wamp64\www\afyaplus\models\MedicalSchemesAdd.php
 C:\wamp64\www\afyaplus\models\MedicalSchemesDelete.php
@@ -244,6 +251,7 @@ C:\wamp64\www\afyaplus\models\PaymentMethodsDelete.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsEdit.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsList.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsView.php
+C:\wamp64\www\afyaplus\models\PersonalData.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetails.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetailsAdd.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetailsDelete.php
@@ -280,6 +288,9 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueEdit.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsView.php
+C:\wamp64\www\afyaplus\models\Radiologyreportsdetails.php
+C:\wamp64\www\afyaplus\models\RadiologyreportsdetailsList.php
+C:\wamp64\www\afyaplus\models\ResetPassword.php
 C:\wamp64\www\afyaplus\models\Roles.php
 C:\wamp64\www\afyaplus\models\RolesAdd.php
 C:\wamp64\www\afyaplus\models\RolesDelete.php
@@ -386,6 +397,7 @@ C:\wamp64\www\afyaplus\src\Entity\LabTestRequest.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryBilling.php
+C:\wamp64\www\afyaplus\src\Entity\Laboratoryreport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicalScheme.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineBrand.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineCategory.php
@@ -408,6 +420,7 @@ C:\wamp64\www\afyaplus\src\Entity\RadiologyReport.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequest.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsQueue.php
+C:\wamp64\www\afyaplus\src\Entity\Radiologyreportsdetail.php
 C:\wamp64\www\afyaplus\src\Entity\Role.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
@@ -504,6 +517,7 @@ C:\wamp64\www\afyaplus\src\routes.php
 C:\wamp64\www\afyaplus\src\userfn.php
 C:\wamp64\www\afyaplus\src\userlevelsettings.php
 C:\wamp64\www\afyaplus\views\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\views\ChangePassword.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php
 C:\wamp64\www\afyaplus\views\DepartmentsDelete.php
 C:\wamp64\www\afyaplus\views\DepartmentsEdit.php
@@ -582,6 +596,8 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\views\LaboratoryreportsList.php
+C:\wamp64\www\afyaplus\views\Login.php
 C:\wamp64\www\afyaplus\views\MedicalSchemesAdd.php
 C:\wamp64\www\afyaplus\views\MedicalSchemesDelete.php
 C:\wamp64\www\afyaplus\views\MedicalSchemesEdit.php
@@ -650,6 +666,7 @@ C:\wamp64\www\afyaplus\views\PaymentMethodsDelete.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsEdit.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsList.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsView.php
+C:\wamp64\www\afyaplus\views\PersonalData.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsAdd.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsDelete.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsEdit.php
@@ -680,6 +697,8 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueEdit.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsView.php
+C:\wamp64\www\afyaplus\views\RadiologyreportsdetailsList.php
+C:\wamp64\www\afyaplus\views\ResetPassword.php
 C:\wamp64\www\afyaplus\views\RolesAdd.php
 C:\wamp64\www\afyaplus\views\RolesDelete.php
 C:\wamp64\www\afyaplus\views\RolesEdit.php

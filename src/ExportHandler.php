@@ -58,6 +58,11 @@ class ExportHandler
             return;
         }
         $tbl = Container($exportLogTable);
+        $Security->loadTablePermissions($exportLogTable);
+        if (!$Security->canList()) {
+            SetStatus(401);
+            return;
+        }
         $filter = $tbl->applyUserIDFilters("");
         // Handle export type
         $fld = $tbl->Fields[Config("EXPORT_LOG_FIELD_NAME_EXPORT_TYPE")];
@@ -205,11 +210,16 @@ class ExportHandler
         if ($row !== false) {
             $fileName ??= $row[Config("EXPORT_LOG_FIELD_NAME_FILENAME")]; // Get file name
             $table = $row[Config("EXPORT_LOG_FIELD_NAME_TABLE")];
-            $info = pathinfo($fileName);
-            $ext = strtolower($info["extension"] ?? "");
-            $file = ExportPath(true) . $guid . "." . $ext;
-            $file = str_replace("\0", "", $file);
-            return [$fileName, $file];
+            $Security->loadTablePermissions($table);
+            if (!$Security->canExport()) {
+                SetStatus(401);
+            } else {
+                $info = pathinfo($fileName);
+                $ext = strtolower($info["extension"] ?? "");
+                $file = ExportPath(true) . $guid . "." . $ext;
+                $file = str_replace("\0", "", $file);
+                return [$fileName, $file];
+            }
         }
         return null;
     }
@@ -241,6 +251,13 @@ class ExportHandler
             } else { // View page
                 $recordKey = explode(",", $key);
             }
+        }
+
+        // Check permission
+        $Security->loadTablePermissions($table);
+        if (!$Security->canExport()) {
+            SetStatus(401);
+            return;
         }
 
         // Validate export type

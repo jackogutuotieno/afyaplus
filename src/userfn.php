@@ -155,17 +155,13 @@ function Api_Action($app)
 // Container Build event
 function Container_Build($builder)
 {
-    // Example:
-    // $builder->addDefinitions([
-    //    "myservice" => function (ContainerInterface $c) {
-    //        // your code to provide the service, e.g.
-    //        return new MyService();
-    //    },
-    //    "myservice2" => function (ContainerInterface $c) {
-    //        // your code to provide the service, e.g.
-    //        return new MyService2();
-    //    }
-    // ]);
+    AddListener(LoginStatusEvent::NAME, function(LoginStatusEvent $event) {
+        // Get current user id
+        $user_id = CurrentUserID();
+
+        // Combine user first and last name to form complete name
+        $event["currentUserName"] =  'Welcome, ' . CurrentUserInfo("first_name") . ' ' . CurrentUserInfo("last_name");
+    });
 }
 
 // Add listeners

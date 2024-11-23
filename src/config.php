@@ -303,8 +303,8 @@ $CONFIG = [
      * first before calculating hash. Otherwise, existing users will not be able
      * to login. Hashed password is irreversible, it will be reset during password recovery.
      */
-    "ENCRYPTED_PASSWORD" => false, // Use encrypted password
-    "CASE_SENSITIVE_PASSWORD" => false, // Case-sensitive password
+    "ENCRYPTED_PASSWORD" => true, // Use encrypted password
+    "CASE_SENSITIVE_PASSWORD" => true, // Case-sensitive password
 
     // Session timeout time
     "SESSION_TIMEOUT" => 0, // Session timeout time (minutes)
@@ -417,38 +417,38 @@ $CONFIG = [
     "PASSWORD_HASH" => false, // Use PHP password hashing functions
     "USE_MODAL_LOGIN" => false, // Use modal login
     "USE_MODAL_REGISTER" => false, // Use modal register
-    "USE_MODAL_CHANGE_PASSWORD" => false, // Use modal change password
-    "USE_MODAL_RESET_PASSWORD" => false, // Use modal reset password
+    "USE_MODAL_CHANGE_PASSWORD" => true, // Use modal change password
+    "USE_MODAL_RESET_PASSWORD" => true, // Use modal reset password
     "RESET_PASSWORD_TIME_LIMIT" => 60, // Reset password time limit (minutes)
 
     // Default User ID allowed permissions
     "DEFAULT_USER_ID_ALLOW_SECURITY" => 360,
 
     // User table/field names
-    "USER_TABLE_NAME" => "",
-    "USER_TABLE_ENTITY_CLASS" => "",
-    "LOGIN_USERNAME_FIELD_NAME" => "",
-    "LOGIN_USERNAME_PROPERTY_NAME" => "",
-    "LOGIN_PASSWORD_FIELD_NAME" => "",
-    "USER_ID_FIELD_NAME" => "",
+    "USER_TABLE_NAME" => "users",
+    "USER_TABLE_ENTITY_CLASS" => Entity\User::class,
+    "LOGIN_USERNAME_FIELD_NAME" => "email",
+    "LOGIN_USERNAME_PROPERTY_NAME" => "email",
+    "LOGIN_PASSWORD_FIELD_NAME" => "password",
+    "USER_ID_FIELD_NAME" => "id",
     "PARENT_USER_ID_FIELD_NAME" => "",
-    "USER_LEVEL_FIELD_NAME" => "",
-    "USER_PROFILE_FIELD_NAME" => "",
+    "USER_LEVEL_FIELD_NAME" => "user_role_id",
+    "USER_PROFILE_FIELD_NAME" => "user_profile",
     "REGISTER_ACTIVATE" => false,
     "REGISTER_AUTO_LOGIN" => false,
-    "REGISTER_ACTIVATE_FIELD_NAME" => "",
-    "REGISTER_ACTIVATE_PROPERTY_NAME" => "",
+    "REGISTER_ACTIVATE_FIELD_NAME" => "is_verified",
+    "REGISTER_ACTIVATE_PROPERTY_NAME" => "isVerified",
     "REGISTER_ACTIVATE_FIELD_VALUE" => "1",
-    "USER_EMAIL_FIELD_NAME" => "",
-    "USER_EMAIL_PROPERTY_NAME" => "",
-    "USER_PHONE_FIELD_NAME" => "",
-    "USER_IMAGE_FIELD_NAME" => "",
+    "USER_EMAIL_FIELD_NAME" => "email",
+    "USER_EMAIL_PROPERTY_NAME" => "email",
+    "USER_PHONE_FIELD_NAME" => "phone",
+    "USER_IMAGE_FIELD_NAME" => "photo",
     "USER_IMAGE_SIZE" => 40,
     "USER_IMAGE_CROP" => true,
 
     // User table filters
-    "USER_TABLE_DBID" => "",
-    "USER_TABLE" => "",
+    "USER_TABLE_DBID" => "DB",
+    "USER_TABLE" => "users",
     "SEARCH_FILTER_OPTION" => "Client",
 
     // Email

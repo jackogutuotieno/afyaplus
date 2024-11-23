@@ -48,6 +48,7 @@ class Users extends DbTable
     // Fields
     public $id;
     public $photo;
+    public $full_name;
     public $first_name;
     public $last_name;
     public $national_id;
@@ -59,11 +60,10 @@ class Users extends DbTable
     public $physical_address;
     public $_password;
     public $user_role_id;
-    public $account_status;
+    public $is_verified;
+    public $user_profile;
     public $date_created;
     public $date_updated;
-    public $otp_code;
-    public $otp_date;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -107,7 +107,6 @@ class Users extends DbTable
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
-        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this);
 
         // id
@@ -161,6 +160,29 @@ class Users extends DbTable
         $this->photo->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['photo'] = &$this->photo;
 
+        // full_name
+        $this->full_name = new DbField(
+            $this, // Table
+            'x_full_name', // Variable name
+            'full_name', // Name
+            'CONCAT(first_name,\' \',last_name)', // Expression
+            'CONCAT(first_name,\' \',last_name)', // Basic search expression
+            200, // Type
+            101, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'CONCAT(first_name,\' \',last_name)', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->full_name->InputTextType = "text";
+        $this->full_name->IsCustom = true; // Custom field
+        $this->full_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['full_name'] = &$this->full_name;
+
         // first_name
         $this->first_name = new DbField(
             $this, // Table
@@ -182,6 +204,7 @@ class Users extends DbTable
         $this->first_name->InputTextType = "text";
         $this->first_name->Nullable = false; // NOT NULL field
         $this->first_name->Required = true; // Required field
+        $this->first_name->Sortable = false; // Allow sort
         $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['first_name'] = &$this->first_name;
 
@@ -206,6 +229,7 @@ class Users extends DbTable
         $this->last_name->InputTextType = "text";
         $this->last_name->Nullable = false; // NOT NULL field
         $this->last_name->Required = true; // Required field
+        $this->last_name->Sortable = false; // Allow sort
         $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['last_name'] = &$this->last_name;
 
@@ -251,12 +275,14 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'RADIO' // Edit Tag
         );
         $this->gender->InputTextType = "text";
         $this->gender->Nullable = false; // NOT NULL field
         $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->gender->Lookup = new Lookup($this->gender, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->gender->OptionCount = 2;
+        $this->gender->SearchOperators = ["=", "<>"];
         $this->Fields['gender'] = &$this->gender;
 
         // phone
@@ -277,6 +303,7 @@ class Users extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
         $this->phone->InputTextType = "text";
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
@@ -301,7 +328,9 @@ class Users extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->_email->addMethod("getLinkPrefix", fn() => "mailto:");
         $this->_email->InputTextType = "text";
+        $this->_email->Raw = true;
         $this->_email->Nullable = false; // NOT NULL field
         $this->_email->Required = true; // Required field
         $this->_email->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
@@ -323,14 +352,18 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->department_id->InputTextType = "text";
         $this->department_id->Raw = true;
         $this->department_id->Nullable = false; // NOT NULL field
         $this->department_id->Required = true; // Required field
+        $this->department_id->setSelectMultiple(false); // Select one
+        $this->department_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->department_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->department_id->Lookup = new Lookup($this->department_id, 'departments', false, 'id', ["department_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`department_name`");
         $this->department_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->department_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->department_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['department_id'] = &$this->department_id;
 
         // designation_id
@@ -349,14 +382,18 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->designation_id->InputTextType = "text";
         $this->designation_id->Raw = true;
         $this->designation_id->Nullable = false; // NOT NULL field
         $this->designation_id->Required = true; // Required field
+        $this->designation_id->setSelectMultiple(false); // Select one
+        $this->designation_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->designation_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->designation_id->Lookup = new Lookup($this->designation_id, 'designations', false, 'id', ["designation","","",""], '', '', [], [], [], [], [], [], false, '', '', "`designation`");
         $this->designation_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->designation_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->designation_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['designation_id'] = &$this->designation_id;
 
         // physical_address
@@ -375,7 +412,7 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->physical_address->InputTextType = "text";
         $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
@@ -397,12 +434,14 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'PASSWORD' // Edit Tag
         );
         $this->_password->InputTextType = "text";
+        $this->_password->Raw = true;
         $this->_password->Nullable = false; // NOT NULL field
         $this->_password->Required = true; // Required field
-        $this->_password->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->_password->Sortable = false; // Allow sort
+        $this->_password->SearchOperators = ["=", "<>"];
         $this->Fields['password'] = &$this->_password;
 
         // user_role_id
@@ -421,39 +460,72 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->user_role_id->addMethod("getDefault", fn() => 0);
         $this->user_role_id->InputTextType = "text";
         $this->user_role_id->Raw = true;
         $this->user_role_id->Nullable = false; // NOT NULL field
         $this->user_role_id->Required = true; // Required field
+        $this->user_role_id->setSelectMultiple(false); // Select one
+        $this->user_role_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->user_role_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->user_role_id->OptionCount = 4;
         $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->user_role_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_role_id'] = &$this->user_role_id;
 
-        // account_status
-        $this->account_status = new DbField(
+        // is_verified
+        $this->is_verified = new DbField(
             $this, // Table
-            'x_account_status', // Variable name
-            'account_status', // Name
-            '`account_status`', // Expression
-            '`account_status`', // Basic search expression
-            200, // Type
-            50, // Size
+            'x_is_verified', // Variable name
+            'is_verified', // Name
+            '`is_verified`', // Expression
+            '`is_verified`', // Basic search expression
+            16, // Type
+            1, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`account_status`', // Virtual expression
+            '`is_verified`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'CHECKBOX' // Edit Tag
         );
-        $this->account_status->addMethod("getDefault", fn() => "Pending");
-        $this->account_status->InputTextType = "text";
-        $this->account_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['account_status'] = &$this->account_status;
+        $this->is_verified->addMethod("getDefault", fn() => 0);
+        $this->is_verified->InputTextType = "text";
+        $this->is_verified->Raw = true;
+        $this->is_verified->Nullable = false; // NOT NULL field
+        $this->is_verified->setDataType(DataType::BOOLEAN);
+        $this->is_verified->Lookup = new Lookup($this->is_verified, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->is_verified->OptionCount = 2;
+        $this->is_verified->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->is_verified->SearchOperators = ["=", "<>"];
+        $this->Fields['is_verified'] = &$this->is_verified;
+
+        // user_profile
+        $this->user_profile = new DbField(
+            $this, // Table
+            'x_user_profile', // Variable name
+            'user_profile', // Name
+            '`user_profile`', // Expression
+            '`user_profile`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`user_profile`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'HIDDEN' // Edit Tag
+        );
+        $this->user_profile->InputTextType = "text";
+        $this->user_profile->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->Fields['user_profile'] = &$this->user_profile;
 
         // date_created
         $this->date_created = new DbField(
@@ -461,10 +533,10 @@ class Users extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -477,7 +549,7 @@ class Users extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -487,10 +559,10 @@ class Users extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -503,55 +575,9 @@ class Users extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // otp_code
-        $this->otp_code = new DbField(
-            $this, // Table
-            'x_otp_code', // Variable name
-            'otp_code', // Name
-            '`otp_code`', // Expression
-            '`otp_code`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`otp_code`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->otp_code->InputTextType = "text";
-        $this->otp_code->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['otp_code'] = &$this->otp_code;
-
-        // otp_date
-        $this->otp_date = new DbField(
-            $this, // Table
-            'x_otp_date', // Variable name
-            'otp_date', // Name
-            '`otp_date`', // Expression
-            CastDateFieldForLike("`otp_date`", 0, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`otp_date`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->otp_date->InputTextType = "text";
-        $this->otp_date->Raw = true;
-        $this->otp_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->otp_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['otp_date'] = &$this->otp_date;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -644,20 +670,7 @@ class Users extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, CONCAT(first_name,' ',last_name) AS `full_name`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -750,6 +763,11 @@ class Users extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter, $id);
+        }
         return $filter;
     }
 
@@ -942,6 +960,9 @@ class Users extends DbTable
             if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom) {
                 continue;
             }
+            if (Config("ENCRYPTED_PASSWORD") && $name == Config("LOGIN_PASSWORD_FIELD_NAME")) {
+                $value = EncryptPassword(Config("CASE_SENSITIVE_PASSWORD") ? $value : strtolower($value));
+            }
             $field = $this->Fields[$name];
             $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
             $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
@@ -985,6 +1006,12 @@ class Users extends DbTable
         foreach ($rs as $name => $value) {
             if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom || $this->Fields[$name]->IsAutoIncrement) {
                 continue;
+            }
+            if (Config("ENCRYPTED_PASSWORD") && $name == Config("LOGIN_PASSWORD_FIELD_NAME")) {
+                if ($value == $this->Fields[$name]->OldValue) { // No need to update hashed password if not changed
+                    continue;
+                }
+                $value = EncryptPassword(Config("CASE_SENSITIVE_PASSWORD") ? $value : strtolower($value));
             }
             $field = $this->Fields[$name];
             $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
@@ -1073,6 +1100,7 @@ class Users extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->photo->Upload->DbValue = $row['photo'];
+        $this->full_name->DbValue = $row['full_name'];
         $this->first_name->DbValue = $row['first_name'];
         $this->last_name->DbValue = $row['last_name'];
         $this->national_id->DbValue = $row['national_id'];
@@ -1084,11 +1112,10 @@ class Users extends DbTable
         $this->physical_address->DbValue = $row['physical_address'];
         $this->_password->DbValue = $row['password'];
         $this->user_role_id->DbValue = $row['user_role_id'];
-        $this->account_status->DbValue = $row['account_status'];
+        $this->is_verified->DbValue = $row['is_verified'];
+        $this->user_profile->DbValue = $row['user_profile'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->otp_code->DbValue = $row['otp_code'];
-        $this->otp_date->DbValue = $row['otp_date'];
     }
 
     // Delete uploaded files
@@ -1328,7 +1355,7 @@ class Users extends DbTable
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
         }
-        if ($this->PageID != "grid" && !$this->isExport() && $fld->UseFilter) {
+        if ($this->PageID != "grid" && !$this->isExport() && $fld->UseFilter && $Security->canSearch()) {
             $html .= '<div class="ew-filter-dropdown-btn" data-ew-action="filter" data-table="' . $fld->TableVar . '" data-field="' . $fld->FieldVar .
                 '"><div class="ew-table-header-filter" role="button" aria-haspopup="true">' . $Language->phrase("Filter") .
                 (is_array($fld->EditValue) ? str_replace("%c", count($fld->EditValue), $Language->phrase("FilterCount")) : '') .
@@ -1443,6 +1470,7 @@ class Users extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->photo->Upload->DbValue = $row['photo'];
+        $this->full_name->setDbValue($row['full_name']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
@@ -1454,11 +1482,10 @@ class Users extends DbTable
         $this->physical_address->setDbValue($row['physical_address']);
         $this->_password->setDbValue($row['password']);
         $this->user_role_id->setDbValue($row['user_role_id']);
-        $this->account_status->setDbValue($row['account_status']);
+        $this->is_verified->setDbValue($row['is_verified']);
+        $this->user_profile->setDbValue($row['user_profile']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->otp_code->setDbValue($row['otp_code']);
-        $this->otp_date->setDbValue($row['otp_date']);
     }
 
     // Render list content
@@ -1493,6 +1520,8 @@ class Users extends DbTable
 
         // photo
 
+        // full_name
+
         // first_name
 
         // last_name
@@ -1512,18 +1541,18 @@ class Users extends DbTable
         // physical_address
 
         // password
+        $this->_password->CellCssStyle = "white-space: nowrap;";
 
         // user_role_id
 
-        // account_status
+        // is_verified
+
+        // user_profile
+        $this->user_profile->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
         // date_updated
-
-        // otp_code
-
-        // otp_date
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1536,6 +1565,9 @@ class Users extends DbTable
             $this->photo->ViewValue = "";
         }
 
+        // full_name
+        $this->full_name->ViewValue = $this->full_name->CurrentValue;
+
         // first_name
         $this->first_name->ViewValue = $this->first_name->CurrentValue;
 
@@ -1544,10 +1576,13 @@ class Users extends DbTable
 
         // national_id
         $this->national_id->ViewValue = $this->national_id->CurrentValue;
-        $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
         // gender
-        $this->gender->ViewValue = $this->gender->CurrentValue;
+        if (strval($this->gender->CurrentValue) != "") {
+            $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
+        } else {
+            $this->gender->ViewValue = null;
+        }
 
         // phone
         $this->phone->ViewValue = $this->phone->CurrentValue;
@@ -1556,25 +1591,77 @@ class Users extends DbTable
         $this->_email->ViewValue = $this->_email->CurrentValue;
 
         // department_id
-        $this->department_id->ViewValue = $this->department_id->CurrentValue;
-        $this->department_id->ViewValue = FormatNumber($this->department_id->ViewValue, $this->department_id->formatPattern());
+        $curVal = strval($this->department_id->CurrentValue);
+        if ($curVal != "") {
+            $this->department_id->ViewValue = $this->department_id->lookupCacheOption($curVal);
+            if ($this->department_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->department_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->department_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->department_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->department_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->department_id->ViewValue = $this->department_id->displayValue($arwrk);
+                } else {
+                    $this->department_id->ViewValue = FormatNumber($this->department_id->CurrentValue, $this->department_id->formatPattern());
+                }
+            }
+        } else {
+            $this->department_id->ViewValue = null;
+        }
 
         // designation_id
-        $this->designation_id->ViewValue = $this->designation_id->CurrentValue;
-        $this->designation_id->ViewValue = FormatNumber($this->designation_id->ViewValue, $this->designation_id->formatPattern());
+        $curVal = strval($this->designation_id->CurrentValue);
+        if ($curVal != "") {
+            $this->designation_id->ViewValue = $this->designation_id->lookupCacheOption($curVal);
+            if ($this->designation_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->designation_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->designation_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->designation_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->designation_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->designation_id->ViewValue = $this->designation_id->displayValue($arwrk);
+                } else {
+                    $this->designation_id->ViewValue = FormatNumber($this->designation_id->CurrentValue, $this->designation_id->formatPattern());
+                }
+            }
+        } else {
+            $this->designation_id->ViewValue = null;
+        }
 
         // physical_address
         $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
         // password
-        $this->_password->ViewValue = $this->_password->CurrentValue;
+        $this->_password->ViewValue = $Language->phrase("PasswordMask");
 
         // user_role_id
-        $this->user_role_id->ViewValue = $this->user_role_id->CurrentValue;
-        $this->user_role_id->ViewValue = FormatNumber($this->user_role_id->ViewValue, $this->user_role_id->formatPattern());
+        if ($Security->canAdmin()) { // System admin
+            if (strval($this->user_role_id->CurrentValue) != "") {
+                $this->user_role_id->ViewValue = $this->user_role_id->optionCaption($this->user_role_id->CurrentValue);
+            } else {
+                $this->user_role_id->ViewValue = null;
+            }
+        } else {
+            $this->user_role_id->ViewValue = $Language->phrase("PasswordMask");
+        }
 
-        // account_status
-        $this->account_status->ViewValue = $this->account_status->CurrentValue;
+        // is_verified
+        if (ConvertToBool($this->is_verified->CurrentValue)) {
+            $this->is_verified->ViewValue = $this->is_verified->tagCaption(1) != "" ? $this->is_verified->tagCaption(1) : "Yes";
+        } else {
+            $this->is_verified->ViewValue = $this->is_verified->tagCaption(2) != "" ? $this->is_verified->tagCaption(2) : "No";
+        }
+
+        // user_profile
+        $this->user_profile->ViewValue = $this->user_profile->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1583,13 +1670,6 @@ class Users extends DbTable
         // date_updated
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-        // otp_code
-        $this->otp_code->ViewValue = $this->otp_code->CurrentValue;
-
-        // otp_date
-        $this->otp_date->ViewValue = $this->otp_date->CurrentValue;
-        $this->otp_date->ViewValue = FormatDateTime($this->otp_date->ViewValue, $this->otp_date->formatPattern());
 
         // id
         $this->id->HrefValue = "";
@@ -1611,6 +1691,10 @@ class Users extends DbTable
         $this->photo->ExportHrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
         $this->photo->TooltipValue = "";
 
+        // full_name
+        $this->full_name->HrefValue = "";
+        $this->full_name->TooltipValue = "";
+
         // first_name
         $this->first_name->HrefValue = "";
         $this->first_name->TooltipValue = "";
@@ -1628,11 +1712,27 @@ class Users extends DbTable
         $this->gender->TooltipValue = "";
 
         // phone
-        $this->phone->HrefValue = "";
+        if (!EmptyValue($this->phone->CurrentValue)) {
+            $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+            $this->phone->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+            }
+        } else {
+            $this->phone->HrefValue = "";
+        }
         $this->phone->TooltipValue = "";
 
         // email
-        $this->_email->HrefValue = "";
+        if (!EmptyValue($this->_email->CurrentValue)) {
+            $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+            $this->_email->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
+            }
+        } else {
+            $this->_email->HrefValue = "";
+        }
         $this->_email->TooltipValue = "";
 
         // department_id
@@ -1655,9 +1755,13 @@ class Users extends DbTable
         $this->user_role_id->HrefValue = "";
         $this->user_role_id->TooltipValue = "";
 
-        // account_status
-        $this->account_status->HrefValue = "";
-        $this->account_status->TooltipValue = "";
+        // is_verified
+        $this->is_verified->HrefValue = "";
+        $this->is_verified->TooltipValue = "";
+
+        // user_profile
+        $this->user_profile->HrefValue = "";
+        $this->user_profile->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1666,14 +1770,6 @@ class Users extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
-
-        // otp_code
-        $this->otp_code->HrefValue = "";
-        $this->otp_code->TooltipValue = "";
-
-        // otp_date
-        $this->otp_date->HrefValue = "";
-        $this->otp_date->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1703,6 +1799,14 @@ class Users extends DbTable
             $this->photo->EditValue = "";
         }
 
+        // full_name
+        $this->full_name->setupEditAttributes();
+        if (!$this->full_name->Raw) {
+            $this->full_name->CurrentValue = HtmlDecode($this->full_name->CurrentValue);
+        }
+        $this->full_name->EditValue = $this->full_name->CurrentValue;
+        $this->full_name->PlaceHolder = RemoveHtml($this->full_name->caption());
+
         // first_name
         $this->first_name->setupEditAttributes();
         if (!$this->first_name->Raw) {
@@ -1724,15 +1828,11 @@ class Users extends DbTable
         $this->national_id->EditValue = $this->national_id->CurrentValue;
         $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
         if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
-            $this->national_id->EditValue = FormatNumber($this->national_id->EditValue, null);
+            $this->national_id->EditValue = $this->national_id->EditValue;
         }
 
         // gender
-        $this->gender->setupEditAttributes();
-        if (!$this->gender->Raw) {
-            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
-        }
-        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->EditValue = $this->gender->options(false);
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
         // phone
@@ -1753,51 +1853,37 @@ class Users extends DbTable
 
         // department_id
         $this->department_id->setupEditAttributes();
-        $this->department_id->EditValue = $this->department_id->CurrentValue;
         $this->department_id->PlaceHolder = RemoveHtml($this->department_id->caption());
-        if (strval($this->department_id->EditValue) != "" && is_numeric($this->department_id->EditValue)) {
-            $this->department_id->EditValue = FormatNumber($this->department_id->EditValue, null);
-        }
 
         // designation_id
         $this->designation_id->setupEditAttributes();
-        $this->designation_id->EditValue = $this->designation_id->CurrentValue;
         $this->designation_id->PlaceHolder = RemoveHtml($this->designation_id->caption());
-        if (strval($this->designation_id->EditValue) != "" && is_numeric($this->designation_id->EditValue)) {
-            $this->designation_id->EditValue = FormatNumber($this->designation_id->EditValue, null);
-        }
 
         // physical_address
         $this->physical_address->setupEditAttributes();
-        if (!$this->physical_address->Raw) {
-            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-        }
         $this->physical_address->EditValue = $this->physical_address->CurrentValue;
         $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
 
         // password
         $this->_password->setupEditAttributes();
-        if (!$this->_password->Raw) {
-            $this->_password->CurrentValue = HtmlDecode($this->_password->CurrentValue);
-        }
         $this->_password->EditValue = $this->_password->CurrentValue;
         $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
 
         // user_role_id
         $this->user_role_id->setupEditAttributes();
-        $this->user_role_id->EditValue = $this->user_role_id->CurrentValue;
-        $this->user_role_id->PlaceHolder = RemoveHtml($this->user_role_id->caption());
-        if (strval($this->user_role_id->EditValue) != "" && is_numeric($this->user_role_id->EditValue)) {
-            $this->user_role_id->EditValue = FormatNumber($this->user_role_id->EditValue, null);
+        if (!$Security->canAdmin()) { // System admin
+            $this->user_role_id->EditValue = $Language->phrase("PasswordMask");
+        } else {
+            $this->user_role_id->EditValue = $this->user_role_id->options(true);
+            $this->user_role_id->PlaceHolder = RemoveHtml($this->user_role_id->caption());
         }
 
-        // account_status
-        $this->account_status->setupEditAttributes();
-        if (!$this->account_status->Raw) {
-            $this->account_status->CurrentValue = HtmlDecode($this->account_status->CurrentValue);
-        }
-        $this->account_status->EditValue = $this->account_status->CurrentValue;
-        $this->account_status->PlaceHolder = RemoveHtml($this->account_status->caption());
+        // is_verified
+        $this->is_verified->EditValue = $this->is_verified->options(false);
+        $this->is_verified->PlaceHolder = RemoveHtml($this->is_verified->caption());
+
+        // user_profile
+        $this->user_profile->setupEditAttributes();
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1808,19 +1894,6 @@ class Users extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // otp_code
-        $this->otp_code->setupEditAttributes();
-        if (!$this->otp_code->Raw) {
-            $this->otp_code->CurrentValue = HtmlDecode($this->otp_code->CurrentValue);
-        }
-        $this->otp_code->EditValue = $this->otp_code->CurrentValue;
-        $this->otp_code->PlaceHolder = RemoveHtml($this->otp_code->caption());
-
-        // otp_date
-        $this->otp_date->setupEditAttributes();
-        $this->otp_date->EditValue = FormatDateTime($this->otp_date->CurrentValue, $this->otp_date->formatPattern());
-        $this->otp_date->PlaceHolder = RemoveHtml($this->otp_date->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1852,8 +1925,7 @@ class Users extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->photo);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->full_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
@@ -1863,15 +1935,12 @@ class Users extends DbTable
                     $doc->exportCaption($this->physical_address);
                     $doc->exportCaption($this->_password);
                     $doc->exportCaption($this->user_role_id);
-                    $doc->exportCaption($this->account_status);
+                    $doc->exportCaption($this->is_verified);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->otp_code);
-                    $doc->exportCaption($this->otp_date);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->full_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
@@ -1879,13 +1948,10 @@ class Users extends DbTable
                     $doc->exportCaption($this->department_id);
                     $doc->exportCaption($this->designation_id);
                     $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->_password);
                     $doc->exportCaption($this->user_role_id);
-                    $doc->exportCaption($this->account_status);
+                    $doc->exportCaption($this->is_verified);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->otp_code);
-                    $doc->exportCaption($this->otp_date);
                 }
                 $doc->endExportRow();
             }
@@ -1914,8 +1980,7 @@ class Users extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->photo);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->full_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
@@ -1925,15 +1990,12 @@ class Users extends DbTable
                         $doc->exportField($this->physical_address);
                         $doc->exportField($this->_password);
                         $doc->exportField($this->user_role_id);
-                        $doc->exportField($this->account_status);
+                        $doc->exportField($this->is_verified);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->otp_code);
-                        $doc->exportField($this->otp_date);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->full_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
@@ -1941,13 +2003,10 @@ class Users extends DbTable
                         $doc->exportField($this->department_id);
                         $doc->exportField($this->designation_id);
                         $doc->exportField($this->physical_address);
-                        $doc->exportField($this->_password);
                         $doc->exportField($this->user_role_id);
-                        $doc->exportField($this->account_status);
+                        $doc->exportField($this->is_verified);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->otp_code);
-                        $doc->exportField($this->otp_date);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1961,6 +2020,60 @@ class Users extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // User ID filter
+    public function getUserIDFilter($userId)
+    {
+        global $Security;
+        $userIdFilter = '`id` = ' . QuotedValue($userId, DataType::NUMBER, Config("USER_TABLE_DBID"));
+        return $userIdFilter;
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "", $id = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        if ($id == "") {
+            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
+        }
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`id` IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM users";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        $conn = Conn($this->Dbid);
+        $config = $conn->getConfiguration();
+        $config->setResultCache($this->Cache);
+        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
+            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data

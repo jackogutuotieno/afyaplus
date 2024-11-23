@@ -96,6 +96,7 @@ return [
     "lab_test_requests_details" => \DI\create(LabTestRequestsDetails::class),
     "lab_test_requests_queue" => \DI\create(LabTestRequestsQueue::class),
     "laboratory_billing" => \DI\create(LaboratoryBilling::class),
+    "laboratoryreports" => \DI\create(Laboratoryreports::class),
     "medical_schemes" => \DI\create(MedicalSchemes::class),
     "medicine_brands" => \DI\create(MedicineBrands::class),
     "medicine_categories" => \DI\create(MedicineCategories::class),
@@ -118,6 +119,7 @@ return [
     "radiology_requests" => \DI\create(RadiologyRequests::class),
     "radiology_requests_details" => \DI\create(RadiologyRequestsDetails::class),
     "radiology_requests_queue" => \DI\create(RadiologyRequestsQueue::class),
+    "radiologyreportsdetails" => \DI\create(Radiologyreportsdetails::class),
     "roles" => \DI\create(Roles::class),
     "service_categories" => \DI\create(ServiceCategories::class),
     "service_charges" => \DI\create(ServiceCharges::class),
@@ -127,4 +129,7 @@ return [
     "visit_types" => \DI\create(VisitTypes::class),
     "vitalsreport" => \DI\create(Vitalsreport::class),
     "exportlog" => \DI\create(Exportlog::class),
+
+    // User table
+    "usertable" => \DI\get("users"),
 ] + $definitions;

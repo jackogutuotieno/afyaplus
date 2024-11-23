@@ -7,9 +7,9 @@ namespace PHPMaker2024\afyaplus;
  */
 class UserProfile implements \Stringable
 {
-    public static $CONCURRENT_SESSION_COUNT = -1; // Maximum sessions allowed
+    public static $CONCURRENT_SESSION_COUNT = 1; // Maximum sessions allowed
     public static $FORCE_LOGOUT_USER = false; // Force logout user
-    public static $FORCE_LOGOUT_CONCURRENT_USER = false; // Force logout concurrent user
+    public static $FORCE_LOGOUT_CONCURRENT_USER = true; // Force logout concurrent user
     public static $SESSION_CLEANUP_TIME = 60 * 24; // Clean up unused sessions if idle more than 1 day
     public static $SESSION_TIMEOUT = -1;
     public static $MAX_RETRY = 3;

@@ -156,7 +156,7 @@ class PatientVitalsView extends PatientVitals
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'patient_vitals';
         $this->TableName = 'patient_vitals';
 
@@ -192,6 +192,9 @@ class PatientVitalsView extends PatientVitals
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // Export options
         $this->ExportOptions = new ListOptions(TagClassName: "ew-export-option");
@@ -509,6 +512,18 @@ class PatientVitalsView extends PatientVitals
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
 
         // Get export parameters
@@ -625,6 +640,9 @@ class PatientVitalsView extends PatientVitals
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -668,7 +686,7 @@ class PatientVitalsView extends PatientVitals
         } else {
             $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("ViewPageAddLink") . "</a>";
         }
-        $item->Visible = $this->AddUrl != "";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
 
         // Edit
         $item = &$option->add("edit");
@@ -678,7 +696,7 @@ class PatientVitalsView extends PatientVitals
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "";
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Copy
         $item = &$option->add("copy");
@@ -688,7 +706,7 @@ class PatientVitalsView extends PatientVitals
         } else {
             $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
         }
-        $item->Visible = $this->CopyUrl != "";
+        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
 
         // Delete
         $item = &$option->add("delete");
@@ -697,7 +715,7 @@ class PatientVitalsView extends PatientVitals
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "";
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
 
         // Set up action default
         $option = $options["action"];
@@ -1076,6 +1094,9 @@ class PatientVitalsView extends PatientVitals
 
         // Hide options if json response
         if (IsJsonResponse()) {
+            $this->ExportOptions->hideAllOptions();
+        }
+        if (!$Security->canExport()) { // Export not allowed
             $this->ExportOptions->hideAllOptions();
         }
     }

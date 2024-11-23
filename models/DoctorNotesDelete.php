@@ -138,7 +138,7 @@ class DoctorNotesDelete extends DoctorNotes
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'doctor_notes';
         $this->TableName = 'doctor_notes';
 
@@ -169,6 +169,9 @@ class DoctorNotesDelete extends DoctorNotes
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -379,6 +382,18 @@ class DoctorNotesDelete extends DoctorNotes
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
+
+            // Force logout user
+            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
+                $this->terminate("logout");
+                return;
+            }
+
+            // Check if valid user and update last accessed time
+            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
+                $this->terminate("logout"); // Handle as session expired
+                return;
+            }
         }
         $this->CurrentAction = Param("action"); // Set up current action
         $this->setVisibility();
@@ -473,6 +488,9 @@ class DoctorNotesDelete extends DoctorNotes
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -744,6 +762,10 @@ class DoctorNotesDelete extends DoctorNotes
     protected function deleteRows()
     {
         global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
         $sql = $this->getCurrentSql();
         $conn = $this->getConnection();
         $rows = $conn->fetchAllAssociative($sql);

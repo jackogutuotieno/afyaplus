@@ -83,6 +83,7 @@ loadjs.ready(["wrapper", "head"], function () {
 });
 </script>
 <input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
 <div class="row mb-0">
@@ -106,6 +107,7 @@ loadjs.ready(["wrapper", "head"], function () {
     </div>
 </div>
 </div><!-- /.ew-extended-search -->
+<?php } ?>
 <?php } ?>
 </div><!-- /.ew-search-panel -->
 </form>
@@ -158,11 +160,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_users_id" class="users_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_users_first_name" class="users_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_users_last_name" class="users_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+<?php if ($Page->full_name->Visible) { // full_name ?>
+        <th data-name="full_name" class="<?= $Page->full_name->headerCellClass() ?>"><div id="elh_users_full_name" class="users_full_name"><?= $Page->renderFieldHeader($Page->full_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->national_id->Visible) { // national_id ?>
         <th data-name="national_id" class="<?= $Page->national_id->headerCellClass() ?>"><div id="elh_users_national_id" class="users_national_id"><?= $Page->renderFieldHeader($Page->national_id) ?></div></th>
@@ -185,26 +184,17 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
         <th data-name="physical_address" class="<?= $Page->physical_address->headerCellClass() ?>"><div id="elh_users_physical_address" class="users_physical_address"><?= $Page->renderFieldHeader($Page->physical_address) ?></div></th>
 <?php } ?>
-<?php if ($Page->_password->Visible) { // password ?>
-        <th data-name="_password" class="<?= $Page->_password->headerCellClass() ?>"><div id="elh_users__password" class="users__password"><?= $Page->renderFieldHeader($Page->_password) ?></div></th>
-<?php } ?>
 <?php if ($Page->user_role_id->Visible) { // user_role_id ?>
         <th data-name="user_role_id" class="<?= $Page->user_role_id->headerCellClass() ?>"><div id="elh_users_user_role_id" class="users_user_role_id"><?= $Page->renderFieldHeader($Page->user_role_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->account_status->Visible) { // account_status ?>
-        <th data-name="account_status" class="<?= $Page->account_status->headerCellClass() ?>"><div id="elh_users_account_status" class="users_account_status"><?= $Page->renderFieldHeader($Page->account_status) ?></div></th>
+<?php if ($Page->is_verified->Visible) { // is_verified ?>
+        <th data-name="is_verified" class="<?= $Page->is_verified->headerCellClass() ?>"><div id="elh_users_is_verified" class="users_is_verified"><?= $Page->renderFieldHeader($Page->is_verified) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_users_date_created" class="users_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_users_date_updated" class="users_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->otp_code->Visible) { // otp_code ?>
-        <th data-name="otp_code" class="<?= $Page->otp_code->headerCellClass() ?>"><div id="elh_users_otp_code" class="users_otp_code"><?= $Page->renderFieldHeader($Page->otp_code) ?></div></th>
-<?php } ?>
-<?php if ($Page->otp_date->Visible) { // otp_date ?>
-        <th data-name="otp_date" class="<?= $Page->otp_date->headerCellClass() ?>"><div id="elh_users_otp_date" class="users_otp_date"><?= $Page->renderFieldHeader($Page->otp_date) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -242,19 +232,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_first_name" class="el_users_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->last_name->Visible) { // last_name ?>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_last_name" class="el_users_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+    <?php if ($Page->full_name->Visible) { // full_name ?>
+        <td data-name="full_name"<?= $Page->full_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_full_name" class="el_users_full_name">
+<span<?= $Page->full_name->viewAttributes() ?>>
+<?= $Page->full_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -278,7 +260,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_phone" class="el_users_phone">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -286,7 +273,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td data-name="_email"<?= $Page->_email->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users__email" class="el_users__email">
 <span<?= $Page->_email->viewAttributes() ?>>
-<?= $Page->_email->getViewValue() ?></span>
+<?php if (!EmptyString($Page->_email->getViewValue()) && $Page->_email->linkAttributes() != "") { ?>
+<a<?= $Page->_email->linkAttributes() ?>><?= $Page->_email->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->_email->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -314,14 +306,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->_password->Visible) { // password ?>
-        <td data-name="_password"<?= $Page->_password->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users__password" class="el_users__password">
-<span<?= $Page->_password->viewAttributes() ?>>
-<?= $Page->_password->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->user_role_id->Visible) { // user_role_id ?>
         <td data-name="user_role_id"<?= $Page->user_role_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_user_role_id" class="el_users_user_role_id">
@@ -330,11 +314,15 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->account_status->Visible) { // account_status ?>
-        <td data-name="account_status"<?= $Page->account_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_account_status" class="el_users_account_status">
-<span<?= $Page->account_status->viewAttributes() ?>>
-<?= $Page->account_status->getViewValue() ?></span>
+    <?php if ($Page->is_verified->Visible) { // is_verified ?>
+        <td data-name="is_verified"<?= $Page->is_verified->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_is_verified" class="el_users_is_verified">
+<span<?= $Page->is_verified->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_verified_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_verified->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_verified->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_verified_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -351,22 +339,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_date_updated" class="el_users_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->otp_code->Visible) { // otp_code ?>
-        <td data-name="otp_code"<?= $Page->otp_code->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_otp_code" class="el_users_otp_code">
-<span<?= $Page->otp_code->viewAttributes() ?>>
-<?= $Page->otp_code->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->otp_date->Visible) { // otp_date ?>
-        <td data-name="otp_date"<?= $Page->otp_date->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_users_otp_date" class="el_users_otp_date">
-<span<?= $Page->otp_date->viewAttributes() ?>>
-<?= $Page->otp_date->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

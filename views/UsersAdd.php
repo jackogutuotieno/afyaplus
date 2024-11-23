@@ -29,16 +29,13 @@ loadjs.ready(["wrapper", "head"], function () {
             ["gender", [fields.gender.visible && fields.gender.required ? ew.Validators.required(fields.gender.caption) : null], fields.gender.isInvalid],
             ["phone", [fields.phone.visible && fields.phone.required ? ew.Validators.required(fields.phone.caption) : null], fields.phone.isInvalid],
             ["_email", [fields._email.visible && fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid],
-            ["department_id", [fields.department_id.visible && fields.department_id.required ? ew.Validators.required(fields.department_id.caption) : null, ew.Validators.integer], fields.department_id.isInvalid],
-            ["designation_id", [fields.designation_id.visible && fields.designation_id.required ? ew.Validators.required(fields.designation_id.caption) : null, ew.Validators.integer], fields.designation_id.isInvalid],
+            ["department_id", [fields.department_id.visible && fields.department_id.required ? ew.Validators.required(fields.department_id.caption) : null], fields.department_id.isInvalid],
+            ["designation_id", [fields.designation_id.visible && fields.designation_id.required ? ew.Validators.required(fields.designation_id.caption) : null], fields.designation_id.isInvalid],
             ["physical_address", [fields.physical_address.visible && fields.physical_address.required ? ew.Validators.required(fields.physical_address.caption) : null], fields.physical_address.isInvalid],
             ["_password", [fields._password.visible && fields._password.required ? ew.Validators.required(fields._password.caption) : null], fields._password.isInvalid],
-            ["user_role_id", [fields.user_role_id.visible && fields.user_role_id.required ? ew.Validators.required(fields.user_role_id.caption) : null, ew.Validators.integer], fields.user_role_id.isInvalid],
-            ["account_status", [fields.account_status.visible && fields.account_status.required ? ew.Validators.required(fields.account_status.caption) : null], fields.account_status.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
-            ["otp_code", [fields.otp_code.visible && fields.otp_code.required ? ew.Validators.required(fields.otp_code.caption) : null], fields.otp_code.isInvalid],
-            ["otp_date", [fields.otp_date.visible && fields.otp_date.required ? ew.Validators.required(fields.otp_date.caption) : null, ew.Validators.datetime(fields.otp_date.clientFormatPattern)], fields.otp_date.isInvalid]
+            ["user_role_id", [fields.user_role_id.visible && fields.user_role_id.required ? ew.Validators.required(fields.user_role_id.caption) : null], fields.user_role_id.isInvalid],
+            ["is_verified", [fields.is_verified.visible && fields.is_verified.required ? ew.Validators.required(fields.is_verified.caption) : null], fields.is_verified.isInvalid],
+            ["user_profile", [fields.user_profile.visible && fields.user_profile.required ? ew.Validators.required(fields.user_profile.caption) : null], fields.user_profile.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -54,6 +51,11 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "gender": <?= $Page->gender->toClientList($Page) ?>,
+            "department_id": <?= $Page->department_id->toClientList($Page) ?>,
+            "designation_id": <?= $Page->designation_id->toClientList($Page) ?>,
+            "user_role_id": <?= $Page->user_role_id->toClientList($Page) ?>,
+            "is_verified": <?= $Page->is_verified->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -156,10 +158,29 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
     <div id="r_gender"<?= $Page->gender->rowAttributes() ?>>
-        <label id="elh_users_gender" for="x_gender" class="<?= $Page->LeftColumnClass ?>"><?= $Page->gender->caption() ?><?= $Page->gender->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_users_gender" class="<?= $Page->LeftColumnClass ?>"><?= $Page->gender->caption() ?><?= $Page->gender->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->gender->cellAttributes() ?>>
 <span id="el_users_gender">
-<input type="<?= $Page->gender->getInputTextType() ?>" name="x_gender" id="x_gender" data-table="users" data-field="x_gender" value="<?= $Page->gender->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->gender->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->gender->formatPattern()) ?>"<?= $Page->gender->editAttributes() ?> aria-describedby="x_gender_help">
+<template id="tp_x_gender">
+    <div class="form-check">
+        <input type="radio" class="form-check-input" data-table="users" data-field="x_gender" name="x_gender" id="x_gender"<?= $Page->gender->editAttributes() ?>>
+        <label class="form-check-label"></label>
+    </div>
+</template>
+<div id="dsl_x_gender" class="ew-item-list"></div>
+<selection-list hidden
+    id="x_gender"
+    name="x_gender"
+    value="<?= HtmlEncode($Page->gender->CurrentValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_gender"
+    data-target="dsl_x_gender"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->gender->isInvalidClass() ?>"
+    data-table="users"
+    data-field="x_gender"
+    data-value-separator="<?= $Page->gender->displayValueSeparatorAttribute() ?>"
+    <?= $Page->gender->editAttributes() ?>></selection-list>
 <?= $Page->gender->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->gender->getErrorMessage() ?></div>
 </span>
@@ -195,9 +216,43 @@ $Page->showMessage();
         <label id="elh_users_department_id" for="x_department_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->department_id->caption() ?><?= $Page->department_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->department_id->cellAttributes() ?>>
 <span id="el_users_department_id">
-<input type="<?= $Page->department_id->getInputTextType() ?>" name="x_department_id" id="x_department_id" data-table="users" data-field="x_department_id" value="<?= $Page->department_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->department_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->department_id->formatPattern()) ?>"<?= $Page->department_id->editAttributes() ?> aria-describedby="x_department_id_help">
-<?= $Page->department_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->department_id->getErrorMessage() ?></div>
+    <select
+        id="x_department_id"
+        name="x_department_id"
+        class="form-select ew-select<?= $Page->department_id->isInvalidClass() ?>"
+        <?php if (!$Page->department_id->IsNativeSelect) { ?>
+        data-select2-id="fusersadd_x_department_id"
+        <?php } ?>
+        data-table="users"
+        data-field="x_department_id"
+        data-value-separator="<?= $Page->department_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->department_id->getPlaceHolder()) ?>"
+        <?= $Page->department_id->editAttributes() ?>>
+        <?= $Page->department_id->selectOptionListHtml("x_department_id") ?>
+    </select>
+    <?= $Page->department_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->department_id->getErrorMessage() ?></div>
+<?= $Page->department_id->Lookup->getParamTag($Page, "p_x_department_id") ?>
+<?php if (!$Page->department_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fusersadd", function() {
+    var options = { name: "x_department_id", selectId: "fusersadd_x_department_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fusersadd.lists.department_id?.lookupOptions.length) {
+        options.data = { id: "x_department_id", form: "fusersadd" };
+    } else {
+        options.ajax = { id: "x_department_id", form: "fusersadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.users.fields.department_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -207,21 +262,61 @@ $Page->showMessage();
         <label id="elh_users_designation_id" for="x_designation_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->designation_id->caption() ?><?= $Page->designation_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->designation_id->cellAttributes() ?>>
 <span id="el_users_designation_id">
-<input type="<?= $Page->designation_id->getInputTextType() ?>" name="x_designation_id" id="x_designation_id" data-table="users" data-field="x_designation_id" value="<?= $Page->designation_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->designation_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->designation_id->formatPattern()) ?>"<?= $Page->designation_id->editAttributes() ?> aria-describedby="x_designation_id_help">
-<?= $Page->designation_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->designation_id->getErrorMessage() ?></div>
+    <select
+        id="x_designation_id"
+        name="x_designation_id"
+        class="form-select ew-select<?= $Page->designation_id->isInvalidClass() ?>"
+        <?php if (!$Page->designation_id->IsNativeSelect) { ?>
+        data-select2-id="fusersadd_x_designation_id"
+        <?php } ?>
+        data-table="users"
+        data-field="x_designation_id"
+        data-value-separator="<?= $Page->designation_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->designation_id->getPlaceHolder()) ?>"
+        <?= $Page->designation_id->editAttributes() ?>>
+        <?= $Page->designation_id->selectOptionListHtml("x_designation_id") ?>
+    </select>
+    <?= $Page->designation_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->designation_id->getErrorMessage() ?></div>
+<?= $Page->designation_id->Lookup->getParamTag($Page, "p_x_designation_id") ?>
+<?php if (!$Page->designation_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fusersadd", function() {
+    var options = { name: "x_designation_id", selectId: "fusersadd_x_designation_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fusersadd.lists.designation_id?.lookupOptions.length) {
+        options.data = { id: "x_designation_id", form: "fusersadd" };
+    } else {
+        options.ajax = { id: "x_designation_id", form: "fusersadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.users.fields.designation_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
 <?php } ?>
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
     <div id="r_physical_address"<?= $Page->physical_address->rowAttributes() ?>>
-        <label id="elh_users_physical_address" for="x_physical_address" class="<?= $Page->LeftColumnClass ?>"><?= $Page->physical_address->caption() ?><?= $Page->physical_address->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_users_physical_address" class="<?= $Page->LeftColumnClass ?>"><?= $Page->physical_address->caption() ?><?= $Page->physical_address->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->physical_address->cellAttributes() ?>>
 <span id="el_users_physical_address">
-<input type="<?= $Page->physical_address->getInputTextType() ?>" name="x_physical_address" id="x_physical_address" data-table="users" data-field="x_physical_address" value="<?= $Page->physical_address->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->physical_address->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->physical_address->formatPattern()) ?>"<?= $Page->physical_address->editAttributes() ?> aria-describedby="x_physical_address_help">
+<?php $Page->physical_address->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="users" data-field="x_physical_address" name="x_physical_address" id="x_physical_address" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->physical_address->getPlaceHolder()) ?>"<?= $Page->physical_address->editAttributes() ?> aria-describedby="x_physical_address_help"><?= $Page->physical_address->EditValue ?></textarea>
 <?= $Page->physical_address->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->physical_address->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fusersadd", "editor"], function() {
+    ew.createEditor("fusersadd", "x_physical_address", 0, 0, <?= $Page->physical_address->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -231,7 +326,10 @@ $Page->showMessage();
         <label id="elh_users__password" for="x__password" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_password->caption() ?><?= $Page->_password->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->_password->cellAttributes() ?>>
 <span id="el_users__password">
-<input type="<?= $Page->_password->getInputTextType() ?>" name="x__password" id="x__password" data-table="users" data-field="x__password" value="<?= $Page->_password->EditValue ?>" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->_password->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->_password->formatPattern()) ?>"<?= $Page->_password->editAttributes() ?> aria-describedby="x__password_help">
+<div class="input-group">
+    <input type="password" name="x__password" id="x__password" autocomplete="new-password" data-table="users" data-field="x__password" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->_password->getPlaceHolder()) ?>"<?= $Page->_password->editAttributes() ?> aria-describedby="x__password_help">
+    <button type="button" class="btn btn-default ew-toggle-password rounded-end" data-ew-action="password"><i class="fa-solid fa-eye"></i></button>
+</div>
 <?= $Page->_password->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->_password->getErrorMessage() ?></div>
 </span>
@@ -242,157 +340,75 @@ $Page->showMessage();
     <div id="r_user_role_id"<?= $Page->user_role_id->rowAttributes() ?>>
         <label id="elh_users_user_role_id" for="x_user_role_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->user_role_id->caption() ?><?= $Page->user_role_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->user_role_id->cellAttributes() ?>>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
 <span id="el_users_user_role_id">
-<input type="<?= $Page->user_role_id->getInputTextType() ?>" name="x_user_role_id" id="x_user_role_id" data-table="users" data-field="x_user_role_id" value="<?= $Page->user_role_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->user_role_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->user_role_id->formatPattern()) ?>"<?= $Page->user_role_id->editAttributes() ?> aria-describedby="x_user_role_id_help">
-<?= $Page->user_role_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->user_role_id->getErrorMessage() ?></div>
+<span class="form-control-plaintext"><?= $Page->user_role_id->getDisplayValue($Page->user_role_id->EditValue) ?></span>
 </span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->account_status->Visible) { // account_status ?>
-    <div id="r_account_status"<?= $Page->account_status->rowAttributes() ?>>
-        <label id="elh_users_account_status" for="x_account_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->account_status->caption() ?><?= $Page->account_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->account_status->cellAttributes() ?>>
-<span id="el_users_account_status">
-<input type="<?= $Page->account_status->getInputTextType() ?>" name="x_account_status" id="x_account_status" data-table="users" data-field="x_account_status" value="<?= $Page->account_status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->account_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->account_status->formatPattern()) ?>"<?= $Page->account_status->editAttributes() ?> aria-describedby="x_account_status_help">
-<?= $Page->account_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->account_status->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_users_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_users_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="users" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+<?php } else { ?>
+<span id="el_users_user_role_id">
+    <select
+        id="x_user_role_id"
+        name="x_user_role_id"
+        class="form-select ew-select<?= $Page->user_role_id->isInvalidClass() ?>"
+        <?php if (!$Page->user_role_id->IsNativeSelect) { ?>
+        data-select2-id="fusersadd_x_user_role_id"
+        <?php } ?>
+        data-table="users"
+        data-field="x_user_role_id"
+        data-value-separator="<?= $Page->user_role_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->user_role_id->getPlaceHolder()) ?>"
+        <?= $Page->user_role_id->editAttributes() ?>>
+        <?= $Page->user_role_id->selectOptionListHtml("x_user_role_id") ?>
+    </select>
+    <?= $Page->user_role_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->user_role_id->getErrorMessage() ?></div>
+<?php if (!$Page->user_role_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fusersadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fusersadd", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fusersadd", function() {
+    var options = { name: "x_user_role_id", selectId: "fusersadd_x_user_role_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fusersadd.lists.user_role_id?.lookupOptions.length) {
+        options.data = { id: "x_user_role_id", form: "fusersadd" };
+    } else {
+        options.ajax = { id: "x_user_role_id", form: "fusersadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.users.fields.user_role_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_users_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_users_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="users" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fusersadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fusersadd", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
+<?php if ($Page->is_verified->Visible) { // is_verified ?>
+    <div id="r_is_verified"<?= $Page->is_verified->rowAttributes() ?>>
+        <label id="elh_users_is_verified" class="<?= $Page->LeftColumnClass ?>"><?= $Page->is_verified->caption() ?><?= $Page->is_verified->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->is_verified->cellAttributes() ?>>
+<span id="el_users_is_verified">
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" class="form-check-input<?= $Page->is_verified->isInvalidClass() ?>" data-table="users" data-field="x_is_verified" data-boolean name="x_is_verified" id="x_is_verified" value="1"<?= ConvertToBool($Page->is_verified->CurrentValue) ? " checked" : "" ?><?= $Page->is_verified->editAttributes() ?> aria-describedby="x_is_verified_help">
+    <div class="invalid-feedback"><?= $Page->is_verified->getErrorMessage() ?></div>
+</div>
+<?= $Page->is_verified->getCustomMessage() ?>
 </span>
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->otp_code->Visible) { // otp_code ?>
-    <div id="r_otp_code"<?= $Page->otp_code->rowAttributes() ?>>
-        <label id="elh_users_otp_code" for="x_otp_code" class="<?= $Page->LeftColumnClass ?>"><?= $Page->otp_code->caption() ?><?= $Page->otp_code->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->otp_code->cellAttributes() ?>>
-<span id="el_users_otp_code">
-<input type="<?= $Page->otp_code->getInputTextType() ?>" name="x_otp_code" id="x_otp_code" data-table="users" data-field="x_otp_code" value="<?= $Page->otp_code->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->otp_code->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->otp_code->formatPattern()) ?>"<?= $Page->otp_code->editAttributes() ?> aria-describedby="x_otp_code_help">
-<?= $Page->otp_code->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->otp_code->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->otp_date->Visible) { // otp_date ?>
-    <div id="r_otp_date"<?= $Page->otp_date->rowAttributes() ?>>
-        <label id="elh_users_otp_date" for="x_otp_date" class="<?= $Page->LeftColumnClass ?>"><?= $Page->otp_date->caption() ?><?= $Page->otp_date->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->otp_date->cellAttributes() ?>>
-<span id="el_users_otp_date">
-<input type="<?= $Page->otp_date->getInputTextType() ?>" name="x_otp_date" id="x_otp_date" data-table="users" data-field="x_otp_date" value="<?= $Page->otp_date->EditValue ?>" placeholder="<?= HtmlEncode($Page->otp_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->otp_date->formatPattern()) ?>"<?= $Page->otp_date->editAttributes() ?> aria-describedby="x_otp_date_help">
-<?= $Page->otp_date->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->otp_date->getErrorMessage() ?></div>
-<?php if (!$Page->otp_date->ReadOnly && !$Page->otp_date->Disabled && !isset($Page->otp_date->EditAttrs["readonly"]) && !isset($Page->otp_date->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fusersadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fusersadd", "x_otp_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
+<?php if ($Page->user_profile->Visible) { // user_profile ?>
+    <div id="r_user_profile"<?= $Page->user_profile->rowAttributes() ?>>
+        <label id="elh_users_user_profile" class="<?= $Page->LeftColumnClass ?>"><?= $Page->user_profile->caption() ?><?= $Page->user_profile->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->user_profile->cellAttributes() ?>>
+<span id="el_users_user_profile">
+<input type="<?= $Page->user_profile->getInputTextType() ?>" name="x_user_profile" id="x_user_profile" data-table="users" data-field="x_user_profile" value="<?= $Page->user_profile->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->user_profile->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->user_profile->formatPattern()) ?>"<?= $Page->user_profile->editAttributes() ?> aria-describedby="x_user_profile_help">
+<?= $Page->user_profile->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->user_profile->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

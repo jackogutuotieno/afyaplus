@@ -605,8 +605,100 @@ class AdvancedSecurity
             $userProfile->setUserName($usr); // User name might be changed by userCustomValidate()
             $this->loginUser(...$userProfile->getLoginArguments());
         }
-        if ($customValid) {
-            $customValid = $this->userValidated([]) !== false;
+
+        // Check other users
+        if (!$valid) {
+            // Find user
+            if (Config("REGISTER_ACTIVATE") && !EmptyValue(Config("REGISTER_ACTIVATE_FIELD_NAME"))) {
+                $user = FindUserByUserName($usr, [Config("REGISTER_ACTIVATE_PROPERTY_NAME") => Config("REGISTER_ACTIVATE_FIELD_VALUE")]);
+            } else {
+                $user = FindUserByUserName($usr);
+            }
+            if ($user) {
+                $valid = $customValid;
+
+                // Set user
+                $userProfile->setUser($user);
+
+                // Force logout
+                if ($userProfile->isForceLogout(session_id())) {
+                    if ($loginType == "cookie") {
+                        RemoveCookie("AutoLogin"); // Clear auto login cookie
+                    }
+                    return $valid;
+                }
+
+                // Check password
+                if (!$valid) {
+                    $valid = Config("OTP_ONLY") && Config("USE_TWO_FACTOR_AUTHENTICATION") && Config("FORCE_TWO_FACTOR_AUTHENTICATION"); // OTP only + 2FA enabled
+                }
+                if (!$valid) {
+                    if (in_array($loginType, ["cookie", "token"])) {
+                        $userName = DecodeJwt($pwd)["username"] ?? "";
+                        $valid = !EmptyValue($userName) && $userName == $usr;
+                    } else {
+                        $valid = ComparePassword($user->get(Config("LOGIN_PASSWORD_FIELD_NAME")), $pwd);
+                    }
+                }
+
+                // Check user login session
+                if ($valid && !$userProfile->isValidUser(session_id())) {
+                    return true; // Return true but do not login
+                }
+
+                // Check password expiry
+                if ($valid && !$loginType && $userProfile->passwordExpired()) {
+                        $this->setSessionPasswordExpired();
+                        $this->userPasswordExpired($user->toArray());
+                    if (IsPasswordExpired()) {
+                        return false;
+                    }
+                }
+                if ($valid) {
+                    // Check two factor authentication
+                    if (Config("USE_TWO_FACTOR_AUTHENTICATION")) {
+                        // Check API login
+                        if (IsApi()) {
+                            if (
+                                SameText(Config("TWO_FACTOR_AUTHENTICATION_TYPE"), "google") &&
+                                (Config("FORCE_TWO_FACTOR_AUTHENTICATION") || $userProfile->hasUserSecret(true))
+                            ) { // Verify security code for Google Authenticator
+                                if (!$userProfile->verify2FACode($securityCode)) {
+                                    return false;
+                                }
+                            }
+                        } elseif (Config("FORCE_TWO_FACTOR_AUTHENTICATION") && !$userProfile->hasUserSecret(true)) { // Non API, go to 2fa page
+                            if ($valid && $user) {
+                                Container("app.user", $user); // Save the user
+                            }
+                            return $valid;
+                        }
+                    }
+                    $this->isLoggedIn = true;
+                    $this->isSysAdmin = false;
+                    $_SESSION[SESSION_STATUS] = "login";
+                    $_SESSION[SESSION_SYS_ADMIN] = 0; // Non System Administrator
+                    $this->loginUser(...$user->getLoginArguments());
+
+                    // Call User Validated event
+                    $valid = $this->userValidated($user->toArray()) !== false; // For backward compatibility
+
+                    // Set up user image
+                    if (!EmptyValue(Config("USER_IMAGE_FIELD_NAME"))) {
+                        $imageField = Container("usertable")->Fields[Config("USER_IMAGE_FIELD_NAME")];
+                        if ($imageField->hasMethod("getUploadPath")) {
+                            $imageField->UploadPath = $imageField->getUploadPath();
+                        }
+                        $image = GetFileImage($imageField, $user->get(Config("USER_IMAGE_FIELD_NAME")), Config("USER_IMAGE_SIZE"), Config("USER_IMAGE_SIZE"), Config("USER_IMAGE_CROP"));
+                        $userProfile->set(UserProfile::$IMAGE, base64_encode($image))->saveToStorage(); // Save as base64 encoded
+                    }
+                }
+            } else { // User not found in user table
+                if ($customValid) { // Grant default permissions
+                    $this->loginUser($usr);
+                    $customValid = $this->userValidated($userProfile->toArray()) !== false;
+                }
+            }
         }
         if ($customValid) {
             return true;
@@ -635,9 +727,28 @@ class AdvancedSecurity
         }
     }
 
-    // No User Level security
+    // Static User Level security
     public function setupUserLevel()
     {
+        // Load user level from user level settings
+        global $USER_LEVELS, $USER_LEVEL_PRIVS;
+        $this->UserLevel = $USER_LEVELS;
+        $this->UserLevelPriv = $USER_LEVEL_PRIVS;
+
+        // User Level loaded event
+        $this->userLevelLoaded();
+
+        // Check permissions
+        $this->checkPermissions();
+
+        // Save the User Level to Session variable
+        $this->saveUserLevel();
+    }
+
+    // Get all User Level settings from database
+    public function setupUserLevelEx()
+    {
+        return false;
     }
 
     // Check permissions
@@ -779,7 +890,11 @@ class AdvancedSecurity
     protected function currentUserLevelPriv($tableName)
     {
         if ($this->isLoggedIn()) {
-            return Allow::ALL->value;
+            $priv = 0;
+            foreach ($this->UserLevelID as $userLevelID) {
+                $priv |= $this->getUserLevelPrivEx($tableName, $userLevelID);
+            }
+            return $priv;
         } else { // Anonymous
             return $this->getUserLevelPrivEx($tableName, self::ANONYMOUS_USER_LEVEL_ID);
         }
@@ -1063,6 +1178,12 @@ class AdvancedSecurity
     public function isAdmin()
     {
         $isAdmin = $this->isSysAdmin();
+        if (!$isAdmin) {
+            $isAdmin = $this->CurrentUserLevelID == self::ADMIN_USER_LEVEL_ID || $this->hasUserLevelID(self::ADMIN_USER_LEVEL_ID) || $this->canAdmin();
+        }
+        if (!$isAdmin) {
+            $isAdmin = $this->CurrentUserID == self::ADMIN_USER_LEVEL_ID || in_array(self::ADMIN_USER_LEVEL_ID, $this->UserID);
+        }
         return $isAdmin;
     }
 
@@ -1085,6 +1206,12 @@ class AdvancedSecurity
         }
     }
 
+    // Get user email
+    public function currentUserEmail()
+    {
+        return Config("USER_EMAIL_FIELD_NAME") ? $this->currentUserInfo(Config("USER_EMAIL_FIELD_NAME")) : null;
+    }
+
     // Get current user info
     public function currentUserInfo(string $fldname)
     {
@@ -1092,6 +1219,92 @@ class AdvancedSecurity
             return FindUserByUserName($this->currentUserName())?->get($fldname);
         }
         return null;
+    }
+
+    // Get User ID by user name
+    public function getUserIDByUserName($userName)
+    {
+        return FindUserByUserName($userName)?->get(Config("USER_ID_FIELD_NAME")) ?? "";
+    }
+
+    // Load User ID
+    public function loadUserID()
+    {
+        global $UserTable;
+        $this->UserID = [];
+        if (strval($this->CurrentUserID) == "") {
+            // Handle empty User ID here
+        } elseif ($this->CurrentUserID != self::ADMIN_USER_LEVEL_ID) {
+            // Get first level
+            $this->addUserID($this->CurrentUserID);
+            $UserTable = Container("usertable");
+            $filter = "";
+            if (method_exists($UserTable, "getUserIDFilter")) {
+                $filter = $UserTable->getUserIDFilter($this->CurrentUserID);
+            }
+            $sql = $UserTable->getSql($filter);
+            $rows = Conn($UserTable->Dbid)->executeQuery($sql)->fetchAll();
+            foreach ($rows as $row) {
+                $this->addUserID($row[Config("USER_ID_FIELD_NAME")]);
+            }
+        }
+    }
+
+    // Add user name
+    public function addUserName($userName)
+    {
+        $this->addUserID($this->getUserIDByUserName($userName));
+    }
+
+    // Add User ID
+    public function addUserID($userId)
+    {
+        if (strval($userId) == "") {
+            return;
+        }
+        if (!is_numeric($userId)) {
+            return;
+        }
+        $userId = trim($userId);
+        if (!in_array($userId, $this->UserID)) {
+            $this->UserID[] = $userId;
+        }
+    }
+
+    // Delete user name
+    public function deleteUserName($userName)
+    {
+        $this->deleteUserID($this->getUserIDByUserName($userName));
+    }
+
+    // Delete User ID
+    public function deleteUserID($userId)
+    {
+        if (strval($userId) == "") {
+            return;
+        }
+        if (!is_numeric($userId)) {
+            return;
+        }
+        $cnt = count($this->UserID);
+        for ($i = 0; $i < $cnt; $i++) {
+            if (SameString($this->UserID[$i], $userId)) {
+                unset($this->UserID[$i]);
+                break;
+            }
+        }
+    }
+
+    // User ID list
+    public function userIDList()
+    {
+        return implode(", ", array_map(fn($userId) => QuotedValue($userId, DataType::NUMBER, Config("USER_TABLE_DBID")), $this->UserID));
+    }
+
+    // List of allowed User IDs for this user
+    public function isValidUserID($userId)
+    {
+        return strval($userId) !== "" && in_array(trim($userId), $this->UserID);
     }
 
     // UserID Loading event
