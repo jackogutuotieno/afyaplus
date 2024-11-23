@@ -1,147 +1,174 @@
-<ew-language date="2024/11/22" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/23" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="49">
+      <phrase id="menutext" value="Human Resources" />
+    </menu>
     <menu id="2">
-      <phrase id="menutext" value="departments" />
+      <phrase id="menutext" value="Departments" />
     </menu>
     <menu id="3">
-      <phrase id="menutext" value="designations" />
+      <phrase id="menutext" value="Designations" />
     </menu>
-    <menu id="4">
-      <phrase id="menutext" value="diagnosis" />
+    <menu id="50">
+      <phrase id="menutext" value="Doctor Panel" />
     </menu>
     <menu id="5">
-      <phrase id="menutext" value="diseases" />
+      <phrase id="menutext" value="Diseases" />
     </menu>
     <menu id="6">
-      <phrase id="menutext" value="doctor charges" />
+      <phrase id="menutext" value="My Charges" />
+    </menu>
+    <menu id="51">
+      <phrase id="menutext" value="Patients Management" />
+    </menu>
+    <menu id="48">
+      <phrase id="menutext" value="Patients List" />
+    </menu>
+    <menu id="22">
+      <phrase id="menutext" value="Appointments" />
+    </menu>
+    <menu id="24">
+      <phrase id="menutext" value="Visits" />
+    </menu>
+    <menu id="25">
+      <phrase id="menutext" value="Vitals" />
+    </menu>
+    <menu id="23">
+      <phrase id="menutext" value="Vaccinations" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="Diagnosis" />
     </menu>
     <menu id="7">
-      <phrase id="menutext" value="doctor notes" />
+      <phrase id="menutext" value="Medical Notes" />
     </menu>
-    <menu id="8">
-      <phrase id="menutext" value="expenses" />
+    <menu id="28">
+      <phrase id="menutext" value="Prescriptions" />
     </menu>
-    <menu id="9">
-      <phrase id="menutext" value="invoice details" />
+    <menu id="27">
+      <phrase id="menutext" value="prescription details" />
     </menu>
-    <menu id="10">
-      <phrase id="menutext" value="invoices" />
+    <menu id="52">
+      <phrase id="menutext" value="Laboratory Setup" />
     </menu>
     <menu id="11">
-      <phrase id="menutext" value="lab specimens" />
-    </menu>
-    <menu id="12">
-      <phrase id="menutext" value="lab test reports" />
+      <phrase id="menutext" value="Lab Specimens" />
     </menu>
     <menu id="13">
-      <phrase id="menutext" value="lab test requests" />
+      <phrase id="menutext" value="Lab Requests" />
     </menu>
     <menu id="14">
       <phrase id="menutext" value="lab test requests details" />
     </menu>
     <menu id="15">
-      <phrase id="menutext" value="lab test requests queue" />
+      <phrase id="menutext" value="Lab Queue" />
     </menu>
-    <menu id="16">
-      <phrase id="menutext" value="medical schemes" />
+    <menu id="12">
+      <phrase id="menutext" value="Lab Reports" />
+    </menu>
+    <menu id="54">
+      <phrase id="menutext" value="Pharmacy Setup" />
+    </menu>
+    <menu id="21">
+      <phrase id="menutext" value="Medicine Suppliers" />
     </menu>
     <menu id="17">
-      <phrase id="menutext" value="medicine brands" />
+      <phrase id="menutext" value="Medicine Brands" />
+    </menu>
+    <menu id="47">
+      <phrase id="menutext" value="Medicine Stock" />
     </menu>
     <menu id="18">
-      <phrase id="menutext" value="medicine categories" />
+      <phrase id="menutext" value="Medicine Categories" />
     </menu>
     <menu id="19">
-      <phrase id="menutext" value="medicine dispensation" />
+      <phrase id="menutext" value="Dispense Medicine" />
     </menu>
     <menu id="20">
       <phrase id="menutext" value="medicine dispensation details" />
     </menu>
-    <menu id="21">
-      <phrase id="menutext" value="medicine suppliers" />
-    </menu>
-    <menu id="22">
-      <phrase id="menutext" value="patient appointments" />
-    </menu>
-    <menu id="23">
-      <phrase id="menutext" value="patient vaccinations" />
-    </menu>
-    <menu id="24">
-      <phrase id="menutext" value="patient visits" />
-    </menu>
-    <menu id="25">
-      <phrase id="menutext" value="patient vitals" />
-    </menu>
-    <menu id="26">
-      <phrase id="menutext" value="payment methods" />
-    </menu>
-    <menu id="27">
-      <phrase id="menutext" value="prescription details" />
-    </menu>
-    <menu id="28">
-      <phrase id="menutext" value="prescriptions" />
-    </menu>
-    <menu id="29">
-      <phrase id="menutext" value="radiology reports" />
+    <menu id="102">
+      <phrase id="menutext" value="Radiology Setup" />
     </menu>
     <menu id="30">
-      <phrase id="menutext" value="radiology requests" />
+      <phrase id="menutext" value="Radiology Requests" />
     </menu>
     <menu id="31">
       <phrase id="menutext" value="radiology requests details" />
     </menu>
     <menu id="32">
-      <phrase id="menutext" value="radiology requests queue" />
+      <phrase id="menutext" value="Radiology Queue" />
     </menu>
-    <menu id="33">
-      <phrase id="menutext" value="roles" />
+    <menu id="29">
+      <phrase id="menutext" value="Radiology Reports" />
+    </menu>
+    <menu id="53">
+      <phrase id="menutext" value="Financials Setup" />
+    </menu>
+    <menu id="26">
+      <phrase id="menutext" value="Payment Methods" />
+    </menu>
+    <menu id="10">
+      <phrase id="menutext" value="Invoices" />
+    </menu>
+    <menu id="9">
+      <phrase id="menutext" value="invoice details" />
+    </menu>
+    <menu id="8">
+      <phrase id="menutext" value="Expenses" />
+    </menu>
+    <menu id="16">
+      <phrase id="menutext" value="Medical Schemes" />
     </menu>
     <menu id="34">
-      <phrase id="menutext" value="service categories" />
-    </menu>
-    <menu id="35">
-      <phrase id="menutext" value="service charges" />
+      <phrase id="menutext" value="Service Categories" />
     </menu>
     <menu id="36">
-      <phrase id="menutext" value="service subcategories" />
+      <phrase id="menutext" value="Service Subcategories" />
     </menu>
-    <menu id="37">
-      <phrase id="menutext" value="users" />
+    <menu id="35">
+      <phrase id="menutext" value="Facility Charges" />
     </menu>
-    <menu id="38">
-      <phrase id="menutext" value="visit types" />
+    <menu id="104">
+      <phrase id="menutext" value="Reports" />
+    </menu>
+    <menu id="43">
+      <phrase id="menutext" value="Patient" />
     </menu>
     <menu id="39">
-      <phrase id="menutext" value="appointments report" />
+      <phrase id="menutext" value="Appointments" />
+    </menu>
+    <menu id="44">
+      <phrase id="menutext" value="Visits" />
     </menu>
     <menu id="40">
-      <phrase id="menutext" value="invoice reports" />
+      <phrase id="menutext" value="Invoices" />
+    </menu>
+    <menu id="42">
+      <phrase id="menutext" value="Medicine Stock" />
+    </menu>
+    <menu id="45">
+      <phrase id="menutext" value="Vaccinations" />
+    </menu>
+    <menu id="46">
+      <phrase id="menutext" value="Vitals" />
     </menu>
     <menu id="41">
       <phrase id="menutext" value="laboratory billing" />
     </menu>
-    <menu id="42">
-      <phrase id="menutext" value="medicine stock report" />
+    <menu id="103">
+      <phrase id="menutext" value="Administrator" />
     </menu>
-    <menu id="43">
-      <phrase id="menutext" value="patients report" />
+    <menu id="33">
+      <phrase id="menutext" value="roles" />
     </menu>
-    <menu id="44">
-      <phrase id="menutext" value="patientsvisitsreport" />
+    <menu id="37">
+      <phrase id="menutext" value="Users" />
     </menu>
-    <menu id="45">
-      <phrase id="menutext" value="vaccinationsreport" />
-    </menu>
-    <menu id="46">
-      <phrase id="menutext" value="vitalsreport" />
-    </menu>
-    <menu id="47">
-      <phrase id="menutext" value="medicine stock" />
-    </menu>
-    <menu id="48">
-      <phrase id="menutext" value="patients" />
+    <menu id="38">
+      <phrase id="menutext" value="Visit Types" />
     </menu>
     <table id="appointments_report">
       <phrase id="tblcaption" value="appointments report" />
@@ -183,21 +210,21 @@
       </field>
     </table>
     <table id="departments">
-      <phrase id="tblcaption" value="departments" />
+      <phrase id="tblcaption" value="Departments" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Department ID" />
       </field>
       <field id="department_name">
-        <phrase id="fldcaption" value="department name" />
+        <phrase id="fldcaption" value="Department" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="designations">

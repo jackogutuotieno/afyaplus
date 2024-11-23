@@ -81,7 +81,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
  * [5] string URL (for OthersController::index)
  */
 $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments report",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointmentsreportlist"],
-    ["departments","departments","departments",true,"{32536B8D-F37B-4419-80D5-260932800712}","departmentslist"],
+    ["departments","departments","Departments",true,"{32536B8D-F37B-4419-80D5-260932800712}","departmentslist"],
     ["designations","designations","designations",true,"{32536B8D-F37B-4419-80D5-260932800712}","designationslist"],
     ["diagnosis","diagnosis","diagnosis",true,"{32536B8D-F37B-4419-80D5-260932800712}","diagnosislist"],
     ["diseases","diseases","diseases",true,"{32536B8D-F37B-4419-80D5-260932800712}","diseaseslist"],
