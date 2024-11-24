@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_patient_appointments_id" class="patient_appointments_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_patient_appointments_patient_id" class="patient_appointments_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
@@ -73,9 +70,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->is_all_day->Visible) { // is_all_day ?>
         <th class="<?= $Page->is_all_day->headerCellClass() ?>"><span id="elh_patient_appointments_is_all_day" class="patient_appointments_is_all_day"><?= $Page->is_all_day->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_patient_appointments_created_by_user_id" class="patient_appointments_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_appointments_date_created" class="patient_appointments_date_created"><?= $Page->date_created->caption() ?></span></th>
@@ -104,14 +98,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td<?= $Page->patient_id->cellAttributes() ?>>
 <span id="">
@@ -169,14 +155,6 @@ while ($Page->fetch()) {
     <label class="form-check-label" for="x_is_all_day_<?= $Page->RowCount ?>"></label>
 </div>
 </span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

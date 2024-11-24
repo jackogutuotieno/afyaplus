@@ -565,6 +565,8 @@ class PatientAppointmentsView extends PatientAppointments
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->doctor_id);
         $this->setupLookupOptions($this->is_all_day);
 
         // Check modal
@@ -700,16 +702,6 @@ class PatientAppointmentsView extends PatientAppointments
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit();
-
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
 
         // Delete
         $item = &$option->add("delete");
@@ -900,8 +892,27 @@ class PatientAppointmentsView extends PatientAppointments
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // title
             $this->_title->ViewValue = $this->_title->CurrentValue;
@@ -910,8 +921,28 @@ class PatientAppointmentsView extends PatientAppointments
             $this->description->ViewValue = $this->description->CurrentValue;
 
             // doctor_id
-            $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+            $curVal = strval($this->doctor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+                if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
+                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                    } else {
+                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->doctor_id->ViewValue = null;
+            }
 
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -927,10 +958,6 @@ class PatientAppointmentsView extends PatientAppointments
             } else {
                 $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
             }
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -971,18 +998,6 @@ class PatientAppointmentsView extends PatientAppointments
             // is_all_day
             $this->is_all_day->HrefValue = "";
             $this->is_all_day->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1175,6 +1190,11 @@ class PatientAppointmentsView extends PatientAppointments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_doctor_id":
+                    $lookupFilter = $fld->getSelectFilter(); // PHP
+                    break;
                 case "x_is_all_day":
                     break;
                 default:

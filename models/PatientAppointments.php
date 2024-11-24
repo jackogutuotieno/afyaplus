@@ -146,14 +146,18 @@ class PatientAppointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // title
@@ -196,7 +200,7 @@ class PatientAppointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->description->InputTextType = "text";
         $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
@@ -218,14 +222,19 @@ class PatientAppointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
+        $this->doctor_id->addMethod("getSelectFilter", fn() => "`user_role_id`=2");
         $this->doctor_id->InputTextType = "text";
         $this->doctor_id->Raw = true;
         $this->doctor_id->Nullable = false; // NOT NULL field
         $this->doctor_id->Required = true; // Required field
+        $this->doctor_id->setSelectMultiple(false); // Select one
+        $this->doctor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->doctor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->doctor_id->Lookup = new Lookup($this->doctor_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->doctor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->doctor_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->doctor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['doctor_id'] = &$this->doctor_id;
 
         // start_date
@@ -323,14 +332,15 @@ class PatientAppointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->Sortable = false; // Allow sort
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -339,10 +349,10 @@ class PatientAppointments extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -355,7 +365,7 @@ class PatientAppointments extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -365,10 +375,10 @@ class PatientAppointments extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -381,7 +391,7 @@ class PatientAppointments extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -1324,6 +1334,7 @@ class PatientAppointments extends DbTable
         // is_all_day
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1333,8 +1344,27 @@ class PatientAppointments extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
 
         // title
         $this->_title->ViewValue = $this->_title->CurrentValue;
@@ -1343,8 +1373,28 @@ class PatientAppointments extends DbTable
         $this->description->ViewValue = $this->description->CurrentValue;
 
         // doctor_id
-        $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+        $curVal = strval($this->doctor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+            if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
+                $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                } else {
+                    $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                }
+            }
+        } else {
+            $this->doctor_id->ViewValue = null;
+        }
 
         // start_date
         $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -1438,11 +1488,7 @@ class PatientAppointments extends DbTable
 
         // patient_id
         $this->patient_id->setupEditAttributes();
-        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
         $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-        }
 
         // title
         $this->_title->setupEditAttributes();
@@ -1454,19 +1500,12 @@ class PatientAppointments extends DbTable
 
         // description
         $this->description->setupEditAttributes();
-        if (!$this->description->Raw) {
-            $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-        }
         $this->description->EditValue = $this->description->CurrentValue;
         $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
         // doctor_id
         $this->doctor_id->setupEditAttributes();
-        $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
         $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-        if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-            $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
-        }
 
         // start_date
         $this->start_date->setupEditAttributes();
@@ -1483,12 +1522,6 @@ class PatientAppointments extends DbTable
         $this->is_all_day->PlaceHolder = RemoveHtml($this->is_all_day->caption());
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1536,9 +1569,6 @@ class PatientAppointments extends DbTable
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->is_all_day);
-                    $doc->exportCaption($this->created_by_user_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
@@ -1548,7 +1578,6 @@ class PatientAppointments extends DbTable
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->is_all_day);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1585,9 +1614,6 @@ class PatientAppointments extends DbTable
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->is_all_day);
-                        $doc->exportField($this->created_by_user_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
@@ -1597,7 +1623,6 @@ class PatientAppointments extends DbTable
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->is_all_day);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
