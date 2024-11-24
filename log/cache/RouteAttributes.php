@@ -120,6 +120,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -232,6 +237,30 @@
     [
         'PHPMaker2024\\afyaplus\\Attributes\\Map' => [
             'methods' => [
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
                 [
                     'GET',
                     'POST',
@@ -1364,6 +1393,11 @@
                 ],
             ],
             'pattern' => [
+                '/appointments',
+                '/appointmentsadd[/{id}]',
+                '/appointmentsview[/{id}]',
+                '/appointmentsedit[/{id}]',
+                '/appointmentsdelete[/{id}]',
                 '/appointmentsreportlist[/{id}]',
                 '/departmentslist[/{id}]',
                 '/departmentsadd[/{id}]',
@@ -1593,6 +1627,11 @@
                 '/vitalsreportlist[/{id}]',
             ],
             'handler' => [
+                'PHPMaker2024\\afyaplus\\AppointmentsController:calendar',
+                'PHPMaker2024\\afyaplus\\AppointmentsController:add',
+                'PHPMaker2024\\afyaplus\\AppointmentsController:view',
+                'PHPMaker2024\\afyaplus\\AppointmentsController:edit',
+                'PHPMaker2024\\afyaplus\\AppointmentsController:delete',
                 'PHPMaker2024\\afyaplus\\AppointmentsReportController:list',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:list',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:add',
@@ -1822,6 +1861,21 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2503,6 +2557,11 @@
                 ],
             ],
             'name' => [
+                'calendar.Appointments',
+                'add.Appointments',
+                'view.Appointments',
+                'edit.Appointments',
+                'delete.Appointments',
                 'list.appointments_report',
                 'list.departments',
                 'add.departments',
@@ -2732,6 +2791,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3190,6 +3254,11 @@
         $o[224],
         $o[225],
         $o[226],
+        $o[227],
+        $o[228],
+        $o[229],
+        $o[230],
+        $o[231],
     ],
     []
 );

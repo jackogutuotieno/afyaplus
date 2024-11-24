@@ -130,8 +130,8 @@ return [
     "vitalsreport" => \DI\create(Vitalsreport::class),
     "exportlog" => \DI\create(Exportlog::class),
     "subscriptions" => \DI\create(Subscriptions::class),
-    "Patients_Appointments" => \DI\create(PatientsAppointments::class),
-    "patients_appointments" => \DI\create(PatientsAppointments::class),
+    "Appointments" => \DI\create(Appointments::class),
+    "appointments" => \DI\create(Appointments::class),
 
     // User table
     "usertable" => \DI\get("users"),

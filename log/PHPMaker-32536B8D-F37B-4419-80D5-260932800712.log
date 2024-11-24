@@ -3,6 +3,7 @@ C:\wamp64\www\afyaplus\api\.htaccess
 C:\wamp64\www\afyaplus\api\index.php
 C:\wamp64\www\afyaplus\composer.json
 C:\wamp64\www\afyaplus\controllers\ApiController.php
+C:\wamp64\www\afyaplus\controllers\AppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReportController.php
 C:\wamp64\www\afyaplus\controllers\ControllerBase.php
 C:\wamp64\www\afyaplus\controllers\DepartmentsController.php
@@ -68,8 +69,14 @@ C:\wamp64\www\afyaplus\js\eweditor.js
 C:\wamp64\www\afyaplus\js\userevent.js
 C:\wamp64\www\afyaplus\js\userfn.js
 C:\wamp64\www\afyaplus\log\index.html
+C:\wamp64\www\afyaplus\models\Appointments.php
+C:\wamp64\www\afyaplus\models\AppointmentsAdd.php
+C:\wamp64\www\afyaplus\models\AppointmentsCalendar.php
+C:\wamp64\www\afyaplus\models\AppointmentsDelete.php
+C:\wamp64\www\afyaplus\models\AppointmentsEdit.php
 C:\wamp64\www\afyaplus\models\AppointmentsReport.php
 C:\wamp64\www\afyaplus\models\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\models\AppointmentsView.php
 C:\wamp64\www\afyaplus\models\ChangePassword.php
 C:\wamp64\www\afyaplus\models\Departments.php
 C:\wamp64\www\afyaplus\models\DepartmentsAdd.php
@@ -539,7 +546,12 @@ C:\wamp64\www\afyaplus\src\routes.php
 C:\wamp64\www\afyaplus\src\userfn.php
 C:\wamp64\www\afyaplus\src\userlevelsettings.php
 C:\wamp64\www\afyaplus\sw.js
+C:\wamp64\www\afyaplus\views\AppointmentsAdd.php
+C:\wamp64\www\afyaplus\views\AppointmentsCalendar.php
+C:\wamp64\www\afyaplus\views\AppointmentsDelete.php
+C:\wamp64\www\afyaplus\views\AppointmentsEdit.php
 C:\wamp64\www\afyaplus\views\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\views\AppointmentsView.php
 C:\wamp64\www\afyaplus\views\ChangePassword.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php
 C:\wamp64\www\afyaplus\views\DepartmentsDelete.php

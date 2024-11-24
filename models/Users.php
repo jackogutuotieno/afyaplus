@@ -144,8 +144,8 @@ class Users extends DbTable
             'photo', // Name
             '`photo`', // Expression
             '`photo`', // Basic search expression
-            204, // Type
-            65535, // Size
+            205, // Type
+            2147483647, // Size
             -1, // Date/Time format
             true, // Is upload field
             '`photo`', // Virtual expression
@@ -1560,8 +1560,8 @@ class Users extends DbTable
 
         // photo
         if (!EmptyValue($this->photo->Upload->DbValue)) {
-            $this->photo->ImageWidth = 50;
-            $this->photo->ImageHeight = 50;
+            $this->photo->ImageWidth = 70;
+            $this->photo->ImageHeight = 70;
             $this->photo->ImageAlt = $this->photo->alt();
             $this->photo->ImageCssClass = "ew-image";
             $this->photo->ViewValue = $this->id->CurrentValue;
@@ -1805,8 +1805,8 @@ class Users extends DbTable
         // photo
         $this->photo->setupEditAttributes();
         if (!EmptyValue($this->photo->Upload->DbValue)) {
-            $this->photo->ImageWidth = 50;
-            $this->photo->ImageHeight = 50;
+            $this->photo->ImageWidth = 70;
+            $this->photo->ImageHeight = 70;
             $this->photo->ImageAlt = $this->photo->alt();
             $this->photo->ImageCssClass = "ew-image";
             $this->photo->EditValue = $this->id->CurrentValue;

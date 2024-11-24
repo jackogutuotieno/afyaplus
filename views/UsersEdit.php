@@ -113,7 +113,7 @@ loadjs.ready("head", function () {
         lang="<?= CurrentLanguageID() ?>"
         data-table="users"
         data-field="x_photo"
-        data-size="65535"
+        data-size="2147483647"
         data-accept-file-types="<?= $Page->photo->acceptFileTypes() ?>"
         data-max-file-size="<?= $Page->photo->UploadMaxFileSize ?>"
         data-max-number-of-files="null"

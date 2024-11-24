@@ -11,9 +11,6 @@
     <menu id="37">
       <phrase id="menutext" value="Users" />
     </menu>
-    <menu id="38">
-      <phrase id="menutext" value="Visit Types" />
-    </menu>
     <menu id="105">
       <phrase id="menutext" value="Export Log" />
     </menu>
@@ -61,6 +58,9 @@
     </menu>
     <menu id="27">
       <phrase id="menutext" value="prescription details" />
+    </menu>
+    <menu id="38">
+      <phrase id="menutext" value="Visit Types" />
     </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />
@@ -1723,7 +1723,7 @@
         <phrase id="fldcaption" value="Content Encoding" />
       </field>
     </table>
-    <table id="patients_appointments">
+    <table id="appointments">
       <phrase id="tblcaption" value="Patients Appointments" />
       <field id="id">
         <phrase id="fldcaption" value="id" />

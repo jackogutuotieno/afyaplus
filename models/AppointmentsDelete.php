@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class UsersDelete extends Users
+class AppointmentsDelete extends Appointments
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class UsersDelete extends Users
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "UsersDelete";
+    public $PageObjName = "AppointmentsDelete";
 
     // View file path
     public $View = null;
@@ -38,7 +38,8 @@ class UsersDelete extends Users
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "usersdelete";
+    public $ReportContainerClass = "ew-grid";
+    public $CurrentPageName = "appointmentsdelete";
 
     // Page headings
     public $Heading = "";
@@ -71,9 +72,6 @@ class UsersDelete extends Users
         global $Language;
         if ($this->Subheading != "") {
             return $this->Subheading;
-        }
-        if ($this->TableName) {
-            return $Language->phrase($this->PageID);
         }
         return "";
     }
@@ -118,39 +116,20 @@ class UsersDelete extends Users
         }
     }
 
-    // Set field visibility
-    public function setVisibility()
-    {
-        $this->id->setVisibility();
-        $this->photo->setVisibility();
-        $this->full_name->setVisibility();
-        $this->first_name->Visible = false;
-        $this->last_name->Visible = false;
-        $this->national_id->setVisibility();
-        $this->gender->setVisibility();
-        $this->phone->setVisibility();
-        $this->_email->setVisibility();
-        $this->department_id->setVisibility();
-        $this->designation_id->setVisibility();
-        $this->physical_address->setVisibility();
-        $this->_password->Visible = false;
-        $this->user_role_id->setVisibility();
-        $this->is_verified->setVisibility();
-        $this->user_profile->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
-    }
-
     // Constructor
     public function __construct()
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'users';
-        $this->TableName = 'users';
+        $this->TableVar = 'Appointments';
+        $this->TableName = 'Appointments';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
+
+        // Start/End fields
+        $this->Fields['start_date']->DateTimeFormat = 1;
+        $this->Fields['end_date']->DateTimeFormat = 1;
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -158,14 +137,14 @@ class UsersDelete extends Users
         // Language object
         $Language = Container("app.language");
 
-        // Table object (users)
-        if (!isset($GLOBALS["users"]) || $GLOBALS["users"]::class == PROJECT_NAMESPACE . "users") {
-            $GLOBALS["users"] = &$this;
+        // Table object (Appointments)
+        if (!isset($GLOBALS["Appointments"]) || $GLOBALS["Appointments"]::class == PROJECT_NAMESPACE . "Appointments") {
+            $GLOBALS["Appointments"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'users');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'Appointments');
         }
 
         // Start timer
@@ -243,8 +222,10 @@ class UsersDelete extends Users
             $this->pageRedirecting($url);
         }
 
-        // Close connection
-        CloseConnections();
+        // Close connection if not in dashboard
+        if (!$DashboardReport) {
+            CloseConnections();
+        }
 
         // Return for API
         if (IsApi()) {
@@ -389,26 +370,8 @@ class UsersDelete extends Users
         // Load user profile
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
-
-            // Force logout user
-            if (!IsSysAdmin() && Profile()->isForceLogout(session_id())) {
-                $this->terminate("logout");
-                return;
-            }
-
-            // Check if valid user and update last accessed time
-            if (!IsSysAdmin() && !IsPasswordExpired() && !Profile()->isValidUser(session_id(), false)) {
-                $this->terminate("logout"); // Handle as session expired
-                return;
-            }
         }
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->setVisibility();
-
-        // Set lookup cache
-        if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
-            $this->setUseLookupCache(false);
-        }
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -418,22 +381,6 @@ class UsersDelete extends Users
             $this->pageLoad();
         }
 
-        // Hide fields for add/edit
-        if (!$this->UseAjaxActions) {
-            $this->hideFieldsForAddEdit();
-        }
-        // Use inline delete
-        if ($this->UseAjaxActions) {
-            $this->InlineDelete = true;
-        }
-
-        // Set up lookup cache
-        $this->setupLookupOptions($this->gender);
-        $this->setupLookupOptions($this->department_id);
-        $this->setupLookupOptions($this->designation_id);
-        $this->setupLookupOptions($this->user_role_id);
-        $this->setupLookupOptions($this->is_verified);
-
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -441,31 +388,12 @@ class UsersDelete extends Users
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("userslist"); // Prevent SQL injection, return to list
+            $this->terminate("appointmentslist"); // Prevent SQL injection, return to list
             return;
         }
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
-
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("userslist"); // Return to list
-            return;
-        }
 
         // Get action
         if (IsApi()) {
@@ -487,7 +415,8 @@ class UsersDelete extends Users
                     $this->terminate(true);
                     return;
                 } else {
-                    $this->terminate($this->getReturnUrl()); // Return to caller
+                    WriteJson(["url" => $this->getReturnUrl()]); // Reload calendar
+                    $this->terminate();
                     return;
                 }
             } else { // Delete failed
@@ -514,7 +443,7 @@ class UsersDelete extends Users
             $this->Recordset = $this->loadRecordset();
             if ($this->TotalRecords <= 0) { // No record found, exit
                 $this->Recordset?->free();
-                $this->terminate("userslist"); // Return to list
+                $this->terminate("appointmentslist"); // Return to list
                 return;
             }
         }
@@ -636,26 +565,16 @@ class UsersDelete extends Users
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->photo->Upload->DbValue = $row['photo'];
-        if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
-            $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
-        }
-        $this->full_name->setDbValue($row['full_name']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->national_id->setDbValue($row['national_id']);
-        $this->gender->setDbValue($row['gender']);
-        $this->phone->setDbValue($row['phone']);
-        $this->_email->setDbValue($row['email']);
-        $this->department_id->setDbValue($row['department_id']);
-        $this->designation_id->setDbValue($row['designation_id']);
-        $this->physical_address->setDbValue($row['physical_address']);
-        $this->_password->setDbValue($row['password']);
-        $this->user_role_id->setDbValue($row['user_role_id']);
-        $this->is_verified->setDbValue($row['is_verified']);
-        $this->user_profile->setDbValue($row['user_profile']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->_title->setDbValue($row['title']);
+        $this->description->setDbValue($row['description']);
+        $this->doctor_id->setDbValue($row['doctor_id']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
     }
 
     // Return a row with default values
@@ -663,23 +582,16 @@ class UsersDelete extends Users
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['photo'] = $this->photo->DefaultValue;
-        $row['full_name'] = $this->full_name->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
-        $row['national_id'] = $this->national_id->DefaultValue;
-        $row['gender'] = $this->gender->DefaultValue;
-        $row['phone'] = $this->phone->DefaultValue;
-        $row['email'] = $this->_email->DefaultValue;
-        $row['department_id'] = $this->department_id->DefaultValue;
-        $row['designation_id'] = $this->designation_id->DefaultValue;
-        $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['password'] = $this->_password->DefaultValue;
-        $row['user_role_id'] = $this->user_role_id->DefaultValue;
-        $row['is_verified'] = $this->is_verified->DefaultValue;
-        $row['user_profile'] = $this->user_profile->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['title'] = $this->_title->DefaultValue;
+        $row['description'] = $this->description->DefaultValue;
+        $row['doctor_id'] = $this->doctor_id->DefaultValue;
+        $row['start_date'] = $this->start_date->DefaultValue;
+        $row['end_date'] = $this->end_date->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         return $row;
     }
 
@@ -697,144 +609,56 @@ class UsersDelete extends Users
 
         // id
 
-        // photo
+        // patient_id
 
-        // full_name
+        // title
 
-        // first_name
+        // description
 
-        // last_name
+        // doctor_id
 
-        // national_id
+        // start_date
 
-        // gender
+        // end_date
 
-        // phone
-
-        // email
-
-        // department_id
-
-        // designation_id
-
-        // physical_address
-
-        // password
-        $this->_password->CellCssStyle = "white-space: nowrap;";
-
-        // user_role_id
-
-        // is_verified
-
-        // user_profile
-        $this->user_profile->CellCssStyle = "white-space: nowrap;";
+        // created_by_user_id
 
         // date_created
 
         // date_updated
+
+        // is_all_day
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // photo
-            if (!EmptyValue($this->photo->Upload->DbValue)) {
-                $this->photo->ImageWidth = 70;
-                $this->photo->ImageHeight = 70;
-                $this->photo->ImageAlt = $this->photo->alt();
-                $this->photo->ImageCssClass = "ew-image";
-                $this->photo->ViewValue = $this->id->CurrentValue;
-                $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
-            } else {
-                $this->photo->ViewValue = "";
-            }
+            // patient_id
+            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
 
-            // full_name
-            $this->full_name->ViewValue = $this->full_name->CurrentValue;
+            // title
+            $this->_title->ViewValue = $this->_title->CurrentValue;
 
-            // national_id
-            $this->national_id->ViewValue = $this->national_id->CurrentValue;
+            // description
+            $this->description->ViewValue = $this->description->CurrentValue;
 
-            // gender
-            if (strval($this->gender->CurrentValue) != "") {
-                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
-            } else {
-                $this->gender->ViewValue = null;
-            }
+            // doctor_id
+            $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
+            $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
 
-            // phone
-            $this->phone->ViewValue = $this->phone->CurrentValue;
+            // start_date
+            $this->start_date->ViewValue = $this->start_date->CurrentValue;
+            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, $this->start_date->formatPattern());
 
-            // email
-            $this->_email->ViewValue = $this->_email->CurrentValue;
+            // end_date
+            $this->end_date->ViewValue = $this->end_date->CurrentValue;
+            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
-            // department_id
-            $curVal = strval($this->department_id->CurrentValue);
-            if ($curVal != "") {
-                $this->department_id->ViewValue = $this->department_id->lookupCacheOption($curVal);
-                if ($this->department_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->department_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->department_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->department_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->department_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->department_id->ViewValue = $this->department_id->displayValue($arwrk);
-                    } else {
-                        $this->department_id->ViewValue = FormatNumber($this->department_id->CurrentValue, $this->department_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->department_id->ViewValue = null;
-            }
-
-            // designation_id
-            $curVal = strval($this->designation_id->CurrentValue);
-            if ($curVal != "") {
-                $this->designation_id->ViewValue = $this->designation_id->lookupCacheOption($curVal);
-                if ($this->designation_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->designation_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->designation_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->designation_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->designation_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->designation_id->ViewValue = $this->designation_id->displayValue($arwrk);
-                    } else {
-                        $this->designation_id->ViewValue = FormatNumber($this->designation_id->CurrentValue, $this->designation_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->designation_id->ViewValue = null;
-            }
-
-            // physical_address
-            $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
-
-            // user_role_id
-            if ($Security->canAdmin()) { // System admin
-                if (strval($this->user_role_id->CurrentValue) != "") {
-                    $this->user_role_id->ViewValue = $this->user_role_id->optionCaption($this->user_role_id->CurrentValue);
-                } else {
-                    $this->user_role_id->ViewValue = null;
-                }
-            } else {
-                $this->user_role_id->ViewValue = $Language->phrase("PasswordMask");
-            }
-
-            // is_verified
-            if (ConvertToBool($this->is_verified->CurrentValue)) {
-                $this->is_verified->ViewValue = $this->is_verified->tagCaption(1) != "" ? $this->is_verified->tagCaption(1) : "Yes";
-            } else {
-                $this->is_verified->ViewValue = $this->is_verified->tagCaption(2) != "" ? $this->is_verified->tagCaption(2) : "No";
-            }
+            // created_by_user_id
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -844,88 +668,44 @@ class UsersDelete extends Users
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // is_all_day
+            if (ConvertToBool($this->is_all_day->CurrentValue)) {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+            } else {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // photo
-            if (!empty($this->photo->Upload->DbValue)) {
-                $this->photo->HrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-                $this->photo->LinkAttrs["target"] = "";
-                if ($this->photo->IsBlobImage && empty($this->photo->LinkAttrs["target"])) {
-                    $this->photo->LinkAttrs["target"] = "_blank";
-                }
-                if ($this->isExport()) {
-                    $this->photo->HrefValue = FullUrl($this->photo->HrefValue, "href");
-                }
-            } else {
-                $this->photo->HrefValue = "";
-            }
-            $this->photo->ExportHrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-            $this->photo->TooltipValue = "";
-            if ($this->photo->UseColorbox) {
-                if (EmptyValue($this->photo->TooltipValue)) {
-                    $this->photo->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
-                }
-                $this->photo->LinkAttrs["data-rel"] = "users_x" . $this->RowCount . "_photo";
-                $this->photo->LinkAttrs->appendClass("ew-lightbox");
-            }
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // full_name
-            $this->full_name->HrefValue = "";
-            $this->full_name->TooltipValue = "";
+            // title
+            $this->_title->HrefValue = "";
+            $this->_title->TooltipValue = "";
 
-            // national_id
-            $this->national_id->HrefValue = "";
-            $this->national_id->TooltipValue = "";
+            // description
+            $this->description->HrefValue = "";
+            $this->description->TooltipValue = "";
 
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // doctor_id
+            $this->doctor_id->HrefValue = "";
+            $this->doctor_id->TooltipValue = "";
 
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-                }
-            } else {
-                $this->phone->HrefValue = "";
-            }
-            $this->phone->TooltipValue = "";
+            // start_date
+            $this->start_date->HrefValue = "";
+            $this->start_date->TooltipValue = "";
 
-            // email
-            if (!EmptyValue($this->_email->CurrentValue)) {
-                $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
-                $this->_email->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
-                }
-            } else {
-                $this->_email->HrefValue = "";
-            }
-            $this->_email->TooltipValue = "";
+            // end_date
+            $this->end_date->HrefValue = "";
+            $this->end_date->TooltipValue = "";
 
-            // department_id
-            $this->department_id->HrefValue = "";
-            $this->department_id->TooltipValue = "";
-
-            // designation_id
-            $this->designation_id->HrefValue = "";
-            $this->designation_id->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
-
-            // user_role_id
-            $this->user_role_id->HrefValue = "";
-            $this->user_role_id->TooltipValue = "";
-
-            // is_verified
-            $this->is_verified->HrefValue = "";
-            $this->is_verified->TooltipValue = "";
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -934,6 +714,10 @@ class UsersDelete extends Users
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // is_all_day
+            $this->is_all_day->HrefValue = "";
+            $this->is_all_day->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1032,7 +816,10 @@ class UsersDelete extends Users
         // Write JSON response
         if ((IsJsonResponse() || ConvertToBool(Param("infinitescroll"))) && $deleteRows) {
             $rows = $this->getRecordsFromRecordset($rsold);
-            $table = $this->TableVar;
+            $table = $this->UpdateTable;
+            foreach ($rows as &$row) {
+                $row["id"] = $row['id']; // Get event ID
+            }
             if (Param("key_m") === null) { // Single delete
                 $rows = $rows[0]; // Return object
             }
@@ -1041,23 +828,13 @@ class UsersDelete extends Users
         return $deleteRows;
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("userslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("appointmentslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }
@@ -1075,15 +852,7 @@ class UsersDelete extends Users
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_gender":
-                    break;
-                case "x_department_id":
-                    break;
-                case "x_designation_id":
-                    break;
-                case "x_user_role_id":
-                    break;
-                case "x_is_verified":
+                case "x_is_all_day":
                     break;
                 default:
                     $lookupFilter = "";

@@ -3214,5 +3214,10 @@ td button, .btn-primary  {
 .users_photo {
 	border-radius: 50%;
 }
+.el_users_photo img {
+	border-radius: 50%;
+	object-fit: cover;
+	max-width: 70px;
+}
 
 /*END_USER_STYLES*/
