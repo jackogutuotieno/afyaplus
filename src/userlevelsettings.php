@@ -291,7 +291,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["service_subcategories","service_subcategories","service subcategories",true,"{32536B8D-F37B-4419-80D5-260932800712}","servicesubcategorieslist"],
     ["users","users","Users",true,"{32536B8D-F37B-4419-80D5-260932800712}","userslist"],
     ["vaccinationsreport","vaccinationsreport","vaccinationsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vaccinationsreportlist"],
-    ["visit_types","visit_types","visit types",true,"{32536B8D-F37B-4419-80D5-260932800712}","visittypeslist"],
+    ["visit_types","visit_types","Visit Types",true,"{32536B8D-F37B-4419-80D5-260932800712}","visittypeslist"],
     ["vitalsreport","vitalsreport","vitalsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vitalsreportlist"],
     ["exportlog","exportlog","exportlog",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"],
     ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"],

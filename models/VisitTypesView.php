@@ -692,16 +692,6 @@ class VisitTypesView extends VisitTypes
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
-
         // Delete
         $item = &$option->add("delete");
         $url = GetUrl($this->DeleteUrl);
@@ -869,10 +859,6 @@ class VisitTypesView extends VisitTypes
             // visit_type
             $this->visit_type->ViewValue = $this->visit_type->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -888,10 +874,6 @@ class VisitTypesView extends VisitTypes
             // visit_type
             $this->visit_type->HrefValue = "";
             $this->visit_type->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

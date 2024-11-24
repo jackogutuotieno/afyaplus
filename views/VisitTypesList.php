@@ -157,14 +157,8 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_visit_types_id" class="visit_types_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->visit_type->Visible) { // visit_type ?>
         <th data-name="visit_type" class="<?= $Page->visit_type->headerCellClass() ?>"><div id="elh_visit_types_visit_type" class="visit_types_visit_type"><?= $Page->renderFieldHeader($Page->visit_type) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_visit_types_created_by_user_id" class="visit_types_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_visit_types_date_created" class="visit_types_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -200,27 +194,11 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_visit_types_id" class="el_visit_types_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->visit_type->Visible) { // visit_type ?>
         <td data-name="visit_type"<?= $Page->visit_type->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_visit_types_visit_type" class="el_visit_types_visit_type">
 <span<?= $Page->visit_type->viewAttributes() ?>>
 <?= $Page->visit_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_visit_types_created_by_user_id" class="el_visit_types_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

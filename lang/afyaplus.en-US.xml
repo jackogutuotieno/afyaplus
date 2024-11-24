@@ -1,4 +1,4 @@
-<ew-language date="2024/11/23" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/24" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -1605,21 +1605,21 @@
       </field>
     </table>
     <table id="visit_types">
-      <phrase id="tblcaption" value="visit types" />
+      <phrase id="tblcaption" value="Visit Types" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="visit_type">
-        <phrase id="fldcaption" value="visit type" />
+        <phrase id="fldcaption" value="Visit Typ" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="vitalsreport">

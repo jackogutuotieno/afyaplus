@@ -121,9 +121,9 @@ class VisitTypesDelete extends VisitTypes
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->visit_type->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -645,10 +645,6 @@ class VisitTypesDelete extends VisitTypes
             // visit_type
             $this->visit_type->ViewValue = $this->visit_type->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -657,17 +653,9 @@ class VisitTypesDelete extends VisitTypes
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // visit_type
             $this->visit_type->HrefValue = "";
             $this->visit_type->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

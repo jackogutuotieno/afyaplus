@@ -694,7 +694,7 @@ class VisitTypesAdd extends VisitTypes
             if (IsApi() && $val === null) {
                 $this->created_by_user_id->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
+                $this->created_by_user_id->setFormValue($val);
             }
         }
 
@@ -880,12 +880,6 @@ class VisitTypesAdd extends VisitTypes
             $this->visit_type->PlaceHolder = RemoveHtml($this->visit_type->caption());
 
             // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -940,9 +934,6 @@ class VisitTypesAdd extends VisitTypes
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1035,6 +1026,7 @@ class VisitTypesAdd extends VisitTypes
         $this->visit_type->setDbValueDef($rsnew, $this->visit_type->CurrentValue, false);
 
         // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
 
         // date_created
