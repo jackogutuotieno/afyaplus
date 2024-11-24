@@ -1570,6 +1570,8 @@
         <phrase id="fldtagcaption5" value="Doctor" />
         <phrase id="fldtagvalue6" value="3" />
         <phrase id="fldtagcaption6" value="Nurse" />
+        <phrase id="fldtagvalue7" value="4" />
+        <phrase id="fldtagcaption7" value="Laboratorist" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="is verified" />
