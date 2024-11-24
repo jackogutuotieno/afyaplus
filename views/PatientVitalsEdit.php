@@ -33,6 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
             ["height", [fields.height.visible && fields.height.required ? ew.Validators.required(fields.height.caption) : null, ew.Validators.float], fields.height.isInvalid],
             ["weight", [fields.weight.visible && fields.weight.required ? ew.Validators.required(fields.weight.caption) : null, ew.Validators.integer], fields.weight.isInvalid],
+            ["bmi", [fields.bmi.visible && fields.bmi.required ? ew.Validators.required(fields.bmi.caption) : null, ew.Validators.float], fields.bmi.isInvalid],
             ["temperature", [fields.temperature.visible && fields.temperature.required ? ew.Validators.required(fields.temperature.caption) : null, ew.Validators.float], fields.temperature.isInvalid],
             ["pulse", [fields.pulse.visible && fields.pulse.required ? ew.Validators.required(fields.pulse.caption) : null, ew.Validators.integer], fields.pulse.isInvalid],
             ["blood_pressure", [fields.blood_pressure.visible && fields.blood_pressure.required ? ew.Validators.required(fields.blood_pressure.caption) : null], fields.blood_pressure.isInvalid]
@@ -212,6 +213,18 @@ loadjs.ready("fpatient_vitalsedit", function() {
 <input type="<?= $Page->weight->getInputTextType() ?>" name="x_weight" id="x_weight" data-table="patient_vitals" data-field="x_weight" value="<?= $Page->weight->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->weight->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->weight->formatPattern()) ?>"<?= $Page->weight->editAttributes() ?> aria-describedby="x_weight_help">
 <?= $Page->weight->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->weight->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->bmi->Visible) { // bmi ?>
+    <div id="r_bmi"<?= $Page->bmi->rowAttributes() ?>>
+        <label id="elh_patient_vitals_bmi" for="x_bmi" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bmi->caption() ?><?= $Page->bmi->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->bmi->cellAttributes() ?>>
+<span id="el_patient_vitals_bmi">
+<input type="<?= $Page->bmi->getInputTextType() ?>" name="x_bmi" id="x_bmi" data-table="patient_vitals" data-field="x_bmi" value="<?= $Page->bmi->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->bmi->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->bmi->formatPattern()) ?>"<?= $Page->bmi->editAttributes() ?> aria-describedby="x_bmi_help">
+<?= $Page->bmi->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->bmi->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

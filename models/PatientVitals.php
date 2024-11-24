@@ -51,6 +51,7 @@ class PatientVitals extends DbTable
     public $visit_id;
     public $height;
     public $weight;
+    public $bmi;
     public $temperature;
     public $pulse;
     public $blood_pressure;
@@ -242,6 +243,31 @@ class PatientVitals extends DbTable
         $this->weight->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->weight->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['weight'] = &$this->weight;
+
+        // bmi
+        $this->bmi = new DbField(
+            $this, // Table
+            'x_bmi', // Variable name
+            'bmi', // Name
+            'round(weight/(height * height))', // Expression
+            'round(weight/(height * height))', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'round(weight/(height * height))', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->bmi->InputTextType = "text";
+        $this->bmi->Raw = true;
+        $this->bmi->IsCustom = true; // Custom field
+        $this->bmi->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->bmi->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['bmi'] = &$this->bmi;
 
         // temperature
         $this->temperature = new DbField(
@@ -571,20 +597,7 @@ class PatientVitals extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, round(weight/(height * height)) AS `bmi`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -1010,6 +1023,7 @@ class PatientVitals extends DbTable
         $this->visit_id->DbValue = $row['visit_id'];
         $this->height->DbValue = $row['height'];
         $this->weight->DbValue = $row['weight'];
+        $this->bmi->DbValue = $row['bmi'];
         $this->temperature->DbValue = $row['temperature'];
         $this->pulse->DbValue = $row['pulse'];
         $this->blood_pressure->DbValue = $row['blood_pressure'];
@@ -1377,6 +1391,7 @@ class PatientVitals extends DbTable
         $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
+        $this->bmi->setDbValue($row['bmi']);
         $this->temperature->setDbValue($row['temperature']);
         $this->pulse->setDbValue($row['pulse']);
         $this->blood_pressure->setDbValue($row['blood_pressure']);
@@ -1422,6 +1437,8 @@ class PatientVitals extends DbTable
         // height
 
         // weight
+
+        // bmi
 
         // temperature
 
@@ -1493,6 +1510,10 @@ class PatientVitals extends DbTable
         $this->weight->ViewValue = $this->weight->CurrentValue;
         $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
 
+        // bmi
+        $this->bmi->ViewValue = $this->bmi->CurrentValue;
+        $this->bmi->ViewValue = FormatNumber($this->bmi->ViewValue, $this->bmi->formatPattern());
+
         // temperature
         $this->temperature->ViewValue = $this->temperature->CurrentValue;
         $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
@@ -1535,6 +1556,10 @@ class PatientVitals extends DbTable
         // weight
         $this->weight->HrefValue = "";
         $this->weight->TooltipValue = "";
+
+        // bmi
+        $this->bmi->HrefValue = "";
+        $this->bmi->TooltipValue = "";
 
         // temperature
         $this->temperature->HrefValue = "";
@@ -1628,6 +1653,14 @@ class PatientVitals extends DbTable
             $this->weight->EditValue = FormatNumber($this->weight->EditValue, null);
         }
 
+        // bmi
+        $this->bmi->setupEditAttributes();
+        $this->bmi->EditValue = $this->bmi->CurrentValue;
+        $this->bmi->PlaceHolder = RemoveHtml($this->bmi->caption());
+        if (strval($this->bmi->EditValue) != "" && is_numeric($this->bmi->EditValue)) {
+            $this->bmi->EditValue = FormatNumber($this->bmi->EditValue, null);
+        }
+
         // temperature
         $this->temperature->setupEditAttributes();
         $this->temperature->EditValue = $this->temperature->CurrentValue;
@@ -1697,6 +1730,7 @@ class PatientVitals extends DbTable
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->height);
                     $doc->exportCaption($this->weight);
+                    $doc->exportCaption($this->bmi);
                     $doc->exportCaption($this->temperature);
                     $doc->exportCaption($this->pulse);
                     $doc->exportCaption($this->blood_pressure);
@@ -1706,6 +1740,7 @@ class PatientVitals extends DbTable
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->height);
                     $doc->exportCaption($this->weight);
+                    $doc->exportCaption($this->bmi);
                     $doc->exportCaption($this->temperature);
                     $doc->exportCaption($this->pulse);
                     $doc->exportCaption($this->blood_pressure);
@@ -1742,6 +1777,7 @@ class PatientVitals extends DbTable
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->height);
                         $doc->exportField($this->weight);
+                        $doc->exportField($this->bmi);
                         $doc->exportField($this->temperature);
                         $doc->exportField($this->pulse);
                         $doc->exportField($this->blood_pressure);
@@ -1751,6 +1787,7 @@ class PatientVitals extends DbTable
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->height);
                         $doc->exportField($this->weight);
+                        $doc->exportField($this->bmi);
                         $doc->exportField($this->temperature);
                         $doc->exportField($this->pulse);
                         $doc->exportField($this->blood_pressure);

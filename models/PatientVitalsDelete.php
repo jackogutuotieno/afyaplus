@@ -126,6 +126,7 @@ class PatientVitalsDelete extends PatientVitals
         $this->visit_id->setVisibility();
         $this->height->setVisibility();
         $this->weight->setVisibility();
+        $this->bmi->setVisibility();
         $this->temperature->setVisibility();
         $this->pulse->setVisibility();
         $this->blood_pressure->setVisibility();
@@ -614,6 +615,7 @@ class PatientVitalsDelete extends PatientVitals
         $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
+        $this->bmi->setDbValue($row['bmi']);
         $this->temperature->setDbValue($row['temperature']);
         $this->pulse->setDbValue($row['pulse']);
         $this->blood_pressure->setDbValue($row['blood_pressure']);
@@ -631,6 +633,7 @@ class PatientVitalsDelete extends PatientVitals
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['height'] = $this->height->DefaultValue;
         $row['weight'] = $this->weight->DefaultValue;
+        $row['bmi'] = $this->bmi->DefaultValue;
         $row['temperature'] = $this->temperature->DefaultValue;
         $row['pulse'] = $this->pulse->DefaultValue;
         $row['blood_pressure'] = $this->blood_pressure->DefaultValue;
@@ -661,6 +664,8 @@ class PatientVitalsDelete extends PatientVitals
         // height
 
         // weight
+
+        // bmi
 
         // temperature
 
@@ -734,6 +739,10 @@ class PatientVitalsDelete extends PatientVitals
             $this->weight->ViewValue = $this->weight->CurrentValue;
             $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
 
+            // bmi
+            $this->bmi->ViewValue = $this->bmi->CurrentValue;
+            $this->bmi->ViewValue = FormatNumber($this->bmi->ViewValue, $this->bmi->formatPattern());
+
             // temperature
             $this->temperature->ViewValue = $this->temperature->CurrentValue;
             $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
@@ -772,6 +781,10 @@ class PatientVitalsDelete extends PatientVitals
             // weight
             $this->weight->HrefValue = "";
             $this->weight->TooltipValue = "";
+
+            // bmi
+            $this->bmi->HrefValue = "";
+            $this->bmi->TooltipValue = "";
 
             // temperature
             $this->temperature->HrefValue = "";

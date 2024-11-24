@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/LabTestRequestsMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="flab_test_requests_queuesrch" id="flab_test_requests_queuesrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="flab_test_requests_queuesrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -142,6 +151,10 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "lab_test_requests" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_request_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_lab_test_requests_queue" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_lab_test_requests_queuelist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -160,14 +173,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_id" class="lab_test_requests_queue_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th data-name="lab_test_request_id" class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_lab_test_request_id" class="lab_test_requests_queue_lab_test_request_id"><?= $Page->renderFieldHeader($Page->lab_test_request_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <th data-name="waiting_time" class="<?= $Page->waiting_time->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_waiting_time" class="lab_test_requests_queue_waiting_time"><?= $Page->renderFieldHeader($Page->waiting_time) ?></div></th>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <th data-name="waiting_interval" class="<?= $Page->waiting_interval->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_waiting_interval" class="lab_test_requests_queue_waiting_interval"><?= $Page->renderFieldHeader($Page->waiting_interval) ?></div></th>
+<?php if ($Page->time->Visible) { // time ?>
+        <th data-name="time" class="<?= $Page->time->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_time" class="lab_test_requests_queue_time"><?= $Page->renderFieldHeader($Page->time) ?></div></th>
 <?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_status" class="lab_test_requests_queue_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
@@ -217,27 +224,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_lab_test_request_id" class="el_lab_test_requests_queue_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <td data-name="waiting_time"<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_waiting_time" class="el_lab_test_requests_queue_waiting_time">
-<span<?= $Page->waiting_time->viewAttributes() ?>>
-<?= $Page->waiting_time->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <td data-name="waiting_interval"<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_waiting_interval" class="el_lab_test_requests_queue_waiting_interval">
-<span<?= $Page->waiting_interval->viewAttributes() ?>>
-<?= $Page->waiting_interval->getViewValue() ?></span>
+    <?php if ($Page->time->Visible) { // time ?>
+        <td data-name="time"<?= $Page->time->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_time" class="el_lab_test_requests_queue_time">
+<span<?= $Page->time->viewAttributes() ?>>
+<?= $Page->time->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientVitalsGrid extends PatientVitals
+class LabTestRequestsQueueGrid extends LabTestRequestsQueue
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class PatientVitalsGrid extends PatientVitals
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientVitalsGrid";
+    public $PageObjName = "LabTestRequestsQueueGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class PatientVitalsGrid extends PatientVitals
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fpatient_vitalsgrid";
+    public $FormName = "flab_test_requests_queuegrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "patientvitalsgrid";
+    public $CurrentPageName = "labtestrequestsqueuegrid";
 
     // Page URLs
     public $AddUrl;
@@ -136,15 +136,12 @@ class PatientVitalsGrid extends PatientVitals
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
-        $this->height->setVisibility();
-        $this->weight->setVisibility();
-        $this->bmi->setVisibility();
-        $this->temperature->setVisibility();
-        $this->pulse->setVisibility();
-        $this->blood_pressure->setVisibility();
-        $this->created_by_user_id->Visible = false;
+        $this->lab_test_request_id->Visible = false;
+        $this->time->setVisibility();
+        $this->waiting_time->Visible = false;
+        $this->waiting_interval->Visible = false;
+        $this->status->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -157,8 +154,8 @@ class PatientVitalsGrid extends PatientVitals
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'patient_vitals';
-        $this->TableName = 'patient_vitals';
+        $this->TableVar = 'lab_test_requests_queue';
+        $this->TableName = 'lab_test_requests_queue';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -182,15 +179,15 @@ class PatientVitalsGrid extends PatientVitals
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_vitals)
-        if (!isset($GLOBALS["patient_vitals"]) || $GLOBALS["patient_vitals"]::class == PROJECT_NAMESPACE . "patient_vitals") {
-            $GLOBALS["patient_vitals"] = &$this;
+        // Table object (lab_test_requests_queue)
+        if (!isset($GLOBALS["lab_test_requests_queue"]) || $GLOBALS["lab_test_requests_queue"]::class == PROJECT_NAMESPACE . "lab_test_requests_queue") {
+            $GLOBALS["lab_test_requests_queue"] = &$this;
         }
-        $this->AddUrl = "patientvitalsadd";
+        $this->AddUrl = "labtestrequestsqueueadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_vitals');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'lab_test_requests_queue');
         }
 
         // Start timer
@@ -631,15 +628,15 @@ class PatientVitalsGrid extends PatientVitals
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->visit_id);
+        $this->setupLookupOptions($this->status);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fpatient_vitalsgrid";
+            $this->FormName = "flab_test_requests_queuegrid";
         }
 
         // Set up page action
@@ -715,21 +712,21 @@ class PatientVitalsGrid extends PatientVitals
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patient_visits") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patient_visits"); // Add master User ID filter
+            if ($this->getCurrentMasterTable() == "lab_test_requests") {
+                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests"); // Add master User ID filter
             }
         }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $masterTbl = Container("patient_visits");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests") {
+            $masterTbl = Container("lab_test_requests");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientvisitslist"); // Return to master page
+                $this->terminate("labtestrequestslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -871,9 +868,6 @@ class PatientVitalsGrid extends PatientVitals
     // Exit inline mode
     protected function clearInlineMode()
     {
-        $this->height->FormValue = ""; // Clear form value
-        $this->bmi->FormValue = ""; // Clear form value
-        $this->temperature->FormValue = ""; // Clear form value
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1115,66 +1109,18 @@ class PatientVitalsGrid extends PatientVitals
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_patient_id") &&
-            $CurrentForm->hasValue("o_patient_id") &&
-            $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
-            !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
+            $CurrentForm->hasValue("x_time") &&
+            $CurrentForm->hasValue("o_time") &&
+            $this->time->CurrentValue != $this->time->DefaultValue &&
+            !($this->time->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->time->CurrentValue == $this->time->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_visit_id") &&
-            $CurrentForm->hasValue("o_visit_id") &&
-            $this->visit_id->CurrentValue != $this->visit_id->DefaultValue &&
-            !($this->visit_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->visit_id->CurrentValue == $this->visit_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_height") &&
-            $CurrentForm->hasValue("o_height") &&
-            $this->height->CurrentValue != $this->height->DefaultValue &&
-            !($this->height->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->height->CurrentValue == $this->height->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_weight") &&
-            $CurrentForm->hasValue("o_weight") &&
-            $this->weight->CurrentValue != $this->weight->DefaultValue &&
-            !($this->weight->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->weight->CurrentValue == $this->weight->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_bmi") &&
-            $CurrentForm->hasValue("o_bmi") &&
-            $this->bmi->CurrentValue != $this->bmi->DefaultValue &&
-            !($this->bmi->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->bmi->CurrentValue == $this->bmi->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_temperature") &&
-            $CurrentForm->hasValue("o_temperature") &&
-            $this->temperature->CurrentValue != $this->temperature->DefaultValue &&
-            !($this->temperature->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->temperature->CurrentValue == $this->temperature->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_pulse") &&
-            $CurrentForm->hasValue("o_pulse") &&
-            $this->pulse->CurrentValue != $this->pulse->DefaultValue &&
-            !($this->pulse->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->pulse->CurrentValue == $this->pulse->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_blood_pressure") &&
-            $CurrentForm->hasValue("o_blood_pressure") &&
-            $this->blood_pressure->CurrentValue != $this->blood_pressure->DefaultValue &&
-            !($this->blood_pressure->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->blood_pressure->CurrentValue == $this->blood_pressure->getSessionValue())
+            $CurrentForm->hasValue("x_status") &&
+            $CurrentForm->hasValue("o_status") &&
+            $this->status->CurrentValue != $this->status->DefaultValue &&
+            !($this->status->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->status->CurrentValue == $this->status->getSessionValue())
         ) {
             return false;
         }
@@ -1321,7 +1267,7 @@ class PatientVitalsGrid extends PatientVitals
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->patient_id->setSessionValue("");
+                        $this->lab_test_request_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1365,6 +1311,12 @@ class PatientVitalsGrid extends PatientVitals
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1447,7 +1399,7 @@ class PatientVitalsGrid extends PatientVitals
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"lab_test_requests_queue\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1460,9 +1412,22 @@ class PatientVitalsGrid extends PatientVitals
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"lab_test_requests_queue\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd()) {
+                if ($this->ModalAdd && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"lab_test_requests_queue\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1512,7 +1477,7 @@ class PatientVitalsGrid extends PatientVitals
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
             if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"lab_test_requests_queue\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
             } else {
                 $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
@@ -1609,7 +1574,7 @@ class PatientVitalsGrid extends PatientVitals
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_patient_vitals", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_lab_test_requests_queue", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1697,7 +1662,7 @@ class PatientVitalsGrid extends PatientVitals
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_patient_vitals",
+            "id" => "r" . $this->RowCount . "_lab_test_requests_queue",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1738,108 +1703,43 @@ class PatientVitalsGrid extends PatientVitals
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'patient_id' first before field var 'x_patient_id'
-        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
-        if (!$this->patient_id->IsDetailKey) {
+        // Check field name 'time' first before field var 'x_time'
+        $val = $CurrentForm->hasValue("time") ? $CurrentForm->getValue("time") : $CurrentForm->getValue("x_time");
+        if (!$this->time->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->patient_id->Visible = false; // Disable update for API request
+                $this->time->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val);
+                $this->time->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o_patient_id")) {
-            $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
+        if ($CurrentForm->hasValue("o_time")) {
+            $this->time->setOldValue($CurrentForm->getValue("o_time"));
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
+                $this->status->Visible = false; // Disable update for API request
             } else {
-                $this->visit_id->setFormValue($val);
+                $this->status->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o_visit_id")) {
-            $this->visit_id->setOldValue($CurrentForm->getValue("o_visit_id"));
+        if ($CurrentForm->hasValue("o_status")) {
+            $this->status->setOldValue($CurrentForm->getValue("o_status"));
         }
 
-        // Check field name 'height' first before field var 'x_height'
-        $val = $CurrentForm->hasValue("height") ? $CurrentForm->getValue("height") : $CurrentForm->getValue("x_height");
-        if (!$this->height->IsDetailKey) {
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->height->Visible = false; // Disable update for API request
+                $this->created_by_user_id->Visible = false; // Disable update for API request
             } else {
-                $this->height->setFormValue($val, true, $validate);
+                $this->created_by_user_id->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o_height")) {
-            $this->height->setOldValue($CurrentForm->getValue("o_height"));
-        }
-
-        // Check field name 'weight' first before field var 'x_weight'
-        $val = $CurrentForm->hasValue("weight") ? $CurrentForm->getValue("weight") : $CurrentForm->getValue("x_weight");
-        if (!$this->weight->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->weight->Visible = false; // Disable update for API request
-            } else {
-                $this->weight->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_weight")) {
-            $this->weight->setOldValue($CurrentForm->getValue("o_weight"));
-        }
-
-        // Check field name 'bmi' first before field var 'x_bmi'
-        $val = $CurrentForm->hasValue("bmi") ? $CurrentForm->getValue("bmi") : $CurrentForm->getValue("x_bmi");
-        if (!$this->bmi->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->bmi->Visible = false; // Disable update for API request
-            } else {
-                $this->bmi->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_bmi")) {
-            $this->bmi->setOldValue($CurrentForm->getValue("o_bmi"));
-        }
-
-        // Check field name 'temperature' first before field var 'x_temperature'
-        $val = $CurrentForm->hasValue("temperature") ? $CurrentForm->getValue("temperature") : $CurrentForm->getValue("x_temperature");
-        if (!$this->temperature->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->temperature->Visible = false; // Disable update for API request
-            } else {
-                $this->temperature->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_temperature")) {
-            $this->temperature->setOldValue($CurrentForm->getValue("o_temperature"));
-        }
-
-        // Check field name 'pulse' first before field var 'x_pulse'
-        $val = $CurrentForm->hasValue("pulse") ? $CurrentForm->getValue("pulse") : $CurrentForm->getValue("x_pulse");
-        if (!$this->pulse->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->pulse->Visible = false; // Disable update for API request
-            } else {
-                $this->pulse->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_pulse")) {
-            $this->pulse->setOldValue($CurrentForm->getValue("o_pulse"));
-        }
-
-        // Check field name 'blood_pressure' first before field var 'x_blood_pressure'
-        $val = $CurrentForm->hasValue("blood_pressure") ? $CurrentForm->getValue("blood_pressure") : $CurrentForm->getValue("x_blood_pressure");
-        if (!$this->blood_pressure->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->blood_pressure->Visible = false; // Disable update for API request
-            } else {
-                $this->blood_pressure->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_blood_pressure")) {
-            $this->blood_pressure->setOldValue($CurrentForm->getValue("o_blood_pressure"));
+        if ($CurrentForm->hasValue("o_created_by_user_id")) {
+            $this->created_by_user_id->setOldValue($CurrentForm->getValue("o_created_by_user_id"));
         }
 
         // Check field name 'date_created' first before field var 'x_date_created'
@@ -1878,14 +1778,9 @@ class PatientVitalsGrid extends PatientVitals
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->height->CurrentValue = $this->height->FormValue;
-        $this->weight->CurrentValue = $this->weight->FormValue;
-        $this->bmi->CurrentValue = $this->bmi->FormValue;
-        $this->temperature->CurrentValue = $this->temperature->FormValue;
-        $this->pulse->CurrentValue = $this->pulse->FormValue;
-        $this->blood_pressure->CurrentValue = $this->blood_pressure->FormValue;
+        $this->time->CurrentValue = $this->time->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -1986,14 +1881,11 @@ class PatientVitalsGrid extends PatientVitals
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->height->setDbValue($row['height']);
-        $this->weight->setDbValue($row['weight']);
-        $this->bmi->setDbValue($row['bmi']);
-        $this->temperature->setDbValue($row['temperature']);
-        $this->pulse->setDbValue($row['pulse']);
-        $this->blood_pressure->setDbValue($row['blood_pressure']);
+        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
+        $this->time->setDbValue($row['time']);
+        $this->waiting_time->setDbValue($row['waiting_time']);
+        $this->waiting_interval->setDbValue($row['waiting_interval']);
+        $this->status->setDbValue($row['status']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -2004,14 +1896,11 @@ class PatientVitalsGrid extends PatientVitals
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['height'] = $this->height->DefaultValue;
-        $row['weight'] = $this->weight->DefaultValue;
-        $row['bmi'] = $this->bmi->DefaultValue;
-        $row['temperature'] = $this->temperature->DefaultValue;
-        $row['pulse'] = $this->pulse->DefaultValue;
-        $row['blood_pressure'] = $this->blood_pressure->DefaultValue;
+        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
+        $row['time'] = $this->time->DefaultValue;
+        $row['waiting_time'] = $this->waiting_time->DefaultValue;
+        $row['waiting_interval'] = $this->waiting_interval->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2055,24 +1944,19 @@ class PatientVitalsGrid extends PatientVitals
 
         // id
 
-        // patient_id
+        // lab_test_request_id
 
-        // visit_id
+        // time
 
-        // height
+        // waiting_time
+        $this->waiting_time->CellCssStyle = "white-space: nowrap;";
 
-        // weight
+        // waiting_interval
+        $this->waiting_interval->CellCssStyle = "white-space: nowrap;";
 
-        // bmi
-
-        // temperature
-
-        // pulse
-
-        // blood_pressure
+        // status
 
         // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -2083,74 +1967,42 @@ class PatientVitalsGrid extends PatientVitals
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
+            // lab_test_request_id
+            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+
+            // time
+            $this->time->ViewValue = $this->time->CurrentValue;
+
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->created_by_user_id->ViewValue = null;
             }
-
-            // visit_id
-            $curVal = strval($this->visit_id->CurrentValue);
-            if ($curVal != "") {
-                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-                if ($this->visit_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
-                    } else {
-                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->visit_id->ViewValue = null;
-            }
-
-            // height
-            $this->height->ViewValue = $this->height->CurrentValue;
-            $this->height->ViewValue = FormatNumber($this->height->ViewValue, $this->height->formatPattern());
-
-            // weight
-            $this->weight->ViewValue = $this->weight->CurrentValue;
-            $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
-
-            // bmi
-            $this->bmi->ViewValue = $this->bmi->CurrentValue;
-            $this->bmi->ViewValue = FormatNumber($this->bmi->ViewValue, $this->bmi->formatPattern());
-
-            // temperature
-            $this->temperature->ViewValue = $this->temperature->CurrentValue;
-            $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
-
-            // pulse
-            $this->pulse->ViewValue = $this->pulse->CurrentValue;
-            $this->pulse->ViewValue = FormatNumber($this->pulse->ViewValue, $this->pulse->formatPattern());
-
-            // blood_pressure
-            $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2164,37 +2016,17 @@ class PatientVitalsGrid extends PatientVitals
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // time
+            $this->time->HrefValue = "";
+            $this->time->TooltipValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
-            // height
-            $this->height->HrefValue = "";
-            $this->height->TooltipValue = "";
-
-            // weight
-            $this->weight->HrefValue = "";
-            $this->weight->TooltipValue = "";
-
-            // bmi
-            $this->bmi->HrefValue = "";
-            $this->bmi->TooltipValue = "";
-
-            // temperature
-            $this->temperature->HrefValue = "";
-            $this->temperature->TooltipValue = "";
-
-            // pulse
-            $this->pulse->HrefValue = "";
-            $this->pulse->TooltipValue = "";
-
-            // blood_pressure
-            $this->blood_pressure->HrefValue = "";
-            $this->blood_pressure->TooltipValue = "";
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2206,133 +2038,20 @@ class PatientVitalsGrid extends PatientVitals
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->patient_id->ViewValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->patient_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                } else {
-                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->patient_id->ViewValue !== null) { // Load from cache
-                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->patient_id->EditValue = $arwrk;
-                }
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            // time
+            $this->time->setupEditAttributes();
+            if (!$this->time->Raw) {
+                $this->time->CurrentValue = HtmlDecode($this->time->CurrentValue);
             }
+            $this->time->EditValue = HtmlEncode($this->time->CurrentValue);
+            $this->time->PlaceHolder = RemoveHtml($this->time->caption());
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            $curVal = trim(strval($this->visit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-            } else {
-                $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->visit_id->ViewValue !== null) { // Load from cache
-                $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->visit_id->EditValue = $arwrk;
-            }
-            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
-            // height
-            $this->height->setupEditAttributes();
-            $this->height->EditValue = $this->height->CurrentValue;
-            $this->height->PlaceHolder = RemoveHtml($this->height->caption());
-            if (strval($this->height->EditValue) != "" && is_numeric($this->height->EditValue)) {
-                $this->height->EditValue = FormatNumber($this->height->EditValue, null);
-            }
-
-            // weight
-            $this->weight->setupEditAttributes();
-            $this->weight->EditValue = $this->weight->CurrentValue;
-            $this->weight->PlaceHolder = RemoveHtml($this->weight->caption());
-            if (strval($this->weight->EditValue) != "" && is_numeric($this->weight->EditValue)) {
-                $this->weight->EditValue = FormatNumber($this->weight->EditValue, null);
-            }
-
-            // bmi
-            $this->bmi->setupEditAttributes();
-            $this->bmi->EditValue = $this->bmi->CurrentValue;
-            $this->bmi->PlaceHolder = RemoveHtml($this->bmi->caption());
-            if (strval($this->bmi->EditValue) != "" && is_numeric($this->bmi->EditValue)) {
-                $this->bmi->EditValue = FormatNumber($this->bmi->EditValue, null);
-            }
-
-            // temperature
-            $this->temperature->setupEditAttributes();
-            $this->temperature->EditValue = $this->temperature->CurrentValue;
-            $this->temperature->PlaceHolder = RemoveHtml($this->temperature->caption());
-            if (strval($this->temperature->EditValue) != "" && is_numeric($this->temperature->EditValue)) {
-                $this->temperature->EditValue = FormatNumber($this->temperature->EditValue, null);
-            }
-
-            // pulse
-            $this->pulse->setupEditAttributes();
-            $this->pulse->EditValue = $this->pulse->CurrentValue;
-            $this->pulse->PlaceHolder = RemoveHtml($this->pulse->caption());
-            if (strval($this->pulse->EditValue) != "" && is_numeric($this->pulse->EditValue)) {
-                $this->pulse->EditValue = FormatNumber($this->pulse->EditValue, null);
-            }
-
-            // blood_pressure
-            $this->blood_pressure->setupEditAttributes();
-            if (!$this->blood_pressure->Raw) {
-                $this->blood_pressure->CurrentValue = HtmlDecode($this->blood_pressure->CurrentValue);
-            }
-            $this->blood_pressure->EditValue = HtmlEncode($this->blood_pressure->CurrentValue);
-            $this->blood_pressure->PlaceHolder = RemoveHtml($this->blood_pressure->caption());
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2349,29 +2068,14 @@ class PatientVitalsGrid extends PatientVitals
             // id
             $this->id->HrefValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
+            // time
+            $this->time->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
+            // status
+            $this->status->HrefValue = "";
 
-            // height
-            $this->height->HrefValue = "";
-
-            // weight
-            $this->weight->HrefValue = "";
-
-            // bmi
-            $this->bmi->HrefValue = "";
-
-            // temperature
-            $this->temperature->HrefValue = "";
-
-            // pulse
-            $this->pulse->HrefValue = "";
-
-            // blood_pressure
-            $this->blood_pressure->HrefValue = "";
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2383,133 +2087,20 @@ class PatientVitalsGrid extends PatientVitals
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
 
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->patient_id->ViewValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->patient_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                } else {
-                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->patient_id->ViewValue !== null) { // Load from cache
-                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->patient_id->EditValue = $arwrk;
-                }
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            // time
+            $this->time->setupEditAttributes();
+            if (!$this->time->Raw) {
+                $this->time->CurrentValue = HtmlDecode($this->time->CurrentValue);
             }
+            $this->time->EditValue = HtmlEncode($this->time->CurrentValue);
+            $this->time->PlaceHolder = RemoveHtml($this->time->caption());
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            $curVal = trim(strval($this->visit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-            } else {
-                $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->visit_id->ViewValue !== null) { // Load from cache
-                $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->visit_id->EditValue = $arwrk;
-            }
-            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
-            // height
-            $this->height->setupEditAttributes();
-            $this->height->EditValue = $this->height->CurrentValue;
-            $this->height->PlaceHolder = RemoveHtml($this->height->caption());
-            if (strval($this->height->EditValue) != "" && is_numeric($this->height->EditValue)) {
-                $this->height->EditValue = FormatNumber($this->height->EditValue, null);
-            }
-
-            // weight
-            $this->weight->setupEditAttributes();
-            $this->weight->EditValue = $this->weight->CurrentValue;
-            $this->weight->PlaceHolder = RemoveHtml($this->weight->caption());
-            if (strval($this->weight->EditValue) != "" && is_numeric($this->weight->EditValue)) {
-                $this->weight->EditValue = FormatNumber($this->weight->EditValue, null);
-            }
-
-            // bmi
-            $this->bmi->setupEditAttributes();
-            $this->bmi->EditValue = $this->bmi->CurrentValue;
-            $this->bmi->PlaceHolder = RemoveHtml($this->bmi->caption());
-            if (strval($this->bmi->EditValue) != "" && is_numeric($this->bmi->EditValue)) {
-                $this->bmi->EditValue = FormatNumber($this->bmi->EditValue, null);
-            }
-
-            // temperature
-            $this->temperature->setupEditAttributes();
-            $this->temperature->EditValue = $this->temperature->CurrentValue;
-            $this->temperature->PlaceHolder = RemoveHtml($this->temperature->caption());
-            if (strval($this->temperature->EditValue) != "" && is_numeric($this->temperature->EditValue)) {
-                $this->temperature->EditValue = FormatNumber($this->temperature->EditValue, null);
-            }
-
-            // pulse
-            $this->pulse->setupEditAttributes();
-            $this->pulse->EditValue = $this->pulse->CurrentValue;
-            $this->pulse->PlaceHolder = RemoveHtml($this->pulse->caption());
-            if (strval($this->pulse->EditValue) != "" && is_numeric($this->pulse->EditValue)) {
-                $this->pulse->EditValue = FormatNumber($this->pulse->EditValue, null);
-            }
-
-            // blood_pressure
-            $this->blood_pressure->setupEditAttributes();
-            if (!$this->blood_pressure->Raw) {
-                $this->blood_pressure->CurrentValue = HtmlDecode($this->blood_pressure->CurrentValue);
-            }
-            $this->blood_pressure->EditValue = HtmlEncode($this->blood_pressure->CurrentValue);
-            $this->blood_pressure->PlaceHolder = RemoveHtml($this->blood_pressure->caption());
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2526,29 +2117,14 @@ class PatientVitalsGrid extends PatientVitals
             // id
             $this->id->HrefValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
+            // time
+            $this->time->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
+            // status
+            $this->status->HrefValue = "";
 
-            // height
-            $this->height->HrefValue = "";
-
-            // weight
-            $this->weight->HrefValue = "";
-
-            // bmi
-            $this->bmi->HrefValue = "";
-
-            // temperature
-            $this->temperature->HrefValue = "";
-
-            // pulse
-            $this->pulse->HrefValue = "";
-
-            // blood_pressure
-            $this->blood_pressure->HrefValue = "";
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2581,59 +2157,19 @@ class PatientVitalsGrid extends PatientVitals
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->patient_id->Visible && $this->patient_id->Required) {
-                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
-                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
+            if ($this->time->Visible && $this->time->Required) {
+                if (!$this->time->IsDetailKey && EmptyValue($this->time->FormValue)) {
+                    $this->time->addErrorMessage(str_replace("%s", $this->time->caption(), $this->time->RequiredErrorMessage));
                 }
             }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
-            if ($this->height->Visible && $this->height->Required) {
-                if (!$this->height->IsDetailKey && EmptyValue($this->height->FormValue)) {
-                    $this->height->addErrorMessage(str_replace("%s", $this->height->caption(), $this->height->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->height->FormValue)) {
-                $this->height->addErrorMessage($this->height->getErrorMessage(false));
-            }
-            if ($this->weight->Visible && $this->weight->Required) {
-                if (!$this->weight->IsDetailKey && EmptyValue($this->weight->FormValue)) {
-                    $this->weight->addErrorMessage(str_replace("%s", $this->weight->caption(), $this->weight->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->weight->FormValue)) {
-                $this->weight->addErrorMessage($this->weight->getErrorMessage(false));
-            }
-            if ($this->bmi->Visible && $this->bmi->Required) {
-                if (!$this->bmi->IsDetailKey && EmptyValue($this->bmi->FormValue)) {
-                    $this->bmi->addErrorMessage(str_replace("%s", $this->bmi->caption(), $this->bmi->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->bmi->FormValue)) {
-                $this->bmi->addErrorMessage($this->bmi->getErrorMessage(false));
-            }
-            if ($this->temperature->Visible && $this->temperature->Required) {
-                if (!$this->temperature->IsDetailKey && EmptyValue($this->temperature->FormValue)) {
-                    $this->temperature->addErrorMessage(str_replace("%s", $this->temperature->caption(), $this->temperature->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->temperature->FormValue)) {
-                $this->temperature->addErrorMessage($this->temperature->getErrorMessage(false));
-            }
-            if ($this->pulse->Visible && $this->pulse->Required) {
-                if (!$this->pulse->IsDetailKey && EmptyValue($this->pulse->FormValue)) {
-                    $this->pulse->addErrorMessage(str_replace("%s", $this->pulse->caption(), $this->pulse->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->pulse->FormValue)) {
-                $this->pulse->addErrorMessage($this->pulse->getErrorMessage(false));
-            }
-            if ($this->blood_pressure->Visible && $this->blood_pressure->Required) {
-                if (!$this->blood_pressure->IsDetailKey && EmptyValue($this->blood_pressure->FormValue)) {
-                    $this->blood_pressure->addErrorMessage(str_replace("%s", $this->blood_pressure->caption(), $this->blood_pressure->RequiredErrorMessage));
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
@@ -2802,32 +2338,15 @@ class PatientVitalsGrid extends PatientVitals
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->ReadOnly = true;
-        }
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
+        // time
+        $this->time->setDbValueDef($rsnew, $this->time->CurrentValue, $this->time->ReadOnly);
 
-        // visit_id
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
 
-        // height
-        $this->height->setDbValueDef($rsnew, $this->height->CurrentValue, $this->height->ReadOnly);
-
-        // weight
-        $this->weight->setDbValueDef($rsnew, $this->weight->CurrentValue, $this->weight->ReadOnly);
-
-        // bmi
-        $this->bmi->setDbValueDef($rsnew, $this->bmi->CurrentValue, $this->bmi->ReadOnly);
-
-        // temperature
-        $this->temperature->setDbValueDef($rsnew, $this->temperature->CurrentValue, $this->temperature->ReadOnly);
-
-        // pulse
-        $this->pulse->setDbValueDef($rsnew, $this->pulse->CurrentValue, $this->pulse->ReadOnly);
-
-        // blood_pressure
-        $this->blood_pressure->setDbValueDef($rsnew, $this->blood_pressure->CurrentValue, $this->blood_pressure->ReadOnly);
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
@@ -2843,29 +2362,14 @@ class PatientVitalsGrid extends PatientVitals
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->CurrentValue = $row['patient_id'];
+        if (isset($row['time'])) { // time
+            $this->time->CurrentValue = $row['time'];
         }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->CurrentValue = $row['visit_id'];
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
-        if (isset($row['height'])) { // height
-            $this->height->CurrentValue = $row['height'];
-        }
-        if (isset($row['weight'])) { // weight
-            $this->weight->CurrentValue = $row['weight'];
-        }
-        if (isset($row['bmi'])) { // bmi
-            $this->bmi->CurrentValue = $row['bmi'];
-        }
-        if (isset($row['temperature'])) { // temperature
-            $this->temperature->CurrentValue = $row['temperature'];
-        }
-        if (isset($row['pulse'])) { // pulse
-            $this->pulse->CurrentValue = $row['pulse'];
-        }
-        if (isset($row['blood_pressure'])) { // blood_pressure
-            $this->blood_pressure->CurrentValue = $row['blood_pressure'];
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -2881,9 +2385,9 @@ class PatientVitalsGrid extends PatientVitals
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "patient_visits") {
-            $this->patient_id->Visible = true; // Need to insert foreign key
-            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+        if ($this->getCurrentMasterTable() == "lab_test_requests") {
+            $this->lab_test_request_id->Visible = true; // Need to insert foreign key
+            $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->getSessionValue();
         }
 
         // Get new row
@@ -2895,14 +2399,14 @@ class PatientVitalsGrid extends PatientVitals
         // Check if valid key values for master user
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
             $detailKeys = [];
-            $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
-            $masterTable = Container("patient_visits");
+            $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->CurrentValue;
+            $masterTable = Container("lab_test_requests");
             $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
             if (!EmptyValue($masterFilter)) {
                 $validMasterKey = true;
                 if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
                     $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "patient_visits") {
+                } elseif ($this->getCurrentMasterTable() == "lab_test_requests") {
                     $validMasterKey = false;
                 }
                 if (!$validMasterKey) {
@@ -2954,35 +2458,26 @@ class PatientVitalsGrid extends PatientVitals
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
+        // time
+        $this->time->setDbValueDef($rsnew, $this->time->CurrentValue, false);
 
-        // visit_id
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
 
-        // height
-        $this->height->setDbValueDef($rsnew, $this->height->CurrentValue, false);
-
-        // weight
-        $this->weight->setDbValueDef($rsnew, $this->weight->CurrentValue, false);
-
-        // bmi
-        $this->bmi->setDbValueDef($rsnew, $this->bmi->CurrentValue, false);
-
-        // temperature
-        $this->temperature->setDbValueDef($rsnew, $this->temperature->CurrentValue, false);
-
-        // pulse
-        $this->pulse->setDbValueDef($rsnew, $this->pulse->CurrentValue, false);
-
-        // blood_pressure
-        $this->blood_pressure->setDbValueDef($rsnew, $this->blood_pressure->CurrentValue, false);
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
         // date_updated
         $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // lab_test_request_id
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $rsnew['lab_test_request_id'] = $this->lab_test_request_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2992,35 +2487,23 @@ class PatientVitalsGrid extends PatientVitals
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
+        if (isset($row['time'])) { // time
+            $this->time->setFormValue($row['time']);
         }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->setFormValue($row['visit_id']);
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
-        if (isset($row['height'])) { // height
-            $this->height->setFormValue($row['height']);
-        }
-        if (isset($row['weight'])) { // weight
-            $this->weight->setFormValue($row['weight']);
-        }
-        if (isset($row['bmi'])) { // bmi
-            $this->bmi->setFormValue($row['bmi']);
-        }
-        if (isset($row['temperature'])) { // temperature
-            $this->temperature->setFormValue($row['temperature']);
-        }
-        if (isset($row['pulse'])) { // pulse
-            $this->pulse->setFormValue($row['pulse']);
-        }
-        if (isset($row['blood_pressure'])) { // blood_pressure
-            $this->blood_pressure->setFormValue($row['blood_pressure']);
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
+            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
         }
     }
 
@@ -3029,8 +2512,9 @@ class PatientVitalsGrid extends PatientVitals
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "patient_visits") {
-            $masterTbl = Container("patient_visits");
+        if ($masterTblVar == "lab_test_requests") {
+            $masterTbl = Container("lab_test_requests");
+            $this->lab_test_request_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
@@ -3052,9 +2536,9 @@ class PatientVitalsGrid extends PatientVitals
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
+                case "x_status":
                     break;
-                case "x_visit_id":
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -3088,10 +2572,7 @@ class PatientVitalsGrid extends PatientVitals
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add vitals");
+        //Log("Page Load");
     }
 
     // Page Unload event

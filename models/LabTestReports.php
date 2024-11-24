@@ -146,6 +146,7 @@ class LabTestReports extends DbTable
         );
         $this->lab_test_request_id->InputTextType = "text";
         $this->lab_test_request_id->Raw = true;
+        $this->lab_test_request_id->IsForeignKey = true; // Foreign key field
         $this->lab_test_request_id->Nullable = false; // NOT NULL field
         $this->lab_test_request_id->Required = true; // Required field
         $this->lab_test_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -336,6 +337,88 @@ class LabTestReports extends DbTable
         }
     }
 
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "lab_test_requests") {
+            $masterTable = Container("lab_test_requests");
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_request_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "lab_test_requests") {
+            $masterTable = Container("lab_test_requests");
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_request_id, $this->lab_test_request_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "lab_test_requests":
+                $key = $keys["lab_test_request_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_request_id"], $this->lab_test_request_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "lab_test_requests":
+                return GetKeyFilter($this->lab_test_request_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
+    }
+
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -475,6 +558,13 @@ class LabTestReports extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "lab_test_requests" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "lab_test_requests"); // Add detail User ID filter
+            }
+        }
         return $filter;
     }
 
@@ -997,6 +1087,10 @@ class LabTestReports extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "lab_test_requests" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_request_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1280,10 +1374,16 @@ class LabTestReports extends DbTable
 
         // lab_test_request_id
         $this->lab_test_request_id->setupEditAttributes();
-        $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-        $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-        if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-            $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
+            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+        } else {
+            $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
+            if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
+                $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+            }
         }
 
         // report_title
@@ -1417,6 +1517,30 @@ class LabTestReports extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_requests") {
+            $filterWrk = Container("lab_test_requests")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_requests") {
+            $mastertable = Container("lab_test_requests");
+            if (!$mastertable->userIDAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->lab_test_request_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

@@ -185,6 +185,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->weight->Visible) { // weight ?>
         <th data-name="weight" class="<?= $Page->weight->headerCellClass() ?>"><div id="elh_patient_vitals_weight" class="patient_vitals_weight"><?= $Page->renderFieldHeader($Page->weight) ?></div></th>
 <?php } ?>
+<?php if ($Page->bmi->Visible) { // bmi ?>
+        <th data-name="bmi" class="<?= $Page->bmi->headerCellClass() ?>"><div id="elh_patient_vitals_bmi" class="patient_vitals_bmi"><?= $Page->renderFieldHeader($Page->bmi) ?></div></th>
+<?php } ?>
 <?php if ($Page->temperature->Visible) { // temperature ?>
         <th data-name="temperature" class="<?= $Page->temperature->headerCellClass() ?>"><div id="elh_patient_vitals_temperature" class="patient_vitals_temperature"><?= $Page->renderFieldHeader($Page->temperature) ?></div></th>
 <?php } ?>
@@ -265,6 +268,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_weight" class="el_patient_vitals_weight">
 <span<?= $Page->weight->viewAttributes() ?>>
 <?= $Page->weight->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bmi->Visible) { // bmi ?>
+        <td data-name="bmi"<?= $Page->bmi->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_bmi" class="el_patient_vitals_bmi">
+<span<?= $Page->bmi->viewAttributes() ?>>
+<?= $Page->bmi->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

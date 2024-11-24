@@ -122,12 +122,12 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
+        $this->lab_test_request_id->Visible = false;
         $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->created_by_user_id->Visible = false;
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -416,6 +416,13 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->specimen_id);
+        $this->setupLookupOptions($this->service_id);
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -429,6 +436,25 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAllAssociative($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("labtestrequestsdetailslist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -642,6 +668,7 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         // service_id
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -657,32 +684,54 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
             $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
 
             // specimen_id
-            $this->specimen_id->ViewValue = $this->specimen_id->CurrentValue;
-            $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->ViewValue, $this->specimen_id->formatPattern());
+            $curVal = strval($this->specimen_id->CurrentValue);
+            if ($curVal != "") {
+                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
+                if ($this->specimen_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->specimen_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->specimen_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->specimen_id->ViewValue = $this->specimen_id->displayValue($arwrk);
+                    } else {
+                        $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->CurrentValue, $this->specimen_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->specimen_id->ViewValue = null;
+            }
 
             // service_id
-            $this->service_id->ViewValue = $this->service_id->CurrentValue;
-            $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            $curVal = strval($this->service_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+                if ($this->service_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                    } else {
+                        $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
 
             // specimen_id
             $this->specimen_id->HrefValue = "";
@@ -691,18 +740,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -810,6 +847,89 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         return $deleteRows;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests");
+                if (($parm = Get("fk_id", Get("lab_test_request_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->lab_test_request_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->QueryStringValue);
+                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests");
+                if (($parm = Post("fk_id", Post("lab_test_request_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->lab_test_request_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->FormValue);
+                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "lab_test_requests") {
+                if (!array_key_exists("lab_test_request_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_request_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -834,6 +954,10 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_specimen_id":
+                    break;
+                case "x_service_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

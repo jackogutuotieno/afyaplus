@@ -81,7 +81,7 @@
       <phrase id="menutext" value="Lab Requests" />
     </menu>
     <menu id="14">
-      <phrase id="menutext" value="lab test requests details" />
+      <phrase id="menutext" value="Test Details" />
     </menu>
     <menu id="15">
       <phrase id="menutext" value="Lab Queue" />
@@ -495,7 +495,7 @@
       </field>
     </table>
     <table id="lab_test_reports">
-      <phrase id="tblcaption" value="lab test reports" />
+      <phrase id="tblcaption" value="Test Reports" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -519,45 +519,51 @@
       </field>
     </table>
     <table id="lab_test_requests">
-      <phrase id="tblcaption" value="lab test requests" />
+      <phrase id="tblcaption" value="Laboratory Requests" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Request ID" />
       </field>
       <field id="test_title">
-        <phrase id="fldcaption" value="test title" />
+        <phrase id="fldcaption" value="Test Title" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="visit id" />
+        <phrase id="fldcaption" value="Check-In Title" />
       </field>
       <field id="status">
-        <phrase id="fldcaption" value="status" />
+        <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Done" />
+        <phrase id="fldtagcaption1" value="Done" />
+        <phrase id="fldtagvalue2" value="Cancelled" />
+        <phrase id="fldtagcaption2" value="Cancelled" />
+        <phrase id="fldtagvalue3" value="Differed" />
+        <phrase id="fldtagcaption3" value="Differed" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Requested By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Request Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="lab_test_requests_details">
-      <phrase id="tblcaption" value="lab test requests details" />
+      <phrase id="tblcaption" value="Test Details" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/No" />
       </field>
       <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
+        <phrase id="fldcaption" value="Request ID" />
       </field>
       <field id="specimen_id">
-        <phrase id="fldcaption" value="specimen id" />
+        <phrase id="fldcaption" value="Specimen" />
       </field>
       <field id="service_id">
-        <phrase id="fldcaption" value="service id" />
+        <phrase id="fldcaption" value="Test Title" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
@@ -570,30 +576,39 @@
       </field>
     </table>
     <table id="lab_test_requests_queue">
-      <phrase id="tblcaption" value="lab test requests queue" />
+      <phrase id="tblcaption" value="Test Queue" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/No" />
       </field>
       <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
+        <phrase id="fldcaption" value="Request ID" />
+      </field>
+      <field id="time">
+        <phrase id="fldcaption" value="time" />
       </field>
       <field id="waiting_time">
-        <phrase id="fldcaption" value="waiting time" />
+        <phrase id="fldcaption" value="Waiting Time" />
       </field>
       <field id="waiting_interval">
-        <phrase id="fldcaption" value="waiting interval" />
+        <phrase id="fldcaption" value="Waiting Interval" />
       </field>
       <field id="status">
-        <phrase id="fldcaption" value="status" />
+        <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Done" />
+        <phrase id="fldtagcaption1" value="Done" />
+        <phrase id="fldtagvalue2" value="In Progress" />
+        <phrase id="fldtagcaption2" value="In Progress" />
+        <phrase id="fldtagvalue3" value="Cancelled" />
+        <phrase id="fldtagcaption3" value="Cancelled" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Submitted by" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="laboratory_billing">
@@ -1009,6 +1024,9 @@
       </field>
       <field id="weight">
         <phrase id="fldcaption" value="Weight (Kg)" />
+      </field>
+      <field id="bmi">
+        <phrase id="fldcaption" value="BMI" />
       </field>
       <field id="temperature">
         <phrase id="fldcaption" value="Temp (C)" />

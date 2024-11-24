@@ -53,14 +53,8 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_id" class="lab_test_requests_queue_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_lab_test_request_id" class="lab_test_requests_queue_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <th class="<?= $Page->waiting_time->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_waiting_time" class="lab_test_requests_queue_waiting_time"><?= $Page->waiting_time->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <th class="<?= $Page->waiting_interval->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_waiting_interval" class="lab_test_requests_queue_waiting_interval"><?= $Page->waiting_interval->caption() ?></span></th>
+<?php if ($Page->time->Visible) { // time ?>
+        <th class="<?= $Page->time->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_time" class="lab_test_requests_queue_time"><?= $Page->time->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_lab_test_requests_queue_status" class="lab_test_requests_queue_status"><?= $Page->status->caption() ?></span></th>
@@ -103,27 +97,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<?php if ($Page->time->Visible) { // time ?>
+        <td<?= $Page->time->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <td<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->waiting_time->viewAttributes() ?>>
-<?= $Page->waiting_time->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <td<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->waiting_interval->viewAttributes() ?>>
-<?= $Page->waiting_interval->getViewValue() ?></span>
+<span<?= $Page->time->viewAttributes() ?>>
+<?= $Page->time->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

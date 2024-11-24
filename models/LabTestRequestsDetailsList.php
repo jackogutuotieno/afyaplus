@@ -146,12 +146,12 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
+        $this->lab_test_request_id->Visible = false;
         $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->created_by_user_id->Visible = false;
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -459,6 +459,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -654,6 +657,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             }
         }
 
+        // Create form object
+        $CurrentForm = new HttpForm();
+
         // Get export parameters
         $custom = "";
         if (Param("export") !== null) {
@@ -704,8 +710,18 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->InlineDelete = true;
         }
 
+        // Set up master detail parameters
+        $this->setupMasterParms();
+
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->specimen_id);
+        $this->setupLookupOptions($this->service_id);
+
+        // Load default values for add
+        $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -748,6 +764,52 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->setupBreadcrumb();
         }
 
+        // Check QueryString parameters
+        if (Get("action") !== null) {
+            $this->CurrentAction = Get("action");
+        } else {
+            if (Post("action") !== null && Post("action") !== $this->UserAction) {
+                $this->CurrentAction = Post("action"); // Get action
+            }
+        }
+
+        // Clear inline mode
+        if ($this->isCancel()) {
+            $this->clearInlineMode();
+        }
+
+        // Switch to grid add mode
+        if ($this->isGridAdd()) {
+            $this->gridAddMode();
+            // Grid Insert
+        } elseif (IsPost() && $this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
+            if ($this->validateGridForm()) {
+                $gridInsert = $this->gridInsert();
+            } else {
+                $gridInsert = false;
+            }
+            if ($gridInsert) {
+                // Handle modal grid add, redirect to list page directly
+                if ($this->IsModal && !$this->UseAjaxActions) {
+                    $this->terminate("labtestrequestsdetailslist");
+                    return;
+                }
+            } else {
+                $this->EventCancelled = true;
+                if ($this->UseAjaxActions) {
+                    WriteJson([
+                        "success" => false,
+                        "validation" => $this->ValidationErrors,
+                        "error" => $this->getFailureMessage()
+                    ]);
+                    $this->clearFailureMessage();
+                    $this->terminate();
+                    return;
+                }
+                $this->gridAddMode(); // Stay in grid add mode
+            }
+        }
+
         // Hide list options
         if ($this->isExport()) {
             $this->ListOptions->hideAllOptions(["sequence"]);
@@ -771,6 +833,16 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->OtherOptions->hideAllOptions();
         }
 
+        // Show grid delete link for grid add / grid edit
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $item = $this->ListOptions["griddelete"];
+                if ($item) {
+                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                }
+            }
+        }
+
         // Set up sorting order
         $this->setupSortOrder();
 
@@ -786,8 +858,35 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
+
+        // Restore master/detail filter from session
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
+
+        // Add master User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "lab_test_requests") {
+                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests"); // Add master User ID filter
+            }
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests") {
+            $masterTbl = Container("lab_test_requests");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("labtestrequestslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -957,6 +1056,22 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         }
     }
 
+    // Exit inline mode
+    protected function clearInlineMode()
+    {
+        $this->LastAction = $this->CurrentAction; // Save last action
+        $this->CurrentAction = ""; // Clear action
+        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to grid add mode
+    protected function gridAddMode()
+    {
+        $this->CurrentAction = "gridadd";
+        $_SESSION[SESSION_INLINE_MODE] = "gridadd";
+        $this->hideFieldsForAddEdit();
+    }
+
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -988,6 +1103,220 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         return $wrkFilter;
     }
 
+    // Perform grid add
+    public function gridInsert()
+    {
+        global $Language, $CurrentForm;
+        $rowindex = 1;
+        $gridInsert = false;
+        $conn = $this->getConnection();
+
+        // Call Grid Inserting event
+        if (!$this->gridInserting()) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridAddCancelled")); // Set grid add cancelled message
+            }
+            $this->EventCancelled = true;
+            return false;
+        }
+
+        // Begin transaction
+        if ($this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
+        // Init key filter
+        $wrkfilter = "";
+        $addcnt = 0;
+        $key = "";
+
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Insert all rows
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "" && $rowaction != "insert") {
+                continue; // Skip
+            }
+            $rsold = null;
+            if ($rowaction == "insert") {
+                $this->OldKey = strval($CurrentForm->getValue($this->OldKeyName));
+                $rsold = $this->loadOldRecord(); // Load old record
+            }
+            $this->loadFormValues(); // Get form values
+            if (!$this->emptyRow()) {
+                $addcnt++;
+                $this->SendEmail = false; // Do not send email on insert success
+                $gridInsert = $this->addRow($rsold); // Insert row (already validated by validateGridForm())
+                if ($gridInsert) {
+                    if ($key != "") {
+                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
+                    }
+                    $key .= $this->id->CurrentValue;
+
+                    // Add filter for this record
+                    AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
+                } else {
+                    $this->EventCancelled = true;
+                    break;
+                }
+            }
+        }
+        if ($addcnt == 0) { // No record inserted
+            $this->setFailureMessage($Language->phrase("NoAddRecord"));
+            $gridInsert = false;
+        }
+        if ($gridInsert) {
+            if ($this->UseTransaction) { // Commit transaction
+                if ($conn->isTransactionActive()) {
+                    $conn->commit();
+                }
+            }
+
+            // Get new records
+            $this->CurrentFilter = $wrkfilter;
+            $this->FilterForModalActions = $wrkfilter;
+            $sql = $this->getCurrentSql();
+            $rsnew = $conn->fetchAllAssociative($sql);
+
+            // Call Grid_Inserted event
+            $this->gridInserted($rsnew);
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("InsertSuccess")); // Set up insert success message
+            }
+            $this->clearInlineMode(); // Clear grid add mode
+        } else {
+            if ($this->UseTransaction) { // Rollback transaction
+                if ($conn->isTransactionActive()) {
+                    $conn->rollback();
+                }
+            }
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
+            }
+        }
+        return $gridInsert;
+    }
+
+    // Check if empty row
+    public function emptyRow()
+    {
+        global $CurrentForm;
+        if (
+            $CurrentForm->hasValue("x_specimen_id") &&
+            $CurrentForm->hasValue("o_specimen_id") &&
+            $this->specimen_id->CurrentValue != $this->specimen_id->DefaultValue &&
+            !($this->specimen_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->specimen_id->CurrentValue == $this->specimen_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_service_id") &&
+            $CurrentForm->hasValue("o_service_id") &&
+            $this->service_id->CurrentValue != $this->service_id->DefaultValue &&
+            !($this->service_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->service_id->CurrentValue == $this->service_id->getSessionValue())
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate grid form
+    public function validateGridForm()
+    {
+        global $CurrentForm;
+
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Load default values for emptyRow checking
+        $this->loadDefaultValues();
+
+        // Validate all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete" && $rowaction != "hide") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } elseif (!$this->validateForm()) {
+                    $this->ValidationErrors[$rowindex] = $this->getValidationErrors();
+                    $this->EventCancelled = true;
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Get all form values of the grid
+    public function getGridFormValues()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+        $rows = [];
+
+        // Loop through all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } else {
+                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
+                }
+            }
+        }
+        return $rows; // Return as array of array
+    }
+
+    // Restore form values for current row
+    public function restoreCurrentRowFormValues($idx)
+    {
+        global $CurrentForm;
+
+        // Get row based on current index
+        $CurrentForm->Index = $idx;
+        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+        $this->loadFormValues(); // Load form values
+        // Set up invalid status correctly
+        $this->resetFormError();
+        if ($rowaction == "insert" && $this->emptyRow()) {
+            // Ignore
+        } else {
+            $this->validateForm();
+        }
+    }
+
+    // Reset form status
+    public function resetFormError()
+    {
+        foreach ($this->Fields as $field) {
+            $field->clearErrorMessage();
+        }
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1004,12 +1333,8 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->lab_test_request_id); // lab_test_request_id
             $this->updateSort($this->specimen_id); // specimen_id
             $this->updateSort($this->service_id); // service_id
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1025,6 +1350,14 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset master/detail keys
+            if ($this->Command == "resetall") {
+                $this->setCurrentMasterTable(""); // Clear master table
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+                        $this->lab_test_request_id->setSessionValue("");
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -1049,6 +1382,14 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     {
         global $Security, $Language;
 
+        // "griddelete"
+        if ($this->AllowAddDeleteRow) {
+            $item = &$this->ListOptions->add("griddelete");
+            $item->CssClass = "text-nowrap";
+            $item->OnLeft = false;
+            $item->Visible = false; // Default hidden
+        }
+
         // Add group option item ("button")
         $item = &$this->ListOptions->addGroupOption();
         $item->Body = "";
@@ -1065,12 +1406,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1135,12 +1470,44 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // Set up row action and key
+        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
+            $CurrentForm->Index = $this->RowIndex;
+            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
+            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+            if ($this->RowAction != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
+            }
+            $oldKey = $this->getKey(false); // Get from OldValue
+            if ($oldKeyName != "" && $oldKey != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
+            }
+            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
+            }
+        }
+
+        // "delete"
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $options = &$this->ListOptions;
+                $options->UseButtonGroup = true; // Use button group for grid delete button
+                $opt = $options["griddelete"];
+                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                    $opt->Body = "&nbsp;";
+                } else {
+                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
+                }
+            }
+        }
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"lab_test_requests_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1153,7 +1520,7 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"lab_test_requests_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1163,22 +1530,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"lab_test_requests_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1262,6 +1616,13 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $item = &$option->add("gridadd");
+        if ($this->ModalGridAdd && !IsMobile()) {
+            $item->Body = "<button class=\"ew-add-edit ew-grid-add\" title=\"" . $Language->phrase("GridAddLink", true) . "\" data-caption=\"" . $Language->phrase("GridAddLink", true) . "\" data-ew-action=\"modal\" data-btn=\"AddBtn\" data-url=\"" . HtmlEncode(GetUrl($this->GridAddUrl)) . "\">" . $Language->phrase("GridAddLink") . "</button>";
+        } else {
+            $item->Body = "<a class=\"ew-add-edit ew-grid-add\" title=\"" . $Language->phrase("GridAddLink", true) . "\" data-caption=\"" . $Language->phrase("GridAddLink", true) . "\" href=\"" . HtmlEncode(GetUrl($this->GridAddUrl)) . "\">" . $Language->phrase("GridAddLink") . "</a>";
+        }
+        $item->Visible = $this->GridAddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1271,12 +1632,8 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "lab_test_request_id");
             $this->createColumnOption($option, "specimen_id");
             $this->createColumnOption($option, "service_id");
-            $this->createColumnOption($option, "created_by_user_id");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1357,27 +1714,58 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["action"];
-        // Set up list action buttons
-        foreach ($this->ListActions as $listAction) {
-            if ($listAction->Select == ACTION_MULTIPLE) {
-                $item = &$option->add("custom_" . $listAction->Action);
-                $caption = $listAction->Caption;
-                $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flab_test_requests_detailslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
-                $item->Visible = $listAction->Allowed;
-            }
-        }
-
-        // Hide multi edit, grid edit and other options
-        if ($this->TotalRecords <= 0) {
-            $option = $options["addedit"];
-            $item = $option["gridedit"];
-            if ($item) {
-                $item->Visible = false;
-            }
+        if (!$this->isGridAdd() && !$this->isGridEdit() && !$this->isMultiEdit()) { // Not grid add/grid edit/multi edit mode
             $option = $options["action"];
-            $option->hideAllOptions();
+            // Set up list action buttons
+            foreach ($this->ListActions as $listAction) {
+                if ($listAction->Select == ACTION_MULTIPLE) {
+                    $item = &$option->add("custom_" . $listAction->Action);
+                    $caption = $listAction->Caption;
+                    $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
+                    $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flab_test_requests_detailslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                    $item->Visible = $listAction->Allowed;
+                }
+            }
+
+            // Hide multi edit, grid edit and other options
+            if ($this->TotalRecords <= 0) {
+                $option = $options["addedit"];
+                $item = $option["gridedit"];
+                if ($item) {
+                    $item->Visible = false;
+                }
+                $option = $options["action"];
+                $option->hideAllOptions();
+            }
+        } else { // Grid add/grid edit/multi edit mode
+            // Hide all options first
+            foreach ($options as $option) {
+                $option->hideAllOptions();
+            }
+            $pageUrl = $this->pageUrl(false);
+
+            // Grid-Add
+            if ($this->isGridAdd()) {
+                    if ($this->AllowAddDeleteRow) {
+                        // Add add blank row
+                        $option = $options["addedit"];
+                        $option->UseDropDownButton = false;
+                        $item = &$option->add("addblankrow");
+                        $item->Body = "<a type=\"button\" class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
+                        $item->Visible = $Security->canAdd();
+                    }
+                if (!($this->ModalGridAdd && !IsMobile())) {
+                    $option = $options["action"];
+                    $option->UseDropDownButton = false;
+                    // Add grid insert
+                    $item = &$option->add("gridinsert");
+                    $item->Body = "<button class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" form=\"flab_test_requests_detailslist\" formaction=\"" . GetUrl($this->pageName()) . "\">" . $Language->phrase("GridInsertLink") . "</button>";
+                    // Add grid cancel
+                    $item = &$option->add("gridcancel");
+                    $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                    $item->Body = "<a type=\"button\" class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
+                }
+            }
         }
     }
 
@@ -1507,6 +1895,15 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $this->StopRecord = $this->TotalRecords;
             }
         }
+
+        // Restore number of post back records
+        if ($CurrentForm && ($this->isConfirm() || $this->EventCancelled)) {
+            $CurrentForm->resetIndex();
+            if ($CurrentForm->hasValue($this->FormKeyCountName) && ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm())) {
+                $this->KeyCount = $CurrentForm->getValue($this->FormKeyCountName);
+                $this->StopRecord = $this->StartRecord + $this->KeyCount - 1;
+            }
+        }
         $this->RecordCount = $this->StartRecord - 1;
         if ($this->CurrentRow !== false) {
             // Nothing to do
@@ -1549,6 +1946,17 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 return;
             }
         }
+        if ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm() || $this->isMultiEdit()) {
+            $this->RowIndex++;
+            $CurrentForm->Index = $this->RowIndex;
+            if ($CurrentForm->hasValue($this->FormActionName) && ($this->isConfirm() || $this->EventCancelled)) {
+                $this->RowAction = strval($CurrentForm->getValue($this->FormActionName));
+            } elseif ($this->isGridAdd()) {
+                $this->RowAction = "insert";
+            } else {
+                $this->RowAction = "";
+            }
+        }
 
         // Set up key count
         $this->KeyCount = $this->RowIndex;
@@ -1575,6 +1983,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $this->RowType = RowType::VIEW; // Render view
         if (($this->isAdd() || $this->isCopy()) && $this->InlineRowCount == 0 || $this->isGridAdd()) { // Add
             $this->RowType = RowType::ADD; // Render add
+        }
+        if ($this->isGridAdd() && $this->EventCancelled && !$CurrentForm->hasValue($this->FormBlankRowName)) { // Insert failed
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
         }
 
         // Inline Add/Copy row (row 0)
@@ -1610,6 +2021,64 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
         // Render list options
         $this->renderListOptions();
+    }
+
+    // Load default values
+    protected function loadDefaultValues()
+    {
+        $this->created_by_user_id->DefaultValue = CurrentUserID();
+        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
+    }
+
+    // Load form values
+    protected function loadFormValues()
+    {
+        // Load from form
+        global $CurrentForm;
+        $validate = !Config("SERVER_VALIDATE");
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
+        // Check field name 'specimen_id' first before field var 'x_specimen_id'
+        $val = $CurrentForm->hasValue("specimen_id") ? $CurrentForm->getValue("specimen_id") : $CurrentForm->getValue("x_specimen_id");
+        if (!$this->specimen_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->specimen_id->Visible = false; // Disable update for API request
+            } else {
+                $this->specimen_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_specimen_id")) {
+            $this->specimen_id->setOldValue($CurrentForm->getValue("o_specimen_id"));
+        }
+
+        // Check field name 'service_id' first before field var 'x_service_id'
+        $val = $CurrentForm->hasValue("service_id") ? $CurrentForm->getValue("service_id") : $CurrentForm->getValue("x_service_id");
+        if (!$this->service_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->service_id->Visible = false; // Disable update for API request
+            } else {
+                $this->service_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_service_id")) {
+            $this->service_id->setOldValue($CurrentForm->getValue("o_service_id"));
+        }
+    }
+
+    // Restore form values
+    public function restoreFormValues()
+    {
+        global $CurrentForm;
+        if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->CurrentValue = $this->id->FormValue;
+        }
+        $this->specimen_id->CurrentValue = $this->specimen_id->FormValue;
+        $this->service_id->CurrentValue = $this->service_id->FormValue;
     }
 
     /**
@@ -1774,6 +2243,7 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         // service_id
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1789,32 +2259,54 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
 
             // specimen_id
-            $this->specimen_id->ViewValue = $this->specimen_id->CurrentValue;
-            $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->ViewValue, $this->specimen_id->formatPattern());
+            $curVal = strval($this->specimen_id->CurrentValue);
+            if ($curVal != "") {
+                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
+                if ($this->specimen_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->specimen_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->specimen_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->specimen_id->ViewValue = $this->specimen_id->displayValue($arwrk);
+                    } else {
+                        $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->CurrentValue, $this->specimen_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->specimen_id->ViewValue = null;
+            }
 
             // service_id
-            $this->service_id->ViewValue = $this->service_id->CurrentValue;
-            $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            $curVal = strval($this->service_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+                if ($this->service_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                    } else {
+                        $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
 
             // specimen_id
             $this->specimen_id->HrefValue = "";
@@ -1823,23 +2315,298 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
+            // id
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
+            // specimen_id
+            $this->specimen_id->setupEditAttributes();
+            $curVal = trim(strval($this->specimen_id->CurrentValue));
+            if ($curVal != "") {
+                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
+            } else {
+                $this->specimen_id->ViewValue = $this->specimen_id->Lookup !== null && is_array($this->specimen_id->lookupOptions()) && count($this->specimen_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->specimen_id->ViewValue !== null) { // Load from cache
+                $this->specimen_id->EditValue = array_values($this->specimen_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->specimen_id->CurrentValue, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->specimen_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->specimen_id->EditValue = $arwrk;
+            }
+            $this->specimen_id->PlaceHolder = RemoveHtml($this->specimen_id->caption());
 
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
+            // service_id
+            $this->service_id->setupEditAttributes();
+            $curVal = trim(strval($this->service_id->CurrentValue));
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+            } else {
+                $this->service_id->ViewValue = $this->service_id->Lookup !== null && is_array($this->service_id->lookupOptions()) && count($this->service_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->service_id->ViewValue !== null) { // Load from cache
+                $this->service_id->EditValue = array_values($this->service_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->service_id->CurrentValue, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->service_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->service_id->EditValue = $arwrk;
+            }
+            $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
 
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
+            // Add refer script
+
+            // id
+            $this->id->HrefValue = "";
+
+            // specimen_id
+            $this->specimen_id->HrefValue = "";
+
+            // service_id
+            $this->service_id->HrefValue = "";
+        }
+        if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
+        }
+    }
+
+    // Validate form
+    protected function validateForm()
+    {
+        global $Language, $Security;
+
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+        $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
+            if ($this->specimen_id->Visible && $this->specimen_id->Required) {
+                if (!$this->specimen_id->IsDetailKey && EmptyValue($this->specimen_id->FormValue)) {
+                    $this->specimen_id->addErrorMessage(str_replace("%s", $this->specimen_id->caption(), $this->specimen_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->service_id->Visible && $this->service_id->Required) {
+                if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
+                    $this->service_id->addErrorMessage(str_replace("%s", $this->service_id->caption(), $this->service_id->RequiredErrorMessage));
+                }
+            }
+
+        // Return validate result
+        $validateForm = $validateForm && !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateForm;
+    }
+
+    // Delete records based on current filter
+    protected function deleteRows()
+    {
+        global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $rows = $conn->fetchAllAssociative($sql);
+        if (count($rows) == 0) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
+            return false;
+        }
+
+        // Clone old rows
+        $rsold = $rows;
+        $successKeys = [];
+        $failKeys = [];
+        foreach ($rsold as $row) {
+            $thisKey = "";
+            if ($thisKey != "") {
+                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+            }
+            $thisKey .= $row['id'];
+
+            // Call row deleting event
+            $deleteRow = $this->rowDeleting($row);
+            if ($deleteRow) { // Delete
+                $deleteRow = $this->delete($row);
+                if (!$deleteRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
+                    $this->setFailureMessage($this->DbErrorMessage);
+                }
+            }
+            if ($deleteRow === false) {
+                if ($this->UseTransaction) {
+                    $successKeys = []; // Reset success keys
+                    break;
+                }
+                $failKeys[] = $thisKey;
+            } else {
+                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
+                    $this->deleteUploadedFiles($row);
+                }
+
+                // Call Row Deleted event
+                $this->rowDeleted($row);
+                $successKeys[] = $thisKey;
+            }
+        }
+
+        // Any records deleted
+        $deleteRows = count($successKeys) > 0;
+        if (!$deleteRows) {
+            // Set up error message
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
+            }
+        }
+        return $deleteRows;
+    }
+
+    // Add record
+    protected function addRow($rsold = null)
+    {
+        global $Language, $Security;
+
+        // Get new row
+        $rsnew = $this->getAddRow();
+
+        // Update current values
+        $this->setCurrentValues($rsnew);
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $detailKeys = [];
+            $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->CurrentValue;
+            $masterTable = Container("lab_test_requests");
+            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+            if (!EmptyValue($masterFilter)) {
+                $validMasterKey = true;
+                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
+                } elseif ($this->getCurrentMasterTable() == "lab_test_requests") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
+        $conn = $this->getConnection();
+
+        // Load db values from old row
+        $this->loadDbValues($rsold);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
+                $this->setFailureMessage($this->DbErrorMessage);
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
+            }
+            $addRow = false;
+        }
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
+        }
+        return $addRow;
+    }
+
+    /**
+     * Get add row
+     *
+     * @return array
+     */
+    protected function getAddRow()
+    {
+        global $Security;
+        $rsnew = [];
+
+        // specimen_id
+        $this->specimen_id->setDbValueDef($rsnew, $this->specimen_id->CurrentValue, false);
+
+        // service_id
+        $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, false);
+
+        // lab_test_request_id
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $rsnew['lab_test_request_id'] = $this->lab_test_request_id->getSessionValue();
+        }
+
+        // created_by_user_id
+        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+            $rsnew['created_by_user_id'] = CurrentUserID();
+        }
+        return $rsnew;
+    }
+
+    /**
+     * Restore add form from row
+     * @param array $row Row
+     */
+    protected function restoreAddFormFromRow($row)
+    {
+        if (isset($row['specimen_id'])) { // specimen_id
+            $this->specimen_id->setFormValue($row['specimen_id']);
+        }
+        if (isset($row['service_id'])) { // service_id
+            $this->service_id->setFormValue($row['service_id']);
+        }
+        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
+            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
     }
 
@@ -2040,6 +2807,23 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests") {
+            $lab_test_requests = new LabTestRequestsList();
+            $rsmaster = $lab_test_requests->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($lab_test_requests);
+                    $lab_test_requests->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2057,6 +2841,100 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
         // Call Page Exported server event
         $this->pageExported($doc);
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests");
+                if (($parm = Get("fk_id", Get("lab_test_request_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->lab_test_request_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->QueryStringValue);
+                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests");
+                if (($parm = Post("fk_id", Post("lab_test_request_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->lab_test_request_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->FormValue);
+                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Update URL
+            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
+            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
+            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
+            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
+            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
+
+            // Set up Breadcrumb
+            if (!$this->isExport()) {
+                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
+            }
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "lab_test_requests") {
+                if (!array_key_exists("lab_test_request_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_request_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -2082,6 +2960,10 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_specimen_id":
+                    break;
+                case "x_service_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2254,7 +3136,10 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add test details");
     }
 
     // Page Unload event

@@ -128,18 +128,31 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_lab_test_requests_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
+<?php
+    if (in_array("lab_test_requests_details", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_details->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsDetailsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_queue->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests_queue", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsQueueGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_reports", explode(",", $Page->getCurrentDetailTable())) && $lab_test_reports->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_reports", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestReportsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

@@ -144,6 +144,7 @@ C:\wamp64\www\afyaplus\models\LabTestReports.php
 C:\wamp64\www\afyaplus\models\LabTestReportsAdd.php
 C:\wamp64\www\afyaplus\models\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\models\LabTestReportsEdit.php
+C:\wamp64\www\afyaplus\models\LabTestReportsGrid.php
 C:\wamp64\www\afyaplus\models\LabTestReportsList.php
 C:\wamp64\www\afyaplus\models\LabTestReportsView.php
 C:\wamp64\www\afyaplus\models\LabTestRequests.php
@@ -153,6 +154,7 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsDetails.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsAdd.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsDelete.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsEdit.php
+C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsGrid.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsList.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsEdit.php
@@ -162,6 +164,7 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueDelete.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueEdit.php
+C:\wamp64\www\afyaplus\models\LabTestRequestsQueueGrid.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueList.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsView.php
@@ -599,6 +602,7 @@ C:\wamp64\www\afyaplus\views\LabSpecimensView.php
 C:\wamp64\www\afyaplus\views\LabTestReportsAdd.php
 C:\wamp64\www\afyaplus\views\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestReportsEdit.php
+C:\wamp64\www\afyaplus\views\LabTestReportsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestReportsList.php
 C:\wamp64\www\afyaplus\views\LabTestReportsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsAdd.php
@@ -606,14 +610,17 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsAdd.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsEdit.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsList.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsEdit.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsList.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueDelete.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueEdit.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsQueueGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php

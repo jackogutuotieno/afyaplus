@@ -150,6 +150,7 @@ class PatientVitalsList extends PatientVitals
         $this->visit_id->setVisibility();
         $this->height->setVisibility();
         $this->weight->setVisibility();
+        $this->bmi->setVisibility();
         $this->temperature->setVisibility();
         $this->pulse->setVisibility();
         $this->blood_pressure->setVisibility();
@@ -1099,6 +1100,7 @@ class PatientVitalsList extends PatientVitals
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->height->AdvancedSearch->toJson(), ","); // Field height
         $filterList = Concat($filterList, $this->weight->AdvancedSearch->toJson(), ","); // Field weight
+        $filterList = Concat($filterList, $this->bmi->AdvancedSearch->toJson(), ","); // Field bmi
         $filterList = Concat($filterList, $this->temperature->AdvancedSearch->toJson(), ","); // Field temperature
         $filterList = Concat($filterList, $this->pulse->AdvancedSearch->toJson(), ","); // Field pulse
         $filterList = Concat($filterList, $this->blood_pressure->AdvancedSearch->toJson(), ","); // Field blood_pressure
@@ -1180,6 +1182,14 @@ class PatientVitalsList extends PatientVitals
         $this->weight->AdvancedSearch->SearchValue2 = @$filter["y_weight"];
         $this->weight->AdvancedSearch->SearchOperator2 = @$filter["w_weight"];
         $this->weight->AdvancedSearch->save();
+
+        // Field bmi
+        $this->bmi->AdvancedSearch->SearchValue = @$filter["x_bmi"];
+        $this->bmi->AdvancedSearch->SearchOperator = @$filter["z_bmi"];
+        $this->bmi->AdvancedSearch->SearchCondition = @$filter["v_bmi"];
+        $this->bmi->AdvancedSearch->SearchValue2 = @$filter["y_bmi"];
+        $this->bmi->AdvancedSearch->SearchOperator2 = @$filter["w_bmi"];
+        $this->bmi->AdvancedSearch->save();
 
         // Field temperature
         $this->temperature->AdvancedSearch->SearchValue = @$filter["x_temperature"];
@@ -1327,6 +1337,7 @@ class PatientVitalsList extends PatientVitals
             $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->height); // height
             $this->updateSort($this->weight); // weight
+            $this->updateSort($this->bmi); // bmi
             $this->updateSort($this->temperature); // temperature
             $this->updateSort($this->pulse); // pulse
             $this->updateSort($this->blood_pressure); // blood_pressure
@@ -1369,6 +1380,7 @@ class PatientVitalsList extends PatientVitals
                 $this->visit_id->setSort("");
                 $this->height->setSort("");
                 $this->weight->setSort("");
+                $this->bmi->setSort("");
                 $this->temperature->setSort("");
                 $this->pulse->setSort("");
                 $this->blood_pressure->setSort("");
@@ -1595,6 +1607,7 @@ class PatientVitalsList extends PatientVitals
             $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "height");
             $this->createColumnOption($option, "weight");
+            $this->createColumnOption($option, "bmi");
             $this->createColumnOption($option, "temperature");
             $this->createColumnOption($option, "pulse");
             $this->createColumnOption($option, "blood_pressure");
@@ -2043,6 +2056,7 @@ class PatientVitalsList extends PatientVitals
         $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
+        $this->bmi->setDbValue($row['bmi']);
         $this->temperature->setDbValue($row['temperature']);
         $this->pulse->setDbValue($row['pulse']);
         $this->blood_pressure->setDbValue($row['blood_pressure']);
@@ -2060,6 +2074,7 @@ class PatientVitalsList extends PatientVitals
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['height'] = $this->height->DefaultValue;
         $row['weight'] = $this->weight->DefaultValue;
+        $row['bmi'] = $this->bmi->DefaultValue;
         $row['temperature'] = $this->temperature->DefaultValue;
         $row['pulse'] = $this->pulse->DefaultValue;
         $row['blood_pressure'] = $this->blood_pressure->DefaultValue;
@@ -2115,6 +2130,8 @@ class PatientVitalsList extends PatientVitals
         // height
 
         // weight
+
+        // bmi
 
         // temperature
 
@@ -2188,6 +2205,10 @@ class PatientVitalsList extends PatientVitals
             $this->weight->ViewValue = $this->weight->CurrentValue;
             $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
 
+            // bmi
+            $this->bmi->ViewValue = $this->bmi->CurrentValue;
+            $this->bmi->ViewValue = FormatNumber($this->bmi->ViewValue, $this->bmi->formatPattern());
+
             // temperature
             $this->temperature->ViewValue = $this->temperature->CurrentValue;
             $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
@@ -2226,6 +2247,10 @@ class PatientVitalsList extends PatientVitals
             // weight
             $this->weight->HrefValue = "";
             $this->weight->TooltipValue = "";
+
+            // bmi
+            $this->bmi->HrefValue = "";
+            $this->bmi->TooltipValue = "";
 
             // temperature
             $this->temperature->HrefValue = "";

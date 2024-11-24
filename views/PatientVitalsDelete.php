@@ -65,6 +65,9 @@ $Page->showMessage();
 <?php if ($Page->weight->Visible) { // weight ?>
         <th class="<?= $Page->weight->headerCellClass() ?>"><span id="elh_patient_vitals_weight" class="patient_vitals_weight"><?= $Page->weight->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->bmi->Visible) { // bmi ?>
+        <th class="<?= $Page->bmi->headerCellClass() ?>"><span id="elh_patient_vitals_bmi" class="patient_vitals_bmi"><?= $Page->bmi->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->temperature->Visible) { // temperature ?>
         <th class="<?= $Page->temperature->headerCellClass() ?>"><span id="elh_patient_vitals_temperature" class="patient_vitals_temperature"><?= $Page->temperature->caption() ?></span></th>
 <?php } ?>
@@ -138,6 +141,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->weight->viewAttributes() ?>>
 <?= $Page->weight->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->bmi->Visible) { // bmi ?>
+        <td<?= $Page->bmi->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->bmi->viewAttributes() ?>>
+<?= $Page->bmi->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

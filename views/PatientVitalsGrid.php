@@ -28,6 +28,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
             ["height", [fields.height.visible && fields.height.required ? ew.Validators.required(fields.height.caption) : null, ew.Validators.float], fields.height.isInvalid],
             ["weight", [fields.weight.visible && fields.weight.required ? ew.Validators.required(fields.weight.caption) : null, ew.Validators.integer], fields.weight.isInvalid],
+            ["bmi", [fields.bmi.visible && fields.bmi.required ? ew.Validators.required(fields.bmi.caption) : null, ew.Validators.float], fields.bmi.isInvalid],
             ["temperature", [fields.temperature.visible && fields.temperature.required ? ew.Validators.required(fields.temperature.caption) : null, ew.Validators.float], fields.temperature.isInvalid],
             ["pulse", [fields.pulse.visible && fields.pulse.required ? ew.Validators.required(fields.pulse.caption) : null, ew.Validators.integer], fields.pulse.isInvalid],
             ["blood_pressure", [fields.blood_pressure.visible && fields.blood_pressure.required ? ew.Validators.required(fields.blood_pressure.caption) : null], fields.blood_pressure.isInvalid],
@@ -39,7 +40,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["visit_id",false],["height",false],["weight",false],["temperature",false],["pulse",false],["blood_pressure",false],["date_created",false],["date_updated",false]];
+                    fields = [["patient_id",false],["visit_id",false],["height",false],["weight",false],["bmi",false],["temperature",false],["pulse",false],["blood_pressure",false],["date_created",false],["date_updated",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -109,6 +110,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->weight->Visible) { // weight ?>
         <th data-name="weight" class="<?= $Grid->weight->headerCellClass() ?>"><div id="elh_patient_vitals_weight" class="patient_vitals_weight"><?= $Grid->renderFieldHeader($Grid->weight) ?></div></th>
+<?php } ?>
+<?php if ($Grid->bmi->Visible) { // bmi ?>
+        <th data-name="bmi" class="<?= $Grid->bmi->headerCellClass() ?>"><div id="elh_patient_vitals_bmi" class="patient_vitals_bmi"><?= $Grid->renderFieldHeader($Grid->bmi) ?></div></th>
 <?php } ?>
 <?php if ($Grid->temperature->Visible) { // temperature ?>
         <th data-name="temperature" class="<?= $Grid->temperature->headerCellClass() ?>"><div id="elh_patient_vitals_temperature" class="patient_vitals_temperature"><?= $Grid->renderFieldHeader($Grid->temperature) ?></div></th>
@@ -442,6 +446,33 @@ loadjs.ready("fpatient_vitalsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patient_vitals" data-field="x_weight" data-hidden="1" name="fpatient_vitalsgrid$x<?= $Grid->RowIndex ?>_weight" id="fpatient_vitalsgrid$x<?= $Grid->RowIndex ?>_weight" value="<?= HtmlEncode($Grid->weight->FormValue) ?>">
 <input type="hidden" data-table="patient_vitals" data-field="x_weight" data-hidden="1" data-old name="fpatient_vitalsgrid$o<?= $Grid->RowIndex ?>_weight" id="fpatient_vitalsgrid$o<?= $Grid->RowIndex ?>_weight" value="<?= HtmlEncode($Grid->weight->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->bmi->Visible) { // bmi ?>
+        <td data-name="bmi"<?= $Grid->bmi->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vitals_bmi" class="el_patient_vitals_bmi">
+<input type="<?= $Grid->bmi->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_bmi" id="x<?= $Grid->RowIndex ?>_bmi" data-table="patient_vitals" data-field="x_bmi" value="<?= $Grid->bmi->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->bmi->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->bmi->formatPattern()) ?>"<?= $Grid->bmi->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->bmi->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="patient_vitals" data-field="x_bmi" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_bmi" id="o<?= $Grid->RowIndex ?>_bmi" value="<?= HtmlEncode($Grid->bmi->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vitals_bmi" class="el_patient_vitals_bmi">
+<input type="<?= $Grid->bmi->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_bmi" id="x<?= $Grid->RowIndex ?>_bmi" data-table="patient_vitals" data-field="x_bmi" value="<?= $Grid->bmi->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->bmi->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->bmi->formatPattern()) ?>"<?= $Grid->bmi->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->bmi->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vitals_bmi" class="el_patient_vitals_bmi">
+<span<?= $Grid->bmi->viewAttributes() ?>>
+<?= $Grid->bmi->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patient_vitals" data-field="x_bmi" data-hidden="1" name="fpatient_vitalsgrid$x<?= $Grid->RowIndex ?>_bmi" id="fpatient_vitalsgrid$x<?= $Grid->RowIndex ?>_bmi" value="<?= HtmlEncode($Grid->bmi->FormValue) ?>">
+<input type="hidden" data-table="patient_vitals" data-field="x_bmi" data-hidden="1" data-old name="fpatient_vitalsgrid$o<?= $Grid->RowIndex ?>_bmi" id="fpatient_vitalsgrid$o<?= $Grid->RowIndex ?>_bmi" value="<?= HtmlEncode($Grid->bmi->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

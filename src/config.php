@@ -606,7 +606,7 @@ $CONFIG = [
     "SESSIONLESS_API_ACTIONS" => ["file"],
 
     // List page inline/grid/modal settings
-    "USE_AJAX_ACTIONS" => false,
+    "USE_AJAX_ACTIONS" => true,
 
     // Send push notification time limit
     "SEND_PUSH_NOTIFICATION_TIME_LIMIT" => 300,

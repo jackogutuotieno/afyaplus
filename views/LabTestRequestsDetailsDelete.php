@@ -53,23 +53,11 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_id" class="lab_test_requests_details_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_lab_test_request_id" class="lab_test_requests_details_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->specimen_id->Visible) { // specimen_id ?>
         <th class="<?= $Page->specimen_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_specimen_id" class="lab_test_requests_details_specimen_id"><?= $Page->specimen_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th class="<?= $Page->service_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_service_id" class="lab_test_requests_details_service_id"><?= $Page->service_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_created_by_user_id" class="lab_test_requests_details_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_lab_test_requests_details_date_created" class="lab_test_requests_details_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_lab_test_requests_details_date_updated" class="lab_test_requests_details_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -100,14 +88,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->specimen_id->Visible) { // specimen_id ?>
         <td<?= $Page->specimen_id->cellAttributes() ?>>
 <span id="">
@@ -121,30 +101,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->service_id->viewAttributes() ?>>
 <?= $Page->service_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

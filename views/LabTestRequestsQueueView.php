@@ -73,24 +73,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-    <tr id="r_waiting_time"<?= $Page->waiting_time->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_waiting_time"><?= $Page->waiting_time->caption() ?></span></td>
-        <td data-name="waiting_time"<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_waiting_time">
-<span<?= $Page->waiting_time->viewAttributes() ?>>
-<?= $Page->waiting_time->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-    <tr id="r_waiting_interval"<?= $Page->waiting_interval->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_waiting_interval"><?= $Page->waiting_interval->caption() ?></span></td>
-        <td data-name="waiting_interval"<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_waiting_interval">
-<span<?= $Page->waiting_interval->viewAttributes() ?>>
-<?= $Page->waiting_interval->getViewValue() ?></span>
+<?php if ($Page->time->Visible) { // time ?>
+    <tr id="r_time"<?= $Page->time->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_time"><?= $Page->time->caption() ?></span></td>
+        <td data-name="time"<?= $Page->time->cellAttributes() ?>>
+<span id="el_lab_test_requests_queue_time">
+<span<?= $Page->time->viewAttributes() ?>>
+<?= $Page->time->getViewValue() ?></span>
 </span>
 </td>
     </tr>

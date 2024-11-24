@@ -126,6 +126,7 @@ class PatientVitalsEdit extends PatientVitals
         $this->visit_id->setVisibility();
         $this->height->setVisibility();
         $this->weight->setVisibility();
+        $this->bmi->setVisibility();
         $this->temperature->setVisibility();
         $this->pulse->setVisibility();
         $this->blood_pressure->setVisibility();
@@ -765,6 +766,16 @@ class PatientVitalsEdit extends PatientVitals
             }
         }
 
+        // Check field name 'bmi' first before field var 'x_bmi'
+        $val = $CurrentForm->hasValue("bmi") ? $CurrentForm->getValue("bmi") : $CurrentForm->getValue("x_bmi");
+        if (!$this->bmi->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->bmi->Visible = false; // Disable update for API request
+            } else {
+                $this->bmi->setFormValue($val, true, $validate);
+            }
+        }
+
         // Check field name 'temperature' first before field var 'x_temperature'
         $val = $CurrentForm->hasValue("temperature") ? $CurrentForm->getValue("temperature") : $CurrentForm->getValue("x_temperature");
         if (!$this->temperature->IsDetailKey) {
@@ -805,6 +816,7 @@ class PatientVitalsEdit extends PatientVitals
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->height->CurrentValue = $this->height->FormValue;
         $this->weight->CurrentValue = $this->weight->FormValue;
+        $this->bmi->CurrentValue = $this->bmi->FormValue;
         $this->temperature->CurrentValue = $this->temperature->FormValue;
         $this->pulse->CurrentValue = $this->pulse->FormValue;
         $this->blood_pressure->CurrentValue = $this->blood_pressure->FormValue;
@@ -853,6 +865,7 @@ class PatientVitalsEdit extends PatientVitals
         $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
+        $this->bmi->setDbValue($row['bmi']);
         $this->temperature->setDbValue($row['temperature']);
         $this->pulse->setDbValue($row['pulse']);
         $this->blood_pressure->setDbValue($row['blood_pressure']);
@@ -870,6 +883,7 @@ class PatientVitalsEdit extends PatientVitals
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['height'] = $this->height->DefaultValue;
         $row['weight'] = $this->weight->DefaultValue;
+        $row['bmi'] = $this->bmi->DefaultValue;
         $row['temperature'] = $this->temperature->DefaultValue;
         $row['pulse'] = $this->pulse->DefaultValue;
         $row['blood_pressure'] = $this->blood_pressure->DefaultValue;
@@ -924,6 +938,9 @@ class PatientVitalsEdit extends PatientVitals
 
         // weight
         $this->weight->RowCssClass = "row";
+
+        // bmi
+        $this->bmi->RowCssClass = "row";
 
         // temperature
         $this->temperature->RowCssClass = "row";
@@ -1002,6 +1019,10 @@ class PatientVitalsEdit extends PatientVitals
             $this->weight->ViewValue = $this->weight->CurrentValue;
             $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
 
+            // bmi
+            $this->bmi->ViewValue = $this->bmi->CurrentValue;
+            $this->bmi->ViewValue = FormatNumber($this->bmi->ViewValue, $this->bmi->formatPattern());
+
             // temperature
             $this->temperature->ViewValue = $this->temperature->CurrentValue;
             $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
@@ -1035,6 +1056,9 @@ class PatientVitalsEdit extends PatientVitals
 
             // weight
             $this->weight->HrefValue = "";
+
+            // bmi
+            $this->bmi->HrefValue = "";
 
             // temperature
             $this->temperature->HrefValue = "";
@@ -1144,6 +1168,14 @@ class PatientVitalsEdit extends PatientVitals
                 $this->weight->EditValue = FormatNumber($this->weight->EditValue, null);
             }
 
+            // bmi
+            $this->bmi->setupEditAttributes();
+            $this->bmi->EditValue = $this->bmi->CurrentValue;
+            $this->bmi->PlaceHolder = RemoveHtml($this->bmi->caption());
+            if (strval($this->bmi->EditValue) != "" && is_numeric($this->bmi->EditValue)) {
+                $this->bmi->EditValue = FormatNumber($this->bmi->EditValue, null);
+            }
+
             // temperature
             $this->temperature->setupEditAttributes();
             $this->temperature->EditValue = $this->temperature->CurrentValue;
@@ -1184,6 +1216,9 @@ class PatientVitalsEdit extends PatientVitals
 
             // weight
             $this->weight->HrefValue = "";
+
+            // bmi
+            $this->bmi->HrefValue = "";
 
             // temperature
             $this->temperature->HrefValue = "";
@@ -1244,6 +1279,14 @@ class PatientVitalsEdit extends PatientVitals
             }
             if (!CheckInteger($this->weight->FormValue)) {
                 $this->weight->addErrorMessage($this->weight->getErrorMessage(false));
+            }
+            if ($this->bmi->Visible && $this->bmi->Required) {
+                if (!$this->bmi->IsDetailKey && EmptyValue($this->bmi->FormValue)) {
+                    $this->bmi->addErrorMessage(str_replace("%s", $this->bmi->caption(), $this->bmi->RequiredErrorMessage));
+                }
+            }
+            if (!CheckNumber($this->bmi->FormValue)) {
+                $this->bmi->addErrorMessage($this->bmi->getErrorMessage(false));
             }
             if ($this->temperature->Visible && $this->temperature->Required) {
                 if (!$this->temperature->IsDetailKey && EmptyValue($this->temperature->FormValue)) {
@@ -1370,6 +1413,9 @@ class PatientVitalsEdit extends PatientVitals
         // weight
         $this->weight->setDbValueDef($rsnew, $this->weight->CurrentValue, $this->weight->ReadOnly);
 
+        // bmi
+        $this->bmi->setDbValueDef($rsnew, $this->bmi->CurrentValue, $this->bmi->ReadOnly);
+
         // temperature
         $this->temperature->setDbValueDef($rsnew, $this->temperature->CurrentValue, $this->temperature->ReadOnly);
 
@@ -1398,6 +1444,9 @@ class PatientVitalsEdit extends PatientVitals
         }
         if (isset($row['weight'])) { // weight
             $this->weight->CurrentValue = $row['weight'];
+        }
+        if (isset($row['bmi'])) { // bmi
+            $this->bmi->CurrentValue = $row['bmi'];
         }
         if (isset($row['temperature'])) { // temperature
             $this->temperature->CurrentValue = $row['temperature'];

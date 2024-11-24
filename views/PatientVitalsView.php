@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->bmi->Visible) { // bmi ?>
+    <tr id="r_bmi"<?= $Page->bmi->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_vitals_bmi"><?= $Page->bmi->caption() ?></span></td>
+        <td data-name="bmi"<?= $Page->bmi->cellAttributes() ?>>
+<span id="el_patient_vitals_bmi">
+<span<?= $Page->bmi->viewAttributes() ?>>
+<?= $Page->bmi->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->temperature->Visible) { // temperature ?>
     <tr id="r_temperature"<?= $Page->temperature->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_vitals_temperature"><?= $Page->temperature->caption() ?></span></td>
