@@ -140,8 +140,8 @@ class PatientVitalsView extends PatientVitals
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->visit_id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->visit_id->setVisibility();
         $this->height->setVisibility();
         $this->weight->setVisibility();
         $this->temperature->setVisibility();
@@ -564,6 +564,10 @@ class PatientVitalsView extends PatientVitals
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->visit_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -698,16 +702,6 @@ class PatientVitalsView extends PatientVitals
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
-
         // Delete
         $item = &$option->add("delete");
         $url = GetUrl($this->DeleteUrl);
@@ -821,8 +815,8 @@ class PatientVitalsView extends PatientVitals
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
         $this->temperature->setDbValue($row['temperature']);
@@ -838,8 +832,8 @@ class PatientVitalsView extends PatientVitals
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['height'] = $this->height->DefaultValue;
         $row['weight'] = $this->weight->DefaultValue;
         $row['temperature'] = $this->temperature->DefaultValue;
@@ -871,9 +865,9 @@ class PatientVitalsView extends PatientVitals
 
         // id
 
-        // visit_id
-
         // patient_id
+
+        // visit_id
 
         // height
 
@@ -896,13 +890,51 @@ class PatientVitalsView extends PatientVitals
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
+
+            // visit_id
+            $curVal = strval($this->visit_id->CurrentValue);
+            if ($curVal != "") {
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                if ($this->visit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
+                    } else {
+                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->visit_id->ViewValue = null;
+            }
 
             // height
             $this->height->ViewValue = $this->height->CurrentValue;
@@ -923,10 +955,6 @@ class PatientVitalsView extends PatientVitals
             // blood_pressure
             $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -939,13 +967,13 @@ class PatientVitalsView extends PatientVitals
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // visit_id
+            $this->visit_id->HrefValue = "";
+            $this->visit_id->TooltipValue = "";
 
             // height
             $this->height->HrefValue = "";
@@ -966,18 +994,6 @@ class PatientVitalsView extends PatientVitals
             // blood_pressure
             $this->blood_pressure->HrefValue = "";
             $this->blood_pressure->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1170,6 +1186,10 @@ class PatientVitalsView extends PatientVitals
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_visit_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

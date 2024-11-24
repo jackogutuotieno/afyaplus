@@ -107,6 +107,7 @@ class Users extends DbTable
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
+        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this);
 
         // id
@@ -471,7 +472,7 @@ class Users extends DbTable
         $this->user_role_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->user_role_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->user_role_id->OptionCount = 5;
+        $this->user_role_id->OptionCount = 6;
         $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_role_id'] = &$this->user_role_id;

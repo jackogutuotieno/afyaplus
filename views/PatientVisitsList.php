@@ -191,9 +191,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
         <th data-name="medical_scheme_id" class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><div id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Page->renderFieldHeader($Page->medical_scheme_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_patient_visits_created_by_user_id" class="patient_visits_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -281,14 +278,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_medical_scheme_id" class="el_patient_visits_medical_scheme_id">
 <span<?= $Page->medical_scheme_id->viewAttributes() ?>>
 <?= $Page->medical_scheme_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_created_by_user_id" class="el_patient_visits_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -160,11 +160,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patient_vitals_id" class="patient_vitals_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_patient_vitals_visit_id" class="patient_vitals_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_vitals_patient_id" class="patient_vitals_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->visit_id->Visible) { // visit_id ?>
+        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_patient_vitals_visit_id" class="patient_vitals_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->height->Visible) { // height ?>
         <th data-name="height" class="<?= $Page->height->headerCellClass() ?>"><div id="elh_patient_vitals_height" class="patient_vitals_height"><?= $Page->renderFieldHeader($Page->height) ?></div></th>
@@ -180,9 +180,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->blood_pressure->Visible) { // blood_pressure ?>
         <th data-name="blood_pressure" class="<?= $Page->blood_pressure->headerCellClass() ?>"><div id="elh_patient_vitals_blood_pressure" class="patient_vitals_blood_pressure"><?= $Page->renderFieldHeader($Page->blood_pressure) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_patient_vitals_created_by_user_id" class="patient_vitals_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_vitals_date_created" class="patient_vitals_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -226,19 +223,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_visit_id" class="el_patient_vitals_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_patient_id" class="el_patient_vitals_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->visit_id->Visible) { // visit_id ?>
+        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_visit_id" class="el_patient_vitals_visit_id">
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -279,14 +276,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_blood_pressure" class="el_patient_vitals_blood_pressure">
 <span<?= $Page->blood_pressure->viewAttributes() ?>>
 <?= $Page->blood_pressure->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_created_by_user_id" class="el_patient_vitals_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -145,15 +145,19 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // title
@@ -196,14 +200,18 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->visit_type_id->InputTextType = "text";
         $this->visit_type_id->Raw = true;
         $this->visit_type_id->Nullable = false; // NOT NULL field
         $this->visit_type_id->Required = true; // Required field
+        $this->visit_type_id->setSelectMultiple(false); // Select one
+        $this->visit_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->visit_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->visit_type_id->Lookup = new Lookup($this->visit_type_id, 'visit_types', false, 'id', ["visit_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "`visit_type`");
         $this->visit_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_type_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->visit_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_type_id'] = &$this->visit_type_id;
 
         // doctor_id
@@ -222,14 +230,19 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
+        $this->doctor_id->addMethod("getSelectFilter", fn() => "`user_role_id`=2");
         $this->doctor_id->InputTextType = "text";
         $this->doctor_id->Raw = true;
         $this->doctor_id->Nullable = false; // NOT NULL field
         $this->doctor_id->Required = true; // Required field
+        $this->doctor_id->setSelectMultiple(false); // Select one
+        $this->doctor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->doctor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->doctor_id->Lookup = new Lookup($this->doctor_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->doctor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->doctor_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->doctor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['doctor_id'] = &$this->doctor_id;
 
         // payment_method_id
@@ -248,14 +261,18 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->payment_method_id->InputTextType = "text";
         $this->payment_method_id->Raw = true;
         $this->payment_method_id->Nullable = false; // NOT NULL field
         $this->payment_method_id->Required = true; // Required field
+        $this->payment_method_id->setSelectMultiple(false); // Select one
+        $this->payment_method_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->payment_method_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', false, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
         $this->payment_method_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->payment_method_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->payment_method_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['payment_method_id'] = &$this->payment_method_id;
 
         // medical_scheme_id
@@ -274,12 +291,16 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->medical_scheme_id->InputTextType = "text";
         $this->medical_scheme_id->Raw = true;
+        $this->medical_scheme_id->setSelectMultiple(false); // Select one
+        $this->medical_scheme_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->medical_scheme_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', false, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
         $this->medical_scheme_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->medical_scheme_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->medical_scheme_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['medical_scheme_id'] = &$this->medical_scheme_id;
 
         // created_by_user_id
@@ -298,14 +319,15 @@ class PatientVisits extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->Sortable = false; // Allow sort
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -314,10 +336,10 @@ class PatientVisits extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -330,7 +352,7 @@ class PatientVisits extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -340,10 +362,10 @@ class PatientVisits extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -356,7 +378,7 @@ class PatientVisits extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -639,6 +661,11 @@ class PatientVisits extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter, $id);
+        }
         return $filter;
     }
 
@@ -1381,6 +1408,7 @@ class PatientVisits extends DbTable
         // medical_scheme_id
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1390,27 +1418,123 @@ class PatientVisits extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
 
         // title
         $this->_title->ViewValue = $this->_title->CurrentValue;
 
         // visit_type_id
-        $this->visit_type_id->ViewValue = $this->visit_type_id->CurrentValue;
-        $this->visit_type_id->ViewValue = FormatNumber($this->visit_type_id->ViewValue, $this->visit_type_id->formatPattern());
+        $curVal = strval($this->visit_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->visit_type_id->ViewValue = $this->visit_type_id->lookupCacheOption($curVal);
+            if ($this->visit_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->visit_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->visit_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->visit_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->visit_type_id->ViewValue = $this->visit_type_id->displayValue($arwrk);
+                } else {
+                    $this->visit_type_id->ViewValue = FormatNumber($this->visit_type_id->CurrentValue, $this->visit_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->visit_type_id->ViewValue = null;
+        }
 
         // doctor_id
-        $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+        $curVal = strval($this->doctor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+            if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
+                $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                } else {
+                    $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                }
+            }
+        } else {
+            $this->doctor_id->ViewValue = null;
+        }
 
         // payment_method_id
-        $this->payment_method_id->ViewValue = $this->payment_method_id->CurrentValue;
-        $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->ViewValue, $this->payment_method_id->formatPattern());
+        $curVal = strval($this->payment_method_id->CurrentValue);
+        if ($curVal != "") {
+            $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
+            if ($this->payment_method_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
+                } else {
+                    $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
+                }
+            }
+        } else {
+            $this->payment_method_id->ViewValue = null;
+        }
 
         // medical_scheme_id
-        $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->CurrentValue;
-        $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->ViewValue, $this->medical_scheme_id->formatPattern());
+        $curVal = strval($this->medical_scheme_id->CurrentValue);
+        if ($curVal != "") {
+            $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
+            if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
+                } else {
+                    $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
+                }
+            }
+        } else {
+            $this->medical_scheme_id->ViewValue = null;
+        }
 
         // created_by_user_id
         $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
@@ -1487,14 +1611,29 @@ class PatientVisits extends DbTable
         $this->patient_id->setupEditAttributes();
         if ($this->patient_id->getSessionValue() != "") {
             $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-        } else {
-            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
             }
+        } else {
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
         }
 
         // title
@@ -1507,43 +1646,21 @@ class PatientVisits extends DbTable
 
         // visit_type_id
         $this->visit_type_id->setupEditAttributes();
-        $this->visit_type_id->EditValue = $this->visit_type_id->CurrentValue;
         $this->visit_type_id->PlaceHolder = RemoveHtml($this->visit_type_id->caption());
-        if (strval($this->visit_type_id->EditValue) != "" && is_numeric($this->visit_type_id->EditValue)) {
-            $this->visit_type_id->EditValue = FormatNumber($this->visit_type_id->EditValue, null);
-        }
 
         // doctor_id
         $this->doctor_id->setupEditAttributes();
-        $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
         $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-        if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-            $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
-        }
 
         // payment_method_id
         $this->payment_method_id->setupEditAttributes();
-        $this->payment_method_id->EditValue = $this->payment_method_id->CurrentValue;
         $this->payment_method_id->PlaceHolder = RemoveHtml($this->payment_method_id->caption());
-        if (strval($this->payment_method_id->EditValue) != "" && is_numeric($this->payment_method_id->EditValue)) {
-            $this->payment_method_id->EditValue = FormatNumber($this->payment_method_id->EditValue, null);
-        }
 
         // medical_scheme_id
         $this->medical_scheme_id->setupEditAttributes();
-        $this->medical_scheme_id->EditValue = $this->medical_scheme_id->CurrentValue;
         $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
-        if (strval($this->medical_scheme_id->EditValue) != "" && is_numeric($this->medical_scheme_id->EditValue)) {
-            $this->medical_scheme_id->EditValue = FormatNumber($this->medical_scheme_id->EditValue, null);
-        }
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1590,9 +1707,6 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
-                    $doc->exportCaption($this->created_by_user_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
@@ -1601,7 +1715,6 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1637,9 +1750,6 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
-                        $doc->exportField($this->created_by_user_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
@@ -1648,7 +1758,6 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1664,6 +1773,52 @@ class PatientVisits extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "", $id = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        if ($id == "") {
+            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
+        }
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM patient_visits";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        $conn = Conn($this->Dbid);
+        $config = $conn->getConfiguration();
+        $config->setResultCache($this->Cache);
+        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
+            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data

@@ -146,14 +146,14 @@ class PatientVitalsList extends PatientVitals
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->visit_id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->visit_id->setVisibility();
         $this->height->setVisibility();
         $this->weight->setVisibility();
         $this->temperature->setVisibility();
         $this->pulse->setVisibility();
         $this->blood_pressure->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -463,6 +463,9 @@ class PatientVitalsList extends PatientVitals
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -710,6 +713,10 @@ class PatientVitalsList extends PatientVitals
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->visit_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1058,16 +1065,13 @@ class PatientVitalsList extends PatientVitals
             $savedFilterList = Profile()->getSearchFilters("fpatient_vitalssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
+        $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->height->AdvancedSearch->toJson(), ","); // Field height
         $filterList = Concat($filterList, $this->weight->AdvancedSearch->toJson(), ","); // Field weight
         $filterList = Concat($filterList, $this->temperature->AdvancedSearch->toJson(), ","); // Field temperature
         $filterList = Concat($filterList, $this->pulse->AdvancedSearch->toJson(), ","); // Field pulse
         $filterList = Concat($filterList, $this->blood_pressure->AdvancedSearch->toJson(), ","); // Field blood_pressure
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1115,14 +1119,6 @@ class PatientVitalsList extends PatientVitals
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field visit_id
-        $this->visit_id->AdvancedSearch->SearchValue = @$filter["x_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator = @$filter["z_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchCondition = @$filter["v_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchValue2 = @$filter["y_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator2 = @$filter["w_visit_id"];
-        $this->visit_id->AdvancedSearch->save();
-
         // Field patient_id
         $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
         $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
@@ -1130,6 +1126,14 @@ class PatientVitalsList extends PatientVitals
         $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
         $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
         $this->patient_id->AdvancedSearch->save();
+
+        // Field visit_id
+        $this->visit_id->AdvancedSearch->SearchValue = @$filter["x_visit_id"];
+        $this->visit_id->AdvancedSearch->SearchOperator = @$filter["z_visit_id"];
+        $this->visit_id->AdvancedSearch->SearchCondition = @$filter["v_visit_id"];
+        $this->visit_id->AdvancedSearch->SearchValue2 = @$filter["y_visit_id"];
+        $this->visit_id->AdvancedSearch->SearchOperator2 = @$filter["w_visit_id"];
+        $this->visit_id->AdvancedSearch->save();
 
         // Field height
         $this->height->AdvancedSearch->SearchValue = @$filter["x_height"];
@@ -1170,30 +1174,6 @@ class PatientVitalsList extends PatientVitals
         $this->blood_pressure->AdvancedSearch->SearchValue2 = @$filter["y_blood_pressure"];
         $this->blood_pressure->AdvancedSearch->SearchOperator2 = @$filter["w_blood_pressure"];
         $this->blood_pressure->AdvancedSearch->save();
-
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1313,14 +1293,13 @@ class PatientVitalsList extends PatientVitals
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->patient_id); // patient_id
+            $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->height); // height
             $this->updateSort($this->weight); // weight
             $this->updateSort($this->temperature); // temperature
             $this->updateSort($this->pulse); // pulse
             $this->updateSort($this->blood_pressure); // blood_pressure
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1348,8 +1327,8 @@ class PatientVitalsList extends PatientVitals
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->visit_id->setSort("");
                 $this->patient_id->setSort("");
+                $this->visit_id->setSort("");
                 $this->height->setSort("");
                 $this->weight->setSort("");
                 $this->temperature->setSort("");
@@ -1387,12 +1366,6 @@ class PatientVitalsList extends PatientVitals
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1480,19 +1453,6 @@ class PatientVitalsList extends PatientVitals
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1593,14 +1553,13 @@ class PatientVitalsList extends PatientVitals
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "patient_id");
+            $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "height");
             $this->createColumnOption($option, "weight");
             $this->createColumnOption($option, "temperature");
             $this->createColumnOption($option, "pulse");
             $this->createColumnOption($option, "blood_pressure");
-            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2042,8 +2001,8 @@ class PatientVitalsList extends PatientVitals
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
         $this->temperature->setDbValue($row['temperature']);
@@ -2059,8 +2018,8 @@ class PatientVitalsList extends PatientVitals
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['height'] = $this->height->DefaultValue;
         $row['weight'] = $this->weight->DefaultValue;
         $row['temperature'] = $this->temperature->DefaultValue;
@@ -2111,9 +2070,9 @@ class PatientVitalsList extends PatientVitals
 
         // id
 
-        // visit_id
-
         // patient_id
+
+        // visit_id
 
         // height
 
@@ -2126,6 +2085,7 @@ class PatientVitalsList extends PatientVitals
         // blood_pressure
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -2136,13 +2096,51 @@ class PatientVitalsList extends PatientVitals
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
+
+            // visit_id
+            $curVal = strval($this->visit_id->CurrentValue);
+            if ($curVal != "") {
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                if ($this->visit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
+                    } else {
+                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->visit_id->ViewValue = null;
+            }
 
             // height
             $this->height->ViewValue = $this->height->CurrentValue;
@@ -2163,10 +2161,6 @@ class PatientVitalsList extends PatientVitals
             // blood_pressure
             $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2179,13 +2173,13 @@ class PatientVitalsList extends PatientVitals
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // visit_id
+            $this->visit_id->HrefValue = "";
+            $this->visit_id->TooltipValue = "";
 
             // height
             $this->height->HrefValue = "";
@@ -2206,10 +2200,6 @@ class PatientVitalsList extends PatientVitals
             // blood_pressure
             $this->blood_pressure->HrefValue = "";
             $this->blood_pressure->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2480,6 +2470,10 @@ class PatientVitalsList extends PatientVitals
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_visit_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2652,7 +2646,10 @@ class PatientVitalsList extends PatientVitals
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add vitals");
     }
 
     // Page Unload event

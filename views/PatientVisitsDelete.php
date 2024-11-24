@@ -71,9 +71,6 @@ $Page->showMessage();
 <?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
         <th class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><span id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Page->medical_scheme_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_patient_visits_created_by_user_id" class="patient_visits_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -154,14 +151,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->medical_scheme_id->viewAttributes() ?>>
 <?= $Page->medical_scheme_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

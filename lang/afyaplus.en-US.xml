@@ -966,67 +966,67 @@
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="_title">
-        <phrase id="fldcaption" value="title" />
+        <phrase id="fldcaption" value="Title" />
       </field>
       <field id="visit_type_id">
-        <phrase id="fldcaption" value="visit type id" />
+        <phrase id="fldcaption" value="Visit Type" />
       </field>
       <field id="doctor_id">
-        <phrase id="fldcaption" value="doctor id" />
+        <phrase id="fldcaption" value="Doctor" />
       </field>
       <field id="payment_method_id">
-        <phrase id="fldcaption" value="payment method id" />
+        <phrase id="fldcaption" value="Patment Method" />
       </field>
       <field id="medical_scheme_id">
-        <phrase id="fldcaption" value="medical scheme id" />
+        <phrase id="fldcaption" value="Medical Scheme" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="patient_vitals">
-      <phrase id="tblcaption" value="patient vitals" />
+      <phrase id="tblcaption" value="Vitals" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="visit_id">
-        <phrase id="fldcaption" value="visit id" />
+        <phrase id="fldcaption" value="Vitals ID" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="visit_id">
+        <phrase id="fldcaption" value="Checkup Case" />
       </field>
       <field id="height">
-        <phrase id="fldcaption" value="height" />
+        <phrase id="fldcaption" value="Height (m)" />
       </field>
       <field id="weight">
-        <phrase id="fldcaption" value="weight" />
+        <phrase id="fldcaption" value="Weight (Kg)" />
       </field>
       <field id="temperature">
-        <phrase id="fldcaption" value="temperature" />
+        <phrase id="fldcaption" value="Temp (C)" />
       </field>
       <field id="pulse">
-        <phrase id="fldcaption" value="pulse" />
+        <phrase id="fldcaption" value="Pulse Rate" />
       </field>
       <field id="blood_pressure">
-        <phrase id="fldcaption" value="blood pressure" />
+        <phrase id="fldcaption" value="BP (mmHg)" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="patients">
@@ -1550,6 +1550,8 @@
         <phrase id="fldtagcaption4" value="Receptionist" />
         <phrase id="fldtagvalue5" value="2" />
         <phrase id="fldtagcaption5" value="Doctor" />
+        <phrase id="fldtagvalue6" value="3" />
+        <phrase id="fldtagcaption6" value="Nurse" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="is verified" />

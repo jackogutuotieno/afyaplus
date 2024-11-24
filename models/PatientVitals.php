@@ -47,8 +47,8 @@ class PatientVitals extends DbTable
 
     // Fields
     public $id;
-    public $visit_id;
     public $patient_id;
+    public $visit_id;
     public $height;
     public $weight;
     public $temperature;
@@ -130,32 +130,6 @@ class PatientVitals extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // visit_id
-        $this->visit_id = new DbField(
-            $this, // Table
-            'x_visit_id', // Variable name
-            'visit_id', // Name
-            '`visit_id`', // Expression
-            '`visit_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`visit_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->visit_id->InputTextType = "text";
-        $this->visit_id->Raw = true;
-        $this->visit_id->Nullable = false; // NOT NULL field
-        $this->visit_id->Required = true; // Required field
-        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_id'] = &$this->visit_id;
-
         // patient_id
         $this->patient_id = new DbField(
             $this, // Table
@@ -172,15 +146,49 @@ class PatientVitals extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], ["x_visit_id"], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
+
+        // visit_id
+        $this->visit_id = new DbField(
+            $this, // Table
+            'x_visit_id', // Variable name
+            'visit_id', // Name
+            '`visit_id`', // Expression
+            '`visit_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`visit_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->visit_id->InputTextType = "text";
+        $this->visit_id->Raw = true;
+        $this->visit_id->Nullable = false; // NOT NULL field
+        $this->visit_id->Required = true; // Required field
+        $this->visit_id->setSelectMultiple(false); // Select one
+        $this->visit_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->visit_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->visit_id->Lookup = new Lookup($this->visit_id, 'patient_visits', true, 'id', ["title","","",""], '', '', ["x_patient_id"], [], ["patient_id"], ["x_patient_id"], [], [], false, '`date_created` DESC', '', "`title`");
+        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->visit_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['visit_id'] = &$this->visit_id;
 
         // height
         $this->height = new DbField(
@@ -326,14 +334,15 @@ class PatientVitals extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->Sortable = false; // Allow sort
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -342,10 +351,10 @@ class PatientVitals extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -358,7 +367,7 @@ class PatientVitals extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -368,10 +377,10 @@ class PatientVitals extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -384,7 +393,7 @@ class PatientVitals extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -907,8 +916,8 @@ class PatientVitals extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->visit_id->DbValue = $row['visit_id'];
         $this->patient_id->DbValue = $row['patient_id'];
+        $this->visit_id->DbValue = $row['visit_id'];
         $this->height->DbValue = $row['height'];
         $this->weight->DbValue = $row['weight'];
         $this->temperature->DbValue = $row['temperature'];
@@ -1270,8 +1279,8 @@ class PatientVitals extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->visit_id->setDbValue($row['visit_id']);
         $this->height->setDbValue($row['height']);
         $this->weight->setDbValue($row['weight']);
         $this->temperature->setDbValue($row['temperature']);
@@ -1312,9 +1321,9 @@ class PatientVitals extends DbTable
 
         // id
 
-        // visit_id
-
         // patient_id
+
+        // visit_id
 
         // height
 
@@ -1327,6 +1336,7 @@ class PatientVitals extends DbTable
         // blood_pressure
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1335,13 +1345,51 @@ class PatientVitals extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // visit_id
-        $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-        $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
+
+        // visit_id
+        $curVal = strval($this->visit_id->CurrentValue);
+        if ($curVal != "") {
+            $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+            if ($this->visit_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
+                } else {
+                    $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
+                }
+            }
+        } else {
+            $this->visit_id->ViewValue = null;
+        }
 
         // height
         $this->height->ViewValue = $this->height->CurrentValue;
@@ -1378,13 +1426,13 @@ class PatientVitals extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // visit_id
-        $this->visit_id->HrefValue = "";
-        $this->visit_id->TooltipValue = "";
-
         // patient_id
         $this->patient_id->HrefValue = "";
         $this->patient_id->TooltipValue = "";
+
+        // visit_id
+        $this->visit_id->HrefValue = "";
+        $this->visit_id->TooltipValue = "";
 
         // height
         $this->height->HrefValue = "";
@@ -1437,21 +1485,13 @@ class PatientVitals extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
-        }
-
         // patient_id
         $this->patient_id->setupEditAttributes();
-        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
         $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-        }
+
+        // visit_id
+        $this->visit_id->setupEditAttributes();
+        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
         // height
         $this->height->setupEditAttributes();
@@ -1494,12 +1534,6 @@ class PatientVitals extends DbTable
         $this->blood_pressure->PlaceHolder = RemoveHtml($this->blood_pressure->caption());
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1540,26 +1574,22 @@ class PatientVitals extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->height);
                     $doc->exportCaption($this->weight);
                     $doc->exportCaption($this->temperature);
                     $doc->exportCaption($this->pulse);
                     $doc->exportCaption($this->blood_pressure);
-                    $doc->exportCaption($this->created_by_user_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->height);
                     $doc->exportCaption($this->weight);
                     $doc->exportCaption($this->temperature);
                     $doc->exportCaption($this->pulse);
                     $doc->exportCaption($this->blood_pressure);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1589,26 +1619,22 @@ class PatientVitals extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->patient_id);
+                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->height);
                         $doc->exportField($this->weight);
                         $doc->exportField($this->temperature);
                         $doc->exportField($this->pulse);
                         $doc->exportField($this->blood_pressure);
-                        $doc->exportField($this->created_by_user_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->patient_id);
+                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->height);
                         $doc->exportField($this->weight);
                         $doc->exportField($this->temperature);
                         $doc->exportField($this->pulse);
                         $doc->exportField($this->blood_pressure);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }

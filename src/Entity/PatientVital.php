@@ -33,11 +33,11 @@ class PatientVital extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "visit_id", type: "integer")]
-    private int $visitId;
-
     #[Column(name: "patient_id", type: "integer")]
     private int $patientId;
+
+    #[Column(name: "visit_id", type: "integer")]
+    private int $visitId;
 
     #[Column(type: "float")]
     private float $height;
@@ -74,17 +74,6 @@ class PatientVital extends AbstractEntity
         return $this;
     }
 
-    public function getVisitId(): int
-    {
-        return $this->visitId;
-    }
-
-    public function setVisitId(int $value): static
-    {
-        $this->visitId = $value;
-        return $this;
-    }
-
     public function getPatientId(): int
     {
         return $this->patientId;
@@ -93,6 +82,17 @@ class PatientVital extends AbstractEntity
     public function setPatientId(int $value): static
     {
         $this->patientId = $value;
+        return $this;
+    }
+
+    public function getVisitId(): int
+    {
+        return $this->visitId;
+    }
+
+    public function setVisitId(int $value): static
+    {
+        $this->visitId = $value;
         return $this;
     }
 
