@@ -121,16 +121,16 @@ class PatientVisitsDelete extends PatientVisits
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->_title->setVisibility();
-        $this->visit_type_id->setVisibility();
-        $this->doctor_id->setVisibility();
-        $this->payment_method_id->setVisibility();
-        $this->medical_scheme_id->setVisibility();
+        $this->visit_type_id->Visible = false;
+        $this->doctor_id->Visible = false;
+        $this->payment_method_id->Visible = false;
+        $this->medical_scheme_id->Visible = false;
         $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -824,10 +824,6 @@ class PatientVisitsDelete extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -836,29 +832,9 @@ class PatientVisitsDelete extends PatientVisits
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
 
-            // visit_type_id
-            $this->visit_type_id->HrefValue = "";
-            $this->visit_type_id->TooltipValue = "";
-
-            // doctor_id
-            $this->doctor_id->HrefValue = "";
-            $this->doctor_id->TooltipValue = "";
-
-            // payment_method_id
-            $this->payment_method_id->HrefValue = "";
-            $this->payment_method_id->TooltipValue = "";
-
-            // medical_scheme_id
-            $this->medical_scheme_id->HrefValue = "";
-            $this->medical_scheme_id->TooltipValue = "";
-
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

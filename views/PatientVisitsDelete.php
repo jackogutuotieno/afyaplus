@@ -50,32 +50,14 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_patient_visits_id" class="patient_visits_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_patient_visits_patient_id" class="patient_visits_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->_title->Visible) { // title ?>
         <th class="<?= $Page->_title->headerCellClass() ?>"><span id="elh_patient_visits__title" class="patient_visits__title"><?= $Page->_title->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->visit_type_id->Visible) { // visit_type_id ?>
-        <th class="<?= $Page->visit_type_id->headerCellClass() ?>"><span id="elh_patient_visits_visit_type_id" class="patient_visits_visit_type_id"><?= $Page->visit_type_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->doctor_id->Visible) { // doctor_id ?>
-        <th class="<?= $Page->doctor_id->headerCellClass() ?>"><span id="elh_patient_visits_doctor_id" class="patient_visits_doctor_id"><?= $Page->doctor_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
-        <th class="<?= $Page->payment_method_id->headerCellClass() ?>"><span id="elh_patient_visits_payment_method_id" class="patient_visits_payment_method_id"><?= $Page->payment_method_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
-        <th class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><span id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Page->medical_scheme_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_patient_visits_date_updated" class="patient_visits_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -98,14 +80,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td<?= $Page->patient_id->cellAttributes() ?>>
 <span id="">
@@ -122,51 +96,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->visit_type_id->Visible) { // visit_type_id ?>
-        <td<?= $Page->visit_type_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->visit_type_id->viewAttributes() ?>>
-<?= $Page->visit_type_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->doctor_id->Visible) { // doctor_id ?>
-        <td<?= $Page->doctor_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->doctor_id->viewAttributes() ?>>
-<?= $Page->doctor_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
-        <td<?= $Page->payment_method_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->payment_method_id->viewAttributes() ?>>
-<?= $Page->payment_method_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
-        <td<?= $Page->medical_scheme_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->medical_scheme_id->viewAttributes() ?>>
-<?= $Page->medical_scheme_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <td<?= $Page->date_created->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

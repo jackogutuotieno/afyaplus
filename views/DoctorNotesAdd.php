@@ -22,14 +22,14 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
-            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
+            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
             ["chief_complaint", [fields.chief_complaint.visible && fields.chief_complaint.required ? ew.Validators.required(fields.chief_complaint.caption) : null], fields.chief_complaint.isInvalid],
             ["history_of_presenting_illness", [fields.history_of_presenting_illness.visible && fields.history_of_presenting_illness.required ? ew.Validators.required(fields.history_of_presenting_illness.caption) : null], fields.history_of_presenting_illness.isInvalid],
             ["past_medical_history", [fields.past_medical_history.visible && fields.past_medical_history.required ? ew.Validators.required(fields.past_medical_history.caption) : null], fields.past_medical_history.isInvalid],
             ["family_history", [fields.family_history.visible && fields.family_history.required ? ew.Validators.required(fields.family_history.caption) : null], fields.family_history.isInvalid],
             ["allergies", [fields.allergies.visible && fields.allergies.required ? ew.Validators.required(fields.allergies.caption) : null], fields.allergies.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -47,6 +47,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "visit_id": <?= $Page->visit_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -75,16 +77,61 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_doctor_notes_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_doctor_notes_patient_id">
-<input type="<?= $Page->patient_id->getInputTextType() ?>" name="x_patient_id" id="x_patient_id" data-table="doctor_notes" data-field="x_patient_id" value="<?= $Page->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
-<?= $Page->patient_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+    <select
+        id="x_patient_id"
+        name="x_patient_id"
+        class="form-select ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+        <?php if (!$Page->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fdoctor_notesadd_x_patient_id"
+        <?php } ?>
+        data-table="doctor_notes"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Page->patient_id->editAttributes() ?>>
+        <?= $Page->patient_id->selectOptionListHtml("x_patient_id") ?>
+    </select>
+    <?= $Page->patient_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+<?= $Page->patient_id->Lookup->getParamTag($Page, "p_x_patient_id") ?>
+<?php if (!$Page->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fdoctor_notesadd", function() {
+    var options = { name: "x_patient_id", selectId: "fdoctor_notesadd_x_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdoctor_notesadd.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x_patient_id", form: "fdoctor_notesadd" };
+    } else {
+        options.ajax = { id: "x_patient_id", form: "fdoctor_notesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.doctor_notes.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -93,9 +140,43 @@ $Page->showMessage();
         <label id="elh_doctor_notes_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
 <span id="el_doctor_notes_visit_id">
-<input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="doctor_notes" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
-<?= $Page->visit_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
+    <select
+        id="x_visit_id"
+        name="x_visit_id"
+        class="form-select ew-select<?= $Page->visit_id->isInvalidClass() ?>"
+        <?php if (!$Page->visit_id->IsNativeSelect) { ?>
+        data-select2-id="fdoctor_notesadd_x_visit_id"
+        <?php } ?>
+        data-table="doctor_notes"
+        data-field="x_visit_id"
+        data-value-separator="<?= $Page->visit_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>"
+        <?= $Page->visit_id->editAttributes() ?>>
+        <?= $Page->visit_id->selectOptionListHtml("x_visit_id") ?>
+    </select>
+    <?= $Page->visit_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
+<?= $Page->visit_id->Lookup->getParamTag($Page, "p_x_visit_id") ?>
+<?php if (!$Page->visit_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fdoctor_notesadd", function() {
+    var options = { name: "x_visit_id", selectId: "fdoctor_notesadd_x_visit_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdoctor_notesadd.lists.visit_id?.lookupOptions.length) {
+        options.data = { id: "x_visit_id", form: "fdoctor_notesadd" };
+    } else {
+        options.ajax = { id: "x_visit_id", form: "fdoctor_notesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.doctor_notes.fields.visit_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -156,18 +237,6 @@ $Page->showMessage();
 <input type="<?= $Page->allergies->getInputTextType() ?>" name="x_allergies" id="x_allergies" data-table="doctor_notes" data-field="x_allergies" value="<?= $Page->allergies->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->allergies->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->allergies->formatPattern()) ?>"<?= $Page->allergies->editAttributes() ?> aria-describedby="x_allergies_help">
 <?= $Page->allergies->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->allergies->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_doctor_notes_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el_doctor_notes_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="doctor_notes" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

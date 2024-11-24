@@ -105,6 +105,7 @@ C:\wamp64\www\afyaplus\models\DoctorNotes.php
 C:\wamp64\www\afyaplus\models\DoctorNotesAdd.php
 C:\wamp64\www\afyaplus\models\DoctorNotesDelete.php
 C:\wamp64\www\afyaplus\models\DoctorNotesEdit.php
+C:\wamp64\www\afyaplus\models\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\models\DoctorNotesList.php
 C:\wamp64\www\afyaplus\models\DoctorNotesView.php
 C:\wamp64\www\afyaplus\models\Expenses.php
@@ -155,6 +156,7 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsList.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsDetailsView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsEdit.php
+C:\wamp64\www\afyaplus\models\LabTestRequestsGrid.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsList.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsQueueAdd.php
@@ -236,6 +238,7 @@ C:\wamp64\www\afyaplus\models\PatientVitals.php
 C:\wamp64\www\afyaplus\models\PatientVitalsAdd.php
 C:\wamp64\www\afyaplus\models\PatientVitalsDelete.php
 C:\wamp64\www\afyaplus\models\PatientVitalsEdit.php
+C:\wamp64\www\afyaplus\models\PatientVitalsGrid.php
 C:\wamp64\www\afyaplus\models\PatientVitalsList.php
 C:\wamp64\www\afyaplus\models\PatientVitalsView.php
 C:\wamp64\www\afyaplus\models\Patients.php
@@ -563,6 +566,7 @@ C:\wamp64\www\afyaplus\views\DoctorChargesView.php
 C:\wamp64\www\afyaplus\views\DoctorNotesAdd.php
 C:\wamp64\www\afyaplus\views\DoctorNotesDelete.php
 C:\wamp64\www\afyaplus\views\DoctorNotesEdit.php
+C:\wamp64\www\afyaplus\views\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\views\DoctorNotesList.php
 C:\wamp64\www\afyaplus\views\DoctorNotesView.php
 C:\wamp64\www\afyaplus\views\Error.php
@@ -605,6 +609,7 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsList.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsEdit.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsList.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueDelete.php
@@ -666,10 +671,12 @@ C:\wamp64\www\afyaplus\views\PatientVisitsDelete.php
 C:\wamp64\www\afyaplus\views\PatientVisitsEdit.php
 C:\wamp64\www\afyaplus\views\PatientVisitsGrid.php
 C:\wamp64\www\afyaplus\views\PatientVisitsList.php
+C:\wamp64\www\afyaplus\views\PatientVisitsMaster.php
 C:\wamp64\www\afyaplus\views\PatientVisitsView.php
 C:\wamp64\www\afyaplus\views\PatientVitalsAdd.php
 C:\wamp64\www\afyaplus\views\PatientVitalsDelete.php
 C:\wamp64\www\afyaplus\views\PatientVitalsEdit.php
+C:\wamp64\www\afyaplus\views\PatientVitalsGrid.php
 C:\wamp64\www\afyaplus\views\PatientVitalsList.php
 C:\wamp64\www\afyaplus\views\PatientVitalsView.php
 C:\wamp64\www\afyaplus\views\PatientsAdd.php

@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientVisitsGrid extends PatientVisits
+class DoctorNotesGrid extends DoctorNotes
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class PatientVisitsGrid extends PatientVisits
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientVisitsGrid";
+    public $PageObjName = "DoctorNotesGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class PatientVisitsGrid extends PatientVisits
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fpatient_visitsgrid";
+    public $FormName = "fdoctor_notesgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "patientvisitsgrid";
+    public $CurrentPageName = "doctornotesgrid";
 
     // Page URLs
     public $AddUrl;
@@ -135,16 +135,17 @@ class PatientVisitsGrid extends PatientVisits
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->_title->setVisibility();
-        $this->visit_type_id->Visible = false;
-        $this->doctor_id->Visible = false;
-        $this->payment_method_id->Visible = false;
-        $this->medical_scheme_id->Visible = false;
-        $this->created_by_user_id->Visible = false;
+        $this->visit_id->setVisibility();
+        $this->chief_complaint->setVisibility();
+        $this->history_of_presenting_illness->setVisibility();
+        $this->past_medical_history->setVisibility();
+        $this->family_history->setVisibility();
+        $this->allergies->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->Visible = false;
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -155,8 +156,8 @@ class PatientVisitsGrid extends PatientVisits
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'patient_visits';
-        $this->TableName = 'patient_visits';
+        $this->TableVar = 'doctor_notes';
+        $this->TableName = 'doctor_notes';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -180,15 +181,15 @@ class PatientVisitsGrid extends PatientVisits
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_visits)
-        if (!isset($GLOBALS["patient_visits"]) || $GLOBALS["patient_visits"]::class == PROJECT_NAMESPACE . "patient_visits") {
-            $GLOBALS["patient_visits"] = &$this;
+        // Table object (doctor_notes)
+        if (!isset($GLOBALS["doctor_notes"]) || $GLOBALS["doctor_notes"]::class == PROJECT_NAMESPACE . "doctor_notes") {
+            $GLOBALS["doctor_notes"] = &$this;
         }
-        $this->AddUrl = "patientvisitsadd";
+        $this->AddUrl = "doctornotesadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_visits');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'doctor_notes');
         }
 
         // Start timer
@@ -630,17 +631,14 @@ class PatientVisitsGrid extends PatientVisits
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->visit_type_id);
-        $this->setupLookupOptions($this->doctor_id);
-        $this->setupLookupOptions($this->payment_method_id);
-        $this->setupLookupOptions($this->medical_scheme_id);
+        $this->setupLookupOptions($this->visit_id);
 
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fpatient_visitsgrid";
+            $this->FormName = "fdoctor_notesgrid";
         }
 
         // Set up page action
@@ -713,17 +711,24 @@ class PatientVisitsGrid extends PatientVisits
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
+
+        // Add master User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "patient_visits") {
+                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patient_visits"); // Add master User ID filter
+            }
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients") {
-            $masterTbl = Container("patients");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
+            $masterTbl = Container("patient_visits");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientslist"); // Return to master page
+                $this->terminate("patientvisitslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1114,10 +1119,50 @@ class PatientVisitsGrid extends PatientVisits
             return false;
         }
         if (
-            $CurrentForm->hasValue("x__title") &&
-            $CurrentForm->hasValue("o__title") &&
-            $this->_title->CurrentValue != $this->_title->DefaultValue &&
-            !($this->_title->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->_title->CurrentValue == $this->_title->getSessionValue())
+            $CurrentForm->hasValue("x_visit_id") &&
+            $CurrentForm->hasValue("o_visit_id") &&
+            $this->visit_id->CurrentValue != $this->visit_id->DefaultValue &&
+            !($this->visit_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->visit_id->CurrentValue == $this->visit_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_chief_complaint") &&
+            $CurrentForm->hasValue("o_chief_complaint") &&
+            $this->chief_complaint->CurrentValue != $this->chief_complaint->DefaultValue &&
+            !($this->chief_complaint->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->chief_complaint->CurrentValue == $this->chief_complaint->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_history_of_presenting_illness") &&
+            $CurrentForm->hasValue("o_history_of_presenting_illness") &&
+            $this->history_of_presenting_illness->CurrentValue != $this->history_of_presenting_illness->DefaultValue &&
+            !($this->history_of_presenting_illness->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->history_of_presenting_illness->CurrentValue == $this->history_of_presenting_illness->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_past_medical_history") &&
+            $CurrentForm->hasValue("o_past_medical_history") &&
+            $this->past_medical_history->CurrentValue != $this->past_medical_history->DefaultValue &&
+            !($this->past_medical_history->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->past_medical_history->CurrentValue == $this->past_medical_history->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_family_history") &&
+            $CurrentForm->hasValue("o_family_history") &&
+            $this->family_history->CurrentValue != $this->family_history->DefaultValue &&
+            !($this->family_history->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->family_history->CurrentValue == $this->family_history->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_allergies") &&
+            $CurrentForm->hasValue("o_allergies") &&
+            $this->allergies->CurrentValue != $this->allergies->DefaultValue &&
+            !($this->allergies->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->allergies->CurrentValue == $this->allergies->getSessionValue())
         ) {
             return false;
         }
@@ -1126,6 +1171,14 @@ class PatientVisitsGrid extends PatientVisits
             $CurrentForm->hasValue("o_date_created") &&
             $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
             !($this->date_created->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_created->CurrentValue == $this->date_created->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_date_updated") &&
+            $CurrentForm->hasValue("o_date_updated") &&
+            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
+            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
         ) {
             return false;
         }
@@ -1226,7 +1279,7 @@ class PatientVisitsGrid extends PatientVisits
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
+            $defaultSort = ""; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1302,19 +1355,17 @@ class PatientVisitsGrid extends PatientVisits
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd();
+        $item->OnLeft = false;
+
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
-
-        // "sequence"
-        $item = &$this->ListOptions->add("sequence");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = true; // Always on left
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
@@ -1384,17 +1435,13 @@ class PatientVisitsGrid extends PatientVisits
                 }
             }
         }
-
-        // "sequence"
-        $opt = $this->ListOptions["sequence"];
-        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1407,9 +1454,22 @@ class PatientVisitsGrid extends PatientVisits
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd() && $this->showOptionLink("add")) {
+                if ($this->ModalAdd && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1459,7 +1519,7 @@ class PatientVisitsGrid extends PatientVisits
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
             if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
             } else {
                 $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
@@ -1556,7 +1616,7 @@ class PatientVisitsGrid extends PatientVisits
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_patient_visits", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_doctor_notes", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1644,7 +1704,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_patient_visits",
+            "id" => "r" . $this->RowCount . "_doctor_notes",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1681,6 +1741,12 @@ class PatientVisitsGrid extends PatientVisits
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1694,17 +1760,95 @@ class PatientVisitsGrid extends PatientVisits
             $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
         }
 
-        // Check field name 'title' first before field var 'x__title'
-        $val = $CurrentForm->hasValue("title") ? $CurrentForm->getValue("title") : $CurrentForm->getValue("x__title");
-        if (!$this->_title->IsDetailKey) {
+        // Check field name 'visit_id' first before field var 'x_visit_id'
+        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
+        if (!$this->visit_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->_title->Visible = false; // Disable update for API request
+                $this->visit_id->Visible = false; // Disable update for API request
             } else {
-                $this->_title->setFormValue($val);
+                $this->visit_id->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o__title")) {
-            $this->_title->setOldValue($CurrentForm->getValue("o__title"));
+        if ($CurrentForm->hasValue("o_visit_id")) {
+            $this->visit_id->setOldValue($CurrentForm->getValue("o_visit_id"));
+        }
+
+        // Check field name 'chief_complaint' first before field var 'x_chief_complaint'
+        $val = $CurrentForm->hasValue("chief_complaint") ? $CurrentForm->getValue("chief_complaint") : $CurrentForm->getValue("x_chief_complaint");
+        if (!$this->chief_complaint->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->chief_complaint->Visible = false; // Disable update for API request
+            } else {
+                $this->chief_complaint->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_chief_complaint")) {
+            $this->chief_complaint->setOldValue($CurrentForm->getValue("o_chief_complaint"));
+        }
+
+        // Check field name 'history_of_presenting_illness' first before field var 'x_history_of_presenting_illness'
+        $val = $CurrentForm->hasValue("history_of_presenting_illness") ? $CurrentForm->getValue("history_of_presenting_illness") : $CurrentForm->getValue("x_history_of_presenting_illness");
+        if (!$this->history_of_presenting_illness->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->history_of_presenting_illness->Visible = false; // Disable update for API request
+            } else {
+                $this->history_of_presenting_illness->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_history_of_presenting_illness")) {
+            $this->history_of_presenting_illness->setOldValue($CurrentForm->getValue("o_history_of_presenting_illness"));
+        }
+
+        // Check field name 'past_medical_history' first before field var 'x_past_medical_history'
+        $val = $CurrentForm->hasValue("past_medical_history") ? $CurrentForm->getValue("past_medical_history") : $CurrentForm->getValue("x_past_medical_history");
+        if (!$this->past_medical_history->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->past_medical_history->Visible = false; // Disable update for API request
+            } else {
+                $this->past_medical_history->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_past_medical_history")) {
+            $this->past_medical_history->setOldValue($CurrentForm->getValue("o_past_medical_history"));
+        }
+
+        // Check field name 'family_history' first before field var 'x_family_history'
+        $val = $CurrentForm->hasValue("family_history") ? $CurrentForm->getValue("family_history") : $CurrentForm->getValue("x_family_history");
+        if (!$this->family_history->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->family_history->Visible = false; // Disable update for API request
+            } else {
+                $this->family_history->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_family_history")) {
+            $this->family_history->setOldValue($CurrentForm->getValue("o_family_history"));
+        }
+
+        // Check field name 'allergies' first before field var 'x_allergies'
+        $val = $CurrentForm->hasValue("allergies") ? $CurrentForm->getValue("allergies") : $CurrentForm->getValue("x_allergies");
+        if (!$this->allergies->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->allergies->Visible = false; // Disable update for API request
+            } else {
+                $this->allergies->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_allergies")) {
+            $this->allergies->setOldValue($CurrentForm->getValue("o_allergies"));
+        }
+
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_created_by_user_id")) {
+            $this->created_by_user_id->setOldValue($CurrentForm->getValue("o_created_by_user_id"));
         }
 
         // Check field name 'date_created' first before field var 'x_date_created'
@@ -1721,10 +1865,18 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
+        // Check field name 'date_updated' first before field var 'x_date_updated'
+        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
+        if (!$this->date_updated->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->date_updated->Visible = false; // Disable update for API request
+            } else {
+                $this->date_updated->setFormValue($val, true, $validate);
+            }
+            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_date_updated")) {
+            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
         }
     }
 
@@ -1736,9 +1888,17 @@ class PatientVisitsGrid extends PatientVisits
             $this->id->CurrentValue = $this->id->FormValue;
         }
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->_title->CurrentValue = $this->_title->FormValue;
+        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
+        $this->chief_complaint->CurrentValue = $this->chief_complaint->FormValue;
+        $this->history_of_presenting_illness->CurrentValue = $this->history_of_presenting_illness->FormValue;
+        $this->past_medical_history->CurrentValue = $this->past_medical_history->FormValue;
+        $this->family_history->CurrentValue = $this->family_history->FormValue;
+        $this->allergies->CurrentValue = $this->allergies->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
+        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1836,11 +1996,12 @@ class PatientVisitsGrid extends PatientVisits
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
-        $this->_title->setDbValue($row['title']);
-        $this->visit_type_id->setDbValue($row['visit_type_id']);
-        $this->doctor_id->setDbValue($row['doctor_id']);
-        $this->payment_method_id->setDbValue($row['payment_method_id']);
-        $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
+        $this->visit_id->setDbValue($row['visit_id']);
+        $this->chief_complaint->setDbValue($row['chief_complaint']);
+        $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
+        $this->past_medical_history->setDbValue($row['past_medical_history']);
+        $this->family_history->setDbValue($row['family_history']);
+        $this->allergies->setDbValue($row['allergies']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1852,11 +2013,12 @@ class PatientVisitsGrid extends PatientVisits
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['title'] = $this->_title->DefaultValue;
-        $row['visit_type_id'] = $this->visit_type_id->DefaultValue;
-        $row['doctor_id'] = $this->doctor_id->DefaultValue;
-        $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
-        $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
+        $row['visit_id'] = $this->visit_id->DefaultValue;
+        $row['chief_complaint'] = $this->chief_complaint->DefaultValue;
+        $row['history_of_presenting_illness'] = $this->history_of_presenting_illness->DefaultValue;
+        $row['past_medical_history'] = $this->past_medical_history->DefaultValue;
+        $row['family_history'] = $this->family_history->DefaultValue;
+        $row['allergies'] = $this->allergies->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -1902,18 +2064,19 @@ class PatientVisitsGrid extends PatientVisits
 
         // patient_id
 
-        // title
+        // visit_id
 
-        // visit_type_id
+        // chief_complaint
 
-        // doctor_id
+        // history_of_presenting_illness
 
-        // payment_method_id
+        // past_medical_history
 
-        // medical_scheme_id
+        // family_history
+
+        // allergies
 
         // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1947,101 +2110,47 @@ class PatientVisitsGrid extends PatientVisits
                 $this->patient_id->ViewValue = null;
             }
 
-            // title
-            $this->_title->ViewValue = $this->_title->CurrentValue;
-
-            // visit_type_id
-            $curVal = strval($this->visit_type_id->CurrentValue);
+            // visit_id
+            $curVal = strval($this->visit_id->CurrentValue);
             if ($curVal != "") {
-                $this->visit_type_id->ViewValue = $this->visit_type_id->lookupCacheOption($curVal);
-                if ($this->visit_type_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->visit_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->visit_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                if ($this->visit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->visit_type_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->visit_type_id->ViewValue = $this->visit_type_id->displayValue($arwrk);
+                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
                     } else {
-                        $this->visit_type_id->ViewValue = FormatNumber($this->visit_type_id->CurrentValue, $this->visit_type_id->formatPattern());
+                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
                     }
                 }
             } else {
-                $this->visit_type_id->ViewValue = null;
+                $this->visit_id->ViewValue = null;
             }
 
-            // doctor_id
-            $curVal = strval($this->doctor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
-                if ($this->doctor_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
-                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
-                    } else {
-                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->doctor_id->ViewValue = null;
-            }
+            // chief_complaint
+            $this->chief_complaint->ViewValue = $this->chief_complaint->CurrentValue;
 
-            // payment_method_id
-            $curVal = strval($this->payment_method_id->CurrentValue);
-            if ($curVal != "") {
-                $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
-                if ($this->payment_method_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
-                    } else {
-                        $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->payment_method_id->ViewValue = null;
-            }
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->ViewValue = $this->history_of_presenting_illness->CurrentValue;
 
-            // medical_scheme_id
-            $curVal = strval($this->medical_scheme_id->CurrentValue);
-            if ($curVal != "") {
-                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
-                if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
-                    } else {
-                        $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->medical_scheme_id->ViewValue = null;
-            }
+            // past_medical_history
+            $this->past_medical_history->ViewValue = $this->past_medical_history->CurrentValue;
+
+            // family_history
+            $this->family_history->ViewValue = $this->family_history->CurrentValue;
+
+            // allergies
+            $this->allergies->ViewValue = $this->allergies->CurrentValue;
+
+            // created_by_user_id
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2051,18 +2160,52 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
-            $this->_title->TooltipValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+            $this->visit_id->TooltipValue = "";
+
+            // chief_complaint
+            $this->chief_complaint->HrefValue = "";
+            $this->chief_complaint->TooltipValue = "";
+
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->HrefValue = "";
+            $this->history_of_presenting_illness->TooltipValue = "";
+
+            // past_medical_history
+            $this->past_medical_history->HrefValue = "";
+            $this->past_medical_history->TooltipValue = "";
+
+            // family_history
+            $this->family_history->HrefValue = "";
+            $this->family_history->TooltipValue = "";
+
+            // allergies
+            $this->allergies->HrefValue = "";
+            $this->allergies->TooltipValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // id
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2116,30 +2259,124 @@ class PatientVisitsGrid extends PatientVisits
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // title
-            $this->_title->setupEditAttributes();
-            if (!$this->_title->Raw) {
-                $this->_title->CurrentValue = HtmlDecode($this->_title->CurrentValue);
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            $curVal = trim(strval($this->visit_id->CurrentValue));
+            if ($curVal != "") {
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+            } else {
+                $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
             }
-            $this->_title->EditValue = HtmlEncode($this->_title->CurrentValue);
-            $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
+            if ($this->visit_id->ViewValue !== null) { // Load from cache
+                $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->visit_id->EditValue = $arwrk;
+            }
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+
+            // chief_complaint
+            $this->chief_complaint->setupEditAttributes();
+            if (!$this->chief_complaint->Raw) {
+                $this->chief_complaint->CurrentValue = HtmlDecode($this->chief_complaint->CurrentValue);
+            }
+            $this->chief_complaint->EditValue = HtmlEncode($this->chief_complaint->CurrentValue);
+            $this->chief_complaint->PlaceHolder = RemoveHtml($this->chief_complaint->caption());
+
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->setupEditAttributes();
+            if (!$this->history_of_presenting_illness->Raw) {
+                $this->history_of_presenting_illness->CurrentValue = HtmlDecode($this->history_of_presenting_illness->CurrentValue);
+            }
+            $this->history_of_presenting_illness->EditValue = HtmlEncode($this->history_of_presenting_illness->CurrentValue);
+            $this->history_of_presenting_illness->PlaceHolder = RemoveHtml($this->history_of_presenting_illness->caption());
+
+            // past_medical_history
+            $this->past_medical_history->setupEditAttributes();
+            if (!$this->past_medical_history->Raw) {
+                $this->past_medical_history->CurrentValue = HtmlDecode($this->past_medical_history->CurrentValue);
+            }
+            $this->past_medical_history->EditValue = HtmlEncode($this->past_medical_history->CurrentValue);
+            $this->past_medical_history->PlaceHolder = RemoveHtml($this->past_medical_history->caption());
+
+            // family_history
+            $this->family_history->setupEditAttributes();
+            if (!$this->family_history->Raw) {
+                $this->family_history->CurrentValue = HtmlDecode($this->family_history->CurrentValue);
+            }
+            $this->family_history->EditValue = HtmlEncode($this->family_history->CurrentValue);
+            $this->family_history->PlaceHolder = RemoveHtml($this->family_history->caption());
+
+            // allergies
+            $this->allergies->setupEditAttributes();
+            if (!$this->allergies->Raw) {
+                $this->allergies->CurrentValue = HtmlDecode($this->allergies->CurrentValue);
+            }
+            $this->allergies->EditValue = HtmlEncode($this->allergies->CurrentValue);
+            $this->allergies->PlaceHolder = RemoveHtml($this->allergies->caption());
+
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+
+            // chief_complaint
+            $this->chief_complaint->HrefValue = "";
+
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->HrefValue = "";
+
+            // past_medical_history
+            $this->past_medical_history->HrefValue = "";
+
+            // family_history
+            $this->family_history->HrefValue = "";
+
+            // allergies
+            $this->allergies->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2193,29 +2430,119 @@ class PatientVisitsGrid extends PatientVisits
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // title
-            $this->_title->setupEditAttributes();
-            if (!$this->_title->Raw) {
-                $this->_title->CurrentValue = HtmlDecode($this->_title->CurrentValue);
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            $curVal = trim(strval($this->visit_id->CurrentValue));
+            if ($curVal != "") {
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+            } else {
+                $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
             }
-            $this->_title->EditValue = HtmlEncode($this->_title->CurrentValue);
-            $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
+            if ($this->visit_id->ViewValue !== null) { // Load from cache
+                $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->visit_id->EditValue = $arwrk;
+            }
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+
+            // chief_complaint
+            $this->chief_complaint->setupEditAttributes();
+            if (!$this->chief_complaint->Raw) {
+                $this->chief_complaint->CurrentValue = HtmlDecode($this->chief_complaint->CurrentValue);
+            }
+            $this->chief_complaint->EditValue = HtmlEncode($this->chief_complaint->CurrentValue);
+            $this->chief_complaint->PlaceHolder = RemoveHtml($this->chief_complaint->caption());
+
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->setupEditAttributes();
+            if (!$this->history_of_presenting_illness->Raw) {
+                $this->history_of_presenting_illness->CurrentValue = HtmlDecode($this->history_of_presenting_illness->CurrentValue);
+            }
+            $this->history_of_presenting_illness->EditValue = HtmlEncode($this->history_of_presenting_illness->CurrentValue);
+            $this->history_of_presenting_illness->PlaceHolder = RemoveHtml($this->history_of_presenting_illness->caption());
+
+            // past_medical_history
+            $this->past_medical_history->setupEditAttributes();
+            if (!$this->past_medical_history->Raw) {
+                $this->past_medical_history->CurrentValue = HtmlDecode($this->past_medical_history->CurrentValue);
+            }
+            $this->past_medical_history->EditValue = HtmlEncode($this->past_medical_history->CurrentValue);
+            $this->past_medical_history->PlaceHolder = RemoveHtml($this->past_medical_history->caption());
+
+            // family_history
+            $this->family_history->setupEditAttributes();
+            if (!$this->family_history->Raw) {
+                $this->family_history->CurrentValue = HtmlDecode($this->family_history->CurrentValue);
+            }
+            $this->family_history->EditValue = HtmlEncode($this->family_history->CurrentValue);
+            $this->family_history->PlaceHolder = RemoveHtml($this->family_history->caption());
+
+            // allergies
+            $this->allergies->setupEditAttributes();
+            if (!$this->allergies->Raw) {
+                $this->allergies->CurrentValue = HtmlDecode($this->allergies->CurrentValue);
+            }
+            $this->allergies->EditValue = HtmlEncode($this->allergies->CurrentValue);
+            $this->allergies->PlaceHolder = RemoveHtml($this->allergies->caption());
+
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
             // Edit refer script
+
+            // id
+            $this->id->HrefValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+
+            // chief_complaint
+            $this->chief_complaint->HrefValue = "";
+
+            // history_of_presenting_illness
+            $this->history_of_presenting_illness->HrefValue = "";
+
+            // past_medical_history
+            $this->past_medical_history->HrefValue = "";
+
+            // family_history
+            $this->family_history->HrefValue = "";
+
+            // allergies
+            $this->allergies->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2237,14 +2564,49 @@ class PatientVisitsGrid extends PatientVisits
             return true;
         }
         $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->_title->Visible && $this->_title->Required) {
-                if (!$this->_title->IsDetailKey && EmptyValue($this->_title->FormValue)) {
-                    $this->_title->addErrorMessage(str_replace("%s", $this->_title->caption(), $this->_title->RequiredErrorMessage));
+            if ($this->visit_id->Visible && $this->visit_id->Required) {
+                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
+                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->chief_complaint->Visible && $this->chief_complaint->Required) {
+                if (!$this->chief_complaint->IsDetailKey && EmptyValue($this->chief_complaint->FormValue)) {
+                    $this->chief_complaint->addErrorMessage(str_replace("%s", $this->chief_complaint->caption(), $this->chief_complaint->RequiredErrorMessage));
+                }
+            }
+            if ($this->history_of_presenting_illness->Visible && $this->history_of_presenting_illness->Required) {
+                if (!$this->history_of_presenting_illness->IsDetailKey && EmptyValue($this->history_of_presenting_illness->FormValue)) {
+                    $this->history_of_presenting_illness->addErrorMessage(str_replace("%s", $this->history_of_presenting_illness->caption(), $this->history_of_presenting_illness->RequiredErrorMessage));
+                }
+            }
+            if ($this->past_medical_history->Visible && $this->past_medical_history->Required) {
+                if (!$this->past_medical_history->IsDetailKey && EmptyValue($this->past_medical_history->FormValue)) {
+                    $this->past_medical_history->addErrorMessage(str_replace("%s", $this->past_medical_history->caption(), $this->past_medical_history->RequiredErrorMessage));
+                }
+            }
+            if ($this->family_history->Visible && $this->family_history->Required) {
+                if (!$this->family_history->IsDetailKey && EmptyValue($this->family_history->FormValue)) {
+                    $this->family_history->addErrorMessage(str_replace("%s", $this->family_history->caption(), $this->family_history->RequiredErrorMessage));
+                }
+            }
+            if ($this->allergies->Visible && $this->allergies->Required) {
+                if (!$this->allergies->IsDetailKey && EmptyValue($this->allergies->FormValue)) {
+                    $this->allergies->addErrorMessage(str_replace("%s", $this->allergies->caption(), $this->allergies->RequiredErrorMessage));
+                }
+            }
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
@@ -2254,6 +2616,14 @@ class PatientVisitsGrid extends PatientVisits
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+            }
+            if ($this->date_updated->Visible && $this->date_updated->Required) {
+                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
+                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
+                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2411,11 +2781,33 @@ class PatientVisitsGrid extends PatientVisits
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // title
-        $this->_title->setDbValueDef($rsnew, $this->_title->CurrentValue, $this->_title->ReadOnly);
+        // visit_id
+        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
+
+        // chief_complaint
+        $this->chief_complaint->setDbValueDef($rsnew, $this->chief_complaint->CurrentValue, $this->chief_complaint->ReadOnly);
+
+        // history_of_presenting_illness
+        $this->history_of_presenting_illness->setDbValueDef($rsnew, $this->history_of_presenting_illness->CurrentValue, $this->history_of_presenting_illness->ReadOnly);
+
+        // past_medical_history
+        $this->past_medical_history->setDbValueDef($rsnew, $this->past_medical_history->CurrentValue, $this->past_medical_history->ReadOnly);
+
+        // family_history
+        $this->family_history->setDbValueDef($rsnew, $this->family_history->CurrentValue, $this->family_history->ReadOnly);
+
+        // allergies
+        $this->allergies->setDbValueDef($rsnew, $this->allergies->CurrentValue, $this->allergies->ReadOnly);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
+
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -2428,11 +2820,32 @@ class PatientVisitsGrid extends PatientVisits
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
-        if (isset($row['title'])) { // title
-            $this->_title->CurrentValue = $row['title'];
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->CurrentValue = $row['visit_id'];
+        }
+        if (isset($row['chief_complaint'])) { // chief_complaint
+            $this->chief_complaint->CurrentValue = $row['chief_complaint'];
+        }
+        if (isset($row['history_of_presenting_illness'])) { // history_of_presenting_illness
+            $this->history_of_presenting_illness->CurrentValue = $row['history_of_presenting_illness'];
+        }
+        if (isset($row['past_medical_history'])) { // past_medical_history
+            $this->past_medical_history->CurrentValue = $row['past_medical_history'];
+        }
+        if (isset($row['family_history'])) { // family_history
+            $this->family_history->CurrentValue = $row['family_history'];
+        }
+        if (isset($row['allergies'])) { // allergies
+            $this->allergies->CurrentValue = $row['allergies'];
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
+        }
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->CurrentValue = $row['date_updated'];
         }
     }
 
@@ -2442,7 +2855,7 @@ class PatientVisitsGrid extends PatientVisits
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "patients") {
+        if ($this->getCurrentMasterTable() == "patient_visits") {
             $this->patient_id->Visible = true; // Need to insert foreign key
             $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
         }
@@ -2452,6 +2865,28 @@ class PatientVisitsGrid extends PatientVisits
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $detailKeys = [];
+            $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
+            $masterTable = Container("patient_visits");
+            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+            if (!EmptyValue($masterFilter)) {
+                $validMasterKey = true;
+                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
+                } elseif ($this->getCurrentMasterTable() == "patient_visits") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2496,16 +2931,33 @@ class PatientVisitsGrid extends PatientVisits
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // title
-        $this->_title->setDbValueDef($rsnew, $this->_title->CurrentValue, false);
+        // visit_id
+        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
+
+        // chief_complaint
+        $this->chief_complaint->setDbValueDef($rsnew, $this->chief_complaint->CurrentValue, false);
+
+        // history_of_presenting_illness
+        $this->history_of_presenting_illness->setDbValueDef($rsnew, $this->history_of_presenting_illness->CurrentValue, false);
+
+        // past_medical_history
+        $this->past_medical_history->setDbValueDef($rsnew, $this->past_medical_history->CurrentValue, false);
+
+        // family_history
+        $this->family_history->setDbValueDef($rsnew, $this->family_history->CurrentValue, false);
+
+        // allergies
+        $this->allergies->setDbValueDef($rsnew, $this->allergies->CurrentValue, false);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
-        // created_by_user_id
-        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            $rsnew['created_by_user_id'] = CurrentUserID();
-        }
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
         return $rsnew;
     }
 
@@ -2518,14 +2970,32 @@ class PatientVisitsGrid extends PatientVisits
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
         }
-        if (isset($row['title'])) { // title
-            $this->_title->setFormValue($row['title']);
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
+        if (isset($row['chief_complaint'])) { // chief_complaint
+            $this->chief_complaint->setFormValue($row['chief_complaint']);
+        }
+        if (isset($row['history_of_presenting_illness'])) { // history_of_presenting_illness
+            $this->history_of_presenting_illness->setFormValue($row['history_of_presenting_illness']);
+        }
+        if (isset($row['past_medical_history'])) { // past_medical_history
+            $this->past_medical_history->setFormValue($row['past_medical_history']);
+        }
+        if (isset($row['family_history'])) { // family_history
+            $this->family_history->setFormValue($row['family_history']);
+        }
+        if (isset($row['allergies'])) { // allergies
+            $this->allergies->setFormValue($row['allergies']);
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->setFormValue($row['date_updated']);
         }
     }
 
@@ -2544,9 +3014,8 @@ class PatientVisitsGrid extends PatientVisits
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "patients") {
-            $masterTbl = Container("patients");
-            $this->patient_id->Visible = false;
+        if ($masterTblVar == "patient_visits") {
+            $masterTbl = Container("patient_visits");
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
@@ -2570,14 +3039,7 @@ class PatientVisitsGrid extends PatientVisits
             switch ($fld->FieldVar) {
                 case "x_patient_id":
                     break;
-                case "x_visit_type_id":
-                    break;
-                case "x_doctor_id":
-                    $lookupFilter = $fld->getSelectFilter(); // PHP
-                    break;
-                case "x_payment_method_id":
-                    break;
-                case "x_medical_scheme_id":
+                case "x_visit_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2611,10 +3073,7 @@ class PatientVisitsGrid extends PatientVisits
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "check-in patient");
+        //Log("Page Load");
     }
 
     // Page Unload event

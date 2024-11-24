@@ -35,14 +35,14 @@
     <menu id="48">
       <phrase id="menutext" value="Patients List" />
     </menu>
+    <menu id="24">
+      <phrase id="menutext" value="Patient Check-Ins" />
+    </menu>
     <menu id="22">
       <phrase id="menutext" value="Appointments" />
     </menu>
     <menu id="109">
       <phrase id="menutext" value="Calendar" />
-    </menu>
-    <menu id="24">
-      <phrase id="menutext" value="Visits" />
     </menu>
     <menu id="25">
       <phrase id="menutext" value="Vitals" />
@@ -327,39 +327,39 @@
       </field>
     </table>
     <table id="doctor_notes">
-      <phrase id="tblcaption" value="doctor notes" />
+      <phrase id="tblcaption" value="Medical Notes" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="visit id" />
+        <phrase id="fldcaption" value="Checkup Case" />
       </field>
       <field id="chief_complaint">
-        <phrase id="fldcaption" value="chief complaint" />
+        <phrase id="fldcaption" value="Chief Complaint" />
       </field>
       <field id="history_of_presenting_illness">
-        <phrase id="fldcaption" value="history of presenting illness" />
+        <phrase id="fldcaption" value="History of Presenting Illness" />
       </field>
       <field id="past_medical_history">
-        <phrase id="fldcaption" value="past medical history" />
+        <phrase id="fldcaption" value="Past Medical History" />
       </field>
       <field id="family_history">
-        <phrase id="fldcaption" value="family history" />
+        <phrase id="fldcaption" value="Family History" />
       </field>
       <field id="allergies">
-        <phrase id="fldcaption" value="allergies" />
+        <phrase id="fldcaption" value="Allergies" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="expenses">
@@ -961,9 +961,9 @@
       </field>
     </table>
     <table id="patient_visits">
-      <phrase id="tblcaption" value="Visits" />
+      <phrase id="tblcaption" value="Check-Ins" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Check-In ID" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
@@ -978,7 +978,7 @@
         <phrase id="fldcaption" value="Doctor" />
       </field>
       <field id="payment_method_id">
-        <phrase id="fldcaption" value="Patment Method" />
+        <phrase id="fldcaption" value="Payment Method" />
       </field>
       <field id="medical_scheme_id">
         <phrase id="fldcaption" value="Medical Scheme" />
@@ -987,7 +987,7 @@
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
+        <phrase id="fldcaption" value="Check In Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

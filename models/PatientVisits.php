@@ -94,7 +94,7 @@ class PatientVisits extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -520,6 +520,40 @@ class PatientVisits extends DbTable
                 return GetKeyFilter($this->patient_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "patient_vitals") {
+            $detailUrl = Container("patient_vitals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "doctor_notes") {
+            $detailUrl = Container("doctor_notes")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "lab_test_requests") {
+            $detailUrl = Container("lab_test_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "patientvisitslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -1153,7 +1187,11 @@ class PatientVisits extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("patientvisitsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientvisitsedit", $parm);
+        } else {
+            $url = $this->keyUrl("patientvisitsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1167,7 +1205,11 @@ class PatientVisits extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("patientvisitsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientvisitsadd", $parm);
+        } else {
+            $url = $this->keyUrl("patientvisitsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1841,7 +1883,6 @@ class PatientVisits extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        // Enter your code here
     }
 
     // Recordset Selected event

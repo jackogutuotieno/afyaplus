@@ -23,22 +23,16 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["_title", [fields._title.visible && fields._title.required ? ew.Validators.required(fields._title.caption) : null], fields._title.isInvalid],
-            ["visit_type_id", [fields.visit_type_id.visible && fields.visit_type_id.required ? ew.Validators.required(fields.visit_type_id.caption) : null], fields.visit_type_id.isInvalid],
-            ["doctor_id", [fields.doctor_id.visible && fields.doctor_id.required ? ew.Validators.required(fields.doctor_id.caption) : null], fields.doctor_id.isInvalid],
-            ["payment_method_id", [fields.payment_method_id.visible && fields.payment_method_id.required ? ew.Validators.required(fields.payment_method_id.caption) : null], fields.payment_method_id.isInvalid],
-            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["_title",false],["visit_type_id",false],["doctor_id",false],["payment_method_id",false],["medical_scheme_id",false],["date_created",false],["date_updated",false]];
+                    fields = [["patient_id",false],["_title",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -59,10 +53,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
-            "visit_type_id": <?= $Grid->visit_type_id->toClientList($Grid) ?>,
-            "doctor_id": <?= $Grid->doctor_id->toClientList($Grid) ?>,
-            "payment_method_id": <?= $Grid->payment_method_id->toClientList($Grid) ?>,
-            "medical_scheme_id": <?= $Grid->medical_scheme_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -97,32 +87,14 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_patient_visits_id" class="patient_visits_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_patient_visits_patient_id" class="patient_visits_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->_title->Visible) { // title ?>
         <th data-name="_title" class="<?= $Grid->_title->headerCellClass() ?>"><div id="elh_patient_visits__title" class="patient_visits__title"><?= $Grid->renderFieldHeader($Grid->_title) ?></div></th>
 <?php } ?>
-<?php if ($Grid->visit_type_id->Visible) { // visit_type_id ?>
-        <th data-name="visit_type_id" class="<?= $Grid->visit_type_id->headerCellClass() ?>"><div id="elh_patient_visits_visit_type_id" class="patient_visits_visit_type_id"><?= $Grid->renderFieldHeader($Grid->visit_type_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->doctor_id->Visible) { // doctor_id ?>
-        <th data-name="doctor_id" class="<?= $Grid->doctor_id->headerCellClass() ?>"><div id="elh_patient_visits_doctor_id" class="patient_visits_doctor_id"><?= $Grid->renderFieldHeader($Grid->doctor_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->payment_method_id->Visible) { // payment_method_id ?>
-        <th data-name="payment_method_id" class="<?= $Grid->payment_method_id->headerCellClass() ?>"><div id="elh_patient_visits_payment_method_id" class="patient_visits_payment_method_id"><?= $Grid->renderFieldHeader($Grid->payment_method_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->medical_scheme_id->Visible) { // medical_scheme_id ?>
-        <th data-name="medical_scheme_id" class="<?= $Grid->medical_scheme_id->headerCellClass() ?>"><div id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Grid->renderFieldHeader($Grid->medical_scheme_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Grid->date_updated->headerCellClass() ?>"><div id="elh_patient_visits_date_updated" class="patient_visits_date_updated"><?= $Grid->renderFieldHeader($Grid->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -160,33 +132,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_id" class="el_patient_visits_id"></span>
-<input type="hidden" data-table="patient_visits" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_id" class="el_patient_visits_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="patient_visits" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_id" class="el_patient_visits_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_id" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_id" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_id" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_id" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="patient_visits" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -321,386 +266,6 @@ loadjs.ready("fpatient_visitsgrid", function() {
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->visit_type_id->Visible) { // visit_type_id ?>
-        <td data-name="visit_type_id"<?= $Grid->visit_type_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_visit_type_id" class="el_patient_visits_visit_type_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_visit_type_id"
-        name="x<?= $Grid->RowIndex ?>_visit_type_id"
-        class="form-select ew-select<?= $Grid->visit_type_id->isInvalidClass() ?>"
-        <?php if (!$Grid->visit_type_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_visit_type_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_visit_type_id"
-        data-value-separator="<?= $Grid->visit_type_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->visit_type_id->getPlaceHolder()) ?>"
-        <?= $Grid->visit_type_id->editAttributes() ?>>
-        <?= $Grid->visit_type_id->selectOptionListHtml("x{$Grid->RowIndex}_visit_type_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->visit_type_id->getErrorMessage() ?></div>
-<?= $Grid->visit_type_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visit_type_id") ?>
-<?php if (!$Grid->visit_type_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_visit_type_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_visit_type_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.visit_type_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_visit_type_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_visit_type_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.visit_type_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patient_visits" data-field="x_visit_type_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_visit_type_id" id="o<?= $Grid->RowIndex ?>_visit_type_id" value="<?= HtmlEncode($Grid->visit_type_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_visit_type_id" class="el_patient_visits_visit_type_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_visit_type_id"
-        name="x<?= $Grid->RowIndex ?>_visit_type_id"
-        class="form-select ew-select<?= $Grid->visit_type_id->isInvalidClass() ?>"
-        <?php if (!$Grid->visit_type_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_visit_type_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_visit_type_id"
-        data-value-separator="<?= $Grid->visit_type_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->visit_type_id->getPlaceHolder()) ?>"
-        <?= $Grid->visit_type_id->editAttributes() ?>>
-        <?= $Grid->visit_type_id->selectOptionListHtml("x{$Grid->RowIndex}_visit_type_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->visit_type_id->getErrorMessage() ?></div>
-<?= $Grid->visit_type_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visit_type_id") ?>
-<?php if (!$Grid->visit_type_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_visit_type_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_visit_type_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.visit_type_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_visit_type_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_visit_type_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.visit_type_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_visit_type_id" class="el_patient_visits_visit_type_id">
-<span<?= $Grid->visit_type_id->viewAttributes() ?>>
-<?= $Grid->visit_type_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_visit_type_id" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_visit_type_id" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_visit_type_id" value="<?= HtmlEncode($Grid->visit_type_id->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_visit_type_id" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_visit_type_id" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_visit_type_id" value="<?= HtmlEncode($Grid->visit_type_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->doctor_id->Visible) { // doctor_id ?>
-        <td data-name="doctor_id"<?= $Grid->doctor_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_doctor_id" class="el_patient_visits_doctor_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_doctor_id"
-        name="x<?= $Grid->RowIndex ?>_doctor_id"
-        class="form-select ew-select<?= $Grid->doctor_id->isInvalidClass() ?>"
-        <?php if (!$Grid->doctor_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_doctor_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_doctor_id"
-        data-value-separator="<?= $Grid->doctor_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->doctor_id->getPlaceHolder()) ?>"
-        <?= $Grid->doctor_id->editAttributes() ?>>
-        <?= $Grid->doctor_id->selectOptionListHtml("x{$Grid->RowIndex}_doctor_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->doctor_id->getErrorMessage() ?></div>
-<?= $Grid->doctor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_doctor_id") ?>
-<?php if (!$Grid->doctor_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_doctor_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_doctor_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.doctor_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_doctor_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_doctor_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.doctor_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patient_visits" data-field="x_doctor_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_doctor_id" id="o<?= $Grid->RowIndex ?>_doctor_id" value="<?= HtmlEncode($Grid->doctor_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_doctor_id" class="el_patient_visits_doctor_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_doctor_id"
-        name="x<?= $Grid->RowIndex ?>_doctor_id"
-        class="form-select ew-select<?= $Grid->doctor_id->isInvalidClass() ?>"
-        <?php if (!$Grid->doctor_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_doctor_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_doctor_id"
-        data-value-separator="<?= $Grid->doctor_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->doctor_id->getPlaceHolder()) ?>"
-        <?= $Grid->doctor_id->editAttributes() ?>>
-        <?= $Grid->doctor_id->selectOptionListHtml("x{$Grid->RowIndex}_doctor_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->doctor_id->getErrorMessage() ?></div>
-<?= $Grid->doctor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_doctor_id") ?>
-<?php if (!$Grid->doctor_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_doctor_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_doctor_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.doctor_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_doctor_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_doctor_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.doctor_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_doctor_id" class="el_patient_visits_doctor_id">
-<span<?= $Grid->doctor_id->viewAttributes() ?>>
-<?= $Grid->doctor_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_doctor_id" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_doctor_id" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_doctor_id" value="<?= HtmlEncode($Grid->doctor_id->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_doctor_id" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_doctor_id" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_doctor_id" value="<?= HtmlEncode($Grid->doctor_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->payment_method_id->Visible) { // payment_method_id ?>
-        <td data-name="payment_method_id"<?= $Grid->payment_method_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_payment_method_id" class="el_patient_visits_payment_method_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_payment_method_id"
-        name="x<?= $Grid->RowIndex ?>_payment_method_id"
-        class="form-select ew-select<?= $Grid->payment_method_id->isInvalidClass() ?>"
-        <?php if (!$Grid->payment_method_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_payment_method_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_payment_method_id"
-        data-value-separator="<?= $Grid->payment_method_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->payment_method_id->getPlaceHolder()) ?>"
-        <?= $Grid->payment_method_id->editAttributes() ?>>
-        <?= $Grid->payment_method_id->selectOptionListHtml("x{$Grid->RowIndex}_payment_method_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->payment_method_id->getErrorMessage() ?></div>
-<?= $Grid->payment_method_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_payment_method_id") ?>
-<?php if (!$Grid->payment_method_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_payment_method_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_payment_method_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.payment_method_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_payment_method_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_payment_method_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.payment_method_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patient_visits" data-field="x_payment_method_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_payment_method_id" id="o<?= $Grid->RowIndex ?>_payment_method_id" value="<?= HtmlEncode($Grid->payment_method_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_payment_method_id" class="el_patient_visits_payment_method_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_payment_method_id"
-        name="x<?= $Grid->RowIndex ?>_payment_method_id"
-        class="form-select ew-select<?= $Grid->payment_method_id->isInvalidClass() ?>"
-        <?php if (!$Grid->payment_method_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_payment_method_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_payment_method_id"
-        data-value-separator="<?= $Grid->payment_method_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->payment_method_id->getPlaceHolder()) ?>"
-        <?= $Grid->payment_method_id->editAttributes() ?>>
-        <?= $Grid->payment_method_id->selectOptionListHtml("x{$Grid->RowIndex}_payment_method_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->payment_method_id->getErrorMessage() ?></div>
-<?= $Grid->payment_method_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_payment_method_id") ?>
-<?php if (!$Grid->payment_method_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_payment_method_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_payment_method_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.payment_method_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_payment_method_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_payment_method_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.payment_method_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_payment_method_id" class="el_patient_visits_payment_method_id">
-<span<?= $Grid->payment_method_id->viewAttributes() ?>>
-<?= $Grid->payment_method_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_payment_method_id" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_payment_method_id" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_payment_method_id" value="<?= HtmlEncode($Grid->payment_method_id->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_payment_method_id" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_payment_method_id" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_payment_method_id" value="<?= HtmlEncode($Grid->payment_method_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->medical_scheme_id->Visible) { // medical_scheme_id ?>
-        <td data-name="medical_scheme_id"<?= $Grid->medical_scheme_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_medical_scheme_id" class="el_patient_visits_medical_scheme_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        name="x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        class="form-select ew-select<?= $Grid->medical_scheme_id->isInvalidClass() ?>"
-        <?php if (!$Grid->medical_scheme_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_medical_scheme_id"
-        data-value-separator="<?= $Grid->medical_scheme_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->medical_scheme_id->getPlaceHolder()) ?>"
-        <?= $Grid->medical_scheme_id->editAttributes() ?>>
-        <?= $Grid->medical_scheme_id->selectOptionListHtml("x{$Grid->RowIndex}_medical_scheme_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->medical_scheme_id->getErrorMessage() ?></div>
-<?= $Grid->medical_scheme_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_medical_scheme_id") ?>
-<?php if (!$Grid->medical_scheme_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_medical_scheme_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_medical_scheme_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.medical_scheme_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_medical_scheme_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_medical_scheme_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.medical_scheme_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patient_visits" data-field="x_medical_scheme_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_medical_scheme_id" id="o<?= $Grid->RowIndex ?>_medical_scheme_id" value="<?= HtmlEncode($Grid->medical_scheme_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_medical_scheme_id" class="el_patient_visits_medical_scheme_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        name="x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        class="form-select ew-select<?= $Grid->medical_scheme_id->isInvalidClass() ?>"
-        <?php if (!$Grid->medical_scheme_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_medical_scheme_id"
-        <?php } ?>
-        data-table="patient_visits"
-        data-field="x_medical_scheme_id"
-        data-value-separator="<?= $Grid->medical_scheme_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->medical_scheme_id->getPlaceHolder()) ?>"
-        <?= $Grid->medical_scheme_id->editAttributes() ?>>
-        <?= $Grid->medical_scheme_id->selectOptionListHtml("x{$Grid->RowIndex}_medical_scheme_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->medical_scheme_id->getErrorMessage() ?></div>
-<?= $Grid->medical_scheme_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_medical_scheme_id") ?>
-<?php if (!$Grid->medical_scheme_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_visitsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_medical_scheme_id", selectId: "fpatient_visitsgrid_x<?= $Grid->RowIndex ?>_medical_scheme_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_visitsgrid.lists.medical_scheme_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_medical_scheme_id", form: "fpatient_visitsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_medical_scheme_id", form: "fpatient_visitsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.medical_scheme_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_medical_scheme_id" class="el_patient_visits_medical_scheme_id">
-<span<?= $Grid->medical_scheme_id->viewAttributes() ?>>
-<?= $Grid->medical_scheme_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_medical_scheme_id" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_medical_scheme_id" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_medical_scheme_id" value="<?= HtmlEncode($Grid->medical_scheme_id->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_medical_scheme_id" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_medical_scheme_id" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_medical_scheme_id" value="<?= HtmlEncode($Grid->medical_scheme_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Grid->date_created->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -782,91 +347,6 @@ loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patient_visits" data-field="x_date_created" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_date_created" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->FormValue) ?>">
 <input type="hidden" data-table="patient_visits" data-field="x_date_created" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_date_created" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Grid->date_updated->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_date_updated" class="el_patient_visits_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="patient_visits" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatient_visitsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patient_visits" data-field="x_date_updated" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_date_updated" id="o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_date_updated" class="el_patient_visits_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="patient_visits" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatient_visitsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_date_updated" class="el_patient_visits_date_updated">
-<span<?= $Grid->date_updated->viewAttributes() ?>>
-<?= $Grid->date_updated->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_visits" data-field="x_date_updated" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_date_updated" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->FormValue) ?>">
-<input type="hidden" data-table="patient_visits" data-field="x_date_updated" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_date_updated" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

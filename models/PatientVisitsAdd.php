@@ -576,6 +576,9 @@ class PatientVisitsAdd extends PatientVisits
             $this->loadFormValues(); // Load form values
         }
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -600,6 +603,9 @@ class PatientVisitsAdd extends PatientVisits
                     $this->terminate("patientvisitslist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -607,7 +613,11 @@ class PatientVisitsAdd extends PatientVisits
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "patientvisitslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "patientvisitsview") {
@@ -640,6 +650,9 @@ class PatientVisitsAdd extends PatientVisits
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -1297,6 +1310,24 @@ class PatientVisitsAdd extends PatientVisits
                 }
             }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PatientVitalsGrid");
+        if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("DoctorNotesGrid");
+        if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("LabTestRequestsGrid");
+        if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1321,6 +1352,11 @@ class PatientVisitsAdd extends PatientVisits
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -1342,6 +1378,58 @@ class PatientVisitsAdd extends PatientVisits
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("PatientVitalsGrid");
+            if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_vitals"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("DoctorNotesGrid");
+            if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "doctor_notes"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("LabTestRequestsGrid");
+            if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                if ($this->UseTransaction) { // Commit transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->commit();
+                    }
+                }
+            } else {
+                if ($this->UseTransaction) { // Rollback transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->rollback();
+                    }
+                }
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1501,6 +1589,78 @@ class PatientVisitsAdd extends PatientVisits
         }
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("patient_vitals", $detailTblVar)) {
+                $detailPageObj = Container("PatientVitalsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("doctor_notes", $detailTblVar)) {
+                $detailPageObj = Container("DoctorNotesGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("lab_test_requests", $detailTblVar)) {
+                $detailPageObj = Container("LabTestRequestsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+        }
     }
 
     // Set up Breadcrumb
