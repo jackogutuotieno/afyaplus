@@ -347,6 +347,30 @@ loadjs.ready("fpatient_visitsadd", function() {
 <?php include_once "DoctorNotesGrid.php" ?>
 <?php } ?>
 <?php
+    if (in_array("diagnosis", explode(",", $Page->getCurrentDetailTable())) && $diagnosis->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("diagnosis", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "DiagnosisGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("prescriptions", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PrescriptionsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("radiology_requests", explode(",", $Page->getCurrentDetailTable())) && $radiology_requests->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "RadiologyRequestsGrid.php" ?>
+<?php } ?>
+<?php
     if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailAdd) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>

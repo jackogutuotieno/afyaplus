@@ -94,6 +94,7 @@ C:\wamp64\www\afyaplus\models\Diagnosis.php
 C:\wamp64\www\afyaplus\models\DiagnosisAdd.php
 C:\wamp64\www\afyaplus\models\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\models\DiagnosisEdit.php
+C:\wamp64\www\afyaplus\models\DiagnosisGrid.php
 C:\wamp64\www\afyaplus\models\DiagnosisList.php
 C:\wamp64\www\afyaplus\models\DiagnosisView.php
 C:\wamp64\www\afyaplus\models\Diseases.php
@@ -284,6 +285,7 @@ C:\wamp64\www\afyaplus\models\Prescriptions.php
 C:\wamp64\www\afyaplus\models\PrescriptionsAdd.php
 C:\wamp64\www\afyaplus\models\PrescriptionsDelete.php
 C:\wamp64\www\afyaplus\models\PrescriptionsEdit.php
+C:\wamp64\www\afyaplus\models\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\models\PrescriptionsList.php
 C:\wamp64\www\afyaplus\models\PrescriptionsView.php
 C:\wamp64\www\afyaplus\models\RadiologyReports.php
@@ -302,6 +304,7 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsEdit.php
+C:\wamp64\www\afyaplus\models\RadiologyRequestsGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueue.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueAdd.php
@@ -566,6 +569,7 @@ C:\wamp64\www\afyaplus\views\DesignationsView.php
 C:\wamp64\www\afyaplus\views\DiagnosisAdd.php
 C:\wamp64\www\afyaplus\views\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\views\DiagnosisEdit.php
+C:\wamp64\www\afyaplus\views\DiagnosisGrid.php
 C:\wamp64\www\afyaplus\views\DiagnosisList.php
 C:\wamp64\www\afyaplus\views\DiagnosisView.php
 C:\wamp64\www\afyaplus\views\DiseasesAdd.php
@@ -624,6 +628,7 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsList.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsEdit.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsGrid.php
@@ -725,6 +730,7 @@ C:\wamp64\www\afyaplus\views\PrescriptionDetailsView.php
 C:\wamp64\www\afyaplus\views\PrescriptionsAdd.php
 C:\wamp64\www\afyaplus\views\PrescriptionsDelete.php
 C:\wamp64\www\afyaplus\views\PrescriptionsEdit.php
+C:\wamp64\www\afyaplus\views\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\views\PrescriptionsList.php
 C:\wamp64\www\afyaplus\views\PrescriptionsView.php
 C:\wamp64\www\afyaplus\views\RadiologyReportsAdd.php
@@ -740,6 +746,7 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsEdit.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueDelete.php

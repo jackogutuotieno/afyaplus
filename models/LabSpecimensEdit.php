@@ -123,7 +123,7 @@ class LabSpecimensEdit extends LabSpecimens
     {
         $this->id->setVisibility();
         $this->specimen->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -722,16 +722,6 @@ class LabSpecimensEdit extends LabSpecimens
             }
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -761,7 +751,6 @@ class LabSpecimensEdit extends LabSpecimens
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->specimen->CurrentValue = $this->specimen->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -879,10 +868,6 @@ class LabSpecimensEdit extends LabSpecimens
             // specimen
             $this->specimen->ViewValue = $this->specimen->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -896,9 +881,6 @@ class LabSpecimensEdit extends LabSpecimens
 
             // specimen
             $this->specimen->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -918,14 +900,6 @@ class LabSpecimensEdit extends LabSpecimens
             $this->specimen->EditValue = HtmlEncode($this->specimen->CurrentValue);
             $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
 
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -943,9 +917,6 @@ class LabSpecimensEdit extends LabSpecimens
 
             // specimen
             $this->specimen->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -982,14 +953,6 @@ class LabSpecimensEdit extends LabSpecimens
                 if (!$this->specimen->IsDetailKey && EmptyValue($this->specimen->FormValue)) {
                     $this->specimen->addErrorMessage(str_replace("%s", $this->specimen->caption(), $this->specimen->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1099,9 +1062,6 @@ class LabSpecimensEdit extends LabSpecimens
         // specimen
         $this->specimen->setDbValueDef($rsnew, $this->specimen->CurrentValue, $this->specimen->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
 
@@ -1118,9 +1078,6 @@ class LabSpecimensEdit extends LabSpecimens
     {
         if (isset($row['specimen'])) { // specimen
             $this->specimen->CurrentValue = $row['specimen'];
-        }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];

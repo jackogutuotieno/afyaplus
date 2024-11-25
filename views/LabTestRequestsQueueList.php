@@ -52,9 +52,9 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests_details") {
     if ($Page->MasterRecordExists) {
-        include_once "views/LabTestRequestsMaster.php";
+        include_once "views/LabTestRequestsDetailsMaster.php";
     }
 }
 ?>
@@ -151,9 +151,9 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "lab_test_requests" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_request_id->getSessionValue()) ?>">
+<?php if ($Page->getCurrentMasterTable() == "lab_test_requests_details" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests_details">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_requests_detail_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_lab_test_requests_queue" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>

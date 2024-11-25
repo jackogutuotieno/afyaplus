@@ -121,6 +121,7 @@ class LabTestRequestsDetails extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -432,6 +433,32 @@ class LabTestRequestsDetails extends DbTable
                 return GetKeyFilter($this->lab_test_request_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "lab_test_requests_queue") {
+            $detailUrl = Container("lab_test_requests_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "labtestrequestsdetailslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -833,6 +860,33 @@ class LabTestRequestsDetails extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
+        // Cascade Update detail table 'lab_test_requests_queue'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'lab_test_requests_detail_id'
+            $cascadeUpdate = true;
+            $rscascade['lab_test_requests_detail_id'] = $rs['id'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("lab_test_requests_queue")->loadRs("`lab_test_requests_detail_id` = " . QuotedValue($rsold['id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("lab_test_requests_queue")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("lab_test_requests_queue")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("lab_test_requests_queue")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
@@ -881,6 +935,30 @@ class LabTestRequestsDetails extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
+
+        // Cascade delete detail table 'lab_test_requests_queue'
+        $dtlrows = Container("lab_test_requests_queue")->loadRs("`lab_test_requests_detail_id` = " . QuotedValue($rs['id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("lab_test_requests_queue")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("lab_test_requests_queue")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("lab_test_requests_queue")->rowDeleted($dtlrow);
+            }
+        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();
@@ -1062,7 +1140,11 @@ class LabTestRequestsDetails extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("labtestrequestsdetailsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("labtestrequestsdetailsedit", $parm);
+        } else {
+            $url = $this->keyUrl("labtestrequestsdetailsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1076,7 +1158,11 @@ class LabTestRequestsDetails extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("labtestrequestsdetailsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("labtestrequestsdetailsadd", $parm);
+        } else {
+            $url = $this->keyUrl("labtestrequestsdetailsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 

@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class LabTestRequestsGrid extends LabTestRequests
+class DiagnosisGrid extends Diagnosis
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class LabTestRequestsGrid extends LabTestRequests
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LabTestRequestsGrid";
+    public $PageObjName = "DiagnosisGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class LabTestRequestsGrid extends LabTestRequests
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "flab_test_requestsgrid";
+    public $FormName = "fdiagnosisgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "labtestrequestsgrid";
+    public $CurrentPageName = "diagnosisgrid";
 
     // Page URLs
     public $AddUrl;
@@ -136,10 +136,11 @@ class LabTestRequestsGrid extends LabTestRequests
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->test_title->setVisibility();
-        $this->patient_id->Visible = false;
-        $this->visit_id->Visible = false;
-        $this->status->setVisibility();
+        $this->patient_id->setVisibility();
+        $this->visit_id->setVisibility();
+        $this->report_id->setVisibility();
+        $this->disease_id->setVisibility();
+        $this->additional_findings->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -153,8 +154,8 @@ class LabTestRequestsGrid extends LabTestRequests
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'lab_test_requests';
-        $this->TableName = 'lab_test_requests';
+        $this->TableVar = 'diagnosis';
+        $this->TableName = 'diagnosis';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -178,15 +179,15 @@ class LabTestRequestsGrid extends LabTestRequests
         // Language object
         $Language = Container("app.language");
 
-        // Table object (lab_test_requests)
-        if (!isset($GLOBALS["lab_test_requests"]) || $GLOBALS["lab_test_requests"]::class == PROJECT_NAMESPACE . "lab_test_requests") {
-            $GLOBALS["lab_test_requests"] = &$this;
+        // Table object (diagnosis)
+        if (!isset($GLOBALS["diagnosis"]) || $GLOBALS["diagnosis"]::class == PROJECT_NAMESPACE . "diagnosis") {
+            $GLOBALS["diagnosis"] = &$this;
         }
-        $this->AddUrl = "labtestrequestsadd";
+        $this->AddUrl = "diagnosisadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'lab_test_requests');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'diagnosis');
         }
 
         // Start timer
@@ -391,9 +392,6 @@ class LabTestRequestsGrid extends LabTestRequests
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
-        }
-        if ($this->isAddOrEdit()) {
-            $this->created_by_user_id->Visible = false;
         }
     }
 
@@ -626,18 +624,12 @@ class LabTestRequestsGrid extends LabTestRequests
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->visit_id);
-        $this->setupLookupOptions($this->status);
-        $this->setupLookupOptions($this->created_by_user_id);
-
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "flab_test_requestsgrid";
+            $this->FormName = "fdiagnosisgrid";
         }
 
         // Set up page action
@@ -1110,18 +1102,50 @@ class LabTestRequestsGrid extends LabTestRequests
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_test_title") &&
-            $CurrentForm->hasValue("o_test_title") &&
-            $this->test_title->CurrentValue != $this->test_title->DefaultValue &&
-            !($this->test_title->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->test_title->CurrentValue == $this->test_title->getSessionValue())
+            $CurrentForm->hasValue("x_patient_id") &&
+            $CurrentForm->hasValue("o_patient_id") &&
+            $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
+            !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_status") &&
-            $CurrentForm->hasValue("o_status") &&
-            $this->status->CurrentValue != $this->status->DefaultValue &&
-            !($this->status->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->status->CurrentValue == $this->status->getSessionValue())
+            $CurrentForm->hasValue("x_visit_id") &&
+            $CurrentForm->hasValue("o_visit_id") &&
+            $this->visit_id->CurrentValue != $this->visit_id->DefaultValue &&
+            !($this->visit_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->visit_id->CurrentValue == $this->visit_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_report_id") &&
+            $CurrentForm->hasValue("o_report_id") &&
+            $this->report_id->CurrentValue != $this->report_id->DefaultValue &&
+            !($this->report_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->report_id->CurrentValue == $this->report_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_disease_id") &&
+            $CurrentForm->hasValue("o_disease_id") &&
+            $this->disease_id->CurrentValue != $this->disease_id->DefaultValue &&
+            !($this->disease_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->disease_id->CurrentValue == $this->disease_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_additional_findings") &&
+            $CurrentForm->hasValue("o_additional_findings") &&
+            $this->additional_findings->CurrentValue != $this->additional_findings->DefaultValue &&
+            !($this->additional_findings->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->additional_findings->CurrentValue == $this->additional_findings->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_created_by_user_id") &&
+            $CurrentForm->hasValue("o_created_by_user_id") &&
+            $this->created_by_user_id->CurrentValue != $this->created_by_user_id->DefaultValue &&
+            !($this->created_by_user_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->created_by_user_id->CurrentValue == $this->created_by_user_id->getSessionValue())
         ) {
             return false;
         }
@@ -1314,6 +1338,12 @@ class LabTestRequestsGrid extends LabTestRequests
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd();
+        $item->OnLeft = false;
+
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1392,9 +1422,9 @@ class LabTestRequestsGrid extends LabTestRequests
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"lab_test_requests\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"diagnosis\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1405,9 +1435,9 @@ class LabTestRequestsGrid extends LabTestRequests
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"lab_test_requests\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"diagnosis\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 }
@@ -1415,9 +1445,22 @@ class LabTestRequestsGrid extends LabTestRequests
                 $opt->Body = "";
             }
 
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd()) {
+                if ($this->ModalAdd && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"diagnosis\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1459,7 +1502,7 @@ class LabTestRequestsGrid extends LabTestRequests
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
             if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"lab_test_requests\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"diagnosis\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
             } else {
                 $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
@@ -1556,7 +1599,7 @@ class LabTestRequestsGrid extends LabTestRequests
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_lab_test_requests", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_diagnosis", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1644,7 +1687,7 @@ class LabTestRequestsGrid extends LabTestRequests
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_lab_test_requests",
+            "id" => "r" . $this->RowCount . "_diagnosis",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1669,10 +1712,6 @@ class LabTestRequestsGrid extends LabTestRequests
     // Load default values
     protected function loadDefaultValues()
     {
-        $this->status->DefaultValue = $this->status->getDefault(); // PHP
-        $this->status->OldValue = $this->status->DefaultValue;
-        $this->created_by_user_id->DefaultValue = CurrentUserID();
-        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
     }
 
     // Load form values
@@ -1689,30 +1728,69 @@ class LabTestRequestsGrid extends LabTestRequests
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'test_title' first before field var 'x_test_title'
-        $val = $CurrentForm->hasValue("test_title") ? $CurrentForm->getValue("test_title") : $CurrentForm->getValue("x_test_title");
-        if (!$this->test_title->IsDetailKey) {
+        // Check field name 'patient_id' first before field var 'x_patient_id'
+        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
+        if (!$this->patient_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->test_title->Visible = false; // Disable update for API request
+                $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->test_title->setFormValue($val);
+                $this->patient_id->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_test_title")) {
-            $this->test_title->setOldValue($CurrentForm->getValue("o_test_title"));
+        if ($CurrentForm->hasValue("o_patient_id")) {
+            $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
         }
 
-        // Check field name 'status' first before field var 'x_status'
-        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
-        if (!$this->status->IsDetailKey) {
+        // Check field name 'visit_id' first before field var 'x_visit_id'
+        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
+        if (!$this->visit_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->status->Visible = false; // Disable update for API request
+                $this->visit_id->Visible = false; // Disable update for API request
             } else {
-                $this->status->setFormValue($val);
+                $this->visit_id->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_status")) {
-            $this->status->setOldValue($CurrentForm->getValue("o_status"));
+        if ($CurrentForm->hasValue("o_visit_id")) {
+            $this->visit_id->setOldValue($CurrentForm->getValue("o_visit_id"));
+        }
+
+        // Check field name 'report_id' first before field var 'x_report_id'
+        $val = $CurrentForm->hasValue("report_id") ? $CurrentForm->getValue("report_id") : $CurrentForm->getValue("x_report_id");
+        if (!$this->report_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->report_id->Visible = false; // Disable update for API request
+            } else {
+                $this->report_id->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_report_id")) {
+            $this->report_id->setOldValue($CurrentForm->getValue("o_report_id"));
+        }
+
+        // Check field name 'disease_id' first before field var 'x_disease_id'
+        $val = $CurrentForm->hasValue("disease_id") ? $CurrentForm->getValue("disease_id") : $CurrentForm->getValue("x_disease_id");
+        if (!$this->disease_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->disease_id->Visible = false; // Disable update for API request
+            } else {
+                $this->disease_id->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_disease_id")) {
+            $this->disease_id->setOldValue($CurrentForm->getValue("o_disease_id"));
+        }
+
+        // Check field name 'additional_findings' first before field var 'x_additional_findings'
+        $val = $CurrentForm->hasValue("additional_findings") ? $CurrentForm->getValue("additional_findings") : $CurrentForm->getValue("x_additional_findings");
+        if (!$this->additional_findings->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->additional_findings->Visible = false; // Disable update for API request
+            } else {
+                $this->additional_findings->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_additional_findings")) {
+            $this->additional_findings->setOldValue($CurrentForm->getValue("o_additional_findings"));
         }
 
         // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
@@ -1721,7 +1799,7 @@ class LabTestRequestsGrid extends LabTestRequests
             if (IsApi() && $val === null) {
                 $this->created_by_user_id->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val);
+                $this->created_by_user_id->setFormValue($val, true, $validate);
             }
         }
         if ($CurrentForm->hasValue("o_created_by_user_id")) {
@@ -1764,8 +1842,11 @@ class LabTestRequestsGrid extends LabTestRequests
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->test_title->CurrentValue = $this->test_title->FormValue;
-        $this->status->CurrentValue = $this->status->FormValue;
+        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
+        $this->report_id->CurrentValue = $this->report_id->FormValue;
+        $this->disease_id->CurrentValue = $this->disease_id->FormValue;
+        $this->additional_findings->CurrentValue = $this->additional_findings->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1867,10 +1948,11 @@ class LabTestRequestsGrid extends LabTestRequests
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->test_title->setDbValue($row['test_title']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->status->setDbValue($row['status']);
+        $this->report_id->setDbValue($row['report_id']);
+        $this->disease_id->setDbValue($row['disease_id']);
+        $this->additional_findings->setDbValue($row['additional_findings']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1881,10 +1963,11 @@ class LabTestRequestsGrid extends LabTestRequests
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['test_title'] = $this->test_title->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
+        $row['report_id'] = $this->report_id->DefaultValue;
+        $row['disease_id'] = $this->disease_id->DefaultValue;
+        $row['additional_findings'] = $this->additional_findings->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -1928,13 +2011,15 @@ class LabTestRequestsGrid extends LabTestRequests
 
         // id
 
-        // test_title
-
         // patient_id
 
         // visit_id
 
-        // status
+        // report_id
+
+        // disease_id
+
+        // additional_findings
 
         // created_by_user_id
 
@@ -1947,84 +2032,28 @@ class LabTestRequestsGrid extends LabTestRequests
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // test_title
-            $this->test_title->ViewValue = $this->test_title->CurrentValue;
-
             // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                    } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->patient_id->ViewValue = null;
-            }
+            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
 
             // visit_id
-            $curVal = strval($this->visit_id->CurrentValue);
-            if ($curVal != "") {
-                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-                if ($this->visit_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
-                    } else {
-                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->visit_id->ViewValue = null;
-            }
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-            // status
-            if (strval($this->status->CurrentValue) != "") {
-                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-            } else {
-                $this->status->ViewValue = null;
-            }
+            // report_id
+            $this->report_id->ViewValue = $this->report_id->CurrentValue;
+            $this->report_id->ViewValue = FormatNumber($this->report_id->ViewValue, $this->report_id->formatPattern());
+
+            // disease_id
+            $this->disease_id->ViewValue = $this->disease_id->CurrentValue;
+            $this->disease_id->ViewValue = FormatNumber($this->disease_id->ViewValue, $this->disease_id->formatPattern());
+
+            // additional_findings
+            $this->additional_findings->ViewValue = $this->additional_findings->CurrentValue;
 
             // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->ViewValue = null;
-            }
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2038,13 +2067,25 @@ class LabTestRequestsGrid extends LabTestRequests
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // test_title
-            $this->test_title->HrefValue = "";
-            $this->test_title->TooltipValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+            $this->visit_id->TooltipValue = "";
+
+            // report_id
+            $this->report_id->HrefValue = "";
+            $this->report_id->TooltipValue = "";
+
+            // disease_id
+            $this->disease_id->HrefValue = "";
+            $this->disease_id->TooltipValue = "";
+
+            // additional_findings
+            $this->additional_findings->HrefValue = "";
+            $this->additional_findings->TooltipValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -2060,20 +2101,60 @@ class LabTestRequestsGrid extends LabTestRequests
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
-            // test_title
-            $this->test_title->setupEditAttributes();
-            if (!$this->test_title->Raw) {
-                $this->test_title->CurrentValue = HtmlDecode($this->test_title->CurrentValue);
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            } else {
+                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+                }
             }
-            $this->test_title->EditValue = HtmlEncode($this->test_title->CurrentValue);
-            $this->test_title->PlaceHolder = RemoveHtml($this->test_title->caption());
 
-            // status
-            $this->status->setupEditAttributes();
-            $this->status->EditValue = $this->status->options(true);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            }
+
+            // report_id
+            $this->report_id->setupEditAttributes();
+            $this->report_id->EditValue = $this->report_id->CurrentValue;
+            $this->report_id->PlaceHolder = RemoveHtml($this->report_id->caption());
+            if (strval($this->report_id->EditValue) != "" && is_numeric($this->report_id->EditValue)) {
+                $this->report_id->EditValue = FormatNumber($this->report_id->EditValue, null);
+            }
+
+            // disease_id
+            $this->disease_id->setupEditAttributes();
+            $this->disease_id->EditValue = $this->disease_id->CurrentValue;
+            $this->disease_id->PlaceHolder = RemoveHtml($this->disease_id->caption());
+            if (strval($this->disease_id->EditValue) != "" && is_numeric($this->disease_id->EditValue)) {
+                $this->disease_id->EditValue = FormatNumber($this->disease_id->EditValue, null);
+            }
+
+            // additional_findings
+            $this->additional_findings->setupEditAttributes();
+            if (!$this->additional_findings->Raw) {
+                $this->additional_findings->CurrentValue = HtmlDecode($this->additional_findings->CurrentValue);
+            }
+            $this->additional_findings->EditValue = HtmlEncode($this->additional_findings->CurrentValue);
+            $this->additional_findings->PlaceHolder = RemoveHtml($this->additional_findings->caption());
 
             // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            }
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2090,11 +2171,20 @@ class LabTestRequestsGrid extends LabTestRequests
             // id
             $this->id->HrefValue = "";
 
-            // test_title
-            $this->test_title->HrefValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
 
-            // status
-            $this->status->HrefValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+
+            // report_id
+            $this->report_id->HrefValue = "";
+
+            // disease_id
+            $this->disease_id->HrefValue = "";
+
+            // additional_findings
+            $this->additional_findings->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -2109,20 +2199,60 @@ class LabTestRequestsGrid extends LabTestRequests
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
 
-            // test_title
-            $this->test_title->setupEditAttributes();
-            if (!$this->test_title->Raw) {
-                $this->test_title->CurrentValue = HtmlDecode($this->test_title->CurrentValue);
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            } else {
+                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+                }
             }
-            $this->test_title->EditValue = HtmlEncode($this->test_title->CurrentValue);
-            $this->test_title->PlaceHolder = RemoveHtml($this->test_title->caption());
 
-            // status
-            $this->status->setupEditAttributes();
-            $this->status->EditValue = $this->status->options(true);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            }
+
+            // report_id
+            $this->report_id->setupEditAttributes();
+            $this->report_id->EditValue = $this->report_id->CurrentValue;
+            $this->report_id->PlaceHolder = RemoveHtml($this->report_id->caption());
+            if (strval($this->report_id->EditValue) != "" && is_numeric($this->report_id->EditValue)) {
+                $this->report_id->EditValue = FormatNumber($this->report_id->EditValue, null);
+            }
+
+            // disease_id
+            $this->disease_id->setupEditAttributes();
+            $this->disease_id->EditValue = $this->disease_id->CurrentValue;
+            $this->disease_id->PlaceHolder = RemoveHtml($this->disease_id->caption());
+            if (strval($this->disease_id->EditValue) != "" && is_numeric($this->disease_id->EditValue)) {
+                $this->disease_id->EditValue = FormatNumber($this->disease_id->EditValue, null);
+            }
+
+            // additional_findings
+            $this->additional_findings->setupEditAttributes();
+            if (!$this->additional_findings->Raw) {
+                $this->additional_findings->CurrentValue = HtmlDecode($this->additional_findings->CurrentValue);
+            }
+            $this->additional_findings->EditValue = HtmlEncode($this->additional_findings->CurrentValue);
+            $this->additional_findings->PlaceHolder = RemoveHtml($this->additional_findings->caption());
 
             // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            }
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2139,11 +2269,20 @@ class LabTestRequestsGrid extends LabTestRequests
             // id
             $this->id->HrefValue = "";
 
-            // test_title
-            $this->test_title->HrefValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
 
-            // status
-            $this->status->HrefValue = "";
+            // visit_id
+            $this->visit_id->HrefValue = "";
+
+            // report_id
+            $this->report_id->HrefValue = "";
+
+            // disease_id
+            $this->disease_id->HrefValue = "";
+
+            // additional_findings
+            $this->additional_findings->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -2179,20 +2318,50 @@ class LabTestRequestsGrid extends LabTestRequests
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->test_title->Visible && $this->test_title->Required) {
-                if (!$this->test_title->IsDetailKey && EmptyValue($this->test_title->FormValue)) {
-                    $this->test_title->addErrorMessage(str_replace("%s", $this->test_title->caption(), $this->test_title->RequiredErrorMessage));
+            if ($this->patient_id->Visible && $this->patient_id->Required) {
+                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
+                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->status->Visible && $this->status->Required) {
-                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
-                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+            if (!CheckInteger($this->patient_id->FormValue)) {
+                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
+            }
+            if ($this->visit_id->Visible && $this->visit_id->Required) {
+                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
+                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->visit_id->FormValue)) {
+                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
+            }
+            if ($this->report_id->Visible && $this->report_id->Required) {
+                if (!$this->report_id->IsDetailKey && EmptyValue($this->report_id->FormValue)) {
+                    $this->report_id->addErrorMessage(str_replace("%s", $this->report_id->caption(), $this->report_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->report_id->FormValue)) {
+                $this->report_id->addErrorMessage($this->report_id->getErrorMessage(false));
+            }
+            if ($this->disease_id->Visible && $this->disease_id->Required) {
+                if (!$this->disease_id->IsDetailKey && EmptyValue($this->disease_id->FormValue)) {
+                    $this->disease_id->addErrorMessage(str_replace("%s", $this->disease_id->caption(), $this->disease_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->disease_id->FormValue)) {
+                $this->disease_id->addErrorMessage($this->disease_id->getErrorMessage(false));
+            }
+            if ($this->additional_findings->Visible && $this->additional_findings->Required) {
+                if (!$this->additional_findings->IsDetailKey && EmptyValue($this->additional_findings->FormValue)) {
+                    $this->additional_findings->addErrorMessage(str_replace("%s", $this->additional_findings->caption(), $this->additional_findings->RequiredErrorMessage));
                 }
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
+            }
+            if (!CheckInteger($this->created_by_user_id->FormValue)) {
+                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -2317,24 +2486,6 @@ class LabTestRequestsGrid extends LabTestRequests
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check referential integrity for master table 'patient_visits'
-        $detailKeys = [];
-        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
-        $detailKeys['patient_id'] = $keyValue;
-        $masterTable = Container("patient_visits");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
-
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2378,14 +2529,25 @@ class LabTestRequestsGrid extends LabTestRequests
         global $Security;
         $rsnew = [];
 
-        // test_title
-        $this->test_title->setDbValueDef($rsnew, $this->test_title->CurrentValue, $this->test_title->ReadOnly);
+        // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->ReadOnly = true;
+        }
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
+        // visit_id
+        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
+
+        // report_id
+        $this->report_id->setDbValueDef($rsnew, $this->report_id->CurrentValue, $this->report_id->ReadOnly);
+
+        // disease_id
+        $this->disease_id->setDbValueDef($rsnew, $this->disease_id->CurrentValue, $this->disease_id->ReadOnly);
+
+        // additional_findings
+        $this->additional_findings->setDbValueDef($rsnew, $this->additional_findings->CurrentValue, $this->additional_findings->ReadOnly);
 
         // created_by_user_id
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
 
         // date_created
@@ -2402,11 +2564,20 @@ class LabTestRequestsGrid extends LabTestRequests
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['test_title'])) { // test_title
-            $this->test_title->CurrentValue = $row['test_title'];
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->CurrentValue = $row['patient_id'];
         }
-        if (isset($row['status'])) { // status
-            $this->status->CurrentValue = $row['status'];
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->CurrentValue = $row['visit_id'];
+        }
+        if (isset($row['report_id'])) { // report_id
+            $this->report_id->CurrentValue = $row['report_id'];
+        }
+        if (isset($row['disease_id'])) { // disease_id
+            $this->disease_id->CurrentValue = $row['disease_id'];
+        }
+        if (isset($row['additional_findings'])) { // additional_findings
+            $this->additional_findings->CurrentValue = $row['additional_findings'];
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
@@ -2457,24 +2628,6 @@ class LabTestRequestsGrid extends LabTestRequests
                 }
             }
         }
-
-        // Check referential integrity for master table 'lab_test_requests'
-        $validMasterRecord = true;
-        $detailKeys = [];
-        $detailKeys["patient_id"] = $this->patient_id->getSessionValue();
-        $masterTable = Container("patient_visits");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2516,14 +2669,22 @@ class LabTestRequestsGrid extends LabTestRequests
         global $Security;
         $rsnew = [];
 
-        // test_title
-        $this->test_title->setDbValueDef($rsnew, $this->test_title->CurrentValue, false);
+        // patient_id
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, strval($this->status->CurrentValue) == "");
+        // visit_id
+        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
+
+        // report_id
+        $this->report_id->setDbValueDef($rsnew, $this->report_id->CurrentValue, false);
+
+        // disease_id
+        $this->disease_id->setDbValueDef($rsnew, $this->disease_id->CurrentValue, false);
+
+        // additional_findings
+        $this->additional_findings->setDbValueDef($rsnew, $this->additional_findings->CurrentValue, false);
 
         // created_by_user_id
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
 
         // date_created
@@ -2531,11 +2692,6 @@ class LabTestRequestsGrid extends LabTestRequests
 
         // date_updated
         $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
-
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $rsnew['patient_id'] = $this->patient_id->getSessionValue();
-        }
         return $rsnew;
     }
 
@@ -2545,11 +2701,20 @@ class LabTestRequestsGrid extends LabTestRequests
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['test_title'])) { // test_title
-            $this->test_title->setFormValue($row['test_title']);
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
         }
-        if (isset($row['status'])) { // status
-            $this->status->setFormValue($row['status']);
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
+        if (isset($row['report_id'])) { // report_id
+            $this->report_id->setFormValue($row['report_id']);
+        }
+        if (isset($row['disease_id'])) { // disease_id
+            $this->disease_id->setFormValue($row['disease_id']);
+        }
+        if (isset($row['additional_findings'])) { // additional_findings
+            $this->additional_findings->setFormValue($row['additional_findings']);
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
@@ -2560,19 +2725,6 @@ class LabTestRequestsGrid extends LabTestRequests
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString
@@ -2604,14 +2756,6 @@ class LabTestRequestsGrid extends LabTestRequests
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
-                    break;
-                case "x_visit_id":
-                    break;
-                case "x_status":
-                    break;
-                case "x_created_by_user_id":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

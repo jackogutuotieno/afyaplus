@@ -1213,16 +1213,6 @@ class LabTestRequestsEdit extends LabTestRequests
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("LabTestRequestsQueueGrid");
-        if (in_array("lab_test_requests_queue", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("LabTestReportsGrid");
-        if (in_array("lab_test_reports", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1267,6 +1257,24 @@ class LabTestRequestsEdit extends LabTestRequests
             $conn->beginTransaction();
         }
 
+        // Check referential integrity for master table 'patient_visits'
+        $detailKeys = [];
+        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
+        $detailKeys['patient_id'] = $keyValue;
+        $masterTable = Container("patient_visits");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -1287,18 +1295,6 @@ class LabTestRequestsEdit extends LabTestRequests
             $detailPage = Container("LabTestRequestsDetailsGrid");
             if (in_array("lab_test_requests_details", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
                 $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests_details"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("LabTestRequestsQueueGrid");
-            if (in_array("lab_test_requests_queue", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests_queue"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("LabTestReportsGrid");
-            if (in_array("lab_test_reports", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_reports"); // Load user level of detail table
                 $editRow = $detailPage->gridUpdate();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
             }
@@ -1496,36 +1492,6 @@ class LabTestRequestsEdit extends LabTestRequests
             $detailTblVar = explode(",", $detailTblVar);
             if (in_array("lab_test_requests_details", $detailTblVar)) {
                 $detailPageObj = Container("LabTestRequestsDetailsGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->lab_test_request_id->IsDetailKey = true;
-                    $detailPageObj->lab_test_request_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->lab_test_request_id->setSessionValue($detailPageObj->lab_test_request_id->CurrentValue);
-                }
-            }
-            if (in_array("lab_test_requests_queue", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsQueueGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->lab_test_request_id->IsDetailKey = true;
-                    $detailPageObj->lab_test_request_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->lab_test_request_id->setSessionValue($detailPageObj->lab_test_request_id->CurrentValue);
-                }
-            }
-            if (in_array("lab_test_reports", $detailTblVar)) {
-                $detailPageObj = Container("LabTestReportsGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";

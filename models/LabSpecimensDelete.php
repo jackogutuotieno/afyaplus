@@ -123,7 +123,7 @@ class LabSpecimensDelete extends LabSpecimens
     {
         $this->id->setVisibility();
         $this->specimen->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -632,6 +632,7 @@ class LabSpecimensDelete extends LabSpecimens
         // specimen
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -644,10 +645,6 @@ class LabSpecimensDelete extends LabSpecimens
 
             // specimen
             $this->specimen->ViewValue = $this->specimen->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -664,10 +661,6 @@ class LabSpecimensDelete extends LabSpecimens
             // specimen
             $this->specimen->HrefValue = "";
             $this->specimen->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

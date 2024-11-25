@@ -2217,6 +2217,24 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check referential integrity for master table 'lab_test_requests'
+        $detailKeys = [];
+        $keyValue = $rsnew['lab_test_request_id'] ?? $rsold['lab_test_request_id'];
+        $detailKeys['lab_test_request_id'] = $keyValue;
+        $masterTable = Container("lab_test_requests");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "lab_test_requests", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2319,6 +2337,24 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
                     return false;
                 }
             }
+        }
+
+        // Check referential integrity for master table 'lab_test_requests_details'
+        $validMasterRecord = true;
+        $detailKeys = [];
+        $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->getSessionValue();
+        $masterTable = Container("lab_test_requests");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "lab_test_requests", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
         }
         $conn = $this->getConnection();
 

@@ -122,7 +122,7 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->Visible = false;
+        $this->lab_test_requests_detail_id->Visible = false;
         $this->time->setVisibility();
         $this->waiting_time->Visible = false;
         $this->waiting_interval->Visible = false;
@@ -419,6 +419,7 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->waiting_interval);
         $this->setupLookupOptions($this->status);
         $this->setupLookupOptions($this->created_by_user_id);
 
@@ -438,6 +439,25 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAllAssociative($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("labtestrequestsqueuelist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -608,7 +628,7 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
+        $this->lab_test_requests_detail_id->setDbValue($row['lab_test_requests_detail_id']);
         $this->time->setDbValue($row['time']);
         $this->waiting_time->setDbValue($row['waiting_time']);
         $this->waiting_interval->setDbValue($row['waiting_interval']);
@@ -623,7 +643,7 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
+        $row['lab_test_requests_detail_id'] = $this->lab_test_requests_detail_id->DefaultValue;
         $row['time'] = $this->time->DefaultValue;
         $row['waiting_time'] = $this->waiting_time->DefaultValue;
         $row['waiting_interval'] = $this->waiting_interval->DefaultValue;
@@ -648,7 +668,7 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
 
         // id
 
-        // lab_test_request_id
+        // lab_test_requests_detail_id
 
         // time
 
@@ -671,9 +691,9 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_request_id
-            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+            // lab_test_requests_detail_id
+            $this->lab_test_requests_detail_id->ViewValue = $this->lab_test_requests_detail_id->CurrentValue;
+            $this->lab_test_requests_detail_id->ViewValue = FormatNumber($this->lab_test_requests_detail_id->ViewValue, $this->lab_test_requests_detail_id->formatPattern());
 
             // time
             $this->time->ViewValue = $this->time->CurrentValue;
@@ -846,6 +866,16 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
         return $deleteRows;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -859,14 +889,14 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "lab_test_requests") {
+            if ($masterTblVar == "lab_test_requests_details") {
                 $validMaster = true;
-                $masterTbl = Container("lab_test_requests");
-                if (($parm = Get("fk_id", Get("lab_test_request_id"))) !== null) {
+                $masterTbl = Container("lab_test_requests_details");
+                if (($parm = Get("fk_id", Get("lab_test_requests_detail_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_request_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->QueryStringValue);
-                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->QueryStringValue;
+                    $this->lab_test_requests_detail_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_requests_detail_id->setSessionValue($this->lab_test_requests_detail_id->QueryStringValue);
+                    $foreignKeys["lab_test_requests_detail_id"] = $this->lab_test_requests_detail_id->QueryStringValue;
                     if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
@@ -881,14 +911,14 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "lab_test_requests") {
+            if ($masterTblVar == "lab_test_requests_details") {
                 $validMaster = true;
-                $masterTbl = Container("lab_test_requests");
-                if (($parm = Post("fk_id", Post("lab_test_request_id"))) !== null) {
+                $masterTbl = Container("lab_test_requests_details");
+                if (($parm = Post("fk_id", Post("lab_test_requests_detail_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_request_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->FormValue);
-                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->FormValue;
+                    $this->lab_test_requests_detail_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_requests_detail_id->setSessionValue($this->lab_test_requests_detail_id->FormValue);
+                    $foreignKeys["lab_test_requests_detail_id"] = $this->lab_test_requests_detail_id->FormValue;
                     if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
@@ -909,9 +939,9 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "lab_test_requests") {
-                if (!array_key_exists("lab_test_request_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_request_id->setSessionValue("");
+            if ($masterTblVar != "lab_test_requests_details") {
+                if (!array_key_exists("lab_test_requests_detail_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_requests_detail_id->setSessionValue("");
                 }
             }
         }
@@ -943,6 +973,8 @@ class LabTestRequestsQueueDelete extends LabTestRequestsQueue
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_waiting_interval":
+                    break;
                 case "x_status":
                     break;
                 case "x_created_by_user_id":

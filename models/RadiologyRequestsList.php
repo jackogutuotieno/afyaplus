@@ -705,6 +705,9 @@ class RadiologyRequestsList extends RadiologyRequests
             $this->InlineDelete = true;
         }
 
+        // Set up master detail parameters
+        $this->setupMasterParms();
+
         // Setup other options
         $this->setupOtherOptions();
 
@@ -841,8 +844,35 @@ class RadiologyRequestsList extends RadiologyRequests
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
+
+        // Restore master/detail filter from session
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
+
+        // Add master User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "patient_visits") {
+                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patient_visits"); // Add master User ID filter
+            }
+        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
+            $masterTbl = Container("patient_visits");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("patientvisitslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1309,6 +1339,14 @@ class RadiologyRequestsList extends RadiologyRequests
             // Reset search criteria
             if ($this->Command == "reset" || $this->Command == "resetall") {
                 $this->resetSearchParms();
+            }
+
+            // Reset master/detail keys
+            if ($this->Command == "resetall") {
+                $this->setCurrentMasterTable(""); // Clear master table
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+                        $this->patient_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -2363,6 +2401,23 @@ class RadiologyRequestsList extends RadiologyRequests
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
+            $patient_visits = new PatientVisitsList();
+            $rsmaster = $patient_visits->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($patient_visits);
+                    $patient_visits->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2380,6 +2435,90 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Call Page Exported server event
         $this->pageExported($doc);
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Update URL
+            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
+            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
+            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
+            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
+            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
+
+            // Set up Breadcrumb
+            if (!$this->isExport()) {
+                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
+            }
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_visits") {
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

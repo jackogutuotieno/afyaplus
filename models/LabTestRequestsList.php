@@ -1412,20 +1412,6 @@ class LabTestRequestsList extends LabTestRequests
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
-        // "detail_lab_test_requests_queue"
-        $item = &$this->ListOptions->add("detail_lab_test_requests_queue");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests_queue');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_lab_test_reports"
-        $item = &$this->ListOptions->add("detail_lab_test_reports");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_reports');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $item = &$this->ListOptions->add("details");
@@ -1439,8 +1425,6 @@ class LabTestRequestsList extends LabTestRequests
         // Set up detail pages
         $pages = new SubPages();
         $pages->add("lab_test_requests_details");
-        $pages->add("lab_test_requests_queue");
-        $pages->add("lab_test_reports");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1621,82 +1605,6 @@ class LabTestRequestsList extends LabTestRequests
                 $opt->Visible = false;
             }
         }
-
-        // "detail_lab_test_requests_queue"
-        $opt = $this->ListOptions["detail_lab_test_requests_queue"];
-        if ($Security->allowList(CurrentProjectID() . 'lab_test_requests_queue') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("lab_test_requests_queue", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("labtestrequestsqueuelist?" . Config("TABLE_SHOW_MASTER") . "=lab_test_requests&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("LabTestRequestsQueueGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'lab_test_requests')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests_queue");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "lab_test_requests_queue";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'lab_test_requests')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests_queue");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "lab_test_requests_queue";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_lab_test_reports"
-        $opt = $this->ListOptions["detail_lab_test_reports"];
-        if ($Security->allowList(CurrentProjectID() . 'lab_test_reports') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("lab_test_reports", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("labtestreportslist?" . Config("TABLE_SHOW_MASTER") . "=lab_test_requests&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("LabTestReportsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'lab_test_requests')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_reports");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "lab_test_reports";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'lab_test_requests')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_reports");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "lab_test_reports";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
             $links = "";
@@ -1764,30 +1672,6 @@ class LabTestRequestsList extends LabTestRequests
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "lab_test_requests_details";
-        }
-        $item = &$option->add("detailadd_lab_test_requests_queue");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests_queue");
-        $detailPage = Container("LabTestRequestsQueueGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'lab_test_requests') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "lab_test_requests_queue";
-        }
-        $item = &$option->add("detailadd_lab_test_reports");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_reports");
-        $detailPage = Container("LabTestReportsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'lab_test_requests') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "lab_test_reports";
         }
 
         // Add multiple details

@@ -1,4 +1,4 @@
-<ew-language date="2024/11/24" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/25" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -477,21 +477,21 @@
       </field>
     </table>
     <table id="lab_specimens">
-      <phrase id="tblcaption" value="lab specimens" />
+      <phrase id="tblcaption" value="Specimens" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Specimen ID" />
       </field>
       <field id="specimen">
-        <phrase id="fldcaption" value="specimen" />
+        <phrase id="fldcaption" value="Specimen" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="lab_test_reports">
@@ -580,17 +580,25 @@
       <field id="id">
         <phrase id="fldcaption" value="S/No" />
       </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="Request ID" />
+      <field id="lab_test_requests_detail_id">
+        <phrase id="fldcaption" value="Test Item No." />
+        <phrase id="custommsg" value="The test item has already been queued" />
       </field>
       <field id="time">
-        <phrase id="fldcaption" value="time" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="waiting_time">
         <phrase id="fldcaption" value="Waiting Time" />
+        <phrase id="custommsg" value="Enter an integer (e.g 45)" />
       </field>
       <field id="waiting_interval">
         <phrase id="fldcaption" value="Waiting Interval" />
+        <phrase id="fldtagvalue1" value="Minutes" />
+        <phrase id="fldtagcaption1" value="Minutes" />
+        <phrase id="fldtagvalue2" value="Hours" />
+        <phrase id="fldtagcaption2" value="Hours" />
+        <phrase id="fldtagvalue3" value="Days" />
+        <phrase id="fldtagcaption3" value="Days" />
       </field>
       <field id="status">
         <phrase id="fldcaption" value="Status" />

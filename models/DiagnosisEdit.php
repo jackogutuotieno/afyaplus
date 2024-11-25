@@ -585,6 +585,9 @@ class DiagnosisEdit extends Diagnosis
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -635,7 +638,7 @@ class DiagnosisEdit extends Diagnosis
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "diagnosislist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -1008,10 +1011,16 @@ class DiagnosisEdit extends Diagnosis
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            } else {
+                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+                }
             }
 
             // visit_id
@@ -1269,6 +1278,9 @@ class DiagnosisEdit extends Diagnosis
         $rsnew = [];
 
         // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->ReadOnly = true;
+        }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
         // visit_id
@@ -1324,6 +1336,79 @@ class DiagnosisEdit extends Diagnosis
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->CurrentValue = $row['date_updated'];
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_visits") {
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

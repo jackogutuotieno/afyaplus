@@ -56,9 +56,6 @@ $Page->showMessage();
 <?php if ($Page->specimen->Visible) { // specimen ?>
         <th class="<?= $Page->specimen->headerCellClass() ?>"><span id="elh_lab_specimens_specimen" class="lab_specimens_specimen"><?= $Page->specimen->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_lab_specimens_created_by_user_id" class="lab_specimens_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_lab_specimens_date_created" class="lab_specimens_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -99,14 +96,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->specimen->viewAttributes() ?>>
 <?= $Page->specimen->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

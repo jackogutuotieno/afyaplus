@@ -74,6 +74,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -91,11 +95,17 @@ loadjs.ready("head", function () {
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_prescriptions_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->patient_id->getDisplayValue($Page->patient_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_prescriptions_patient_id">
 <input type="<?= $Page->patient_id->getInputTextType() ?>" name="x_patient_id" id="x_patient_id" data-table="prescriptions" data-field="x_patient_id" value="<?= $Page->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
 <?= $Page->patient_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

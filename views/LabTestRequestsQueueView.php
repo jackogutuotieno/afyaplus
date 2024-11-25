@@ -62,24 +62,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->time->Visible) { // time ?>
-    <tr id="r_time"<?= $Page->time->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_time"><?= $Page->time->caption() ?></span></td>
-        <td data-name="time"<?= $Page->time->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_time">
-<span<?= $Page->time->viewAttributes() ?>>
-<?= $Page->time->getViewValue() ?></span>
+<?php if ($Page->lab_test_requests_detail_id->Visible) { // lab_test_requests_detail_id ?>
+    <tr id="r_lab_test_requests_detail_id"<?= $Page->lab_test_requests_detail_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_lab_test_requests_detail_id"><?= $Page->lab_test_requests_detail_id->caption() ?></span></td>
+        <td data-name="lab_test_requests_detail_id"<?= $Page->lab_test_requests_detail_id->cellAttributes() ?>>
+<span id="el_lab_test_requests_queue_lab_test_requests_detail_id">
+<span<?= $Page->lab_test_requests_detail_id->viewAttributes() ?>>
+<?= $Page->lab_test_requests_detail_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -102,28 +91,6 @@ loadjs.ready("head", function () {
 <span id="el_lab_test_requests_queue_created_by_user_id">
 <span<?= $Page->created_by_user_id->viewAttributes() ?>>
 <?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_date_created"><?= $Page->date_created->caption() ?></span></td>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     </tr>

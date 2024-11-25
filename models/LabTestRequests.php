@@ -485,14 +485,6 @@ class LabTestRequests extends DbTable
             $detailUrl = Container("lab_test_requests_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        if ($this->getCurrentDetailTable() == "lab_test_requests_queue") {
-            $detailUrl = Container("lab_test_requests_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "lab_test_reports") {
-            $detailUrl = Container("lab_test_reports")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
         if ($detailUrl == "") {
             $detailUrl = "labtestrequestslist";
         }
@@ -898,6 +890,33 @@ class LabTestRequests extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
+        // Cascade Update detail table 'lab_test_requests_details'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'lab_test_request_id'
+            $cascadeUpdate = true;
+            $rscascade['lab_test_request_id'] = $rs['id'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("lab_test_requests_details")->loadRs("`lab_test_request_id` = " . QuotedValue($rsold['id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("lab_test_requests_details")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("lab_test_requests_details")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("lab_test_requests_details")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
@@ -946,6 +965,30 @@ class LabTestRequests extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
+
+        // Cascade delete detail table 'lab_test_requests_details'
+        $dtlrows = Container("lab_test_requests_details")->loadRs("`lab_test_request_id` = " . QuotedValue($rs['id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("lab_test_requests_details")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("lab_test_requests_details")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("lab_test_requests_details")->rowDeleted($dtlrow);
+            }
+        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();

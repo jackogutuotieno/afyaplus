@@ -164,14 +164,15 @@ class LabSpecimens extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->Sortable = false; // Allow sort
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -180,10 +181,10 @@ class LabSpecimens extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -196,7 +197,7 @@ class LabSpecimens extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -206,10 +207,10 @@ class LabSpecimens extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -222,7 +223,7 @@ class LabSpecimens extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -1141,6 +1142,7 @@ class LabSpecimens extends DbTable
         // specimen
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1212,12 +1214,6 @@ class LabSpecimens extends DbTable
         $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1259,13 +1255,11 @@ class LabSpecimens extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->specimen);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->specimen);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1296,13 +1290,11 @@ class LabSpecimens extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->specimen);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->specimen);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }

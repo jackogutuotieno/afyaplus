@@ -361,7 +361,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["invoice_details","invoice_details","invoice details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicedetailslist"],
     ["invoice_reports","invoice_reports","invoice reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportslist"],
     ["invoices","invoices","invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoiceslist"],
-    ["lab_specimens","lab_specimens","lab specimens",true,"{32536B8D-F37B-4419-80D5-260932800712}","labspecimenslist"],
+    ["lab_specimens","lab_specimens","Specimens",true,"{32536B8D-F37B-4419-80D5-260932800712}","labspecimenslist"],
     ["lab_test_reports","lab_test_reports","Test Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestreportslist"],
     ["lab_test_requests","lab_test_requests","Laboratory Requests",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestrequestslist"],
     ["lab_test_requests_details","lab_test_requests_details","Test Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestrequestsdetailslist"],

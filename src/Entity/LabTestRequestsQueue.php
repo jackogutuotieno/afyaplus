@@ -33,8 +33,8 @@ class LabTestRequestsQueue extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "lab_test_request_id", type: "integer")]
-    private int $labTestRequestId;
+    #[Column(name: "lab_test_requests_detail_id", type: "integer")]
+    private int $labTestRequestsDetailId;
 
     #[Column(name: "waiting_time", type: "integer")]
     private int $waitingTime;
@@ -65,14 +65,14 @@ class LabTestRequestsQueue extends AbstractEntity
         return $this;
     }
 
-    public function getLabTestRequestId(): int
+    public function getLabTestRequestsDetailId(): int
     {
-        return $this->labTestRequestId;
+        return $this->labTestRequestsDetailId;
     }
 
-    public function setLabTestRequestId(int $value): static
+    public function setLabTestRequestsDetailId(int $value): static
     {
-        $this->labTestRequestId = $value;
+        $this->labTestRequestsDetailId = $value;
         return $this;
     }
 

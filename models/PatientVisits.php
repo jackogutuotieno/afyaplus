@@ -546,6 +546,18 @@ class PatientVisits extends DbTable
             $detailUrl = Container("doctor_notes")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "diagnosis") {
+            $detailUrl = Container("diagnosis")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "prescriptions") {
+            $detailUrl = Container("prescriptions")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "radiology_requests") {
+            $detailUrl = Container("radiology_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
         if ($this->getCurrentDetailTable() == "lab_test_requests") {
             $detailUrl = Container("lab_test_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
@@ -955,6 +967,33 @@ class PatientVisits extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
+        // Cascade Update detail table 'lab_test_requests'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['patient_id']) && $rsold['patient_id'] != $rs['patient_id'])) { // Update detail field 'patient_id'
+            $cascadeUpdate = true;
+            $rscascade['patient_id'] = $rs['patient_id'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("lab_test_requests")->loadRs("`patient_id` = " . QuotedValue($rsold['patient_id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("lab_test_requests")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("lab_test_requests")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("lab_test_requests")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
@@ -1003,6 +1042,30 @@ class PatientVisits extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
+
+        // Cascade delete detail table 'lab_test_requests'
+        $dtlrows = Container("lab_test_requests")->loadRs("`patient_id` = " . QuotedValue($rs['patient_id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("lab_test_requests")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("lab_test_requests")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("lab_test_requests")->rowDeleted($dtlrow);
+            }
+        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();

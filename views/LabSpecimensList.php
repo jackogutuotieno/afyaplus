@@ -163,9 +163,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->specimen->Visible) { // specimen ?>
         <th data-name="specimen" class="<?= $Page->specimen->headerCellClass() ?>"><div id="elh_lab_specimens_specimen" class="lab_specimens_specimen"><?= $Page->renderFieldHeader($Page->specimen) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_lab_specimens_created_by_user_id" class="lab_specimens_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_lab_specimens_date_created" class="lab_specimens_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -213,14 +210,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_specimens_specimen" class="el_lab_specimens_specimen">
 <span<?= $Page->specimen->viewAttributes() ?>>
 <?= $Page->specimen->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_specimens_created_by_user_id" class="el_lab_specimens_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -557,10 +557,6 @@ class LabTestReportsAdd extends LabTestReports
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
-        // Set up master/detail parameters
-        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
-        $this->setupMasterParms();
-
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -605,7 +601,7 @@ class LabTestReportsAdd extends LabTestReports
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
+                    if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "labtestreportslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -924,16 +920,10 @@ class LabTestReportsAdd extends LabTestReports
         } elseif ($this->RowType == RowType::ADD) {
             // lab_test_request_id
             $this->lab_test_request_id->setupEditAttributes();
-            if ($this->lab_test_request_id->getSessionValue() != "") {
-                $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-            } else {
-                $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-                if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-                    $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
-                }
+            $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
+            if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
+                $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
             }
 
             // report_title
@@ -1075,28 +1065,6 @@ class LabTestReportsAdd extends LabTestReports
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->CurrentValue;
-            $masterTable = Container("lab_test_requests");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_requests") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1189,78 +1157,6 @@ class LabTestReportsAdd extends LabTestReports
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_requests") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_requests");
-                if (($parm = Get("fk_id", Get("lab_test_request_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_request_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->QueryStringValue);
-                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_requests") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_requests");
-                if (($parm = Post("fk_id", Post("lab_test_request_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_request_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_request_id->setSessionValue($this->lab_test_request_id->FormValue);
-                    $foreignKeys["lab_test_request_id"] = $this->lab_test_request_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "lab_test_requests") {
-                if (!array_key_exists("lab_test_request_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_request_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

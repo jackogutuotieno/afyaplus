@@ -147,7 +147,7 @@ class LabSpecimensList extends LabSpecimens
     {
         $this->id->setVisibility();
         $this->specimen->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -456,6 +456,9 @@ class LabSpecimensList extends LabSpecimens
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
         }
     }
 
@@ -1254,7 +1257,6 @@ class LabSpecimensList extends LabSpecimens
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->specimen); // specimen
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1315,12 +1317,6 @@ class LabSpecimensList extends LabSpecimens
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1408,19 +1404,6 @@ class LabSpecimensList extends LabSpecimens
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"lab_specimens\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"lab_specimens\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1522,7 +1505,6 @@ class LabSpecimensList extends LabSpecimens
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "specimen");
-            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2024,6 +2006,7 @@ class LabSpecimensList extends LabSpecimens
         // specimen
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -2036,10 +2019,6 @@ class LabSpecimensList extends LabSpecimens
 
             // specimen
             $this->specimen->ViewValue = $this->specimen->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2056,10 +2035,6 @@ class LabSpecimensList extends LabSpecimens
             // specimen
             $this->specimen->HrefValue = "";
             $this->specimen->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2502,7 +2477,10 @@ class LabSpecimensList extends LabSpecimens
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add specimen");
     }
 
     // Page Unload event
