@@ -1015,8 +1015,11 @@
       <field id="section">
         <phrase id="fldcaption" value="Status" />
       </field>
+      <field id="checkin_date">
+        <phrase id="fldcaption" value="Check-In Date" />
+      </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Check In Time" />
+        <phrase id="fldcaption" value="Check-In Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

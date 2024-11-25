@@ -139,6 +139,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->checkin_date->Visible) { // checkin_date ?>
+    <tr id="r_checkin_date"<?= $Page->checkin_date->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_visits_checkin_date"><?= $Page->checkin_date->caption() ?></span></td>
+        <td data-name="checkin_date"<?= $Page->checkin_date->cellAttributes() ?>>
+<span id="el_patient_visits_checkin_date">
+<span<?= $Page->checkin_date->viewAttributes() ?>>
+<?= $Page->checkin_date->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <?php
     if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {

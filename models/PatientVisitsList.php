@@ -153,6 +153,7 @@ class PatientVisitsList extends PatientVisits
         $this->payment_method_id->Visible = false;
         $this->medical_scheme_id->Visible = false;
         $this->section->setVisibility();
+        $this->checkin_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -1089,6 +1090,7 @@ class PatientVisitsList extends PatientVisits
         $filterList = Concat($filterList, $this->payment_method_id->AdvancedSearch->toJson(), ","); // Field payment_method_id
         $filterList = Concat($filterList, $this->medical_scheme_id->AdvancedSearch->toJson(), ","); // Field medical_scheme_id
         $filterList = Concat($filterList, $this->section->AdvancedSearch->toJson(), ","); // Field section
+        $filterList = Concat($filterList, $this->checkin_date->AdvancedSearch->toJson(), ","); // Field checkin_date
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1193,6 +1195,14 @@ class PatientVisitsList extends PatientVisits
         $this->section->AdvancedSearch->SearchValue2 = @$filter["y_section"];
         $this->section->AdvancedSearch->SearchOperator2 = @$filter["w_section"];
         $this->section->AdvancedSearch->save();
+
+        // Field checkin_date
+        $this->checkin_date->AdvancedSearch->SearchValue = @$filter["x_checkin_date"];
+        $this->checkin_date->AdvancedSearch->SearchOperator = @$filter["z_checkin_date"];
+        $this->checkin_date->AdvancedSearch->SearchCondition = @$filter["v_checkin_date"];
+        $this->checkin_date->AdvancedSearch->SearchValue2 = @$filter["y_checkin_date"];
+        $this->checkin_date->AdvancedSearch->SearchOperator2 = @$filter["w_checkin_date"];
+        $this->checkin_date->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1331,6 +1341,7 @@ class PatientVisitsList extends PatientVisits
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->_title); // title
             $this->updateSort($this->section); // section
+            $this->updateSort($this->checkin_date); // checkin_date
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1372,6 +1383,7 @@ class PatientVisitsList extends PatientVisits
                 $this->payment_method_id->setSort("");
                 $this->medical_scheme_id->setSort("");
                 $this->section->setSort("");
+                $this->checkin_date->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1835,6 +1847,7 @@ class PatientVisitsList extends PatientVisits
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "title");
             $this->createColumnOption($option, "section");
+            $this->createColumnOption($option, "checkin_date");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -2282,6 +2295,7 @@ class PatientVisitsList extends PatientVisits
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->section->setDbValue($row['section']);
+        $this->checkin_date->setDbValue($row['checkin_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2298,6 +2312,7 @@ class PatientVisitsList extends PatientVisits
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['checkin_date'] = $this->checkin_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2355,6 +2370,8 @@ class PatientVisitsList extends PatientVisits
         // medical_scheme_id
 
         // section
+
+        // checkin_date
 
         // date_created
 
@@ -2487,6 +2504,10 @@ class PatientVisitsList extends PatientVisits
             // section
             $this->section->ViewValue = $this->section->CurrentValue;
 
+            // checkin_date
+            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
+            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2506,6 +2527,10 @@ class PatientVisitsList extends PatientVisits
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
+            $this->checkin_date->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

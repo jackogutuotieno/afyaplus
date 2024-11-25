@@ -143,6 +143,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->payment_method_id->Visible = false;
         $this->medical_scheme_id->Visible = false;
         $this->section->setVisibility();
+        $this->checkin_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -1127,6 +1128,14 @@ class PatientVisitsGrid extends PatientVisits
             return false;
         }
         if (
+            $CurrentForm->hasValue("x_checkin_date") &&
+            $CurrentForm->hasValue("o_checkin_date") &&
+            $this->checkin_date->CurrentValue != $this->checkin_date->DefaultValue &&
+            !($this->checkin_date->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->checkin_date->CurrentValue == $this->checkin_date->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
             $CurrentForm->hasValue("x_date_created") &&
             $CurrentForm->hasValue("o_date_created") &&
             $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
@@ -1725,6 +1734,20 @@ class PatientVisitsGrid extends PatientVisits
             $this->section->setOldValue($CurrentForm->getValue("o_section"));
         }
 
+        // Check field name 'checkin_date' first before field var 'x_checkin_date'
+        $val = $CurrentForm->hasValue("checkin_date") ? $CurrentForm->getValue("checkin_date") : $CurrentForm->getValue("x_checkin_date");
+        if (!$this->checkin_date->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->checkin_date->Visible = false; // Disable update for API request
+            } else {
+                $this->checkin_date->setFormValue($val, true, $validate);
+            }
+            $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_checkin_date")) {
+            $this->checkin_date->setOldValue($CurrentForm->getValue("o_checkin_date"));
+        }
+
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -1756,6 +1779,8 @@ class PatientVisitsGrid extends PatientVisits
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->_title->CurrentValue = $this->_title->FormValue;
         $this->section->CurrentValue = $this->section->FormValue;
+        $this->checkin_date->CurrentValue = $this->checkin_date->FormValue;
+        $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
     }
@@ -1861,6 +1886,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->section->setDbValue($row['section']);
+        $this->checkin_date->setDbValue($row['checkin_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1877,6 +1903,7 @@ class PatientVisitsGrid extends PatientVisits
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['checkin_date'] = $this->checkin_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1932,6 +1959,8 @@ class PatientVisitsGrid extends PatientVisits
         // medical_scheme_id
 
         // section
+
+        // checkin_date
 
         // date_created
 
@@ -2064,6 +2093,10 @@ class PatientVisitsGrid extends PatientVisits
             // section
             $this->section->ViewValue = $this->section->CurrentValue;
 
+            // checkin_date
+            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
+            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2083,6 +2116,10 @@ class PatientVisitsGrid extends PatientVisits
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
+            $this->checkin_date->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2157,6 +2194,11 @@ class PatientVisitsGrid extends PatientVisits
             $this->section->EditValue = HtmlEncode($this->section->CurrentValue);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+            // checkin_date
+            $this->checkin_date->setupEditAttributes();
+            $this->checkin_date->EditValue = HtmlEncode(FormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()));
+            $this->checkin_date->PlaceHolder = RemoveHtml($this->checkin_date->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2172,6 +2214,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // section
             $this->section->HrefValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2245,6 +2290,11 @@ class PatientVisitsGrid extends PatientVisits
             $this->section->EditValue = HtmlEncode($this->section->CurrentValue);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+            // checkin_date
+            $this->checkin_date->setupEditAttributes();
+            $this->checkin_date->EditValue = HtmlEncode(FormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()));
+            $this->checkin_date->PlaceHolder = RemoveHtml($this->checkin_date->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2260,6 +2310,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // section
             $this->section->HrefValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2298,6 +2351,14 @@ class PatientVisitsGrid extends PatientVisits
                 if (!$this->section->IsDetailKey && EmptyValue($this->section->FormValue)) {
                     $this->section->addErrorMessage(str_replace("%s", $this->section->caption(), $this->section->RequiredErrorMessage));
                 }
+            }
+            if ($this->checkin_date->Visible && $this->checkin_date->Required) {
+                if (!$this->checkin_date->IsDetailKey && EmptyValue($this->checkin_date->FormValue)) {
+                    $this->checkin_date->addErrorMessage(str_replace("%s", $this->checkin_date->caption(), $this->checkin_date->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->checkin_date->FormValue, $this->checkin_date->formatPattern())) {
+                $this->checkin_date->addErrorMessage($this->checkin_date->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -2487,6 +2548,9 @@ class PatientVisitsGrid extends PatientVisits
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, $this->section->ReadOnly);
 
+        // checkin_date
+        $this->checkin_date->setDbValueDef($rsnew, UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()), $this->checkin_date->ReadOnly);
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
         return $rsnew;
@@ -2506,6 +2570,9 @@ class PatientVisitsGrid extends PatientVisits
         }
         if (isset($row['section'])) { // section
             $this->section->CurrentValue = $row['section'];
+        }
+        if (isset($row['checkin_date'])) { // checkin_date
+            $this->checkin_date->CurrentValue = $row['checkin_date'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -2596,6 +2663,9 @@ class PatientVisitsGrid extends PatientVisits
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, strval($this->section->CurrentValue) == "");
 
+        // checkin_date
+        $this->checkin_date->setDbValueDef($rsnew, UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()), false);
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
         return $rsnew;
@@ -2615,6 +2685,9 @@ class PatientVisitsGrid extends PatientVisits
         }
         if (isset($row['section'])) { // section
             $this->section->setFormValue($row['section']);
+        }
+        if (isset($row['checkin_date'])) { // checkin_date
+            $this->checkin_date->setFormValue($row['checkin_date']);
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);

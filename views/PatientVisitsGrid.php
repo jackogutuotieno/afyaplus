@@ -26,6 +26,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["_title", [fields._title.visible && fields._title.required ? ew.Validators.required(fields._title.caption) : null], fields._title.isInvalid],
             ["section", [fields.section.visible && fields.section.required ? ew.Validators.required(fields.section.caption) : null], fields.section.isInvalid],
+            ["checkin_date", [fields.checkin_date.visible && fields.checkin_date.required ? ew.Validators.required(fields.checkin_date.caption) : null, ew.Validators.datetime(fields.checkin_date.clientFormatPattern)], fields.checkin_date.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
@@ -33,7 +34,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["_title",false],["section",false],["date_created",false]];
+                    fields = [["patient_id",false],["_title",false],["section",false],["checkin_date",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -96,6 +97,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->section->Visible) { // section ?>
         <th data-name="section" class="<?= $Grid->section->headerCellClass() ?>"><div id="elh_patient_visits_section" class="patient_visits_section"><?= $Grid->renderFieldHeader($Grid->section) ?></div></th>
+<?php } ?>
+<?php if ($Grid->checkin_date->Visible) { // checkin_date ?>
+        <th data-name="checkin_date" class="<?= $Grid->checkin_date->headerCellClass() ?>"><div id="elh_patient_visits_checkin_date" class="patient_visits_checkin_date"><?= $Grid->renderFieldHeader($Grid->checkin_date) ?></div></th>
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
@@ -297,6 +301,91 @@ loadjs.ready("fpatient_visitsgrid", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->checkin_date->Visible) { // checkin_date ?>
+        <td data-name="checkin_date"<?= $Grid->checkin_date->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_checkin_date" class="el_patient_visits_checkin_date">
+<input type="<?= $Grid->checkin_date->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_checkin_date" id="x<?= $Grid->RowIndex ?>_checkin_date" data-table="patient_visits" data-field="x_checkin_date" value="<?= $Grid->checkin_date->EditValue ?>" placeholder="<?= HtmlEncode($Grid->checkin_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->checkin_date->formatPattern()) ?>"<?= $Grid->checkin_date->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->checkin_date->getErrorMessage() ?></div>
+<?php if (!$Grid->checkin_date->ReadOnly && !$Grid->checkin_date->Disabled && !isset($Grid->checkin_date->EditAttrs["readonly"]) && !isset($Grid->checkin_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(7) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fpatient_visitsgrid", "x<?= $Grid->RowIndex ?>_checkin_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="patient_visits" data-field="x_checkin_date" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_checkin_date" id="o<?= $Grid->RowIndex ?>_checkin_date" value="<?= HtmlEncode($Grid->checkin_date->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_checkin_date" class="el_patient_visits_checkin_date">
+<input type="<?= $Grid->checkin_date->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_checkin_date" id="x<?= $Grid->RowIndex ?>_checkin_date" data-table="patient_visits" data-field="x_checkin_date" value="<?= $Grid->checkin_date->EditValue ?>" placeholder="<?= HtmlEncode($Grid->checkin_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->checkin_date->formatPattern()) ?>"<?= $Grid->checkin_date->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->checkin_date->getErrorMessage() ?></div>
+<?php if (!$Grid->checkin_date->ReadOnly && !$Grid->checkin_date->Disabled && !isset($Grid->checkin_date->EditAttrs["readonly"]) && !isset($Grid->checkin_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(7) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fpatient_visitsgrid", "x<?= $Grid->RowIndex ?>_checkin_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_checkin_date" class="el_patient_visits_checkin_date">
+<span<?= $Grid->checkin_date->viewAttributes() ?>>
+<?= $Grid->checkin_date->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patient_visits" data-field="x_checkin_date" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_checkin_date" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_checkin_date" value="<?= HtmlEncode($Grid->checkin_date->FormValue) ?>">
+<input type="hidden" data-table="patient_visits" data-field="x_checkin_date" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_checkin_date" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_checkin_date" value="<?= HtmlEncode($Grid->checkin_date->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Grid->date_created->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -306,7 +395,7 @@ loadjs.ready("fpatient_visitsgrid", function() {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -342,7 +431,7 @@ loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_visitsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

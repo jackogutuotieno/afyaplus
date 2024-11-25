@@ -129,6 +129,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->payment_method_id->setVisibility();
         $this->medical_scheme_id->setVisibility();
         $this->section->Visible = false;
+        $this->checkin_date->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -769,6 +770,17 @@ class PatientVisitsAdd extends PatientVisits
             }
         }
 
+        // Check field name 'checkin_date' first before field var 'x_checkin_date'
+        $val = $CurrentForm->hasValue("checkin_date") ? $CurrentForm->getValue("checkin_date") : $CurrentForm->getValue("x_checkin_date");
+        if (!$this->checkin_date->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->checkin_date->Visible = false; // Disable update for API request
+            } else {
+                $this->checkin_date->setFormValue($val, true, $validate);
+            }
+            $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -783,6 +795,8 @@ class PatientVisitsAdd extends PatientVisits
         $this->doctor_id->CurrentValue = $this->doctor_id->FormValue;
         $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
+        $this->checkin_date->CurrentValue = $this->checkin_date->FormValue;
+        $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
     }
 
     /**
@@ -831,6 +845,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->section->setDbValue($row['section']);
+        $this->checkin_date->setDbValue($row['checkin_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -847,6 +862,7 @@ class PatientVisitsAdd extends PatientVisits
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['checkin_date'] = $this->checkin_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -906,6 +922,9 @@ class PatientVisitsAdd extends PatientVisits
 
         // section
         $this->section->RowCssClass = "row";
+
+        // checkin_date
+        $this->checkin_date->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -1040,6 +1059,10 @@ class PatientVisitsAdd extends PatientVisits
             // section
             $this->section->ViewValue = $this->section->CurrentValue;
 
+            // checkin_date
+            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
+            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1065,6 +1088,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -1235,6 +1261,11 @@ class PatientVisitsAdd extends PatientVisits
             }
             $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
+            // checkin_date
+            $this->checkin_date->setupEditAttributes();
+            $this->checkin_date->EditValue = HtmlEncode(FormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()));
+            $this->checkin_date->PlaceHolder = RemoveHtml($this->checkin_date->caption());
+
             // Add refer script
 
             // patient_id
@@ -1254,6 +1285,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1304,6 +1338,14 @@ class PatientVisitsAdd extends PatientVisits
                 if (!$this->medical_scheme_id->IsDetailKey && EmptyValue($this->medical_scheme_id->FormValue)) {
                     $this->medical_scheme_id->addErrorMessage(str_replace("%s", $this->medical_scheme_id->caption(), $this->medical_scheme_id->RequiredErrorMessage));
                 }
+            }
+            if ($this->checkin_date->Visible && $this->checkin_date->Required) {
+                if (!$this->checkin_date->IsDetailKey && EmptyValue($this->checkin_date->FormValue)) {
+                    $this->checkin_date->addErrorMessage(str_replace("%s", $this->checkin_date->caption(), $this->checkin_date->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->checkin_date->FormValue, $this->checkin_date->formatPattern())) {
+                $this->checkin_date->addErrorMessage($this->checkin_date->getErrorMessage(false));
             }
 
         // Validate detail grid
@@ -1486,6 +1528,9 @@ class PatientVisitsAdd extends PatientVisits
 
         // medical_scheme_id
         $this->medical_scheme_id->setDbValueDef($rsnew, $this->medical_scheme_id->CurrentValue, false);
+
+        // checkin_date
+        $this->checkin_date->setDbValueDef($rsnew, UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()), false);
         return $rsnew;
     }
 
@@ -1512,6 +1557,9 @@ class PatientVisitsAdd extends PatientVisits
         }
         if (isset($row['medical_scheme_id'])) { // medical_scheme_id
             $this->medical_scheme_id->setFormValue($row['medical_scheme_id']);
+        }
+        if (isset($row['checkin_date'])) { // checkin_date
+            $this->checkin_date->setFormValue($row['checkin_date']);
         }
     }
 

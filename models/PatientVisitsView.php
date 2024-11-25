@@ -147,6 +147,7 @@ class PatientVisitsView extends PatientVisits
         $this->payment_method_id->setVisibility();
         $this->medical_scheme_id->setVisibility();
         $this->section->setVisibility();
+        $this->checkin_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -986,6 +987,7 @@ class PatientVisitsView extends PatientVisits
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->section->setDbValue($row['section']);
+        $this->checkin_date->setDbValue($row['checkin_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1002,6 +1004,7 @@ class PatientVisitsView extends PatientVisits
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['checkin_date'] = $this->checkin_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1040,6 +1043,8 @@ class PatientVisitsView extends PatientVisits
         // medical_scheme_id
 
         // section
+
+        // checkin_date
 
         // date_created
 
@@ -1172,6 +1177,10 @@ class PatientVisitsView extends PatientVisits
             // section
             $this->section->ViewValue = $this->section->CurrentValue;
 
+            // checkin_date
+            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
+            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1211,6 +1220,10 @@ class PatientVisitsView extends PatientVisits
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // checkin_date
+            $this->checkin_date->HrefValue = "";
+            $this->checkin_date->TooltipValue = "";
         }
 
         // Call Row Rendered event

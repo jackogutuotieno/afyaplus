@@ -54,6 +54,7 @@ class PatientVisits extends DbTable
     public $payment_method_id;
     public $medical_scheme_id;
     public $section;
+    public $checkin_date;
     public $date_created;
     public $date_updated;
 
@@ -328,16 +329,41 @@ class PatientVisits extends DbTable
         $this->section->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['section'] = &$this->section;
 
+        // checkin_date
+        $this->checkin_date = new DbField(
+            $this, // Table
+            'x_checkin_date', // Variable name
+            'checkin_date', // Name
+            '(SELECT date_created from patient_visits)', // Expression
+            CastDateFieldForLike("(SELECT date_created from patient_visits)", 7, "DB"), // Basic search expression
+            135, // Type
+            76, // Size
+            7, // Date/Time format
+            false, // Is upload field
+            '(SELECT date_created from patient_visits)', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->checkin_date->InputTextType = "text";
+        $this->checkin_date->Raw = true;
+        $this->checkin_date->IsCustom = true; // Custom field
+        $this->checkin_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->checkin_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['checkin_date'] = &$this->checkin_date;
+
         // date_created
         $this->date_created = new DbField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            11, // Date/Time format
+            3, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -350,7 +376,7 @@ class PatientVisits extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -587,20 +613,7 @@ class PatientVisits extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, (SELECT date_created from patient_visits) AS `checkin_date`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -1073,6 +1086,7 @@ class PatientVisits extends DbTable
         $this->payment_method_id->DbValue = $row['payment_method_id'];
         $this->medical_scheme_id->DbValue = $row['medical_scheme_id'];
         $this->section->DbValue = $row['section'];
+        $this->checkin_date->DbValue = $row['checkin_date'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1447,6 +1461,7 @@ class PatientVisits extends DbTable
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->section->setDbValue($row['section']);
+        $this->checkin_date->setDbValue($row['checkin_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1494,6 +1509,8 @@ class PatientVisits extends DbTable
         // medical_scheme_id
 
         // section
+
+        // checkin_date
 
         // date_created
 
@@ -1624,6 +1641,10 @@ class PatientVisits extends DbTable
         // section
         $this->section->ViewValue = $this->section->CurrentValue;
 
+        // checkin_date
+        $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
+        $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1663,6 +1684,10 @@ class PatientVisits extends DbTable
         // section
         $this->section->HrefValue = "";
         $this->section->TooltipValue = "";
+
+        // checkin_date
+        $this->checkin_date->HrefValue = "";
+        $this->checkin_date->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1752,6 +1777,11 @@ class PatientVisits extends DbTable
         $this->section->EditValue = $this->section->CurrentValue;
         $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+        // checkin_date
+        $this->checkin_date->setupEditAttributes();
+        $this->checkin_date->EditValue = FormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
+        $this->checkin_date->PlaceHolder = RemoveHtml($this->checkin_date->caption());
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1798,6 +1828,7 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
                     $doc->exportCaption($this->section);
+                    $doc->exportCaption($this->checkin_date);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
@@ -1807,6 +1838,7 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
                     $doc->exportCaption($this->section);
+                    $doc->exportCaption($this->checkin_date);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1843,6 +1875,7 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
                         $doc->exportField($this->section);
+                        $doc->exportField($this->checkin_date);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
@@ -1852,6 +1885,7 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
                         $doc->exportField($this->section);
+                        $doc->exportField($this->checkin_date);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }

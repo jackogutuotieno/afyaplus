@@ -179,6 +179,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->section->Visible) { // section ?>
         <th data-name="section" class="<?= $Page->section->headerCellClass() ?>"><div id="elh_patient_visits_section" class="patient_visits_section"><?= $Page->renderFieldHeader($Page->section) ?></div></th>
 <?php } ?>
+<?php if ($Page->checkin_date->Visible) { // checkin_date ?>
+        <th data-name="checkin_date" class="<?= $Page->checkin_date->headerCellClass() ?>"><div id="elh_patient_visits_checkin_date" class="patient_visits_checkin_date"><?= $Page->renderFieldHeader($Page->checkin_date) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -231,6 +234,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
 <span<?= $Page->section->viewAttributes() ?>>
 <?= $Page->section->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->checkin_date->Visible) { // checkin_date ?>
+        <td data-name="checkin_date"<?= $Page->checkin_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_checkin_date" class="el_patient_visits_checkin_date">
+<span<?= $Page->checkin_date->viewAttributes() ?>>
+<?= $Page->checkin_date->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

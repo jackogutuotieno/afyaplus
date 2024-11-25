@@ -27,7 +27,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["visit_type_id", [fields.visit_type_id.visible && fields.visit_type_id.required ? ew.Validators.required(fields.visit_type_id.caption) : null], fields.visit_type_id.isInvalid],
             ["doctor_id", [fields.doctor_id.visible && fields.doctor_id.required ? ew.Validators.required(fields.doctor_id.caption) : null], fields.doctor_id.isInvalid],
             ["payment_method_id", [fields.payment_method_id.visible && fields.payment_method_id.required ? ew.Validators.required(fields.payment_method_id.caption) : null], fields.payment_method_id.isInvalid],
-            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid]
+            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid],
+            ["checkin_date", [fields.checkin_date.visible && fields.checkin_date.required ? ew.Validators.required(fields.checkin_date.caption) : null, ew.Validators.datetime(fields.checkin_date.clientFormatPattern)], fields.checkin_date.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -322,6 +323,47 @@ loadjs.ready("fpatient_visitsadd", function() {
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_visits.fields.medical_scheme_id.selectOptions);
     ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->checkin_date->Visible) { // checkin_date ?>
+    <div id="r_checkin_date"<?= $Page->checkin_date->rowAttributes() ?>>
+        <label id="elh_patient_visits_checkin_date" for="x_checkin_date" class="<?= $Page->LeftColumnClass ?>"><?= $Page->checkin_date->caption() ?><?= $Page->checkin_date->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->checkin_date->cellAttributes() ?>>
+<span id="el_patient_visits_checkin_date">
+<input type="<?= $Page->checkin_date->getInputTextType() ?>" name="x_checkin_date" id="x_checkin_date" data-table="patient_visits" data-field="x_checkin_date" value="<?= $Page->checkin_date->EditValue ?>" placeholder="<?= HtmlEncode($Page->checkin_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->checkin_date->formatPattern()) ?>"<?= $Page->checkin_date->editAttributes() ?> aria-describedby="x_checkin_date_help">
+<?= $Page->checkin_date->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->checkin_date->getErrorMessage() ?></div>
+<?php if (!$Page->checkin_date->ReadOnly && !$Page->checkin_date->Disabled && !isset($Page->checkin_date->EditAttrs["readonly"]) && !isset($Page->checkin_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fpatient_visitsadd", "datetimepicker"], function () {
+    let format = "<?= DateFormat(7) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fpatient_visitsadd", "x_checkin_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
 });
 </script>
 <?php } ?>

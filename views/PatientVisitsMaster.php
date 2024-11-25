@@ -43,6 +43,17 @@ $patient_visits->TableClass = "table table-bordered table-hover table-sm ew-tabl
 </td>
         </tr>
 <?php } ?>
+<?php if ($patient_visits->checkin_date->Visible) { // checkin_date ?>
+        <tr id="r_checkin_date"<?= $patient_visits->checkin_date->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->checkin_date->caption() ?></td>
+            <td<?= $patient_visits->checkin_date->cellAttributes() ?>>
+<span id="el_patient_visits_checkin_date">
+<span<?= $patient_visits->checkin_date->viewAttributes() ?>>
+<?= $patient_visits->checkin_date->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patient_visits->date_created->Visible) { // date_created ?>
         <tr id="r_date_created"<?= $patient_visits->date_created->rowAttributes() ?>>
             <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->date_created->caption() ?></td>
