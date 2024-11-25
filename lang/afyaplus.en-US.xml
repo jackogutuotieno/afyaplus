@@ -983,7 +983,7 @@
         <phrase id="fldcaption" value="Submitted By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
+        <phrase id="fldcaption" value="Time Taken" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
