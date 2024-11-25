@@ -3225,4 +3225,12 @@ td button, .btn-primary  {
     font-weight: 700;
 }
 
+/* detail tables */
+.dropdown-item.ew-detail-view {
+	display: none;
+}
+.dropdown-toggle.ew-detail.ew-dropdown-toggle {
+	display: none;
+}
+
 /*END_USER_STYLES*/
