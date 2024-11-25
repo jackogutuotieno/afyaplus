@@ -24,11 +24,11 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
-            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
-            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null, ew.Validators.integer], fields.service_id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
+            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
+            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -37,7 +37,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["visit_id",false],["service_id",false],["status",false],["created_by_user_id",false],["date_created",false],["date_updated",false]];
+                    fields = [["patient_id",false],["visit_id",false],["service_id",false],["status",false],["date_created",false],["date_updated",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -57,6 +57,11 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
+            "visit_id": <?= $Grid->visit_id->toClientList($Grid) ?>,
+            "service_id": <?= $Grid->service_id->toClientList($Grid) ?>,
+            "status": <?= $Grid->status->toClientList($Grid) ?>,
+            "created_by_user_id": <?= $Grid->created_by_user_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -182,15 +187,83 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
-<input type="<?= $Grid->patient_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_patient_id" id="x<?= $Grid->RowIndex ?>_patient_id" data-table="patient_vaccinations" data-field="x_patient_id" value="<?= $Grid->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->patient_id->formatPattern()) ?>"<?= $Grid->patient_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_patient_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_id" id="o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
-<input type="<?= $Grid->patient_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_patient_id" id="x<?= $Grid->RowIndex ?>_patient_id" data-table="patient_vaccinations" data-field="x_patient_id" value="<?= $Grid->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->patient_id->formatPattern()) ?>"<?= $Grid->patient_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -210,12 +283,46 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->visit_id->getSessionValue() != "") { ?>
 <span<?= $Grid->visit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_visit_id"
+        name="x<?= $Grid->RowIndex ?>_visit_id"
+        class="form-select ew-select<?= $Grid->visit_id->isInvalidClass() ?>"
+        <?php if (!$Grid->visit_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_visit_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_visit_id"
+        data-value-separator="<?= $Grid->visit_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>"
+        <?= $Grid->visit_id->editAttributes() ?>>
+        <?= $Grid->visit_id->selectOptionListHtml("x{$Grid->RowIndex}_visit_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
+<?= $Grid->visit_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visit_id") ?>
+<?php if (!$Grid->visit_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_visit_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_visit_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.visit_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_visit_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_visit_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.visit_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_visit_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_visit_id" id="o<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->OldValue) ?>">
@@ -223,12 +330,46 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->visit_id->getSessionValue() != "") { ?>
 <span<?= $Grid->visit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_visit_id"
+        name="x<?= $Grid->RowIndex ?>_visit_id"
+        class="form-select ew-select<?= $Grid->visit_id->isInvalidClass() ?>"
+        <?php if (!$Grid->visit_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_visit_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_visit_id"
+        data-value-separator="<?= $Grid->visit_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>"
+        <?= $Grid->visit_id->editAttributes() ?>>
+        <?= $Grid->visit_id->selectOptionListHtml("x{$Grid->RowIndex}_visit_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
+<?= $Grid->visit_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visit_id") ?>
+<?php if (!$Grid->visit_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_visit_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_visit_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.visit_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_visit_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_visit_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.visit_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php } ?>
@@ -248,15 +389,83 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="service_id"<?= $Grid->service_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_service_id" class="el_patient_vaccinations_service_id">
-<input type="<?= $Grid->service_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_service_id" id="x<?= $Grid->RowIndex ?>_service_id" data-table="patient_vaccinations" data-field="x_service_id" value="<?= $Grid->service_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->service_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->service_id->formatPattern()) ?>"<?= $Grid->service_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->service_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_service_id"
+        name="x<?= $Grid->RowIndex ?>_service_id"
+        class="form-select ew-select<?= $Grid->service_id->isInvalidClass() ?>"
+        <?php if (!$Grid->service_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_service_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_service_id"
+        data-value-separator="<?= $Grid->service_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->service_id->getPlaceHolder()) ?>"
+        <?= $Grid->service_id->editAttributes() ?>>
+        <?= $Grid->service_id->selectOptionListHtml("x{$Grid->RowIndex}_service_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->service_id->getErrorMessage() ?></div>
+<?= $Grid->service_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_service_id") ?>
+<?php if (!$Grid->service_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_service_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_service_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.service_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_service_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_service_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.service_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_service_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_service_id" id="o<?= $Grid->RowIndex ?>_service_id" value="<?= HtmlEncode($Grid->service_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_service_id" class="el_patient_vaccinations_service_id">
-<input type="<?= $Grid->service_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_service_id" id="x<?= $Grid->RowIndex ?>_service_id" data-table="patient_vaccinations" data-field="x_service_id" value="<?= $Grid->service_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->service_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->service_id->formatPattern()) ?>"<?= $Grid->service_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->service_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_service_id"
+        name="x<?= $Grid->RowIndex ?>_service_id"
+        class="form-select ew-select<?= $Grid->service_id->isInvalidClass() ?>"
+        <?php if (!$Grid->service_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_service_id"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_service_id"
+        data-value-separator="<?= $Grid->service_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->service_id->getPlaceHolder()) ?>"
+        <?= $Grid->service_id->editAttributes() ?>>
+        <?= $Grid->service_id->selectOptionListHtml("x{$Grid->RowIndex}_service_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->service_id->getErrorMessage() ?></div>
+<?= $Grid->service_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_service_id") ?>
+<?php if (!$Grid->service_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_service_id", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_service_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.service_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_service_id", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_service_id", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.service_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -275,15 +484,81 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_status" class="el_patient_vaccinations_status">
-<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="patient_vaccinations" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_status" class="el_patient_vaccinations_status">
-<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="patient_vaccinations" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_vaccinations"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_vaccinationsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_vaccinationsgrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_vaccinationsgrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_vaccinationsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_vaccinationsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vaccinations.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -301,29 +576,9 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
         <td data-name="created_by_user_id"<?= $Grid->created_by_user_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
-<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="patient_vaccinations" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_created_by_user_id" class="el_patient_vaccinations_created_by_user_id">
-<input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="patient_vaccinations" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_created_by_user_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_created_by_user_id" id="o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
-<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="patient_vaccinations" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_created_by_user_id" class="el_patient_vaccinations_created_by_user_id">
-<input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="patient_vaccinations" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_created_by_user_id" class="el_patient_vaccinations_created_by_user_id">
@@ -346,7 +601,7 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -382,7 +637,7 @@ loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -431,7 +686,7 @@ loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -467,7 +722,7 @@ loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vaccinationsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

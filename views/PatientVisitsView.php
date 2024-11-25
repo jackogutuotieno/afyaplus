@@ -156,6 +156,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "PatientVitalsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vaccinations", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientVaccinationsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

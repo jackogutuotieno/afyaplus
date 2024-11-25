@@ -377,7 +377,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","appointments
     ["medicine_stock_report","medicine_stock_report","medicine stock report",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockreportlist"],
     ["medicine_suppliers","medicine_suppliers","medicine suppliers",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinesupplierslist"],
     ["patient_appointments","patient_appointments","Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientappointmentslist"],
-    ["patient_vaccinations","patient_vaccinations","patient vaccinations",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvaccinationslist"],
+    ["patient_vaccinations","patient_vaccinations","Vaccinations",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvaccinationslist"],
     ["patient_visits","patient_visits","Check-Ins",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvisitslist"],
     ["patient_vitals","patient_vitals","Vitals",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvitalslist"],
     ["patients","patients","Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientslist"],
