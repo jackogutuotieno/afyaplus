@@ -711,15 +711,13 @@ class DoctorNotesList extends DoctorNotes
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -854,35 +852,8 @@ class DoctorNotesList extends DoctorNotes
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patient_visits") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patient_visits"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $masterTbl = Container("patient_visits");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientvisitslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -893,11 +864,6 @@ class DoctorNotesList extends DoctorNotes
             $this->CurrentFilter = "";
         }
         $this->Filter = $this->applyUserIDFilters($this->Filter);
-
-        // Export selected records
-        if ($this->isExport()) {
-            $this->CurrentFilter = $this->buildExportSelectedFilter();
-        }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
             $this->StartRecord = 1;
@@ -1384,14 +1350,6 @@ class DoctorNotesList extends DoctorNotes
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->patient_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -1460,7 +1418,7 @@ class DoctorNotesList extends DoctorNotes
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = true;
+        $item->Visible = false;
         $item->OnLeft = false;
         $item->Header = "<div class=\"form-check\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"form-check-input\" data-ew-action=\"select-all-keys\"></div>";
         if ($item->OnLeft) {
@@ -2247,8 +2205,27 @@ class DoctorNotesList extends DoctorNotes
             $this->allergies->ViewValue = $this->allergies->CurrentValue;
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2309,17 +2286,6 @@ class DoctorNotesList extends DoctorNotes
         }
     }
 
-    // Build export filter for selected records
-    protected function buildExportSelectedFilter()
-    {
-        global $Language;
-        $wrkFilter = "";
-        if ($this->isExport()) {
-            $wrkFilter = $this->getFilterFromRecordKeys();
-        }
-        return $wrkFilter;
-    }
-
     // Get export HTML tag
     protected function getExportTag($type, $custom = false)
     {
@@ -2332,33 +2298,33 @@ class DoctorNotesList extends DoctorNotes
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
         } elseif (SameText($type, "html")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"html\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToHtml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
         } elseif (SameText($type, "xml")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"xml\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToXml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
         } elseif (SameText($type, "csv")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"csv\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToCsv") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fdoctor_noteslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="true"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fdoctor_noteslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"print\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("PrinterFriendly") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
     }
 
@@ -2521,23 +2487,6 @@ class DoctorNotesList extends DoctorNotes
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $patient_visits = new PatientVisitsList();
-            $rsmaster = $patient_visits->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($patient_visits);
-                    $patient_visits->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2567,90 +2516,6 @@ class DoctorNotesList extends DoctorNotes
         return true;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2677,6 +2542,8 @@ class DoctorNotesList extends DoctorNotes
                 case "x_patient_id":
                     break;
                 case "x_visit_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2850,7 +2717,10 @@ class DoctorNotesList extends DoctorNotes
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add notes");
     }
 
     // Page Unload event

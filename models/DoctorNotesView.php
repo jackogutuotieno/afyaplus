@@ -567,6 +567,7 @@ class DoctorNotesView extends DoctorNotes
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -577,9 +578,6 @@ class DoctorNotesView extends DoctorNotes
         $loadCurrentRecord = false;
         $returnUrl = "";
         $matchRecord = false;
-
-        // Set up master/detail parameters
-        $this->setupMasterParms();
         if (($keyValue = Get("id") ?? Route("id")) !== null) {
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
@@ -965,8 +963,27 @@ class DoctorNotesView extends DoctorNotes
             $this->allergies->ViewValue = $this->allergies->CurrentValue;
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1197,79 +1214,6 @@ class DoctorNotesView extends DoctorNotes
         return true;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-            $this->setSessionWhere($this->getDetailFilterFromSession());
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1297,6 +1241,8 @@ class DoctorNotesView extends DoctorNotes
                 case "x_patient_id":
                     break;
                 case "x_visit_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

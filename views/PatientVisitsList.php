@@ -176,6 +176,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->_title->Visible) { // title ?>
         <th data-name="_title" class="<?= $Page->_title->headerCellClass() ?>"><div id="elh_patient_visits__title" class="patient_visits__title"><?= $Page->renderFieldHeader($Page->_title) ?></div></th>
 <?php } ?>
+<?php if ($Page->section->Visible) { // section ?>
+        <th data-name="section" class="<?= $Page->section->headerCellClass() ?>"><div id="elh_patient_visits_section" class="patient_visits_section"><?= $Page->renderFieldHeader($Page->section) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -220,6 +223,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits__title" class="el_patient_visits__title">
 <span<?= $Page->_title->viewAttributes() ?>>
 <?= $Page->_title->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->section->Visible) { // section ?>
+        <td data-name="section"<?= $Page->section->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
+<span<?= $Page->section->viewAttributes() ?>>
+<?= $Page->section->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -835,6 +835,15 @@ class PatientAppointmentsEdit extends PatientAppointments
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("edit");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -1371,6 +1380,16 @@ class PatientAppointmentsEdit extends PatientAppointments
         if (isset($row['is_all_day'])) { // is_all_day
             $this->is_all_day->CurrentValue = $row['is_all_day'];
         }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up Breadcrumb

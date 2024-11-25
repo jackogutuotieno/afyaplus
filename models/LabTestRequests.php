@@ -75,7 +75,7 @@ class LabTestRequests extends DbTable
         // Update Table
         $this->UpdateTable = "lab_test_requests";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -1777,30 +1777,6 @@ class LabTestRequests extends DbTable
             $wrk = "0=1";
         }
         return $wrk;
-    }
-
-    // Add master User ID filter
-    public function addMasterUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "patient_visits") {
-            $filterWrk = Container("patient_visits")->addUserIDFilter($filterWrk);
-        }
-        return $filterWrk;
-    }
-
-    // Add detail User ID filter
-    public function addDetailUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "patient_visits") {
-            $mastertable = Container("patient_visits");
-            if (!$mastertable->userIDAllow()) {
-                $subqueryWrk = $mastertable->getUserIDSubquery($this->patient_id, $mastertable->patient_id);
-                AddFilter($filterWrk, $subqueryWrk);
-            }
-        }
-        return $filterWrk;
     }
 
     // Get file data

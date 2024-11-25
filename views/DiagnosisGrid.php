@@ -332,17 +332,29 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
         <td data-name="created_by_user_id"<?= $Grid->created_by_user_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
+<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
+<input type="hidden" data-table="diagnosis" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_diagnosis_created_by_user_id" class="el_diagnosis_created_by_user_id">
 <input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="diagnosis" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 <input type="hidden" data-table="diagnosis" data-field="x_created_by_user_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_created_by_user_id" id="o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
+<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
+<input type="hidden" data-table="diagnosis" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_diagnosis_created_by_user_id" class="el_diagnosis_created_by_user_id">
 <input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="diagnosis" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_diagnosis_created_by_user_id" class="el_diagnosis_created_by_user_id">

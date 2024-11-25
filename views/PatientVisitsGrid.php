@@ -25,6 +25,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["_title", [fields._title.visible && fields._title.required ? ew.Validators.required(fields._title.caption) : null], fields._title.isInvalid],
+            ["section", [fields.section.visible && fields.section.required ? ew.Validators.required(fields.section.caption) : null], fields.section.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
@@ -32,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["_title",false],["date_created",false]];
+                    fields = [["patient_id",false],["_title",false],["section",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -92,6 +93,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->_title->Visible) { // title ?>
         <th data-name="_title" class="<?= $Grid->_title->headerCellClass() ?>"><div id="elh_patient_visits__title" class="patient_visits__title"><?= $Grid->renderFieldHeader($Grid->_title) ?></div></th>
+<?php } ?>
+<?php if ($Grid->section->Visible) { // section ?>
+        <th data-name="section" class="<?= $Grid->section->headerCellClass() ?>"><div id="elh_patient_visits_section" class="patient_visits_section"><?= $Grid->renderFieldHeader($Grid->section) ?></div></th>
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
@@ -262,6 +266,33 @@ loadjs.ready("fpatient_visitsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patient_visits" data-field="x__title" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>__title" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>__title" value="<?= HtmlEncode($Grid->_title->FormValue) ?>">
 <input type="hidden" data-table="patient_visits" data-field="x__title" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>__title" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>__title" value="<?= HtmlEncode($Grid->_title->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->section->Visible) { // section ?>
+        <td data-name="section"<?= $Grid->section->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
+<input type="<?= $Grid->section->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_section" id="x<?= $Grid->RowIndex ?>_section" data-table="patient_visits" data-field="x_section" value="<?= $Grid->section->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->section->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->section->formatPattern()) ?>"<?= $Grid->section->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->section->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="patient_visits" data-field="x_section" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_section" id="o<?= $Grid->RowIndex ?>_section" value="<?= HtmlEncode($Grid->section->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
+<input type="<?= $Grid->section->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_section" id="x<?= $Grid->RowIndex ?>_section" data-table="patient_visits" data-field="x_section" value="<?= $Grid->section->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->section->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->section->formatPattern()) ?>"<?= $Grid->section->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->section->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
+<span<?= $Grid->section->viewAttributes() ?>>
+<?= $Grid->section->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patient_visits" data-field="x_section" data-hidden="1" name="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_section" id="fpatient_visitsgrid$x<?= $Grid->RowIndex ?>_section" value="<?= HtmlEncode($Grid->section->FormValue) ?>">
+<input type="hidden" data-table="patient_visits" data-field="x_section" data-hidden="1" data-old name="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_section" id="fpatient_visitsgrid$o<?= $Grid->RowIndex ?>_section" value="<?= HtmlEncode($Grid->section->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

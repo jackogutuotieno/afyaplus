@@ -795,6 +795,15 @@ class RadiologyRequestsQueueAdd extends RadiologyRequestsQueue
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("add");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -976,10 +985,16 @@ class RadiologyRequestsQueueAdd extends RadiologyRequestsQueue
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
+                $this->created_by_user_id->CurrentValue = CurrentUserID();
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            } else {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                }
             }
 
             // date_created
@@ -1108,6 +1123,18 @@ class RadiologyRequestsQueueAdd extends RadiologyRequestsQueue
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Check if valid User ID
+        if (
+            !EmptyValue($Security->currentUserID()) &&
+            !$Security->isAdmin() && // Non system admin
+            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
+        ) {
+            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
+            $this->setFailureMessage($userIdMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1206,6 +1233,16 @@ class RadiologyRequestsQueueAdd extends RadiologyRequestsQueue
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up Breadcrumb

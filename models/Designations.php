@@ -72,7 +72,7 @@ class Designations extends DbTable
         // Update Table
         $this->UpdateTable = "designations";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -424,6 +424,11 @@ class Designations extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter, $id);
+        }
         return $filter;
     }
 
@@ -1310,6 +1315,52 @@ class Designations extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "", $id = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        if ($id == "") {
+            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
+        }
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM designations";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        $conn = Conn($this->Dbid);
+        $config = $conn->getConfiguration();
+        $config->setResultCache($this->Cache);
+        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
+            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data

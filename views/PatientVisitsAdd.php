@@ -331,52 +331,20 @@ loadjs.ready("fpatient_visitsadd", function() {
 <?php } ?>
 </div><!-- /page* -->
 <?php
-    if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "PatientVitalsGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("doctor_notes", explode(",", $Page->getCurrentDetailTable())) && $doctor_notes->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("doctor_notes", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "DoctorNotesGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("diagnosis", explode(",", $Page->getCurrentDetailTable())) && $diagnosis->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("diagnosis", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "DiagnosisGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("prescriptions", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "PrescriptionsGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("radiology_requests", explode(",", $Page->getCurrentDetailTable())) && $radiology_requests->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "RadiologyRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailAdd) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientVitalsGrid.php" ?>
 <?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

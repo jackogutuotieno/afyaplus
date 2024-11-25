@@ -128,47 +128,18 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->section->Visible) { // section ?>
+    <tr id="r_section"<?= $Page->section->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_visits_section"><?= $Page->section->caption() ?></span></td>
+        <td data-name="section"<?= $Page->section->cellAttributes() ?>>
+<span id="el_patient_visits_section">
+<span<?= $Page->section->viewAttributes() ?>>
+<?= $Page->section->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
-<?php
-    if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "PatientVitalsGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("doctor_notes", explode(",", $Page->getCurrentDetailTable())) && $doctor_notes->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("doctor_notes", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "DoctorNotesGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("diagnosis", explode(",", $Page->getCurrentDetailTable())) && $diagnosis->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("diagnosis", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "DiagnosisGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("prescriptions", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "PrescriptionsGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("radiology_requests", explode(",", $Page->getCurrentDetailTable())) && $radiology_requests->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "RadiologyRequestsGrid.php" ?>
-<?php } ?>
 <?php
     if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
 ?>
@@ -176,6 +147,14 @@ loadjs.ready("head", function () {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientVitalsGrid.php" ?>
 <?php } ?>
 </form>
 </main>

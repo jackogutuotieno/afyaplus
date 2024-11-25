@@ -73,7 +73,7 @@ class Subscriptions extends DbTable
         // Update Table
         $this->UpdateTable = "subscriptions";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF

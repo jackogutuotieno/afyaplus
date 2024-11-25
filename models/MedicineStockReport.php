@@ -80,7 +80,7 @@ class MedicineStockReport extends DbTable
         // Update Table
         $this->UpdateTable = "medicine_stock_report";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF

@@ -568,6 +568,7 @@ class PatientVitalsView extends PatientVitals
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -704,7 +705,7 @@ class PatientVitalsView extends PatientVitals
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
 
         // Delete
         $item = &$option->add("delete");
@@ -713,7 +714,7 @@ class PatientVitalsView extends PatientVitals
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete");
 
         // Set up action default
         $option = $options["action"];
@@ -971,10 +972,6 @@ class PatientVitalsView extends PatientVitals
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -1178,6 +1175,16 @@ class PatientVitalsView extends PatientVitals
         $this->pageExported($doc);
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -1194,12 +1201,12 @@ class PatientVitalsView extends PatientVitals
             if ($masterTblVar == "patient_visits") {
                 $validMaster = true;
                 $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1216,12 +1223,12 @@ class PatientVitalsView extends PatientVitals
             if ($masterTblVar == "patient_visits") {
                 $validMaster = true;
                 $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
+                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1242,8 +1249,8 @@ class PatientVitalsView extends PatientVitals
 
             // Clear previous master key from Session
             if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
+                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
+                    $this->visit_id->setSessionValue("");
                 }
             }
         }
@@ -1278,6 +1285,8 @@ class PatientVitalsView extends PatientVitals
                 case "x_patient_id":
                     break;
                 case "x_visit_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

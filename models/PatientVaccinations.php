@@ -75,7 +75,7 @@ class PatientVaccinations extends DbTable
         // Update Table
         $this->UpdateTable = "patient_vaccinations";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -504,6 +504,11 @@ class PatientVaccinations extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter, $id);
+        }
         return $filter;
     }
 
@@ -1354,10 +1359,16 @@ class PatientVaccinations extends DbTable
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
-        $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
+            $this->created_by_user_id->CurrentValue = CurrentUserID();
+            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+        } else {
+            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            }
         }
 
         // date_created
@@ -1471,6 +1482,52 @@ class PatientVaccinations extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "", $id = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        if ($id == "") {
+            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
+        }
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM patient_vaccinations";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        $conn = Conn($this->Dbid);
+        $config = $conn->getConfiguration();
+        $config->setResultCache($this->Cache);
+        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
+            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data

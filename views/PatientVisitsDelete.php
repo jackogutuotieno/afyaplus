@@ -56,6 +56,9 @@ $Page->showMessage();
 <?php if ($Page->_title->Visible) { // title ?>
         <th class="<?= $Page->_title->headerCellClass() ?>"><span id="elh_patient_visits__title" class="patient_visits__title"><?= $Page->_title->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->section->Visible) { // section ?>
+        <th class="<?= $Page->section->headerCellClass() ?>"><span id="elh_patient_visits_section" class="patient_visits_section"><?= $Page->section->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -93,6 +96,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->_title->viewAttributes() ?>>
 <?= $Page->_title->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->section->Visible) { // section ?>
+        <td<?= $Page->section->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->section->viewAttributes() ?>>
+<?= $Page->section->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

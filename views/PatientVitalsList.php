@@ -153,7 +153,7 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_patient_vitals" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
@@ -170,9 +170,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patient_vitals_id" class="patient_vitals_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_vitals_patient_id" class="patient_vitals_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
@@ -197,11 +194,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->blood_pressure->Visible) { // blood_pressure ?>
         <th data-name="blood_pressure" class="<?= $Page->blood_pressure->headerCellClass() ?>"><div id="elh_patient_vitals_blood_pressure" class="patient_vitals_blood_pressure"><?= $Page->renderFieldHeader($Page->blood_pressure) ?></div></th>
 <?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_patient_vitals_created_by_user_id" class="patient_vitals_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_vitals_date_created" class="patient_vitals_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_patient_vitals_date_updated" class="patient_vitals_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -231,14 +228,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_id" class="el_patient_vitals_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_patient_id" class="el_patient_vitals_patient_id">
@@ -303,19 +292,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_created_by_user_id" class="el_patient_vitals_created_by_user_id">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_date_created" class="el_patient_vitals_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_date_updated" class="el_patient_vitals_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

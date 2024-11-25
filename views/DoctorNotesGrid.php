@@ -62,6 +62,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
             "visit_id": <?= $Grid->visit_id->toClientList($Grid) ?>,
+            "created_by_user_id": <?= $Grid->created_by_user_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -195,11 +196,6 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
-<span<?= $Grid->patient_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_patient_id" class="el_doctor_notes_patient_id">
     <select
         id="x<?= $Grid->RowIndex ?>_patient_id"
@@ -239,15 +235,9 @@ loadjs.ready("fdoctor_notesgrid", function() {
 </script>
 <?php } ?>
 </span>
-<?php } ?>
 <input type="hidden" data-table="doctor_notes" data-field="x_patient_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_id" id="o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
-<span<?= $Grid->patient_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_patient_id" class="el_doctor_notes_patient_id">
     <select
         id="x<?= $Grid->RowIndex ?>_patient_id"
@@ -287,7 +277,6 @@ loadjs.ready("fdoctor_notesgrid", function() {
 </script>
 <?php } ?>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_patient_id" class="el_doctor_notes_patient_id">
@@ -304,6 +293,11 @@ loadjs.ready("fdoctor_notesgrid", function() {
     <?php if ($Grid->visit_id->Visible) { // visit_id ?>
         <td data-name="visit_id"<?= $Grid->visit_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<?php if ($Grid->visit_id->getSessionValue() != "") { ?>
+<span<?= $Grid->visit_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_visit_id" class="el_doctor_notes_visit_id">
     <select
         id="x<?= $Grid->RowIndex ?>_visit_id"
@@ -342,9 +336,15 @@ loadjs.ready("fdoctor_notesgrid", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 <input type="hidden" data-table="doctor_notes" data-field="x_visit_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_visit_id" id="o<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<?php if ($Grid->visit_id->getSessionValue() != "") { ?>
+<span<?= $Grid->visit_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_visit_id" class="el_doctor_notes_visit_id">
     <select
         id="x<?= $Grid->RowIndex ?>_visit_id"
@@ -383,6 +383,7 @@ loadjs.ready("fdoctor_notesgrid", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_visit_id" class="el_doctor_notes_visit_id">
@@ -400,14 +401,14 @@ loadjs.ready("fdoctor_notesgrid", function() {
         <td data-name="chief_complaint"<?= $Grid->chief_complaint->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_chief_complaint" class="el_doctor_notes_chief_complaint">
-<input type="<?= $Grid->chief_complaint->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_chief_complaint" id="x<?= $Grid->RowIndex ?>_chief_complaint" data-table="doctor_notes" data-field="x_chief_complaint" value="<?= $Grid->chief_complaint->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->chief_complaint->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->chief_complaint->formatPattern()) ?>"<?= $Grid->chief_complaint->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_chief_complaint" name="x<?= $Grid->RowIndex ?>_chief_complaint" id="x<?= $Grid->RowIndex ?>_chief_complaint" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->chief_complaint->getPlaceHolder()) ?>"<?= $Grid->chief_complaint->editAttributes() ?>><?= $Grid->chief_complaint->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->chief_complaint->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="doctor_notes" data-field="x_chief_complaint" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_chief_complaint" id="o<?= $Grid->RowIndex ?>_chief_complaint" value="<?= HtmlEncode($Grid->chief_complaint->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_chief_complaint" class="el_doctor_notes_chief_complaint">
-<input type="<?= $Grid->chief_complaint->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_chief_complaint" id="x<?= $Grid->RowIndex ?>_chief_complaint" data-table="doctor_notes" data-field="x_chief_complaint" value="<?= $Grid->chief_complaint->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->chief_complaint->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->chief_complaint->formatPattern()) ?>"<?= $Grid->chief_complaint->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_chief_complaint" name="x<?= $Grid->RowIndex ?>_chief_complaint" id="x<?= $Grid->RowIndex ?>_chief_complaint" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->chief_complaint->getPlaceHolder()) ?>"<?= $Grid->chief_complaint->editAttributes() ?>><?= $Grid->chief_complaint->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->chief_complaint->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -427,14 +428,14 @@ loadjs.ready("fdoctor_notesgrid", function() {
         <td data-name="history_of_presenting_illness"<?= $Grid->history_of_presenting_illness->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_history_of_presenting_illness" class="el_doctor_notes_history_of_presenting_illness">
-<input type="<?= $Grid->history_of_presenting_illness->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" id="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" data-table="doctor_notes" data-field="x_history_of_presenting_illness" value="<?= $Grid->history_of_presenting_illness->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->history_of_presenting_illness->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->history_of_presenting_illness->formatPattern()) ?>"<?= $Grid->history_of_presenting_illness->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_history_of_presenting_illness" name="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" id="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->history_of_presenting_illness->getPlaceHolder()) ?>"<?= $Grid->history_of_presenting_illness->editAttributes() ?>><?= $Grid->history_of_presenting_illness->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->history_of_presenting_illness->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="doctor_notes" data-field="x_history_of_presenting_illness" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_history_of_presenting_illness" id="o<?= $Grid->RowIndex ?>_history_of_presenting_illness" value="<?= HtmlEncode($Grid->history_of_presenting_illness->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_history_of_presenting_illness" class="el_doctor_notes_history_of_presenting_illness">
-<input type="<?= $Grid->history_of_presenting_illness->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" id="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" data-table="doctor_notes" data-field="x_history_of_presenting_illness" value="<?= $Grid->history_of_presenting_illness->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->history_of_presenting_illness->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->history_of_presenting_illness->formatPattern()) ?>"<?= $Grid->history_of_presenting_illness->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_history_of_presenting_illness" name="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" id="x<?= $Grid->RowIndex ?>_history_of_presenting_illness" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->history_of_presenting_illness->getPlaceHolder()) ?>"<?= $Grid->history_of_presenting_illness->editAttributes() ?>><?= $Grid->history_of_presenting_illness->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->history_of_presenting_illness->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -454,14 +455,14 @@ loadjs.ready("fdoctor_notesgrid", function() {
         <td data-name="past_medical_history"<?= $Grid->past_medical_history->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_past_medical_history" class="el_doctor_notes_past_medical_history">
-<input type="<?= $Grid->past_medical_history->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_past_medical_history" id="x<?= $Grid->RowIndex ?>_past_medical_history" data-table="doctor_notes" data-field="x_past_medical_history" value="<?= $Grid->past_medical_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->past_medical_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->past_medical_history->formatPattern()) ?>"<?= $Grid->past_medical_history->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_past_medical_history" name="x<?= $Grid->RowIndex ?>_past_medical_history" id="x<?= $Grid->RowIndex ?>_past_medical_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->past_medical_history->getPlaceHolder()) ?>"<?= $Grid->past_medical_history->editAttributes() ?>><?= $Grid->past_medical_history->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->past_medical_history->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="doctor_notes" data-field="x_past_medical_history" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_past_medical_history" id="o<?= $Grid->RowIndex ?>_past_medical_history" value="<?= HtmlEncode($Grid->past_medical_history->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_past_medical_history" class="el_doctor_notes_past_medical_history">
-<input type="<?= $Grid->past_medical_history->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_past_medical_history" id="x<?= $Grid->RowIndex ?>_past_medical_history" data-table="doctor_notes" data-field="x_past_medical_history" value="<?= $Grid->past_medical_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->past_medical_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->past_medical_history->formatPattern()) ?>"<?= $Grid->past_medical_history->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_past_medical_history" name="x<?= $Grid->RowIndex ?>_past_medical_history" id="x<?= $Grid->RowIndex ?>_past_medical_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->past_medical_history->getPlaceHolder()) ?>"<?= $Grid->past_medical_history->editAttributes() ?>><?= $Grid->past_medical_history->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->past_medical_history->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -481,14 +482,14 @@ loadjs.ready("fdoctor_notesgrid", function() {
         <td data-name="family_history"<?= $Grid->family_history->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_family_history" class="el_doctor_notes_family_history">
-<input type="<?= $Grid->family_history->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_family_history" id="x<?= $Grid->RowIndex ?>_family_history" data-table="doctor_notes" data-field="x_family_history" value="<?= $Grid->family_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->family_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->family_history->formatPattern()) ?>"<?= $Grid->family_history->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_family_history" name="x<?= $Grid->RowIndex ?>_family_history" id="x<?= $Grid->RowIndex ?>_family_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->family_history->getPlaceHolder()) ?>"<?= $Grid->family_history->editAttributes() ?>><?= $Grid->family_history->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->family_history->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="doctor_notes" data-field="x_family_history" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_family_history" id="o<?= $Grid->RowIndex ?>_family_history" value="<?= HtmlEncode($Grid->family_history->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_family_history" class="el_doctor_notes_family_history">
-<input type="<?= $Grid->family_history->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_family_history" id="x<?= $Grid->RowIndex ?>_family_history" data-table="doctor_notes" data-field="x_family_history" value="<?= $Grid->family_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->family_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->family_history->formatPattern()) ?>"<?= $Grid->family_history->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_family_history" name="x<?= $Grid->RowIndex ?>_family_history" id="x<?= $Grid->RowIndex ?>_family_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->family_history->getPlaceHolder()) ?>"<?= $Grid->family_history->editAttributes() ?>><?= $Grid->family_history->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->family_history->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -508,14 +509,14 @@ loadjs.ready("fdoctor_notesgrid", function() {
         <td data-name="allergies"<?= $Grid->allergies->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_allergies" class="el_doctor_notes_allergies">
-<input type="<?= $Grid->allergies->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_allergies" id="x<?= $Grid->RowIndex ?>_allergies" data-table="doctor_notes" data-field="x_allergies" value="<?= $Grid->allergies->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->allergies->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->allergies->formatPattern()) ?>"<?= $Grid->allergies->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_allergies" name="x<?= $Grid->RowIndex ?>_allergies" id="x<?= $Grid->RowIndex ?>_allergies" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->allergies->getPlaceHolder()) ?>"<?= $Grid->allergies->editAttributes() ?>><?= $Grid->allergies->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->allergies->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="doctor_notes" data-field="x_allergies" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_allergies" id="o<?= $Grid->RowIndex ?>_allergies" value="<?= HtmlEncode($Grid->allergies->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_doctor_notes_allergies" class="el_doctor_notes_allergies">
-<input type="<?= $Grid->allergies->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_allergies" id="x<?= $Grid->RowIndex ?>_allergies" data-table="doctor_notes" data-field="x_allergies" value="<?= $Grid->allergies->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->allergies->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->allergies->formatPattern()) ?>"<?= $Grid->allergies->editAttributes() ?>>
+<textarea data-table="doctor_notes" data-field="x_allergies" name="x<?= $Grid->RowIndex ?>_allergies" id="x<?= $Grid->RowIndex ?>_allergies" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->allergies->getPlaceHolder()) ?>"<?= $Grid->allergies->editAttributes() ?>><?= $Grid->allergies->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->allergies->getErrorMessage() ?></div>
 </span>
 <?php } ?>

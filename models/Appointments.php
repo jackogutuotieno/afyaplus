@@ -75,7 +75,7 @@ class Appointments extends DbTable
         $this->TableReportType = "calendar"; // Report Type
         $this->UpdateTable = 'patient_appointments'; // Calendar update table
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
 
         // PDF

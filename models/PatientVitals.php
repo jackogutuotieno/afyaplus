@@ -79,7 +79,7 @@ class PatientVitals extends DbTable
         // Update Table
         $this->UpdateTable = "patient_vitals";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -151,7 +151,6 @@ class PatientVitals extends DbTable
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
-        $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
         $this->patient_id->setSelectMultiple(false); // Select one
@@ -182,6 +181,7 @@ class PatientVitals extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
+        $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
         $this->visit_id->setSelectMultiple(false); // Select one
@@ -361,15 +361,20 @@ class PatientVitals extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'HIDDEN' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
+        $this->created_by_user_id->addMethod("getDefault", fn() => 0);
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Sortable = false; // Allow sort
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -378,10 +383,10 @@ class PatientVitals extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            11, // Date/Time format
+            3, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -394,7 +399,7 @@ class PatientVitals extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -420,6 +425,7 @@ class PatientVitals extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -500,8 +506,8 @@ class PatientVitals extends DbTable
         $masterFilter = "";
         if ($this->getCurrentMasterTable() == "patient_visits") {
             $masterTable = Container("patient_visits");
-            if ($this->patient_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            if ($this->visit_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
             } else {
                 return "";
             }
@@ -516,8 +522,8 @@ class PatientVitals extends DbTable
         $detailFilter = "";
         if ($this->getCurrentMasterTable() == "patient_visits") {
             $masterTable = Container("patient_visits");
-            if ($this->patient_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            if ($this->visit_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->visit_id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
                 return "";
             }
@@ -537,9 +543,9 @@ class PatientVitals extends DbTable
         $validKeys = true;
         switch ($masterTable->TableVar) {
             case "patient_visits":
-                $key = $keys["patient_id"] ?? "";
+                $key = $keys["visit_id"] ?? "";
                 if (EmptyValue($key)) {
-                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                    if ($masterTable->id->Required) { // Required field and empty value
                         return ""; // Return empty filter
                     }
                     $validKeys = false;
@@ -547,7 +553,7 @@ class PatientVitals extends DbTable
                     return ""; // Return empty filter
                 }
                 if ($validKeys) {
-                    return GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                    return GetKeyFilter($masterTable->id, $keys["visit_id"], $this->visit_id->DataType, $this->Dbid);
                 }
                 break;
         }
@@ -559,7 +565,7 @@ class PatientVitals extends DbTable
     {
         switch ($masterTable->TableVar) {
             case "patient_visits":
-                return GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+                return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
     }
@@ -693,9 +699,7 @@ class PatientVitals extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patient_visits" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "patient_visits"); // Add detail User ID filter
-            }
+            $filter = $this->addUserIDFilter($filter, $id);
         }
         return $filter;
     }
@@ -1226,7 +1230,7 @@ class PatientVitals extends DbTable
     {
         if ($this->getCurrentMasterTable() == "patient_visits" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->visit_id->getSessionValue()); // Use Session Value
         }
         return $url;
     }
@@ -1526,8 +1530,27 @@ class PatientVitals extends DbTable
         $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
         // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1606,36 +1629,36 @@ class PatientVitals extends DbTable
 
         // patient_id
         $this->patient_id->setupEditAttributes();
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-            $curVal = strval($this->patient_id->CurrentValue);
+        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+
+        // visit_id
+        $this->visit_id->setupEditAttributes();
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $curVal = strval($this->visit_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                if ($this->visit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->visit_id->ViewValue = null;
             }
         } else {
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
         }
-
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
         // height
         $this->height->setupEditAttributes();
@@ -1745,7 +1768,6 @@ class PatientVitals extends DbTable
                     $doc->exportCaption($this->pulse);
                     $doc->exportCaption($this->blood_pressure);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1792,7 +1814,6 @@ class PatientVitals extends DbTable
                         $doc->exportField($this->pulse);
                         $doc->exportField($this->blood_pressure);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1808,28 +1829,50 @@ class PatientVitals extends DbTable
         }
     }
 
-    // Add master User ID filter
-    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    // Add User ID filter
+    public function addUserIDFilter($filter = "", $id = "")
     {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "patient_visits") {
-            $filterWrk = Container("patient_visits")->addUserIDFilter($filterWrk);
+        global $Security;
+        $filterWrk = "";
+        if ($id == "") {
+            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
         }
-        return $filterWrk;
-    }
-
-    // Add detail User ID filter
-    public function addDetailUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "patient_visits") {
-            $mastertable = Container("patient_visits");
-            if (!$mastertable->userIDAllow()) {
-                $subqueryWrk = $mastertable->getUserIDSubquery($this->patient_id, $mastertable->patient_id);
-                AddFilter($filterWrk, $subqueryWrk);
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
             }
         }
-        return $filterWrk;
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM patient_vitals";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        $conn = Conn($this->Dbid);
+        $config = $conn->getConfiguration();
+        $config->setResultCache($this->Cache);
+        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
+            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data
@@ -1889,8 +1932,14 @@ class PatientVitals extends DbTable
     // Row Inserting event
     public function rowInserting($rsold, &$rsnew)
     {
-        // Enter your code here
-        // To cancel, set return value to false
+        // Check if both visit id and patient id exists
+        $if_exists = ExecuteScalar("SELECT count(*) FROM patient_vitals where visit_id = '".$rsnew["visit_id"]."' and patient_id = '".$rsnew["patient_id"]."'");
+    	if($if_exists > 0) { // Check for double applications
+    		$this->CancelMessage = "Vitals already taken for checked in patient. Vitals can only be recorded once.";
+    		return false;
+    	} else if ($if_exists < 0) { 
+            return true; 
+        }
         return true;
     }
 

@@ -558,10 +558,6 @@ class RadiologyRequestsAdd extends RadiologyRequests
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
-        // Set up master/detail parameters
-        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
-        $this->setupMasterParms();
-
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -606,7 +602,7 @@ class RadiologyRequestsAdd extends RadiologyRequests
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
+                    if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "radiologyrequestslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -801,6 +797,15 @@ class RadiologyRequestsAdd extends RadiologyRequests
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("add");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -958,16 +963,10 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-            } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-                }
+            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
             }
 
             // visit_id
@@ -988,10 +987,16 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
+                $this->created_by_user_id->CurrentValue = CurrentUserID();
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            } else {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                }
             }
 
             // date_created
@@ -1121,26 +1126,16 @@ class RadiologyRequestsAdd extends RadiologyRequests
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
-            $masterTable = Container("patient_visits");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "patient_visits") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
+        // Check if valid User ID
+        if (
+            !EmptyValue($Security->currentUserID()) &&
+            !$Security->isAdmin() && // Non system admin
+            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
+        ) {
+            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
+            $this->setFailureMessage($userIdMsg);
+            return false;
         }
         $conn = $this->getConnection();
 
@@ -1242,76 +1237,14 @@ class RadiologyRequestsAdd extends RadiologyRequests
         }
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
     {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
         }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+        return true;
     }
 
     // Set up Breadcrumb

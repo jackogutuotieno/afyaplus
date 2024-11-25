@@ -1413,7 +1413,7 @@ class PrescriptionsGrid extends Prescriptions
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"prescriptions\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1426,7 +1426,7 @@ class PrescriptionsGrid extends Prescriptions
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"prescriptions\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1439,7 +1439,7 @@ class PrescriptionsGrid extends Prescriptions
             // "copy"
             $opt = $this->ListOptions["copy"];
             $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
+            if ($Security->canAdd() && $this->showOptionLink("add")) {
                 if ($this->ModalAdd && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"prescriptions\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
                 } else {
@@ -1451,7 +1451,7 @@ class PrescriptionsGrid extends Prescriptions
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1703,6 +1703,8 @@ class PrescriptionsGrid extends Prescriptions
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->created_by_user_id->DefaultValue = CurrentUserID();
+        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
     }
 
     // Load form values
@@ -2107,10 +2109,16 @@ class PrescriptionsGrid extends Prescriptions
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
+                $this->created_by_user_id->CurrentValue = CurrentUserID();
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            } else {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                }
             }
 
             // date_created
@@ -2194,10 +2202,16 @@ class PrescriptionsGrid extends Prescriptions
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
+                $this->created_by_user_id->CurrentValue = CurrentUserID();
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            } else {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                }
             }
 
             // date_created
@@ -2421,6 +2435,24 @@ class PrescriptionsGrid extends Prescriptions
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check referential integrity for master table 'patient_visits'
+        $detailKeys = [];
+        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
+        $detailKeys['patient_id'] = $keyValue;
+        $masterTable = Container("patient_visits");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2536,6 +2568,18 @@ class PrescriptionsGrid extends Prescriptions
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check if valid User ID
+        if (
+            !EmptyValue($Security->currentUserID()) &&
+            !$Security->isAdmin() && // Non system admin
+            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
+        ) {
+            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
+            $this->setFailureMessage($userIdMsg);
+            return false;
+        }
+
         // Check if valid key values for master user
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
             $detailKeys = [];
@@ -2556,6 +2600,24 @@ class PrescriptionsGrid extends Prescriptions
                     return false;
                 }
             }
+        }
+
+        // Check referential integrity for master table 'prescriptions'
+        $validMasterRecord = true;
+        $detailKeys = [];
+        $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
+        $masterTable = Container("patient_visits");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
         }
         $conn = $this->getConnection();
 
@@ -2648,6 +2710,16 @@ class PrescriptionsGrid extends Prescriptions
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up master/detail based on QueryString

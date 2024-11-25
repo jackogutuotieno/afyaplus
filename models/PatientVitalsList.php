@@ -145,7 +145,7 @@ class PatientVitalsList extends PatientVitals
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->height->setVisibility();
@@ -154,9 +154,9 @@ class PatientVitalsList extends PatientVitals
         $this->temperature->setVisibility();
         $this->pulse->setVisibility();
         $this->blood_pressure->setVisibility();
-        $this->created_by_user_id->Visible = false;
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -721,6 +721,7 @@ class PatientVitalsList extends PatientVitals
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -859,13 +860,6 @@ class PatientVitalsList extends PatientVitals
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patient_visits") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patient_visits"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
@@ -894,11 +888,6 @@ class PatientVitalsList extends PatientVitals
             $this->CurrentFilter = "";
         }
         $this->Filter = $this->applyUserIDFilters($this->Filter);
-
-        // Export selected records
-        if ($this->isExport()) {
-            $this->CurrentFilter = $this->buildExportSelectedFilter();
-        }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
             $this->StartRecord = 1;
@@ -1332,7 +1321,6 @@ class PatientVitalsList extends PatientVitals
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->height); // height
@@ -1341,8 +1329,8 @@ class PatientVitalsList extends PatientVitals
             $this->updateSort($this->temperature); // temperature
             $this->updateSort($this->pulse); // pulse
             $this->updateSort($this->blood_pressure); // blood_pressure
+            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1368,7 +1356,7 @@ class PatientVitalsList extends PatientVitals
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->patient_id->setSessionValue("");
+                        $this->visit_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1434,12 +1422,20 @@ class PatientVitalsList extends PatientVitals
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = true;
+        $item->Visible = false;
         $item->OnLeft = false;
         $item->Header = "<div class=\"form-check\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"form-check-input\" data-ew-action=\"select-all-keys\"></div>";
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1480,12 +1476,16 @@ class PatientVitalsList extends PatientVitals
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1498,7 +1498,7 @@ class PatientVitalsList extends PatientVitals
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_vitals\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1510,7 +1510,7 @@ class PatientVitalsList extends PatientVitals
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1602,7 +1602,6 @@ class PatientVitalsList extends PatientVitals
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "height");
@@ -1611,8 +1610,8 @@ class PatientVitalsList extends PatientVitals
             $this->createColumnOption($option, "temperature");
             $this->createColumnOption($option, "pulse");
             $this->createColumnOption($option, "blood_pressure");
+            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2220,17 +2219,32 @@ class PatientVitalsList extends PatientVitals
             // blood_pressure
             $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -2264,30 +2278,19 @@ class PatientVitalsList extends PatientVitals
             $this->blood_pressure->HrefValue = "";
             $this->blood_pressure->TooltipValue = "";
 
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    // Build export filter for selected records
-    protected function buildExportSelectedFilter()
-    {
-        global $Language;
-        $wrkFilter = "";
-        if ($this->isExport()) {
-            $wrkFilter = $this->getFilterFromRecordKeys();
-        }
-        return $wrkFilter;
     }
 
     // Get export HTML tag
@@ -2302,33 +2305,33 @@ class PatientVitalsList extends PatientVitals
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
         } elseif (SameText($type, "html")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"html\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToHtml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
         } elseif (SameText($type, "xml")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"xml\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToXml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
         } elseif (SameText($type, "csv")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"csv\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToCsv") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_vitalslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="true"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_vitalslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" form=\"fpatient_vitalslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"print\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("PrinterFriendly") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
     }
 
@@ -2527,6 +2530,16 @@ class PatientVitalsList extends PatientVitals
         $this->pageExported($doc);
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -2543,12 +2556,12 @@ class PatientVitalsList extends PatientVitals
             if ($masterTblVar == "patient_visits") {
                 $validMaster = true;
                 $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -2565,12 +2578,12 @@ class PatientVitalsList extends PatientVitals
             if ($masterTblVar == "patient_visits") {
                 $validMaster = true;
                 $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
+                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -2602,8 +2615,8 @@ class PatientVitalsList extends PatientVitals
 
             // Clear previous master key from Session
             if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
+                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
+                    $this->visit_id->setSessionValue("");
                 }
             }
         }
@@ -2637,6 +2650,8 @@ class PatientVitalsList extends PatientVitals
                 case "x_patient_id":
                     break;
                 case "x_visit_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

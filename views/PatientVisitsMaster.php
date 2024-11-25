@@ -32,6 +32,17 @@ $patient_visits->TableClass = "table table-bordered table-hover table-sm ew-tabl
 </td>
         </tr>
 <?php } ?>
+<?php if ($patient_visits->section->Visible) { // section ?>
+        <tr id="r_section"<?= $patient_visits->section->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->section->caption() ?></td>
+            <td<?= $patient_visits->section->cellAttributes() ?>>
+<span id="el_patient_visits_section">
+<span<?= $patient_visits->section->viewAttributes() ?>>
+<?= $patient_visits->section->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patient_visits->date_created->Visible) { // date_created ?>
         <tr id="r_date_created"<?= $patient_visits->date_created->rowAttributes() ?>>
             <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->date_created->caption() ?></td>

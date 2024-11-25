@@ -1193,28 +1193,6 @@ class LabTestRequestsAdd extends LabTestRequests
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
-            $masterTable = Container("patient_visits");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "patient_visits") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
-
         // Check referential integrity for master table 'lab_test_requests'
         $validMasterRecord = true;
         $detailKeys = [];

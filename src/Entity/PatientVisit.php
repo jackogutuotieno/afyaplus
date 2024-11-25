@@ -51,14 +51,19 @@ class PatientVisit extends AbstractEntity
     #[Column(name: "medical_scheme_id", type: "integer", nullable: true)]
     private ?int $medicalSchemeId;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
+    #[Column(type: "string")]
+    private string $section;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    public function __construct()
+    {
+        $this->section = "Checked-In at Reception";
+    }
 
     public function getId(): int
     {
@@ -137,14 +142,14 @@ class PatientVisit extends AbstractEntity
         return $this;
     }
 
-    public function getCreatedByUserId(): int
+    public function getSection(): string
     {
-        return $this->createdByUserId;
+        return HtmlDecode($this->section);
     }
 
-    public function setCreatedByUserId(int $value): static
+    public function setSection(string $value): static
     {
-        $this->createdByUserId = $value;
+        $this->section = RemoveXss($value);
         return $this;
     }
 

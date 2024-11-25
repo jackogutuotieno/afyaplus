@@ -152,7 +152,7 @@ class PatientVisitsList extends PatientVisits
         $this->doctor_id->Visible = false;
         $this->payment_method_id->Visible = false;
         $this->medical_scheme_id->Visible = false;
-        $this->created_by_user_id->Visible = false;
+        $this->section->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -461,9 +461,6 @@ class PatientVisitsList extends PatientVisits
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
-        }
-        if ($this->isAddOrEdit()) {
-            $this->created_by_user_id->Visible = false;
         }
     }
 
@@ -888,11 +885,6 @@ class PatientVisitsList extends PatientVisits
             $this->CurrentFilter = "";
         }
         $this->Filter = $this->applyUserIDFilters($this->Filter);
-
-        // Export selected records
-        if ($this->isExport()) {
-            $this->CurrentFilter = $this->buildExportSelectedFilter();
-        }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
             $this->StartRecord = 1;
@@ -1096,7 +1088,7 @@ class PatientVisitsList extends PatientVisits
         $filterList = Concat($filterList, $this->doctor_id->AdvancedSearch->toJson(), ","); // Field doctor_id
         $filterList = Concat($filterList, $this->payment_method_id->AdvancedSearch->toJson(), ","); // Field payment_method_id
         $filterList = Concat($filterList, $this->medical_scheme_id->AdvancedSearch->toJson(), ","); // Field medical_scheme_id
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
+        $filterList = Concat($filterList, $this->section->AdvancedSearch->toJson(), ","); // Field section
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1194,13 +1186,13 @@ class PatientVisitsList extends PatientVisits
         $this->medical_scheme_id->AdvancedSearch->SearchOperator2 = @$filter["w_medical_scheme_id"];
         $this->medical_scheme_id->AdvancedSearch->save();
 
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
+        // Field section
+        $this->section->AdvancedSearch->SearchValue = @$filter["x_section"];
+        $this->section->AdvancedSearch->SearchOperator = @$filter["z_section"];
+        $this->section->AdvancedSearch->SearchCondition = @$filter["v_section"];
+        $this->section->AdvancedSearch->SearchValue2 = @$filter["y_section"];
+        $this->section->AdvancedSearch->SearchOperator2 = @$filter["w_section"];
+        $this->section->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1257,6 +1249,7 @@ class PatientVisitsList extends PatientVisits
         // Fields to search
         $searchFlds = [];
         $searchFlds[] = &$this->_title;
+        $searchFlds[] = &$this->section;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1337,6 +1330,7 @@ class PatientVisitsList extends PatientVisits
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->_title); // title
+            $this->updateSort($this->section); // section
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1377,7 +1371,7 @@ class PatientVisitsList extends PatientVisits
                 $this->doctor_id->setSort("");
                 $this->payment_method_id->setSort("");
                 $this->medical_scheme_id->setSort("");
-                $this->created_by_user_id->setSort("");
+                $this->section->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1417,45 +1411,17 @@ class PatientVisitsList extends PatientVisits
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
-        // "detail_patient_vitals"
-        $item = &$this->ListOptions->add("detail_patient_vitals");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_vitals');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_doctor_notes"
-        $item = &$this->ListOptions->add("detail_doctor_notes");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'doctor_notes');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_diagnosis"
-        $item = &$this->ListOptions->add("detail_diagnosis");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'diagnosis');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_prescriptions"
-        $item = &$this->ListOptions->add("detail_prescriptions");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'prescriptions');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_radiology_requests"
-        $item = &$this->ListOptions->add("detail_radiology_requests");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'radiology_requests');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
         // "detail_lab_test_requests"
         $item = &$this->ListOptions->add("detail_lab_test_requests");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_patient_vitals"
+        $item = &$this->ListOptions->add("detail_patient_vitals");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_vitals');
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
@@ -1471,12 +1437,8 @@ class PatientVisitsList extends PatientVisits
 
         // Set up detail pages
         $pages = new SubPages();
-        $pages->add("patient_vitals");
-        $pages->add("doctor_notes");
-        $pages->add("diagnosis");
-        $pages->add("prescriptions");
-        $pages->add("radiology_requests");
         $pages->add("lab_test_requests");
+        $pages->add("patient_vitals");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1489,7 +1451,7 @@ class PatientVisitsList extends PatientVisits
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = true;
+        $item->Visible = false;
         $item->OnLeft = false;
         $item->Header = "<div class=\"form-check\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"form-check-input\" data-ew-action=\"select-all-keys\"></div>";
         if ($item->OnLeft) {
@@ -1552,7 +1514,7 @@ class PatientVisitsList extends PatientVisits
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1565,7 +1527,7 @@ class PatientVisitsList extends PatientVisits
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1577,7 +1539,7 @@ class PatientVisitsList extends PatientVisits
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1632,204 +1594,14 @@ class PatientVisitsList extends PatientVisits
         $detailCopyTblVar = "";
         $detailEditTblVar = "";
 
-        // "detail_patient_vitals"
-        $opt = $this->ListOptions["detail_patient_vitals"];
-        if ($Security->allowList(CurrentProjectID() . 'patient_vitals') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_vitals", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientvitalslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("PatientVitalsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "patient_vitals";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "patient_vitals";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_doctor_notes"
-        $opt = $this->ListOptions["detail_doctor_notes"];
-        if ($Security->allowList(CurrentProjectID() . 'doctor_notes') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("doctor_notes", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("doctornoteslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("DoctorNotesGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=doctor_notes");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "doctor_notes";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=doctor_notes");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "doctor_notes";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_diagnosis"
-        $opt = $this->ListOptions["detail_diagnosis"];
-        if ($Security->allowList(CurrentProjectID() . 'diagnosis') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("diagnosis", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("diagnosislist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("DiagnosisGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=diagnosis");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "diagnosis";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=diagnosis");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "diagnosis";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_prescriptions"
-        $opt = $this->ListOptions["detail_prescriptions"];
-        if ($Security->allowList(CurrentProjectID() . 'prescriptions') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("prescriptions", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("prescriptionslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("PrescriptionsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=prescriptions");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "prescriptions";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=prescriptions");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "prescriptions";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_radiology_requests"
-        $opt = $this->ListOptions["detail_radiology_requests"];
-        if ($Security->allowList(CurrentProjectID() . 'radiology_requests') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("radiology_requests", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("radiologyrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("RadiologyRequestsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=radiology_requests");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "radiology_requests";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=radiology_requests");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "radiology_requests";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
         // "detail_lab_test_requests"
         $opt = $this->ListOptions["detail_lab_test_requests"];
-        if ($Security->allowList(CurrentProjectID() . 'lab_test_requests') && $this->showOptionLink()) {
+        if ($Security->allowList(CurrentProjectID() . 'lab_test_requests')) {
             $body = $Language->phrase("DetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
             $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("LabTestRequestsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
                 $caption = $Language->phrase("MasterDetailViewLink", null);
                 $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
                 $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
@@ -1838,7 +1610,7 @@ class PatientVisitsList extends PatientVisits
                 }
                 $detailViewTblVar .= "lab_test_requests";
             }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
                 $caption = $Language->phrase("MasterDetailEditLink", null);
                 $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
                 $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
@@ -1846,6 +1618,44 @@ class PatientVisitsList extends PatientVisits
                     $detailEditTblVar .= ",";
                 }
                 $detailEditTblVar .= "lab_test_requests";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_patient_vitals"
+        $opt = $this->ListOptions["detail_patient_vitals"];
+        if ($Security->allowList(CurrentProjectID() . 'patient_vitals')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_vitals", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientvitalslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientVitalsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patient_vitals";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "patient_vitals";
             }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
@@ -1915,66 +1725,6 @@ class PatientVisitsList extends PatientVisits
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["detail"];
         $detailTableLink = "";
-        $item = &$option->add("detailadd_patient_vitals");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
-        $detailPage = Container("PatientVitalsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "patient_vitals";
-        }
-        $item = &$option->add("detailadd_doctor_notes");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=doctor_notes");
-        $detailPage = Container("DoctorNotesGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "doctor_notes";
-        }
-        $item = &$option->add("detailadd_diagnosis");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=diagnosis");
-        $detailPage = Container("DiagnosisGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "diagnosis";
-        }
-        $item = &$option->add("detailadd_prescriptions");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=prescriptions");
-        $detailPage = Container("PrescriptionsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "prescriptions";
-        }
-        $item = &$option->add("detailadd_radiology_requests");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=radiology_requests");
-        $detailPage = Container("RadiologyRequestsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "radiology_requests";
-        }
         $item = &$option->add("detailadd_lab_test_requests");
         $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
         $detailPage = Container("LabTestRequestsGrid");
@@ -1986,6 +1736,18 @@ class PatientVisitsList extends PatientVisits
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "lab_test_requests";
+        }
+        $item = &$option->add("detailadd_patient_vitals");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patient_vitals");
+        $detailPage = Container("PatientVitalsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "patient_vitals";
         }
 
         // Add multiple details
@@ -2014,6 +1776,7 @@ class PatientVisitsList extends PatientVisits
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "title");
+            $this->createColumnOption($option, "section");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -2460,7 +2223,7 @@ class PatientVisitsList extends PatientVisits
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->section->setDbValue($row['section']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2476,7 +2239,7 @@ class PatientVisitsList extends PatientVisits
         $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['section'] = $this->section->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2533,8 +2296,7 @@ class PatientVisitsList extends PatientVisits
 
         // medical_scheme_id
 
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
+        // section
 
         // date_created
 
@@ -2664,6 +2426,9 @@ class PatientVisitsList extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
+            // section
+            $this->section->ViewValue = $this->section->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2680,6 +2445,10 @@ class PatientVisitsList extends PatientVisits
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
 
+            // section
+            $this->section->HrefValue = "";
+            $this->section->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
@@ -2689,17 +2458,6 @@ class PatientVisitsList extends PatientVisits
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    // Build export filter for selected records
-    protected function buildExportSelectedFilter()
-    {
-        global $Language;
-        $wrkFilter = "";
-        if ($this->isExport()) {
-            $wrkFilter = $this->getFilterFromRecordKeys();
-        }
-        return $wrkFilter;
     }
 
     // Get export HTML tag
@@ -2714,33 +2472,33 @@ class PatientVisitsList extends PatientVisits
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_visitslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_visitslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_visitslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
         } elseif (SameText($type, "html")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"html\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToHtml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
         } elseif (SameText($type, "xml")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"xml\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToXml") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
         } elseif (SameText($type, "csv")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"csv\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("ExportToCsv") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_visitslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="true"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_visitslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
-            return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" form=\"fpatient_visitslist\" data-url=\"" . $exportUrl . "\" data-ew-action=\"export\" data-export=\"print\" data-custom=\"false\" data-export-selected=\"true\">" . $Language->phrase("PrinterFriendly") . "</button>";
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
     }
 
@@ -2937,16 +2695,6 @@ class PatientVisitsList extends PatientVisits
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString

@@ -827,6 +827,15 @@ class ServiceChargesEdit extends ServiceCharges
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("edit");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -1008,10 +1017,16 @@ class ServiceChargesEdit extends ServiceCharges
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
+                $this->created_by_user_id->CurrentValue = CurrentUserID();
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            } else {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                }
             }
 
             // date_created
@@ -1275,6 +1290,16 @@ class ServiceChargesEdit extends ServiceCharges
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
         }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up Breadcrumb

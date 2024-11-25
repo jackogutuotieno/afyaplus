@@ -72,10 +72,6 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
-<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->test_title->Visible) { // test_title ?>
     <div id="r_test_title"<?= $Page->test_title->rowAttributes() ?>>
@@ -93,17 +89,11 @@ $Page->showMessage();
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_radiology_requests_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
-<?php if ($Page->patient_id->getSessionValue() != "") { ?>
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->patient_id->getDisplayValue($Page->patient_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_radiology_requests_patient_id">
 <input type="<?= $Page->patient_id->getInputTextType() ?>" name="x_patient_id" id="x_patient_id" data-table="radiology_requests" data-field="x_patient_id" value="<?= $Page->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
 <?= $Page->patient_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -135,11 +125,17 @@ $Page->showMessage();
     <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
         <label id="elh_radiology_requests_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
+<input type="hidden" data-table="radiology_requests" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el_radiology_requests_created_by_user_id">
 <input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="radiology_requests" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
 <?= $Page->created_by_user_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

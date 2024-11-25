@@ -36,9 +36,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["past_medical_history", [fields.past_medical_history.visible && fields.past_medical_history.required ? ew.Validators.required(fields.past_medical_history.caption) : null], fields.past_medical_history.isInvalid],
             ["family_history", [fields.family_history.visible && fields.family_history.required ? ew.Validators.required(fields.family_history.caption) : null], fields.family_history.isInvalid],
             ["allergies", [fields.allergies.visible && fields.allergies.required ? ew.Validators.required(fields.allergies.caption) : null], fields.allergies.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -56,6 +54,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
             "visit_id": <?= $Page->visit_id->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -79,10 +78,6 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
-<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -100,11 +95,6 @@ loadjs.ready("head", function () {
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_doctor_notes_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
-<?php if ($Page->patient_id->getSessionValue() != "") { ?>
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
-<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_doctor_notes_patient_id">
     <select
         id="x_patient_id"
@@ -145,7 +135,6 @@ loadjs.ready("fdoctor_notesedit", function() {
 </script>
 <?php } ?>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -200,7 +189,7 @@ loadjs.ready("fdoctor_notesedit", function() {
         <label id="elh_doctor_notes_chief_complaint" for="x_chief_complaint" class="<?= $Page->LeftColumnClass ?>"><?= $Page->chief_complaint->caption() ?><?= $Page->chief_complaint->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->chief_complaint->cellAttributes() ?>>
 <span id="el_doctor_notes_chief_complaint">
-<input type="<?= $Page->chief_complaint->getInputTextType() ?>" name="x_chief_complaint" id="x_chief_complaint" data-table="doctor_notes" data-field="x_chief_complaint" value="<?= $Page->chief_complaint->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->chief_complaint->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->chief_complaint->formatPattern()) ?>"<?= $Page->chief_complaint->editAttributes() ?> aria-describedby="x_chief_complaint_help">
+<textarea data-table="doctor_notes" data-field="x_chief_complaint" name="x_chief_complaint" id="x_chief_complaint" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->chief_complaint->getPlaceHolder()) ?>"<?= $Page->chief_complaint->editAttributes() ?> aria-describedby="x_chief_complaint_help"><?= $Page->chief_complaint->EditValue ?></textarea>
 <?= $Page->chief_complaint->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->chief_complaint->getErrorMessage() ?></div>
 </span>
@@ -212,7 +201,7 @@ loadjs.ready("fdoctor_notesedit", function() {
         <label id="elh_doctor_notes_history_of_presenting_illness" for="x_history_of_presenting_illness" class="<?= $Page->LeftColumnClass ?>"><?= $Page->history_of_presenting_illness->caption() ?><?= $Page->history_of_presenting_illness->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->history_of_presenting_illness->cellAttributes() ?>>
 <span id="el_doctor_notes_history_of_presenting_illness">
-<input type="<?= $Page->history_of_presenting_illness->getInputTextType() ?>" name="x_history_of_presenting_illness" id="x_history_of_presenting_illness" data-table="doctor_notes" data-field="x_history_of_presenting_illness" value="<?= $Page->history_of_presenting_illness->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->history_of_presenting_illness->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->history_of_presenting_illness->formatPattern()) ?>"<?= $Page->history_of_presenting_illness->editAttributes() ?> aria-describedby="x_history_of_presenting_illness_help">
+<textarea data-table="doctor_notes" data-field="x_history_of_presenting_illness" name="x_history_of_presenting_illness" id="x_history_of_presenting_illness" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->history_of_presenting_illness->getPlaceHolder()) ?>"<?= $Page->history_of_presenting_illness->editAttributes() ?> aria-describedby="x_history_of_presenting_illness_help"><?= $Page->history_of_presenting_illness->EditValue ?></textarea>
 <?= $Page->history_of_presenting_illness->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->history_of_presenting_illness->getErrorMessage() ?></div>
 </span>
@@ -224,7 +213,7 @@ loadjs.ready("fdoctor_notesedit", function() {
         <label id="elh_doctor_notes_past_medical_history" for="x_past_medical_history" class="<?= $Page->LeftColumnClass ?>"><?= $Page->past_medical_history->caption() ?><?= $Page->past_medical_history->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->past_medical_history->cellAttributes() ?>>
 <span id="el_doctor_notes_past_medical_history">
-<input type="<?= $Page->past_medical_history->getInputTextType() ?>" name="x_past_medical_history" id="x_past_medical_history" data-table="doctor_notes" data-field="x_past_medical_history" value="<?= $Page->past_medical_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->past_medical_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->past_medical_history->formatPattern()) ?>"<?= $Page->past_medical_history->editAttributes() ?> aria-describedby="x_past_medical_history_help">
+<textarea data-table="doctor_notes" data-field="x_past_medical_history" name="x_past_medical_history" id="x_past_medical_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->past_medical_history->getPlaceHolder()) ?>"<?= $Page->past_medical_history->editAttributes() ?> aria-describedby="x_past_medical_history_help"><?= $Page->past_medical_history->EditValue ?></textarea>
 <?= $Page->past_medical_history->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->past_medical_history->getErrorMessage() ?></div>
 </span>
@@ -236,7 +225,7 @@ loadjs.ready("fdoctor_notesedit", function() {
         <label id="elh_doctor_notes_family_history" for="x_family_history" class="<?= $Page->LeftColumnClass ?>"><?= $Page->family_history->caption() ?><?= $Page->family_history->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->family_history->cellAttributes() ?>>
 <span id="el_doctor_notes_family_history">
-<input type="<?= $Page->family_history->getInputTextType() ?>" name="x_family_history" id="x_family_history" data-table="doctor_notes" data-field="x_family_history" value="<?= $Page->family_history->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->family_history->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->family_history->formatPattern()) ?>"<?= $Page->family_history->editAttributes() ?> aria-describedby="x_family_history_help">
+<textarea data-table="doctor_notes" data-field="x_family_history" name="x_family_history" id="x_family_history" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->family_history->getPlaceHolder()) ?>"<?= $Page->family_history->editAttributes() ?> aria-describedby="x_family_history_help"><?= $Page->family_history->EditValue ?></textarea>
 <?= $Page->family_history->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->family_history->getErrorMessage() ?></div>
 </span>
@@ -248,91 +237,9 @@ loadjs.ready("fdoctor_notesedit", function() {
         <label id="elh_doctor_notes_allergies" for="x_allergies" class="<?= $Page->LeftColumnClass ?>"><?= $Page->allergies->caption() ?><?= $Page->allergies->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->allergies->cellAttributes() ?>>
 <span id="el_doctor_notes_allergies">
-<input type="<?= $Page->allergies->getInputTextType() ?>" name="x_allergies" id="x_allergies" data-table="doctor_notes" data-field="x_allergies" value="<?= $Page->allergies->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->allergies->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->allergies->formatPattern()) ?>"<?= $Page->allergies->editAttributes() ?> aria-describedby="x_allergies_help">
+<textarea data-table="doctor_notes" data-field="x_allergies" name="x_allergies" id="x_allergies" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->allergies->getPlaceHolder()) ?>"<?= $Page->allergies->editAttributes() ?> aria-describedby="x_allergies_help"><?= $Page->allergies->EditValue ?></textarea>
 <?= $Page->allergies->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->allergies->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_doctor_notes_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_doctor_notes_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="doctor_notes" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fdoctor_notesedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fdoctor_notesedit", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_doctor_notes_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_doctor_notes_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="doctor_notes" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fdoctor_notesedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fdoctor_notesedit", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>

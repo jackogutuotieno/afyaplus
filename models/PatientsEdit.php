@@ -128,7 +128,7 @@ class PatientsEdit extends Patients
         $this->last_name->setVisibility();
         $this->national_id->setVisibility();
         $this->date_of_birth->setVisibility();
-        $this->age->setVisibility();
+        $this->age->Visible = false;
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
@@ -788,16 +788,6 @@ class PatientsEdit extends Patients
             $this->date_of_birth->CurrentValue = UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
         }
 
-        // Check field name 'age' first before field var 'x_age'
-        $val = $CurrentForm->hasValue("age") ? $CurrentForm->getValue("age") : $CurrentForm->getValue("x_age");
-        if (!$this->age->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->age->Visible = false; // Disable update for API request
-            } else {
-                $this->age->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'gender' first before field var 'x_gender'
         $val = $CurrentForm->hasValue("gender") ? $CurrentForm->getValue("gender") : $CurrentForm->getValue("x_gender");
         if (!$this->gender->IsDetailKey) {
@@ -900,7 +890,6 @@ class PatientsEdit extends Patients
         $this->national_id->CurrentValue = $this->national_id->FormValue;
         $this->date_of_birth->CurrentValue = $this->date_of_birth->FormValue;
         $this->date_of_birth->CurrentValue = UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
-        $this->age->CurrentValue = $this->age->FormValue;
         $this->gender->CurrentValue = $this->gender->FormValue;
         $this->phone->CurrentValue = $this->phone->FormValue;
         $this->email_address->CurrentValue = $this->email_address->FormValue;
@@ -1202,9 +1191,6 @@ class PatientsEdit extends Patients
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
 
-            // age
-            $this->age->HrefValue = "";
-
             // gender
             $this->gender->HrefValue = "";
 
@@ -1293,14 +1279,6 @@ class PatientsEdit extends Patients
             $this->date_of_birth->EditValue = HtmlEncode(FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern()));
             $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
 
-            // age
-            $this->age->setupEditAttributes();
-            $this->age->EditValue = $this->age->CurrentValue;
-            $this->age->PlaceHolder = RemoveHtml($this->age->caption());
-            if (strval($this->age->EditValue) != "" && is_numeric($this->age->EditValue)) {
-                $this->age->EditValue = FormatNumber($this->age->EditValue, null);
-            }
-
             // gender
             $this->gender->EditValue = $this->gender->options(false);
             $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
@@ -1388,9 +1366,6 @@ class PatientsEdit extends Patients
 
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
-
-            // age
-            $this->age->HrefValue = "";
 
             // gender
             $this->gender->HrefValue = "";
@@ -1490,14 +1465,6 @@ class PatientsEdit extends Patients
             }
             if (!CheckDate($this->date_of_birth->FormValue, $this->date_of_birth->formatPattern())) {
                 $this->date_of_birth->addErrorMessage($this->date_of_birth->getErrorMessage(false));
-            }
-            if ($this->age->Visible && $this->age->Required) {
-                if (!$this->age->IsDetailKey && EmptyValue($this->age->FormValue)) {
-                    $this->age->addErrorMessage(str_replace("%s", $this->age->caption(), $this->age->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->age->FormValue)) {
-                $this->age->addErrorMessage($this->age->getErrorMessage(false));
             }
             if ($this->gender->Visible && $this->gender->Required) {
                 if ($this->gender->FormValue == "") {
@@ -1693,9 +1660,6 @@ class PatientsEdit extends Patients
         // date_of_birth
         $this->date_of_birth->setDbValueDef($rsnew, UnFormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern()), $this->date_of_birth->ReadOnly);
 
-        // age
-        $this->age->setDbValueDef($rsnew, $this->age->CurrentValue, $this->age->ReadOnly);
-
         // gender
         $this->gender->setDbValueDef($rsnew, $this->gender->CurrentValue, $this->gender->ReadOnly);
 
@@ -1745,9 +1709,6 @@ class PatientsEdit extends Patients
         }
         if (isset($row['date_of_birth'])) { // date_of_birth
             $this->date_of_birth->CurrentValue = $row['date_of_birth'];
-        }
-        if (isset($row['age'])) { // age
-            $this->age->CurrentValue = $row['age'];
         }
         if (isset($row['gender'])) { // gender
             $this->gender->CurrentValue = $row['gender'];

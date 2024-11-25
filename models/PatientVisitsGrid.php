@@ -142,7 +142,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->doctor_id->Visible = false;
         $this->payment_method_id->Visible = false;
         $this->medical_scheme_id->Visible = false;
-        $this->created_by_user_id->Visible = false;
+        $this->section->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -393,9 +393,6 @@ class PatientVisitsGrid extends PatientVisits
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
-        }
-        if ($this->isAddOrEdit()) {
-            $this->created_by_user_id->Visible = false;
         }
     }
 
@@ -1122,6 +1119,14 @@ class PatientVisitsGrid extends PatientVisits
             return false;
         }
         if (
+            $CurrentForm->hasValue("x_section") &&
+            $CurrentForm->hasValue("o_section") &&
+            $this->section->CurrentValue != $this->section->DefaultValue &&
+            !($this->section->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->section->CurrentValue == $this->section->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
             $CurrentForm->hasValue("x_date_created") &&
             $CurrentForm->hasValue("o_date_created") &&
             $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
@@ -1392,7 +1397,7 @@ class PatientVisitsGrid extends PatientVisits
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1405,7 +1410,7 @@ class PatientVisitsGrid extends PatientVisits
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_visits\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1417,7 +1422,7 @@ class PatientVisitsGrid extends PatientVisits
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1669,8 +1674,8 @@ class PatientVisitsGrid extends PatientVisits
     // Load default values
     protected function loadDefaultValues()
     {
-        $this->created_by_user_id->DefaultValue = CurrentUserID();
-        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
+        $this->section->DefaultValue = $this->section->getDefault(); // PHP
+        $this->section->OldValue = $this->section->DefaultValue;
     }
 
     // Load form values
@@ -1707,6 +1712,19 @@ class PatientVisitsGrid extends PatientVisits
             $this->_title->setOldValue($CurrentForm->getValue("o__title"));
         }
 
+        // Check field name 'section' first before field var 'x_section'
+        $val = $CurrentForm->hasValue("section") ? $CurrentForm->getValue("section") : $CurrentForm->getValue("x_section");
+        if (!$this->section->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->section->Visible = false; // Disable update for API request
+            } else {
+                $this->section->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_section")) {
+            $this->section->setOldValue($CurrentForm->getValue("o_section"));
+        }
+
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -1737,6 +1755,7 @@ class PatientVisitsGrid extends PatientVisits
         }
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->_title->CurrentValue = $this->_title->FormValue;
+        $this->section->CurrentValue = $this->section->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
     }
@@ -1841,7 +1860,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->section->setDbValue($row['section']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1857,7 +1876,7 @@ class PatientVisitsGrid extends PatientVisits
         $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['section'] = $this->section->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1912,8 +1931,7 @@ class PatientVisitsGrid extends PatientVisits
 
         // medical_scheme_id
 
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
+        // section
 
         // date_created
 
@@ -2043,6 +2061,9 @@ class PatientVisitsGrid extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
+            // section
+            $this->section->ViewValue = $this->section->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2058,6 +2079,10 @@ class PatientVisitsGrid extends PatientVisits
             // title
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
+
+            // section
+            $this->section->HrefValue = "";
+            $this->section->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2124,6 +2149,14 @@ class PatientVisitsGrid extends PatientVisits
             $this->_title->EditValue = HtmlEncode($this->_title->CurrentValue);
             $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
 
+            // section
+            $this->section->setupEditAttributes();
+            if (!$this->section->Raw) {
+                $this->section->CurrentValue = HtmlDecode($this->section->CurrentValue);
+            }
+            $this->section->EditValue = HtmlEncode($this->section->CurrentValue);
+            $this->section->PlaceHolder = RemoveHtml($this->section->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2136,6 +2169,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // title
             $this->_title->HrefValue = "";
+
+            // section
+            $this->section->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2201,6 +2237,14 @@ class PatientVisitsGrid extends PatientVisits
             $this->_title->EditValue = HtmlEncode($this->_title->CurrentValue);
             $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
 
+            // section
+            $this->section->setupEditAttributes();
+            if (!$this->section->Raw) {
+                $this->section->CurrentValue = HtmlDecode($this->section->CurrentValue);
+            }
+            $this->section->EditValue = HtmlEncode($this->section->CurrentValue);
+            $this->section->PlaceHolder = RemoveHtml($this->section->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2213,6 +2257,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // title
             $this->_title->HrefValue = "";
+
+            // section
+            $this->section->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2245,6 +2292,11 @@ class PatientVisitsGrid extends PatientVisits
             if ($this->_title->Visible && $this->_title->Required) {
                 if (!$this->_title->IsDetailKey && EmptyValue($this->_title->FormValue)) {
                     $this->_title->addErrorMessage(str_replace("%s", $this->_title->caption(), $this->_title->RequiredErrorMessage));
+                }
+            }
+            if ($this->section->Visible && $this->section->Required) {
+                if (!$this->section->IsDetailKey && EmptyValue($this->section->FormValue)) {
+                    $this->section->addErrorMessage(str_replace("%s", $this->section->caption(), $this->section->RequiredErrorMessage));
                 }
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
@@ -2362,6 +2414,24 @@ class PatientVisitsGrid extends PatientVisits
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check referential integrity for master table 'patients'
+        $detailKeys = [];
+        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
+        $detailKeys['patient_id'] = $keyValue;
+        $masterTable = Container("patients");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patients", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2414,6 +2484,9 @@ class PatientVisitsGrid extends PatientVisits
         // title
         $this->_title->setDbValueDef($rsnew, $this->_title->CurrentValue, $this->_title->ReadOnly);
 
+        // section
+        $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, $this->section->ReadOnly);
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
         return $rsnew;
@@ -2430,6 +2503,9 @@ class PatientVisitsGrid extends PatientVisits
         }
         if (isset($row['title'])) { // title
             $this->_title->CurrentValue = $row['title'];
+        }
+        if (isset($row['section'])) { // section
+            $this->section->CurrentValue = $row['section'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -2452,6 +2528,24 @@ class PatientVisitsGrid extends PatientVisits
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Check referential integrity for master table 'patient_visits'
+        $validMasterRecord = true;
+        $detailKeys = [];
+        $detailKeys["patient_id"] = $this->patient_id->CurrentValue;
+        $masterTable = Container("patients");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patients", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2499,13 +2593,11 @@ class PatientVisitsGrid extends PatientVisits
         // title
         $this->_title->setDbValueDef($rsnew, $this->_title->CurrentValue, false);
 
+        // section
+        $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, strval($this->section->CurrentValue) == "");
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // created_by_user_id
-        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            $rsnew['created_by_user_id'] = CurrentUserID();
-        }
         return $rsnew;
     }
 
@@ -2521,22 +2613,12 @@ class PatientVisitsGrid extends PatientVisits
         if (isset($row['title'])) { // title
             $this->_title->setFormValue($row['title']);
         }
+        if (isset($row['section'])) { // section
+            $this->section->setFormValue($row['section']);
+        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString

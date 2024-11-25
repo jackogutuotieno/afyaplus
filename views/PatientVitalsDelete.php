@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_patient_vitals_id" class="patient_vitals_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_patient_vitals_patient_id" class="patient_vitals_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
@@ -77,11 +74,11 @@ $Page->showMessage();
 <?php if ($Page->blood_pressure->Visible) { // blood_pressure ?>
         <th class="<?= $Page->blood_pressure->headerCellClass() ?>"><span id="elh_patient_vitals_blood_pressure" class="patient_vitals_blood_pressure"><?= $Page->blood_pressure->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_patient_vitals_created_by_user_id" class="patient_vitals_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_vitals_date_created" class="patient_vitals_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_patient_vitals_date_updated" class="patient_vitals_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -104,14 +101,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td<?= $Page->patient_id->cellAttributes() ?>>
 <span id="">
@@ -176,19 +165,19 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <td<?= $Page->date_created->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
