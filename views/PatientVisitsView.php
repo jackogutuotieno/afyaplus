@@ -152,20 +152,28 @@ loadjs.ready("head", function () {
 <?php } ?>
 </table>
 <?php
-    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "PatientVitalsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("doctor_notes", explode(",", $Page->getCurrentDetailTable())) && $doctor_notes->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("doctor_notes", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "DoctorNotesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 <?php
     if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailView) {

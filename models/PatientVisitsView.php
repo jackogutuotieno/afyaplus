@@ -725,45 +725,6 @@ class PatientVisitsView extends PatientVisits
         $detailCopyTblVar = "";
         $detailEditTblVar = "";
 
-        // "detail_lab_test_requests"
-        $item = &$option->add("detail_lab_test_requests");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("LabTestRequestsGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "lab_test_requests";
-        }
-        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            if ($detailEditTblVar != "") {
-                $detailEditTblVar .= ",";
-            }
-            $detailEditTblVar .= "lab_test_requests";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "lab_test_requests";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
         // "detail_patient_vitals"
         $item = &$option->add("detail_patient_vitals");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patient_vitals", "TblCaption");
@@ -798,6 +759,84 @@ class PatientVisitsView extends PatientVisits
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "patient_vitals";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_doctor_notes"
+        $item = &$option->add("detail_doctor_notes");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("doctor_notes", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("doctornoteslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("DoctorNotesGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=doctor_notes"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "doctor_notes";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=doctor_notes"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "doctor_notes";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'doctor_notes');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "doctor_notes";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_lab_test_requests"
+        $item = &$option->add("detail_lab_test_requests");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("LabTestRequestsGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "lab_test_requests";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "lab_test_requests";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "lab_test_requests";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -1382,25 +1421,6 @@ class PatientVisitsView extends PatientVisits
         // Set up detail parameters
         $this->setupDetailParms();
 
-        // Export detail records (lab_test_requests)
-        if (Config("EXPORT_DETAIL_RECORDS") && in_array("lab_test_requests", explode(",", $this->getCurrentDetailTable()))) {
-            $lab_test_requests = new LabTestRequestsList();
-            $rsdetail = $lab_test_requests->loadRs($lab_test_requests->getDetailFilterFromSession(), $lab_test_requests->getSessionOrderBy()); // Load detail records
-            if ($rsdetail) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("h"); // Change to horizontal
-                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
-                    $doc->exportEmptyRow();
-                    $detailcnt = $rsdetail->rowCount();
-                    $oldtbl = $doc->getTable();
-                    $doc->setTable($lab_test_requests);
-                    $lab_test_requests->exportDocument($doc, $rsdetail, 1, $detailcnt);
-                    $doc->setTable($oldtbl);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Export detail records (patient_vitals)
         if (Config("EXPORT_DETAIL_RECORDS") && in_array("patient_vitals", explode(",", $this->getCurrentDetailTable()))) {
             $patient_vitals = new PatientVitalsList();
@@ -1414,6 +1434,44 @@ class PatientVisitsView extends PatientVisits
                     $oldtbl = $doc->getTable();
                     $doc->setTable($patient_vitals);
                     $patient_vitals->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (doctor_notes)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("doctor_notes", explode(",", $this->getCurrentDetailTable()))) {
+            $doctor_notes = new DoctorNotesList();
+            $rsdetail = $doctor_notes->loadRs($doctor_notes->getDetailFilterFromSession(), $doctor_notes->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($doctor_notes);
+                    $doctor_notes->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (lab_test_requests)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("lab_test_requests", explode(",", $this->getCurrentDetailTable()))) {
+            $lab_test_requests = new LabTestRequestsList();
+            $rsdetail = $lab_test_requests->loadRs($lab_test_requests->getDetailFilterFromSession(), $lab_test_requests->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($lab_test_requests);
+                    $lab_test_requests->exportDocument($doc, $rsdetail, 1, $detailcnt);
                     $doc->setTable($oldtbl);
                 }
                 $doc->setStyle($exportStyle); // Restore
@@ -1537,20 +1595,6 @@ class PatientVisitsView extends PatientVisits
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("lab_test_requests", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "view";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
             if (in_array("patient_vitals", $detailTblVar)) {
                 $detailPageObj = Container("PatientVitalsGrid");
                 if ($detailPageObj->DetailView) {
@@ -1563,6 +1607,34 @@ class PatientVisitsView extends PatientVisits
                     $detailPageObj->visit_id->IsDetailKey = true;
                     $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                }
+            }
+            if (in_array("doctor_notes", $detailTblVar)) {
+                $detailPageObj = Container("DoctorNotesGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                }
+            }
+            if (in_array("lab_test_requests", $detailTblVar)) {
+                $detailPageObj = Container("LabTestRequestsGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
             if (in_array("patient_vaccinations", $detailTblVar)) {

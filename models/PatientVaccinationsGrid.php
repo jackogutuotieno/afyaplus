@@ -1325,7 +1325,7 @@ class PatientVaccinationsGrid extends PatientVaccinations
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
-        $this->ListOptions->UseButtonGroup = false;
+        $this->ListOptions->UseButtonGroup = true;
         if ($this->ListOptions->UseButtonGroup && IsMobile()) {
             $this->ListOptions->UseDropDownButton = true;
         }
@@ -2549,6 +2549,24 @@ class PatientVaccinationsGrid extends PatientVaccinations
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check referential integrity for master table 'patient_visits'
+        $detailKeys = [];
+        $keyValue = $rsnew['visit_id'] ?? $rsold['visit_id'];
+        $detailKeys['visit_id'] = $keyValue;
+        $masterTable = Container("patient_visits");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2658,6 +2676,24 @@ class PatientVaccinationsGrid extends PatientVaccinations
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Check referential integrity for master table 'patient_vaccinations'
+        $validMasterRecord = true;
+        $detailKeys = [];
+        $detailKeys["visit_id"] = $this->visit_id->CurrentValue;
+        $masterTable = Container("patient_visits");
+        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+        if (!EmptyValue($masterFilter)) {
+            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        } else { // Allow null value if not required field
+            $validMasterRecord = $masterFilter === null;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from old row

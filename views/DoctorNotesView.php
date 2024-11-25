@@ -161,17 +161,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_doctor_notes_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_doctor_notes_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
 </form>
 </main>

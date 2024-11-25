@@ -413,6 +413,7 @@ class Login extends Users
 
                     // Check user login session
                     if ($validPwd && !IsSysAdmin() && !$profile->isValidUser(session_id())) {
+                        WriteAuditLog($this->Username->CurrentValue, $Language->phrase("AuditTrailUserLoggedIn"), CurrentUserIP());
                         $message = str_replace("%u", $this->Username->CurrentValue, $Language->phrase("UserLoggedIn"));
                         if ($this->IsModal) {
                             WriteJson(["error" => ["description" => $message]]);
@@ -479,6 +480,7 @@ class Login extends Users
             } else {
                 RemoveCookie("AutoLogin"); // Clear cookie
             }
+            $this->writeAuditTrailOnLogin();
 
             // Call loggedin event
             $this->userLoggedIn($this->Username->CurrentValue);
@@ -555,6 +557,14 @@ class Login extends Users
             $this->setFailureMessage($formCustomError);
         }
         return $validateForm;
+    }
+
+    // Write audit trail on login
+    protected function writeAuditTrailOnLogin()
+    {
+        global $Language;
+        $usr = CurrentUserIdentifier();
+        WriteAuditLog($usr, $Language->phrase("AuditTrailLogin"), CurrentUserIP());
     }
 
     // Page Load event

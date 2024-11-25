@@ -78,6 +78,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -142,6 +146,11 @@ loadjs.ready("fdoctor_notesedit", function() {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_doctor_notes_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
+<?php if ($Page->visit_id->getSessionValue() != "") { ?>
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->visit_id->getDisplayValue($Page->visit_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_doctor_notes_visit_id">
     <select
         id="x_visit_id"
@@ -181,6 +190,7 @@ loadjs.ready("fdoctor_notesedit", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

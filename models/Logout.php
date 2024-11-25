@@ -285,6 +285,7 @@ class Logout
                 $isForceLogout = false;
                 $isValidUser = true; // Anonymous user
             }
+            $this->writeAuditTrailOnLogout();
 
             // Call User LoggedOut event
             $this->userLoggedOut($username);
@@ -357,6 +358,13 @@ class Logout
                 $this->renderSearchOptions();
             }
         }
+    }
+
+    // Write audit trail on logout
+    protected function writeAuditTrailOnLogout()
+    {
+        global $Language;
+        WriteAuditLog(CurrentUserIdentifier(), $Language->phrase("AuditTrailLogout"), CurrentUserIP());
     }
 
     // Page Load event

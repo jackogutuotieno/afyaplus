@@ -356,7 +356,7 @@
         <phrase id="fldcaption" value="Doctor" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
+        <phrase id="fldcaption" value="Submission Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

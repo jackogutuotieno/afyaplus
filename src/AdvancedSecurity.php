@@ -489,6 +489,9 @@ class AdvancedSecurity
                 }
             }
         }
+        if ($valid) {
+            WriteAuditLog($usr, $GLOBALS["Language"]->phrase("AuditTrailAutoLogin"), CurrentUserIP());
+        }
         return $valid;
     }
 
@@ -651,6 +654,7 @@ class AdvancedSecurity
                         $this->setSessionPasswordExpired();
                         $this->userPasswordExpired($user->toArray());
                     if (IsPasswordExpired()) {
+                        WriteAuditLog($usr, $Language->phrase("AuditTrailPasswordExpired"), CurrentUserIP());
                         return false;
                     }
                 }
