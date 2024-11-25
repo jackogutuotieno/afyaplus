@@ -1,4 +1,4 @@
-<ew-language date="2024/11/25" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/26" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -545,7 +545,7 @@
         <phrase id="fldcaption" value="Requested By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Request Date" />
+        <phrase id="fldcaption" value="Submission Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

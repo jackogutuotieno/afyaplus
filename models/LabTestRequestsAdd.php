@@ -125,7 +125,7 @@ class LabTestRequestsAdd extends LabTestRequests
         $this->test_title->setVisibility();
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
-        $this->status->setVisibility();
+        $this->status->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -736,16 +736,6 @@ class LabTestRequestsAdd extends LabTestRequests
             }
         }
 
-        // Check field name 'status' first before field var 'x_status'
-        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
-        if (!$this->status->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->status->Visible = false; // Disable update for API request
-            } else {
-                $this->status->setFormValue($val);
-            }
-        }
-
         // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
         $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
         if (!$this->created_by_user_id->IsDetailKey) {
@@ -767,7 +757,6 @@ class LabTestRequestsAdd extends LabTestRequests
         $this->test_title->CurrentValue = $this->test_title->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->status->CurrentValue = $this->status->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
@@ -986,10 +975,6 @@ class LabTestRequestsAdd extends LabTestRequests
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
             // test_title
             $this->test_title->HrefValue = "";
 
@@ -998,9 +983,6 @@ class LabTestRequestsAdd extends LabTestRequests
 
             // visit_id
             $this->visit_id->HrefValue = "";
-
-            // status
-            $this->status->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1092,11 +1074,6 @@ class LabTestRequestsAdd extends LabTestRequests
             }
             $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
-            // status
-            $this->status->setupEditAttributes();
-            $this->status->EditValue = $this->status->options(true);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
             // created_by_user_id
 
             // Add refer script
@@ -1109,9 +1086,6 @@ class LabTestRequestsAdd extends LabTestRequests
 
             // visit_id
             $this->visit_id->HrefValue = "";
-
-            // status
-            $this->status->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1149,11 +1123,6 @@ class LabTestRequestsAdd extends LabTestRequests
             if ($this->visit_id->Visible && $this->visit_id->Required) {
                 if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
                     $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if ($this->status->Visible && $this->status->Required) {
-                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
-                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
@@ -1304,9 +1273,6 @@ class LabTestRequestsAdd extends LabTestRequests
         // visit_id
         $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
 
-        // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, strval($this->status->CurrentValue) == "");
-
         // created_by_user_id
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
@@ -1327,9 +1293,6 @@ class LabTestRequestsAdd extends LabTestRequests
         }
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->setFormValue($row['visit_id']);
-        }
-        if (isset($row['status'])) { // status
-            $this->status->setFormValue($row['status']);
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);

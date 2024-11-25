@@ -25,7 +25,6 @@ loadjs.ready(["wrapper", "head"], function () {
             ["test_title", [fields.test_title.visible && fields.test_title.required ? ew.Validators.required(fields.test_title.caption) : null], fields.test_title.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
-            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
@@ -44,7 +43,6 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
             "visit_id": <?= $Page->visit_id->toClientList($Page) ?>,
-            "status": <?= $Page->status->toClientList($Page) ?>,
             "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
@@ -182,51 +180,6 @@ loadjs.ready("flab_test_requestsadd", function() {
     }
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests.fields.visit_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <label id="elh_lab_test_requests_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
-<span id="el_lab_test_requests_status">
-    <select
-        id="x_status"
-        name="x_status"
-        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
-        <?php if (!$Page->status->IsNativeSelect) { ?>
-        data-select2-id="flab_test_requestsadd_x_status"
-        <?php } ?>
-        data-table="lab_test_requests"
-        data-field="x_status"
-        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
-        <?= $Page->status->editAttributes() ?>>
-        <?= $Page->status->selectOptionListHtml("x_status") ?>
-    </select>
-    <?= $Page->status->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
-<?php if (!$Page->status->IsNativeSelect) { ?>
-<script>
-loadjs.ready("flab_test_requestsadd", function() {
-    var options = { name: "x_status", selectId: "flab_test_requestsadd_x_status" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (flab_test_requestsadd.lists.status?.lookupOptions.length) {
-        options.data = { id: "x_status", form: "flab_test_requestsadd" };
-    } else {
-        options.ajax = { id: "x_status", form: "flab_test_requestsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests.fields.status.selectOptions);
     ew.createSelect(options);
 });
 </script>

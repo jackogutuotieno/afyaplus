@@ -65,17 +65,6 @@ $lab_test_requests->TableClass = "table table-bordered table-hover table-sm ew-t
 </td>
         </tr>
 <?php } ?>
-<?php if ($lab_test_requests->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $lab_test_requests->date_updated->rowAttributes() ?>>
-            <td class="<?= $lab_test_requests->TableLeftColumnClass ?>"><?= $lab_test_requests->date_updated->caption() ?></td>
-            <td<?= $lab_test_requests->date_updated->cellAttributes() ?>>
-<span id="el_lab_test_requests_date_updated">
-<span<?= $lab_test_requests->date_updated->viewAttributes() ?>>
-<?= $lab_test_requests->date_updated->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>
