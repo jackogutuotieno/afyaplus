@@ -153,17 +153,23 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_patient_visitsview" class="ew-custom-template"></div>
 <template id="tpm_patient_visitsview">
-<div id="ct_PatientVisitsView"><div class="row">
+<div id="ct_PatientVisitsView"><div class="row check-in-view">
     <div class="col-lg-4 col-md-6 col-sm-12">
-        <div class="card"><slot class="ew-slot" name="tpc_patient_visits_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_patient_id"></slot></div>
-    </div>
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_patient_id"></slot></p>
+        </div>
+    </div> <!-- ./col -->
     <div class="col-lg-4 col-md-6 col-sm-12">
-        <div class="card"><slot class="ew-slot" name="tpc_patient_visits_section"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_section"></slot></div>
-    </div>
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_section"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_section"></slot></p>
+        </div>
+    </div> <!-- ./col -->
     <div class="col-lg-4 col-md-6 col-sm-12">
-        <div class="card"><slot class="ew-slot" name="tpc_patient_visits_checkin_date"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_checkin_date"></slot></div>
-    </div>
-</div></div>
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_checkin_date"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_checkin_date"></slot></p>
+        </div>
+    </div> <!-- ./col -->  
+</div> <!-- ./row --></div>
 </template>
 <?php
     if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailView) {
@@ -182,20 +188,20 @@ loadjs.ready("head", function () {
 <?php include_once "DoctorNotesGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vaccinations", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "PatientVaccinationsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

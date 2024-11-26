@@ -485,6 +485,7 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
     public $RecordRange = 10;
     public $RecKey = [];
     public $IsModal = false;
+    public $DetailPages; // Detail pages object
 
     /**
      * Page run
@@ -542,6 +543,9 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
             $this->setUseLookupCache(false);
         }
+
+        // Set up detail page object
+        $this->setupDetailPages();
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -752,6 +756,45 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "lab_test_requests_queue";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_lab_test_reports"
+        $item = &$option->add("detail_lab_test_reports");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("lab_test_reports", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("labtestreportslist?" . Config("TABLE_SHOW_MASTER") . "=lab_test_requests_details&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("LabTestReportsGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'lab_test_requests_details')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_reports"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "lab_test_reports";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'lab_test_requests_details')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_reports"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "lab_test_reports";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_reports');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "lab_test_reports";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -1195,6 +1238,25 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
                 $doc->setStyle($exportStyle); // Restore
             }
         }
+
+        // Export detail records (lab_test_reports)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("lab_test_reports", explode(",", $this->getCurrentDetailTable()))) {
+            $lab_test_reports = new LabTestReportsList();
+            $rsdetail = $lab_test_reports->loadRs($lab_test_reports->getDetailFilterFromSession(), $lab_test_reports->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($lab_test_reports);
+                    $lab_test_reports->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
         $rs->free();
 
         // Page footer
@@ -1318,6 +1380,20 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
                     $detailPageObj->lab_test_requests_detail_id->setSessionValue($detailPageObj->lab_test_requests_detail_id->CurrentValue);
                 }
             }
+            if (in_array("lab_test_reports", $detailTblVar)) {
+                $detailPageObj = Container("LabTestReportsGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->lab_test_requests_details_id->IsDetailKey = true;
+                    $detailPageObj->lab_test_requests_details_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->lab_test_requests_details_id->setSessionValue($detailPageObj->lab_test_requests_details_id->CurrentValue);
+                }
+            }
         }
     }
 
@@ -1330,6 +1406,19 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("labtestrequestsdetailslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
+    }
+
+    // Set up detail pages
+    protected function setupDetailPages()
+    {
+        $pages = new SubPages();
+        $pages->Style = "tabs";
+        if ($pages->isAccordion()) {
+            $pages->Parent = "#accordion_" . $this->PageObjName;
+        }
+        $pages->add('lab_test_requests_queue');
+        $pages->add('lab_test_reports');
+        $this->DetailPages = $pages;
     }
 
     // Setup lookup options

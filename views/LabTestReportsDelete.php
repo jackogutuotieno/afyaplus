@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_lab_test_reports_lab_test_request_id" class="lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->report_title->Visible) { // report_title ?>
         <th class="<?= $Page->report_title->headerCellClass() ?>"><span id="elh_lab_test_reports_report_title" class="lab_test_reports_report_title"><?= $Page->report_title->caption() ?></span></th>
 <?php } ?>
@@ -70,6 +67,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_lab_test_reports_date_updated" class="lab_test_reports_date_updated"><?= $Page->date_updated->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->lab_test_requests_details_id->Visible) { // lab_test_requests_details_id ?>
+        <th class="<?= $Page->lab_test_requests_details_id->headerCellClass() ?>"><span id="elh_lab_test_reports_lab_test_requests_details_id" class="lab_test_reports_lab_test_requests_details_id"><?= $Page->lab_test_requests_details_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -97,14 +97,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -145,6 +137,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->lab_test_requests_details_id->Visible) { // lab_test_requests_details_id ?>
+        <td<?= $Page->lab_test_requests_details_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->lab_test_requests_details_id->viewAttributes() ?>>
+<?= $Page->lab_test_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

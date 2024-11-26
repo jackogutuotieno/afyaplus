@@ -22,13 +22,12 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["service_category_id", [fields.service_category_id.visible && fields.service_category_id.required ? ew.Validators.required(fields.service_category_id.caption) : null, ew.Validators.integer], fields.service_category_id.isInvalid],
-            ["service_subcategory_id", [fields.service_subcategory_id.visible && fields.service_subcategory_id.required ? ew.Validators.required(fields.service_subcategory_id.caption) : null, ew.Validators.integer], fields.service_subcategory_id.isInvalid],
+            ["service_category_id", [fields.service_category_id.visible && fields.service_category_id.required ? ew.Validators.required(fields.service_category_id.caption) : null], fields.service_category_id.isInvalid],
+            ["service_subcategory_id", [fields.service_subcategory_id.visible && fields.service_subcategory_id.required ? ew.Validators.required(fields.service_subcategory_id.caption) : null], fields.service_subcategory_id.isInvalid],
             ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
+            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
-            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
+            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -44,6 +43,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "service_category_id": <?= $Page->service_category_id->toClientList($Page) ?>,
+            "service_subcategory_id": <?= $Page->service_subcategory_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -78,9 +79,43 @@ $Page->showMessage();
         <label id="elh_service_charges_service_category_id" for="x_service_category_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->service_category_id->caption() ?><?= $Page->service_category_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->service_category_id->cellAttributes() ?>>
 <span id="el_service_charges_service_category_id">
-<input type="<?= $Page->service_category_id->getInputTextType() ?>" name="x_service_category_id" id="x_service_category_id" data-table="service_charges" data-field="x_service_category_id" value="<?= $Page->service_category_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->service_category_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->service_category_id->formatPattern()) ?>"<?= $Page->service_category_id->editAttributes() ?> aria-describedby="x_service_category_id_help">
-<?= $Page->service_category_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->service_category_id->getErrorMessage() ?></div>
+    <select
+        id="x_service_category_id"
+        name="x_service_category_id"
+        class="form-select ew-select<?= $Page->service_category_id->isInvalidClass() ?>"
+        <?php if (!$Page->service_category_id->IsNativeSelect) { ?>
+        data-select2-id="fservice_chargesadd_x_service_category_id"
+        <?php } ?>
+        data-table="service_charges"
+        data-field="x_service_category_id"
+        data-value-separator="<?= $Page->service_category_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->service_category_id->getPlaceHolder()) ?>"
+        <?= $Page->service_category_id->editAttributes() ?>>
+        <?= $Page->service_category_id->selectOptionListHtml("x_service_category_id") ?>
+    </select>
+    <?= $Page->service_category_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->service_category_id->getErrorMessage() ?></div>
+<?= $Page->service_category_id->Lookup->getParamTag($Page, "p_x_service_category_id") ?>
+<?php if (!$Page->service_category_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fservice_chargesadd", function() {
+    var options = { name: "x_service_category_id", selectId: "fservice_chargesadd_x_service_category_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fservice_chargesadd.lists.service_category_id?.lookupOptions.length) {
+        options.data = { id: "x_service_category_id", form: "fservice_chargesadd" };
+    } else {
+        options.ajax = { id: "x_service_category_id", form: "fservice_chargesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.service_charges.fields.service_category_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -90,9 +125,43 @@ $Page->showMessage();
         <label id="elh_service_charges_service_subcategory_id" for="x_service_subcategory_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->service_subcategory_id->caption() ?><?= $Page->service_subcategory_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->service_subcategory_id->cellAttributes() ?>>
 <span id="el_service_charges_service_subcategory_id">
-<input type="<?= $Page->service_subcategory_id->getInputTextType() ?>" name="x_service_subcategory_id" id="x_service_subcategory_id" data-table="service_charges" data-field="x_service_subcategory_id" value="<?= $Page->service_subcategory_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->service_subcategory_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->service_subcategory_id->formatPattern()) ?>"<?= $Page->service_subcategory_id->editAttributes() ?> aria-describedby="x_service_subcategory_id_help">
-<?= $Page->service_subcategory_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->service_subcategory_id->getErrorMessage() ?></div>
+    <select
+        id="x_service_subcategory_id"
+        name="x_service_subcategory_id"
+        class="form-select ew-select<?= $Page->service_subcategory_id->isInvalidClass() ?>"
+        <?php if (!$Page->service_subcategory_id->IsNativeSelect) { ?>
+        data-select2-id="fservice_chargesadd_x_service_subcategory_id"
+        <?php } ?>
+        data-table="service_charges"
+        data-field="x_service_subcategory_id"
+        data-value-separator="<?= $Page->service_subcategory_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->service_subcategory_id->getPlaceHolder()) ?>"
+        <?= $Page->service_subcategory_id->editAttributes() ?>>
+        <?= $Page->service_subcategory_id->selectOptionListHtml("x_service_subcategory_id") ?>
+    </select>
+    <?= $Page->service_subcategory_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->service_subcategory_id->getErrorMessage() ?></div>
+<?= $Page->service_subcategory_id->Lookup->getParamTag($Page, "p_x_service_subcategory_id") ?>
+<?php if (!$Page->service_subcategory_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fservice_chargesadd", function() {
+    var options = { name: "x_service_subcategory_id", selectId: "fservice_chargesadd_x_service_subcategory_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fservice_chargesadd.lists.service_subcategory_id?.lookupOptions.length) {
+        options.data = { id: "x_service_subcategory_id", form: "fservice_chargesadd" };
+    } else {
+        options.ajax = { id: "x_service_subcategory_id", form: "fservice_chargesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.service_charges.fields.service_subcategory_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -109,21 +178,15 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_service_charges_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="service_charges" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_service_charges_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="service_charges" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
+<?php if ($Page->cost->Visible) { // cost ?>
+    <div id="r_cost"<?= $Page->cost->rowAttributes() ?>>
+        <label id="elh_service_charges_cost" for="x_cost" class="<?= $Page->LeftColumnClass ?>"><?= $Page->cost->caption() ?><?= $Page->cost->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->cost->cellAttributes() ?>>
+<span id="el_service_charges_cost">
+<input type="<?= $Page->cost->getInputTextType() ?>" name="x_cost" id="x_cost" data-table="service_charges" data-field="x_cost" value="<?= $Page->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->cost->formatPattern()) ?>"<?= $Page->cost->editAttributes() ?> aria-describedby="x_cost_help">
+<?= $Page->cost->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->cost->getErrorMessage() ?></div>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -138,7 +201,7 @@ $Page->showMessage();
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fservice_chargesadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -179,7 +242,7 @@ loadjs.ready(["fservice_chargesadd", "datetimepicker"], function () {
 <?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fservice_chargesadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -205,18 +268,6 @@ loadjs.ready(["fservice_chargesadd", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-    <div id="r_cost"<?= $Page->cost->rowAttributes() ?>>
-        <label id="elh_service_charges_cost" for="x_cost" class="<?= $Page->LeftColumnClass ?>"><?= $Page->cost->caption() ?><?= $Page->cost->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->cost->cellAttributes() ?>>
-<span id="el_service_charges_cost">
-<input type="<?= $Page->cost->getInputTextType() ?>" name="x_cost" id="x_cost" data-table="service_charges" data-field="x_cost" value="<?= $Page->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->cost->formatPattern()) ?>"<?= $Page->cost->editAttributes() ?> aria-describedby="x_cost_help">
-<?= $Page->cost->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->cost->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

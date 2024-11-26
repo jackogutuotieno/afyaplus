@@ -74,7 +74,7 @@ $Page->showMessage();
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
 <?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->test_title->Visible) { // test_title ?>
@@ -93,11 +93,6 @@ $Page->showMessage();
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_lab_test_requests_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
-<?php if ($Page->patient_id->getSessionValue() != "") { ?>
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
-<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_lab_test_requests_patient_id">
     <select
         id="x_patient_id"
@@ -138,7 +133,6 @@ loadjs.ready("flab_test_requestsadd", function() {
 </script>
 <?php } ?>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -146,6 +140,11 @@ loadjs.ready("flab_test_requestsadd", function() {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_lab_test_requests_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
+<?php if ($Page->visit_id->getSessionValue() != "") { ?>
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->visit_id->getDisplayValue($Page->visit_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_lab_test_requests_visit_id">
     <select
         id="x_visit_id"
@@ -185,6 +184,7 @@ loadjs.ready("flab_test_requestsadd", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

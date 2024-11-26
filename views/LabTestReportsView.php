@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el_lab_test_reports_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->report_title->Visible) { // report_title ?>
     <tr id="r_report_title"<?= $Page->report_title->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_report_title"><?= $Page->report_title->caption() ?></span></td>
@@ -124,6 +113,17 @@ loadjs.ready("head", function () {
 <span id="el_lab_test_reports_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->lab_test_requests_details_id->Visible) { // lab_test_requests_details_id ?>
+    <tr id="r_lab_test_requests_details_id"<?= $Page->lab_test_requests_details_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_requests_details_id"><?= $Page->lab_test_requests_details_id->caption() ?></span></td>
+        <td data-name="lab_test_requests_details_id"<?= $Page->lab_test_requests_details_id->cellAttributes() ?>>
+<span id="el_lab_test_reports_lab_test_requests_details_id">
+<span<?= $Page->lab_test_requests_details_id->viewAttributes() ?>>
+<?= $Page->lab_test_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

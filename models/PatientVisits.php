@@ -570,12 +570,12 @@ class PatientVisits extends DbTable
             $detailUrl = Container("doctor_notes")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        if ($this->getCurrentDetailTable() == "lab_test_requests") {
-            $detailUrl = Container("lab_test_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
         if ($this->getCurrentDetailTable() == "patient_vaccinations") {
             $detailUrl = Container("patient_vaccinations")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "lab_test_requests") {
+            $detailUrl = Container("lab_test_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
@@ -1019,33 +1019,6 @@ class PatientVisits extends DbTable
             }
         }
 
-        // Cascade Update detail table 'lab_test_requests'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['patient_id']) && $rsold['patient_id'] != $rs['patient_id'])) { // Update detail field 'patient_id'
-            $cascadeUpdate = true;
-            $rscascade['patient_id'] = $rs['patient_id'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("lab_test_requests")->loadRs("`patient_id` = " . QuotedValue($rsold['patient_id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("lab_test_requests")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("lab_test_requests")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("lab_test_requests")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // Cascade Update detail table 'patient_vaccinations'
         $cascadeUpdate = false;
         $rscascade = [];
@@ -1070,6 +1043,33 @@ class PatientVisits extends DbTable
                 }
                 // Call Row_Updated event
                 Container("patient_vaccinations")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
+        // Cascade Update detail table 'lab_test_requests'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'visit_id'
+            $cascadeUpdate = true;
+            $rscascade['visit_id'] = $rs['id'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("lab_test_requests")->loadRs("`visit_id` = " . QuotedValue($rsold['id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("lab_test_requests")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("lab_test_requests")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("lab_test_requests")->rowUpdated($rsdtlold, $rsdtlnew);
             }
         }
 
@@ -1170,30 +1170,6 @@ class PatientVisits extends DbTable
             }
         }
 
-        // Cascade delete detail table 'lab_test_requests'
-        $dtlrows = Container("lab_test_requests")->loadRs("`patient_id` = " . QuotedValue($rs['patient_id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
-        // Call Row Deleting event
-        foreach ($dtlrows as $dtlrow) {
-            $success = Container("lab_test_requests")->rowDeleting($dtlrow);
-            if (!$success) {
-                break;
-            }
-        }
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                $success = Container("lab_test_requests")->delete($dtlrow); // Delete
-                if (!$success) {
-                    break;
-                }
-            }
-        }
-        // Call Row Deleted event
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                Container("lab_test_requests")->rowDeleted($dtlrow);
-            }
-        }
-
         // Cascade delete detail table 'patient_vaccinations'
         $dtlrows = Container("patient_vaccinations")->loadRs("`visit_id` = " . QuotedValue($rs['id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
         // Call Row Deleting event
@@ -1215,6 +1191,30 @@ class PatientVisits extends DbTable
         if ($success) {
             foreach ($dtlrows as $dtlrow) {
                 Container("patient_vaccinations")->rowDeleted($dtlrow);
+            }
+        }
+
+        // Cascade delete detail table 'lab_test_requests'
+        $dtlrows = Container("lab_test_requests")->loadRs("`visit_id` = " . QuotedValue($rs['id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("lab_test_requests")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("lab_test_requests")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("lab_test_requests")->rowDeleted($dtlrow);
             }
         }
         if ($success) {

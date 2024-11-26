@@ -172,7 +172,6 @@ class LabTestRequests extends DbTable
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
-        $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
         $this->patient_id->setSelectMultiple(false); // Select one
@@ -203,6 +202,7 @@ class LabTestRequests extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
+        $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
         $this->visit_id->setSelectMultiple(false); // Select one
@@ -402,8 +402,8 @@ class LabTestRequests extends DbTable
         $masterFilter = "";
         if ($this->getCurrentMasterTable() == "patient_visits") {
             $masterTable = Container("patient_visits");
-            if ($this->patient_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            if ($this->visit_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
             } else {
                 return "";
             }
@@ -418,8 +418,8 @@ class LabTestRequests extends DbTable
         $detailFilter = "";
         if ($this->getCurrentMasterTable() == "patient_visits") {
             $masterTable = Container("patient_visits");
-            if ($this->patient_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            if ($this->visit_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->visit_id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
                 return "";
             }
@@ -439,9 +439,9 @@ class LabTestRequests extends DbTable
         $validKeys = true;
         switch ($masterTable->TableVar) {
             case "patient_visits":
-                $key = $keys["patient_id"] ?? "";
+                $key = $keys["visit_id"] ?? "";
                 if (EmptyValue($key)) {
-                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                    if ($masterTable->id->Required) { // Required field and empty value
                         return ""; // Return empty filter
                     }
                     $validKeys = false;
@@ -449,7 +449,7 @@ class LabTestRequests extends DbTable
                     return ""; // Return empty filter
                 }
                 if ($validKeys) {
-                    return GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                    return GetKeyFilter($masterTable->id, $keys["visit_id"], $this->visit_id->DataType, $this->Dbid);
                 }
                 break;
         }
@@ -461,7 +461,7 @@ class LabTestRequests extends DbTable
     {
         switch ($masterTable->TableVar) {
             case "patient_visits":
-                return GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+                return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
     }
@@ -1220,7 +1220,7 @@ class LabTestRequests extends DbTable
     {
         if ($this->getCurrentMasterTable() == "patient_visits" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->visit_id->getSessionValue()); // Use Session Value
         }
         return $url;
     }
@@ -1586,36 +1586,36 @@ class LabTestRequests extends DbTable
 
         // patient_id
         $this->patient_id->setupEditAttributes();
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-            $curVal = strval($this->patient_id->CurrentValue);
+        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+
+        // visit_id
+        $this->visit_id->setupEditAttributes();
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $curVal = strval($this->visit_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                if ($this->visit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->visit_id->ViewValue = null;
             }
         } else {
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
         }
-
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
         // status
         $this->status->setupEditAttributes();

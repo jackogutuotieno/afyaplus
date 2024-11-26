@@ -95,6 +95,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->cost->Visible) { // cost ?>
+    <tr id="r_cost"<?= $Page->cost->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_service_charges_cost"><?= $Page->cost->caption() ?></span></td>
+        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
+<span id="el_service_charges_cost">
+<span<?= $Page->cost->viewAttributes() ?>>
+<?= $Page->cost->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
     <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_service_charges_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
@@ -124,17 +135,6 @@ loadjs.ready("head", function () {
 <span id="el_service_charges_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-    <tr id="r_cost"<?= $Page->cost->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_service_charges_cost"><?= $Page->cost->caption() ?></span></td>
-        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
-<span id="el_service_charges_cost">
-<span<?= $Page->cost->viewAttributes() ?>>
-<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     </tr>

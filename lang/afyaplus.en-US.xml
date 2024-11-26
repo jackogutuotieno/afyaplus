@@ -176,14 +176,8 @@
     <menu id="46">
       <phrase id="menutext" value="Vitals" />
     </menu>
-    <menu id="106">
-      <phrase id="menutext" value="Laboratory" />
-    </menu>
     <menu id="107">
       <phrase id="menutext" value="Radiology" />
-    </menu>
-    <menu id="41">
-      <phrase id="menutext" value="laboratory billing" />
     </menu>
     <table id="appointments_report">
       <phrase id="tblcaption" value="appointments report" />
@@ -499,9 +493,6 @@
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
-      </field>
       <field id="report_title">
         <phrase id="fldcaption" value="report title" />
       </field>
@@ -516,6 +507,9 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="lab_test_requests_details_id">
+        <phrase id="fldcaption" value="lab test requests details id" />
       </field>
     </table>
     <table id="lab_test_requests">
@@ -617,75 +611,6 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
-      </field>
-    </table>
-    <table id="laboratory_billing">
-      <phrase id="tblcaption" value="laboratory billing" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
-      </field>
-      <field id="status">
-        <phrase id="fldcaption" value="status" />
-      </field>
-      <field id="test_title">
-        <phrase id="fldcaption" value="test title" />
-      </field>
-      <field id="specimen">
-        <phrase id="fldcaption" value="specimen" />
-      </field>
-      <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
-      </field>
-      <field id="cost">
-        <phrase id="fldcaption" value="cost" />
-      </field>
-    </table>
-    <table id="laboratoryreports">
-      <phrase id="tblcaption" value="laboratoryreports" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="report_title">
-        <phrase id="fldcaption" value="report title" />
-      </field>
-      <field id="details">
-        <phrase id="fldcaption" value="details" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
-      </field>
-      <field id="patient_name">
-        <phrase id="fldcaption" value="patient name" />
-      </field>
-      <field id="date_of_birth">
-        <phrase id="fldcaption" value="date of birth" />
-      </field>
-      <field id="gender">
-        <phrase id="fldcaption" value="gender" />
-      </field>
-      <field id="specimen">
-        <phrase id="fldcaption" value="specimen" />
-      </field>
-      <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
-      </field>
-      <field id="cost">
-        <phrase id="fldcaption" value="cost" />
-      </field>
-      <field id="subcategory">
-        <phrase id="fldcaption" value="subcategory" />
-      </field>
-      <field id="additional_findings">
-        <phrase id="fldcaption" value="additional findings" />
-      </field>
-      <field id="disease_name">
-        <phrase id="fldcaption" value="disease name" />
       </field>
     </table>
     <table id="medical_schemes">
@@ -1478,30 +1403,30 @@
       </field>
     </table>
     <table id="service_charges">
-      <phrase id="tblcaption" value="service charges" />
+      <phrase id="tblcaption" value="Facility Charges" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="service_category_id">
-        <phrase id="fldcaption" value="service category id" />
+        <phrase id="fldcaption" value="Category" />
       </field>
       <field id="service_subcategory_id">
-        <phrase id="fldcaption" value="service subcategory id" />
+        <phrase id="fldcaption" value="Subcategory" />
       </field>
       <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
+        <phrase id="fldcaption" value="Service" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="Cost (Kshs)" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="created by user id" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
-      </field>
-      <field id="cost">
-        <phrase id="fldcaption" value="cost" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="service_subcategories">

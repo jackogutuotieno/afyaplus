@@ -169,17 +169,14 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_service_charges_service_name" class="service_charges_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_service_charges_created_by_user_id" class="service_charges_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
+<?php if ($Page->cost->Visible) { // cost ?>
+        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_service_charges_cost" class="service_charges_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_service_charges_date_created" class="service_charges_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_service_charges_date_updated" class="service_charges_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_service_charges_cost" class="service_charges_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -241,11 +238,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_created_by_user_id" class="el_service_charges_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
+    <?php if ($Page->cost->Visible) { // cost ?>
+        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_cost" class="el_service_charges_cost">
+<span<?= $Page->cost->viewAttributes() ?>>
+<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -262,14 +259,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_date_updated" class="el_service_charges_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->cost->Visible) { // cost ?>
-        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_cost" class="el_service_charges_cost">
-<span<?= $Page->cost->viewAttributes() ?>>
-<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

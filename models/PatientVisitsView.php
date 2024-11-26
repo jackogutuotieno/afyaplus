@@ -803,45 +803,6 @@ class PatientVisitsView extends PatientVisits
             $item->Visible = false;
         }
 
-        // "detail_lab_test_requests"
-        $item = &$option->add("detail_lab_test_requests");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("LabTestRequestsGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "lab_test_requests";
-        }
-        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            if ($detailEditTblVar != "") {
-                $detailEditTblVar .= ",";
-            }
-            $detailEditTblVar .= "lab_test_requests";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "lab_test_requests";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
         // "detail_patient_vaccinations"
         $item = &$option->add("detail_patient_vaccinations");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patient_vaccinations", "TblCaption");
@@ -876,6 +837,45 @@ class PatientVisitsView extends PatientVisits
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "patient_vaccinations";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_lab_test_requests"
+        $item = &$option->add("detail_lab_test_requests");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("LabTestRequestsGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "lab_test_requests";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "lab_test_requests";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "lab_test_requests";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -1464,25 +1464,6 @@ class PatientVisitsView extends PatientVisits
             }
         }
 
-        // Export detail records (lab_test_requests)
-        if (Config("EXPORT_DETAIL_RECORDS") && in_array("lab_test_requests", explode(",", $this->getCurrentDetailTable()))) {
-            $lab_test_requests = new LabTestRequestsList();
-            $rsdetail = $lab_test_requests->loadRs($lab_test_requests->getDetailFilterFromSession(), $lab_test_requests->getSessionOrderBy()); // Load detail records
-            if ($rsdetail) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("h"); // Change to horizontal
-                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
-                    $doc->exportEmptyRow();
-                    $detailcnt = $rsdetail->rowCount();
-                    $oldtbl = $doc->getTable();
-                    $doc->setTable($lab_test_requests);
-                    $lab_test_requests->exportDocument($doc, $rsdetail, 1, $detailcnt);
-                    $doc->setTable($oldtbl);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Export detail records (patient_vaccinations)
         if (Config("EXPORT_DETAIL_RECORDS") && in_array("patient_vaccinations", explode(",", $this->getCurrentDetailTable()))) {
             $patient_vaccinations = new PatientVaccinationsList();
@@ -1496,6 +1477,25 @@ class PatientVisitsView extends PatientVisits
                     $oldtbl = $doc->getTable();
                     $doc->setTable($patient_vaccinations);
                     $patient_vaccinations->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (lab_test_requests)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("lab_test_requests", explode(",", $this->getCurrentDetailTable()))) {
+            $lab_test_requests = new LabTestRequestsList();
+            $rsdetail = $lab_test_requests->loadRs($lab_test_requests->getDetailFilterFromSession(), $lab_test_requests->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($lab_test_requests);
+                    $lab_test_requests->exportDocument($doc, $rsdetail, 1, $detailcnt);
                     $doc->setTable($oldtbl);
                 }
                 $doc->setStyle($exportStyle); // Restore
@@ -1628,8 +1628,8 @@ class PatientVisitsView extends PatientVisits
                     $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
                 }
             }
-            if (in_array("lab_test_requests", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsGrid");
+            if (in_array("patient_vaccinations", $detailTblVar)) {
+                $detailPageObj = Container("PatientVaccinationsGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";
@@ -1637,13 +1637,13 @@ class PatientVisitsView extends PatientVisits
                     // Save current master table to detail table
                     $detailPageObj->setCurrentMasterTable($this->TableVar);
                     $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
                 }
             }
-            if (in_array("patient_vaccinations", $detailTblVar)) {
-                $detailPageObj = Container("PatientVaccinationsGrid");
+            if (in_array("lab_test_requests", $detailTblVar)) {
+                $detailPageObj = Container("LabTestRequestsGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";

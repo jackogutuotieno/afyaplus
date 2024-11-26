@@ -1253,7 +1253,7 @@ class LabTestRequestsGrid extends LabTestRequests
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->patient_id->setSessionValue("");
+                        $this->visit_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -2257,8 +2257,8 @@ class LabTestRequestsGrid extends LabTestRequests
 
         // Check referential integrity for master table 'patient_visits'
         $detailKeys = [];
-        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
-        $detailKeys['patient_id'] = $keyValue;
+        $keyValue = $rsnew['visit_id'] ?? $rsold['visit_id'];
+        $detailKeys['visit_id'] = $keyValue;
         $masterTable = Container("patient_visits");
         $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
         if (!EmptyValue($masterFilter)) {
@@ -2358,8 +2358,8 @@ class LabTestRequestsGrid extends LabTestRequests
 
         // Set up foreign key field value from Session
         if ($this->getCurrentMasterTable() == "patient_visits") {
-            $this->patient_id->Visible = true; // Need to insert foreign key
-            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+            $this->visit_id->Visible = true; // Need to insert foreign key
+            $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
         }
 
         // Get new row
@@ -2371,7 +2371,7 @@ class LabTestRequestsGrid extends LabTestRequests
         // Check referential integrity for master table 'lab_test_requests'
         $validMasterRecord = true;
         $detailKeys = [];
-        $detailKeys["patient_id"] = $this->patient_id->getSessionValue();
+        $detailKeys["visit_id"] = $this->visit_id->getSessionValue();
         $masterTable = Container("patient_visits");
         $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
         if (!EmptyValue($masterFilter)) {
@@ -2439,9 +2439,9 @@ class LabTestRequestsGrid extends LabTestRequests
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $rsnew['patient_id'] = $this->patient_id->getSessionValue();
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
         }
         return $rsnew;
     }
@@ -2464,8 +2464,8 @@ class LabTestRequestsGrid extends LabTestRequests
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
         }
     }
 
@@ -2486,7 +2486,7 @@ class LabTestRequestsGrid extends LabTestRequests
         $masterTblVar = $this->getCurrentMasterTable();
         if ($masterTblVar == "patient_visits") {
             $masterTbl = Container("patient_visits");
-            $this->patient_id->Visible = false;
+            $this->visit_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }

@@ -95,8 +95,6 @@ return [
     "lab_test_requests" => \DI\create(LabTestRequests::class),
     "lab_test_requests_details" => \DI\create(LabTestRequestsDetails::class),
     "lab_test_requests_queue" => \DI\create(LabTestRequestsQueue::class),
-    "laboratory_billing" => \DI\create(LaboratoryBilling::class),
-    "laboratoryreports" => \DI\create(Laboratoryreports::class),
     "medical_schemes" => \DI\create(MedicalSchemes::class),
     "medicine_brands" => \DI\create(MedicineBrands::class),
     "medicine_categories" => \DI\create(MedicineCategories::class),

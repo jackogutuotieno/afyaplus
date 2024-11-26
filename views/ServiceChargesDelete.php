@@ -62,17 +62,14 @@ $Page->showMessage();
 <?php if ($Page->service_name->Visible) { // service_name ?>
         <th class="<?= $Page->service_name->headerCellClass() ?>"><span id="elh_service_charges_service_name" class="service_charges_service_name"><?= $Page->service_name->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_service_charges_created_by_user_id" class="service_charges_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
+<?php if ($Page->cost->Visible) { // cost ?>
+        <th class="<?= $Page->cost->headerCellClass() ?>"><span id="elh_service_charges_cost" class="service_charges_cost"><?= $Page->cost->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_service_charges_date_created" class="service_charges_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_service_charges_date_updated" class="service_charges_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-        <th class="<?= $Page->cost->headerCellClass() ?>"><span id="elh_service_charges_cost" class="service_charges_cost"><?= $Page->cost->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -127,11 +124,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
+<?php if ($Page->cost->Visible) { // cost ?>
+        <td<?= $Page->cost->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
+<span<?= $Page->cost->viewAttributes() ?>>
+<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -148,14 +145,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-        <td<?= $Page->cost->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->cost->viewAttributes() ?>>
-<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

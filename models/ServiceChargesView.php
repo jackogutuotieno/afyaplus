@@ -143,10 +143,10 @@ class ServiceChargesView extends ServiceCharges
         $this->service_category_id->setVisibility();
         $this->service_subcategory_id->setVisibility();
         $this->service_name->setVisibility();
+        $this->cost->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->cost->setVisibility();
     }
 
     // Constructor
@@ -561,6 +561,10 @@ class ServiceChargesView extends ServiceCharges
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_category_id);
+        $this->setupLookupOptions($this->service_subcategory_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -821,10 +825,10 @@ class ServiceChargesView extends ServiceCharges
         $this->service_category_id->setDbValue($row['service_category_id']);
         $this->service_subcategory_id->setDbValue($row['service_subcategory_id']);
         $this->service_name->setDbValue($row['service_name']);
+        $this->cost->setDbValue($row['cost']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->cost->setDbValue($row['cost']);
     }
 
     // Return a row with default values
@@ -835,10 +839,10 @@ class ServiceChargesView extends ServiceCharges
         $row['service_category_id'] = $this->service_category_id->DefaultValue;
         $row['service_subcategory_id'] = $this->service_subcategory_id->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
+        $row['cost'] = $this->cost->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['cost'] = $this->cost->DefaultValue;
         return $row;
     }
 
@@ -868,13 +872,13 @@ class ServiceChargesView extends ServiceCharges
 
         // service_name
 
+        // cost
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
-
-        // cost
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -882,15 +886,57 @@ class ServiceChargesView extends ServiceCharges
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // service_category_id
-            $this->service_category_id->ViewValue = $this->service_category_id->CurrentValue;
-            $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->ViewValue, $this->service_category_id->formatPattern());
+            $curVal = strval($this->service_category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_category_id->ViewValue = $this->service_category_id->lookupCacheOption($curVal);
+                if ($this->service_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_category_id->ViewValue = $this->service_category_id->displayValue($arwrk);
+                    } else {
+                        $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->CurrentValue, $this->service_category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_category_id->ViewValue = null;
+            }
 
             // service_subcategory_id
-            $this->service_subcategory_id->ViewValue = $this->service_subcategory_id->CurrentValue;
-            $this->service_subcategory_id->ViewValue = FormatNumber($this->service_subcategory_id->ViewValue, $this->service_subcategory_id->formatPattern());
+            $curVal = strval($this->service_subcategory_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_subcategory_id->ViewValue = $this->service_subcategory_id->lookupCacheOption($curVal);
+                if ($this->service_subcategory_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_subcategory_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_subcategory_id->ViewValue = $this->service_subcategory_id->displayValue($arwrk);
+                    } else {
+                        $this->service_subcategory_id->ViewValue = FormatNumber($this->service_subcategory_id->CurrentValue, $this->service_subcategory_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_subcategory_id->ViewValue = null;
+            }
 
             // service_name
             $this->service_name->ViewValue = $this->service_name->CurrentValue;
+
+            // cost
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
@@ -903,10 +949,6 @@ class ServiceChargesView extends ServiceCharges
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // cost
-            $this->cost->ViewValue = $this->cost->CurrentValue;
-            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -924,6 +966,10 @@ class ServiceChargesView extends ServiceCharges
             $this->service_name->HrefValue = "";
             $this->service_name->TooltipValue = "";
 
+            // cost
+            $this->cost->HrefValue = "";
+            $this->cost->TooltipValue = "";
+
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
@@ -935,10 +981,6 @@ class ServiceChargesView extends ServiceCharges
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // cost
-            $this->cost->HrefValue = "";
-            $this->cost->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1141,6 +1183,10 @@ class ServiceChargesView extends ServiceCharges
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_category_id":
+                    break;
+                case "x_service_subcategory_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

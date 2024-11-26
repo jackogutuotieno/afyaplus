@@ -150,6 +150,7 @@ C:\wamp64\www\afyaplus\models\LabTestReports.php
 C:\wamp64\www\afyaplus\models\LabTestReportsAdd.php
 C:\wamp64\www\afyaplus\models\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\models\LabTestReportsEdit.php
+C:\wamp64\www\afyaplus\models\LabTestReportsGrid.php
 C:\wamp64\www\afyaplus\models\LabTestReportsList.php
 C:\wamp64\www\afyaplus\models\LabTestReportsView.php
 C:\wamp64\www\afyaplus\models\LabTestRequests.php
@@ -607,6 +608,7 @@ C:\wamp64\www\afyaplus\views\LabSpecimensView.php
 C:\wamp64\www\afyaplus\views\LabTestReportsAdd.php
 C:\wamp64\www\afyaplus\views\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestReportsEdit.php
+C:\wamp64\www\afyaplus\views\LabTestReportsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestReportsList.php
 C:\wamp64\www\afyaplus\views\LabTestReportsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsAdd.php
