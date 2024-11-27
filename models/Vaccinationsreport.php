@@ -71,7 +71,7 @@ class Vaccinationsreport extends DbTable
         $Language = Container("app.language");
         $this->TableVar = "vaccinationsreport";
         $this->TableName = 'vaccinationsreport';
-        $this->TableType = "VIEW";
+        $this->TableType = "TABLE";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
@@ -119,15 +119,12 @@ class Vaccinationsreport extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
-        $this->id->IsAutoIncrement = true; // Autoincrement field
-        $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['id'] = &$this->id;
 
         // date_created
@@ -138,7 +135,7 @@ class Vaccinationsreport extends DbTable
             '`date_created`', // Expression
             CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
@@ -150,10 +147,8 @@ class Vaccinationsreport extends DbTable
         );
         $this->date_created->InputTextType = "text";
         $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
         $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
@@ -164,7 +159,7 @@ class Vaccinationsreport extends DbTable
             '`date_updated`', // Expression
             CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
@@ -176,10 +171,8 @@ class Vaccinationsreport extends DbTable
         );
         $this->date_updated->InputTextType = "text";
         $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
         $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
         // patient_name
@@ -212,7 +205,7 @@ class Vaccinationsreport extends DbTable
             '`date_of_birth`', // Expression
             CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
             133, // Type
-            40, // Size
+            10, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
@@ -224,10 +217,8 @@ class Vaccinationsreport extends DbTable
         );
         $this->date_of_birth->InputTextType = "text";
         $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
         $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
 
         // gender
@@ -249,9 +240,7 @@ class Vaccinationsreport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->gender->InputTextType = "text";
-        $this->gender->Nullable = false; // NOT NULL field
-        $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['gender'] = &$this->gender;
 
         // service_name
@@ -273,9 +262,7 @@ class Vaccinationsreport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->service_name->InputTextType = "text";
-        $this->service_name->Nullable = false; // NOT NULL field
-        $this->service_name->Required = true; // Required field
-        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['service_name'] = &$this->service_name;
 
         // cost
@@ -298,10 +285,8 @@ class Vaccinationsreport extends DbTable
         );
         $this->cost->InputTextType = "text";
         $this->cost->Raw = true;
-        $this->cost->Nullable = false; // NOT NULL field
-        $this->cost->Required = true; // Required field
         $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['cost'] = &$this->cost;
 
         // category_name
@@ -323,9 +308,7 @@ class Vaccinationsreport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->category_name->InputTextType = "text";
-        $this->category_name->Nullable = false; // NOT NULL field
-        $this->category_name->Required = true; // Required field
-        $this->category_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->category_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['category_name'] = &$this->category_name;
 
         // subcategory
@@ -347,9 +330,7 @@ class Vaccinationsreport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->subcategory->InputTextType = "text";
-        $this->subcategory->Nullable = false; // NOT NULL field
-        $this->subcategory->Required = true; // Required field
-        $this->subcategory->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->subcategory->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['subcategory'] = &$this->subcategory;
 
         // nurse
@@ -784,8 +765,6 @@ class Vaccinationsreport extends DbTable
             $this->DbErrorMessage = $e->getMessage();
         }
         if ($result) {
-            $this->id->setDbValue($conn->lastInsertId());
-            $rs['id'] = $this->id->DbValue;
         }
         return $result;
     }
@@ -835,13 +814,6 @@ class Vaccinationsreport extends DbTable
             $success = false;
             $this->DbErrorMessage = $e->getMessage();
         }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
-                $rs['id'] = $this->id->CurrentValue;
-            }
-        }
         return $success;
     }
 
@@ -861,9 +833,6 @@ class Vaccinationsreport extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
-            if (array_key_exists('id', $rs)) {
-                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
-            }
         }
         $filter = $curfilter ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -914,19 +883,13 @@ class Vaccinationsreport extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`id` = @id@";
+        return "";
     }
 
     // Get Key
     public function getKey($current = false, $keySeparator = null)
     {
         $keys = [];
-        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
-        if (EmptyValue($val)) {
-            return "";
-        } else {
-            $keys[] = $val;
-        }
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         return implode($keySeparator, $keys);
     }
@@ -937,12 +900,7 @@ class Vaccinationsreport extends DbTable
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         $this->OldKey = strval($key);
         $keys = explode($keySeparator, $this->OldKey);
-        if (count($keys) == 1) {
-            if ($current) {
-                $this->id->CurrentValue = $keys[0];
-            } else {
-                $this->id->OldValue = $keys[0];
-            }
+        if (count($keys) == 0) {
         }
     }
 
@@ -950,19 +908,6 @@ class Vaccinationsreport extends DbTable
     public function getRecordFilter($row = null, $current = false)
     {
         $keyFilter = $this->sqlKeyFilter();
-        if (is_array($row)) {
-            $val = array_key_exists('id', $row) ? $row['id'] : null;
-        } else {
-            $val = !EmptyValue($this->id->OldValue) && !$current ? $this->id->OldValue : $this->id->CurrentValue;
-        }
-        if (!is_numeric($val)) {
-            return "0=1"; // Invalid key
-        }
-        if ($val === null) {
-            return "0=1"; // Invalid key
-        } else {
-            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
-        }
         return $keyFilter;
     }
 
@@ -1103,7 +1048,6 @@ class Vaccinationsreport extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
-        $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -1114,11 +1058,6 @@ class Vaccinationsreport extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
-        if ($this->id->CurrentValue !== null) {
-            $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
-        } else {
-            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
-        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -1188,24 +1127,14 @@ class Vaccinationsreport extends DbTable
             $isApi = IsApi();
             $keyValues = $isApi
                 ? (Route(0) == "export"
-                    ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
-                    : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
+                    ? array_map(fn ($i) => Route($i + 3), range(0, -1))  // Export API
+                    : array_map(fn ($i) => Route($i + 2), range(0, -1))) // Other API
                 : []; // Non-API
-            if (($keyValue = Param("id") ?? Route("id")) !== null) {
-                $arKeys[] = $keyValue;
-            } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
-                $arKeys[] = $keyValue;
-            } else {
-                $arKeys = null; // Do not setup
-            }
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
-                if (!is_numeric($key)) {
-                    continue;
-                }
                 $ar[] = $key;
             }
         }
@@ -1226,11 +1155,6 @@ class Vaccinationsreport extends DbTable
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
-            }
-            if ($setCurrent) {
-                $this->id->CurrentValue = $key;
-            } else {
-                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1320,6 +1244,7 @@ class Vaccinationsreport extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+        $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1417,6 +1342,10 @@ class Vaccinationsreport extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
+        }
 
         // date_created
         $this->date_created->setupEditAttributes();

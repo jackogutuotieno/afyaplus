@@ -146,7 +146,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_requests_detail_id->Visible = false;
         $this->time->setVisibility();
         $this->waiting_time->Visible = false;
         $this->waiting_interval->Visible = false;
@@ -154,6 +153,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->lab_test_request_id->setVisibility();
     }
 
     // Constructor
@@ -709,9 +709,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
@@ -853,35 +850,8 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_requests_details") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests_details"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests_details") {
-            $masterTbl = Container("lab_test_requests_details");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestrequestsdetailslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1089,7 +1059,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             $savedFilterList = Profile()->getSearchFilters("flab_test_requests_queuesrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->lab_test_requests_detail_id->AdvancedSearch->toJson(), ","); // Field lab_test_requests_detail_id
         $filterList = Concat($filterList, $this->time->AdvancedSearch->toJson(), ","); // Field time
         $filterList = Concat($filterList, $this->waiting_time->AdvancedSearch->toJson(), ","); // Field waiting_time
         $filterList = Concat($filterList, $this->waiting_interval->AdvancedSearch->toJson(), ","); // Field waiting_interval
@@ -1097,6 +1066,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+        $filterList = Concat($filterList, $this->lab_test_request_id->AdvancedSearch->toJson(), ","); // Field lab_test_request_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1143,14 +1113,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field lab_test_requests_detail_id
-        $this->lab_test_requests_detail_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_requests_detail_id"];
-        $this->lab_test_requests_detail_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_requests_detail_id"];
-        $this->lab_test_requests_detail_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_requests_detail_id"];
-        $this->lab_test_requests_detail_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_requests_detail_id"];
-        $this->lab_test_requests_detail_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_requests_detail_id"];
-        $this->lab_test_requests_detail_id->AdvancedSearch->save();
 
         // Field time
         $this->time->AdvancedSearch->SearchValue = @$filter["x_time"];
@@ -1207,6 +1169,14 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
+
+        // Field lab_test_request_id
+        $this->lab_test_request_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_request_id"];
+        $this->lab_test_request_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_request_id"];
+        $this->lab_test_request_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_request_id"];
+        $this->lab_test_request_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_request_id"];
+        $this->lab_test_request_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_request_id"];
+        $this->lab_test_request_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1333,6 +1303,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
+            $this->updateSort($this->lab_test_request_id); // lab_test_request_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1353,20 +1324,11 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->lab_test_requests_detail_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->lab_test_requests_detail_id->setSort("");
                 $this->time->setSort("");
                 $this->waiting_time->setSort("");
                 $this->waiting_interval->setSort("");
@@ -1374,6 +1336,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
                 $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
+                $this->lab_test_request_id->setSort("");
             }
 
             // Reset start position
@@ -1595,6 +1558,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
+            $this->createColumnOption($option, "lab_test_request_id");
         }
 
         // Set up custom actions
@@ -2034,7 +1998,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_requests_detail_id->setDbValue($row['lab_test_requests_detail_id']);
         $this->time->setDbValue($row['time']);
         $this->waiting_time->setDbValue($row['waiting_time']);
         $this->waiting_interval->setDbValue($row['waiting_interval']);
@@ -2042,6 +2005,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
     }
 
     // Return a row with default values
@@ -2049,7 +2013,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_requests_detail_id'] = $this->lab_test_requests_detail_id->DefaultValue;
         $row['time'] = $this->time->DefaultValue;
         $row['waiting_time'] = $this->waiting_time->DefaultValue;
         $row['waiting_interval'] = $this->waiting_interval->DefaultValue;
@@ -2057,6 +2020,7 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         return $row;
     }
 
@@ -2099,8 +2063,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
 
         // id
 
-        // lab_test_requests_detail_id
-
         // time
 
         // waiting_time
@@ -2117,14 +2079,12 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
 
         // date_updated
 
+        // lab_test_request_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // lab_test_requests_detail_id
-            $this->lab_test_requests_detail_id->ViewValue = $this->lab_test_requests_detail_id->CurrentValue;
-            $this->lab_test_requests_detail_id->ViewValue = FormatNumber($this->lab_test_requests_detail_id->ViewValue, $this->lab_test_requests_detail_id->formatPattern());
 
             // time
             $this->time->ViewValue = $this->time->CurrentValue;
@@ -2167,6 +2127,10 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // lab_test_request_id
+            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2190,6 +2154,10 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // lab_test_request_id
+            $this->lab_test_request_id->HrefValue = "";
+            $this->lab_test_request_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2399,23 +2367,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests_details") {
-            $lab_test_requests_details = new LabTestRequestsDetailsList();
-            $rsmaster = $lab_test_requests_details->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($lab_test_requests_details);
-                    $lab_test_requests_details->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2443,90 +2394,6 @@ class LabTestRequestsQueueList extends LabTestRequestsQueue
             return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
         }
         return true;
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_requests_details") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_requests_details");
-                if (($parm = Get("fk_id", Get("lab_test_requests_detail_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_requests_detail_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_requests_detail_id->setSessionValue($this->lab_test_requests_detail_id->QueryStringValue);
-                    $foreignKeys["lab_test_requests_detail_id"] = $this->lab_test_requests_detail_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_requests_details") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_requests_details");
-                if (($parm = Post("fk_id", Post("lab_test_requests_detail_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_requests_detail_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_requests_detail_id->setSessionValue($this->lab_test_requests_detail_id->FormValue);
-                    $foreignKeys["lab_test_requests_detail_id"] = $this->lab_test_requests_detail_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "lab_test_requests_details") {
-                if (!array_key_exists("lab_test_requests_detail_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_requests_detail_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

@@ -42,12 +42,6 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
-<?php if ($Page->SearchOptions->visible()) { ?>
-<?php $Page->SearchOptions->render("body") ?>
-<?php } ?>
-<?php if ($Page->FilterOptions->visible()) { ?>
-<?php $Page->FilterOptions->render("body") ?>
-<?php } ?>
 </div>
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
@@ -60,66 +54,6 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patients")
 ?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fpatient_visitssrch" id="fpatient_visitssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fpatient_visitssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
-<script>
-var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { patient_visits: currentTable } });
-var currentForm;
-var fpatient_visitssrch, currentSearchForm, currentAdvancedSearchForm;
-loadjs.ready(["wrapper", "head"], function () {
-    let $ = jQuery,
-        fields = currentTable.fields;
-
-    // Form object for search
-    let form = new ew.FormBuilder()
-        .setId("fpatient_visitssrch")
-        .setPageId("list")
-<?php if ($Page->UseAjaxActions) { ?>
-        .setSubmitWithFetch(true)
-<?php } ?>
-
-        // Dynamic selection lists
-        .setLists({
-        })
-
-        // Filters
-        .setFilterList(<?= $Page->getFilterList() ?>)
-        .build();
-    window[form.id] = form;
-    currentSearchForm = form;
-    loadjs.done(form.id);
-});
-</script>
-<input type="hidden" name="cmd" value="search">
-<?php if ($Security->canSearch()) { ?>
-<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
-<div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0">
-    <div class="col-sm-auto px-0 pe-sm-2">
-        <div class="ew-basic-search input-group">
-            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
-            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
-            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
-                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fpatient_visitssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fpatient_visitssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fpatient_visitssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fpatient_visitssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-auto mb-3">
-        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-    </div>
-</div>
-</div><!-- /.ew-extended-search -->
-<?php } ?>
-<?php } ?>
-</div><!-- /.ew-search-panel -->
-</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -173,17 +107,23 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_visits_patient_id" class="patient_visits_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->_title->Visible) { // title ?>
-        <th data-name="_title" class="<?= $Page->_title->headerCellClass() ?>"><div id="elh_patient_visits__title" class="patient_visits__title"><?= $Page->renderFieldHeader($Page->_title) ?></div></th>
+<?php if ($Page->visit_type_id->Visible) { // visit_type_id ?>
+        <th data-name="visit_type_id" class="<?= $Page->visit_type_id->headerCellClass() ?>"><div id="elh_patient_visits_visit_type_id" class="patient_visits_visit_type_id"><?= $Page->renderFieldHeader($Page->visit_type_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->section->Visible) { // section ?>
-        <th data-name="section" class="<?= $Page->section->headerCellClass() ?>"><div id="elh_patient_visits_section" class="patient_visits_section"><?= $Page->renderFieldHeader($Page->section) ?></div></th>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <th data-name="payment_method_id" class="<?= $Page->payment_method_id->headerCellClass() ?>"><div id="elh_patient_visits_payment_method_id" class="patient_visits_payment_method_id"><?= $Page->renderFieldHeader($Page->payment_method_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->checkin_date->Visible) { // checkin_date ?>
-        <th data-name="checkin_date" class="<?= $Page->checkin_date->headerCellClass() ?>"><div id="elh_patient_visits_checkin_date" class="patient_visits_checkin_date"><?= $Page->renderFieldHeader($Page->checkin_date) ?></div></th>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <th data-name="medical_scheme_id" class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><div id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Page->renderFieldHeader($Page->medical_scheme_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_patient_visits_created_by_user_id" class="patient_visits_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_patient_visits_date_updated" class="patient_visits_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -221,27 +161,35 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->_title->Visible) { // title ?>
-        <td data-name="_title"<?= $Page->_title->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits__title" class="el_patient_visits__title">
-<span<?= $Page->_title->viewAttributes() ?>>
-<?= $Page->_title->getViewValue() ?></span>
+    <?php if ($Page->visit_type_id->Visible) { // visit_type_id ?>
+        <td data-name="visit_type_id"<?= $Page->visit_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_visit_type_id" class="el_patient_visits_visit_type_id">
+<span<?= $Page->visit_type_id->viewAttributes() ?>>
+<?= $Page->visit_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->section->Visible) { // section ?>
-        <td data-name="section"<?= $Page->section->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_section" class="el_patient_visits_section">
-<span<?= $Page->section->viewAttributes() ?>>
-<?= $Page->section->getViewValue() ?></span>
+    <?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <td data-name="payment_method_id"<?= $Page->payment_method_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_payment_method_id" class="el_patient_visits_payment_method_id">
+<span<?= $Page->payment_method_id->viewAttributes() ?>>
+<?= $Page->payment_method_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->checkin_date->Visible) { // checkin_date ?>
-        <td data-name="checkin_date"<?= $Page->checkin_date->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_checkin_date" class="el_patient_visits_checkin_date">
-<span<?= $Page->checkin_date->viewAttributes() ?>>
-<?= $Page->checkin_date->getViewValue() ?></span>
+    <?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <td data-name="medical_scheme_id"<?= $Page->medical_scheme_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_medical_scheme_id" class="el_patient_visits_medical_scheme_id">
+<span<?= $Page->medical_scheme_id->viewAttributes() ?>>
+<?= $Page->medical_scheme_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_created_by_user_id" class="el_patient_visits_created_by_user_id">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -250,6 +198,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_date_created" class="el_patient_visits_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_visits_date_updated" class="el_patient_visits_date_updated">
+<span<?= $Page->date_updated->viewAttributes() ?>>
+<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

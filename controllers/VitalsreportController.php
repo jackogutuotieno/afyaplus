@@ -16,7 +16,7 @@ use PHPMaker2024\afyaplus\Attributes\Put;
 class VitalsreportController extends ControllerBase
 {
     // list
-    #[Map(["GET","POST","OPTIONS"], "/vitalsreportlist[/{id}]", [PermissionMiddleware::class], "list.vitalsreport")]
+    #[Map(["GET","POST","OPTIONS"], "/vitalsreportlist", [PermissionMiddleware::class], "list.vitalsreport")]
     public function list(Request $request, Response $response, array $args): Response
     {
         return $this->runPage($request, $response, $args, "VitalsreportList");

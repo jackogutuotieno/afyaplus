@@ -30,7 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null], fields.visit_id.isInvalid],
+            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
             ["height", [fields.height.visible && fields.height.required ? ew.Validators.required(fields.height.caption) : null, ew.Validators.float], fields.height.isInvalid],
             ["weight", [fields.weight.visible && fields.weight.required ? ew.Validators.required(fields.weight.caption) : null, ew.Validators.integer], fields.weight.isInvalid],
             ["temperature", [fields.temperature.visible && fields.temperature.required ? ew.Validators.required(fields.temperature.caption) : null, ew.Validators.float], fields.temperature.isInvalid],
@@ -52,7 +52,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
-            "visit_id": <?= $Page->visit_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -76,10 +75,6 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
-<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -109,7 +104,6 @@ loadjs.ready("head", function () {
         data-field="x_patient_id"
         data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
         data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
-        data-ew-action="update-options"
         <?= $Page->patient_id->editAttributes() ?>>
         <?= $Page->patient_id->selectOptionListHtml("x_patient_id") ?>
     </select>
@@ -144,51 +138,11 @@ loadjs.ready("fpatient_vitalsedit", function() {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_patient_vitals_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
-<?php if ($Page->visit_id->getSessionValue() != "") { ?>
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->visit_id->getDisplayValue($Page->visit_id->ViewValue) ?></span></span>
-<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_patient_vitals_visit_id">
-    <select
-        id="x_visit_id"
-        name="x_visit_id"
-        class="form-select ew-select<?= $Page->visit_id->isInvalidClass() ?>"
-        <?php if (!$Page->visit_id->IsNativeSelect) { ?>
-        data-select2-id="fpatient_vitalsedit_x_visit_id"
-        <?php } ?>
-        data-table="patient_vitals"
-        data-field="x_visit_id"
-        data-value-separator="<?= $Page->visit_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>"
-        <?= $Page->visit_id->editAttributes() ?>>
-        <?= $Page->visit_id->selectOptionListHtml("x_visit_id") ?>
-    </select>
-    <?= $Page->visit_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
-<?= $Page->visit_id->Lookup->getParamTag($Page, "p_x_visit_id") ?>
-<?php if (!$Page->visit_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatient_vitalsedit", function() {
-    var options = { name: "x_visit_id", selectId: "fpatient_vitalsedit_x_visit_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatient_vitalsedit.lists.visit_id?.lookupOptions.length) {
-        options.data = { id: "x_visit_id", form: "fpatient_vitalsedit" };
-    } else {
-        options.ajax = { id: "x_visit_id", form: "fpatient_vitalsedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_vitals.fields.visit_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
+<input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="patient_vitals" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
+<?= $Page->visit_id->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>

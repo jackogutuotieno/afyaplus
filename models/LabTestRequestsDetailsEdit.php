@@ -463,7 +463,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
     public $TotalRecords = 0;
     public $RecordRange = 10;
     public $RecordCount;
-    public $DetailPages; // Detail pages object
 
     /**
      * Page run
@@ -510,9 +509,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
             $this->setUseLookupCache(false);
         }
-
-        // Set up detail page object
-        $this->setupDetailPages();
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -605,9 +601,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
-
-            // Set up detail parameters
-            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -634,16 +627,9 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
                         $this->terminate("labtestrequestsdetailslist"); // No matching record, return to list
                         return;
                     }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "update": // Update
-                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
-                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
-                } else {
-                    $returnUrl = $this->getReturnUrl();
-                }
+                $returnUrl = $this->getReturnUrl();
                 if (GetPageName($returnUrl) == "labtestrequestsdetailslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -682,9 +668,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -1098,19 +1081,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
                 }
             }
 
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("LabTestRequestsQueueGrid");
-        if (in_array("lab_test_requests_queue", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("LabTestReportsGrid");
-        if (in_array("lab_test_reports", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1149,11 +1119,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
-            $conn->beginTransaction();
-        }
-
         // Check referential integrity for master table 'lab_test_requests'
         $detailKeys = [];
         $keyValue = $rsnew['lab_test_request_id'] ?? $rsold['lab_test_request_id'];
@@ -1185,38 +1150,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
                 $editRow = true; // No field to update
             }
             if ($editRow) {
-            }
-
-            // Update detail records
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("LabTestRequestsQueueGrid");
-            if (in_array("lab_test_requests_queue", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests_queue"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("LabTestReportsGrid");
-            if (in_array("lab_test_reports", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_reports"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-
-            // Commit/Rollback transaction
-            if ($this->getCurrentDetailTable() != "") {
-                if ($editRow) {
-                    if ($this->UseTransaction) { // Commit transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->commit();
-                        }
-                    }
-                } else {
-                    if ($this->UseTransaction) { // Rollback transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->rollback();
-                        }
-                    }
-                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1368,51 +1301,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("lab_test_requests_queue", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsQueueGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->lab_test_requests_detail_id->IsDetailKey = true;
-                    $detailPageObj->lab_test_requests_detail_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->lab_test_requests_detail_id->setSessionValue($detailPageObj->lab_test_requests_detail_id->CurrentValue);
-                }
-            }
-            if (in_array("lab_test_reports", $detailTblVar)) {
-                $detailPageObj = Container("LabTestReportsGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->lab_test_requests_details_id->IsDetailKey = true;
-                    $detailPageObj->lab_test_requests_details_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->lab_test_requests_details_id->setSessionValue($detailPageObj->lab_test_requests_details_id->CurrentValue);
-                }
-            }
-        }
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1422,19 +1310,6 @@ class LabTestRequestsDetailsEdit extends LabTestRequestsDetails
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("labtestrequestsdetailslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
-    }
-
-    // Set up detail pages
-    protected function setupDetailPages()
-    {
-        $pages = new SubPages();
-        $pages->Style = "tabs";
-        if ($pages->isAccordion()) {
-            $pages->Parent = "#accordion_" . $this->PageObjName;
-        }
-        $pages->add('lab_test_requests_queue');
-        $pages->add('lab_test_reports');
-        $this->DetailPages = $pages;
     }
 
     // Setup lookup options

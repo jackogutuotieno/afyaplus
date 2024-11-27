@@ -200,47 +200,6 @@ loadjs.ready("flab_test_requests_detailsedit", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<?php
-    $Page->DetailPages->ValidKeys = explode(",", $Page->getCurrentDetailTable());
-?>
-<div class="ew-detail-pages"><!-- detail-pages -->
-<div class="ew-nav<?= $Page->DetailPages->containerClasses() ?>" id="details_Page"><!-- tabs -->
-    <ul class="<?= $Page->DetailPages->navClasses() ?>" role="tablist"><!-- .nav -->
-<?php
-    if (in_array("lab_test_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_queue->DetailEdit) {
-?>
-        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("lab_test_requests_queue") ?><?= $Page->DetailPages->activeClasses("lab_test_requests_queue") ?>" data-bs-target="#tab_lab_test_requests_queue" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_lab_test_requests_queue" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("lab_test_requests_queue")) ?>"><?= $Language->tablePhrase("lab_test_requests_queue", "TblCaption") ?></button></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("lab_test_reports", explode(",", $Page->getCurrentDetailTable())) && $lab_test_reports->DetailEdit) {
-?>
-        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("lab_test_reports") ?><?= $Page->DetailPages->activeClasses("lab_test_reports") ?>" data-bs-target="#tab_lab_test_reports" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_lab_test_reports" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("lab_test_reports")) ?>"><?= $Language->tablePhrase("lab_test_reports", "TblCaption") ?></button></li>
-<?php
-    }
-?>
-    </ul><!-- /.nav -->
-    <div class="<?= $Page->DetailPages->tabContentClasses() ?>"><!-- .tab-content -->
-<?php
-    if (in_array("lab_test_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_queue->DetailEdit) {
-?>
-        <div class="<?= $Page->DetailPages->tabPaneClasses("lab_test_requests_queue") ?><?= $Page->DetailPages->activeClasses("lab_test_requests_queue") ?>" id="tab_lab_test_requests_queue" role="tabpanel"><!-- page* -->
-<?php include_once "LabTestRequestsQueueGrid.php" ?>
-        </div><!-- /page* -->
-<?php } ?>
-<?php
-    if (in_array("lab_test_reports", explode(",", $Page->getCurrentDetailTable())) && $lab_test_reports->DetailEdit) {
-?>
-        <div class="<?= $Page->DetailPages->tabPaneClasses("lab_test_reports") ?><?= $Page->DetailPages->activeClasses("lab_test_reports") ?>" id="tab_lab_test_reports" role="tabpanel"><!-- page* -->
-<?php include_once "LabTestReportsGrid.php" ?>
-        </div><!-- /page* -->
-<?php } ?>
-    </div><!-- /.tab-content -->
-</div><!-- /tabs -->
-</div><!-- /detail-pages -->
-<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="flab_test_requests_detailsedit"><?= $Language->phrase("SaveBtn") ?></button>

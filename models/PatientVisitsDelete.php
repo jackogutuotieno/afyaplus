@@ -123,15 +123,12 @@ class PatientVisitsDelete extends PatientVisits
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
-        $this->_title->setVisibility();
-        $this->visit_type_id->Visible = false;
-        $this->doctor_id->Visible = false;
-        $this->payment_method_id->Visible = false;
-        $this->medical_scheme_id->Visible = false;
-        $this->section->setVisibility();
-        $this->checkin_date->setVisibility();
+        $this->visit_type_id->setVisibility();
+        $this->payment_method_id->setVisibility();
+        $this->medical_scheme_id->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->Visible = false;
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -423,9 +420,9 @@ class PatientVisitsDelete extends PatientVisits
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_type_id);
-        $this->setupLookupOptions($this->doctor_id);
         $this->setupLookupOptions($this->payment_method_id);
         $this->setupLookupOptions($this->medical_scheme_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Set up master/detail parameters
         $this->setupMasterParms();
@@ -443,6 +440,25 @@ class PatientVisitsDelete extends PatientVisits
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAllAssociative($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("patientvisitslist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -614,13 +630,10 @@ class PatientVisitsDelete extends PatientVisits
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
-        $this->_title->setDbValue($row['title']);
         $this->visit_type_id->setDbValue($row['visit_type_id']);
-        $this->doctor_id->setDbValue($row['doctor_id']);
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->section->setDbValue($row['section']);
-        $this->checkin_date->setDbValue($row['checkin_date']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -631,13 +644,10 @@ class PatientVisitsDelete extends PatientVisits
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['title'] = $this->_title->DefaultValue;
         $row['visit_type_id'] = $this->visit_type_id->DefaultValue;
-        $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
-        $row['section'] = $this->section->DefaultValue;
-        $row['checkin_date'] = $this->checkin_date->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -659,19 +669,14 @@ class PatientVisitsDelete extends PatientVisits
 
         // patient_id
 
-        // title
-
         // visit_type_id
-
-        // doctor_id
 
         // payment_method_id
 
         // medical_scheme_id
 
-        // section
-
-        // checkin_date
+        // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -705,9 +710,6 @@ class PatientVisitsDelete extends PatientVisits
                 $this->patient_id->ViewValue = null;
             }
 
-            // title
-            $this->_title->ViewValue = $this->_title->CurrentValue;
-
             // visit_type_id
             $curVal = strval($this->visit_type_id->CurrentValue);
             if ($curVal != "") {
@@ -729,30 +731,6 @@ class PatientVisitsDelete extends PatientVisits
                 }
             } else {
                 $this->visit_type_id->ViewValue = null;
-            }
-
-            // doctor_id
-            $curVal = strval($this->doctor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
-                if ($this->doctor_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
-                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
-                    } else {
-                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->doctor_id->ViewValue = null;
             }
 
             // payment_method_id
@@ -801,12 +779,28 @@ class PatientVisitsDelete extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
-            // section
-            $this->section->ViewValue = $this->section->CurrentValue;
-
-            // checkin_date
-            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
-            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -820,21 +814,29 @@ class PatientVisitsDelete extends PatientVisits
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
-            $this->_title->TooltipValue = "";
+            // visit_type_id
+            $this->visit_type_id->HrefValue = "";
+            $this->visit_type_id->TooltipValue = "";
 
-            // section
-            $this->section->HrefValue = "";
-            $this->section->TooltipValue = "";
+            // payment_method_id
+            $this->payment_method_id->HrefValue = "";
+            $this->payment_method_id->TooltipValue = "";
 
-            // checkin_date
-            $this->checkin_date->HrefValue = "";
-            $this->checkin_date->TooltipValue = "";
+            // medical_scheme_id
+            $this->medical_scheme_id->HrefValue = "";
+            $this->medical_scheme_id->TooltipValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -942,6 +944,16 @@ class PatientVisitsDelete extends PatientVisits
         return $deleteRows;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -1043,12 +1055,11 @@ class PatientVisitsDelete extends PatientVisits
                     break;
                 case "x_visit_type_id":
                     break;
-                case "x_doctor_id":
-                    $lookupFilter = $fld->getSelectFilter(); // PHP
-                    break;
                 case "x_payment_method_id":
                     break;
                 case "x_medical_scheme_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

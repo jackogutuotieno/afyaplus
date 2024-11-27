@@ -122,7 +122,7 @@ loadjs.ready("head", function () {
     if (in_array("patient_visits", explode(",", $Page->getCurrentDetailTable())) && $patient_visits->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_visits", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_visits", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_visits")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "PatientVisitsGrid.php" ?>
 <?php } ?>

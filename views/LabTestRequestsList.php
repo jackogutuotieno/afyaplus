@@ -50,15 +50,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/PatientVisitsMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="flab_test_requestssrch" id="flab_test_requestssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="flab_test_requestssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -150,10 +141,6 @@ $Page->showMessage();
 <input type="hidden" name="t" value="lab_test_requests">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
-<?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_lab_test_requests" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>

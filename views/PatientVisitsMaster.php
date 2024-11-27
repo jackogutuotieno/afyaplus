@@ -32,24 +32,13 @@ $patient_visits->TableClass = "table table-bordered table-hover table-sm ew-tabl
 </td>
         </tr>
 <?php } ?>
-<?php if ($patient_visits->section->Visible) { // section ?>
-        <tr id="r_section"<?= $patient_visits->section->rowAttributes() ?>>
-            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->section->caption() ?></td>
-            <td<?= $patient_visits->section->cellAttributes() ?>>
-<span id="el_patient_visits_section">
-<span<?= $patient_visits->section->viewAttributes() ?>>
-<?= $patient_visits->section->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($patient_visits->checkin_date->Visible) { // checkin_date ?>
-        <tr id="r_checkin_date"<?= $patient_visits->checkin_date->rowAttributes() ?>>
-            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->checkin_date->caption() ?></td>
-            <td<?= $patient_visits->checkin_date->cellAttributes() ?>>
-<span id="el_patient_visits_checkin_date">
-<span<?= $patient_visits->checkin_date->viewAttributes() ?>>
-<?= $patient_visits->checkin_date->getViewValue() ?></span>
+<?php if ($patient_visits->created_by_user_id->Visible) { // created_by_user_id ?>
+        <tr id="r_created_by_user_id"<?= $patient_visits->created_by_user_id->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->created_by_user_id->caption() ?></td>
+            <td<?= $patient_visits->created_by_user_id->cellAttributes() ?>>
+<span id="el_patient_visits_created_by_user_id">
+<span<?= $patient_visits->created_by_user_id->viewAttributes() ?>>
+<?= $patient_visits->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>

@@ -28,69 +28,67 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 #[Table(name: "vaccinationsreport")]
 class Vaccinationsreport extends AbstractEntity
 {
-    #[Id]
-    #[Column(type: "integer")]
-    #[GeneratedValue]
-    private int $id;
+    #[Column(type: "integer", nullable: true)]
+    private ?int $id;
 
-    #[Column(name: "date_created", type: "datetime")]
-    private DateTime $dateCreated;
+    #[Column(name: "date_created", type: "datetime", nullable: true)]
+    private ?DateTime $dateCreated;
 
-    #[Column(name: "date_updated", type: "datetime")]
-    private DateTime $dateUpdated;
+    #[Column(name: "date_updated", type: "datetime", nullable: true)]
+    private ?DateTime $dateUpdated;
 
     #[Column(name: "patient_name", type: "string", nullable: true)]
     private ?string $patientName;
 
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
+    #[Column(name: "date_of_birth", type: "date", nullable: true)]
+    private ?DateTime $dateOfBirth;
 
-    #[Column(type: "string")]
-    private string $gender;
+    #[Column(type: "string", nullable: true)]
+    private ?string $gender;
 
-    #[Column(name: "service_name", type: "string")]
-    private string $serviceName;
+    #[Column(name: "service_name", type: "string", nullable: true)]
+    private ?string $serviceName;
 
-    #[Column(type: "float")]
-    private float $cost;
+    #[Column(type: "float", nullable: true)]
+    private ?float $cost;
 
-    #[Column(name: "category_name", type: "string")]
-    private string $categoryName;
+    #[Column(name: "category_name", type: "string", nullable: true)]
+    private ?string $categoryName;
 
-    #[Column(type: "string")]
-    private string $subcategory;
+    #[Column(type: "string", nullable: true)]
+    private ?string $subcategory;
 
     #[Column(type: "string", nullable: true)]
     private ?string $nurse;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $value): static
+    public function setId(?int $value): static
     {
         $this->id = $value;
         return $this;
     }
 
-    public function getDateCreated(): DateTime
+    public function getDateCreated(): ?DateTime
     {
         return $this->dateCreated;
     }
 
-    public function setDateCreated(DateTime $value): static
+    public function setDateCreated(?DateTime $value): static
     {
         $this->dateCreated = $value;
         return $this;
     }
 
-    public function getDateUpdated(): DateTime
+    public function getDateUpdated(): ?DateTime
     {
         return $this->dateUpdated;
     }
 
-    public function setDateUpdated(DateTime $value): static
+    public function setDateUpdated(?DateTime $value): static
     {
         $this->dateUpdated = $value;
         return $this;
@@ -107,67 +105,67 @@ class Vaccinationsreport extends AbstractEntity
         return $this;
     }
 
-    public function getDateOfBirth(): DateTime
+    public function getDateOfBirth(): ?DateTime
     {
         return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(DateTime $value): static
+    public function setDateOfBirth(?DateTime $value): static
     {
         $this->dateOfBirth = $value;
         return $this;
     }
 
-    public function getGender(): string
+    public function getGender(): ?string
     {
         return HtmlDecode($this->gender);
     }
 
-    public function setGender(string $value): static
+    public function setGender(?string $value): static
     {
         $this->gender = RemoveXss($value);
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getServiceName(): ?string
     {
         return HtmlDecode($this->serviceName);
     }
 
-    public function setServiceName(string $value): static
+    public function setServiceName(?string $value): static
     {
         $this->serviceName = RemoveXss($value);
         return $this;
     }
 
-    public function getCost(): float
+    public function getCost(): ?float
     {
         return $this->cost;
     }
 
-    public function setCost(float $value): static
+    public function setCost(?float $value): static
     {
         $this->cost = $value;
         return $this;
     }
 
-    public function getCategoryName(): string
+    public function getCategoryName(): ?string
     {
         return HtmlDecode($this->categoryName);
     }
 
-    public function setCategoryName(string $value): static
+    public function setCategoryName(?string $value): static
     {
         $this->categoryName = RemoveXss($value);
         return $this;
     }
 
-    public function getSubcategory(): string
+    public function getSubcategory(): ?string
     {
         return HtmlDecode($this->subcategory);
     }
 
-    public function setSubcategory(string $value): static
+    public function setSubcategory(?string $value): static
     {
         $this->subcategory = RemoveXss($value);
         return $this;

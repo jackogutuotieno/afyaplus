@@ -70,7 +70,7 @@ class Vitalsreport extends DbTable
         $Language = Container("app.language");
         $this->TableVar = "vitalsreport";
         $this->TableName = 'vitalsreport';
-        $this->TableType = "VIEW";
+        $this->TableType = "TABLE";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
@@ -118,15 +118,12 @@ class Vitalsreport extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
-        $this->id->IsAutoIncrement = true; // Autoincrement field
-        $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['id'] = &$this->id;
 
         // height
@@ -149,10 +146,8 @@ class Vitalsreport extends DbTable
         );
         $this->height->InputTextType = "text";
         $this->height->Raw = true;
-        $this->height->Nullable = false; // NOT NULL field
-        $this->height->Required = true; // Required field
         $this->height->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->height->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->height->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['height'] = &$this->height;
 
         // weight
@@ -175,10 +170,8 @@ class Vitalsreport extends DbTable
         );
         $this->weight->InputTextType = "text";
         $this->weight->Raw = true;
-        $this->weight->Nullable = false; // NOT NULL field
-        $this->weight->Required = true; // Required field
         $this->weight->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->weight->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->weight->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['weight'] = &$this->weight;
 
         // temperature
@@ -201,10 +194,8 @@ class Vitalsreport extends DbTable
         );
         $this->temperature->InputTextType = "text";
         $this->temperature->Raw = true;
-        $this->temperature->Nullable = false; // NOT NULL field
-        $this->temperature->Required = true; // Required field
         $this->temperature->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->temperature->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->temperature->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['temperature'] = &$this->temperature;
 
         // pulse
@@ -227,10 +218,8 @@ class Vitalsreport extends DbTable
         );
         $this->pulse->InputTextType = "text";
         $this->pulse->Raw = true;
-        $this->pulse->Nullable = false; // NOT NULL field
-        $this->pulse->Required = true; // Required field
         $this->pulse->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->pulse->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->pulse->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['pulse'] = &$this->pulse;
 
         // blood_pressure
@@ -252,9 +241,7 @@ class Vitalsreport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->blood_pressure->InputTextType = "text";
-        $this->blood_pressure->Nullable = false; // NOT NULL field
-        $this->blood_pressure->Required = true; // Required field
-        $this->blood_pressure->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->blood_pressure->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['blood_pressure'] = &$this->blood_pressure;
 
         // date_created
@@ -265,7 +252,7 @@ class Vitalsreport extends DbTable
             '`date_created`', // Expression
             CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
@@ -277,10 +264,8 @@ class Vitalsreport extends DbTable
         );
         $this->date_created->InputTextType = "text";
         $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
         $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
@@ -291,7 +276,7 @@ class Vitalsreport extends DbTable
             '`date_updated`', // Expression
             CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
@@ -303,10 +288,8 @@ class Vitalsreport extends DbTable
         );
         $this->date_updated->InputTextType = "text";
         $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
         $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
         // patient_name
@@ -763,8 +746,6 @@ class Vitalsreport extends DbTable
             $this->DbErrorMessage = $e->getMessage();
         }
         if ($result) {
-            $this->id->setDbValue($conn->lastInsertId());
-            $rs['id'] = $this->id->DbValue;
         }
         return $result;
     }
@@ -814,13 +795,6 @@ class Vitalsreport extends DbTable
             $success = false;
             $this->DbErrorMessage = $e->getMessage();
         }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
-                $rs['id'] = $this->id->CurrentValue;
-            }
-        }
         return $success;
     }
 
@@ -840,9 +814,6 @@ class Vitalsreport extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
-            if (array_key_exists('id', $rs)) {
-                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
-            }
         }
         $filter = $curfilter ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -892,19 +863,13 @@ class Vitalsreport extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`id` = @id@";
+        return "";
     }
 
     // Get Key
     public function getKey($current = false, $keySeparator = null)
     {
         $keys = [];
-        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
-        if (EmptyValue($val)) {
-            return "";
-        } else {
-            $keys[] = $val;
-        }
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         return implode($keySeparator, $keys);
     }
@@ -915,12 +880,7 @@ class Vitalsreport extends DbTable
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         $this->OldKey = strval($key);
         $keys = explode($keySeparator, $this->OldKey);
-        if (count($keys) == 1) {
-            if ($current) {
-                $this->id->CurrentValue = $keys[0];
-            } else {
-                $this->id->OldValue = $keys[0];
-            }
+        if (count($keys) == 0) {
         }
     }
 
@@ -928,19 +888,6 @@ class Vitalsreport extends DbTable
     public function getRecordFilter($row = null, $current = false)
     {
         $keyFilter = $this->sqlKeyFilter();
-        if (is_array($row)) {
-            $val = array_key_exists('id', $row) ? $row['id'] : null;
-        } else {
-            $val = !EmptyValue($this->id->OldValue) && !$current ? $this->id->OldValue : $this->id->CurrentValue;
-        }
-        if (!is_numeric($val)) {
-            return "0=1"; // Invalid key
-        }
-        if ($val === null) {
-            return "0=1"; // Invalid key
-        } else {
-            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
-        }
         return $keyFilter;
     }
 
@@ -1081,7 +1028,6 @@ class Vitalsreport extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
-        $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -1092,11 +1038,6 @@ class Vitalsreport extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
-        if ($this->id->CurrentValue !== null) {
-            $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
-        } else {
-            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
-        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -1166,24 +1107,14 @@ class Vitalsreport extends DbTable
             $isApi = IsApi();
             $keyValues = $isApi
                 ? (Route(0) == "export"
-                    ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
-                    : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
+                    ? array_map(fn ($i) => Route($i + 3), range(0, -1))  // Export API
+                    : array_map(fn ($i) => Route($i + 2), range(0, -1))) // Other API
                 : []; // Non-API
-            if (($keyValue = Param("id") ?? Route("id")) !== null) {
-                $arKeys[] = $keyValue;
-            } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
-                $arKeys[] = $keyValue;
-            } else {
-                $arKeys = null; // Do not setup
-            }
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
-                if (!is_numeric($key)) {
-                    continue;
-                }
                 $ar[] = $key;
             }
         }
@@ -1204,11 +1135,6 @@ class Vitalsreport extends DbTable
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
-            }
-            if ($setCurrent) {
-                $this->id->CurrentValue = $key;
-            } else {
-                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1295,6 +1221,7 @@ class Vitalsreport extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+        $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
         // height
         $this->height->ViewValue = $this->height->CurrentValue;
@@ -1387,6 +1314,10 @@ class Vitalsreport extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
+        }
 
         // height
         $this->height->setupEditAttributes();

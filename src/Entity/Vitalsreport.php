@@ -28,31 +28,29 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 #[Table(name: "vitalsreport")]
 class Vitalsreport extends AbstractEntity
 {
-    #[Id]
-    #[Column(type: "integer")]
-    #[GeneratedValue]
-    private int $id;
+    #[Column(type: "integer", nullable: true)]
+    private ?int $id;
 
-    #[Column(type: "float")]
-    private float $height;
+    #[Column(type: "float", nullable: true)]
+    private ?float $height;
 
-    #[Column(type: "integer")]
-    private int $weight;
+    #[Column(type: "integer", nullable: true)]
+    private ?int $weight;
 
-    #[Column(type: "float")]
-    private float $temperature;
+    #[Column(type: "float", nullable: true)]
+    private ?float $temperature;
 
-    #[Column(type: "integer")]
-    private int $pulse;
+    #[Column(type: "integer", nullable: true)]
+    private ?int $pulse;
 
-    #[Column(name: "blood_pressure", type: "string")]
-    private string $bloodPressure;
+    #[Column(name: "blood_pressure", type: "string", nullable: true)]
+    private ?string $bloodPressure;
 
-    #[Column(name: "date_created", type: "datetime")]
-    private DateTime $dateCreated;
+    #[Column(name: "date_created", type: "datetime", nullable: true)]
+    private ?DateTime $dateCreated;
 
-    #[Column(name: "date_updated", type: "datetime")]
-    private DateTime $dateUpdated;
+    #[Column(name: "date_updated", type: "datetime", nullable: true)]
+    private ?DateTime $dateUpdated;
 
     #[Column(name: "patient_name", type: "string", nullable: true)]
     private ?string $patientName;
@@ -60,89 +58,89 @@ class Vitalsreport extends AbstractEntity
     #[Column(type: "string", nullable: true)]
     private ?string $nurse;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $value): static
+    public function setId(?int $value): static
     {
         $this->id = $value;
         return $this;
     }
 
-    public function getHeight(): float
+    public function getHeight(): ?float
     {
         return $this->height;
     }
 
-    public function setHeight(float $value): static
+    public function setHeight(?float $value): static
     {
         $this->height = $value;
         return $this;
     }
 
-    public function getWeight(): int
+    public function getWeight(): ?int
     {
         return $this->weight;
     }
 
-    public function setWeight(int $value): static
+    public function setWeight(?int $value): static
     {
         $this->weight = $value;
         return $this;
     }
 
-    public function getTemperature(): float
+    public function getTemperature(): ?float
     {
         return $this->temperature;
     }
 
-    public function setTemperature(float $value): static
+    public function setTemperature(?float $value): static
     {
         $this->temperature = $value;
         return $this;
     }
 
-    public function getPulse(): int
+    public function getPulse(): ?int
     {
         return $this->pulse;
     }
 
-    public function setPulse(int $value): static
+    public function setPulse(?int $value): static
     {
         $this->pulse = $value;
         return $this;
     }
 
-    public function getBloodPressure(): string
+    public function getBloodPressure(): ?string
     {
         return HtmlDecode($this->bloodPressure);
     }
 
-    public function setBloodPressure(string $value): static
+    public function setBloodPressure(?string $value): static
     {
         $this->bloodPressure = RemoveXss($value);
         return $this;
     }
 
-    public function getDateCreated(): DateTime
+    public function getDateCreated(): ?DateTime
     {
         return $this->dateCreated;
     }
 
-    public function setDateCreated(DateTime $value): static
+    public function setDateCreated(?DateTime $value): static
     {
         $this->dateCreated = $value;
         return $this;
     }
 
-    public function getDateUpdated(): DateTime
+    public function getDateUpdated(): ?DateTime
     {
         return $this->dateUpdated;
     }
 
-    public function setDateUpdated(DateTime $value): static
+    public function setDateUpdated(?DateTime $value): static
     {
         $this->dateUpdated = $value;
         return $this;

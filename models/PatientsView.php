@@ -732,6 +732,14 @@ class PatientsView extends Patients
         // "detail_patient_visits"
         $item = &$option->add("detail_patient_visits");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patient_visits", "TblCaption");
+        $detailTbl = Container("patient_visits");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_visits")->Count, "red"], $Language->phrase("DetailCount"));
+        }
         $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("patientvisitslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("PatientVisitsGrid");

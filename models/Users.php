@@ -144,8 +144,8 @@ class Users extends DbTable
             'photo', // Name
             '`photo`', // Expression
             '`photo`', // Basic search expression
-            205, // Type
-            2147483647, // Size
+            204, // Type
+            65535, // Size
             -1, // Date/Time format
             true, // Is upload field
             '`photo`', // Virtual expression

@@ -36,14 +36,8 @@ class PatientVisit extends AbstractEntity
     #[Column(name: "patient_id", type: "integer")]
     private int $patientId;
 
-    #[Column(type: "string")]
-    private string $title;
-
     #[Column(name: "visit_type_id", type: "integer")]
     private int $visitTypeId;
-
-    #[Column(name: "doctor_id", type: "integer")]
-    private int $doctorId;
 
     #[Column(name: "payment_method_id", type: "integer")]
     private int $paymentMethodId;
@@ -51,19 +45,14 @@ class PatientVisit extends AbstractEntity
     #[Column(name: "medical_scheme_id", type: "integer", nullable: true)]
     private ?int $medicalSchemeId;
 
-    #[Column(type: "string")]
-    private string $section;
+    #[Column(name: "created_by_user_id", type: "integer")]
+    private int $createdByUserId;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
-
-    public function __construct()
-    {
-        $this->section = "Checked-In at Reception";
-    }
 
     public function getId(): int
     {
@@ -87,17 +76,6 @@ class PatientVisit extends AbstractEntity
         return $this;
     }
 
-    public function getTitle(): string
-    {
-        return HtmlDecode($this->title);
-    }
-
-    public function setTitle(string $value): static
-    {
-        $this->title = RemoveXss($value);
-        return $this;
-    }
-
     public function getVisitTypeId(): int
     {
         return $this->visitTypeId;
@@ -106,17 +84,6 @@ class PatientVisit extends AbstractEntity
     public function setVisitTypeId(int $value): static
     {
         $this->visitTypeId = $value;
-        return $this;
-    }
-
-    public function getDoctorId(): int
-    {
-        return $this->doctorId;
-    }
-
-    public function setDoctorId(int $value): static
-    {
-        $this->doctorId = $value;
         return $this;
     }
 
@@ -142,14 +109,14 @@ class PatientVisit extends AbstractEntity
         return $this;
     }
 
-    public function getSection(): string
+    public function getCreatedByUserId(): int
     {
-        return HtmlDecode($this->section);
+        return $this->createdByUserId;
     }
 
-    public function setSection(string $value): static
+    public function setCreatedByUserId(int $value): static
     {
-        $this->section = RemoveXss($value);
+        $this->createdByUserId = $value;
         return $this;
     }
 

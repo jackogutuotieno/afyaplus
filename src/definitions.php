@@ -109,7 +109,6 @@ return [
     "patient_vitals" => \DI\create(PatientVitals::class),
     "patients" => \DI\create(Patients::class),
     "patients_report" => \DI\create(PatientsReport::class),
-    "patientsvisitsreport" => \DI\create(Patientsvisitsreport::class),
     "payment_methods" => \DI\create(PaymentMethods::class),
     "prescription_details" => \DI\create(PrescriptionDetails::class),
     "prescriptions" => \DI\create(Prescriptions::class),
@@ -117,8 +116,6 @@ return [
     "radiology_requests" => \DI\create(RadiologyRequests::class),
     "radiology_requests_details" => \DI\create(RadiologyRequestsDetails::class),
     "radiology_requests_queue" => \DI\create(RadiologyRequestsQueue::class),
-    "radiologyreportsdetails" => \DI\create(Radiologyreportsdetails::class),
-    "roles" => \DI\create(Roles::class),
     "service_categories" => \DI\create(ServiceCategories::class),
     "service_charges" => \DI\create(ServiceCharges::class),
     "service_subcategories" => \DI\create(ServiceSubcategories::class),
@@ -130,6 +127,8 @@ return [
     "subscriptions" => \DI\create(Subscriptions::class),
     "Appointments" => \DI\create(Appointments::class),
     "appointments" => \DI\create(Appointments::class),
+    "laboratory_billing" => \DI\create(LaboratoryBilling::class),
+    "laboratoryreports" => \DI\create(Laboratoryreports::class),
 
     // User table
     "usertable" => \DI\get("users"),

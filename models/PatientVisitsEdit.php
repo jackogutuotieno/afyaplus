@@ -123,13 +123,10 @@ class PatientVisitsEdit extends PatientVisits
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->_title->setVisibility();
         $this->visit_type_id->setVisibility();
-        $this->doctor_id->setVisibility();
         $this->payment_method_id->setVisibility();
         $this->medical_scheme_id->setVisibility();
-        $this->section->Visible = false;
-        $this->checkin_date->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -534,9 +531,9 @@ class PatientVisitsEdit extends PatientVisits
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->visit_type_id);
-        $this->setupLookupOptions($this->doctor_id);
         $this->setupLookupOptions($this->payment_method_id);
         $this->setupLookupOptions($this->medical_scheme_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -608,9 +605,6 @@ class PatientVisitsEdit extends PatientVisits
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
-
-            // Set up detail parameters
-            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -637,16 +631,9 @@ class PatientVisitsEdit extends PatientVisits
                         $this->terminate("patientvisitslist"); // No matching record, return to list
                         return;
                     }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "update": // Update
-                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
-                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
-                } else {
-                    $returnUrl = $this->getReturnUrl();
-                }
+                $returnUrl = $this->getReturnUrl();
                 if (GetPageName($returnUrl) == "patientvisitslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -685,9 +672,6 @@ class PatientVisitsEdit extends PatientVisits
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -751,16 +735,6 @@ class PatientVisitsEdit extends PatientVisits
             }
         }
 
-        // Check field name 'title' first before field var 'x__title'
-        $val = $CurrentForm->hasValue("title") ? $CurrentForm->getValue("title") : $CurrentForm->getValue("x__title");
-        if (!$this->_title->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->_title->Visible = false; // Disable update for API request
-            } else {
-                $this->_title->setFormValue($val);
-            }
-        }
-
         // Check field name 'visit_type_id' first before field var 'x_visit_type_id'
         $val = $CurrentForm->hasValue("visit_type_id") ? $CurrentForm->getValue("visit_type_id") : $CurrentForm->getValue("x_visit_type_id");
         if (!$this->visit_type_id->IsDetailKey) {
@@ -768,16 +742,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->visit_type_id->Visible = false; // Disable update for API request
             } else {
                 $this->visit_type_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'doctor_id' first before field var 'x_doctor_id'
-        $val = $CurrentForm->hasValue("doctor_id") ? $CurrentForm->getValue("doctor_id") : $CurrentForm->getValue("x_doctor_id");
-        if (!$this->doctor_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->doctor_id->Visible = false; // Disable update for API request
-            } else {
-                $this->doctor_id->setFormValue($val);
             }
         }
 
@@ -800,17 +764,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->medical_scheme_id->setFormValue($val);
             }
         }
-
-        // Check field name 'checkin_date' first before field var 'x_checkin_date'
-        $val = $CurrentForm->hasValue("checkin_date") ? $CurrentForm->getValue("checkin_date") : $CurrentForm->getValue("x_checkin_date");
-        if (!$this->checkin_date->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->checkin_date->Visible = false; // Disable update for API request
-            } else {
-                $this->checkin_date->setFormValue($val, true, $validate);
-            }
-            $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
-        }
     }
 
     // Restore form values
@@ -819,13 +772,9 @@ class PatientVisitsEdit extends PatientVisits
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->_title->CurrentValue = $this->_title->FormValue;
         $this->visit_type_id->CurrentValue = $this->visit_type_id->FormValue;
-        $this->doctor_id->CurrentValue = $this->doctor_id->FormValue;
         $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
-        $this->checkin_date->CurrentValue = $this->checkin_date->FormValue;
-        $this->checkin_date->CurrentValue = UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern());
     }
 
     /**
@@ -851,6 +800,15 @@ class PatientVisitsEdit extends PatientVisits
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("edit");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -868,13 +826,10 @@ class PatientVisitsEdit extends PatientVisits
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
-        $this->_title->setDbValue($row['title']);
         $this->visit_type_id->setDbValue($row['visit_type_id']);
-        $this->doctor_id->setDbValue($row['doctor_id']);
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->section->setDbValue($row['section']);
-        $this->checkin_date->setDbValue($row['checkin_date']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -885,13 +840,10 @@ class PatientVisitsEdit extends PatientVisits
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['title'] = $this->_title->DefaultValue;
         $row['visit_type_id'] = $this->visit_type_id->DefaultValue;
-        $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
-        $row['section'] = $this->section->DefaultValue;
-        $row['checkin_date'] = $this->checkin_date->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -934,14 +886,8 @@ class PatientVisitsEdit extends PatientVisits
         // patient_id
         $this->patient_id->RowCssClass = "row";
 
-        // title
-        $this->_title->RowCssClass = "row";
-
         // visit_type_id
         $this->visit_type_id->RowCssClass = "row";
-
-        // doctor_id
-        $this->doctor_id->RowCssClass = "row";
 
         // payment_method_id
         $this->payment_method_id->RowCssClass = "row";
@@ -949,11 +895,8 @@ class PatientVisitsEdit extends PatientVisits
         // medical_scheme_id
         $this->medical_scheme_id->RowCssClass = "row";
 
-        // section
-        $this->section->RowCssClass = "row";
-
-        // checkin_date
-        $this->checkin_date->RowCssClass = "row";
+        // created_by_user_id
+        $this->created_by_user_id->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -989,9 +932,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->patient_id->ViewValue = null;
             }
 
-            // title
-            $this->_title->ViewValue = $this->_title->CurrentValue;
-
             // visit_type_id
             $curVal = strval($this->visit_type_id->CurrentValue);
             if ($curVal != "") {
@@ -1013,30 +953,6 @@ class PatientVisitsEdit extends PatientVisits
                 }
             } else {
                 $this->visit_type_id->ViewValue = null;
-            }
-
-            // doctor_id
-            $curVal = strval($this->doctor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
-                if ($this->doctor_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
-                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
-                    } else {
-                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->doctor_id->ViewValue = null;
             }
 
             // payment_method_id
@@ -1085,13 +1001,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
-            // section
-            $this->section->ViewValue = $this->section->CurrentValue;
-
-            // checkin_date
-            $this->checkin_date->ViewValue = $this->checkin_date->CurrentValue;
-            $this->checkin_date->ViewValue = FormatDateTime($this->checkin_date->ViewValue, $this->checkin_date->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1106,23 +1015,14 @@ class PatientVisitsEdit extends PatientVisits
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
-
             // visit_type_id
             $this->visit_type_id->HrefValue = "";
-
-            // doctor_id
-            $this->doctor_id->HrefValue = "";
 
             // payment_method_id
             $this->payment_method_id->HrefValue = "";
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
-
-            // checkin_date
-            $this->checkin_date->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1180,14 +1080,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // title
-            $this->_title->setupEditAttributes();
-            if (!$this->_title->Raw) {
-                $this->_title->CurrentValue = HtmlDecode($this->_title->CurrentValue);
-            }
-            $this->_title->EditValue = HtmlEncode($this->_title->CurrentValue);
-            $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
-
             // visit_type_id
             $this->visit_type_id->setupEditAttributes();
             $curVal = trim(strval($this->visit_type_id->CurrentValue));
@@ -1214,34 +1106,6 @@ class PatientVisitsEdit extends PatientVisits
                 $this->visit_type_id->EditValue = $arwrk;
             }
             $this->visit_type_id->PlaceHolder = RemoveHtml($this->visit_type_id->caption());
-
-            // doctor_id
-            $this->doctor_id->setupEditAttributes();
-            $curVal = trim(strval($this->doctor_id->CurrentValue));
-            if ($curVal != "") {
-                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
-            } else {
-                $this->doctor_id->ViewValue = $this->doctor_id->Lookup !== null && is_array($this->doctor_id->lookupOptions()) && count($this->doctor_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->doctor_id->ViewValue !== null) { // Load from cache
-                $this->doctor_id->EditValue = array_values($this->doctor_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->doctor_id->CurrentValue, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $lookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
-                $sqlWrk = $this->doctor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->doctor_id->EditValue = $arwrk;
-            }
-            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
 
             // payment_method_id
             $this->payment_method_id->setupEditAttributes();
@@ -1297,11 +1161,6 @@ class PatientVisitsEdit extends PatientVisits
             }
             $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
-            // checkin_date
-            $this->checkin_date->setupEditAttributes();
-            $this->checkin_date->EditValue = HtmlEncode(FormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()));
-            $this->checkin_date->PlaceHolder = RemoveHtml($this->checkin_date->caption());
-
             // Edit refer script
 
             // id
@@ -1310,23 +1169,14 @@ class PatientVisitsEdit extends PatientVisits
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // title
-            $this->_title->HrefValue = "";
-
             // visit_type_id
             $this->visit_type_id->HrefValue = "";
-
-            // doctor_id
-            $this->doctor_id->HrefValue = "";
 
             // payment_method_id
             $this->payment_method_id->HrefValue = "";
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
-
-            // checkin_date
-            $this->checkin_date->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1358,19 +1208,9 @@ class PatientVisitsEdit extends PatientVisits
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->_title->Visible && $this->_title->Required) {
-                if (!$this->_title->IsDetailKey && EmptyValue($this->_title->FormValue)) {
-                    $this->_title->addErrorMessage(str_replace("%s", $this->_title->caption(), $this->_title->RequiredErrorMessage));
-                }
-            }
             if ($this->visit_type_id->Visible && $this->visit_type_id->Required) {
                 if (!$this->visit_type_id->IsDetailKey && EmptyValue($this->visit_type_id->FormValue)) {
                     $this->visit_type_id->addErrorMessage(str_replace("%s", $this->visit_type_id->caption(), $this->visit_type_id->RequiredErrorMessage));
-                }
-            }
-            if ($this->doctor_id->Visible && $this->doctor_id->Required) {
-                if (!$this->doctor_id->IsDetailKey && EmptyValue($this->doctor_id->FormValue)) {
-                    $this->doctor_id->addErrorMessage(str_replace("%s", $this->doctor_id->caption(), $this->doctor_id->RequiredErrorMessage));
                 }
             }
             if ($this->payment_method_id->Visible && $this->payment_method_id->Required) {
@@ -1383,37 +1223,6 @@ class PatientVisitsEdit extends PatientVisits
                     $this->medical_scheme_id->addErrorMessage(str_replace("%s", $this->medical_scheme_id->caption(), $this->medical_scheme_id->RequiredErrorMessage));
                 }
             }
-            if ($this->checkin_date->Visible && $this->checkin_date->Required) {
-                if (!$this->checkin_date->IsDetailKey && EmptyValue($this->checkin_date->FormValue)) {
-                    $this->checkin_date->addErrorMessage(str_replace("%s", $this->checkin_date->caption(), $this->checkin_date->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->checkin_date->FormValue, $this->checkin_date->formatPattern())) {
-                $this->checkin_date->addErrorMessage($this->checkin_date->getErrorMessage(false));
-            }
-
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("PatientVitalsGrid");
-        if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("DoctorNotesGrid");
-        if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("PatientVaccinationsGrid");
-        if (in_array("patient_vaccinations", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("LabTestRequestsGrid");
-        if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1453,29 +1262,6 @@ class PatientVisitsEdit extends PatientVisits
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
-            $conn->beginTransaction();
-        }
-
-        // Check referential integrity for master table 'patients'
-        $detailKeys = [];
-        $keyValue = $rsnew['patient_id'] ?? $rsold['patient_id'];
-        $detailKeys['patient_id'] = $keyValue;
-        $masterTable = Container("patients");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "patients", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
-
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -1489,50 +1275,6 @@ class PatientVisitsEdit extends PatientVisits
                 $editRow = true; // No field to update
             }
             if ($editRow) {
-            }
-
-            // Update detail records
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("PatientVitalsGrid");
-            if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "patient_vitals"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("DoctorNotesGrid");
-            if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "doctor_notes"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("PatientVaccinationsGrid");
-            if (in_array("patient_vaccinations", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "patient_vaccinations"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-            $detailPage = Container("LabTestRequestsGrid");
-            if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-
-            // Commit/Rollback transaction
-            if ($this->getCurrentDetailTable() != "") {
-                if ($editRow) {
-                    if ($this->UseTransaction) { // Commit transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->commit();
-                        }
-                    }
-                } else {
-                    if ($this->UseTransaction) { // Rollback transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->rollback();
-                        }
-                    }
-                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1576,23 +1318,14 @@ class PatientVisitsEdit extends PatientVisits
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // title
-        $this->_title->setDbValueDef($rsnew, $this->_title->CurrentValue, $this->_title->ReadOnly);
-
         // visit_type_id
         $this->visit_type_id->setDbValueDef($rsnew, $this->visit_type_id->CurrentValue, $this->visit_type_id->ReadOnly);
-
-        // doctor_id
-        $this->doctor_id->setDbValueDef($rsnew, $this->doctor_id->CurrentValue, $this->doctor_id->ReadOnly);
 
         // payment_method_id
         $this->payment_method_id->setDbValueDef($rsnew, $this->payment_method_id->CurrentValue, $this->payment_method_id->ReadOnly);
 
         // medical_scheme_id
         $this->medical_scheme_id->setDbValueDef($rsnew, $this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->ReadOnly);
-
-        // checkin_date
-        $this->checkin_date->setDbValueDef($rsnew, UnFormatDateTime($this->checkin_date->CurrentValue, $this->checkin_date->formatPattern()), $this->checkin_date->ReadOnly);
         return $rsnew;
     }
 
@@ -1605,14 +1338,8 @@ class PatientVisitsEdit extends PatientVisits
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
-        if (isset($row['title'])) { // title
-            $this->_title->CurrentValue = $row['title'];
-        }
         if (isset($row['visit_type_id'])) { // visit_type_id
             $this->visit_type_id->CurrentValue = $row['visit_type_id'];
-        }
-        if (isset($row['doctor_id'])) { // doctor_id
-            $this->doctor_id->CurrentValue = $row['doctor_id'];
         }
         if (isset($row['payment_method_id'])) { // payment_method_id
             $this->payment_method_id->CurrentValue = $row['payment_method_id'];
@@ -1620,9 +1347,16 @@ class PatientVisitsEdit extends PatientVisits
         if (isset($row['medical_scheme_id'])) { // medical_scheme_id
             $this->medical_scheme_id->CurrentValue = $row['medical_scheme_id'];
         }
-        if (isset($row['checkin_date'])) { // checkin_date
-            $this->checkin_date->CurrentValue = $row['checkin_date'];
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
         }
+        return true;
     }
 
     // Set up master/detail based on QueryString
@@ -1698,81 +1432,6 @@ class PatientVisitsEdit extends PatientVisits
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("patient_vitals", $detailTblVar)) {
-                $detailPageObj = Container("PatientVitalsGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                }
-            }
-            if (in_array("doctor_notes", $detailTblVar)) {
-                $detailPageObj = Container("DoctorNotesGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                }
-            }
-            if (in_array("patient_vaccinations", $detailTblVar)) {
-                $detailPageObj = Container("PatientVaccinationsGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                }
-            }
-            if (in_array("lab_test_requests", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                }
-            }
-        }
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1801,12 +1460,11 @@ class PatientVisitsEdit extends PatientVisits
                     break;
                 case "x_visit_type_id":
                     break;
-                case "x_doctor_id":
-                    $lookupFilter = $fld->getSelectFilter(); // PHP
-                    break;
                 case "x_payment_method_id":
                     break;
                 case "x_medical_scheme_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

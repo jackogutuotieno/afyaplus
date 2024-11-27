@@ -1655,6 +1655,14 @@ class PatientsList extends Patients
         $opt = $this->ListOptions["detail_patient_visits"];
         if ($Security->allowList(CurrentProjectID() . 'patient_visits')) {
             $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_visits", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("patient_visits");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_visits")->Count, "red"], $Language->phrase("DetailCount"));
+            }
             $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientvisitslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("PatientVisitsGrid");

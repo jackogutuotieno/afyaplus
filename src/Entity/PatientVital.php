@@ -63,11 +63,6 @@ class PatientVital extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
-    public function __construct()
-    {
-        $this->createdByUserId = 0;
-    }
-
     public function getId(): int
     {
         return $this->id;

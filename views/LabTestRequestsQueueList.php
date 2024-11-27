@@ -50,15 +50,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests_details") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/LabTestRequestsDetailsMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="flab_test_requests_queuesrch" id="flab_test_requests_queuesrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="flab_test_requests_queuesrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -151,10 +142,6 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "lab_test_requests_details" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests_details">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_requests_detail_id->getSessionValue()) ?>">
-<?php } ?>
 <div id="gmp_lab_test_requests_queue" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_lab_test_requests_queuelist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -187,6 +174,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_date_updated" class="lab_test_requests_queue_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+<?php } ?>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+        <th data-name="lab_test_request_id" class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><div id="elh_lab_test_requests_queue_lab_test_request_id" class="lab_test_requests_queue_lab_test_request_id"><?= $Page->renderFieldHeader($Page->lab_test_request_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -261,6 +251,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_date_updated" class="el_lab_test_requests_queue_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_queue_lab_test_request_id" class="el_lab_test_requests_queue_lab_test_request_id">
+<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
+<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

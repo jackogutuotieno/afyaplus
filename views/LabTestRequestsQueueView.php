@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->lab_test_requests_detail_id->Visible) { // lab_test_requests_detail_id ?>
-    <tr id="r_lab_test_requests_detail_id"<?= $Page->lab_test_requests_detail_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_lab_test_requests_detail_id"><?= $Page->lab_test_requests_detail_id->caption() ?></span></td>
-        <td data-name="lab_test_requests_detail_id"<?= $Page->lab_test_requests_detail_id->cellAttributes() ?>>
-<span id="el_lab_test_requests_queue_lab_test_requests_detail_id">
-<span<?= $Page->lab_test_requests_detail_id->viewAttributes() ?>>
-<?= $Page->lab_test_requests_detail_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
     <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_status"><?= $Page->status->caption() ?></span></td>
@@ -91,6 +80,17 @@ loadjs.ready("head", function () {
 <span id="el_lab_test_requests_queue_created_by_user_id">
 <span<?= $Page->created_by_user_id->viewAttributes() ?>>
 <?= $Page->created_by_user_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_queue_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
+        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<span id="el_lab_test_requests_queue_lab_test_request_id">
+<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
+<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
