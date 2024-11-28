@@ -107,14 +107,6 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
-<?php
-    if (in_array("diagnosis", explode(",", $Page->getCurrentDetailTable())) && $diagnosis->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("diagnosis", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "DiagnosisGrid.php" ?>
-<?php } ?>
 </form>
 </main>
 <?php

@@ -521,6 +521,7 @@ class DiagnosisAdd extends Diagnosis
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->lab_test_report_id);
         $this->setupLookupOptions($this->disease_id);
         $this->setupLookupOptions($this->created_by_user_id);
 
@@ -559,10 +560,6 @@ class DiagnosisAdd extends Diagnosis
 
         // Load old record or default values
         $rsold = $this->loadOldRecord();
-
-        // Set up master/detail parameters
-        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
-        $this->setupMasterParms();
 
         // Load form values
         if ($postBack) {
@@ -608,7 +605,7 @@ class DiagnosisAdd extends Diagnosis
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
+                    if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "diagnosislist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -693,7 +690,7 @@ class DiagnosisAdd extends Diagnosis
             if (IsApi() && $val === null) {
                 $this->lab_test_report_id->Visible = false; // Disable update for API request
             } else {
-                $this->lab_test_report_id->setFormValue($val, true, $validate);
+                $this->lab_test_report_id->setFormValue($val);
             }
         }
 
@@ -853,8 +850,27 @@ class DiagnosisAdd extends Diagnosis
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // lab_test_report_id
-            $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
-            $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
+            $curVal = strval($this->lab_test_report_id->CurrentValue);
+            if ($curVal != "") {
+                $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->lookupCacheOption($curVal);
+                if ($this->lab_test_report_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->lab_test_report_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->lab_test_report_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->displayValue($arwrk);
+                    } else {
+                        $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->CurrentValue, $this->lab_test_report_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->lab_test_report_id->ViewValue = null;
+            }
 
             // disease_id
             $curVal = strval($this->disease_id->CurrentValue);
@@ -921,17 +937,30 @@ class DiagnosisAdd extends Diagnosis
         } elseif ($this->RowType == RowType::ADD) {
             // lab_test_report_id
             $this->lab_test_report_id->setupEditAttributes();
-            if ($this->lab_test_report_id->getSessionValue() != "") {
-                $this->lab_test_report_id->CurrentValue = GetForeignKeyValue($this->lab_test_report_id->getSessionValue());
-                $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
-                $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
+            $curVal = trim(strval($this->lab_test_report_id->CurrentValue));
+            if ($curVal != "") {
+                $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->lookupCacheOption($curVal);
             } else {
-                $this->lab_test_report_id->EditValue = $this->lab_test_report_id->CurrentValue;
-                $this->lab_test_report_id->PlaceHolder = RemoveHtml($this->lab_test_report_id->caption());
-                if (strval($this->lab_test_report_id->EditValue) != "" && is_numeric($this->lab_test_report_id->EditValue)) {
-                    $this->lab_test_report_id->EditValue = FormatNumber($this->lab_test_report_id->EditValue, null);
-                }
+                $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->Lookup !== null && is_array($this->lab_test_report_id->lookupOptions()) && count($this->lab_test_report_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->lab_test_report_id->ViewValue !== null) { // Load from cache
+                $this->lab_test_report_id->EditValue = array_values($this->lab_test_report_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->lab_test_report_id->CurrentValue, $this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->lab_test_report_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->lab_test_report_id->EditValue = $arwrk;
+            }
+            $this->lab_test_report_id->PlaceHolder = RemoveHtml($this->lab_test_report_id->caption());
 
             // disease_id
             $this->disease_id->setupEditAttributes();
@@ -1048,9 +1077,6 @@ class DiagnosisAdd extends Diagnosis
                     $this->lab_test_report_id->addErrorMessage(str_replace("%s", $this->lab_test_report_id->caption(), $this->lab_test_report_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->lab_test_report_id->FormValue)) {
-                $this->lab_test_report_id->addErrorMessage($this->lab_test_report_id->getErrorMessage(false));
-            }
             if ($this->disease_id->Visible && $this->disease_id->Required) {
                 if (!$this->disease_id->IsDetailKey && EmptyValue($this->disease_id->FormValue)) {
                     $this->disease_id->addErrorMessage(str_replace("%s", $this->disease_id->caption(), $this->disease_id->RequiredErrorMessage));
@@ -1094,46 +1120,6 @@ class DiagnosisAdd extends Diagnosis
             $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
             $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
             $this->setFailureMessage($userIdMsg);
-            return false;
-        }
-
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["lab_test_report_id"] = $this->lab_test_report_id->CurrentValue;
-            $masterTable = Container("lab_test_reports");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_reports") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
-
-        // Check referential integrity for master table 'diagnosis'
-        $validMasterRecord = true;
-        $detailKeys = [];
-        $detailKeys["lab_test_report_id"] = $this->lab_test_report_id->CurrentValue;
-        $masterTable = Container("lab_test_reports");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "lab_test_reports", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
             return false;
         }
         $conn = $this->getConnection();
@@ -1222,78 +1208,6 @@ class DiagnosisAdd extends Diagnosis
         return true;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_reports") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_reports");
-                if (($parm = Get("fk_id", Get("lab_test_report_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_report_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->QueryStringValue);
-                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "lab_test_reports") {
-                $validMaster = true;
-                $masterTbl = Container("lab_test_reports");
-                if (($parm = Post("fk_id", Post("lab_test_report_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_report_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->FormValue);
-                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "lab_test_reports") {
-                if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_report_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1318,6 +1232,8 @@ class DiagnosisAdd extends Diagnosis
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_lab_test_report_id":
+                    break;
                 case "x_disease_id":
                     break;
                 case "x_created_by_user_id":

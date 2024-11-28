@@ -23,6 +23,7 @@ C:\wamp64\www\afyaplus\controllers\LabTestRequestsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingController.php
+C:\wamp64\www\afyaplus\controllers\LaboratoryMinorReportController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryreportsController.php
 C:\wamp64\www\afyaplus\controllers\MedicalSchemesController.php
 C:\wamp64\www\afyaplus\controllers\MedicineBrandsController.php
@@ -178,6 +179,8 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\models\LaboratoryBilling.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
+C:\wamp64\www\afyaplus\models\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\models\Laboratoryreports.php
 C:\wamp64\www\afyaplus\models\LaboratoryreportsList.php
 C:\wamp64\www\afyaplus\models\Login.php
@@ -430,6 +433,7 @@ C:\wamp64\www\afyaplus\src\Entity\LabTestRequest.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryBilling.php
+C:\wamp64\www\afyaplus\src\Entity\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\src\Entity\Laboratoryreport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicalScheme.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineBrand.php
@@ -648,6 +652,7 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsQueueMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryreportsList.php
 C:\wamp64\www\afyaplus\views\Login.php
 C:\wamp64\www\afyaplus\views\MedicalSchemesAdd.php

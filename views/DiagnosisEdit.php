@@ -29,7 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["lab_test_report_id", [fields.lab_test_report_id.visible && fields.lab_test_report_id.required ? ew.Validators.required(fields.lab_test_report_id.caption) : null, ew.Validators.integer], fields.lab_test_report_id.isInvalid],
+            ["lab_test_report_id", [fields.lab_test_report_id.visible && fields.lab_test_report_id.required ? ew.Validators.required(fields.lab_test_report_id.caption) : null], fields.lab_test_report_id.isInvalid],
             ["disease_id", [fields.disease_id.visible && fields.disease_id.required ? ew.Validators.required(fields.disease_id.caption) : null], fields.disease_id.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
@@ -47,6 +47,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "lab_test_report_id": <?= $Page->lab_test_report_id->toClientList($Page) ?>,
             "disease_id": <?= $Page->disease_id->toClientList($Page) ?>,
             "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
@@ -72,10 +73,6 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "lab_test_reports") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
-<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -93,17 +90,45 @@ loadjs.ready("head", function () {
     <div id="r_lab_test_report_id"<?= $Page->lab_test_report_id->rowAttributes() ?>>
         <label id="elh_diagnosis_lab_test_report_id" for="x_lab_test_report_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->lab_test_report_id->caption() ?><?= $Page->lab_test_report_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->lab_test_report_id->cellAttributes() ?>>
-<?php if ($Page->lab_test_report_id->getSessionValue() != "") { ?>
-<span<?= $Page->lab_test_report_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->lab_test_report_id->getDisplayValue($Page->lab_test_report_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x_lab_test_report_id" name="x_lab_test_report_id" value="<?= HtmlEncode($Page->lab_test_report_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_diagnosis_lab_test_report_id">
-<input type="<?= $Page->lab_test_report_id->getInputTextType() ?>" name="x_lab_test_report_id" id="x_lab_test_report_id" data-table="diagnosis" data-field="x_lab_test_report_id" value="<?= $Page->lab_test_report_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->lab_test_report_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->lab_test_report_id->formatPattern()) ?>"<?= $Page->lab_test_report_id->editAttributes() ?> aria-describedby="x_lab_test_report_id_help">
-<?= $Page->lab_test_report_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->lab_test_report_id->getErrorMessage() ?></div>
-</span>
+    <select
+        id="x_lab_test_report_id"
+        name="x_lab_test_report_id"
+        class="form-select ew-select<?= $Page->lab_test_report_id->isInvalidClass() ?>"
+        <?php if (!$Page->lab_test_report_id->IsNativeSelect) { ?>
+        data-select2-id="fdiagnosisedit_x_lab_test_report_id"
+        <?php } ?>
+        data-table="diagnosis"
+        data-field="x_lab_test_report_id"
+        data-value-separator="<?= $Page->lab_test_report_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->lab_test_report_id->getPlaceHolder()) ?>"
+        <?= $Page->lab_test_report_id->editAttributes() ?>>
+        <?= $Page->lab_test_report_id->selectOptionListHtml("x_lab_test_report_id") ?>
+    </select>
+    <?= $Page->lab_test_report_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->lab_test_report_id->getErrorMessage() ?></div>
+<?= $Page->lab_test_report_id->Lookup->getParamTag($Page, "p_x_lab_test_report_id") ?>
+<?php if (!$Page->lab_test_report_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fdiagnosisedit", function() {
+    var options = { name: "x_lab_test_report_id", selectId: "fdiagnosisedit_x_lab_test_report_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdiagnosisedit.lists.lab_test_report_id?.lookupOptions.length) {
+        options.data = { id: "x_lab_test_report_id", form: "fdiagnosisedit" };
+    } else {
+        options.ajax = { id: "x_lab_test_report_id", form: "fdiagnosisedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.diagnosis.fields.lab_test_report_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 <?php } ?>
+</span>
 </div></div>
     </div>
 <?php } ?>

@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="115">
+      <phrase id="menutext" value="laboratory minor report" />
+    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -243,7 +246,7 @@
       </field>
     </table>
     <table id="diagnosis">
-      <phrase id="tblcaption" value="diagnosis" />
+      <phrase id="tblcaption" value="Diagnosis" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
@@ -1609,6 +1612,30 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Date Updated" />
+      </field>
+    </table>
+    <table id="laboratory_minor_report">
+      <phrase id="tblcaption" value="laboratory minor report" />
+      <field id="id">
+        <phrase id="fldcaption" value="Report ID" />
+      </field>
+      <field id="specimen">
+        <phrase id="fldcaption" value="Specimen" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="Test Name" />
+      </field>
+      <field id="category_name">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="subcategory">
+        <phrase id="fldcaption" value="Subcategory" />
+      </field>
+      <field id="details">
+        <phrase id="fldcaption" value="Findings" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Reort Date" />
       </field>
     </table>
   </project>

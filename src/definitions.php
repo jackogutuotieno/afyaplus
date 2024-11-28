@@ -128,6 +128,7 @@ return [
     "Appointments" => \DI\create(Appointments::class),
     "appointments" => \DI\create(Appointments::class),
     "patient_queue" => \DI\create(PatientQueue::class),
+    "laboratory_minor_report" => \DI\create(LaboratoryMinorReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

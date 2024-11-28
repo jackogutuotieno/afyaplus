@@ -44,15 +44,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_reports") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/LabTestReportsMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
@@ -84,10 +75,6 @@ $Page->showMessage();
 <input type="hidden" name="t" value="diagnosis">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
-<?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "lab_test_reports" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_diagnosis" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>

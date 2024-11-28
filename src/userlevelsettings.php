@@ -313,7 +313,13 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_queue","1","2029"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_queue","2","2029"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_queue","3","2029"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patient_queue","4","2029"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_queue","4","2029"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","2","840"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","4","0"]];
 
 /**
  * Tables
@@ -329,7 +335,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
 $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintments Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointmentsreportlist"],
     ["departments","departments","Departments",true,"{32536B8D-F37B-4419-80D5-260932800712}","departmentslist"],
     ["designations","designations","Designations",true,"{32536B8D-F37B-4419-80D5-260932800712}","designationslist"],
-    ["diagnosis","diagnosis","diagnosis",true,"{32536B8D-F37B-4419-80D5-260932800712}","diagnosislist"],
+    ["diagnosis","diagnosis","Diagnosis",true,"{32536B8D-F37B-4419-80D5-260932800712}","diagnosislist"],
     ["diseases","diseases","diseases",true,"{32536B8D-F37B-4419-80D5-260932800712}","diseaseslist"],
     ["doctor_charges","doctor_charges","doctor charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctorchargeslist"],
     ["doctor_notes","doctor_notes","Medical Notes",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctornoteslist"],
@@ -373,4 +379,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["exportlog","exportlog","exportlog",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"],
     ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"],
     ["Appointments","Appointments","Patients Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointments"],
-    ["patient_queue","patient_queue","Patient Flow",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientqueuelist"]];
+    ["patient_queue","patient_queue","Patient Flow",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientqueuelist"],
+    ["laboratory_minor_report","laboratory_minor_report","laboratory minor report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryminorreportlist"]];

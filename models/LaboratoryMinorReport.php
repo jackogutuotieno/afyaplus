@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for diagnosis
+ * Table class for laboratory_minor_report
  */
-class Diagnosis extends DbTable
+class LaboratoryMinorReport extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,11 +47,12 @@ class Diagnosis extends DbTable
 
     // Fields
     public $id;
-    public $lab_test_report_id;
-    public $disease_id;
-    public $created_by_user_id;
+    public $specimen;
+    public $service_name;
+    public $category_name;
+    public $subcategory;
+    public $details;
     public $date_created;
-    public $date_updated;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -64,14 +65,14 @@ class Diagnosis extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "diagnosis";
-        $this->TableName = 'diagnosis';
-        $this->TableType = "TABLE";
+        $this->TableVar = "laboratory_minor_report";
+        $this->TableName = 'laboratory_minor_report';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "diagnosis";
+        $this->UpdateTable = "laboratory_minor_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -125,95 +126,125 @@ class Diagnosis extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // lab_test_report_id
-        $this->lab_test_report_id = new DbField(
+        // specimen
+        $this->specimen = new DbField(
             $this, // Table
-            'x_lab_test_report_id', // Variable name
-            'lab_test_report_id', // Name
-            '`lab_test_report_id`', // Expression
-            '`lab_test_report_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_specimen', // Variable name
+            'specimen', // Name
+            '`specimen`', // Expression
+            '`specimen`', // Basic search expression
+            200, // Type
+            50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`lab_test_report_id`', // Virtual expression
+            '`specimen`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->lab_test_report_id->InputTextType = "text";
-        $this->lab_test_report_id->Raw = true;
-        $this->lab_test_report_id->Nullable = false; // NOT NULL field
-        $this->lab_test_report_id->Required = true; // Required field
-        $this->lab_test_report_id->setSelectMultiple(false); // Select one
-        $this->lab_test_report_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->lab_test_report_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->lab_test_report_id->Lookup = new Lookup($this->lab_test_report_id, 'laboratory_minor_report', false, 'id', ["id","service_name","details",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`id`, ''),'" . ValueSeparator(1, $this->lab_test_report_id) . "',COALESCE(`service_name`,''),'" . ValueSeparator(2, $this->lab_test_report_id) . "',COALESCE(`details`,''))");
-        $this->lab_test_report_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->lab_test_report_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['lab_test_report_id'] = &$this->lab_test_report_id;
+        $this->specimen->InputTextType = "text";
+        $this->specimen->Nullable = false; // NOT NULL field
+        $this->specimen->Required = true; // Required field
+        $this->specimen->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['specimen'] = &$this->specimen;
 
-        // disease_id
-        $this->disease_id = new DbField(
+        // service_name
+        $this->service_name = new DbField(
             $this, // Table
-            'x_disease_id', // Variable name
-            'disease_id', // Name
-            '`disease_id`', // Expression
-            '`disease_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_service_name', // Variable name
+            'service_name', // Name
+            '`service_name`', // Expression
+            '`service_name`', // Basic search expression
+            200, // Type
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`disease_id`', // Virtual expression
+            '`service_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->disease_id->InputTextType = "text";
-        $this->disease_id->Raw = true;
-        $this->disease_id->Nullable = false; // NOT NULL field
-        $this->disease_id->Required = true; // Required field
-        $this->disease_id->setSelectMultiple(false); // Select one
-        $this->disease_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->disease_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->disease_id->Lookup = new Lookup($this->disease_id, 'diseases', false, 'id', ["disease_name","icd10_code","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`disease_name`, ''),'" . ValueSeparator(1, $this->disease_id) . "',COALESCE(`icd10_code`,''))");
-        $this->disease_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->disease_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['disease_id'] = &$this->disease_id;
+        $this->service_name->InputTextType = "text";
+        $this->service_name->Nullable = false; // NOT NULL field
+        $this->service_name->Required = true; // Required field
+        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['service_name'] = &$this->service_name;
 
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
+        // category_name
+        $this->category_name = new DbField(
             $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_category_name', // Variable name
+            'category_name', // Name
+            '`category_name`', // Expression
+            '`category_name`', // Basic search expression
+            200, // Type
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
+            '`category_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->setSelectMultiple(false); // Select one
-        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
+        $this->category_name->InputTextType = "text";
+        $this->category_name->Nullable = false; // NOT NULL field
+        $this->category_name->Required = true; // Required field
+        $this->category_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['category_name'] = &$this->category_name;
+
+        // subcategory
+        $this->subcategory = new DbField(
+            $this, // Table
+            'x_subcategory', // Variable name
+            'subcategory', // Name
+            '`subcategory`', // Expression
+            '`subcategory`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`subcategory`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->subcategory->InputTextType = "text";
+        $this->subcategory->Nullable = false; // NOT NULL field
+        $this->subcategory->Required = true; // Required field
+        $this->subcategory->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['subcategory'] = &$this->subcategory;
+
+        // details
+        $this->details = new DbField(
+            $this, // Table
+            'x_details', // Variable name
+            'details', // Name
+            '`details`', // Expression
+            '`details`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`details`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->details->InputTextType = "text";
+        $this->details->Nullable = false; // NOT NULL field
+        $this->details->Required = true; // Required field
+        $this->details->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['details'] = &$this->details;
 
         // date_created
         $this->date_created = new DbField(
@@ -221,10 +252,10 @@ class Diagnosis extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            0, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -237,35 +268,9 @@ class Diagnosis extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -334,7 +339,7 @@ class Diagnosis extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "diagnosis";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "laboratory_minor_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -464,11 +469,6 @@ class Diagnosis extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -791,11 +791,12 @@ class Diagnosis extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->lab_test_report_id->DbValue = $row['lab_test_report_id'];
-        $this->disease_id->DbValue = $row['disease_id'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
+        $this->specimen->DbValue = $row['specimen'];
+        $this->service_name->DbValue = $row['service_name'];
+        $this->category_name->DbValue = $row['category_name'];
+        $this->subcategory->DbValue = $row['subcategory'];
+        $this->details->DbValue = $row['details'];
         $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
     }
 
     // Delete uploaded files
@@ -869,7 +870,7 @@ class Diagnosis extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("diagnosislist");
+        return $_SESSION[$name] ?? GetUrl("laboratoryminorreportlist");
     }
 
     // Set return page URL
@@ -883,9 +884,9 @@ class Diagnosis extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "diagnosisview" => $Language->phrase("View"),
-            "diagnosisedit" => $Language->phrase("Edit"),
-            "diagnosisadd" => $Language->phrase("Add"),
+            "laboratoryminorreportview" => $Language->phrase("View"),
+            "laboratoryminorreportedit" => $Language->phrase("Edit"),
+            "laboratoryminorreportadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -893,18 +894,18 @@ class Diagnosis extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "diagnosislist";
+        return "laboratoryminorreportlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "DiagnosisView",
-            Config("API_ADD_ACTION") => "DiagnosisAdd",
-            Config("API_EDIT_ACTION") => "DiagnosisEdit",
-            Config("API_DELETE_ACTION") => "DiagnosisDelete",
-            Config("API_LIST_ACTION") => "DiagnosisList",
+            Config("API_VIEW_ACTION") => "LaboratoryMinorReportView",
+            Config("API_ADD_ACTION") => "LaboratoryMinorReportAdd",
+            Config("API_EDIT_ACTION") => "LaboratoryMinorReportEdit",
+            Config("API_DELETE_ACTION") => "LaboratoryMinorReportDelete",
+            Config("API_LIST_ACTION") => "LaboratoryMinorReportList",
             default => ""
         };
     }
@@ -924,16 +925,16 @@ class Diagnosis extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "diagnosislist";
+        return "laboratoryminorreportlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("diagnosisview", $parm);
+            $url = $this->keyUrl("laboratoryminorreportview", $parm);
         } else {
-            $url = $this->keyUrl("diagnosisview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("laboratoryminorreportview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -942,9 +943,9 @@ class Diagnosis extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "diagnosisadd?" . $parm;
+            $url = "laboratoryminorreportadd?" . $parm;
         } else {
-            $url = "diagnosisadd";
+            $url = "laboratoryminorreportadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -952,28 +953,28 @@ class Diagnosis extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("diagnosisedit", $parm);
+        $url = $this->keyUrl("laboratoryminorreportedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("diagnosislist", "action=edit");
+        $url = $this->keyUrl("laboratoryminorreportlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("diagnosisadd", $parm);
+        $url = $this->keyUrl("laboratoryminorreportadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("diagnosislist", "action=copy");
+        $url = $this->keyUrl("laboratoryminorreportlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -983,7 +984,7 @@ class Diagnosis extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("diagnosisdelete", $parm);
+            return $this->keyUrl("laboratoryminorreportdelete", $parm);
         }
     }
 
@@ -1149,18 +1150,19 @@ class Diagnosis extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
-        $this->disease_id->setDbValue($row['disease_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->specimen->setDbValue($row['specimen']);
+        $this->service_name->setDbValue($row['service_name']);
+        $this->category_name->setDbValue($row['category_name']);
+        $this->subcategory->setDbValue($row['subcategory']);
+        $this->details->setDbValue($row['details']);
         $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "DiagnosisList";
+        $listPage = "LaboratoryMinorReportList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1186,119 +1188,67 @@ class Diagnosis extends DbTable
 
         // id
 
-        // lab_test_report_id
+        // specimen
 
-        // disease_id
+        // service_name
 
-        // created_by_user_id
+        // category_name
+
+        // subcategory
+
+        // details
 
         // date_created
-
-        // date_updated
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // lab_test_report_id
-        $curVal = strval($this->lab_test_report_id->CurrentValue);
-        if ($curVal != "") {
-            $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->lookupCacheOption($curVal);
-            if ($this->lab_test_report_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->lab_test_report_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->lab_test_report_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->lab_test_report_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->displayValue($arwrk);
-                } else {
-                    $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->CurrentValue, $this->lab_test_report_id->formatPattern());
-                }
-            }
-        } else {
-            $this->lab_test_report_id->ViewValue = null;
-        }
+        // specimen
+        $this->specimen->ViewValue = $this->specimen->CurrentValue;
 
-        // disease_id
-        $curVal = strval($this->disease_id->CurrentValue);
-        if ($curVal != "") {
-            $this->disease_id->ViewValue = $this->disease_id->lookupCacheOption($curVal);
-            if ($this->disease_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->disease_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->disease_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->disease_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->disease_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->disease_id->ViewValue = $this->disease_id->displayValue($arwrk);
-                } else {
-                    $this->disease_id->ViewValue = FormatNumber($this->disease_id->CurrentValue, $this->disease_id->formatPattern());
-                }
-            }
-        } else {
-            $this->disease_id->ViewValue = null;
-        }
+        // service_name
+        $this->service_name->ViewValue = $this->service_name->CurrentValue;
 
-        // created_by_user_id
-        $curVal = strval($this->created_by_user_id->CurrentValue);
-        if ($curVal != "") {
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
-                } else {
-                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                }
-            }
-        } else {
-            $this->created_by_user_id->ViewValue = null;
-        }
+        // category_name
+        $this->category_name->ViewValue = $this->category_name->CurrentValue;
+
+        // subcategory
+        $this->subcategory->ViewValue = $this->subcategory->CurrentValue;
+
+        // details
+        $this->details->ViewValue = $this->details->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // lab_test_report_id
-        $this->lab_test_report_id->HrefValue = "";
-        $this->lab_test_report_id->TooltipValue = "";
+        // specimen
+        $this->specimen->HrefValue = "";
+        $this->specimen->TooltipValue = "";
 
-        // disease_id
-        $this->disease_id->HrefValue = "";
-        $this->disease_id->TooltipValue = "";
+        // service_name
+        $this->service_name->HrefValue = "";
+        $this->service_name->TooltipValue = "";
 
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
+        // category_name
+        $this->category_name->HrefValue = "";
+        $this->category_name->TooltipValue = "";
+
+        // subcategory
+        $this->subcategory->HrefValue = "";
+        $this->subcategory->TooltipValue = "";
+
+        // details
+        $this->details->HrefValue = "";
+        $this->details->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1319,52 +1269,50 @@ class Diagnosis extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // lab_test_report_id
-        $this->lab_test_report_id->setupEditAttributes();
-        $this->lab_test_report_id->PlaceHolder = RemoveHtml($this->lab_test_report_id->caption());
-
-        // disease_id
-        $this->disease_id->setupEditAttributes();
-        $this->disease_id->PlaceHolder = RemoveHtml($this->disease_id->caption());
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->EditValue = null;
-            }
-        } else {
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+        // specimen
+        $this->specimen->setupEditAttributes();
+        if (!$this->specimen->Raw) {
+            $this->specimen->CurrentValue = HtmlDecode($this->specimen->CurrentValue);
         }
+        $this->specimen->EditValue = $this->specimen->CurrentValue;
+        $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
+
+        // service_name
+        $this->service_name->setupEditAttributes();
+        if (!$this->service_name->Raw) {
+            $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
+        }
+        $this->service_name->EditValue = $this->service_name->CurrentValue;
+        $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
+
+        // category_name
+        $this->category_name->setupEditAttributes();
+        if (!$this->category_name->Raw) {
+            $this->category_name->CurrentValue = HtmlDecode($this->category_name->CurrentValue);
+        }
+        $this->category_name->EditValue = $this->category_name->CurrentValue;
+        $this->category_name->PlaceHolder = RemoveHtml($this->category_name->caption());
+
+        // subcategory
+        $this->subcategory->setupEditAttributes();
+        if (!$this->subcategory->Raw) {
+            $this->subcategory->CurrentValue = HtmlDecode($this->subcategory->CurrentValue);
+        }
+        $this->subcategory->EditValue = $this->subcategory->CurrentValue;
+        $this->subcategory->PlaceHolder = RemoveHtml($this->subcategory->caption());
+
+        // details
+        $this->details->setupEditAttributes();
+        if (!$this->details->Raw) {
+            $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
+        }
+        $this->details->EditValue = $this->details->CurrentValue;
+        $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1395,16 +1343,20 @@ class Diagnosis extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->lab_test_report_id);
-                    $doc->exportCaption($this->disease_id);
-                    $doc->exportCaption($this->created_by_user_id);
+                    $doc->exportCaption($this->specimen);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->category_name);
+                    $doc->exportCaption($this->subcategory);
+                    $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->date_created);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->lab_test_report_id);
-                    $doc->exportCaption($this->disease_id);
-                    $doc->exportCaption($this->created_by_user_id);
+                    $doc->exportCaption($this->specimen);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->category_name);
+                    $doc->exportCaption($this->subcategory);
+                    $doc->exportCaption($this->details);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1432,16 +1384,20 @@ class Diagnosis extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->lab_test_report_id);
-                        $doc->exportField($this->disease_id);
-                        $doc->exportField($this->created_by_user_id);
+                        $doc->exportField($this->specimen);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->category_name);
+                        $doc->exportField($this->subcategory);
+                        $doc->exportField($this->details);
+                        $doc->exportField($this->date_created);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->lab_test_report_id);
-                        $doc->exportField($this->disease_id);
-                        $doc->exportField($this->created_by_user_id);
+                        $doc->exportField($this->specimen);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->category_name);
+                        $doc->exportField($this->subcategory);
+                        $doc->exportField($this->details);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1455,52 +1411,6 @@ class Diagnosis extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM diagnosis";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data
