@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(115, "mi_laboratory_minor_report", $Language->menuPhrase("115", "MenuText"), "laboratoryminorreportlist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "", "", false, true);
@@ -26,7 +25,7 @@ $sideMenu->addMenuItem(25, "mi_patient_vitals", $Language->menuPhrase("25", "Men
 $sideMenu->addMenuItem(23, "mi_patient_vaccinations", $Language->menuPhrase("23", "MenuText"), "patientvaccinationslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(4, "mi_diagnosis", $Language->menuPhrase("4", "MenuText"), "diagnosislist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diagnosis'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(7, "mi_doctor_notes", $Language->menuPhrase("7", "MenuText"), "doctornoteslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_notes'), false, false, "", "", false, true);
-$sideMenu->addMenuItem(28, "mi_prescriptions", $Language->menuPhrase("28", "MenuText"), "prescriptionslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}prescriptions'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(28, "mi_prescriptions", $Language->menuPhrase("28", "MenuText"), "prescriptionslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}prescriptions'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(38, "mi_visit_types", $Language->menuPhrase("38", "MenuText"), "visittypeslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}visit_types'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(50, "mci_Doctor_Panel", $Language->menuPhrase("50", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(5, "mi_diseases", $Language->menuPhrase("5", "MenuText"), "diseaseslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diseases'), false, false, "", "", false, true);

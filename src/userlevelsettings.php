@@ -364,7 +364,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["patients_report","patients_report","patients report",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsreportlist"],
     ["payment_methods","payment_methods","payment methods",true,"{32536B8D-F37B-4419-80D5-260932800712}","paymentmethodslist"],
     ["prescription_details","prescription_details","prescription details",true,"{32536B8D-F37B-4419-80D5-260932800712}","prescriptiondetailslist"],
-    ["prescriptions","prescriptions","prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","prescriptionslist"],
+    ["prescriptions","prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","prescriptionslist"],
     ["radiology_reports","radiology_reports","radiology reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyreportslist"],
     ["radiology_requests","radiology_requests","radiology requests",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestslist"],
     ["radiology_requests_details","radiology_requests_details","radiology requests details",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestsdetailslist"],

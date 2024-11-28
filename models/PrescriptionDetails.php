@@ -92,8 +92,8 @@ class PrescriptionDetails extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailAdd = true; // Allow detail add
+        $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -149,6 +149,7 @@ class PrescriptionDetails extends DbTable
         );
         $this->prescription_id->InputTextType = "text";
         $this->prescription_id->Raw = true;
+        $this->prescription_id->IsForeignKey = true; // Foreign key field
         $this->prescription_id->Nullable = false; // NOT NULL field
         $this->prescription_id->Required = true; // Required field
         $this->prescription_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -171,14 +172,18 @@ class PrescriptionDetails extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->medicine_stock_id->InputTextType = "text";
         $this->medicine_stock_id->Raw = true;
         $this->medicine_stock_id->Nullable = false; // NOT NULL field
         $this->medicine_stock_id->Required = true; // Required field
+        $this->medicine_stock_id->setSelectMultiple(false); // Select one
+        $this->medicine_stock_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->medicine_stock_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->medicine_stock_id->Lookup = new Lookup($this->medicine_stock_id, 'medicine_stock_report', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
         $this->medicine_stock_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->medicine_stock_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->medicine_stock_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['medicine_stock_id'] = &$this->medicine_stock_id;
 
         // dose_quantity
@@ -223,12 +228,17 @@ class PrescriptionDetails extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->dose_type->InputTextType = "text";
         $this->dose_type->Nullable = false; // NOT NULL field
         $this->dose_type->Required = true; // Required field
-        $this->dose_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->dose_type->setSelectMultiple(false); // Select one
+        $this->dose_type->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->dose_type->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->dose_type->Lookup = new Lookup($this->dose_type, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->dose_type->OptionCount = 3;
+        $this->dose_type->SearchOperators = ["=", "<>"];
         $this->Fields['dose_type'] = &$this->dose_type;
 
         // dose_interval
@@ -247,12 +257,17 @@ class PrescriptionDetails extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->dose_interval->InputTextType = "text";
         $this->dose_interval->Nullable = false; // NOT NULL field
         $this->dose_interval->Required = true; // Required field
-        $this->dose_interval->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->dose_interval->setSelectMultiple(false); // Select one
+        $this->dose_interval->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->dose_interval->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->dose_interval->Lookup = new Lookup($this->dose_interval, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->dose_interval->OptionCount = 4;
+        $this->dose_interval->SearchOperators = ["=", "<>"];
         $this->Fields['dose_interval'] = &$this->dose_interval;
 
         // number_of_days
@@ -277,6 +292,8 @@ class PrescriptionDetails extends DbTable
         $this->number_of_days->Raw = true;
         $this->number_of_days->Nullable = false; // NOT NULL field
         $this->number_of_days->Required = true; // Required field
+        $this->number_of_days->Lookup = new Lookup($this->number_of_days, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->number_of_days->OptionCount = 7;
         $this->number_of_days->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->number_of_days->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['number_of_days'] = &$this->number_of_days;
@@ -297,12 +314,17 @@ class PrescriptionDetails extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->method->InputTextType = "text";
         $this->method->Nullable = false; // NOT NULL field
         $this->method->Required = true; // Required field
-        $this->method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->method->setSelectMultiple(false); // Select one
+        $this->method->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->method->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->method->Lookup = new Lookup($this->method, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->method->OptionCount = 4;
+        $this->method->SearchOperators = ["=", "<>"];
         $this->Fields['method'] = &$this->method;
 
         // date_created
@@ -311,10 +333,10 @@ class PrescriptionDetails extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -327,7 +349,8 @@ class PrescriptionDetails extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->Sortable = false; // Allow sort
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -337,10 +360,10 @@ class PrescriptionDetails extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -353,7 +376,8 @@ class PrescriptionDetails extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->Sortable = false; // Allow sort
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -413,6 +437,88 @@ class PrescriptionDetails extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "prescriptions") {
+            $masterTable = Container("prescriptions");
+            if ($this->prescription_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->prescription_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "prescriptions") {
+            $masterTable = Container("prescriptions");
+            if ($this->prescription_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->prescription_id, $this->prescription_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "prescriptions":
+                $key = $keys["prescription_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["prescription_id"], $this->prescription_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "prescriptions":
+                return GetKeyFilter($this->prescription_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -554,6 +660,13 @@ class PrescriptionDetails extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "prescriptions" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "prescriptions"); // Add detail User ID filter
+            }
+        }
         return $filter;
     }
 
@@ -1079,6 +1192,10 @@ class PrescriptionDetails extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "prescriptions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->prescription_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1294,8 +1411,10 @@ class PrescriptionDetails extends DbTable
         // method
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1305,25 +1424,55 @@ class PrescriptionDetails extends DbTable
         $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
 
         // medicine_stock_id
-        $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->CurrentValue;
-        $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->ViewValue, $this->medicine_stock_id->formatPattern());
+        $curVal = strval($this->medicine_stock_id->CurrentValue);
+        if ($curVal != "") {
+            $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
+            if ($this->medicine_stock_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->medicine_stock_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->medicine_stock_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->displayValue($arwrk);
+                } else {
+                    $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->formatPattern());
+                }
+            }
+        } else {
+            $this->medicine_stock_id->ViewValue = null;
+        }
 
         // dose_quantity
         $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
         $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
 
         // dose_type
-        $this->dose_type->ViewValue = $this->dose_type->CurrentValue;
+        if (strval($this->dose_type->CurrentValue) != "") {
+            $this->dose_type->ViewValue = $this->dose_type->optionCaption($this->dose_type->CurrentValue);
+        } else {
+            $this->dose_type->ViewValue = null;
+        }
 
         // dose_interval
-        $this->dose_interval->ViewValue = $this->dose_interval->CurrentValue;
+        if (strval($this->dose_interval->CurrentValue) != "") {
+            $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
+        } else {
+            $this->dose_interval->ViewValue = null;
+        }
 
         // number_of_days
         $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-        $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
         // method
-        $this->method->ViewValue = $this->method->CurrentValue;
+        if (strval($this->method->CurrentValue) != "") {
+            $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+        } else {
+            $this->method->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1394,19 +1543,21 @@ class PrescriptionDetails extends DbTable
 
         // prescription_id
         $this->prescription_id->setupEditAttributes();
-        $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-        $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-        if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-            $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+        if ($this->prescription_id->getSessionValue() != "") {
+            $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
+            $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
+            $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+        } else {
+            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
+            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
+            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
+                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+            }
         }
 
         // medicine_stock_id
         $this->medicine_stock_id->setupEditAttributes();
-        $this->medicine_stock_id->EditValue = $this->medicine_stock_id->CurrentValue;
         $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
-        if (strval($this->medicine_stock_id->EditValue) != "" && is_numeric($this->medicine_stock_id->EditValue)) {
-            $this->medicine_stock_id->EditValue = FormatNumber($this->medicine_stock_id->EditValue, null);
-        }
 
         // dose_quantity
         $this->dose_quantity->setupEditAttributes();
@@ -1418,34 +1569,22 @@ class PrescriptionDetails extends DbTable
 
         // dose_type
         $this->dose_type->setupEditAttributes();
-        if (!$this->dose_type->Raw) {
-            $this->dose_type->CurrentValue = HtmlDecode($this->dose_type->CurrentValue);
-        }
-        $this->dose_type->EditValue = $this->dose_type->CurrentValue;
+        $this->dose_type->EditValue = $this->dose_type->options(true);
         $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
 
         // dose_interval
         $this->dose_interval->setupEditAttributes();
-        if (!$this->dose_interval->Raw) {
-            $this->dose_interval->CurrentValue = HtmlDecode($this->dose_interval->CurrentValue);
-        }
-        $this->dose_interval->EditValue = $this->dose_interval->CurrentValue;
+        $this->dose_interval->EditValue = $this->dose_interval->options(true);
         $this->dose_interval->PlaceHolder = RemoveHtml($this->dose_interval->caption());
 
         // number_of_days
         $this->number_of_days->setupEditAttributes();
         $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
         $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-        if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
-            $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
-        }
 
         // method
         $this->method->setupEditAttributes();
-        if (!$this->method->Raw) {
-            $this->method->CurrentValue = HtmlDecode($this->method->CurrentValue);
-        }
-        $this->method->EditValue = $this->method->CurrentValue;
+        $this->method->EditValue = $this->method->options(true);
         $this->method->PlaceHolder = RemoveHtml($this->method->caption());
 
         // date_created
@@ -1494,8 +1633,6 @@ class PrescriptionDetails extends DbTable
                     $doc->exportCaption($this->dose_interval);
                     $doc->exportCaption($this->number_of_days);
                     $doc->exportCaption($this->method);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->prescription_id);
@@ -1505,8 +1642,6 @@ class PrescriptionDetails extends DbTable
                     $doc->exportCaption($this->dose_interval);
                     $doc->exportCaption($this->number_of_days);
                     $doc->exportCaption($this->method);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1541,8 +1676,6 @@ class PrescriptionDetails extends DbTable
                         $doc->exportField($this->dose_interval);
                         $doc->exportField($this->number_of_days);
                         $doc->exportField($this->method);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->prescription_id);
@@ -1552,8 +1685,6 @@ class PrescriptionDetails extends DbTable
                         $doc->exportField($this->dose_interval);
                         $doc->exportField($this->number_of_days);
                         $doc->exportField($this->method);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1567,6 +1698,30 @@ class PrescriptionDetails extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "prescriptions") {
+            $filterWrk = Container("prescriptions")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "prescriptions") {
+            $mastertable = Container("prescriptions");
+            if (!$mastertable->userIDAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->prescription_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

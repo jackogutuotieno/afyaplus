@@ -73,39 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <tr id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescriptions_visit_id"><?= $Page->visit_id->caption() ?></span></td>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el_prescriptions_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->prescription_title->Visible) { // prescription_title ?>
-    <tr id="r_prescription_title"<?= $Page->prescription_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescriptions_prescription_title"><?= $Page->prescription_title->caption() ?></span></td>
-        <td data-name="prescription_title"<?= $Page->prescription_title->cellAttributes() ?>>
-<span id="el_prescriptions_prescription_title">
-<span<?= $Page->prescription_title->viewAttributes() ?>>
-<?= $Page->prescription_title->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->lab_report_id->Visible) { // lab_report_id ?>
-    <tr id="r_lab_report_id"<?= $Page->lab_report_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescriptions_lab_report_id"><?= $Page->lab_report_id->caption() ?></span></td>
-        <td data-name="lab_report_id"<?= $Page->lab_report_id->cellAttributes() ?>>
-<span id="el_prescriptions_lab_report_id">
-<span<?= $Page->lab_report_id->viewAttributes() ?>>
-<?= $Page->lab_report_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
     <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescriptions_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
@@ -140,6 +107,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("prescription_details", explode(",", $Page->getCurrentDetailTable())) && $prescription_details->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("prescription_details", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("prescription_details")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PrescriptionDetailsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

@@ -42,75 +42,18 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
-<?php if ($Page->SearchOptions->visible()) { ?>
-<?php $Page->SearchOptions->render("body") ?>
-<?php } ?>
-<?php if ($Page->FilterOptions->visible()) { ?>
-<?php $Page->FilterOptions->render("body") ?>
-<?php } ?>
 </div>
+<?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/PatientVisitsMaster.php";
+    }
+}
+?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fprescriptionssrch" id="fprescriptionssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fprescriptionssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
-<script>
-var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { prescriptions: currentTable } });
-var currentForm;
-var fprescriptionssrch, currentSearchForm, currentAdvancedSearchForm;
-loadjs.ready(["wrapper", "head"], function () {
-    let $ = jQuery,
-        fields = currentTable.fields;
-
-    // Form object for search
-    let form = new ew.FormBuilder()
-        .setId("fprescriptionssrch")
-        .setPageId("list")
-<?php if ($Page->UseAjaxActions) { ?>
-        .setSubmitWithFetch(true)
-<?php } ?>
-
-        // Dynamic selection lists
-        .setLists({
-        })
-
-        // Filters
-        .setFilterList(<?= $Page->getFilterList() ?>)
-        .build();
-    window[form.id] = form;
-    currentSearchForm = form;
-    loadjs.done(form.id);
-});
-</script>
-<input type="hidden" name="cmd" value="search">
-<?php if ($Security->canSearch()) { ?>
-<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
-<div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0">
-    <div class="col-sm-auto px-0 pe-sm-2">
-        <div class="ew-basic-search input-group">
-            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
-            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
-            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
-                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fprescriptionssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fprescriptionssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fprescriptionssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fprescriptionssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-auto mb-3">
-        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-    </div>
-</div>
-</div><!-- /.ew-extended-search -->
-<?php } ?>
-<?php } ?>
-</div><!-- /.ew-search-panel -->
-</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -142,6 +85,11 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_prescriptions" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_prescriptionslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -162,15 +110,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_prescriptions_patient_id" class="prescriptions_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_prescriptions_visit_id" class="prescriptions_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->prescription_title->Visible) { // prescription_title ?>
-        <th data-name="prescription_title" class="<?= $Page->prescription_title->headerCellClass() ?>"><div id="elh_prescriptions_prescription_title" class="prescriptions_prescription_title"><?= $Page->renderFieldHeader($Page->prescription_title) ?></div></th>
-<?php } ?>
-<?php if ($Page->lab_report_id->Visible) { // lab_report_id ?>
-        <th data-name="lab_report_id" class="<?= $Page->lab_report_id->headerCellClass() ?>"><div id="elh_prescriptions_lab_report_id" class="prescriptions_lab_report_id"><?= $Page->renderFieldHeader($Page->lab_report_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_prescriptions_created_by_user_id" class="prescriptions_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
@@ -222,30 +161,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescriptions_patient_id" class="el_prescriptions_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescriptions_visit_id" class="el_prescriptions_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->prescription_title->Visible) { // prescription_title ?>
-        <td data-name="prescription_title"<?= $Page->prescription_title->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescriptions_prescription_title" class="el_prescriptions_prescription_title">
-<span<?= $Page->prescription_title->viewAttributes() ?>>
-<?= $Page->prescription_title->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->lab_report_id->Visible) { // lab_report_id ?>
-        <td data-name="lab_report_id"<?= $Page->lab_report_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescriptions_lab_report_id" class="el_prescriptions_lab_report_id">
-<span<?= $Page->lab_report_id->viewAttributes() ?>>
-<?= $Page->lab_report_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -159,6 +159,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("prescriptions", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("prescriptions")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PrescriptionsGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

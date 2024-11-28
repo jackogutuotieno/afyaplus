@@ -129,8 +129,8 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
         $this->dose_interval->setVisibility();
         $this->number_of_days->setVisibility();
         $this->method->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -530,6 +530,13 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->medicine_stock_id);
+        $this->setupLookupOptions($this->dose_type);
+        $this->setupLookupOptions($this->dose_interval);
+        $this->setupLookupOptions($this->number_of_days);
+        $this->setupLookupOptions($this->method);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -586,6 +593,9 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -636,7 +646,7 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "prescriptiondetailslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -733,7 +743,7 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
             if (IsApi() && $val === null) {
                 $this->medicine_stock_id->Visible = false; // Disable update for API request
             } else {
-                $this->medicine_stock_id->setFormValue($val, true, $validate);
+                $this->medicine_stock_id->setFormValue($val);
             }
         }
 
@@ -786,28 +796,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
                 $this->method->setFormValue($val);
             }
         }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
     }
 
     // Restore form values
@@ -822,10 +810,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
         $this->dose_interval->CurrentValue = $this->dose_interval->FormValue;
         $this->number_of_days->CurrentValue = $this->number_of_days->FormValue;
         $this->method->CurrentValue = $this->method->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -966,33 +950,55 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
             $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
 
             // medicine_stock_id
-            $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->CurrentValue;
-            $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->ViewValue, $this->medicine_stock_id->formatPattern());
+            $curVal = strval($this->medicine_stock_id->CurrentValue);
+            if ($curVal != "") {
+                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
+                if ($this->medicine_stock_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->medicine_stock_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->medicine_stock_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->displayValue($arwrk);
+                    } else {
+                        $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->medicine_stock_id->ViewValue = null;
+            }
 
             // dose_quantity
             $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
             $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
 
             // dose_type
-            $this->dose_type->ViewValue = $this->dose_type->CurrentValue;
+            if (strval($this->dose_type->CurrentValue) != "") {
+                $this->dose_type->ViewValue = $this->dose_type->optionCaption($this->dose_type->CurrentValue);
+            } else {
+                $this->dose_type->ViewValue = null;
+            }
 
             // dose_interval
-            $this->dose_interval->ViewValue = $this->dose_interval->CurrentValue;
+            if (strval($this->dose_interval->CurrentValue) != "") {
+                $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
+            } else {
+                $this->dose_interval->ViewValue = null;
+            }
 
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-            $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
             // method
-            $this->method->ViewValue = $this->method->CurrentValue;
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            if (strval($this->method->CurrentValue) != "") {
+                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+            } else {
+                $this->method->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -1017,12 +1023,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
             // method
             $this->method->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1030,19 +1030,44 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
             // prescription_id
             $this->prescription_id->setupEditAttributes();
-            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+            if ($this->prescription_id->getSessionValue() != "") {
+                $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
+                $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
+                $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+            } else {
+                $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
+                $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
+                if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
+                    $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+                }
             }
 
             // medicine_stock_id
             $this->medicine_stock_id->setupEditAttributes();
-            $this->medicine_stock_id->EditValue = $this->medicine_stock_id->CurrentValue;
-            $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
-            if (strval($this->medicine_stock_id->EditValue) != "" && is_numeric($this->medicine_stock_id->EditValue)) {
-                $this->medicine_stock_id->EditValue = FormatNumber($this->medicine_stock_id->EditValue, null);
+            $curVal = trim(strval($this->medicine_stock_id->CurrentValue));
+            if ($curVal != "") {
+                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
+            } else {
+                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->Lookup !== null && is_array($this->medicine_stock_id->lookupOptions()) && count($this->medicine_stock_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->medicine_stock_id->ViewValue !== null) { // Load from cache
+                $this->medicine_stock_id->EditValue = array_values($this->medicine_stock_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->medicine_stock_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->medicine_stock_id->EditValue = $arwrk;
+            }
+            $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
 
             // dose_quantity
             $this->dose_quantity->setupEditAttributes();
@@ -1054,45 +1079,23 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
             // dose_type
             $this->dose_type->setupEditAttributes();
-            if (!$this->dose_type->Raw) {
-                $this->dose_type->CurrentValue = HtmlDecode($this->dose_type->CurrentValue);
-            }
-            $this->dose_type->EditValue = HtmlEncode($this->dose_type->CurrentValue);
+            $this->dose_type->EditValue = $this->dose_type->options(true);
             $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
 
             // dose_interval
             $this->dose_interval->setupEditAttributes();
-            if (!$this->dose_interval->Raw) {
-                $this->dose_interval->CurrentValue = HtmlDecode($this->dose_interval->CurrentValue);
-            }
-            $this->dose_interval->EditValue = HtmlEncode($this->dose_interval->CurrentValue);
+            $this->dose_interval->EditValue = $this->dose_interval->options(true);
             $this->dose_interval->PlaceHolder = RemoveHtml($this->dose_interval->caption());
 
             // number_of_days
             $this->number_of_days->setupEditAttributes();
             $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-            if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
-                $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
-            }
 
             // method
             $this->method->setupEditAttributes();
-            if (!$this->method->Raw) {
-                $this->method->CurrentValue = HtmlDecode($this->method->CurrentValue);
-            }
-            $this->method->EditValue = HtmlEncode($this->method->CurrentValue);
+            $this->method->EditValue = $this->method->options(true);
             $this->method->PlaceHolder = RemoveHtml($this->method->caption());
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
 
@@ -1119,12 +1122,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
             // method
             $this->method->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1164,9 +1161,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
                     $this->medicine_stock_id->addErrorMessage(str_replace("%s", $this->medicine_stock_id->caption(), $this->medicine_stock_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->medicine_stock_id->FormValue)) {
-                $this->medicine_stock_id->addErrorMessage($this->medicine_stock_id->getErrorMessage(false));
-            }
             if ($this->dose_quantity->Visible && $this->dose_quantity->Required) {
                 if (!$this->dose_quantity->IsDetailKey && EmptyValue($this->dose_quantity->FormValue)) {
                     $this->dose_quantity->addErrorMessage(str_replace("%s", $this->dose_quantity->caption(), $this->dose_quantity->RequiredErrorMessage));
@@ -1197,22 +1191,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
                 if (!$this->method->IsDetailKey && EmptyValue($this->method->FormValue)) {
                     $this->method->addErrorMessage(str_replace("%s", $this->method->caption(), $this->method->RequiredErrorMessage));
                 }
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1304,6 +1282,9 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
         $rsnew = [];
 
         // prescription_id
+        if ($this->prescription_id->getSessionValue() != "") {
+            $this->prescription_id->ReadOnly = true;
+        }
         $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, $this->prescription_id->ReadOnly);
 
         // medicine_stock_id
@@ -1323,12 +1304,6 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
         // method
         $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, $this->method->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -1359,12 +1334,79 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
         if (isset($row['method'])) { // method
             $this->method->CurrentValue = $row['method'];
         }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "prescriptions") {
+                $validMaster = true;
+                $masterTbl = Container("prescriptions");
+                if (($parm = Get("fk_id", Get("prescription_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->prescription_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->prescription_id->setSessionValue($this->prescription_id->QueryStringValue);
+                    $foreignKeys["prescription_id"] = $this->prescription_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "prescriptions") {
+                $validMaster = true;
+                $masterTbl = Container("prescriptions");
+                if (($parm = Post("fk_id", Post("prescription_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->prescription_id->FormValue = $masterTbl->id->FormValue;
+                    $this->prescription_id->setSessionValue($this->prescription_id->FormValue);
+                    $foreignKeys["prescription_id"] = $this->prescription_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "prescriptions") {
+                if (!array_key_exists("prescription_id", $foreignKeys)) { // Not current foreign key
+                    $this->prescription_id->setSessionValue("");
+                }
+            }
         }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -1391,6 +1433,16 @@ class PrescriptionDetailsEdit extends PrescriptionDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_medicine_stock_id":
+                    break;
+                case "x_dose_type":
+                    break;
+                case "x_dose_interval":
+                    break;
+                case "x_number_of_days":
+                    break;
+                case "x_method":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

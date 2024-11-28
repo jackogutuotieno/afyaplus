@@ -56,15 +56,6 @@ $Page->showMessage();
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_prescriptions_patient_id" class="prescriptions_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th class="<?= $Page->visit_id->headerCellClass() ?>"><span id="elh_prescriptions_visit_id" class="prescriptions_visit_id"><?= $Page->visit_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->prescription_title->Visible) { // prescription_title ?>
-        <th class="<?= $Page->prescription_title->headerCellClass() ?>"><span id="elh_prescriptions_prescription_title" class="prescriptions_prescription_title"><?= $Page->prescription_title->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->lab_report_id->Visible) { // lab_report_id ?>
-        <th class="<?= $Page->lab_report_id->headerCellClass() ?>"><span id="elh_prescriptions_lab_report_id" class="prescriptions_lab_report_id"><?= $Page->lab_report_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_prescriptions_created_by_user_id" class="prescriptions_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
@@ -108,30 +99,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td<?= $Page->visit_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->prescription_title->Visible) { // prescription_title ?>
-        <td<?= $Page->prescription_title->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->prescription_title->viewAttributes() ?>>
-<?= $Page->prescription_title->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->lab_report_id->Visible) { // lab_report_id ?>
-        <td<?= $Page->lab_report_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->lab_report_id->viewAttributes() ?>>
-<?= $Page->lab_report_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -39,12 +39,6 @@ class Prescription extends AbstractEntity
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 
-    #[Column(name: "prescription_title", type: "string")]
-    private string $prescriptionTitle;
-
-    #[Column(name: "lab_report_id", type: "integer")]
-    private int $labReportId;
-
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
 
@@ -84,28 +78,6 @@ class Prescription extends AbstractEntity
     public function setVisitId(int $value): static
     {
         $this->visitId = $value;
-        return $this;
-    }
-
-    public function getPrescriptionTitle(): string
-    {
-        return HtmlDecode($this->prescriptionTitle);
-    }
-
-    public function setPrescriptionTitle(string $value): static
-    {
-        $this->prescriptionTitle = RemoveXss($value);
-        return $this;
-    }
-
-    public function getLabReportId(): int
-    {
-        return $this->labReportId;
-    }
-
-    public function setLabReportId(int $value): static
-    {
-        $this->labReportId = $value;
         return $this;
     }
 
