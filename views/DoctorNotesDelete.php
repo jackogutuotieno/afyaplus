@@ -56,9 +56,6 @@ $Page->showMessage();
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_doctor_notes_patient_id" class="doctor_notes_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th class="<?= $Page->visit_id->headerCellClass() ?>"><span id="elh_doctor_notes_visit_id" class="doctor_notes_visit_id"><?= $Page->visit_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->chief_complaint->Visible) { // chief_complaint ?>
         <th class="<?= $Page->chief_complaint->headerCellClass() ?>"><span id="elh_doctor_notes_chief_complaint" class="doctor_notes_chief_complaint"><?= $Page->chief_complaint->caption() ?></span></th>
 <?php } ?>
@@ -114,14 +111,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td<?= $Page->visit_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

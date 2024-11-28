@@ -166,9 +166,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_radiology_requests_patient_id" class="radiology_requests_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_radiology_requests_visit_id" class="radiology_requests_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_radiology_requests_status" class="radiology_requests_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
@@ -230,14 +227,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_patient_id" class="el_radiology_requests_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_visit_id" class="el_radiology_requests_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

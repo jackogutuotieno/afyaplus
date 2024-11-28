@@ -62,14 +62,8 @@ $Page->showMessage();
 <?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
         <th class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><span id="elh_patient_visits_medical_scheme_id" class="patient_visits_medical_scheme_id"><?= $Page->medical_scheme_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_patient_visits_created_by_user_id" class="patient_visits_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patient_visits_date_created" class="patient_visits_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_patient_visits_date_updated" class="patient_visits_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -124,27 +118,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <td<?= $Page->date_created->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

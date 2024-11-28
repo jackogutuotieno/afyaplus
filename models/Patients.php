@@ -258,6 +258,7 @@ class Patients extends DbTable
         $this->national_id->Raw = true;
         $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->national_id->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->national_id->Param, "CustomMsg");
         $this->Fields['national_id'] = &$this->national_id;
 
         // date_of_birth
@@ -360,6 +361,7 @@ class Patients extends DbTable
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
         $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->phone->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->phone->Param, "CustomMsg");
         $this->Fields['phone'] = &$this->phone;
 
         // email_address
@@ -383,6 +385,7 @@ class Patients extends DbTable
         $this->email_address->addMethod("getLinkPrefix", fn() => "mailto:");
         $this->email_address->InputTextType = "text";
         $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->email_address->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->email_address->Param, "CustomMsg");
         $this->Fields['email_address'] = &$this->email_address;
 
         // physical_address
@@ -544,10 +547,10 @@ class Patients extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            11, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -560,7 +563,7 @@ class Patients extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -664,6 +667,10 @@ class Patients extends DbTable
     {
         // Detail url
         $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "patient_appointments") {
+            $detailUrl = Container("patient_appointments")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
         if ($this->getCurrentDetailTable() == "patient_visits") {
             $detailUrl = Container("patient_visits")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
@@ -1942,12 +1949,11 @@ class Patients extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_name);
-                    $doc->exportCaption($this->national_id);
-                    $doc->exportCaption($this->date_of_birth);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->photo);
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->date_of_birth);
@@ -1991,12 +1997,11 @@ class Patients extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_name);
-                        $doc->exportField($this->national_id);
-                        $doc->exportField($this->date_of_birth);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->photo);
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->date_of_birth);

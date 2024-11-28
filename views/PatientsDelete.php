@@ -56,47 +56,14 @@ $Page->showMessage();
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th class="<?= $Page->patient_name->headerCellClass() ?>"><span id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->patient_name->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->national_id->Visible) { // national_id ?>
-        <th class="<?= $Page->national_id->headerCellClass() ?>"><span id="elh_patients_national_id" class="patients_national_id"><?= $Page->national_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th class="<?= $Page->date_of_birth->headerCellClass() ?>"><span id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->date_of_birth->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <th class="<?= $Page->age->headerCellClass() ?>"><span id="elh_patients_age" class="patients_age"><?= $Page->age->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th class="<?= $Page->gender->headerCellClass() ?>"><span id="elh_patients_gender" class="patients_gender"><?= $Page->gender->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->phone->Visible) { // phone ?>
-        <th class="<?= $Page->phone->headerCellClass() ?>"><span id="elh_patients_phone" class="patients_phone"><?= $Page->phone->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->email_address->Visible) { // email_address ?>
-        <th class="<?= $Page->email_address->headerCellClass() ?>"><span id="elh_patients_email_address" class="patients_email_address"><?= $Page->email_address->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_patients_physical_address" class="patients_physical_address"><?= $Page->physical_address->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->employment_status->Visible) { // employment_status ?>
-        <th class="<?= $Page->employment_status->headerCellClass() ?>"><span id="elh_patients_employment_status" class="patients_employment_status"><?= $Page->employment_status->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->religion->Visible) { // religion ?>
-        <th class="<?= $Page->religion->headerCellClass() ?>"><span id="elh_patients_religion" class="patients_religion"><?= $Page->religion->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->next_of_kin->Visible) { // next_of_kin ?>
-        <th class="<?= $Page->next_of_kin->headerCellClass() ?>"><span id="elh_patients_next_of_kin" class="patients_next_of_kin"><?= $Page->next_of_kin->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->next_of_kin_phone->Visible) { // next_of_kin_phone ?>
-        <th class="<?= $Page->next_of_kin_phone->headerCellClass() ?>"><span id="elh_patients_next_of_kin_phone" class="patients_next_of_kin_phone"><?= $Page->next_of_kin_phone->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->marital_status->Visible) { // marital_status ?>
-        <th class="<?= $Page->marital_status->headerCellClass() ?>"><span id="elh_patients_marital_status" class="patients_marital_status"><?= $Page->marital_status->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patients_date_created" class="patients_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_patients_date_updated" class="patients_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -135,22 +102,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->national_id->Visible) { // national_id ?>
-        <td<?= $Page->national_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->national_id->viewAttributes() ?>>
-<?= $Page->national_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <td<?= $Page->age->cellAttributes() ?>>
 <span id="">
@@ -167,93 +118,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->phone->Visible) { // phone ?>
-        <td<?= $Page->phone->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->phone->viewAttributes() ?>>
-<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
-<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->phone->getViewValue() ?>
-<?php } ?>
-</span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->email_address->Visible) { // email_address ?>
-        <td<?= $Page->email_address->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->email_address->viewAttributes() ?>>
-<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
-<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->email_address->getViewValue() ?>
-<?php } ?>
-</span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <td<?= $Page->physical_address->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->physical_address->viewAttributes() ?>>
-<?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->employment_status->Visible) { // employment_status ?>
-        <td<?= $Page->employment_status->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->employment_status->viewAttributes() ?>>
-<?= $Page->employment_status->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->religion->Visible) { // religion ?>
-        <td<?= $Page->religion->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->religion->viewAttributes() ?>>
-<?= $Page->religion->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->next_of_kin->Visible) { // next_of_kin ?>
-        <td<?= $Page->next_of_kin->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->next_of_kin->viewAttributes() ?>>
-<?= $Page->next_of_kin->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->next_of_kin_phone->Visible) { // next_of_kin_phone ?>
-        <td<?= $Page->next_of_kin_phone->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->next_of_kin_phone->viewAttributes() ?>>
-<?= $Page->next_of_kin_phone->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->marital_status->Visible) { // marital_status ?>
-        <td<?= $Page->marital_status->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->marital_status->viewAttributes() ?>>
-<?= $Page->marital_status->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <td<?= $Page->date_created->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -45,8 +45,8 @@ class PatientVisit extends AbstractEntity
     #[Column(name: "medical_scheme_id", type: "integer", nullable: true)]
     private ?int $medicalSchemeId;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
+    #[Column(name: "user_role", type: "string")]
+    private string $userRole;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -109,14 +109,14 @@ class PatientVisit extends AbstractEntity
         return $this;
     }
 
-    public function getCreatedByUserId(): int
+    public function getUserRole(): string
     {
-        return $this->createdByUserId;
+        return HtmlDecode($this->userRole);
     }
 
-    public function setCreatedByUserId(int $value): static
+    public function setUserRole(string $value): static
     {
-        $this->createdByUserId = $value;
+        $this->userRole = RemoveXss($value);
         return $this;
     }
 

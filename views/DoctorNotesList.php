@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/PatientVisitsMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fdoctor_notessrch" id="fdoctor_notessrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fdoctor_notessrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -142,6 +151,11 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_doctor_notes" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_doctor_noteslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -162,9 +176,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_doctor_notes_patient_id" class="doctor_notes_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_doctor_notes_visit_id" class="doctor_notes_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->chief_complaint->Visible) { // chief_complaint ?>
         <th data-name="chief_complaint" class="<?= $Page->chief_complaint->headerCellClass() ?>"><div id="elh_doctor_notes_chief_complaint" class="doctor_notes_chief_complaint"><?= $Page->renderFieldHeader($Page->chief_complaint) ?></div></th>
@@ -228,14 +239,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_patient_id" class="el_doctor_notes_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_visit_id" class="el_doctor_notes_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

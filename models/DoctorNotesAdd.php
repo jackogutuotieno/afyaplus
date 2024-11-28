@@ -123,7 +123,7 @@ class DoctorNotesAdd extends DoctorNotes
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->chief_complaint->setVisibility();
         $this->history_of_presenting_illness->setVisibility();
         $this->past_medical_history->setVisibility();
@@ -565,6 +565,10 @@ class DoctorNotesAdd extends DoctorNotes
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -609,7 +613,7 @@ class DoctorNotesAdd extends DoctorNotes
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "doctornoteslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -698,16 +702,6 @@ class DoctorNotesAdd extends DoctorNotes
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'chief_complaint' first before field var 'x_chief_complaint'
         $val = $CurrentForm->hasValue("chief_complaint") ? $CurrentForm->getValue("chief_complaint") : $CurrentForm->getValue("x_chief_complaint");
         if (!$this->chief_complaint->IsDetailKey) {
@@ -777,7 +771,6 @@ class DoctorNotesAdd extends DoctorNotes
     {
         global $CurrentForm;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->chief_complaint->CurrentValue = $this->chief_complaint->FormValue;
         $this->history_of_presenting_illness->CurrentValue = $this->history_of_presenting_illness->FormValue;
         $this->past_medical_history->CurrentValue = $this->past_medical_history->FormValue;
@@ -956,10 +949,6 @@ class DoctorNotesAdd extends DoctorNotes
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // chief_complaint
             $this->chief_complaint->ViewValue = $this->chief_complaint->CurrentValue;
 
@@ -1005,9 +994,6 @@ class DoctorNotesAdd extends DoctorNotes
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-
             // chief_complaint
             $this->chief_complaint->HrefValue = "";
 
@@ -1028,37 +1014,54 @@ class DoctorNotesAdd extends DoctorNotes
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $curVal = trim(strval($this->patient_id->CurrentValue));
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            } else {
-                $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->patient_id->ViewValue !== null) { // Load from cache
-                $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
                 } else {
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $this->patient_id->ViewValue = null;
                 }
-                $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->patient_id->EditValue = $arwrk;
-            }
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
             // chief_complaint
@@ -1092,9 +1095,6 @@ class DoctorNotesAdd extends DoctorNotes
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // chief_complaint
             $this->chief_complaint->HrefValue = "";
@@ -1138,14 +1138,6 @@ class DoctorNotesAdd extends DoctorNotes
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
-            }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->chief_complaint->Visible && $this->chief_complaint->Required) {
                 if (!$this->chief_complaint->IsDetailKey && EmptyValue($this->chief_complaint->FormValue)) {
@@ -1251,9 +1243,6 @@ class DoctorNotesAdd extends DoctorNotes
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // visit_id
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
-
         // chief_complaint
         $this->chief_complaint->setDbValueDef($rsnew, $this->chief_complaint->CurrentValue, false);
 
@@ -1272,6 +1261,11 @@ class DoctorNotesAdd extends DoctorNotes
         // created_by_user_id
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -1283,9 +1277,6 @@ class DoctorNotesAdd extends DoctorNotes
     {
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
-        }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->setFormValue($row['visit_id']);
         }
         if (isset($row['chief_complaint'])) { // chief_complaint
             $this->chief_complaint->setFormValue($row['chief_complaint']);
@@ -1305,6 +1296,9 @@ class DoctorNotesAdd extends DoctorNotes
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
     }
 
     // Show link optionally based on User ID
@@ -1315,6 +1309,103 @@ class DoctorNotesAdd extends DoctorNotes
             return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
         }
         return true;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
+                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_visits") {
+                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
+                    $this->visit_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

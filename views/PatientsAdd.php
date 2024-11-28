@@ -430,6 +430,14 @@ loadjs.ready("fpatientsadd", function() {
 <?php } ?>
 </div><!-- /page* -->
 <?php
+    if (in_array("patient_appointments", explode(",", $Page->getCurrentDetailTable())) && $patient_appointments->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_appointments", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientAppointmentsGrid.php" ?>
+<?php } ?>
+<?php
     if (in_array("patient_visits", explode(",", $Page->getCurrentDetailTable())) && $patient_visits->DetailAdd) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>

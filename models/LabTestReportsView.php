@@ -140,12 +140,11 @@ class LabTestReportsView extends LabTestReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->report_title->setVisibility();
+        $this->lab_test_requests_queue_id->setVisibility();
         $this->details->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->lab_test_request_id->setVisibility();
     }
 
     // Constructor
@@ -560,6 +559,9 @@ class LabTestReportsView extends LabTestReports
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->created_by_user_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -569,6 +571,9 @@ class LabTestReportsView extends LabTestReports
         $loadCurrentRecord = false;
         $returnUrl = "";
         $matchRecord = false;
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
         if (($keyValue = Get("id") ?? Route("id")) !== null) {
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
@@ -817,12 +822,11 @@ class LabTestReportsView extends LabTestReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->report_title->setDbValue($row['report_title']);
+        $this->lab_test_requests_queue_id->setDbValue($row['lab_test_requests_queue_id']);
         $this->details->setDbValue($row['details']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
     }
 
     // Return a row with default values
@@ -830,12 +834,11 @@ class LabTestReportsView extends LabTestReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['report_title'] = $this->report_title->DefaultValue;
+        $row['lab_test_requests_queue_id'] = $this->lab_test_requests_queue_id->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         return $row;
     }
 
@@ -859,7 +862,7 @@ class LabTestReportsView extends LabTestReports
 
         // id
 
-        // report_title
+        // lab_test_requests_queue_id
 
         // details
 
@@ -869,42 +872,52 @@ class LabTestReportsView extends LabTestReports
 
         // date_updated
 
-        // lab_test_request_id
-
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // report_title
-            $this->report_title->ViewValue = $this->report_title->CurrentValue;
+            // lab_test_requests_queue_id
+            $this->lab_test_requests_queue_id->ViewValue = $this->lab_test_requests_queue_id->CurrentValue;
+            $this->lab_test_requests_queue_id->ViewValue = FormatNumber($this->lab_test_requests_queue_id->ViewValue, $this->lab_test_requests_queue_id->formatPattern());
 
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // lab_test_request_id
-            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // report_title
-            $this->report_title->HrefValue = "";
-            $this->report_title->TooltipValue = "";
+            // lab_test_requests_queue_id
+            $this->lab_test_requests_queue_id->HrefValue = "";
+            $this->lab_test_requests_queue_id->TooltipValue = "";
 
             // details
             $this->details->HrefValue = "";
@@ -917,14 +930,6 @@ class LabTestReportsView extends LabTestReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
-
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1103,6 +1108,79 @@ class LabTestReportsView extends LabTestReports
         return true;
     }
 
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests_queue") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests_queue");
+                if (($parm = Get("fk_id", Get("lab_test_requests_queue_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->lab_test_requests_queue_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_requests_queue_id->setSessionValue($this->lab_test_requests_queue_id->QueryStringValue);
+                    $foreignKeys["lab_test_requests_queue_id"] = $this->lab_test_requests_queue_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_requests_queue") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_requests_queue");
+                if (($parm = Post("fk_id", Post("lab_test_requests_queue_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->lab_test_requests_queue_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_requests_queue_id->setSessionValue($this->lab_test_requests_queue_id->FormValue);
+                    $foreignKeys["lab_test_requests_queue_id"] = $this->lab_test_requests_queue_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "lab_test_requests_queue") {
+                if (!array_key_exists("lab_test_requests_queue_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_requests_queue_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1127,6 +1205,8 @@ class LabTestReportsView extends LabTestReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

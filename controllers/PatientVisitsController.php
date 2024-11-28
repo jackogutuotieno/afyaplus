@@ -49,4 +49,11 @@ class PatientVisitsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "PatientVisitsDelete");
     }
+
+    // search
+    #[Map(["GET","POST","OPTIONS"], "/patientvisitssearch", [PermissionMiddleware::class], "search.patient_visits")]
+    public function search(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "PatientVisitsSearch");
+    }
 }

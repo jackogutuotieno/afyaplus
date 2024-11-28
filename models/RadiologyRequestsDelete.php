@@ -124,7 +124,7 @@ class RadiologyRequestsDelete extends RadiologyRequests
         $this->id->setVisibility();
         $this->test_title->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -662,6 +662,7 @@ class RadiologyRequestsDelete extends RadiologyRequests
         // patient_id
 
         // visit_id
+        $this->visit_id->CellCssStyle = "white-space: nowrap;";
 
         // status
 
@@ -682,10 +683,6 @@ class RadiologyRequestsDelete extends RadiologyRequests
             // patient_id
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
             $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
@@ -713,10 +710,6 @@ class RadiologyRequestsDelete extends RadiologyRequests
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

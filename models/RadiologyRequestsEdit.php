@@ -124,7 +124,7 @@ class RadiologyRequestsEdit extends RadiologyRequests
         $this->id->setVisibility();
         $this->test_title->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -735,16 +735,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'status' first before field var 'x_status'
         $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
         if (!$this->status->IsDetailKey) {
@@ -795,7 +785,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
         $this->id->CurrentValue = $this->id->FormValue;
         $this->test_title->CurrentValue = $this->test_title->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
@@ -943,10 +932,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
             $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -970,9 +955,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -1004,14 +986,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
             $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
                 $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-            }
-
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
             }
 
             // status
@@ -1056,9 +1030,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -1109,14 +1080,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
             }
             if (!CheckInteger($this->patient_id->FormValue)) {
                 $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
-            }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->status->Visible && $this->status->Required) {
                 if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
@@ -1242,9 +1205,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // visit_id
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
-
         // status
         $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
 
@@ -1270,9 +1230,6 @@ class RadiologyRequestsEdit extends RadiologyRequests
         }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
-        }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->CurrentValue = $row['visit_id'];
         }
         if (isset($row['status'])) { // status
             $this->status->CurrentValue = $row['status'];

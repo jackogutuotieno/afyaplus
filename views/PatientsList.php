@@ -163,47 +163,14 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->national_id->Visible) { // national_id ?>
-        <th data-name="national_id" class="<?= $Page->national_id->headerCellClass() ?>"><div id="elh_patients_national_id" class="patients_national_id"><?= $Page->renderFieldHeader($Page->national_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
-<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <th data-name="age" class="<?= $Page->age->headerCellClass() ?>"><div id="elh_patients_age" class="patients_age"><?= $Page->renderFieldHeader($Page->age) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_patients_gender" class="patients_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
-<?php if ($Page->phone->Visible) { // phone ?>
-        <th data-name="phone" class="<?= $Page->phone->headerCellClass() ?>"><div id="elh_patients_phone" class="patients_phone"><?= $Page->renderFieldHeader($Page->phone) ?></div></th>
-<?php } ?>
-<?php if ($Page->email_address->Visible) { // email_address ?>
-        <th data-name="email_address" class="<?= $Page->email_address->headerCellClass() ?>"><div id="elh_patients_email_address" class="patients_email_address"><?= $Page->renderFieldHeader($Page->email_address) ?></div></th>
-<?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <th data-name="physical_address" class="<?= $Page->physical_address->headerCellClass() ?>"><div id="elh_patients_physical_address" class="patients_physical_address"><?= $Page->renderFieldHeader($Page->physical_address) ?></div></th>
-<?php } ?>
-<?php if ($Page->employment_status->Visible) { // employment_status ?>
-        <th data-name="employment_status" class="<?= $Page->employment_status->headerCellClass() ?>"><div id="elh_patients_employment_status" class="patients_employment_status"><?= $Page->renderFieldHeader($Page->employment_status) ?></div></th>
-<?php } ?>
-<?php if ($Page->religion->Visible) { // religion ?>
-        <th data-name="religion" class="<?= $Page->religion->headerCellClass() ?>"><div id="elh_patients_religion" class="patients_religion"><?= $Page->renderFieldHeader($Page->religion) ?></div></th>
-<?php } ?>
-<?php if ($Page->next_of_kin->Visible) { // next_of_kin ?>
-        <th data-name="next_of_kin" class="<?= $Page->next_of_kin->headerCellClass() ?>"><div id="elh_patients_next_of_kin" class="patients_next_of_kin"><?= $Page->renderFieldHeader($Page->next_of_kin) ?></div></th>
-<?php } ?>
-<?php if ($Page->next_of_kin_phone->Visible) { // next_of_kin_phone ?>
-        <th data-name="next_of_kin_phone" class="<?= $Page->next_of_kin_phone->headerCellClass() ?>"><div id="elh_patients_next_of_kin_phone" class="patients_next_of_kin_phone"><?= $Page->renderFieldHeader($Page->next_of_kin_phone) ?></div></th>
-<?php } ?>
-<?php if ($Page->marital_status->Visible) { // marital_status ?>
-        <th data-name="marital_status" class="<?= $Page->marital_status->headerCellClass() ?>"><div id="elh_patients_marital_status" class="patients_marital_status"><?= $Page->renderFieldHeader($Page->marital_status) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_date_created" class="patients_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_patients_date_updated" class="patients_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -249,22 +216,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->national_id->Visible) { // national_id ?>
-        <td data-name="national_id"<?= $Page->national_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_national_id" class="el_patients_national_id">
-<span<?= $Page->national_id->viewAttributes() ?>>
-<?= $Page->national_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_of_birth" class="el_patients_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->age->Visible) { // age ?>
         <td data-name="age"<?= $Page->age->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_age" class="el_patients_age">
@@ -281,93 +232,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->phone->Visible) { // phone ?>
-        <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_phone" class="el_patients_phone">
-<span<?= $Page->phone->viewAttributes() ?>>
-<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
-<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->phone->getViewValue() ?>
-<?php } ?>
-</span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->email_address->Visible) { // email_address ?>
-        <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_email_address" class="el_patients_email_address">
-<span<?= $Page->email_address->viewAttributes() ?>>
-<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
-<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->email_address->getViewValue() ?>
-<?php } ?>
-</span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <td data-name="physical_address"<?= $Page->physical_address->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_physical_address" class="el_patients_physical_address">
-<span<?= $Page->physical_address->viewAttributes() ?>>
-<?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->employment_status->Visible) { // employment_status ?>
-        <td data-name="employment_status"<?= $Page->employment_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_employment_status" class="el_patients_employment_status">
-<span<?= $Page->employment_status->viewAttributes() ?>>
-<?= $Page->employment_status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->religion->Visible) { // religion ?>
-        <td data-name="religion"<?= $Page->religion->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_religion" class="el_patients_religion">
-<span<?= $Page->religion->viewAttributes() ?>>
-<?= $Page->religion->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->next_of_kin->Visible) { // next_of_kin ?>
-        <td data-name="next_of_kin"<?= $Page->next_of_kin->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_next_of_kin" class="el_patients_next_of_kin">
-<span<?= $Page->next_of_kin->viewAttributes() ?>>
-<?= $Page->next_of_kin->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->next_of_kin_phone->Visible) { // next_of_kin_phone ?>
-        <td data-name="next_of_kin_phone"<?= $Page->next_of_kin_phone->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_next_of_kin_phone" class="el_patients_next_of_kin_phone">
-<span<?= $Page->next_of_kin_phone->viewAttributes() ?>>
-<?= $Page->next_of_kin_phone->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->marital_status->Visible) { // marital_status ?>
-        <td data-name="marital_status"<?= $Page->marital_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_marital_status" class="el_patients_marital_status">
-<span<?= $Page->marital_status->viewAttributes() ?>>
-<?= $Page->marital_status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_created" class="el_patients_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_updated" class="el_patients_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

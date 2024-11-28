@@ -157,11 +157,14 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_appointments_report_id" class="appointments_report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_appointments_report_patient_name" class="appointments_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->_title->Visible) { // title ?>
         <th data-name="_title" class="<?= $Page->_title->headerCellClass() ?>"><div id="elh_appointments_report__title" class="appointments_report__title"><?= $Page->renderFieldHeader($Page->_title) ?></div></th>
+<?php } ?>
+<?php if ($Page->doctor_name->Visible) { // doctor_name ?>
+        <th data-name="doctor_name" class="<?= $Page->doctor_name->headerCellClass() ?>"><div id="elh_appointments_report_doctor_name" class="appointments_report_doctor_name"><?= $Page->renderFieldHeader($Page->doctor_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
         <th data-name="start_date" class="<?= $Page->start_date->headerCellClass() ?>"><div id="elh_appointments_report_start_date" class="appointments_report_start_date"><?= $Page->renderFieldHeader($Page->start_date) ?></div></th>
@@ -174,18 +177,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_appointments_report_date_updated" class="appointments_report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_appointments_report_patient_name" class="appointments_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_appointments_report_date_of_birth" class="appointments_report_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
-<?php } ?>
-<?php if ($Page->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_appointments_report_gender" class="appointments_report_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
-<?php } ?>
-<?php if ($Page->doctor_name->Visible) { // doctor_name ?>
-        <th data-name="doctor_name" class="<?= $Page->doctor_name->headerCellClass() ?>"><div id="elh_appointments_report_doctor_name" class="appointments_report_doctor_name"><?= $Page->renderFieldHeader($Page->doctor_name) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -215,11 +206,11 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_id" class="el_appointments_report_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
+    <?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_patient_name" class="el_appointments_report_patient_name">
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -228,6 +219,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report__title" class="el_appointments_report__title">
 <span<?= $Page->_title->viewAttributes() ?>>
 <?= $Page->_title->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->doctor_name->Visible) { // doctor_name ?>
+        <td data-name="doctor_name"<?= $Page->doctor_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_doctor_name" class="el_appointments_report_doctor_name">
+<span<?= $Page->doctor_name->viewAttributes() ?>>
+<?= $Page->doctor_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -260,38 +259,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_date_updated" class="el_appointments_report_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_patient_name" class="el_appointments_report_patient_name">
-<span<?= $Page->patient_name->viewAttributes() ?>>
-<?= $Page->patient_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_date_of_birth" class="el_appointments_report_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_gender" class="el_appointments_report_gender">
-<span<?= $Page->gender->viewAttributes() ?>>
-<?= $Page->gender->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->doctor_name->Visible) { // doctor_name ?>
-        <td data-name="doctor_name"<?= $Page->doctor_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_appointments_report_doctor_name" class="el_appointments_report_doctor_name">
-<span<?= $Page->doctor_name->viewAttributes() ?>>
-<?= $Page->doctor_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

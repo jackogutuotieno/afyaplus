@@ -73,28 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->national_id->Visible) { // national_id ?>
-    <tr id="r_national_id"<?= $Page->national_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_national_id"><?= $Page->national_id->caption() ?></span></td>
-        <td data-name="national_id"<?= $Page->national_id->cellAttributes() ?>>
-<span id="el_patients_national_id">
-<span<?= $Page->national_id->viewAttributes() ?>>
-<?= $Page->national_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-    <tr id="r_date_of_birth"<?= $Page->date_of_birth->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_date_of_birth"><?= $Page->date_of_birth->caption() ?></span></td>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el_patients_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
     <tr id="r_age"<?= $Page->age->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_age"><?= $Page->age->caption() ?></span></td>
@@ -118,6 +96,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("patient_appointments", explode(",", $Page->getCurrentDetailTable())) && $patient_appointments->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_appointments", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_appointments")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientAppointmentsGrid.php" ?>
+<?php } ?>
 <?php
     if (in_array("patient_visits", explode(",", $Page->getCurrentDetailTable())) && $patient_visits->DetailView) {
 ?>

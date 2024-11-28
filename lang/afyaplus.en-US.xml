@@ -1,10 +1,7 @@
-<ew-language date="2024/11/27" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/28" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="112">
-      <phrase id="menutext" value="laboratory billing" />
-    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -34,6 +31,9 @@
     </menu>
     <menu id="24">
       <phrase id="menutext" value="Visits" />
+    </menu>
+    <menu id="114">
+      <phrase id="menutext" value="Patient Flow" />
     </menu>
     <menu id="22">
       <phrase id="menutext" value="Appointments" />
@@ -173,40 +173,37 @@
     <menu id="42">
       <phrase id="menutext" value="Medicine Stock" />
     </menu>
-    <menu id="113">
-      <phrase id="menutext" value="Laboratory" />
-    </menu>
     <table id="appointments_report">
-      <phrase id="tblcaption" value="appointments report" />
+      <phrase id="tblcaption" value="Apporintments Report" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="_title">
-        <phrase id="fldcaption" value="title" />
-      </field>
-      <field id="start_date">
-        <phrase id="fldcaption" value="start date" />
-      </field>
-      <field id="end_date">
-        <phrase id="fldcaption" value="end date" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Appointment ID" />
       </field>
       <field id="patient_name">
-        <phrase id="fldcaption" value="patient name" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="date_of_birth">
-        <phrase id="fldcaption" value="date of birth" />
+        <phrase id="fldcaption" value="Date of Birth" />
       </field>
       <field id="gender">
-        <phrase id="fldcaption" value="gender" />
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="Title" />
       </field>
       <field id="doctor_name">
-        <phrase id="fldcaption" value="doctor name" />
+        <phrase id="fldcaption" value="Doctor" />
+      </field>
+      <field id="start_date">
+        <phrase id="fldcaption" value="Start Date" />
+      </field>
+      <field id="end_date">
+        <phrase id="fldcaption" value="End Date" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Date Added" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="departments">
@@ -326,7 +323,7 @@
         <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="Checkup Case" />
+        <phrase id="fldcaption" value="Visit ID" />
       </field>
       <field id="chief_complaint">
         <phrase id="fldcaption" value="Chief Complaint" />
@@ -488,25 +485,22 @@
     <table id="lab_test_reports">
       <phrase id="tblcaption" value="Test Reports" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Report ID" />
       </field>
-      <field id="report_title">
-        <phrase id="fldcaption" value="report title" />
+      <field id="lab_test_requests_queue_id">
+        <phrase id="fldcaption" value="Lab Queue ID" />
       </field>
       <field id="details">
-        <phrase id="fldcaption" value="details" />
+        <phrase id="fldcaption" value="Findings" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Submitted By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />
-      </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
       </field>
     </table>
     <table id="lab_test_requests">
@@ -514,23 +508,11 @@
       <field id="id">
         <phrase id="fldcaption" value="Request ID" />
       </field>
-      <field id="test_title">
-        <phrase id="fldcaption" value="Test Title" />
-      </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="Check-In Title" />
-      </field>
-      <field id="status">
-        <phrase id="fldcaption" value="Status" />
-        <phrase id="fldtagvalue1" value="Done" />
-        <phrase id="fldtagcaption1" value="Done" />
-        <phrase id="fldtagvalue2" value="Cancelled" />
-        <phrase id="fldtagcaption2" value="Cancelled" />
-        <phrase id="fldtagvalue3" value="Differed" />
-        <phrase id="fldtagcaption3" value="Differed" />
+        <phrase id="fldcaption" value="Visit ID" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="Requested By" />
@@ -556,9 +538,6 @@
       <field id="service_id">
         <phrase id="fldcaption" value="Test Title" />
       </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
-      </field>
       <field id="date_created">
         <phrase id="fldcaption" value="date created" />
       </field>
@@ -570,6 +549,9 @@
       <phrase id="tblcaption" value="Test Queue" />
       <field id="id">
         <phrase id="fldcaption" value="S/No" />
+      </field>
+      <field id="lab_test_requests_details_id">
+        <phrase id="fldcaption" value="Request Detais ID" />
       </field>
       <field id="time">
         <phrase id="fldcaption" value="Time" />
@@ -604,9 +586,6 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
-      </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
       </field>
     </table>
     <table id="medical_schemes">
@@ -927,11 +906,11 @@
       <field id="medical_scheme_id">
         <phrase id="fldcaption" value="Medical Scheme" />
       </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="Submitted By" />
+      <field id="user_role">
+        <phrase id="fldcaption" value="User Role" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Visit Date" />
+        <phrase id="fldcaption" value="Check-In Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -946,7 +925,7 @@
         <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="Checkup Case" />
+        <phrase id="fldcaption" value="Vsiti ID" />
       </field>
       <field id="height">
         <phrase id="fldcaption" value="Height (m)" />
@@ -995,6 +974,7 @@
       </field>
       <field id="national_id">
         <phrase id="fldcaption" value="National ID" />
+        <phrase id="custommsg" value="The National ID is already registered" />
       </field>
       <field id="date_of_birth">
         <phrase id="fldcaption" value="Date of Birth" />
@@ -1011,9 +991,11 @@
       </field>
       <field id="phone">
         <phrase id="fldcaption" value="Phone" />
+        <phrase id="custommsg" value="Phone number is already registered" />
       </field>
       <field id="email_address">
         <phrase id="fldcaption" value="Email" />
+        <phrase id="custommsg" value="Email Address is already registered" />
       </field>
       <field id="physical_address">
         <phrase id="fldcaption" value="Physical Address" />
@@ -1416,7 +1398,7 @@
         <phrase id="fldtagcaption7" value="Laboratorist" />
       </field>
       <field id="is_verified">
-        <phrase id="fldcaption" value="is verified" />
+        <phrase id="fldcaption" value="Active?" />
         <phrase id="fldtagvalue1" value="1" />
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
@@ -1607,73 +1589,35 @@
         <phrase id="fldtagcaption2" value="No" />
       </field>
     </table>
-    <table id="laboratory_billing">
-      <phrase id="tblcaption" value="laboratory billing" />
+    <table id="patient_queue">
+      <phrase id="tblcaption" value="Patient Flow" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Queue ID" />
       </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
-      <field id="status">
-        <phrase id="fldcaption" value="status" />
+      <field id="visit_id">
+        <phrase id="fldcaption" value="Visit ID" />
       </field>
-      <field id="test_title">
-        <phrase id="fldcaption" value="test title" />
-      </field>
-      <field id="specimen">
-        <phrase id="fldcaption" value="specimen" />
-      </field>
-      <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
-      </field>
-      <field id="cost">
-        <phrase id="fldcaption" value="cost" />
-      </field>
-    </table>
-    <table id="laboratoryreports">
-      <phrase id="tblcaption" value="laboratoryreports" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="report_title">
-        <phrase id="fldcaption" value="report title" />
-      </field>
-      <field id="details">
-        <phrase id="fldcaption" value="details" />
+      <field id="section">
+        <phrase id="fldcaption" value="Section" />
+        <phrase id="fldtagvalue1" value="Triage" />
+        <phrase id="fldtagcaption1" value="Triage" />
+        <phrase id="fldtagvalue2" value="Consultation" />
+        <phrase id="fldtagcaption2" value="Consultation" />
+        <phrase id="fldtagvalue3" value="Laboratory" />
+        <phrase id="fldtagcaption3" value="Laboratory" />
+        <phrase id="fldtagvalue4" value="Radiology" />
+        <phrase id="fldtagcaption4" value="Radiology" />
+        <phrase id="fldtagvalue5" value="Pharmacy" />
+        <phrase id="fldtagcaption5" value="Pharmacy" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
-      </field>
-      <field id="patient_name">
-        <phrase id="fldcaption" value="patient name" />
-      </field>
-      <field id="date_of_birth">
-        <phrase id="fldcaption" value="date of birth" />
-      </field>
-      <field id="gender">
-        <phrase id="fldcaption" value="gender" />
-      </field>
-      <field id="specimen">
-        <phrase id="fldcaption" value="specimen" />
-      </field>
-      <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
-      </field>
-      <field id="cost">
-        <phrase id="fldcaption" value="cost" />
-      </field>
-      <field id="subcategory">
-        <phrase id="fldcaption" value="subcategory" />
-      </field>
-      <field id="additional_findings">
-        <phrase id="fldcaption" value="additional findings" />
-      </field>
-      <field id="disease_name">
-        <phrase id="fldcaption" value="disease name" />
+        <phrase id="fldcaption" value="Date Updated" />
       </field>
     </table>
   </project>

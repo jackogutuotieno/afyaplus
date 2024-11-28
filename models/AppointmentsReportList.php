@@ -145,16 +145,16 @@ class AppointmentsReportList extends AppointmentsReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
+        $this->patient_name->setVisibility();
+        $this->date_of_birth->Visible = false;
+        $this->gender->Visible = false;
         $this->_title->setVisibility();
+        $this->doctor_name->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->patient_name->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->gender->setVisibility();
-        $this->doctor_name->setVisibility();
     }
 
     // Constructor
@@ -549,12 +549,12 @@ class AppointmentsReportList extends AppointmentsReport
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
-    public $DisplayRecords = 20;
+    public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -806,7 +806,7 @@ class AppointmentsReportList extends AppointmentsReport
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 20; // Load default
+            $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -999,7 +999,7 @@ class AppointmentsReportList extends AppointmentsReport
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 20; // Non-numeric, load default
+                    $this->DisplayRecords = 5; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1052,15 +1052,15 @@ class AppointmentsReportList extends AppointmentsReport
             $savedFilterList = Profile()->getSearchFilters("fappointments_reportsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
+        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
+        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->_title->AdvancedSearch->toJson(), ","); // Field title
+        $filterList = Concat($filterList, $this->doctor_name->AdvancedSearch->toJson(), ","); // Field doctor_name
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
-        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
-        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
-        $filterList = Concat($filterList, $this->doctor_name->AdvancedSearch->toJson(), ","); // Field doctor_name
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1108,6 +1108,30 @@ class AppointmentsReportList extends AppointmentsReport
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
+        // Field patient_name
+        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
+        $this->patient_name->AdvancedSearch->save();
+
+        // Field date_of_birth
+        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
+        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
+        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
+        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
+        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
+        $this->date_of_birth->AdvancedSearch->save();
+
+        // Field gender
+        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
+        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
+        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
+        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
+        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
+        $this->gender->AdvancedSearch->save();
+
         // Field title
         $this->_title->AdvancedSearch->SearchValue = @$filter["x__title"];
         $this->_title->AdvancedSearch->SearchOperator = @$filter["z__title"];
@@ -1115,6 +1139,14 @@ class AppointmentsReportList extends AppointmentsReport
         $this->_title->AdvancedSearch->SearchValue2 = @$filter["y__title"];
         $this->_title->AdvancedSearch->SearchOperator2 = @$filter["w__title"];
         $this->_title->AdvancedSearch->save();
+
+        // Field doctor_name
+        $this->doctor_name->AdvancedSearch->SearchValue = @$filter["x_doctor_name"];
+        $this->doctor_name->AdvancedSearch->SearchOperator = @$filter["z_doctor_name"];
+        $this->doctor_name->AdvancedSearch->SearchCondition = @$filter["v_doctor_name"];
+        $this->doctor_name->AdvancedSearch->SearchValue2 = @$filter["y_doctor_name"];
+        $this->doctor_name->AdvancedSearch->SearchOperator2 = @$filter["w_doctor_name"];
+        $this->doctor_name->AdvancedSearch->save();
 
         // Field start_date
         $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
@@ -1147,38 +1179,6 @@ class AppointmentsReportList extends AppointmentsReport
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
-
-        // Field patient_name
-        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
-        $this->patient_name->AdvancedSearch->save();
-
-        // Field date_of_birth
-        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->save();
-
-        // Field gender
-        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
-        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
-        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
-        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
-        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
-        $this->gender->AdvancedSearch->save();
-
-        // Field doctor_name
-        $this->doctor_name->AdvancedSearch->SearchValue = @$filter["x_doctor_name"];
-        $this->doctor_name->AdvancedSearch->SearchOperator = @$filter["z_doctor_name"];
-        $this->doctor_name->AdvancedSearch->SearchCondition = @$filter["v_doctor_name"];
-        $this->doctor_name->AdvancedSearch->SearchValue2 = @$filter["y_doctor_name"];
-        $this->doctor_name->AdvancedSearch->SearchOperator2 = @$filter["w_doctor_name"];
-        $this->doctor_name->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1218,9 +1218,9 @@ class AppointmentsReportList extends AppointmentsReport
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->_title;
         $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
+        $searchFlds[] = &$this->_title;
         $searchFlds[] = &$this->doctor_name;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
@@ -1300,16 +1300,13 @@ class AppointmentsReportList extends AppointmentsReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
+            $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->_title); // title
+            $this->updateSort($this->doctor_name); // doctor_name
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->gender); // gender
-            $this->updateSort($this->doctor_name); // doctor_name
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1335,15 +1332,15 @@ class AppointmentsReportList extends AppointmentsReport
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
+                $this->patient_name->setSort("");
+                $this->date_of_birth->setSort("");
+                $this->gender->setSort("");
                 $this->_title->setSort("");
+                $this->doctor_name->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
-                $this->patient_name->setSort("");
-                $this->date_of_birth->setSort("");
-                $this->gender->setSort("");
-                $this->doctor_name->setSort("");
             }
 
             // Reset start position
@@ -1379,6 +1376,14 @@ class AppointmentsReportList extends AppointmentsReport
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1419,6 +1424,10 @@ class AppointmentsReportList extends AppointmentsReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
@@ -1489,16 +1498,13 @@ class AppointmentsReportList extends AppointmentsReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "patient_name");
             $this->createColumnOption($option, "title");
+            $this->createColumnOption($option, "doctor_name");
             $this->createColumnOption($option, "start_date");
             $this->createColumnOption($option, "end_date");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
-            $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "date_of_birth");
-            $this->createColumnOption($option, "gender");
-            $this->createColumnOption($option, "doctor_name");
         }
 
         // Set up custom actions
@@ -1938,15 +1944,15 @@ class AppointmentsReportList extends AppointmentsReport
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
         $this->_title->setDbValue($row['title']);
+        $this->doctor_name->setDbValue($row['doctor_name']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->patient_name->setDbValue($row['patient_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->gender->setDbValue($row['gender']);
-        $this->doctor_name->setDbValue($row['doctor_name']);
     }
 
     // Return a row with default values
@@ -1954,15 +1960,15 @@ class AppointmentsReportList extends AppointmentsReport
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['gender'] = $this->gender->DefaultValue;
         $row['title'] = $this->_title->DefaultValue;
+        $row['doctor_name'] = $this->doctor_name->DefaultValue;
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['patient_name'] = $this->patient_name->DefaultValue;
-        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
-        $row['gender'] = $this->gender->DefaultValue;
-        $row['doctor_name'] = $this->doctor_name->DefaultValue;
         return $row;
     }
 
@@ -2005,7 +2011,15 @@ class AppointmentsReportList extends AppointmentsReport
 
         // id
 
+        // patient_name
+
+        // date_of_birth
+
+        // gender
+
         // title
+
+        // doctor_name
 
         // start_date
 
@@ -2015,21 +2029,26 @@ class AppointmentsReportList extends AppointmentsReport
 
         // date_updated
 
-        // patient_name
-
-        // date_of_birth
-
-        // gender
-
-        // doctor_name
-
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // date_of_birth
+            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // gender
+            $this->gender->ViewValue = $this->gender->CurrentValue;
+
             // title
             $this->_title->ViewValue = $this->_title->CurrentValue;
+
+            // doctor_name
+            $this->doctor_name->ViewValue = $this->doctor_name->CurrentValue;
 
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -2048,25 +2067,16 @@ class AppointmentsReportList extends AppointmentsReport
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // patient_name
-            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
-
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
-
-            // doctor_name
-            $this->doctor_name->ViewValue = $this->doctor_name->CurrentValue;
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
             // title
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
+
+            // doctor_name
+            $this->doctor_name->HrefValue = "";
+            $this->doctor_name->TooltipValue = "";
 
             // start_date
             $this->start_date->HrefValue = "";
@@ -2083,22 +2093,6 @@ class AppointmentsReportList extends AppointmentsReport
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // patient_name
-            $this->patient_name->HrefValue = "";
-            $this->patient_name->TooltipValue = "";
-
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
-
-            // doctor_name
-            $this->doctor_name->HrefValue = "";
-            $this->doctor_name->TooltipValue = "";
         }
 
         // Call Row Rendered event

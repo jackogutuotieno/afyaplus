@@ -148,7 +148,7 @@ class RadiologyRequestsList extends RadiologyRequests
         $this->id->setVisibility();
         $this->test_title->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -547,12 +547,12 @@ class RadiologyRequestsList extends RadiologyRequests
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
-    public $DisplayRecords = 20;
+    public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -804,7 +804,7 @@ class RadiologyRequestsList extends RadiologyRequests
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 20; // Load default
+            $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -997,7 +997,7 @@ class RadiologyRequestsList extends RadiologyRequests
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 20; // Non-numeric, load default
+                    $this->DisplayRecords = 5; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1281,7 +1281,6 @@ class RadiologyRequestsList extends RadiologyRequests
             $this->updateSort($this->id); // id
             $this->updateSort($this->test_title); // test_title
             $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
@@ -1555,7 +1554,6 @@ class RadiologyRequestsList extends RadiologyRequests
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "test_title");
             $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
@@ -2067,6 +2065,7 @@ class RadiologyRequestsList extends RadiologyRequests
         // patient_id
 
         // visit_id
+        $this->visit_id->CellCssStyle = "white-space: nowrap;";
 
         // status
 
@@ -2087,10 +2086,6 @@ class RadiologyRequestsList extends RadiologyRequests
             // patient_id
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
             $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
@@ -2118,10 +2113,6 @@ class RadiologyRequestsList extends RadiologyRequests
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

@@ -21,24 +21,35 @@ $patient_visits->TableClass = "table table-bordered table-hover table-sm ew-tabl
 </td>
         </tr>
 <?php } ?>
-<?php if ($patient_visits->_title->Visible) { // title ?>
-        <tr id="r__title"<?= $patient_visits->_title->rowAttributes() ?>>
-            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->_title->caption() ?></td>
-            <td<?= $patient_visits->_title->cellAttributes() ?>>
-<span id="el_patient_visits__title">
-<span<?= $patient_visits->_title->viewAttributes() ?>>
-<?= $patient_visits->_title->getViewValue() ?></span>
+<?php if ($patient_visits->visit_type_id->Visible) { // visit_type_id ?>
+        <tr id="r_visit_type_id"<?= $patient_visits->visit_type_id->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->visit_type_id->caption() ?></td>
+            <td<?= $patient_visits->visit_type_id->cellAttributes() ?>>
+<span id="el_patient_visits_visit_type_id">
+<span<?= $patient_visits->visit_type_id->viewAttributes() ?>>
+<?= $patient_visits->visit_type_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>
 <?php } ?>
-<?php if ($patient_visits->created_by_user_id->Visible) { // created_by_user_id ?>
-        <tr id="r_created_by_user_id"<?= $patient_visits->created_by_user_id->rowAttributes() ?>>
-            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->created_by_user_id->caption() ?></td>
-            <td<?= $patient_visits->created_by_user_id->cellAttributes() ?>>
-<span id="el_patient_visits_created_by_user_id">
-<span<?= $patient_visits->created_by_user_id->viewAttributes() ?>>
-<?= $patient_visits->created_by_user_id->getViewValue() ?></span>
+<?php if ($patient_visits->payment_method_id->Visible) { // payment_method_id ?>
+        <tr id="r_payment_method_id"<?= $patient_visits->payment_method_id->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->payment_method_id->caption() ?></td>
+            <td<?= $patient_visits->payment_method_id->cellAttributes() ?>>
+<span id="el_patient_visits_payment_method_id">
+<span<?= $patient_visits->payment_method_id->viewAttributes() ?>>
+<?= $patient_visits->payment_method_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patient_visits->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <tr id="r_medical_scheme_id"<?= $patient_visits->medical_scheme_id->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->medical_scheme_id->caption() ?></td>
+            <td<?= $patient_visits->medical_scheme_id->cellAttributes() ?>>
+<span id="el_patient_visits_medical_scheme_id">
+<span<?= $patient_visits->medical_scheme_id->viewAttributes() ?>>
+<?= $patient_visits->medical_scheme_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>

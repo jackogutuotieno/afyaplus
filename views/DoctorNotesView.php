@@ -73,17 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <tr id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_doctor_notes_visit_id"><?= $Page->visit_id->caption() ?></span></td>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el_doctor_notes_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->chief_complaint->Visible) { // chief_complaint ?>
     <tr id="r_chief_complaint"<?= $Page->chief_complaint->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_doctor_notes_chief_complaint"><?= $Page->chief_complaint->caption() ?></span></td>

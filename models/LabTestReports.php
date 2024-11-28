@@ -47,12 +47,11 @@ class LabTestReports extends DbTable
 
     // Fields
     public $id;
-    public $report_title;
+    public $lab_test_requests_queue_id;
     public $details;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
-    public $lab_test_request_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -126,29 +125,32 @@ class LabTestReports extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // report_title
-        $this->report_title = new DbField(
+        // lab_test_requests_queue_id
+        $this->lab_test_requests_queue_id = new DbField(
             $this, // Table
-            'x_report_title', // Variable name
-            'report_title', // Name
-            '`report_title`', // Expression
-            '`report_title`', // Basic search expression
-            200, // Type
-            100, // Size
+            'x_lab_test_requests_queue_id', // Variable name
+            'lab_test_requests_queue_id', // Name
+            '`lab_test_requests_queue_id`', // Expression
+            '`lab_test_requests_queue_id`', // Basic search expression
+            3, // Type
+            11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`report_title`', // Virtual expression
+            '`lab_test_requests_queue_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->report_title->InputTextType = "text";
-        $this->report_title->Nullable = false; // NOT NULL field
-        $this->report_title->Required = true; // Required field
-        $this->report_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['report_title'] = &$this->report_title;
+        $this->lab_test_requests_queue_id->InputTextType = "text";
+        $this->lab_test_requests_queue_id->Raw = true;
+        $this->lab_test_requests_queue_id->IsForeignKey = true; // Foreign key field
+        $this->lab_test_requests_queue_id->Nullable = false; // NOT NULL field
+        $this->lab_test_requests_queue_id->Required = true; // Required field
+        $this->lab_test_requests_queue_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lab_test_requests_queue_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['lab_test_requests_queue_id'] = &$this->lab_test_requests_queue_id;
 
         // details
         $this->details = new DbField(
@@ -166,7 +168,7 @@ class LabTestReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->details->InputTextType = "text";
         $this->details->Nullable = false; // NOT NULL field
@@ -190,14 +192,18 @@ class LabTestReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -206,10 +212,10 @@ class LabTestReports extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            3, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -222,7 +228,7 @@ class LabTestReports extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -248,35 +254,10 @@ class LabTestReports extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // lab_test_request_id
-        $this->lab_test_request_id = new DbField(
-            $this, // Table
-            'x_lab_test_request_id', // Variable name
-            'lab_test_request_id', // Name
-            '`lab_test_request_id`', // Expression
-            '`lab_test_request_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`lab_test_request_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->lab_test_request_id->InputTextType = "text";
-        $this->lab_test_request_id->Raw = true;
-        $this->lab_test_request_id->Nullable = false; // NOT NULL field
-        $this->lab_test_request_id->Required = true; // Required field
-        $this->lab_test_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->lab_test_request_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['lab_test_request_id'] = &$this->lab_test_request_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -334,6 +315,88 @@ class LabTestReports extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "lab_test_requests_queue") {
+            $masterTable = Container("lab_test_requests_queue");
+            if ($this->lab_test_requests_queue_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_requests_queue_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "lab_test_requests_queue") {
+            $masterTable = Container("lab_test_requests_queue");
+            if ($this->lab_test_requests_queue_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_requests_queue_id, $this->lab_test_requests_queue_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "lab_test_requests_queue":
+                $key = $keys["lab_test_requests_queue_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_requests_queue_id"], $this->lab_test_requests_queue_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "lab_test_requests_queue":
+                return GetKeyFilter($this->lab_test_requests_queue_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -802,12 +865,11 @@ class LabTestReports extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->report_title->DbValue = $row['report_title'];
+        $this->lab_test_requests_queue_id->DbValue = $row['lab_test_requests_queue_id'];
         $this->details->DbValue = $row['details'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->lab_test_request_id->DbValue = $row['lab_test_request_id'];
     }
 
     // Delete uploaded files
@@ -1002,6 +1064,10 @@ class LabTestReports extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "lab_test_requests_queue" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_requests_queue_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1161,12 +1227,11 @@ class LabTestReports extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->report_title->setDbValue($row['report_title']);
+        $this->lab_test_requests_queue_id->setDbValue($row['lab_test_requests_queue_id']);
         $this->details->setDbValue($row['details']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
     }
 
     // Render list content
@@ -1199,7 +1264,7 @@ class LabTestReports extends DbTable
 
         // id
 
-        // report_title
+        // lab_test_requests_queue_id
 
         // details
 
@@ -1208,21 +1273,40 @@ class LabTestReports extends DbTable
         // date_created
 
         // date_updated
-
-        // lab_test_request_id
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // report_title
-        $this->report_title->ViewValue = $this->report_title->CurrentValue;
+        // lab_test_requests_queue_id
+        $this->lab_test_requests_queue_id->ViewValue = $this->lab_test_requests_queue_id->CurrentValue;
+        $this->lab_test_requests_queue_id->ViewValue = FormatNumber($this->lab_test_requests_queue_id->ViewValue, $this->lab_test_requests_queue_id->formatPattern());
 
         // details
         $this->details->ViewValue = $this->details->CurrentValue;
 
         // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1232,17 +1316,13 @@ class LabTestReports extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-        // lab_test_request_id
-        $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-        $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // report_title
-        $this->report_title->HrefValue = "";
-        $this->report_title->TooltipValue = "";
+        // lab_test_requests_queue_id
+        $this->lab_test_requests_queue_id->HrefValue = "";
+        $this->lab_test_requests_queue_id->TooltipValue = "";
 
         // details
         $this->details->HrefValue = "";
@@ -1259,10 +1339,6 @@ class LabTestReports extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
-
-        // lab_test_request_id
-        $this->lab_test_request_id->HrefValue = "";
-        $this->lab_test_request_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1283,19 +1359,22 @@ class LabTestReports extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // report_title
-        $this->report_title->setupEditAttributes();
-        if (!$this->report_title->Raw) {
-            $this->report_title->CurrentValue = HtmlDecode($this->report_title->CurrentValue);
+        // lab_test_requests_queue_id
+        $this->lab_test_requests_queue_id->setupEditAttributes();
+        if ($this->lab_test_requests_queue_id->getSessionValue() != "") {
+            $this->lab_test_requests_queue_id->CurrentValue = GetForeignKeyValue($this->lab_test_requests_queue_id->getSessionValue());
+            $this->lab_test_requests_queue_id->ViewValue = $this->lab_test_requests_queue_id->CurrentValue;
+            $this->lab_test_requests_queue_id->ViewValue = FormatNumber($this->lab_test_requests_queue_id->ViewValue, $this->lab_test_requests_queue_id->formatPattern());
+        } else {
+            $this->lab_test_requests_queue_id->EditValue = $this->lab_test_requests_queue_id->CurrentValue;
+            $this->lab_test_requests_queue_id->PlaceHolder = RemoveHtml($this->lab_test_requests_queue_id->caption());
+            if (strval($this->lab_test_requests_queue_id->EditValue) != "" && is_numeric($this->lab_test_requests_queue_id->EditValue)) {
+                $this->lab_test_requests_queue_id->EditValue = FormatNumber($this->lab_test_requests_queue_id->EditValue, null);
+            }
         }
-        $this->report_title->EditValue = $this->report_title->CurrentValue;
-        $this->report_title->PlaceHolder = RemoveHtml($this->report_title->caption());
 
         // details
         $this->details->setupEditAttributes();
-        if (!$this->details->Raw) {
-            $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
-        }
         $this->details->EditValue = $this->details->CurrentValue;
         $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
@@ -1303,14 +1382,29 @@ class LabTestReports extends DbTable
         $this->created_by_user_id->setupEditAttributes();
         if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
             $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->EditValue = null;
             }
+        } else {
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
         }
 
         // date_created
@@ -1322,14 +1416,6 @@ class LabTestReports extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // lab_test_request_id
-        $this->lab_test_request_id->setupEditAttributes();
-        $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-        $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-        if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-            $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
-        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1360,20 +1446,16 @@ class LabTestReports extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->report_title);
+                    $doc->exportCaption($this->lab_test_requests_queue_id);
                     $doc->exportCaption($this->details);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->lab_test_request_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->report_title);
+                    $doc->exportCaption($this->lab_test_requests_queue_id);
                     $doc->exportCaption($this->details);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->lab_test_request_id);
                 }
                 $doc->endExportRow();
             }
@@ -1401,20 +1483,16 @@ class LabTestReports extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->report_title);
+                        $doc->exportField($this->lab_test_requests_queue_id);
                         $doc->exportField($this->details);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->lab_test_request_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->report_title);
+                        $doc->exportField($this->lab_test_requests_queue_id);
                         $doc->exportField($this->details);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->lab_test_request_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1474,6 +1552,30 @@ class LabTestReports extends DbTable
             $wrk = "0=1";
         }
         return $wrk;
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_requests_queue") {
+            $filterWrk = Container("lab_test_requests_queue")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_requests_queue") {
+            $mastertable = Container("lab_test_requests_queue");
+            if (!$mastertable->userIDAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->lab_test_requests_queue_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

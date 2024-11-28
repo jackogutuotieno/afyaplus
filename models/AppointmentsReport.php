@@ -47,15 +47,15 @@ class AppointmentsReport extends DbTable
 
     // Fields
     public $id;
+    public $patient_name;
+    public $date_of_birth;
+    public $gender;
     public $_title;
+    public $doctor_name;
     public $start_date;
     public $end_date;
     public $date_created;
     public $date_updated;
-    public $patient_name;
-    public $date_of_birth;
-    public $gender;
-    public $doctor_name;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -129,134 +129,6 @@ class AppointmentsReport extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // title
-        $this->_title = new DbField(
-            $this, // Table
-            'x__title', // Variable name
-            'title', // Name
-            '`title`', // Expression
-            '`title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->_title->InputTextType = "text";
-        $this->_title->Nullable = false; // NOT NULL field
-        $this->_title->Required = true; // Required field
-        $this->_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['title'] = &$this->_title;
-
-        // start_date
-        $this->start_date = new DbField(
-            $this, // Table
-            'x_start_date', // Variable name
-            'start_date', // Name
-            '`start_date`', // Expression
-            CastDateFieldForLike("`start_date`", 0, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`start_date`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->start_date->InputTextType = "text";
-        $this->start_date->Raw = true;
-        $this->start_date->Nullable = false; // NOT NULL field
-        $this->start_date->Required = true; // Required field
-        $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->start_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['start_date'] = &$this->start_date;
-
-        // end_date
-        $this->end_date = new DbField(
-            $this, // Table
-            'x_end_date', // Variable name
-            'end_date', // Name
-            '`end_date`', // Expression
-            CastDateFieldForLike("`end_date`", 0, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`end_date`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->end_date->InputTextType = "text";
-        $this->end_date->Raw = true;
-        $this->end_date->Nullable = false; // NOT NULL field
-        $this->end_date->Required = true; // Required field
-        $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['end_date'] = &$this->end_date;
-
-        // date_created
-        $this->date_created = new DbField(
-            $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_created`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
-
         // patient_name
         $this->patient_name = new DbField(
             $this, // Table
@@ -329,6 +201,30 @@ class AppointmentsReport extends DbTable
         $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['gender'] = &$this->gender;
 
+        // title
+        $this->_title = new DbField(
+            $this, // Table
+            'x__title', // Variable name
+            'title', // Name
+            '`title`', // Expression
+            '`title`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`title`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->_title->InputTextType = "text";
+        $this->_title->Nullable = false; // NOT NULL field
+        $this->_title->Required = true; // Required field
+        $this->_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['title'] = &$this->_title;
+
         // doctor_name
         $this->doctor_name = new DbField(
             $this, // Table
@@ -350,6 +246,110 @@ class AppointmentsReport extends DbTable
         $this->doctor_name->InputTextType = "text";
         $this->doctor_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['doctor_name'] = &$this->doctor_name;
+
+        // start_date
+        $this->start_date = new DbField(
+            $this, // Table
+            'x_start_date', // Variable name
+            'start_date', // Name
+            '`start_date`', // Expression
+            CastDateFieldForLike("`start_date`", 7, "DB"), // Basic search expression
+            133, // Type
+            40, // Size
+            7, // Date/Time format
+            false, // Is upload field
+            '`start_date`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->start_date->InputTextType = "text";
+        $this->start_date->Raw = true;
+        $this->start_date->Nullable = false; // NOT NULL field
+        $this->start_date->Required = true; // Required field
+        $this->start_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->start_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['start_date'] = &$this->start_date;
+
+        // end_date
+        $this->end_date = new DbField(
+            $this, // Table
+            'x_end_date', // Variable name
+            'end_date', // Name
+            '`end_date`', // Expression
+            CastDateFieldForLike("`end_date`", 7, "DB"), // Basic search expression
+            133, // Type
+            40, // Size
+            7, // Date/Time format
+            false, // Is upload field
+            '`end_date`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->end_date->InputTextType = "text";
+        $this->end_date->Raw = true;
+        $this->end_date->Nullable = false; // NOT NULL field
+        $this->end_date->Required = true; // Required field
+        $this->end_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['end_date'] = &$this->end_date;
+
+        // date_created
+        $this->date_created = new DbField(
+            $this, // Table
+            'x_date_created', // Variable name
+            'date_created', // Name
+            '`date_created`', // Expression
+            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            135, // Type
+            76, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '`date_created`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->date_created->InputTextType = "text";
+        $this->date_created->Raw = true;
+        $this->date_created->Nullable = false; // NOT NULL field
+        $this->date_created->Required = true; // Required field
+        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_created'] = &$this->date_created;
+
+        // date_updated
+        $this->date_updated = new DbField(
+            $this, // Table
+            'x_date_updated', // Variable name
+            'date_updated', // Name
+            '`date_updated`', // Expression
+            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            135, // Type
+            76, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '`date_updated`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->date_updated->InputTextType = "text";
+        $this->date_updated->Raw = true;
+        $this->date_updated->Nullable = false; // NOT NULL field
+        $this->date_updated->Required = true; // Required field
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_updated'] = &$this->date_updated;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -870,15 +870,15 @@ class AppointmentsReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
+        $this->patient_name->DbValue = $row['patient_name'];
+        $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->gender->DbValue = $row['gender'];
         $this->_title->DbValue = $row['title'];
+        $this->doctor_name->DbValue = $row['doctor_name'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->patient_name->DbValue = $row['patient_name'];
-        $this->date_of_birth->DbValue = $row['date_of_birth'];
-        $this->gender->DbValue = $row['gender'];
-        $this->doctor_name->DbValue = $row['doctor_name'];
     }
 
     // Delete uploaded files
@@ -1232,15 +1232,15 @@ class AppointmentsReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
         $this->_title->setDbValue($row['title']);
+        $this->doctor_name->setDbValue($row['doctor_name']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->patient_name->setDbValue($row['patient_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->gender->setDbValue($row['gender']);
-        $this->doctor_name->setDbValue($row['doctor_name']);
     }
 
     // Render list content
@@ -1273,7 +1273,15 @@ class AppointmentsReport extends DbTable
 
         // id
 
+        // patient_name
+
+        // date_of_birth
+
+        // gender
+
         // title
+
+        // doctor_name
 
         // start_date
 
@@ -1283,19 +1291,24 @@ class AppointmentsReport extends DbTable
 
         // date_updated
 
-        // patient_name
-
-        // date_of_birth
-
-        // gender
-
-        // doctor_name
-
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
+        // patient_name
+        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+        // date_of_birth
+        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+        // gender
+        $this->gender->ViewValue = $this->gender->CurrentValue;
+
         // title
         $this->_title->ViewValue = $this->_title->CurrentValue;
+
+        // doctor_name
+        $this->doctor_name->ViewValue = $this->doctor_name->CurrentValue;
 
         // start_date
         $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -1313,26 +1326,29 @@ class AppointmentsReport extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-        // patient_name
-        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
-
-        // date_of_birth
-        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-
-        // gender
-        $this->gender->ViewValue = $this->gender->CurrentValue;
-
-        // doctor_name
-        $this->doctor_name->ViewValue = $this->doctor_name->CurrentValue;
-
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
+        // patient_name
+        $this->patient_name->HrefValue = "";
+        $this->patient_name->TooltipValue = "";
+
+        // date_of_birth
+        $this->date_of_birth->HrefValue = "";
+        $this->date_of_birth->TooltipValue = "";
+
+        // gender
+        $this->gender->HrefValue = "";
+        $this->gender->TooltipValue = "";
+
         // title
         $this->_title->HrefValue = "";
         $this->_title->TooltipValue = "";
+
+        // doctor_name
+        $this->doctor_name->HrefValue = "";
+        $this->doctor_name->TooltipValue = "";
 
         // start_date
         $this->start_date->HrefValue = "";
@@ -1349,22 +1365,6 @@ class AppointmentsReport extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
-
-        // patient_name
-        $this->patient_name->HrefValue = "";
-        $this->patient_name->TooltipValue = "";
-
-        // date_of_birth
-        $this->date_of_birth->HrefValue = "";
-        $this->date_of_birth->TooltipValue = "";
-
-        // gender
-        $this->gender->HrefValue = "";
-        $this->gender->TooltipValue = "";
-
-        // doctor_name
-        $this->doctor_name->HrefValue = "";
-        $this->doctor_name->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1384,34 +1384,6 @@ class AppointmentsReport extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // title
-        $this->_title->setupEditAttributes();
-        if (!$this->_title->Raw) {
-            $this->_title->CurrentValue = HtmlDecode($this->_title->CurrentValue);
-        }
-        $this->_title->EditValue = $this->_title->CurrentValue;
-        $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
-
-        // start_date
-        $this->start_date->setupEditAttributes();
-        $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
-        $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
-
-        // end_date
-        $this->end_date->setupEditAttributes();
-        $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
-        $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
-
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // patient_name
         $this->patient_name->setupEditAttributes();
@@ -1434,6 +1406,14 @@ class AppointmentsReport extends DbTable
         $this->gender->EditValue = $this->gender->CurrentValue;
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
+        // title
+        $this->_title->setupEditAttributes();
+        if (!$this->_title->Raw) {
+            $this->_title->CurrentValue = HtmlDecode($this->_title->CurrentValue);
+        }
+        $this->_title->EditValue = $this->_title->CurrentValue;
+        $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
+
         // doctor_name
         $this->doctor_name->setupEditAttributes();
         if (!$this->doctor_name->Raw) {
@@ -1441,6 +1421,26 @@ class AppointmentsReport extends DbTable
         }
         $this->doctor_name->EditValue = $this->doctor_name->CurrentValue;
         $this->doctor_name->PlaceHolder = RemoveHtml($this->doctor_name->caption());
+
+        // start_date
+        $this->start_date->setupEditAttributes();
+        $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
+        $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+
+        // end_date
+        $this->end_date->setupEditAttributes();
+        $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
+        $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
+
+        // date_created
+        $this->date_created->setupEditAttributes();
+        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+        // date_updated
+        $this->date_updated->setupEditAttributes();
+        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1471,26 +1471,26 @@ class AppointmentsReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->_title);
+                    $doc->exportCaption($this->doctor_name);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->patient_name);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->doctor_name);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->_title);
+                    $doc->exportCaption($this->doctor_name);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->patient_name);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->doctor_name);
                 }
                 $doc->endExportRow();
             }
@@ -1518,26 +1518,26 @@ class AppointmentsReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
                         $doc->exportField($this->_title);
+                        $doc->exportField($this->doctor_name);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->patient_name);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->doctor_name);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
                         $doc->exportField($this->_title);
+                        $doc->exportField($this->doctor_name);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->patient_name);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->doctor_name);
                     }
                     $doc->endExportRow($rowCnt);
                 }

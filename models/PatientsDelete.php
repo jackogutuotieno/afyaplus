@@ -126,20 +126,20 @@ class PatientsDelete extends Patients
         $this->patient_name->setVisibility();
         $this->first_name->Visible = false;
         $this->last_name->Visible = false;
-        $this->national_id->setVisibility();
-        $this->date_of_birth->setVisibility();
+        $this->national_id->Visible = false;
+        $this->date_of_birth->Visible = false;
         $this->age->setVisibility();
         $this->gender->setVisibility();
-        $this->phone->setVisibility();
-        $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
-        $this->employment_status->setVisibility();
-        $this->religion->setVisibility();
-        $this->next_of_kin->setVisibility();
-        $this->next_of_kin_phone->setVisibility();
-        $this->marital_status->setVisibility();
+        $this->phone->Visible = false;
+        $this->email_address->Visible = false;
+        $this->physical_address->Visible = false;
+        $this->employment_status->Visible = false;
+        $this->religion->Visible = false;
+        $this->next_of_kin->Visible = false;
+        $this->next_of_kin_phone->Visible = false;
+        $this->marital_status->Visible = false;
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -721,6 +721,14 @@ class PatientsDelete extends Patients
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
+            // photo
+            if (!EmptyValue($this->photo->Upload->DbValue)) {
+                $this->photo->ViewValue = $this->id->CurrentValue;
+                $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
+            } else {
+                $this->photo->ViewValue = "";
+            }
+
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
@@ -794,14 +802,6 @@ class PatientsDelete extends Patients
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
 
-            // national_id
-            $this->national_id->HrefValue = "";
-            $this->national_id->TooltipValue = "";
-
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
-
             // age
             $this->age->HrefValue = "";
             $this->age->TooltipValue = "";
@@ -810,61 +810,9 @@ class PatientsDelete extends Patients
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
 
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-                }
-            } else {
-                $this->phone->HrefValue = "";
-            }
-            $this->phone->TooltipValue = "";
-
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-                }
-            } else {
-                $this->email_address->HrefValue = "";
-            }
-            $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
-
-            // employment_status
-            $this->employment_status->HrefValue = "";
-            $this->employment_status->TooltipValue = "";
-
-            // religion
-            $this->religion->HrefValue = "";
-            $this->religion->TooltipValue = "";
-
-            // next_of_kin
-            $this->next_of_kin->HrefValue = "";
-            $this->next_of_kin->TooltipValue = "";
-
-            // next_of_kin_phone
-            $this->next_of_kin_phone->HrefValue = "";
-            $this->next_of_kin_phone->TooltipValue = "";
-
-            // marital_status
-            $this->marital_status->HrefValue = "";
-            $this->marital_status->TooltipValue = "";
-
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

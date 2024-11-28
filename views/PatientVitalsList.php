@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/PatientVisitsMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fpatient_vitalssrch" id="fpatient_vitalssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fpatient_vitalssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -142,6 +151,11 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_patient_vitals" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_patient_vitalslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -157,12 +171,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_vitals_patient_id" class="patient_vitals_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_patient_vitals_visit_id" class="patient_vitals_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->height->Visible) { // height ?>
         <th data-name="height" class="<?= $Page->height->headerCellClass() ?>"><div id="elh_patient_vitals_height" class="patient_vitals_height"><?= $Page->renderFieldHeader($Page->height) ?></div></th>
 <?php } ?>
@@ -215,22 +223,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_patient_id" class="el_patient_vitals_patient_id">
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_visit_id" class="el_patient_vitals_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->height->Visible) { // height ?>
         <td data-name="height"<?= $Page->height->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vitals_height" class="el_patient_vitals_height">

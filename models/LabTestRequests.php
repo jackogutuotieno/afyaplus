@@ -47,10 +47,8 @@ class LabTestRequests extends DbTable
 
     // Fields
     public $id;
-    public $test_title;
     public $patient_id;
     public $visit_id;
-    public $status;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
@@ -92,7 +90,7 @@ class LabTestRequests extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = true; // Allow detail add
         $this->DetailEdit = true; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
+        $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -128,30 +126,6 @@ class LabTestRequests extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // test_title
-        $this->test_title = new DbField(
-            $this, // Table
-            'x_test_title', // Variable name
-            'test_title', // Name
-            '`test_title`', // Expression
-            '`test_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`test_title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->test_title->InputTextType = "text";
-        $this->test_title->Nullable = false; // NOT NULL field
-        $this->test_title->Required = true; // Required field
-        $this->test_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['test_title'] = &$this->test_title;
-
         // patient_id
         $this->patient_id = new DbField(
             $this, // Table
@@ -172,6 +146,7 @@ class LabTestRequests extends DbTable
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
+        $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
         $this->patient_id->setSelectMultiple(false); // Select one
@@ -202,41 +177,13 @@ class LabTestRequests extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
+        $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
+        $this->visit_id->Sortable = false; // Allow sort
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
-
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '`status`', // Expression
-            '`status`', // Basic search expression
-            200, // Type
-            20, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`status`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->status->addMethod("getDefault", fn() => "Pending");
-        $this->status->InputTextType = "text";
-        $this->status->Nullable = false; // NOT NULL field
-        $this->status->Required = true; // Required field
-        $this->status->setSelectMultiple(false); // Select one
-        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->status->Lookup = new Lookup($this->status, 'lab_test_requests', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->status->OptionCount = 3;
-        $this->status->SearchOperators = ["=", "<>"];
-        $this->Fields['status'] = &$this->status;
 
         // created_by_user_id
         $this->created_by_user_id = new DbField(
@@ -377,6 +324,107 @@ class LabTestRequests extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $masterTable = Container("patient_visits");
+            if ($this->visit_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $masterFilter .= " AND " . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $masterTable = Container("patient_visits");
+            if ($this->visit_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->visit_id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $detailFilter .= " AND " . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "patient_visits":
+                $key = $keys["visit_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                $key = $keys["patient_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["visit_id"], $this->visit_id->DataType, $this->Dbid) . " AND " . GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "patient_visits":
+                return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Current detail table name
@@ -804,33 +852,6 @@ class LabTestRequests extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
-        // Cascade Update detail table 'lab_test_requests_details'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'lab_test_request_id'
-            $cascadeUpdate = true;
-            $rscascade['lab_test_request_id'] = $rs['id'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("lab_test_requests_details")->loadRs("`lab_test_request_id` = " . QuotedValue($rsold['id'], DataType::NUMBER, 'DB'))->fetchAllAssociative();
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("lab_test_requests_details")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("lab_test_requests_details")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("lab_test_requests_details")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
@@ -879,30 +900,6 @@ class LabTestRequests extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
-
-        // Cascade delete detail table 'lab_test_requests_details'
-        $dtlrows = Container("lab_test_requests_details")->loadRs("`lab_test_request_id` = " . QuotedValue($rs['id'], DataType::NUMBER, "DB"))->fetchAllAssociative();
-        // Call Row Deleting event
-        foreach ($dtlrows as $dtlrow) {
-            $success = Container("lab_test_requests_details")->rowDeleting($dtlrow);
-            if (!$success) {
-                break;
-            }
-        }
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                $success = Container("lab_test_requests_details")->delete($dtlrow); // Delete
-                if (!$success) {
-                    break;
-                }
-            }
-        }
-        // Call Row Deleted event
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                Container("lab_test_requests_details")->rowDeleted($dtlrow);
-            }
-        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();
@@ -922,10 +919,8 @@ class LabTestRequests extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->test_title->DbValue = $row['test_title'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
-        $this->status->DbValue = $row['status'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1131,6 +1126,11 @@ class LabTestRequests extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "patient_visits" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->visit_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1290,10 +1290,8 @@ class LabTestRequests extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->test_title->setDbValue($row['test_title']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->status->setDbValue($row['status']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1329,13 +1327,9 @@ class LabTestRequests extends DbTable
 
         // id
 
-        // test_title
-
         // patient_id
 
         // visit_id
-
-        // status
 
         // created_by_user_id
 
@@ -1346,9 +1340,6 @@ class LabTestRequests extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // test_title
-        $this->test_title->ViewValue = $this->test_title->CurrentValue;
 
         // patient_id
         $curVal = strval($this->patient_id->CurrentValue);
@@ -1376,13 +1367,6 @@ class LabTestRequests extends DbTable
         // visit_id
         $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
         $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
-        // status
-        if (strval($this->status->CurrentValue) != "") {
-            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-        } else {
-            $this->status->ViewValue = null;
-        }
 
         // created_by_user_id
         $curVal = strval($this->created_by_user_id->CurrentValue);
@@ -1419,10 +1403,6 @@ class LabTestRequests extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // test_title
-        $this->test_title->HrefValue = "";
-        $this->test_title->TooltipValue = "";
-
         // patient_id
         $this->patient_id->HrefValue = "";
         $this->patient_id->TooltipValue = "";
@@ -1430,10 +1410,6 @@ class LabTestRequests extends DbTable
         // visit_id
         $this->visit_id->HrefValue = "";
         $this->visit_id->TooltipValue = "";
-
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
 
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
@@ -1466,30 +1442,48 @@ class LabTestRequests extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // test_title
-        $this->test_title->setupEditAttributes();
-        if (!$this->test_title->Raw) {
-            $this->test_title->CurrentValue = HtmlDecode($this->test_title->CurrentValue);
-        }
-        $this->test_title->EditValue = $this->test_title->CurrentValue;
-        $this->test_title->PlaceHolder = RemoveHtml($this->test_title->caption());
-
         // patient_id
         $this->patient_id->setupEditAttributes();
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
+        } else {
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+        }
 
         // visit_id
         $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        } else {
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            }
         }
-
-        // status
-        $this->status->setupEditAttributes();
-        $this->status->EditValue = $this->status->options(true);
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // created_by_user_id
 
@@ -1532,18 +1526,12 @@ class LabTestRequests extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->test_title);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->test_title);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 }
@@ -1573,18 +1561,12 @@ class LabTestRequests extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->test_title);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->test_title);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     }

@@ -126,7 +126,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->visit_type_id->setVisibility();
         $this->payment_method_id->setVisibility();
         $this->medical_scheme_id->setVisibility();
-        $this->created_by_user_id->Visible = false;
+        $this->user_role->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -527,7 +527,6 @@ class PatientVisitsAdd extends PatientVisits
         $this->setupLookupOptions($this->visit_type_id);
         $this->setupLookupOptions($this->payment_method_id);
         $this->setupLookupOptions($this->medical_scheme_id);
-        $this->setupLookupOptions($this->created_by_user_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -574,6 +573,9 @@ class PatientVisitsAdd extends PatientVisits
             $this->loadFormValues(); // Load form values
         }
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -598,6 +600,9 @@ class PatientVisitsAdd extends PatientVisits
                     $this->terminate("patientvisitslist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -605,7 +610,11 @@ class PatientVisitsAdd extends PatientVisits
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "patientvisitslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "patientvisitsview") {
@@ -638,6 +647,9 @@ class PatientVisitsAdd extends PatientVisits
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -732,6 +744,16 @@ class PatientVisitsAdd extends PatientVisits
             }
         }
 
+        // Check field name 'user_role' first before field var 'x_user_role'
+        $val = $CurrentForm->hasValue("user_role") ? $CurrentForm->getValue("user_role") : $CurrentForm->getValue("x_user_role");
+        if (!$this->user_role->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->user_role->Visible = false; // Disable update for API request
+            } else {
+                $this->user_role->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -744,6 +766,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->visit_type_id->CurrentValue = $this->visit_type_id->FormValue;
         $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
+        $this->user_role->CurrentValue = $this->user_role->FormValue;
     }
 
     /**
@@ -769,15 +792,6 @@ class PatientVisitsAdd extends PatientVisits
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("add");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -798,7 +812,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->visit_type_id->setDbValue($row['visit_type_id']);
         $this->payment_method_id->setDbValue($row['payment_method_id']);
         $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -812,7 +826,7 @@ class PatientVisitsAdd extends PatientVisits
         $row['visit_type_id'] = $this->visit_type_id->DefaultValue;
         $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
         $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -864,8 +878,8 @@ class PatientVisitsAdd extends PatientVisits
         // medical_scheme_id
         $this->medical_scheme_id->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
+        // user_role
+        $this->user_role->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -970,6 +984,9 @@ class PatientVisitsAdd extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
+            // user_role
+            $this->user_role->ViewValue = $this->user_role->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -989,6 +1006,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // user_role
+            $this->user_role->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -1123,6 +1143,8 @@ class PatientVisitsAdd extends PatientVisits
             }
             $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
+            // user_role
+
             // Add refer script
 
             // patient_id
@@ -1136,6 +1158,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // user_role
+            $this->user_role->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1177,6 +1202,34 @@ class PatientVisitsAdd extends PatientVisits
                     $this->medical_scheme_id->addErrorMessage(str_replace("%s", $this->medical_scheme_id->caption(), $this->medical_scheme_id->RequiredErrorMessage));
                 }
             }
+            if ($this->user_role->Visible && $this->user_role->Required) {
+                if (!$this->user_role->IsDetailKey && EmptyValue($this->user_role->FormValue)) {
+                    $this->user_role->addErrorMessage(str_replace("%s", $this->user_role->caption(), $this->user_role->RequiredErrorMessage));
+                }
+            }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PatientQueueGrid");
+        if (in_array("patient_queue", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("PatientVitalsGrid");
+        if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("DoctorNotesGrid");
+        if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("LabTestRequestsGrid");
+        if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1202,6 +1255,11 @@ class PatientVisitsAdd extends PatientVisits
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -1223,6 +1281,76 @@ class PatientVisitsAdd extends PatientVisits
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("PatientQueueGrid");
+            if (in_array("patient_queue", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_queue"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("PatientVitalsGrid");
+            if (in_array("patient_vitals", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_vitals"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("DoctorNotesGrid");
+            if (in_array("doctor_notes", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "doctor_notes"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("LabTestRequestsGrid");
+            if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                if ($this->UseTransaction) { // Commit transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->commit();
+                    }
+                }
+            } else {
+                if ($this->UseTransaction) { // Rollback transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->rollback();
+                    }
+                }
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1260,10 +1388,9 @@ class PatientVisitsAdd extends PatientVisits
         // medical_scheme_id
         $this->medical_scheme_id->setDbValueDef($rsnew, $this->medical_scheme_id->CurrentValue, false);
 
-        // created_by_user_id
-        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            $rsnew['created_by_user_id'] = CurrentUserID();
-        }
+        // user_role
+        $this->user_role->CurrentValue = $this->user_role->getAutoUpdateValue(); // PHP
+        $this->user_role->setDbValueDef($rsnew, $this->user_role->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1285,19 +1412,9 @@ class PatientVisitsAdd extends PatientVisits
         if (isset($row['medical_scheme_id'])) { // medical_scheme_id
             $this->medical_scheme_id->setFormValue($row['medical_scheme_id']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        if (isset($row['user_role'])) { // user_role
+            $this->user_role->setFormValue($row['user_role']);
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString
@@ -1372,6 +1489,109 @@ class PatientVisitsAdd extends PatientVisits
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("patient_queue", $detailTblVar)) {
+                $detailPageObj = Container("PatientQueueGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patient_vitals", $detailTblVar)) {
+                $detailPageObj = Container("PatientVitalsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("doctor_notes", $detailTblVar)) {
+                $detailPageObj = Container("DoctorNotesGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("lab_test_requests", $detailTblVar)) {
+                $detailPageObj = Container("LabTestRequestsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+        }
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1403,8 +1623,6 @@ class PatientVisitsAdd extends PatientVisits
                 case "x_payment_method_id":
                     break;
                 case "x_medical_scheme_id":
-                    break;
-                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

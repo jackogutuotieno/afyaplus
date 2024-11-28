@@ -22,7 +22,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["test_title", [fields.test_title.visible && fields.test_title.required ? ew.Validators.required(fields.test_title.caption) : null], fields.test_title.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
@@ -71,23 +70,21 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<div class="ew-add-div"><!-- page* -->
-<?php if ($Page->test_title->Visible) { // test_title ?>
-    <div id="r_test_title"<?= $Page->test_title->rowAttributes() ?>>
-        <label id="elh_lab_test_requests_test_title" for="x_test_title" class="<?= $Page->LeftColumnClass ?>"><?= $Page->test_title->caption() ?><?= $Page->test_title->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->test_title->cellAttributes() ?>>
-<span id="el_lab_test_requests_test_title">
-<input type="<?= $Page->test_title->getInputTextType() ?>" name="x_test_title" id="x_test_title" data-table="lab_test_requests" data-field="x_test_title" value="<?= $Page->test_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->test_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->test_title->formatPattern()) ?>"<?= $Page->test_title->editAttributes() ?> aria-describedby="x_test_title_help">
-<?= $Page->test_title->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->test_title->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
 <?php } ?>
+<div class="ew-add-div"><!-- page* -->
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_lab_test_requests_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_lab_test_requests_patient_id">
     <select
         id="x_patient_id"
@@ -127,6 +124,7 @@ loadjs.ready("flab_test_requestsadd", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -134,11 +132,17 @@ loadjs.ready("flab_test_requestsadd", function() {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_lab_test_requests_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
+<?php if ($Page->visit_id->getSessionValue() != "") { ?>
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visit_id->getDisplayValue($Page->visit_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_lab_test_requests_visit_id">
 <input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="lab_test_requests" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
 <?= $Page->visit_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

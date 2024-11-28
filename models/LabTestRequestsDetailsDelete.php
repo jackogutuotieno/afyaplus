@@ -125,7 +125,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         $this->lab_test_request_id->Visible = false;
         $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -437,25 +436,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
 
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("labtestrequestsdetailslist"); // Return to list
-            return;
-        }
-
         // Get action
         if (IsApi()) {
             $this->CurrentAction = "delete"; // Delete record directly
@@ -628,7 +608,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
         $this->specimen_id->setDbValue($row['specimen_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -641,7 +620,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         $row['specimen_id'] = $this->specimen_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -666,9 +644,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
         // specimen_id
 
         // service_id
-
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -845,16 +820,6 @@ class LabTestRequestsDetailsDelete extends LabTestRequestsDetails
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString

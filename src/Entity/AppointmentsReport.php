@@ -33,8 +33,20 @@ class AppointmentsReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "patient_name", type: "string", nullable: true)]
+    private ?string $patientName;
+
+    #[Column(name: "date_of_birth", type: "date")]
+    private DateTime $dateOfBirth;
+
+    #[Column(type: "string")]
+    private string $gender;
+
     #[Column(type: "string")]
     private string $title;
+
+    #[Column(name: "doctor_name", type: "string", nullable: true)]
+    private ?string $doctorName;
 
     #[Column(name: "start_date", type: "date")]
     private DateTime $startDate;
@@ -48,18 +60,6 @@ class AppointmentsReport extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
-    #[Column(name: "patient_name", type: "string", nullable: true)]
-    private ?string $patientName;
-
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
-
-    #[Column(type: "string")]
-    private string $gender;
-
-    #[Column(name: "doctor_name", type: "string", nullable: true)]
-    private ?string $doctorName;
-
     public function getId(): int
     {
         return $this->id;
@@ -71,6 +71,39 @@ class AppointmentsReport extends AbstractEntity
         return $this;
     }
 
+    public function getPatientName(): ?string
+    {
+        return HtmlDecode($this->patientName);
+    }
+
+    public function setPatientName(?string $value): static
+    {
+        $this->patientName = RemoveXss($value);
+        return $this;
+    }
+
+    public function getDateOfBirth(): DateTime
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function setDateOfBirth(DateTime $value): static
+    {
+        $this->dateOfBirth = $value;
+        return $this;
+    }
+
+    public function getGender(): string
+    {
+        return HtmlDecode($this->gender);
+    }
+
+    public function setGender(string $value): static
+    {
+        $this->gender = RemoveXss($value);
+        return $this;
+    }
+
     public function getTitle(): string
     {
         return HtmlDecode($this->title);
@@ -79,6 +112,17 @@ class AppointmentsReport extends AbstractEntity
     public function setTitle(string $value): static
     {
         $this->title = RemoveXss($value);
+        return $this;
+    }
+
+    public function getDoctorName(): ?string
+    {
+        return HtmlDecode($this->doctorName);
+    }
+
+    public function setDoctorName(?string $value): static
+    {
+        $this->doctorName = RemoveXss($value);
         return $this;
     }
 
@@ -123,50 +167,6 @@ class AppointmentsReport extends AbstractEntity
     public function setDateUpdated(DateTime $value): static
     {
         $this->dateUpdated = $value;
-        return $this;
-    }
-
-    public function getPatientName(): ?string
-    {
-        return HtmlDecode($this->patientName);
-    }
-
-    public function setPatientName(?string $value): static
-    {
-        $this->patientName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getDateOfBirth(): DateTime
-    {
-        return $this->dateOfBirth;
-    }
-
-    public function setDateOfBirth(DateTime $value): static
-    {
-        $this->dateOfBirth = $value;
-        return $this;
-    }
-
-    public function getGender(): string
-    {
-        return HtmlDecode($this->gender);
-    }
-
-    public function setGender(string $value): static
-    {
-        $this->gender = RemoveXss($value);
-        return $this;
-    }
-
-    public function getDoctorName(): ?string
-    {
-        return HtmlDecode($this->doctorName);
-    }
-
-    public function setDoctorName(?string $value): static
-    {
-        $this->doctorName = RemoveXss($value);
         return $this;
     }
 }

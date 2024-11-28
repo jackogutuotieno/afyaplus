@@ -29,12 +29,9 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["report_title", [fields.report_title.visible && fields.report_title.required ? ew.Validators.required(fields.report_title.caption) : null], fields.report_title.isInvalid],
+            ["lab_test_requests_queue_id", [fields.lab_test_requests_queue_id.visible && fields.lab_test_requests_queue_id.required ? ew.Validators.required(fields.lab_test_requests_queue_id.caption) : null, ew.Validators.integer], fields.lab_test_requests_queue_id.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
-            ["lab_test_request_id", [fields.lab_test_request_id.visible && fields.lab_test_request_id.required ? ew.Validators.required(fields.lab_test_request_id.caption) : null, ew.Validators.integer], fields.lab_test_request_id.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -50,6 +47,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -73,6 +71,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "lab_test_requests_queue") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests_queue">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_requests_queue_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -86,26 +88,38 @@ loadjs.ready("head", function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-    <div id="r_report_title"<?= $Page->report_title->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_report_title" for="x_report_title" class="<?= $Page->LeftColumnClass ?>"><?= $Page->report_title->caption() ?><?= $Page->report_title->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->report_title->cellAttributes() ?>>
-<span id="el_lab_test_reports_report_title">
-<input type="<?= $Page->report_title->getInputTextType() ?>" name="x_report_title" id="x_report_title" data-table="lab_test_reports" data-field="x_report_title" value="<?= $Page->report_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->report_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->report_title->formatPattern()) ?>"<?= $Page->report_title->editAttributes() ?> aria-describedby="x_report_title_help">
-<?= $Page->report_title->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->report_title->getErrorMessage() ?></div>
+<?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
+    <div id="r_lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->rowAttributes() ?>>
+        <label id="elh_lab_test_reports_lab_test_requests_queue_id" for="x_lab_test_requests_queue_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->lab_test_requests_queue_id->caption() ?><?= $Page->lab_test_requests_queue_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->lab_test_requests_queue_id->cellAttributes() ?>>
+<?php if ($Page->lab_test_requests_queue_id->getSessionValue() != "") { ?>
+<span<?= $Page->lab_test_requests_queue_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->lab_test_requests_queue_id->getDisplayValue($Page->lab_test_requests_queue_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_lab_test_requests_queue_id" name="x_lab_test_requests_queue_id" value="<?= HtmlEncode($Page->lab_test_requests_queue_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el_lab_test_reports_lab_test_requests_queue_id">
+<input type="<?= $Page->lab_test_requests_queue_id->getInputTextType() ?>" name="x_lab_test_requests_queue_id" id="x_lab_test_requests_queue_id" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" value="<?= $Page->lab_test_requests_queue_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->lab_test_requests_queue_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->lab_test_requests_queue_id->formatPattern()) ?>"<?= $Page->lab_test_requests_queue_id->editAttributes() ?> aria-describedby="x_lab_test_requests_queue_id_help">
+<?= $Page->lab_test_requests_queue_id->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->lab_test_requests_queue_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
     <div id="r_details"<?= $Page->details->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_details" for="x_details" class="<?= $Page->LeftColumnClass ?>"><?= $Page->details->caption() ?><?= $Page->details->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_lab_test_reports_details" class="<?= $Page->LeftColumnClass ?>"><?= $Page->details->caption() ?><?= $Page->details->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->details->cellAttributes() ?>>
 <span id="el_lab_test_reports_details">
-<input type="<?= $Page->details->getInputTextType() ?>" name="x_details" id="x_details" data-table="lab_test_reports" data-field="x_details" value="<?= $Page->details->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->details->formatPattern()) ?>"<?= $Page->details->editAttributes() ?> aria-describedby="x_details_help">
+<?php $Page->details->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="lab_test_reports" data-field="x_details" name="x_details" id="x_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>"<?= $Page->details->editAttributes() ?> aria-describedby="x_details_help"><?= $Page->details->EditValue ?></textarea>
 <?= $Page->details->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->details->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["flab_test_reportsedit", "editor"], function() {
+    ew.createEditor("flab_test_reportsedit", "x_details", 0, 0, <?= $Page->details->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -116,109 +130,49 @@ loadjs.ready("head", function () {
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
 <span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
 <input type="hidden" data-table="lab_test_reports" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_lab_test_reports_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="lab_test_reports" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_lab_test_reports_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="lab_test_reports" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+    <select
+        id="x_created_by_user_id"
+        name="x_created_by_user_id"
+        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_reportsedit_x_created_by_user_id"
+        <?php } ?>
+        data-table="lab_test_reports"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Page->created_by_user_id->editAttributes() ?>>
+        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
+    </select>
+    <?= $Page->created_by_user_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
+<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
+<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["flab_test_reportsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("flab_test_reportsedit", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("flab_test_reportsedit", function() {
+    var options = { name: "x_created_by_user_id", selectId: "flab_test_reportsedit_x_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_reportsedit.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x_created_by_user_id", form: "flab_test_reportsedit" };
+    } else {
+        options.ajax = { id: "x_created_by_user_id", form: "flab_test_reportsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_reports.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>
 </span>
-</div></div>
-    </div>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_lab_test_reports_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="lab_test_reports" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["flab_test_reportsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("flab_test_reportsedit", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-    <div id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_lab_test_request_id" for="x_lab_test_request_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->lab_test_request_id->caption() ?><?= $Page->lab_test_request_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el_lab_test_reports_lab_test_request_id">
-<input type="<?= $Page->lab_test_request_id->getInputTextType() ?>" name="x_lab_test_request_id" id="x_lab_test_request_id" data-table="lab_test_reports" data-field="x_lab_test_request_id" value="<?= $Page->lab_test_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->lab_test_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->lab_test_request_id->formatPattern()) ?>"<?= $Page->lab_test_request_id->editAttributes() ?> aria-describedby="x_lab_test_request_id_help">
-<?= $Page->lab_test_request_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->lab_test_request_id->getErrorMessage() ?></div>
-</span>
 </div></div>
     </div>
 <?php } ?>

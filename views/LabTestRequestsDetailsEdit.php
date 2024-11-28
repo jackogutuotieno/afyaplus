@@ -200,6 +200,14 @@ loadjs.ready("flab_test_requests_detailsedit", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("lab_test_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_queue->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests_queue", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsQueueGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="flab_test_requests_detailsedit"><?= $Language->phrase("SaveBtn") ?></button>

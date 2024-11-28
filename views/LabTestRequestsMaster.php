@@ -21,28 +21,6 @@ $lab_test_requests->TableClass = "table table-bordered table-hover table-sm ew-t
 </td>
         </tr>
 <?php } ?>
-<?php if ($lab_test_requests->test_title->Visible) { // test_title ?>
-        <tr id="r_test_title"<?= $lab_test_requests->test_title->rowAttributes() ?>>
-            <td class="<?= $lab_test_requests->TableLeftColumnClass ?>"><?= $lab_test_requests->test_title->caption() ?></td>
-            <td<?= $lab_test_requests->test_title->cellAttributes() ?>>
-<span id="el_lab_test_requests_test_title">
-<span<?= $lab_test_requests->test_title->viewAttributes() ?>>
-<?= $lab_test_requests->test_title->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($lab_test_requests->status->Visible) { // status ?>
-        <tr id="r_status"<?= $lab_test_requests->status->rowAttributes() ?>>
-            <td class="<?= $lab_test_requests->TableLeftColumnClass ?>"><?= $lab_test_requests->status->caption() ?></td>
-            <td<?= $lab_test_requests->status->cellAttributes() ?>>
-<span id="el_lab_test_requests_status">
-<span<?= $lab_test_requests->status->viewAttributes() ?>>
-<?= $lab_test_requests->status->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($lab_test_requests->created_by_user_id->Visible) { // created_by_user_id ?>
         <tr id="r_created_by_user_id"<?= $lab_test_requests->created_by_user_id->rowAttributes() ?>>
             <td class="<?= $lab_test_requests->TableLeftColumnClass ?>"><?= $lab_test_requests->created_by_user_id->caption() ?></td>

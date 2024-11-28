@@ -127,8 +127,7 @@ return [
     "subscriptions" => \DI\create(Subscriptions::class),
     "Appointments" => \DI\create(Appointments::class),
     "appointments" => \DI\create(Appointments::class),
-    "laboratory_billing" => \DI\create(LaboratoryBilling::class),
-    "laboratoryreports" => \DI\create(Laboratoryreports::class),
+    "patient_queue" => \DI\create(PatientQueue::class),
 
     // User table
     "usertable" => \DI\get("users"),

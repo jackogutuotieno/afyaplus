@@ -1514,6 +1514,11 @@ class PatientsEdit extends Patients
 
         // Validate detail grid
         $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PatientAppointmentsGrid");
+        if (in_array("patient_appointments", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
         $detailPage = Container("PatientVisitsGrid");
         if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit) {
             $detailPage->run();
@@ -1558,6 +1563,60 @@ class PatientsEdit extends Patients
         // Update current values
         $this->setCurrentValues($rsnew);
 
+        // Check field with unique index (national_id)
+        if ($this->national_id->CurrentValue != "") {
+            $filterChk = "(`national_id` = " . AdjustSql($this->national_id->CurrentValue, $this->Dbid) . ")";
+            $filterChk .= " AND NOT (" . $filter . ")";
+            $this->CurrentFilter = $filterChk;
+            $sqlChk = $this->getCurrentSql();
+            $rsChk = $conn->executeQuery($sqlChk);
+            if (!$rsChk) {
+                return false;
+            }
+            if ($rsChk->fetch()) {
+                $idxErrMsg = str_replace("%f", $this->national_id->caption(), $Language->phrase("DupIndex"));
+                $idxErrMsg = str_replace("%v", $this->national_id->CurrentValue, $idxErrMsg);
+                $this->setFailureMessage($idxErrMsg);
+                return false;
+            }
+        }
+
+        // Check field with unique index (phone)
+        if ($this->phone->CurrentValue != "") {
+            $filterChk = "(`phone` = '" . AdjustSql($this->phone->CurrentValue, $this->Dbid) . "')";
+            $filterChk .= " AND NOT (" . $filter . ")";
+            $this->CurrentFilter = $filterChk;
+            $sqlChk = $this->getCurrentSql();
+            $rsChk = $conn->executeQuery($sqlChk);
+            if (!$rsChk) {
+                return false;
+            }
+            if ($rsChk->fetch()) {
+                $idxErrMsg = str_replace("%f", $this->phone->caption(), $Language->phrase("DupIndex"));
+                $idxErrMsg = str_replace("%v", $this->phone->CurrentValue, $idxErrMsg);
+                $this->setFailureMessage($idxErrMsg);
+                return false;
+            }
+        }
+
+        // Check field with unique index (email_address)
+        if ($this->email_address->CurrentValue != "") {
+            $filterChk = "(`email_address` = '" . AdjustSql($this->email_address->CurrentValue, $this->Dbid) . "')";
+            $filterChk .= " AND NOT (" . $filter . ")";
+            $this->CurrentFilter = $filterChk;
+            $sqlChk = $this->getCurrentSql();
+            $rsChk = $conn->executeQuery($sqlChk);
+            if (!$rsChk) {
+                return false;
+            }
+            if ($rsChk->fetch()) {
+                $idxErrMsg = str_replace("%f", $this->email_address->caption(), $Language->phrase("DupIndex"));
+                $idxErrMsg = str_replace("%v", $this->email_address->CurrentValue, $idxErrMsg);
+                $this->setFailureMessage($idxErrMsg);
+                return false;
+            }
+        }
+
         // Begin transaction
         if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
             $conn->beginTransaction();
@@ -1580,6 +1639,12 @@ class PatientsEdit extends Patients
 
             // Update detail records
             $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("PatientAppointmentsGrid");
+            if (in_array("patient_appointments", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_appointments"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
             $detailPage = Container("PatientVisitsGrid");
             if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
                 $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
@@ -1751,6 +1816,21 @@ class PatientsEdit extends Patients
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("patient_appointments", $detailTblVar)) {
+                $detailPageObj = Container("PatientAppointmentsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
             if (in_array("patient_visits", $detailTblVar)) {
                 $detailPageObj = Container("PatientVisitsGrid");
                 if ($detailPageObj->DetailEdit) {

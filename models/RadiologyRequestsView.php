@@ -888,10 +888,6 @@ class RadiologyRequestsView extends RadiologyRequests
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
             $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -918,10 +914,6 @@ class RadiologyRequestsView extends RadiologyRequests
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

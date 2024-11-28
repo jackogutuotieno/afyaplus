@@ -139,7 +139,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         $this->lab_test_request_id->Visible = false;
         $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -391,9 +390,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
-        if ($this->isAddOrEdit()) {
-            $this->created_by_user_id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -482,12 +478,12 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
     public $ShowOtherOptions = false;
-    public $DisplayRecords = 20;
+    public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -695,7 +691,7 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 20; // Load default
+            $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -853,7 +849,7 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 20; // Non-numeric, load default
+                    $this->DisplayRecords = 5; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1373,7 +1369,7 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"lab_test_requests_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1386,7 +1382,7 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"lab_test_requests_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1398,7 +1394,7 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1650,8 +1646,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
     // Load default values
     protected function loadDefaultValues()
     {
-        $this->created_by_user_id->DefaultValue = CurrentUserID();
-        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
     }
 
     // Load form values
@@ -1803,7 +1797,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
         $this->specimen_id->setDbValue($row['specimen_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1816,7 +1809,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         $row['specimen_id'] = $this->specimen_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1864,9 +1856,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         // specimen_id
 
         // service_id
-
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -2217,24 +2206,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check referential integrity for master table 'lab_test_requests'
-        $detailKeys = [];
-        $keyValue = $rsnew['lab_test_request_id'] ?? $rsold['lab_test_request_id'];
-        $detailKeys['lab_test_request_id'] = $keyValue;
-        $masterTable = Container("lab_test_requests");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "lab_test_requests", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
-
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2338,24 +2309,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
                 }
             }
         }
-
-        // Check referential integrity for master table 'lab_test_requests_details'
-        $validMasterRecord = true;
-        $detailKeys = [];
-        $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->getSessionValue();
-        $masterTable = Container("lab_test_requests");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "lab_test_requests", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2407,11 +2360,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         if ($this->lab_test_request_id->getSessionValue() != "") {
             $rsnew['lab_test_request_id'] = $this->lab_test_request_id->getSessionValue();
         }
-
-        // created_by_user_id
-        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            $rsnew['created_by_user_id'] = CurrentUserID();
-        }
         return $rsnew;
     }
 
@@ -2430,19 +2378,6 @@ class LabTestRequestsDetailsGrid extends LabTestRequestsDetails
         if (isset($row['lab_test_request_id'])) { // lab_test_request_id
             $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up master/detail based on QueryString

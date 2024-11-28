@@ -62,13 +62,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-    <tr id="r_report_title"<?= $Page->report_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_report_title"><?= $Page->report_title->caption() ?></span></td>
-        <td data-name="report_title"<?= $Page->report_title->cellAttributes() ?>>
-<span id="el_lab_test_reports_report_title">
-<span<?= $Page->report_title->viewAttributes() ?>>
-<?= $Page->report_title->getViewValue() ?></span>
+<?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
+    <tr id="r_lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_requests_queue_id"><?= $Page->lab_test_requests_queue_id->caption() ?></span></td>
+        <td data-name="lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->cellAttributes() ?>>
+<span id="el_lab_test_reports_lab_test_requests_queue_id">
+<span<?= $Page->lab_test_requests_queue_id->viewAttributes() ?>>
+<?= $Page->lab_test_requests_queue_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -102,28 +102,6 @@ loadjs.ready("head", function () {
 <span id="el_lab_test_reports_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_lab_test_reports_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el_lab_test_reports_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

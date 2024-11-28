@@ -34,6 +34,7 @@ C:\wamp64\www\afyaplus\controllers\MedicineStockReportController.php
 C:\wamp64\www\afyaplus\controllers\MedicineSuppliersController.php
 C:\wamp64\www\afyaplus\controllers\OthersController.php
 C:\wamp64\www\afyaplus\controllers\PatientAppointmentsController.php
+C:\wamp64\www\afyaplus\controllers\PatientQueueController.php
 C:\wamp64\www\afyaplus\controllers\PatientVaccinationsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVisitsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVitalsController.php
@@ -228,8 +229,16 @@ C:\wamp64\www\afyaplus\models\PatientAppointments.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsAdd.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsDelete.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsEdit.php
+C:\wamp64\www\afyaplus\models\PatientAppointmentsGrid.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsList.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsView.php
+C:\wamp64\www\afyaplus\models\PatientQueue.php
+C:\wamp64\www\afyaplus\models\PatientQueueAdd.php
+C:\wamp64\www\afyaplus\models\PatientQueueDelete.php
+C:\wamp64\www\afyaplus\models\PatientQueueEdit.php
+C:\wamp64\www\afyaplus\models\PatientQueueGrid.php
+C:\wamp64\www\afyaplus\models\PatientQueueList.php
+C:\wamp64\www\afyaplus\models\PatientQueueView.php
 C:\wamp64\www\afyaplus\models\PatientVaccinations.php
 C:\wamp64\www\afyaplus\models\PatientVaccinationsAdd.php
 C:\wamp64\www\afyaplus\models\PatientVaccinationsDelete.php
@@ -243,6 +252,7 @@ C:\wamp64\www\afyaplus\models\PatientVisitsDelete.php
 C:\wamp64\www\afyaplus\models\PatientVisitsEdit.php
 C:\wamp64\www\afyaplus\models\PatientVisitsGrid.php
 C:\wamp64\www\afyaplus\models\PatientVisitsList.php
+C:\wamp64\www\afyaplus\models\PatientVisitsSearch.php
 C:\wamp64\www\afyaplus\models\PatientVisitsView.php
 C:\wamp64\www\afyaplus\models\PatientVitals.php
 C:\wamp64\www\afyaplus\models\PatientVitalsAdd.php
@@ -430,6 +440,7 @@ C:\wamp64\www\afyaplus\src\Entity\MedicineStockReport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineSupplier.php
 C:\wamp64\www\afyaplus\src\Entity\Patient.php
 C:\wamp64\www\afyaplus\src\Entity\PatientAppointment.php
+C:\wamp64\www\afyaplus\src\Entity\PatientQueue.php
 C:\wamp64\www\afyaplus\src\Entity\PatientVaccination.php
 C:\wamp64\www\afyaplus\src\Entity\PatientVisit.php
 C:\wamp64\www\afyaplus\src\Entity\PatientVital.php
@@ -629,6 +640,7 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsQueueDelete.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueEdit.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueGrid.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueList.php
+C:\wamp64\www\afyaplus\views\LabTestRequestsQueueMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingList.php
@@ -673,8 +685,15 @@ C:\wamp64\www\afyaplus\views\MedicineSuppliersView.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsAdd.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsDelete.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsEdit.php
+C:\wamp64\www\afyaplus\views\PatientAppointmentsGrid.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsList.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsView.php
+C:\wamp64\www\afyaplus\views\PatientQueueAdd.php
+C:\wamp64\www\afyaplus\views\PatientQueueDelete.php
+C:\wamp64\www\afyaplus\views\PatientQueueEdit.php
+C:\wamp64\www\afyaplus\views\PatientQueueGrid.php
+C:\wamp64\www\afyaplus\views\PatientQueueList.php
+C:\wamp64\www\afyaplus\views\PatientQueueView.php
 C:\wamp64\www\afyaplus\views\PatientVaccinationsAdd.php
 C:\wamp64\www\afyaplus\views\PatientVaccinationsDelete.php
 C:\wamp64\www\afyaplus\views\PatientVaccinationsEdit.php
@@ -687,6 +706,7 @@ C:\wamp64\www\afyaplus\views\PatientVisitsEdit.php
 C:\wamp64\www\afyaplus\views\PatientVisitsGrid.php
 C:\wamp64\www\afyaplus\views\PatientVisitsList.php
 C:\wamp64\www\afyaplus\views\PatientVisitsMaster.php
+C:\wamp64\www\afyaplus\views\PatientVisitsSearch.php
 C:\wamp64\www\afyaplus\views\PatientVisitsView.php
 C:\wamp64\www\afyaplus\views\PatientVitalsAdd.php
 C:\wamp64\www\afyaplus\views\PatientVitalsDelete.php

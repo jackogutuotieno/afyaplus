@@ -199,6 +199,7 @@ class RadiologyRequests extends DbTable
         $this->visit_id->Raw = true;
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
+        $this->visit_id->Sortable = false; // Allow sort
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
@@ -1234,6 +1235,7 @@ class RadiologyRequests extends DbTable
         // patient_id
 
         // visit_id
+        $this->visit_id->CellCssStyle = "white-space: nowrap;";
 
         // status
 
@@ -1410,7 +1412,6 @@ class RadiologyRequests extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->test_title);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
@@ -1419,7 +1420,6 @@ class RadiologyRequests extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->test_title);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
@@ -1453,7 +1453,6 @@ class RadiologyRequests extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->test_title);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
@@ -1462,7 +1461,6 @@ class RadiologyRequests extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->test_title);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);

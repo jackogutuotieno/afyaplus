@@ -117,16 +117,48 @@ loadjs.ready("head", function () {
     </div> <!-- ./col -->
     <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
-            <p><slot class="ew-slot" name="tpx_section"></slot></p>
+            <p><slot class="ew-slot" name="tpc_patient_visits_visit_type_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_visit_type_id"></slot></p>
         </div>
     </div> <!-- ./col -->
     <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
-            <p><slot class="ew-slot" name="tpx_checkin_date"></slot></p>
+            <p><slot class="ew-slot" name="tpc_patient_visits_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_date_created"></slot></p>
         </div>
     </div> <!-- ./col -->  
 </div> <!-- ./row --></div>
 </template>
+<?php
+    if (in_array("patient_queue", explode(",", $Page->getCurrentDetailTable())) && $patient_queue->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_queue", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_queue")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientQueueGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_vitals->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vitals", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_vitals")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientVitalsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("doctor_notes", explode(",", $Page->getCurrentDetailTable())) && $doctor_notes->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("doctor_notes", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("doctor_notes")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "DoctorNotesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

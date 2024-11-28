@@ -24,19 +24,17 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["report_title", [fields.report_title.visible && fields.report_title.required ? ew.Validators.required(fields.report_title.caption) : null], fields.report_title.isInvalid],
+            ["lab_test_requests_queue_id", [fields.lab_test_requests_queue_id.visible && fields.lab_test_requests_queue_id.required ? ew.Validators.required(fields.lab_test_requests_queue_id.caption) : null, ew.Validators.integer], fields.lab_test_requests_queue_id.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
-            ["lab_test_requests_details_id", [fields.lab_test_requests_details_id.visible && fields.lab_test_requests_details_id.required ? ew.Validators.required(fields.lab_test_requests_details_id.caption) : null, ew.Validators.integer], fields.lab_test_requests_details_id.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
+            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["report_title",false],["details",false],["created_by_user_id",false],["date_created",false],["date_updated",false],["lab_test_requests_details_id",false]];
+                    fields = [["lab_test_requests_queue_id",false],["details",false],["created_by_user_id",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -56,6 +54,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "created_by_user_id": <?= $Grid->created_by_user_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -93,8 +92,8 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
 <?php } ?>
-<?php if ($Grid->report_title->Visible) { // report_title ?>
-        <th data-name="report_title" class="<?= $Grid->report_title->headerCellClass() ?>"><div id="elh_lab_test_reports_report_title" class="lab_test_reports_report_title"><?= $Grid->renderFieldHeader($Grid->report_title) ?></div></th>
+<?php if ($Grid->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
+        <th data-name="lab_test_requests_queue_id" class="<?= $Grid->lab_test_requests_queue_id->headerCellClass() ?>"><div id="elh_lab_test_reports_lab_test_requests_queue_id" class="lab_test_reports_lab_test_requests_queue_id"><?= $Grid->renderFieldHeader($Grid->lab_test_requests_queue_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->details->Visible) { // details ?>
         <th data-name="details" class="<?= $Grid->details->headerCellClass() ?>"><div id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Grid->renderFieldHeader($Grid->details) ?></div></th>
@@ -104,12 +103,6 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_lab_test_reports_date_created" class="lab_test_reports_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Grid->date_updated->headerCellClass() ?>"><div id="elh_lab_test_reports_date_updated" class="lab_test_reports_date_updated"><?= $Grid->renderFieldHeader($Grid->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Grid->lab_test_requests_details_id->Visible) { // lab_test_requests_details_id ?>
-        <th data-name="lab_test_requests_details_id" class="<?= $Grid->lab_test_requests_details_id->headerCellClass() ?>"><div id="elh_lab_test_reports_lab_test_requests_details_id" class="lab_test_reports_lab_test_requests_details_id"><?= $Grid->renderFieldHeader($Grid->lab_test_requests_details_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -174,29 +167,41 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php } else { ?>
             <input type="hidden" data-table="lab_test_reports" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
-    <?php if ($Grid->report_title->Visible) { // report_title ?>
-        <td data-name="report_title"<?= $Grid->report_title->cellAttributes() ?>>
+    <?php if ($Grid->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
+        <td data-name="lab_test_requests_queue_id"<?= $Grid->lab_test_requests_queue_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_report_title" class="el_lab_test_reports_report_title">
-<input type="<?= $Grid->report_title->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_report_title" id="x<?= $Grid->RowIndex ?>_report_title" data-table="lab_test_reports" data-field="x_report_title" value="<?= $Grid->report_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->report_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->report_title->formatPattern()) ?>"<?= $Grid->report_title->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->report_title->getErrorMessage() ?></div>
+<?php if ($Grid->lab_test_requests_queue_id->getSessionValue() != "") { ?>
+<span<?= $Grid->lab_test_requests_queue_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_requests_queue_id->getDisplayValue($Grid->lab_test_requests_queue_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" name="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" value="<?= HtmlEncode($Grid->lab_test_requests_queue_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_queue_id" class="el_lab_test_reports_lab_test_requests_queue_id">
+<input type="<?= $Grid->lab_test_requests_queue_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" id="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" value="<?= $Grid->lab_test_requests_queue_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_requests_queue_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_requests_queue_id->formatPattern()) ?>"<?= $Grid->lab_test_requests_queue_id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->lab_test_requests_queue_id->getErrorMessage() ?></div>
 </span>
-<input type="hidden" data-table="lab_test_reports" data-field="x_report_title" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_report_title" id="o<?= $Grid->RowIndex ?>_report_title" value="<?= HtmlEncode($Grid->report_title->OldValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" id="o<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" value="<?= HtmlEncode($Grid->lab_test_requests_queue_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_report_title" class="el_lab_test_reports_report_title">
-<input type="<?= $Grid->report_title->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_report_title" id="x<?= $Grid->RowIndex ?>_report_title" data-table="lab_test_reports" data-field="x_report_title" value="<?= $Grid->report_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->report_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->report_title->formatPattern()) ?>"<?= $Grid->report_title->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->report_title->getErrorMessage() ?></div>
+<?php if ($Grid->lab_test_requests_queue_id->getSessionValue() != "") { ?>
+<span<?= $Grid->lab_test_requests_queue_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_requests_queue_id->getDisplayValue($Grid->lab_test_requests_queue_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" name="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" value="<?= HtmlEncode($Grid->lab_test_requests_queue_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_queue_id" class="el_lab_test_reports_lab_test_requests_queue_id">
+<input type="<?= $Grid->lab_test_requests_queue_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" id="x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" value="<?= $Grid->lab_test_requests_queue_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_requests_queue_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_requests_queue_id->formatPattern()) ?>"<?= $Grid->lab_test_requests_queue_id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->lab_test_requests_queue_id->getErrorMessage() ?></div>
 </span>
 <?php } ?>
+<?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_report_title" class="el_lab_test_reports_report_title">
-<span<?= $Grid->report_title->viewAttributes() ?>>
-<?= $Grid->report_title->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_queue_id" class="el_lab_test_reports_lab_test_requests_queue_id">
+<span<?= $Grid->lab_test_requests_queue_id->viewAttributes() ?>>
+<?= $Grid->lab_test_requests_queue_id->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_reports" data-field="x_report_title" data-hidden="1" name="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_report_title" id="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_report_title" value="<?= HtmlEncode($Grid->report_title->FormValue) ?>">
-<input type="hidden" data-table="lab_test_reports" data-field="x_report_title" data-hidden="1" data-old name="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_report_title" id="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_report_title" value="<?= HtmlEncode($Grid->report_title->OldValue) ?>">
+<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" data-hidden="1" name="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" id="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" value="<?= HtmlEncode($Grid->lab_test_requests_queue_id->FormValue) ?>">
+<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" data-hidden="1" data-old name="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" id="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_lab_test_requests_queue_id" value="<?= HtmlEncode($Grid->lab_test_requests_queue_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -205,15 +210,27 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="details"<?= $Grid->details->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_details" class="el_lab_test_reports_details">
-<input type="<?= $Grid->details->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_details" id="x<?= $Grid->RowIndex ?>_details" data-table="lab_test_reports" data-field="x_details" value="<?= $Grid->details->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->details->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->details->formatPattern()) ?>"<?= $Grid->details->editAttributes() ?>>
+<?php $Grid->details->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="lab_test_reports" data-field="x_details" name="x<?= $Grid->RowIndex ?>_details" id="x<?= $Grid->RowIndex ?>_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->details->getPlaceHolder()) ?>"<?= $Grid->details->editAttributes() ?>><?= $Grid->details->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->details->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["flab_test_reportsgrid", "editor"], function() {
+    ew.createEditor("flab_test_reportsgrid", "x<?= $Grid->RowIndex ?>_details", 0, 0, <?= $Grid->details->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 <input type="hidden" data-table="lab_test_reports" data-field="x_details" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_details" id="o<?= $Grid->RowIndex ?>_details" value="<?= HtmlEncode($Grid->details->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_details" class="el_lab_test_reports_details">
-<input type="<?= $Grid->details->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_details" id="x<?= $Grid->RowIndex ?>_details" data-table="lab_test_reports" data-field="x_details" value="<?= $Grid->details->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->details->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->details->formatPattern()) ?>"<?= $Grid->details->editAttributes() ?>>
+<?php $Grid->details->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="lab_test_reports" data-field="x_details" name="x<?= $Grid->RowIndex ?>_details" id="x<?= $Grid->RowIndex ?>_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->details->getPlaceHolder()) ?>"<?= $Grid->details->editAttributes() ?>><?= $Grid->details->EditValue ?></textarea>
 <div class="invalid-feedback"><?= $Grid->details->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["flab_test_reportsgrid", "editor"], function() {
+    ew.createEditor("flab_test_reportsgrid", "x<?= $Grid->RowIndex ?>_details", 0, 0, <?= $Grid->details->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -233,12 +250,46 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue) ?></span></span>
 <input type="hidden" data-table="lab_test_reports" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_created_by_user_id" class="el_lab_test_reports_created_by_user_id">
-<input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="lab_test_reports" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_created_by_user_id"
+        name="x<?= $Grid->RowIndex ?>_created_by_user_id"
+        class="form-select ew-select<?= $Grid->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_reportsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id"
+        <?php } ?>
+        data-table="lab_test_reports"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Grid->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Grid->created_by_user_id->editAttributes() ?>>
+        <?= $Grid->created_by_user_id->selectOptionListHtml("x{$Grid->RowIndex}_created_by_user_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
+<?= $Grid->created_by_user_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_created_by_user_id") ?>
+<?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flab_test_reportsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_created_by_user_id", selectId: "flab_test_reportsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_reportsgrid.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "flab_test_reportsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "flab_test_reportsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_reports.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <input type="hidden" data-table="lab_test_reports" data-field="x_created_by_user_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_created_by_user_id" id="o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
@@ -246,12 +297,46 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue) ?></span></span>
 <input type="hidden" data-table="lab_test_reports" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_created_by_user_id" class="el_lab_test_reports_created_by_user_id">
-<input type="<?= $Grid->created_by_user_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" data-table="lab_test_reports" data-field="x_created_by_user_id" value="<?= $Grid->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->created_by_user_id->formatPattern()) ?>"<?= $Grid->created_by_user_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_created_by_user_id"
+        name="x<?= $Grid->RowIndex ?>_created_by_user_id"
+        class="form-select ew-select<?= $Grid->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_reportsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id"
+        <?php } ?>
+        data-table="lab_test_reports"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Grid->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Grid->created_by_user_id->editAttributes() ?>>
+        <?= $Grid->created_by_user_id->selectOptionListHtml("x{$Grid->RowIndex}_created_by_user_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
+<?= $Grid->created_by_user_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_created_by_user_id") ?>
+<?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flab_test_reportsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_created_by_user_id", selectId: "flab_test_reportsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_reportsgrid.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "flab_test_reportsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "flab_test_reportsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_reports.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php } ?>
@@ -348,130 +433,6 @@ loadjs.ready(["flab_test_reportsgrid", "datetimepicker"], function () {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="lab_test_reports" data-field="x_date_created" data-hidden="1" name="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_date_created" id="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->FormValue) ?>">
 <input type="hidden" data-table="lab_test_reports" data-field="x_date_created" data-hidden="1" data-old name="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_date_created" id="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Grid->date_updated->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_date_updated" class="el_lab_test_reports_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="lab_test_reports" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["flab_test_reportsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("flab_test_reportsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="lab_test_reports" data-field="x_date_updated" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_date_updated" id="o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_date_updated" class="el_lab_test_reports_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="lab_test_reports" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["flab_test_reportsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("flab_test_reportsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_date_updated" class="el_lab_test_reports_date_updated">
-<span<?= $Grid->date_updated->viewAttributes() ?>>
-<?= $Grid->date_updated->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_reports" data-field="x_date_updated" data-hidden="1" name="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_date_updated" id="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->FormValue) ?>">
-<input type="hidden" data-table="lab_test_reports" data-field="x_date_updated" data-hidden="1" data-old name="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_date_updated" id="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->lab_test_requests_details_id->Visible) { // lab_test_requests_details_id ?>
-        <td data-name="lab_test_requests_details_id"<?= $Grid->lab_test_requests_details_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->lab_test_requests_details_id->getSessionValue() != "") { ?>
-<span<?= $Grid->lab_test_requests_details_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_requests_details_id->getDisplayValue($Grid->lab_test_requests_details_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" name="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" value="<?= HtmlEncode($Grid->lab_test_requests_details_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_details_id" class="el_lab_test_reports_lab_test_requests_details_id">
-<input type="<?= $Grid->lab_test_requests_details_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" id="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" data-table="lab_test_reports" data-field="x_lab_test_requests_details_id" value="<?= $Grid->lab_test_requests_details_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_requests_details_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_requests_details_id->formatPattern()) ?>"<?= $Grid->lab_test_requests_details_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->lab_test_requests_details_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_details_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_lab_test_requests_details_id" id="o<?= $Grid->RowIndex ?>_lab_test_requests_details_id" value="<?= HtmlEncode($Grid->lab_test_requests_details_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->lab_test_requests_details_id->getSessionValue() != "") { ?>
-<span<?= $Grid->lab_test_requests_details_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_requests_details_id->getDisplayValue($Grid->lab_test_requests_details_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" name="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" value="<?= HtmlEncode($Grid->lab_test_requests_details_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_details_id" class="el_lab_test_reports_lab_test_requests_details_id">
-<input type="<?= $Grid->lab_test_requests_details_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" id="x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" data-table="lab_test_reports" data-field="x_lab_test_requests_details_id" value="<?= $Grid->lab_test_requests_details_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_requests_details_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_requests_details_id->formatPattern()) ?>"<?= $Grid->lab_test_requests_details_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->lab_test_requests_details_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_reports_lab_test_requests_details_id" class="el_lab_test_reports_lab_test_requests_details_id">
-<span<?= $Grid->lab_test_requests_details_id->viewAttributes() ?>>
-<?= $Grid->lab_test_requests_details_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_details_id" data-hidden="1" name="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" id="flab_test_reportsgrid$x<?= $Grid->RowIndex ?>_lab_test_requests_details_id" value="<?= HtmlEncode($Grid->lab_test_requests_details_id->FormValue) ?>">
-<input type="hidden" data-table="lab_test_reports" data-field="x_lab_test_requests_details_id" data-hidden="1" data-old name="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_lab_test_requests_details_id" id="flab_test_reportsgrid$o<?= $Grid->RowIndex ?>_lab_test_requests_details_id" value="<?= HtmlEncode($Grid->lab_test_requests_details_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
