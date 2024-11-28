@@ -172,9 +172,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
         <th data-name="physical_address" class="<?= $Page->physical_address->headerCellClass() ?>"><div id="elh_medicine_suppliers_physical_address" class="medicine_suppliers_physical_address"><?= $Page->renderFieldHeader($Page->physical_address) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_medicine_suppliers_created_by_user_id" class="medicine_suppliers_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_suppliers_date_created" class="medicine_suppliers_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -229,7 +226,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_phone" class="el_medicine_suppliers_phone">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -237,7 +239,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_email_address" class="el_medicine_suppliers_email_address">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -246,14 +253,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_physical_address" class="el_medicine_suppliers_physical_address">
 <span<?= $Page->physical_address->viewAttributes() ?>>
 <?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_created_by_user_id" class="el_medicine_suppliers_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

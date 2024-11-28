@@ -39,9 +39,6 @@ class MedicineBrand extends AbstractEntity
     #[Column(name: "brand_name", type: "string")]
     private string $brandName;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -78,17 +75,6 @@ class MedicineBrand extends AbstractEntity
     public function setBrandName(string $value): static
     {
         $this->brandName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

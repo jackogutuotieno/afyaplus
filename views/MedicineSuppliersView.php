@@ -79,7 +79,12 @@ loadjs.ready("head", function () {
         <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
 <span id="el_medicine_suppliers_phone">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -90,7 +95,12 @@ loadjs.ready("head", function () {
         <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
 <span id="el_medicine_suppliers_email_address">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -102,17 +112,6 @@ loadjs.ready("head", function () {
 <span id="el_medicine_suppliers_physical_address">
 <span<?= $Page->physical_address->viewAttributes() ?>>
 <?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_suppliers_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el_medicine_suppliers_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

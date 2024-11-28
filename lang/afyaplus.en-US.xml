@@ -1,4 +1,4 @@
-<ew-language date="2024/11/28" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/29" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare ERP Platform" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -612,70 +612,74 @@
     <table id="medicine_brands">
       <phrase id="tblcaption" value="medicine brands" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Brand ID" />
       </field>
       <field id="category_id">
-        <phrase id="fldcaption" value="category id" />
+        <phrase id="fldcaption" value="Categry" />
       </field>
       <field id="brand_name">
-        <phrase id="fldcaption" value="brand name" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Brand Name" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Created" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="LAst Updated" />
       </field>
     </table>
     <table id="medicine_categories">
-      <phrase id="tblcaption" value="medicine categories" />
+      <phrase id="tblcaption" value="Medicine Categories" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Categry ID" />
       </field>
       <field id="category_name">
-        <phrase id="fldcaption" value="category name" />
+        <phrase id="fldcaption" value="Category" />
       </field>
       <field id="description">
-        <phrase id="fldcaption" value="description" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Description" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="medicine_dispensation">
       <phrase id="tblcaption" value="medicine dispensation" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="prescription_id">
-        <phrase id="fldcaption" value="prescription id" />
+        <phrase id="fldcaption" value="Prescription ID" />
       </field>
       <field id="dispensation_type">
-        <phrase id="fldcaption" value="dispensation type" />
+        <phrase id="fldcaption" value="Dispensation Type" />
+        <phrase id="fldtagvalue1" value="Internal" />
+        <phrase id="fldtagcaption1" value="Internal" />
+        <phrase id="fldtagvalue2" value="Walk-In" />
+        <phrase id="fldtagcaption2" value="Walk-In" />
+        <phrase id="fldtagvalue3" value="Referral Facility" />
+        <phrase id="fldtagcaption3" value="Referral Facility" />
       </field>
       <field id="status">
-        <phrase id="fldcaption" value="status" />
+        <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Done" />
+        <phrase id="fldtagcaption1" value="Done" />
+        <phrase id="fldtagvalue2" value="Cancelled" />
+        <phrase id="fldtagcaption2" value="Cancelled" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Prepared By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="medicine_dispensation_details">
@@ -687,10 +691,10 @@
         <phrase id="fldcaption" value="medicine dispensation id" />
       </field>
       <field id="medicine_stock_id">
-        <phrase id="fldcaption" value="medicine stock id" />
+        <phrase id="fldcaption" value="Medicine Brand" />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="quantity" />
+        <phrase id="fldcaption" value="Quantity Issued" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="date created" />
@@ -700,45 +704,52 @@
       </field>
     </table>
     <table id="medicine_stock">
-      <phrase id="tblcaption" value="medicine stock" />
+      <phrase id="tblcaption" value="Medicine Stock" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="supplier_id">
-        <phrase id="fldcaption" value="supplier id" />
+        <phrase id="fldcaption" value="Supplier" />
       </field>
       <field id="brand_id">
-        <phrase id="fldcaption" value="brand id" />
+        <phrase id="fldcaption" value="Medicine Brand" />
       </field>
       <field id="batch_number">
-        <phrase id="fldcaption" value="batch number" />
+        <phrase id="fldcaption" value="Batch No." />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="quantity" />
+        <phrase id="fldcaption" value="Batch Qty" />
+      </field>
+      <field id="quantity_left">
+        <phrase id="fldcaption" value="Qty Left" />
       </field>
       <field id="measuring_unit">
-        <phrase id="fldcaption" value="measuring unit" />
+        <phrase id="fldcaption" value="Measuring Unit" />
+        <phrase id="fldtagvalue1" value="Pills" />
+        <phrase id="fldtagcaption1" value="Pills" />
+        <phrase id="fldtagvalue2" value="Packets" />
+        <phrase id="fldtagcaption2" value="Packets" />
+        <phrase id="fldtagvalue3" value="Litres" />
+        <phrase id="fldtagcaption3" value="Litres" />
+        <phrase id="fldtagvalue4" value="Bottles" />
+        <phrase id="fldtagcaption4" value="Bottles" />
+        <phrase id="fldtagvalue5" value="Syringes" />
+        <phrase id="fldtagcaption5" value="Syringes" />
       </field>
       <field id="buying_price_per_unit">
-        <phrase id="fldcaption" value="buying price per unit" />
+        <phrase id="fldcaption" value="BP/Unit (Kshs)" />
       </field>
       <field id="selling_price_per_unit">
-        <phrase id="fldcaption" value="selling price per unit" />
+        <phrase id="fldcaption" value="SP/Unit/Kshs)" />
       </field>
       <field id="expiry_date">
-        <phrase id="fldcaption" value="expiry date" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
-      </field>
-      <field id="modified_by_user_id">
-        <phrase id="fldcaption" value="modified by user id" />
+        <phrase id="fldcaption" value="Expiry Date" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Update" />
       </field>
     </table>
     <table id="medicine_stock_report">
@@ -786,28 +797,25 @@
     <table id="medicine_suppliers">
       <phrase id="tblcaption" value="medicine suppliers" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Suier ID" />
       </field>
       <field id="supplier_name">
-        <phrase id="fldcaption" value="supplier name" />
+        <phrase id="fldcaption" value="Suppier" />
       </field>
       <field id="phone">
-        <phrase id="fldcaption" value="phone" />
+        <phrase id="fldcaption" value="Phone" />
       </field>
       <field id="email_address">
-        <phrase id="fldcaption" value="email address" />
+        <phrase id="fldcaption" value="Email" />
       </field>
       <field id="physical_address">
-        <phrase id="fldcaption" value="physical address" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Physical Address" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="patient_appointments">
@@ -1420,6 +1428,8 @@
         <phrase id="fldtagcaption6" value="Nurse" />
         <phrase id="fldtagvalue7" value="4" />
         <phrase id="fldtagcaption7" value="Laboratorist" />
+        <phrase id="fldtagvalue8" value="5" />
+        <phrase id="fldtagcaption8" value="Pharmacist" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="Active?" />

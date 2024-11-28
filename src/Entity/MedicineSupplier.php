@@ -45,9 +45,6 @@ class MedicineSupplier extends AbstractEntity
     #[Column(name: "physical_address", type: "text", nullable: true)]
     private ?string $physicalAddress;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -106,17 +103,6 @@ class MedicineSupplier extends AbstractEntity
     public function setPhysicalAddress(?string $value): static
     {
         $this->physicalAddress = RemoveXss($value);
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

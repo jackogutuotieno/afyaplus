@@ -121,10 +121,9 @@ class MedicineBrandsDelete extends MedicineBrands
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->category_id->setVisibility();
         $this->brand_name->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -415,6 +414,9 @@ class MedicineBrandsDelete extends MedicineBrands
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -428,25 +430,6 @@ class MedicineBrandsDelete extends MedicineBrands
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
-
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("medicinebrandslist"); // Return to list
-            return;
-        }
 
         // Get action
         if (IsApi()) {
@@ -619,7 +602,6 @@ class MedicineBrandsDelete extends MedicineBrands
         $this->id->setDbValue($row['id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->brand_name->setDbValue($row['brand_name']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -631,7 +613,6 @@ class MedicineBrandsDelete extends MedicineBrands
         $row['id'] = $this->id->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
         $row['brand_name'] = $this->brand_name->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -655,8 +636,6 @@ class MedicineBrandsDelete extends MedicineBrands
 
         // brand_name
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -667,15 +646,30 @@ class MedicineBrandsDelete extends MedicineBrands
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // brand_name
             $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -685,10 +679,6 @@ class MedicineBrandsDelete extends MedicineBrands
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // category_id
             $this->category_id->HrefValue = "";
             $this->category_id->TooltipValue = "";
@@ -696,10 +686,6 @@ class MedicineBrandsDelete extends MedicineBrands
             // brand_name
             $this->brand_name->HrefValue = "";
             $this->brand_name->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -815,16 +801,6 @@ class MedicineBrandsDelete extends MedicineBrands
         return $deleteRows;
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -849,6 +825,8 @@ class MedicineBrandsDelete extends MedicineBrands
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

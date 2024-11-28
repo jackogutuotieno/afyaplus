@@ -172,6 +172,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_medicine_stock_quantity" class="medicine_stock_quantity"><?= $Page->renderFieldHeader($Page->quantity) ?></div></th>
 <?php } ?>
+<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+        <th data-name="quantity_left" class="<?= $Page->quantity_left->headerCellClass() ?>"><div id="elh_medicine_stock_quantity_left" class="medicine_stock_quantity_left"><?= $Page->renderFieldHeader($Page->quantity_left) ?></div></th>
+<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
         <th data-name="measuring_unit" class="<?= $Page->measuring_unit->headerCellClass() ?>"><div id="elh_medicine_stock_measuring_unit" class="medicine_stock_measuring_unit"><?= $Page->renderFieldHeader($Page->measuring_unit) ?></div></th>
 <?php } ?>
@@ -183,12 +186,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->expiry_date->Visible) { // expiry_date ?>
         <th data-name="expiry_date" class="<?= $Page->expiry_date->headerCellClass() ?>"><div id="elh_medicine_stock_expiry_date" class="medicine_stock_expiry_date"><?= $Page->renderFieldHeader($Page->expiry_date) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_medicine_stock_created_by_user_id" class="medicine_stock_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-        <th data-name="modified_by_user_id" class="<?= $Page->modified_by_user_id->headerCellClass() ?>"><div id="elh_medicine_stock_modified_by_user_id" class="medicine_stock_modified_by_user_id"><?= $Page->renderFieldHeader($Page->modified_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_stock_date_created" class="medicine_stock_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -264,6 +261,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+        <td data-name="quantity_left"<?= $Page->quantity_left->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_quantity_left" class="el_medicine_stock_quantity_left">
+<span<?= $Page->quantity_left->viewAttributes() ?>>
+<?= $Page->quantity_left->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
         <td data-name="measuring_unit"<?= $Page->measuring_unit->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_measuring_unit" class="el_medicine_stock_measuring_unit">
@@ -293,22 +298,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_expiry_date" class="el_medicine_stock_expiry_date">
 <span<?= $Page->expiry_date->viewAttributes() ?>>
 <?= $Page->expiry_date->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_created_by_user_id" class="el_medicine_stock_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-        <td data-name="modified_by_user_id"<?= $Page->modified_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_modified_by_user_id" class="el_medicine_stock_modified_by_user_id">
-<span<?= $Page->modified_by_user_id->viewAttributes() ?>>
-<?= $Page->modified_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

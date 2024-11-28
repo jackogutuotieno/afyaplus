@@ -144,12 +144,11 @@ class MedicineStockView extends MedicineStock
         $this->brand_id->setVisibility();
         $this->batch_number->setVisibility();
         $this->quantity->setVisibility();
+        $this->quantity_left->setVisibility();
         $this->measuring_unit->setVisibility();
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->modified_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -566,6 +565,11 @@ class MedicineStockView extends MedicineStock
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->supplier_id);
+        $this->setupLookupOptions($this->brand_id);
+        $this->setupLookupOptions($this->measuring_unit);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -698,17 +702,7 @@ class MedicineStockView extends MedicineStock
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
-
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd() && $this->showOptionLink("add");
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Delete
         $item = &$option->add("delete");
@@ -717,7 +711,7 @@ class MedicineStockView extends MedicineStock
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete");
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
 
         // Set up action default
         $option = $options["action"];
@@ -827,12 +821,11 @@ class MedicineStockView extends MedicineStock
         $this->brand_id->setDbValue($row['brand_id']);
         $this->batch_number->setDbValue($row['batch_number']);
         $this->quantity->setDbValue($row['quantity']);
+        $this->quantity_left->setDbValue($row['quantity_left']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
-        $this->modified_by_user_id->setDbValue($row['modified_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -846,12 +839,11 @@ class MedicineStockView extends MedicineStock
         $row['brand_id'] = $this->brand_id->DefaultValue;
         $row['batch_number'] = $this->batch_number->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
+        $row['quantity_left'] = $this->quantity_left->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['buying_price_per_unit'] = $this->buying_price_per_unit->DefaultValue;
         $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
-        $row['modified_by_user_id'] = $this->modified_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -885,6 +877,8 @@ class MedicineStockView extends MedicineStock
 
         // quantity
 
+        // quantity_left
+
         // measuring_unit
 
         // buying_price_per_unit
@@ -892,10 +886,6 @@ class MedicineStockView extends MedicineStock
         // selling_price_per_unit
 
         // expiry_date
-
-        // created_by_user_id
-
-        // modified_by_user_id
 
         // date_created
 
@@ -907,12 +897,50 @@ class MedicineStockView extends MedicineStock
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // supplier_id
-            $this->supplier_id->ViewValue = $this->supplier_id->CurrentValue;
-            $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+            $curVal = strval($this->supplier_id->CurrentValue);
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    } else {
+                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->supplier_id->ViewValue = null;
+            }
 
             // brand_id
-            $this->brand_id->ViewValue = $this->brand_id->CurrentValue;
-            $this->brand_id->ViewValue = FormatNumber($this->brand_id->ViewValue, $this->brand_id->formatPattern());
+            $curVal = strval($this->brand_id->CurrentValue);
+            if ($curVal != "") {
+                $this->brand_id->ViewValue = $this->brand_id->lookupCacheOption($curVal);
+                if ($this->brand_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->brand_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->brand_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->brand_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->brand_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->brand_id->ViewValue = $this->brand_id->displayValue($arwrk);
+                    } else {
+                        $this->brand_id->ViewValue = FormatNumber($this->brand_id->CurrentValue, $this->brand_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->brand_id->ViewValue = null;
+            }
 
             // batch_number
             $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
@@ -920,6 +948,10 @@ class MedicineStockView extends MedicineStock
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+
+            // quantity_left
+            $this->quantity_left->ViewValue = $this->quantity_left->CurrentValue;
+            $this->quantity_left->ViewValue = FormatNumber($this->quantity_left->ViewValue, $this->quantity_left->formatPattern());
 
             // measuring_unit
             $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
@@ -935,14 +967,6 @@ class MedicineStockView extends MedicineStock
             // expiry_date
             $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
             $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
-            // modified_by_user_id
-            $this->modified_by_user_id->ViewValue = $this->modified_by_user_id->CurrentValue;
-            $this->modified_by_user_id->ViewValue = FormatNumber($this->modified_by_user_id->ViewValue, $this->modified_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -972,6 +996,10 @@ class MedicineStockView extends MedicineStock
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
 
+            // quantity_left
+            $this->quantity_left->HrefValue = "";
+            $this->quantity_left->TooltipValue = "";
+
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
             $this->measuring_unit->TooltipValue = "";
@@ -987,14 +1015,6 @@ class MedicineStockView extends MedicineStock
             // expiry_date
             $this->expiry_date->HrefValue = "";
             $this->expiry_date->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // modified_by_user_id
-            $this->modified_by_user_id->HrefValue = "";
-            $this->modified_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1171,16 +1191,6 @@ class MedicineStockView extends MedicineStock
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1205,6 +1215,12 @@ class MedicineStockView extends MedicineStock
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_supplier_id":
+                    break;
+                case "x_brand_id":
+                    break;
+                case "x_measuring_unit":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

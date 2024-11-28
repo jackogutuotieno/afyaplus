@@ -29,9 +29,8 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null, ew.Validators.integer], fields.category_id.isInvalid],
+            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null], fields.category_id.isInvalid],
             ["brand_name", [fields.brand_name.visible && fields.brand_name.required ? ew.Validators.required(fields.brand_name.caption) : null], fields.brand_name.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -49,6 +48,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "category_id": <?= $Page->category_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -90,9 +90,43 @@ loadjs.ready("head", function () {
         <label id="elh_medicine_brands_category_id" for="x_category_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->category_id->caption() ?><?= $Page->category_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->category_id->cellAttributes() ?>>
 <span id="el_medicine_brands_category_id">
-<input type="<?= $Page->category_id->getInputTextType() ?>" name="x_category_id" id="x_category_id" data-table="medicine_brands" data-field="x_category_id" value="<?= $Page->category_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->category_id->formatPattern()) ?>"<?= $Page->category_id->editAttributes() ?> aria-describedby="x_category_id_help">
-<?= $Page->category_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+    <select
+        id="x_category_id"
+        name="x_category_id"
+        class="form-select ew-select<?= $Page->category_id->isInvalidClass() ?>"
+        <?php if (!$Page->category_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_brandsedit_x_category_id"
+        <?php } ?>
+        data-table="medicine_brands"
+        data-field="x_category_id"
+        data-value-separator="<?= $Page->category_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>"
+        <?= $Page->category_id->editAttributes() ?>>
+        <?= $Page->category_id->selectOptionListHtml("x_category_id") ?>
+    </select>
+    <?= $Page->category_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+<?= $Page->category_id->Lookup->getParamTag($Page, "p_x_category_id") ?>
+<?php if (!$Page->category_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_brandsedit", function() {
+    var options = { name: "x_category_id", selectId: "fmedicine_brandsedit_x_category_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_brandsedit.lists.category_id?.lookupOptions.length) {
+        options.data = { id: "x_category_id", form: "fmedicine_brandsedit" };
+    } else {
+        options.ajax = { id: "x_category_id", form: "fmedicine_brandsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_brands.fields.category_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -106,24 +140,6 @@ loadjs.ready("head", function () {
 <?= $Page->brand_name->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->brand_name->getErrorMessage() ?></div>
 </span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_medicine_brands_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="medicine_brands" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_medicine_brands_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="medicine_brands" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>

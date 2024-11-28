@@ -23,7 +23,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["medicine_dispensation_id", [fields.medicine_dispensation_id.visible && fields.medicine_dispensation_id.required ? ew.Validators.required(fields.medicine_dispensation_id.caption) : null, ew.Validators.integer], fields.medicine_dispensation_id.isInvalid],
-            ["medicine_stock_id", [fields.medicine_stock_id.visible && fields.medicine_stock_id.required ? ew.Validators.required(fields.medicine_stock_id.caption) : null, ew.Validators.integer], fields.medicine_stock_id.isInvalid],
+            ["medicine_stock_id", [fields.medicine_stock_id.visible && fields.medicine_stock_id.required ? ew.Validators.required(fields.medicine_stock_id.caption) : null], fields.medicine_stock_id.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
@@ -42,6 +42,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "medicine_stock_id": <?= $Page->medicine_stock_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -70,16 +71,26 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "medicine_dispensation") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="medicine_dispensation">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->medicine_dispensation_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
     <div id="r_medicine_dispensation_id"<?= $Page->medicine_dispensation_id->rowAttributes() ?>>
         <label id="elh_medicine_dispensation_details_medicine_dispensation_id" for="x_medicine_dispensation_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->medicine_dispensation_id->caption() ?><?= $Page->medicine_dispensation_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->medicine_dispensation_id->cellAttributes() ?>>
+<?php if ($Page->medicine_dispensation_id->getSessionValue() != "") { ?>
+<span<?= $Page->medicine_dispensation_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->medicine_dispensation_id->getDisplayValue($Page->medicine_dispensation_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_medicine_dispensation_id" name="x_medicine_dispensation_id" value="<?= HtmlEncode($Page->medicine_dispensation_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_medicine_dispensation_details_medicine_dispensation_id">
 <input type="<?= $Page->medicine_dispensation_id->getInputTextType() ?>" name="x_medicine_dispensation_id" id="x_medicine_dispensation_id" data-table="medicine_dispensation_details" data-field="x_medicine_dispensation_id" value="<?= $Page->medicine_dispensation_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->medicine_dispensation_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->medicine_dispensation_id->formatPattern()) ?>"<?= $Page->medicine_dispensation_id->editAttributes() ?> aria-describedby="x_medicine_dispensation_id_help">
 <?= $Page->medicine_dispensation_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->medicine_dispensation_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -88,9 +99,43 @@ $Page->showMessage();
         <label id="elh_medicine_dispensation_details_medicine_stock_id" for="x_medicine_stock_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->medicine_stock_id->caption() ?><?= $Page->medicine_stock_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->medicine_stock_id->cellAttributes() ?>>
 <span id="el_medicine_dispensation_details_medicine_stock_id">
-<input type="<?= $Page->medicine_stock_id->getInputTextType() ?>" name="x_medicine_stock_id" id="x_medicine_stock_id" data-table="medicine_dispensation_details" data-field="x_medicine_stock_id" value="<?= $Page->medicine_stock_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->medicine_stock_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->medicine_stock_id->formatPattern()) ?>"<?= $Page->medicine_stock_id->editAttributes() ?> aria-describedby="x_medicine_stock_id_help">
-<?= $Page->medicine_stock_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->medicine_stock_id->getErrorMessage() ?></div>
+    <select
+        id="x_medicine_stock_id"
+        name="x_medicine_stock_id"
+        class="form-select ew-select<?= $Page->medicine_stock_id->isInvalidClass() ?>"
+        <?php if (!$Page->medicine_stock_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_dispensation_detailsadd_x_medicine_stock_id"
+        <?php } ?>
+        data-table="medicine_dispensation_details"
+        data-field="x_medicine_stock_id"
+        data-value-separator="<?= $Page->medicine_stock_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->medicine_stock_id->getPlaceHolder()) ?>"
+        <?= $Page->medicine_stock_id->editAttributes() ?>>
+        <?= $Page->medicine_stock_id->selectOptionListHtml("x_medicine_stock_id") ?>
+    </select>
+    <?= $Page->medicine_stock_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->medicine_stock_id->getErrorMessage() ?></div>
+<?= $Page->medicine_stock_id->Lookup->getParamTag($Page, "p_x_medicine_stock_id") ?>
+<?php if (!$Page->medicine_stock_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_dispensation_detailsadd", function() {
+    var options = { name: "x_medicine_stock_id", selectId: "fmedicine_dispensation_detailsadd_x_medicine_stock_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_dispensation_detailsadd.lists.medicine_stock_id?.lookupOptions.length) {
+        options.data = { id: "x_medicine_stock_id", form: "fmedicine_dispensation_detailsadd" };
+    } else {
+        options.ajax = { id: "x_medicine_stock_id", form: "fmedicine_dispensation_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation_details.fields.medicine_stock_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

@@ -39,9 +39,6 @@ class MedicineCategory extends AbstractEntity
     #[Column(type: "text", nullable: true)]
     private ?string $description;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -78,17 +75,6 @@ class MedicineCategory extends AbstractEntity
     public function setDescription(?string $value): static
     {
         $this->description = RemoveXss($value);
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

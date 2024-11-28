@@ -150,7 +150,6 @@ class MedicineSuppliersList extends MedicineSuppliers
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
         $this->physical_address->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -1054,7 +1053,6 @@ class MedicineSuppliersList extends MedicineSuppliers
         $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
         $filterList = Concat($filterList, $this->email_address->AdvancedSearch->toJson(), ","); // Field email_address
         $filterList = Concat($filterList, $this->physical_address->AdvancedSearch->toJson(), ","); // Field physical_address
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1135,14 +1133,6 @@ class MedicineSuppliersList extends MedicineSuppliers
         $this->physical_address->AdvancedSearch->SearchValue2 = @$filter["y_physical_address"];
         $this->physical_address->AdvancedSearch->SearchOperator2 = @$filter["w_physical_address"];
         $this->physical_address->AdvancedSearch->save();
-
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1285,7 +1275,6 @@ class MedicineSuppliersList extends MedicineSuppliers
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
             $this->updateSort($this->physical_address); // physical_address
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1317,7 +1306,6 @@ class MedicineSuppliersList extends MedicineSuppliers
                 $this->phone->setSort("");
                 $this->email_address->setSort("");
                 $this->physical_address->setSort("");
-                $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1424,7 +1412,7 @@ class MedicineSuppliersList extends MedicineSuppliers
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"medicine_suppliers\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1437,7 +1425,7 @@ class MedicineSuppliersList extends MedicineSuppliers
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"medicine_suppliers\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1450,7 +1438,7 @@ class MedicineSuppliersList extends MedicineSuppliers
             // "copy"
             $opt = $this->ListOptions["copy"];
             $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
+            if ($Security->canAdd()) {
                 if ($this->ModalAdd && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"medicine_suppliers\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
                 } else {
@@ -1462,7 +1450,7 @@ class MedicineSuppliersList extends MedicineSuppliers
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1559,7 +1547,6 @@ class MedicineSuppliersList extends MedicineSuppliers
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
             $this->createColumnOption($option, "physical_address");
-            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2005,7 +1992,6 @@ class MedicineSuppliersList extends MedicineSuppliers
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2019,7 +2005,6 @@ class MedicineSuppliersList extends MedicineSuppliers
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2072,8 +2057,6 @@ class MedicineSuppliersList extends MedicineSuppliers
 
         // physical_address
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -2095,10 +2078,6 @@ class MedicineSuppliersList extends MedicineSuppliers
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2116,20 +2095,32 @@ class MedicineSuppliersList extends MedicineSuppliers
             $this->supplier_name->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
             $this->email_address->TooltipValue = "";
 
             // physical_address
             $this->physical_address->HrefValue = "";
             $this->physical_address->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2364,16 +2355,6 @@ class MedicineSuppliersList extends MedicineSuppliers
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

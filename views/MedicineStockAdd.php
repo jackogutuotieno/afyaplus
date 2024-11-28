@@ -22,16 +22,15 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["supplier_id", [fields.supplier_id.visible && fields.supplier_id.required ? ew.Validators.required(fields.supplier_id.caption) : null, ew.Validators.integer], fields.supplier_id.isInvalid],
-            ["brand_id", [fields.brand_id.visible && fields.brand_id.required ? ew.Validators.required(fields.brand_id.caption) : null, ew.Validators.integer], fields.brand_id.isInvalid],
+            ["supplier_id", [fields.supplier_id.visible && fields.supplier_id.required ? ew.Validators.required(fields.supplier_id.caption) : null], fields.supplier_id.isInvalid],
+            ["brand_id", [fields.brand_id.visible && fields.brand_id.required ? ew.Validators.required(fields.brand_id.caption) : null], fields.brand_id.isInvalid],
             ["batch_number", [fields.batch_number.visible && fields.batch_number.required ? ew.Validators.required(fields.batch_number.caption) : null], fields.batch_number.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
+            ["quantity_left", [fields.quantity_left.visible && fields.quantity_left.required ? ew.Validators.required(fields.quantity_left.caption) : null, ew.Validators.float], fields.quantity_left.isInvalid],
             ["measuring_unit", [fields.measuring_unit.visible && fields.measuring_unit.required ? ew.Validators.required(fields.measuring_unit.caption) : null], fields.measuring_unit.isInvalid],
             ["buying_price_per_unit", [fields.buying_price_per_unit.visible && fields.buying_price_per_unit.required ? ew.Validators.required(fields.buying_price_per_unit.caption) : null, ew.Validators.float], fields.buying_price_per_unit.isInvalid],
             ["selling_price_per_unit", [fields.selling_price_per_unit.visible && fields.selling_price_per_unit.required ? ew.Validators.required(fields.selling_price_per_unit.caption) : null, ew.Validators.float], fields.selling_price_per_unit.isInvalid],
             ["expiry_date", [fields.expiry_date.visible && fields.expiry_date.required ? ew.Validators.required(fields.expiry_date.caption) : null, ew.Validators.datetime(fields.expiry_date.clientFormatPattern)], fields.expiry_date.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["modified_by_user_id", [fields.modified_by_user_id.visible && fields.modified_by_user_id.required ? ew.Validators.required(fields.modified_by_user_id.caption) : null, ew.Validators.integer], fields.modified_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -49,6 +48,9 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "supplier_id": <?= $Page->supplier_id->toClientList($Page) ?>,
+            "brand_id": <?= $Page->brand_id->toClientList($Page) ?>,
+            "measuring_unit": <?= $Page->measuring_unit->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -83,9 +85,43 @@ $Page->showMessage();
         <label id="elh_medicine_stock_supplier_id" for="x_supplier_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->supplier_id->caption() ?><?= $Page->supplier_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->supplier_id->cellAttributes() ?>>
 <span id="el_medicine_stock_supplier_id">
-<input type="<?= $Page->supplier_id->getInputTextType() ?>" name="x_supplier_id" id="x_supplier_id" data-table="medicine_stock" data-field="x_supplier_id" value="<?= $Page->supplier_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->supplier_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->supplier_id->formatPattern()) ?>"<?= $Page->supplier_id->editAttributes() ?> aria-describedby="x_supplier_id_help">
-<?= $Page->supplier_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->supplier_id->getErrorMessage() ?></div>
+    <select
+        id="x_supplier_id"
+        name="x_supplier_id"
+        class="form-select ew-select<?= $Page->supplier_id->isInvalidClass() ?>"
+        <?php if (!$Page->supplier_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_stockadd_x_supplier_id"
+        <?php } ?>
+        data-table="medicine_stock"
+        data-field="x_supplier_id"
+        data-value-separator="<?= $Page->supplier_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->supplier_id->getPlaceHolder()) ?>"
+        <?= $Page->supplier_id->editAttributes() ?>>
+        <?= $Page->supplier_id->selectOptionListHtml("x_supplier_id") ?>
+    </select>
+    <?= $Page->supplier_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->supplier_id->getErrorMessage() ?></div>
+<?= $Page->supplier_id->Lookup->getParamTag($Page, "p_x_supplier_id") ?>
+<?php if (!$Page->supplier_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_stockadd", function() {
+    var options = { name: "x_supplier_id", selectId: "fmedicine_stockadd_x_supplier_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_stockadd.lists.supplier_id?.lookupOptions.length) {
+        options.data = { id: "x_supplier_id", form: "fmedicine_stockadd" };
+    } else {
+        options.ajax = { id: "x_supplier_id", form: "fmedicine_stockadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_stock.fields.supplier_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -95,9 +131,43 @@ $Page->showMessage();
         <label id="elh_medicine_stock_brand_id" for="x_brand_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->brand_id->caption() ?><?= $Page->brand_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->brand_id->cellAttributes() ?>>
 <span id="el_medicine_stock_brand_id">
-<input type="<?= $Page->brand_id->getInputTextType() ?>" name="x_brand_id" id="x_brand_id" data-table="medicine_stock" data-field="x_brand_id" value="<?= $Page->brand_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->brand_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->brand_id->formatPattern()) ?>"<?= $Page->brand_id->editAttributes() ?> aria-describedby="x_brand_id_help">
-<?= $Page->brand_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->brand_id->getErrorMessage() ?></div>
+    <select
+        id="x_brand_id"
+        name="x_brand_id"
+        class="form-select ew-select<?= $Page->brand_id->isInvalidClass() ?>"
+        <?php if (!$Page->brand_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_stockadd_x_brand_id"
+        <?php } ?>
+        data-table="medicine_stock"
+        data-field="x_brand_id"
+        data-value-separator="<?= $Page->brand_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->brand_id->getPlaceHolder()) ?>"
+        <?= $Page->brand_id->editAttributes() ?>>
+        <?= $Page->brand_id->selectOptionListHtml("x_brand_id") ?>
+    </select>
+    <?= $Page->brand_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->brand_id->getErrorMessage() ?></div>
+<?= $Page->brand_id->Lookup->getParamTag($Page, "p_x_brand_id") ?>
+<?php if (!$Page->brand_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_stockadd", function() {
+    var options = { name: "x_brand_id", selectId: "fmedicine_stockadd_x_brand_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_stockadd.lists.brand_id?.lookupOptions.length) {
+        options.data = { id: "x_brand_id", form: "fmedicine_stockadd" };
+    } else {
+        options.ajax = { id: "x_brand_id", form: "fmedicine_stockadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_stock.fields.brand_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -126,14 +196,39 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
+<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+    <div id="r_quantity_left"<?= $Page->quantity_left->rowAttributes() ?>>
+        <label id="elh_medicine_stock_quantity_left" for="x_quantity_left" class="<?= $Page->LeftColumnClass ?>"><?= $Page->quantity_left->caption() ?><?= $Page->quantity_left->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->quantity_left->cellAttributes() ?>>
+<span id="el_medicine_stock_quantity_left">
+<input type="<?= $Page->quantity_left->getInputTextType() ?>" name="x_quantity_left" id="x_quantity_left" data-table="medicine_stock" data-field="x_quantity_left" value="<?= $Page->quantity_left->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->quantity_left->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->quantity_left->formatPattern()) ?>"<?= $Page->quantity_left->editAttributes() ?> aria-describedby="x_quantity_left_help">
+<?= $Page->quantity_left->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->quantity_left->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
     <div id="r_measuring_unit"<?= $Page->measuring_unit->rowAttributes() ?>>
-        <label id="elh_medicine_stock_measuring_unit" for="x_measuring_unit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->measuring_unit->caption() ?><?= $Page->measuring_unit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_medicine_stock_measuring_unit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->measuring_unit->caption() ?><?= $Page->measuring_unit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->measuring_unit->cellAttributes() ?>>
 <span id="el_medicine_stock_measuring_unit">
-<input type="<?= $Page->measuring_unit->getInputTextType() ?>" name="x_measuring_unit" id="x_measuring_unit" data-table="medicine_stock" data-field="x_measuring_unit" value="<?= $Page->measuring_unit->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->measuring_unit->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->measuring_unit->formatPattern()) ?>"<?= $Page->measuring_unit->editAttributes() ?> aria-describedby="x_measuring_unit_help">
+<?php
+if (IsRTL()) {
+    $Page->measuring_unit->EditAttrs["dir"] = "rtl";
+}
+?>
+<span id="as_x_measuring_unit" class="ew-auto-suggest">
+    <input type="<?= $Page->measuring_unit->getInputTextType() ?>" class="form-control" name="sv_x_measuring_unit" id="sv_x_measuring_unit" value="<?= RemoveHtml($Page->measuring_unit->EditValue) ?>" autocomplete="off" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->measuring_unit->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->measuring_unit->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->measuring_unit->formatPattern()) ?>"<?= $Page->measuring_unit->editAttributes() ?> aria-describedby="x_measuring_unit_help">
+</span>
+<selection-list hidden class="form-control" data-table="medicine_stock" data-field="x_measuring_unit" data-input="sv_x_measuring_unit" data-value-separator="<?= $Page->measuring_unit->displayValueSeparatorAttribute() ?>" name="x_measuring_unit" id="x_measuring_unit" value="<?= HtmlEncode($Page->measuring_unit->CurrentValue) ?>"></selection-list>
 <?= $Page->measuring_unit->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->measuring_unit->getErrorMessage() ?></div>
+<script>
+loadjs.ready("fmedicine_stockadd", function() {
+    fmedicine_stockadd.createAutoSuggest(Object.assign({"id":"x_measuring_unit","forceSelect":false}, { lookupAllDisplayFields: <?= $Page->measuring_unit->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.medicine_stock.fields.measuring_unit.autoSuggestOptions));
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -173,7 +268,7 @@ $Page->showMessage();
 <?php if (!$Page->expiry_date->ReadOnly && !$Page->expiry_date->Disabled && !isset($Page->expiry_date->EditAttrs["readonly"]) && !isset($Page->expiry_date->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(7) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -203,36 +298,6 @@ loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_medicine_stock_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="medicine_stock" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_medicine_stock_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="medicine_stock" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-    <div id="r_modified_by_user_id"<?= $Page->modified_by_user_id->rowAttributes() ?>>
-        <label id="elh_medicine_stock_modified_by_user_id" for="x_modified_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->modified_by_user_id->caption() ?><?= $Page->modified_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->modified_by_user_id->cellAttributes() ?>>
-<span id="el_medicine_stock_modified_by_user_id">
-<input type="<?= $Page->modified_by_user_id->getInputTextType() ?>" name="x_modified_by_user_id" id="x_modified_by_user_id" data-table="medicine_stock" data-field="x_modified_by_user_id" value="<?= $Page->modified_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->modified_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->modified_by_user_id->formatPattern()) ?>"<?= $Page->modified_by_user_id->editAttributes() ?> aria-describedby="x_modified_by_user_id_help">
-<?= $Page->modified_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->modified_by_user_id->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
         <label id="elh_medicine_stock_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -244,7 +309,7 @@ loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -285,7 +350,7 @@ loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
 <?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmedicine_stockadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

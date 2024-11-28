@@ -57,12 +57,6 @@ class MedicineStock extends AbstractEntity
     #[Column(name: "expiry_date", type: "date")]
     private DateTime $expiryDate;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
-    #[Column(name: "modified_by_user_id", type: "integer")]
-    private int $modifiedByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -165,28 +159,6 @@ class MedicineStock extends AbstractEntity
     public function setExpiryDate(DateTime $value): static
     {
         $this->expiryDate = $value;
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
-        return $this;
-    }
-
-    public function getModifiedByUserId(): int
-    {
-        return $this->modifiedByUserId;
-    }
-
-    public function setModifiedByUserId(int $value): static
-    {
-        $this->modifiedByUserId = $value;
         return $this;
     }
 

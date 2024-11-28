@@ -125,8 +125,8 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
         $this->medicine_dispensation_id->setVisibility();
         $this->medicine_stock_id->setVisibility();
         $this->quantity->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -415,6 +415,12 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->medicine_stock_id);
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -639,8 +645,10 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
         // quantity
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -652,20 +660,31 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
             $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
 
             // medicine_stock_id
-            $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->CurrentValue;
-            $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->ViewValue, $this->medicine_stock_id->formatPattern());
+            $curVal = strval($this->medicine_stock_id->CurrentValue);
+            if ($curVal != "") {
+                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
+                if ($this->medicine_stock_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->medicine_stock_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->medicine_stock_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->displayValue($arwrk);
+                    } else {
+                        $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->medicine_stock_id->ViewValue = null;
+            }
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -682,14 +701,6 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
             // quantity
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -797,6 +808,79 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
         return $deleteRows;
     }
 
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "medicine_dispensation") {
+                $validMaster = true;
+                $masterTbl = Container("medicine_dispensation");
+                if (($parm = Get("fk_id", Get("medicine_dispensation_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->medicine_dispensation_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->medicine_dispensation_id->setSessionValue($this->medicine_dispensation_id->QueryStringValue);
+                    $foreignKeys["medicine_dispensation_id"] = $this->medicine_dispensation_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "medicine_dispensation") {
+                $validMaster = true;
+                $masterTbl = Container("medicine_dispensation");
+                if (($parm = Post("fk_id", Post("medicine_dispensation_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->medicine_dispensation_id->FormValue = $masterTbl->id->FormValue;
+                    $this->medicine_dispensation_id->setSessionValue($this->medicine_dispensation_id->FormValue);
+                    $foreignKeys["medicine_dispensation_id"] = $this->medicine_dispensation_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "medicine_dispensation") {
+                if (!array_key_exists("medicine_dispensation_id", $foreignKeys)) { // Not current foreign key
+                    $this->medicine_dispensation_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -821,6 +905,8 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_medicine_stock_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

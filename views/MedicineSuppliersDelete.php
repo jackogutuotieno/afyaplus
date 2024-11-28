@@ -65,9 +65,6 @@ $Page->showMessage();
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
         <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_medicine_suppliers_physical_address" class="medicine_suppliers_physical_address"><?= $Page->physical_address->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_medicine_suppliers_created_by_user_id" class="medicine_suppliers_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_medicine_suppliers_date_created" class="medicine_suppliers_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -115,7 +112,12 @@ while ($Page->fetch()) {
         <td<?= $Page->phone->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -123,7 +125,12 @@ while ($Page->fetch()) {
         <td<?= $Page->email_address->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -132,14 +139,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->physical_address->viewAttributes() ?>>
 <?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

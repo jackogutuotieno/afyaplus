@@ -90,8 +90,8 @@ class MedicineDispensation extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailAdd = true; // Allow detail add
+        $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -122,6 +122,7 @@ class MedicineDispensation extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -143,14 +144,18 @@ class MedicineDispensation extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // prescription_id
@@ -195,12 +200,17 @@ class MedicineDispensation extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->dispensation_type->InputTextType = "text";
         $this->dispensation_type->Nullable = false; // NOT NULL field
         $this->dispensation_type->Required = true; // Required field
-        $this->dispensation_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->dispensation_type->setSelectMultiple(false); // Select one
+        $this->dispensation_type->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->dispensation_type->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->dispensation_type->Lookup = new Lookup($this->dispensation_type, 'medicine_dispensation', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->dispensation_type->OptionCount = 3;
+        $this->dispensation_type->SearchOperators = ["=", "<>"];
         $this->Fields['dispensation_type'] = &$this->dispensation_type;
 
         // status
@@ -219,12 +229,17 @@ class MedicineDispensation extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->status->InputTextType = "text";
         $this->status->Nullable = false; // NOT NULL field
         $this->status->Required = true; // Required field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->status->setSelectMultiple(false); // Select one
+        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status->Lookup = new Lookup($this->status, 'medicine_dispensation', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->status->OptionCount = 2;
+        $this->status->SearchOperators = ["=", "<>"];
         $this->Fields['status'] = &$this->status;
 
         // created_by_user_id
@@ -243,14 +258,18 @@ class MedicineDispensation extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -259,10 +278,10 @@ class MedicineDispensation extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -275,7 +294,7 @@ class MedicineDispensation extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -285,10 +304,10 @@ class MedicineDispensation extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -301,7 +320,7 @@ class MedicineDispensation extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -361,6 +380,32 @@ class MedicineDispensation extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "medicine_dispensation_details") {
+            $detailUrl = Container("medicine_dispensation_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "medicinedispensationlist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -992,7 +1037,11 @@ class MedicineDispensation extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinedispensationedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("medicinedispensationedit", $parm);
+        } else {
+            $url = $this->keyUrl("medicinedispensationedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1006,7 +1055,11 @@ class MedicineDispensation extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinedispensationadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("medicinedispensationadd", $parm);
+        } else {
+            $url = $this->keyUrl("medicinedispensationadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1246,22 +1299,68 @@ class MedicineDispensation extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
 
         // prescription_id
         $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
         $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
 
         // dispensation_type
-        $this->dispensation_type->ViewValue = $this->dispensation_type->CurrentValue;
+        if (strval($this->dispensation_type->CurrentValue) != "") {
+            $this->dispensation_type->ViewValue = $this->dispensation_type->optionCaption($this->dispensation_type->CurrentValue);
+        } else {
+            $this->dispensation_type->ViewValue = null;
+        }
 
         // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
 
         // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1324,11 +1423,7 @@ class MedicineDispensation extends DbTable
 
         // patient_id
         $this->patient_id->setupEditAttributes();
-        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
         $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-        }
 
         // prescription_id
         $this->prescription_id->setupEditAttributes();
@@ -1340,32 +1435,41 @@ class MedicineDispensation extends DbTable
 
         // dispensation_type
         $this->dispensation_type->setupEditAttributes();
-        if (!$this->dispensation_type->Raw) {
-            $this->dispensation_type->CurrentValue = HtmlDecode($this->dispensation_type->CurrentValue);
-        }
-        $this->dispensation_type->EditValue = $this->dispensation_type->CurrentValue;
+        $this->dispensation_type->EditValue = $this->dispensation_type->options(true);
         $this->dispensation_type->PlaceHolder = RemoveHtml($this->dispensation_type->caption());
 
         // status
         $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->EditValue = $this->status->options(true);
         $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
         if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
             $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->EditValue = null;
             }
+        } else {
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
         }
 
         // date_created

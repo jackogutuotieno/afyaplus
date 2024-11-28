@@ -29,13 +29,11 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["prescription_id", [fields.prescription_id.visible && fields.prescription_id.required ? ew.Validators.required(fields.prescription_id.caption) : null, ew.Validators.integer], fields.prescription_id.isInvalid],
             ["dispensation_type", [fields.dispensation_type.visible && fields.dispensation_type.required ? ew.Validators.required(fields.dispensation_type.caption) : null], fields.dispensation_type.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -51,6 +49,10 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "dispensation_type": <?= $Page->dispensation_type->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -92,9 +94,43 @@ loadjs.ready("head", function () {
         <label id="elh_medicine_dispensation_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
 <span id="el_medicine_dispensation_patient_id">
-<input type="<?= $Page->patient_id->getInputTextType() ?>" name="x_patient_id" id="x_patient_id" data-table="medicine_dispensation" data-field="x_patient_id" value="<?= $Page->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
-<?= $Page->patient_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+    <select
+        id="x_patient_id"
+        name="x_patient_id"
+        class="form-select ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+        <?php if (!$Page->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_dispensationedit_x_patient_id"
+        <?php } ?>
+        data-table="medicine_dispensation"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+        <?= $Page->patient_id->editAttributes() ?>>
+        <?= $Page->patient_id->selectOptionListHtml("x_patient_id") ?>
+    </select>
+    <?= $Page->patient_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+<?= $Page->patient_id->Lookup->getParamTag($Page, "p_x_patient_id") ?>
+<?php if (!$Page->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_dispensationedit", function() {
+    var options = { name: "x_patient_id", selectId: "fmedicine_dispensationedit_x_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_dispensationedit.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x_patient_id", form: "fmedicine_dispensationedit" };
+    } else {
+        options.ajax = { id: "x_patient_id", form: "fmedicine_dispensationedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -116,9 +152,42 @@ loadjs.ready("head", function () {
         <label id="elh_medicine_dispensation_dispensation_type" for="x_dispensation_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dispensation_type->caption() ?><?= $Page->dispensation_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->dispensation_type->cellAttributes() ?>>
 <span id="el_medicine_dispensation_dispensation_type">
-<input type="<?= $Page->dispensation_type->getInputTextType() ?>" name="x_dispensation_type" id="x_dispensation_type" data-table="medicine_dispensation" data-field="x_dispensation_type" value="<?= $Page->dispensation_type->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->dispensation_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->dispensation_type->formatPattern()) ?>"<?= $Page->dispensation_type->editAttributes() ?> aria-describedby="x_dispensation_type_help">
-<?= $Page->dispensation_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->dispensation_type->getErrorMessage() ?></div>
+    <select
+        id="x_dispensation_type"
+        name="x_dispensation_type"
+        class="form-select ew-select<?= $Page->dispensation_type->isInvalidClass() ?>"
+        <?php if (!$Page->dispensation_type->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_dispensationedit_x_dispensation_type"
+        <?php } ?>
+        data-table="medicine_dispensation"
+        data-field="x_dispensation_type"
+        data-value-separator="<?= $Page->dispensation_type->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->dispensation_type->getPlaceHolder()) ?>"
+        <?= $Page->dispensation_type->editAttributes() ?>>
+        <?= $Page->dispensation_type->selectOptionListHtml("x_dispensation_type") ?>
+    </select>
+    <?= $Page->dispensation_type->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->dispensation_type->getErrorMessage() ?></div>
+<?php if (!$Page->dispensation_type->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_dispensationedit", function() {
+    var options = { name: "x_dispensation_type", selectId: "fmedicine_dispensationedit_x_dispensation_type" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_dispensationedit.lists.dispensation_type?.lookupOptions.length) {
+        options.data = { id: "x_dispensation_type", form: "fmedicine_dispensationedit" };
+    } else {
+        options.ajax = { id: "x_dispensation_type", form: "fmedicine_dispensationedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation.fields.dispensation_type.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -128,9 +197,42 @@ loadjs.ready("head", function () {
         <label id="elh_medicine_dispensation_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
 <span id="el_medicine_dispensation_status">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="medicine_dispensation" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
-<?= $Page->status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+    <select
+        id="x_status"
+        name="x_status"
+        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
+        <?php if (!$Page->status->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_dispensationedit_x_status"
+        <?php } ?>
+        data-table="medicine_dispensation"
+        data-field="x_status"
+        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+        <?= $Page->status->editAttributes() ?>>
+        <?= $Page->status->selectOptionListHtml("x_status") ?>
+    </select>
+    <?= $Page->status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if (!$Page->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fmedicine_dispensationedit", function() {
+    var options = { name: "x_status", selectId: "fmedicine_dispensationedit_x_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_dispensationedit.lists.status?.lookupOptions.length) {
+        options.data = { id: "x_status", form: "fmedicine_dispensationedit" };
+    } else {
+        options.ajax = { id: "x_status", form: "fmedicine_dispensationedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -141,101 +243,61 @@ loadjs.ready("head", function () {
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
 <span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
 <input type="hidden" data-table="medicine_dispensation" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_medicine_dispensation_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="medicine_dispensation" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_medicine_dispensation_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_medicine_dispensation_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="medicine_dispensation" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+    <select
+        id="x_created_by_user_id"
+        name="x_created_by_user_id"
+        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="fmedicine_dispensationedit_x_created_by_user_id"
+        <?php } ?>
+        data-table="medicine_dispensation"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Page->created_by_user_id->editAttributes() ?>>
+        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
+    </select>
+    <?= $Page->created_by_user_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
+<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
+<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fmedicine_dispensationedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fmedicine_dispensationedit", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fmedicine_dispensationedit", function() {
+    var options = { name: "x_created_by_user_id", selectId: "fmedicine_dispensationedit_x_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fmedicine_dispensationedit.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x_created_by_user_id", form: "fmedicine_dispensationedit" };
+    } else {
+        options.ajax = { id: "x_created_by_user_id", form: "fmedicine_dispensationedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>
 </span>
-</div></div>
-    </div>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_medicine_dispensation_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_medicine_dispensation_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="medicine_dispensation" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fmedicine_dispensationedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fmedicine_dispensationedit", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
 </div></div>
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("medicine_dispensation_details", explode(",", $Page->getCurrentDetailTable())) && $medicine_dispensation_details->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("medicine_dispensation_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "MedicineDispensationDetailsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fmedicine_dispensationedit"><?= $Language->phrase("SaveBtn") ?></button>

@@ -65,6 +65,9 @@ $Page->showMessage();
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th class="<?= $Page->quantity->headerCellClass() ?>"><span id="elh_medicine_stock_quantity" class="medicine_stock_quantity"><?= $Page->quantity->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+        <th class="<?= $Page->quantity_left->headerCellClass() ?>"><span id="elh_medicine_stock_quantity_left" class="medicine_stock_quantity_left"><?= $Page->quantity_left->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
         <th class="<?= $Page->measuring_unit->headerCellClass() ?>"><span id="elh_medicine_stock_measuring_unit" class="medicine_stock_measuring_unit"><?= $Page->measuring_unit->caption() ?></span></th>
 <?php } ?>
@@ -76,12 +79,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->expiry_date->Visible) { // expiry_date ?>
         <th class="<?= $Page->expiry_date->headerCellClass() ?>"><span id="elh_medicine_stock_expiry_date" class="medicine_stock_expiry_date"><?= $Page->expiry_date->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_medicine_stock_created_by_user_id" class="medicine_stock_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-        <th class="<?= $Page->modified_by_user_id->headerCellClass() ?>"><span id="elh_medicine_stock_modified_by_user_id" class="medicine_stock_modified_by_user_id"><?= $Page->modified_by_user_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_medicine_stock_date_created" class="medicine_stock_date_created"><?= $Page->date_created->caption() ?></span></th>
@@ -150,6 +147,14 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+        <td<?= $Page->quantity_left->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->quantity_left->viewAttributes() ?>>
+<?= $Page->quantity_left->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
         <td<?= $Page->measuring_unit->cellAttributes() ?>>
 <span id="">
@@ -179,22 +184,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->expiry_date->viewAttributes() ?>>
 <?= $Page->expiry_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-        <td<?= $Page->modified_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->modified_by_user_id->viewAttributes() ?>>
-<?= $Page->modified_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

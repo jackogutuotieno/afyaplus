@@ -126,9 +126,8 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
         $this->physical_address->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -754,38 +753,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
                 $this->physical_address->setFormValue($val);
             }
         }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
     }
 
     // Restore form values
@@ -797,11 +764,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         $this->phone->CurrentValue = $this->phone->FormValue;
         $this->email_address->CurrentValue = $this->email_address->FormValue;
         $this->physical_address->CurrentValue = $this->physical_address->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -827,15 +789,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -856,7 +809,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -870,7 +822,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -922,9 +873,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         // physical_address
         $this->physical_address->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -948,10 +896,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -967,22 +911,29 @@ class MedicineSuppliersEdit extends MedicineSuppliers
             $this->supplier_name->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1014,35 +965,8 @@ class MedicineSuppliersEdit extends MedicineSuppliers
 
             // physical_address
             $this->physical_address->setupEditAttributes();
-            if (!$this->physical_address->Raw) {
-                $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-            }
             $this->physical_address->EditValue = HtmlEncode($this->physical_address->CurrentValue);
             $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
 
@@ -1053,22 +977,29 @@ class MedicineSuppliersEdit extends MedicineSuppliers
             $this->supplier_name->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1114,30 +1045,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
                 if (!$this->physical_address->IsDetailKey && EmptyValue($this->physical_address->FormValue)) {
                     $this->physical_address->addErrorMessage(str_replace("%s", $this->physical_address->caption(), $this->physical_address->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1239,15 +1146,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
 
         // physical_address
         $this->physical_address->setDbValueDef($rsnew, $this->physical_address->CurrentValue, $this->physical_address->ReadOnly);
-
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -1269,25 +1167,6 @@ class MedicineSuppliersEdit extends MedicineSuppliers
         if (isset($row['physical_address'])) { // physical_address
             $this->physical_address->CurrentValue = $row['physical_address'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

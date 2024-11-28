@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
+    <tr id="r_quantity_left"<?= $Page->quantity_left->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_quantity_left"><?= $Page->quantity_left->caption() ?></span></td>
+        <td data-name="quantity_left"<?= $Page->quantity_left->cellAttributes() ?>>
+<span id="el_medicine_stock_quantity_left">
+<span<?= $Page->quantity_left->viewAttributes() ?>>
+<?= $Page->quantity_left->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
     <tr id="r_measuring_unit"<?= $Page->measuring_unit->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_measuring_unit"><?= $Page->measuring_unit->caption() ?></span></td>
@@ -146,28 +157,6 @@ loadjs.ready("head", function () {
 <span id="el_medicine_stock_expiry_date">
 <span<?= $Page->expiry_date->viewAttributes() ?>>
 <?= $Page->expiry_date->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el_medicine_stock_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->modified_by_user_id->Visible) { // modified_by_user_id ?>
-    <tr id="r_modified_by_user_id"<?= $Page->modified_by_user_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_modified_by_user_id"><?= $Page->modified_by_user_id->caption() ?></span></td>
-        <td data-name="modified_by_user_id"<?= $Page->modified_by_user_id->cellAttributes() ?>>
-<span id="el_medicine_stock_modified_by_user_id">
-<span<?= $Page->modified_by_user_id->viewAttributes() ?>>
-<?= $Page->modified_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

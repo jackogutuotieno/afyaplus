@@ -157,17 +157,11 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_categories_id" class="medicine_categories_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->category_name->Visible) { // category_name ?>
         <th data-name="category_name" class="<?= $Page->category_name->headerCellClass() ?>"><div id="elh_medicine_categories_category_name" class="medicine_categories_category_name"><?= $Page->renderFieldHeader($Page->category_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
         <th data-name="description" class="<?= $Page->description->headerCellClass() ?>"><div id="elh_medicine_categories_description" class="medicine_categories_description"><?= $Page->renderFieldHeader($Page->description) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_medicine_categories_created_by_user_id" class="medicine_categories_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_categories_date_created" class="medicine_categories_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -203,14 +197,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_categories_id" class="el_medicine_categories_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->category_name->Visible) { // category_name ?>
         <td data-name="category_name"<?= $Page->category_name->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_categories_category_name" class="el_medicine_categories_category_name">
@@ -224,14 +210,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_categories_description" class="el_medicine_categories_description">
 <span<?= $Page->description->viewAttributes() ?>>
 <?= $Page->description->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_categories_created_by_user_id" class="el_medicine_categories_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

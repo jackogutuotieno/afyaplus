@@ -121,10 +121,9 @@ class MedicineCategoriesDelete extends MedicineCategories
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->category_name->setVisibility();
         $this->description->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -429,25 +428,6 @@ class MedicineCategoriesDelete extends MedicineCategories
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
 
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("medicinecategorieslist"); // Return to list
-            return;
-        }
-
         // Get action
         if (IsApi()) {
             $this->CurrentAction = "delete"; // Delete record directly
@@ -619,7 +599,6 @@ class MedicineCategoriesDelete extends MedicineCategories
         $this->id->setDbValue($row['id']);
         $this->category_name->setDbValue($row['category_name']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -631,7 +610,6 @@ class MedicineCategoriesDelete extends MedicineCategories
         $row['id'] = $this->id->DefaultValue;
         $row['category_name'] = $this->category_name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -655,26 +633,17 @@ class MedicineCategoriesDelete extends MedicineCategories
 
         // description
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
 
         // View row
         if ($this->RowType == RowType::VIEW) {
-            // id
-            $this->id->ViewValue = $this->id->CurrentValue;
-
             // category_name
             $this->category_name->ViewValue = $this->category_name->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -684,10 +653,6 @@ class MedicineCategoriesDelete extends MedicineCategories
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // category_name
             $this->category_name->HrefValue = "";
             $this->category_name->TooltipValue = "";
@@ -695,10 +660,6 @@ class MedicineCategoriesDelete extends MedicineCategories
             // description
             $this->description->HrefValue = "";
             $this->description->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -812,16 +773,6 @@ class MedicineCategoriesDelete extends MedicineCategories
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

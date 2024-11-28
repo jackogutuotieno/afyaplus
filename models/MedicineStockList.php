@@ -150,12 +150,11 @@ class MedicineStockList extends MedicineStock
         $this->brand_id->setVisibility();
         $this->batch_number->setVisibility();
         $this->quantity->setVisibility();
+        $this->quantity_left->setVisibility();
         $this->measuring_unit->setVisibility();
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->modified_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -713,6 +712,11 @@ class MedicineStockList extends MedicineStock
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->supplier_id);
+        $this->setupLookupOptions($this->brand_id);
+        $this->setupLookupOptions($this->measuring_unit);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fmedicine_stockgrid";
@@ -1059,12 +1063,11 @@ class MedicineStockList extends MedicineStock
         $filterList = Concat($filterList, $this->brand_id->AdvancedSearch->toJson(), ","); // Field brand_id
         $filterList = Concat($filterList, $this->batch_number->AdvancedSearch->toJson(), ","); // Field batch_number
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
+        $filterList = Concat($filterList, $this->quantity_left->AdvancedSearch->toJson(), ","); // Field quantity_left
         $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
         $filterList = Concat($filterList, $this->buying_price_per_unit->AdvancedSearch->toJson(), ","); // Field buying_price_per_unit
         $filterList = Concat($filterList, $this->selling_price_per_unit->AdvancedSearch->toJson(), ","); // Field selling_price_per_unit
         $filterList = Concat($filterList, $this->expiry_date->AdvancedSearch->toJson(), ","); // Field expiry_date
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
-        $filterList = Concat($filterList, $this->modified_by_user_id->AdvancedSearch->toJson(), ","); // Field modified_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1146,6 +1149,14 @@ class MedicineStockList extends MedicineStock
         $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
         $this->quantity->AdvancedSearch->save();
 
+        // Field quantity_left
+        $this->quantity_left->AdvancedSearch->SearchValue = @$filter["x_quantity_left"];
+        $this->quantity_left->AdvancedSearch->SearchOperator = @$filter["z_quantity_left"];
+        $this->quantity_left->AdvancedSearch->SearchCondition = @$filter["v_quantity_left"];
+        $this->quantity_left->AdvancedSearch->SearchValue2 = @$filter["y_quantity_left"];
+        $this->quantity_left->AdvancedSearch->SearchOperator2 = @$filter["w_quantity_left"];
+        $this->quantity_left->AdvancedSearch->save();
+
         // Field measuring_unit
         $this->measuring_unit->AdvancedSearch->SearchValue = @$filter["x_measuring_unit"];
         $this->measuring_unit->AdvancedSearch->SearchOperator = @$filter["z_measuring_unit"];
@@ -1177,22 +1188,6 @@ class MedicineStockList extends MedicineStock
         $this->expiry_date->AdvancedSearch->SearchValue2 = @$filter["y_expiry_date"];
         $this->expiry_date->AdvancedSearch->SearchOperator2 = @$filter["w_expiry_date"];
         $this->expiry_date->AdvancedSearch->save();
-
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
-
-        // Field modified_by_user_id
-        $this->modified_by_user_id->AdvancedSearch->SearchValue = @$filter["x_modified_by_user_id"];
-        $this->modified_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_modified_by_user_id"];
-        $this->modified_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_modified_by_user_id"];
-        $this->modified_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_modified_by_user_id"];
-        $this->modified_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_modified_by_user_id"];
-        $this->modified_by_user_id->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1333,12 +1328,11 @@ class MedicineStockList extends MedicineStock
             $this->updateSort($this->brand_id); // brand_id
             $this->updateSort($this->batch_number); // batch_number
             $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->quantity_left); // quantity_left
             $this->updateSort($this->measuring_unit); // measuring_unit
             $this->updateSort($this->buying_price_per_unit); // buying_price_per_unit
             $this->updateSort($this->selling_price_per_unit); // selling_price_per_unit
             $this->updateSort($this->expiry_date); // expiry_date
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
-            $this->updateSort($this->modified_by_user_id); // modified_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1370,12 +1364,11 @@ class MedicineStockList extends MedicineStock
                 $this->brand_id->setSort("");
                 $this->batch_number->setSort("");
                 $this->quantity->setSort("");
+                $this->quantity_left->setSort("");
                 $this->measuring_unit->setSort("");
                 $this->buying_price_per_unit->setSort("");
                 $this->selling_price_per_unit->setSort("");
                 $this->expiry_date->setSort("");
-                $this->created_by_user_id->setSort("");
-                $this->modified_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1407,12 +1400,6 @@ class MedicineStockList extends MedicineStock
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1482,7 +1469,7 @@ class MedicineStockList extends MedicineStock
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"medicine_stock\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1495,7 +1482,7 @@ class MedicineStockList extends MedicineStock
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"medicine_stock\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1505,22 +1492,9 @@ class MedicineStockList extends MedicineStock
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"medicine_stock\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1617,12 +1591,11 @@ class MedicineStockList extends MedicineStock
             $this->createColumnOption($option, "brand_id");
             $this->createColumnOption($option, "batch_number");
             $this->createColumnOption($option, "quantity");
+            $this->createColumnOption($option, "quantity_left");
             $this->createColumnOption($option, "measuring_unit");
             $this->createColumnOption($option, "buying_price_per_unit");
             $this->createColumnOption($option, "selling_price_per_unit");
             $this->createColumnOption($option, "expiry_date");
-            $this->createColumnOption($option, "created_by_user_id");
-            $this->createColumnOption($option, "modified_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2068,12 +2041,11 @@ class MedicineStockList extends MedicineStock
         $this->brand_id->setDbValue($row['brand_id']);
         $this->batch_number->setDbValue($row['batch_number']);
         $this->quantity->setDbValue($row['quantity']);
+        $this->quantity_left->setDbValue($row['quantity_left']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
-        $this->modified_by_user_id->setDbValue($row['modified_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2087,12 +2059,11 @@ class MedicineStockList extends MedicineStock
         $row['brand_id'] = $this->brand_id->DefaultValue;
         $row['batch_number'] = $this->batch_number->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
+        $row['quantity_left'] = $this->quantity_left->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['buying_price_per_unit'] = $this->buying_price_per_unit->DefaultValue;
         $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
-        $row['modified_by_user_id'] = $this->modified_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2145,6 +2116,8 @@ class MedicineStockList extends MedicineStock
 
         // quantity
 
+        // quantity_left
+
         // measuring_unit
 
         // buying_price_per_unit
@@ -2152,10 +2125,6 @@ class MedicineStockList extends MedicineStock
         // selling_price_per_unit
 
         // expiry_date
-
-        // created_by_user_id
-
-        // modified_by_user_id
 
         // date_created
 
@@ -2167,12 +2136,50 @@ class MedicineStockList extends MedicineStock
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // supplier_id
-            $this->supplier_id->ViewValue = $this->supplier_id->CurrentValue;
-            $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+            $curVal = strval($this->supplier_id->CurrentValue);
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    } else {
+                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->supplier_id->ViewValue = null;
+            }
 
             // brand_id
-            $this->brand_id->ViewValue = $this->brand_id->CurrentValue;
-            $this->brand_id->ViewValue = FormatNumber($this->brand_id->ViewValue, $this->brand_id->formatPattern());
+            $curVal = strval($this->brand_id->CurrentValue);
+            if ($curVal != "") {
+                $this->brand_id->ViewValue = $this->brand_id->lookupCacheOption($curVal);
+                if ($this->brand_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->brand_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->brand_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->brand_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->brand_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->brand_id->ViewValue = $this->brand_id->displayValue($arwrk);
+                    } else {
+                        $this->brand_id->ViewValue = FormatNumber($this->brand_id->CurrentValue, $this->brand_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->brand_id->ViewValue = null;
+            }
 
             // batch_number
             $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
@@ -2180,6 +2187,10 @@ class MedicineStockList extends MedicineStock
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+
+            // quantity_left
+            $this->quantity_left->ViewValue = $this->quantity_left->CurrentValue;
+            $this->quantity_left->ViewValue = FormatNumber($this->quantity_left->ViewValue, $this->quantity_left->formatPattern());
 
             // measuring_unit
             $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
@@ -2195,14 +2206,6 @@ class MedicineStockList extends MedicineStock
             // expiry_date
             $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
             $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
-            // modified_by_user_id
-            $this->modified_by_user_id->ViewValue = $this->modified_by_user_id->CurrentValue;
-            $this->modified_by_user_id->ViewValue = FormatNumber($this->modified_by_user_id->ViewValue, $this->modified_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2232,6 +2235,10 @@ class MedicineStockList extends MedicineStock
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
 
+            // quantity_left
+            $this->quantity_left->HrefValue = "";
+            $this->quantity_left->TooltipValue = "";
+
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
             $this->measuring_unit->TooltipValue = "";
@@ -2247,14 +2254,6 @@ class MedicineStockList extends MedicineStock
             // expiry_date
             $this->expiry_date->HrefValue = "";
             $this->expiry_date->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // modified_by_user_id
-            $this->modified_by_user_id->HrefValue = "";
-            $this->modified_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2491,16 +2490,6 @@ class MedicineStockList extends MedicineStock
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2524,6 +2513,12 @@ class MedicineStockList extends MedicineStock
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_supplier_id":
+                    break;
+                case "x_brand_id":
+                    break;
+                case "x_measuring_unit":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2696,7 +2691,10 @@ class MedicineStockList extends MedicineStock
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add/update stock");
     }
 
     // Page Unload event

@@ -140,6 +140,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("medicine_dispensation_details", explode(",", $Page->getCurrentDetailTable())) && $medicine_dispensation_details->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("medicine_dispensation_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "MedicineDispensationDetailsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

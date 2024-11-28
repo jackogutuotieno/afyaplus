@@ -49,7 +49,6 @@ class MedicineCategories extends DbTable
     public $id;
     public $category_name;
     public $description;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -114,15 +113,18 @@ class MedicineCategories extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Nullable = false; // NOT NULL field
+        $this->id->setSelectMultiple(false); // Select one
+        $this->id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
         // category_name
@@ -170,32 +172,6 @@ class MedicineCategories extends DbTable
         $this->description->InputTextType = "text";
         $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['description'] = &$this->description;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -446,11 +422,6 @@ class MedicineCategories extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -775,7 +746,6 @@ class MedicineCategories extends DbTable
         $this->id->DbValue = $row['id'];
         $this->category_name->DbValue = $row['category_name'];
         $this->description->DbValue = $row['description'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1133,7 +1103,6 @@ class MedicineCategories extends DbTable
         $this->id->setDbValue($row['id']);
         $this->category_name->setDbValue($row['category_name']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1172,24 +1141,17 @@ class MedicineCategories extends DbTable
 
         // description
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
 
         // id
-        $this->id->ViewValue = $this->id->CurrentValue;
 
         // category_name
         $this->category_name->ViewValue = $this->category_name->CurrentValue;
 
         // description
         $this->description->ViewValue = $this->description->CurrentValue;
-
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1210,10 +1172,6 @@ class MedicineCategories extends DbTable
         // description
         $this->description->HrefValue = "";
         $this->description->TooltipValue = "";
-
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1240,7 +1198,6 @@ class MedicineCategories extends DbTable
 
         // id
         $this->id->setupEditAttributes();
-        $this->id->EditValue = $this->id->CurrentValue;
 
         // category_name
         $this->category_name->setupEditAttributes();
@@ -1257,20 +1214,6 @@ class MedicineCategories extends DbTable
         }
         $this->description->EditValue = $this->description->CurrentValue;
         $this->description->PlaceHolder = RemoveHtml($this->description->caption());
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1313,14 +1256,12 @@ class MedicineCategories extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->category_name);
                     $doc->exportCaption($this->description);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->category_name);
                     $doc->exportCaption($this->description);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1352,14 +1293,12 @@ class MedicineCategories extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->category_name);
                         $doc->exportField($this->description);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->category_name);
                         $doc->exportField($this->description);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1375,52 +1314,6 @@ class MedicineCategories extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM medicine_categories";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data

@@ -50,17 +50,11 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_medicine_brands_id" class="medicine_brands_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th class="<?= $Page->category_id->headerCellClass() ?>"><span id="elh_medicine_brands_category_id" class="medicine_brands_category_id"><?= $Page->category_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <th class="<?= $Page->brand_name->headerCellClass() ?>"><span id="elh_medicine_brands_brand_name" class="medicine_brands_brand_name"><?= $Page->brand_name->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_medicine_brands_created_by_user_id" class="medicine_brands_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_medicine_brands_date_created" class="medicine_brands_date_created"><?= $Page->date_created->caption() ?></span></th>
@@ -89,14 +83,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <td<?= $Page->category_id->cellAttributes() ?>>
 <span id="">
@@ -110,14 +96,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->brand_name->viewAttributes() ?>>
 <?= $Page->brand_name->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

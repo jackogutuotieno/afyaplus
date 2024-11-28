@@ -124,7 +124,6 @@ class MedicineBrandsAdd extends MedicineBrands
         $this->id->Visible = false;
         $this->category_id->setVisibility();
         $this->brand_name->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -520,6 +519,9 @@ class MedicineBrandsAdd extends MedicineBrands
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -685,7 +687,7 @@ class MedicineBrandsAdd extends MedicineBrands
             if (IsApi() && $val === null) {
                 $this->category_id->Visible = false; // Disable update for API request
             } else {
-                $this->category_id->setFormValue($val, true, $validate);
+                $this->category_id->setFormValue($val);
             }
         }
 
@@ -696,16 +698,6 @@ class MedicineBrandsAdd extends MedicineBrands
                 $this->brand_name->Visible = false; // Disable update for API request
             } else {
                 $this->brand_name->setFormValue($val);
-            }
-        }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
             }
         }
 
@@ -741,7 +733,6 @@ class MedicineBrandsAdd extends MedicineBrands
         global $CurrentForm;
         $this->category_id->CurrentValue = $this->category_id->FormValue;
         $this->brand_name->CurrentValue = $this->brand_name->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -771,15 +762,6 @@ class MedicineBrandsAdd extends MedicineBrands
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("add");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -798,7 +780,6 @@ class MedicineBrandsAdd extends MedicineBrands
         $this->id->setDbValue($row['id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->brand_name->setDbValue($row['brand_name']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -810,7 +791,6 @@ class MedicineBrandsAdd extends MedicineBrands
         $row['id'] = $this->id->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
         $row['brand_name'] = $this->brand_name->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -856,9 +836,6 @@ class MedicineBrandsAdd extends MedicineBrands
         // brand_name
         $this->brand_name->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -871,15 +848,30 @@ class MedicineBrandsAdd extends MedicineBrands
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // brand_name
             $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -895,9 +887,6 @@ class MedicineBrandsAdd extends MedicineBrands
             // brand_name
             $this->brand_name->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
             // date_created
             $this->date_created->HrefValue = "";
 
@@ -906,11 +895,30 @@ class MedicineBrandsAdd extends MedicineBrands
         } elseif ($this->RowType == RowType::ADD) {
             // category_id
             $this->category_id->setupEditAttributes();
-            $this->category_id->EditValue = $this->category_id->CurrentValue;
-            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-            if (strval($this->category_id->EditValue) != "" && is_numeric($this->category_id->EditValue)) {
-                $this->category_id->EditValue = FormatNumber($this->category_id->EditValue, null);
+            $curVal = trim(strval($this->category_id->CurrentValue));
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+            } else {
+                $this->category_id->ViewValue = $this->category_id->Lookup !== null && is_array($this->category_id->lookupOptions()) && count($this->category_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->category_id->ViewValue !== null) { // Load from cache
+                $this->category_id->EditValue = array_values($this->category_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->category_id->CurrentValue, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->category_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->category_id->EditValue = $arwrk;
+            }
+            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
 
             // brand_name
             $this->brand_name->setupEditAttributes();
@@ -919,20 +927,6 @@ class MedicineBrandsAdd extends MedicineBrands
             }
             $this->brand_name->EditValue = HtmlEncode($this->brand_name->CurrentValue);
             $this->brand_name->PlaceHolder = RemoveHtml($this->brand_name->caption());
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -951,9 +945,6 @@ class MedicineBrandsAdd extends MedicineBrands
 
             // brand_name
             $this->brand_name->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -986,21 +977,10 @@ class MedicineBrandsAdd extends MedicineBrands
                     $this->category_id->addErrorMessage(str_replace("%s", $this->category_id->caption(), $this->category_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->category_id->FormValue)) {
-                $this->category_id->addErrorMessage($this->category_id->getErrorMessage(false));
-            }
             if ($this->brand_name->Visible && $this->brand_name->Required) {
                 if (!$this->brand_name->IsDetailKey && EmptyValue($this->brand_name->FormValue)) {
                     $this->brand_name->addErrorMessage(str_replace("%s", $this->brand_name->caption(), $this->brand_name->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1041,18 +1021,6 @@ class MedicineBrandsAdd extends MedicineBrands
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid User ID
-        if (
-            !EmptyValue($Security->currentUserID()) &&
-            !$Security->isAdmin() && // Non system admin
-            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
-        ) {
-            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
-            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
-            $this->setFailureMessage($userIdMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1107,9 +1075,6 @@ class MedicineBrandsAdd extends MedicineBrands
         // brand_name
         $this->brand_name->setDbValueDef($rsnew, $this->brand_name->CurrentValue, false);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
@@ -1130,25 +1095,12 @@ class MedicineBrandsAdd extends MedicineBrands
         if (isset($row['brand_name'])) { // brand_name
             $this->brand_name->setFormValue($row['brand_name']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb
@@ -1175,6 +1127,8 @@ class MedicineBrandsAdd extends MedicineBrands
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

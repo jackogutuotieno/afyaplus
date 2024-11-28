@@ -124,7 +124,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         $this->id->setVisibility();
         $this->category_name->setVisibility();
         $this->description->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -733,16 +732,6 @@ class MedicineCategoriesEdit extends MedicineCategories
             }
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -773,7 +762,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         $this->id->CurrentValue = $this->id->FormValue;
         $this->category_name->CurrentValue = $this->category_name->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -803,15 +791,6 @@ class MedicineCategoriesEdit extends MedicineCategories
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -830,7 +809,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         $this->id->setDbValue($row['id']);
         $this->category_name->setDbValue($row['category_name']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -842,7 +820,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         $row['id'] = $this->id->DefaultValue;
         $row['category_name'] = $this->category_name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -888,9 +865,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         // description
         $this->description->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -899,18 +873,11 @@ class MedicineCategoriesEdit extends MedicineCategories
 
         // View row
         if ($this->RowType == RowType::VIEW) {
-            // id
-            $this->id->ViewValue = $this->id->CurrentValue;
-
             // category_name
             $this->category_name->ViewValue = $this->category_name->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -929,9 +896,6 @@ class MedicineCategoriesEdit extends MedicineCategories
             // description
             $this->description->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
             // date_created
             $this->date_created->HrefValue = "";
 
@@ -940,7 +904,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
 
             // category_name
             $this->category_name->setupEditAttributes();
@@ -957,20 +920,6 @@ class MedicineCategoriesEdit extends MedicineCategories
             }
             $this->description->EditValue = HtmlEncode($this->description->CurrentValue);
             $this->description->PlaceHolder = RemoveHtml($this->description->caption());
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -992,9 +941,6 @@ class MedicineCategoriesEdit extends MedicineCategories
 
             // description
             $this->description->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1036,14 +982,6 @@ class MedicineCategoriesEdit extends MedicineCategories
                 if (!$this->description->IsDetailKey && EmptyValue($this->description->FormValue)) {
                     $this->description->addErrorMessage(str_replace("%s", $this->description->caption(), $this->description->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1156,9 +1094,6 @@ class MedicineCategoriesEdit extends MedicineCategories
         // description
         $this->description->setDbValueDef($rsnew, $this->description->CurrentValue, $this->description->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
 
@@ -1179,25 +1114,12 @@ class MedicineCategoriesEdit extends MedicineCategories
         if (isset($row['description'])) { // description
             $this->description->CurrentValue = $row['description'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->CurrentValue = $row['date_updated'];
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

@@ -145,10 +145,9 @@ class MedicineBrandsList extends MedicineBrands
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->category_id->setVisibility();
         $this->brand_name->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -706,6 +705,9 @@ class MedicineBrandsList extends MedicineBrands
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fmedicine_brandsgrid";
@@ -1050,7 +1052,6 @@ class MedicineBrandsList extends MedicineBrands
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->category_id->AdvancedSearch->toJson(), ","); // Field category_id
         $filterList = Concat($filterList, $this->brand_name->AdvancedSearch->toJson(), ","); // Field brand_name
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1115,14 +1116,6 @@ class MedicineBrandsList extends MedicineBrands
         $this->brand_name->AdvancedSearch->SearchValue2 = @$filter["y_brand_name"];
         $this->brand_name->AdvancedSearch->SearchOperator2 = @$filter["w_brand_name"];
         $this->brand_name->AdvancedSearch->save();
-
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1257,10 +1250,8 @@ class MedicineBrandsList extends MedicineBrands
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->category_id); // category_id
             $this->updateSort($this->brand_name); // brand_name
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1290,7 +1281,6 @@ class MedicineBrandsList extends MedicineBrands
                 $this->id->setSort("");
                 $this->category_id->setSort("");
                 $this->brand_name->setSort("");
-                $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1324,12 +1314,6 @@ class MedicineBrandsList extends MedicineBrands
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1352,6 +1336,14 @@ class MedicineBrandsList extends MedicineBrands
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1392,12 +1384,16 @@ class MedicineBrandsList extends MedicineBrands
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"medicine_brands\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1410,7 +1406,7 @@ class MedicineBrandsList extends MedicineBrands
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"medicine_brands\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1420,22 +1416,9 @@ class MedicineBrandsList extends MedicineBrands
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"medicine_brands\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1527,10 +1510,8 @@ class MedicineBrandsList extends MedicineBrands
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "category_id");
             $this->createColumnOption($option, "brand_name");
-            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -1974,7 +1955,6 @@ class MedicineBrandsList extends MedicineBrands
         $this->id->setDbValue($row['id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->brand_name->setDbValue($row['brand_name']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1986,7 +1966,6 @@ class MedicineBrandsList extends MedicineBrands
         $row['id'] = $this->id->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
         $row['brand_name'] = $this->brand_name->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2035,8 +2014,6 @@ class MedicineBrandsList extends MedicineBrands
 
         // brand_name
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -2047,15 +2024,30 @@ class MedicineBrandsList extends MedicineBrands
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // brand_name
             $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2065,10 +2057,6 @@ class MedicineBrandsList extends MedicineBrands
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // category_id
             $this->category_id->HrefValue = "";
             $this->category_id->TooltipValue = "";
@@ -2076,10 +2064,6 @@ class MedicineBrandsList extends MedicineBrands
             // brand_name
             $this->brand_name->HrefValue = "";
             $this->brand_name->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2316,16 +2300,6 @@ class MedicineBrandsList extends MedicineBrands
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2349,6 +2323,8 @@ class MedicineBrandsList extends MedicineBrands
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

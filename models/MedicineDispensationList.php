@@ -193,7 +193,7 @@ class MedicineDispensationList extends MedicineDispensation
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "medicinedispensationadd";
+        $this->AddUrl = "medicinedispensationadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -707,6 +707,12 @@ class MedicineDispensationList extends MedicineDispensation
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->dispensation_type);
+        $this->setupLookupOptions($this->status);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1349,17 +1355,33 @@ class MedicineDispensationList extends MedicineDispensation
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "detail_medicine_dispensation_details"
+        $item = &$this->ListOptions->add("detail_medicine_dispensation_details");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'medicine_dispensation_details');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("medicine_dispensation_details");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1445,19 +1467,6 @@ class MedicineDispensationList extends MedicineDispensation
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"medicine_dispensation\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
             if ($Security->canDelete() && $this->showOptionLink("delete")) {
@@ -1511,6 +1520,68 @@ class MedicineDispensationList extends MedicineDispensation
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_medicine_dispensation_details"
+        $opt = $this->ListOptions["detail_medicine_dispensation_details"];
+        if ($Security->allowList(CurrentProjectID() . 'medicine_dispensation_details') && $this->showOptionLink()) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("medicine_dispensation_details", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("medicinedispensationdetailslist?" . Config("TABLE_SHOW_MASTER") . "=medicine_dispensation&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("MedicineDispensationDetailsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'medicine_dispensation')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=medicine_dispensation_details");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "medicine_dispensation_details";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'medicine_dispensation')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=medicine_dispensation_details");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "medicine_dispensation_details";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1544,6 +1615,37 @@ class MedicineDispensationList extends MedicineDispensation
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $item = &$option->add("detailadd_medicine_dispensation_details");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=medicine_dispensation_details");
+        $detailPage = Container("MedicineDispensationDetailsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'medicine_dispensation') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "medicine_dispensation_details";
+        }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -2082,22 +2184,68 @@ class MedicineDispensationList extends MedicineDispensation
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // prescription_id
             $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
             $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
 
             // dispensation_type
-            $this->dispensation_type->ViewValue = $this->dispensation_type->CurrentValue;
+            if (strval($this->dispensation_type->CurrentValue) != "") {
+                $this->dispensation_type->ViewValue = $this->dispensation_type->optionCaption($this->dispensation_type->CurrentValue);
+            } else {
+                $this->dispensation_type->ViewValue = null;
+            }
 
             // status
-            $this->status->ViewValue = $this->status->CurrentValue;
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2399,6 +2547,14 @@ class MedicineDispensationList extends MedicineDispensation
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_dispensation_type":
+                    break;
+                case "x_status":
+                    break;
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

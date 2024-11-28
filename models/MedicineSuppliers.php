@@ -51,7 +51,6 @@ class MedicineSuppliers extends DbTable
     public $phone;
     public $email_address;
     public $physical_address;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -169,6 +168,7 @@ class MedicineSuppliers extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
         $this->phone->InputTextType = "text";
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
@@ -193,6 +193,7 @@ class MedicineSuppliers extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->email_address->addMethod("getLinkPrefix", fn() => "mailto:");
         $this->email_address->InputTextType = "text";
         $this->email_address->Nullable = false; // NOT NULL field
         $this->email_address->Required = true; // Required field
@@ -215,37 +216,11 @@ class MedicineSuppliers extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->physical_address->InputTextType = "text";
         $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['physical_address'] = &$this->physical_address;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -253,10 +228,10 @@ class MedicineSuppliers extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -269,7 +244,7 @@ class MedicineSuppliers extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -279,10 +254,10 @@ class MedicineSuppliers extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -295,7 +270,7 @@ class MedicineSuppliers extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -496,11 +471,6 @@ class MedicineSuppliers extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -827,7 +797,6 @@ class MedicineSuppliers extends DbTable
         $this->phone->DbValue = $row['phone'];
         $this->email_address->DbValue = $row['email_address'];
         $this->physical_address->DbValue = $row['physical_address'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1187,7 +1156,6 @@ class MedicineSuppliers extends DbTable
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1230,8 +1198,6 @@ class MedicineSuppliers extends DbTable
 
         // physical_address
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -1251,10 +1217,6 @@ class MedicineSuppliers extends DbTable
         // physical_address
         $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1272,20 +1234,32 @@ class MedicineSuppliers extends DbTable
         $this->supplier_name->TooltipValue = "";
 
         // phone
-        $this->phone->HrefValue = "";
+        if (!EmptyValue($this->phone->CurrentValue)) {
+            $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
+            $this->phone->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+            }
+        } else {
+            $this->phone->HrefValue = "";
+        }
         $this->phone->TooltipValue = "";
 
         // email_address
-        $this->email_address->HrefValue = "";
+        if (!EmptyValue($this->email_address->CurrentValue)) {
+            $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+            $this->email_address->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+            }
+        } else {
+            $this->email_address->HrefValue = "";
+        }
         $this->email_address->TooltipValue = "";
 
         // physical_address
         $this->physical_address->HrefValue = "";
         $this->physical_address->TooltipValue = "";
-
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1340,25 +1314,8 @@ class MedicineSuppliers extends DbTable
 
         // physical_address
         $this->physical_address->setupEditAttributes();
-        if (!$this->physical_address->Raw) {
-            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-        }
         $this->physical_address->EditValue = $this->physical_address->CurrentValue;
         $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1403,7 +1360,6 @@ class MedicineSuppliers extends DbTable
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->email_address);
                     $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
@@ -1412,7 +1368,6 @@ class MedicineSuppliers extends DbTable
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->email_address);
                     $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1446,7 +1401,6 @@ class MedicineSuppliers extends DbTable
                         $doc->exportField($this->phone);
                         $doc->exportField($this->email_address);
                         $doc->exportField($this->physical_address);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
@@ -1455,7 +1409,6 @@ class MedicineSuppliers extends DbTable
                         $doc->exportField($this->phone);
                         $doc->exportField($this->email_address);
                         $doc->exportField($this->physical_address);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1471,52 +1424,6 @@ class MedicineSuppliers extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM medicine_suppliers";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data

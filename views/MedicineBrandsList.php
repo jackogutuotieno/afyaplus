@@ -157,17 +157,11 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_brands_id" class="medicine_brands_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th data-name="category_id" class="<?= $Page->category_id->headerCellClass() ?>"><div id="elh_medicine_brands_category_id" class="medicine_brands_category_id"><?= $Page->renderFieldHeader($Page->category_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <th data-name="brand_name" class="<?= $Page->brand_name->headerCellClass() ?>"><div id="elh_medicine_brands_brand_name" class="medicine_brands_brand_name"><?= $Page->renderFieldHeader($Page->brand_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_medicine_brands_created_by_user_id" class="medicine_brands_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_brands_date_created" class="medicine_brands_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -203,14 +197,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_brands_id" class="el_medicine_brands_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->category_id->Visible) { // category_id ?>
         <td data-name="category_id"<?= $Page->category_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_brands_category_id" class="el_medicine_brands_category_id">
@@ -224,14 +210,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_brands_brand_name" class="el_medicine_brands_brand_name">
 <span<?= $Page->brand_name->viewAttributes() ?>>
 <?= $Page->brand_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_brands_created_by_user_id" class="el_medicine_brands_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

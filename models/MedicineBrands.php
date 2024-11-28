@@ -49,7 +49,6 @@ class MedicineBrands extends DbTable
     public $id;
     public $category_id;
     public $brand_name;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -141,14 +140,18 @@ class MedicineBrands extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->category_id->InputTextType = "text";
         $this->category_id->Raw = true;
         $this->category_id->Nullable = false; // NOT NULL field
         $this->category_id->Required = true; // Required field
+        $this->category_id->setSelectMultiple(false); // Select one
+        $this->category_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->category_id->Lookup = new Lookup($this->category_id, 'medicine_categories', false, 'id', ["category_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`category_name`");
         $this->category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->category_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['category_id'] = &$this->category_id;
 
         // brand_name
@@ -174,32 +177,6 @@ class MedicineBrands extends DbTable
         $this->brand_name->Required = true; // Required field
         $this->brand_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['brand_name'] = &$this->brand_name;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -450,11 +427,6 @@ class MedicineBrands extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -779,7 +751,6 @@ class MedicineBrands extends DbTable
         $this->id->DbValue = $row['id'];
         $this->category_id->DbValue = $row['category_id'];
         $this->brand_name->DbValue = $row['brand_name'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1137,7 +1108,6 @@ class MedicineBrands extends DbTable
         $this->id->setDbValue($row['id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->brand_name->setDbValue($row['brand_name']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1176,8 +1146,6 @@ class MedicineBrands extends DbTable
 
         // brand_name
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -1186,15 +1154,30 @@ class MedicineBrands extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // category_id
-        $this->category_id->ViewValue = $this->category_id->CurrentValue;
-        $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+        $curVal = strval($this->category_id->CurrentValue);
+        if ($curVal != "") {
+            $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+            if ($this->category_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                } else {
+                    $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                }
+            }
+        } else {
+            $this->category_id->ViewValue = null;
+        }
 
         // brand_name
         $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
-
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1215,10 +1198,6 @@ class MedicineBrands extends DbTable
         // brand_name
         $this->brand_name->HrefValue = "";
         $this->brand_name->TooltipValue = "";
-
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1249,11 +1228,7 @@ class MedicineBrands extends DbTable
 
         // category_id
         $this->category_id->setupEditAttributes();
-        $this->category_id->EditValue = $this->category_id->CurrentValue;
         $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-        if (strval($this->category_id->EditValue) != "" && is_numeric($this->category_id->EditValue)) {
-            $this->category_id->EditValue = FormatNumber($this->category_id->EditValue, null);
-        }
 
         // brand_name
         $this->brand_name->setupEditAttributes();
@@ -1262,20 +1237,6 @@ class MedicineBrands extends DbTable
         }
         $this->brand_name->EditValue = $this->brand_name->CurrentValue;
         $this->brand_name->PlaceHolder = RemoveHtml($this->brand_name->caption());
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1318,14 +1279,12 @@ class MedicineBrands extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->category_id);
                     $doc->exportCaption($this->brand_name);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->category_id);
                     $doc->exportCaption($this->brand_name);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1357,14 +1316,12 @@ class MedicineBrands extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->category_id);
                         $doc->exportField($this->brand_name);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->category_id);
                         $doc->exportField($this->brand_name);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1380,52 +1337,6 @@ class MedicineBrands extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM medicine_brands";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data

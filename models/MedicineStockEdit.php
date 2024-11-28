@@ -126,12 +126,11 @@ class MedicineStockEdit extends MedicineStock
         $this->brand_id->setVisibility();
         $this->batch_number->setVisibility();
         $this->quantity->setVisibility();
+        $this->quantity_left->setVisibility();
         $this->measuring_unit->setVisibility();
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->modified_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -533,6 +532,11 @@ class MedicineStockEdit extends MedicineStock
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->supplier_id);
+        $this->setupLookupOptions($this->brand_id);
+        $this->setupLookupOptions($this->measuring_unit);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -726,7 +730,7 @@ class MedicineStockEdit extends MedicineStock
             if (IsApi() && $val === null) {
                 $this->supplier_id->Visible = false; // Disable update for API request
             } else {
-                $this->supplier_id->setFormValue($val, true, $validate);
+                $this->supplier_id->setFormValue($val);
             }
         }
 
@@ -736,7 +740,7 @@ class MedicineStockEdit extends MedicineStock
             if (IsApi() && $val === null) {
                 $this->brand_id->Visible = false; // Disable update for API request
             } else {
-                $this->brand_id->setFormValue($val, true, $validate);
+                $this->brand_id->setFormValue($val);
             }
         }
 
@@ -757,6 +761,16 @@ class MedicineStockEdit extends MedicineStock
                 $this->quantity->Visible = false; // Disable update for API request
             } else {
                 $this->quantity->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'quantity_left' first before field var 'x_quantity_left'
+        $val = $CurrentForm->hasValue("quantity_left") ? $CurrentForm->getValue("quantity_left") : $CurrentForm->getValue("x_quantity_left");
+        if (!$this->quantity_left->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->quantity_left->Visible = false; // Disable update for API request
+            } else {
+                $this->quantity_left->setFormValue($val, true, $validate);
             }
         }
 
@@ -801,26 +815,6 @@ class MedicineStockEdit extends MedicineStock
             $this->expiry_date->CurrentValue = UnFormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern());
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'modified_by_user_id' first before field var 'x_modified_by_user_id'
-        $val = $CurrentForm->hasValue("modified_by_user_id") ? $CurrentForm->getValue("modified_by_user_id") : $CurrentForm->getValue("x_modified_by_user_id");
-        if (!$this->modified_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->modified_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->modified_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -853,13 +847,12 @@ class MedicineStockEdit extends MedicineStock
         $this->brand_id->CurrentValue = $this->brand_id->FormValue;
         $this->batch_number->CurrentValue = $this->batch_number->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
+        $this->quantity_left->CurrentValue = $this->quantity_left->FormValue;
         $this->measuring_unit->CurrentValue = $this->measuring_unit->FormValue;
         $this->buying_price_per_unit->CurrentValue = $this->buying_price_per_unit->FormValue;
         $this->selling_price_per_unit->CurrentValue = $this->selling_price_per_unit->FormValue;
         $this->expiry_date->CurrentValue = $this->expiry_date->FormValue;
         $this->expiry_date->CurrentValue = UnFormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern());
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->modified_by_user_id->CurrentValue = $this->modified_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -889,15 +882,6 @@ class MedicineStockEdit extends MedicineStock
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -918,12 +902,11 @@ class MedicineStockEdit extends MedicineStock
         $this->brand_id->setDbValue($row['brand_id']);
         $this->batch_number->setDbValue($row['batch_number']);
         $this->quantity->setDbValue($row['quantity']);
+        $this->quantity_left->setDbValue($row['quantity_left']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
-        $this->modified_by_user_id->setDbValue($row['modified_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -937,12 +920,11 @@ class MedicineStockEdit extends MedicineStock
         $row['brand_id'] = $this->brand_id->DefaultValue;
         $row['batch_number'] = $this->batch_number->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
+        $row['quantity_left'] = $this->quantity_left->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['buying_price_per_unit'] = $this->buying_price_per_unit->DefaultValue;
         $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
-        $row['modified_by_user_id'] = $this->modified_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -994,6 +976,9 @@ class MedicineStockEdit extends MedicineStock
         // quantity
         $this->quantity->RowCssClass = "row";
 
+        // quantity_left
+        $this->quantity_left->RowCssClass = "row";
+
         // measuring_unit
         $this->measuring_unit->RowCssClass = "row";
 
@@ -1005,12 +990,6 @@ class MedicineStockEdit extends MedicineStock
 
         // expiry_date
         $this->expiry_date->RowCssClass = "row";
-
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
-        // modified_by_user_id
-        $this->modified_by_user_id->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -1024,12 +1003,50 @@ class MedicineStockEdit extends MedicineStock
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // supplier_id
-            $this->supplier_id->ViewValue = $this->supplier_id->CurrentValue;
-            $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+            $curVal = strval($this->supplier_id->CurrentValue);
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    } else {
+                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->supplier_id->ViewValue = null;
+            }
 
             // brand_id
-            $this->brand_id->ViewValue = $this->brand_id->CurrentValue;
-            $this->brand_id->ViewValue = FormatNumber($this->brand_id->ViewValue, $this->brand_id->formatPattern());
+            $curVal = strval($this->brand_id->CurrentValue);
+            if ($curVal != "") {
+                $this->brand_id->ViewValue = $this->brand_id->lookupCacheOption($curVal);
+                if ($this->brand_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->brand_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->brand_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->brand_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->brand_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->brand_id->ViewValue = $this->brand_id->displayValue($arwrk);
+                    } else {
+                        $this->brand_id->ViewValue = FormatNumber($this->brand_id->CurrentValue, $this->brand_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->brand_id->ViewValue = null;
+            }
 
             // batch_number
             $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
@@ -1037,6 +1054,10 @@ class MedicineStockEdit extends MedicineStock
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+
+            // quantity_left
+            $this->quantity_left->ViewValue = $this->quantity_left->CurrentValue;
+            $this->quantity_left->ViewValue = FormatNumber($this->quantity_left->ViewValue, $this->quantity_left->formatPattern());
 
             // measuring_unit
             $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
@@ -1052,14 +1073,6 @@ class MedicineStockEdit extends MedicineStock
             // expiry_date
             $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
             $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
-            // modified_by_user_id
-            $this->modified_by_user_id->ViewValue = $this->modified_by_user_id->CurrentValue;
-            $this->modified_by_user_id->ViewValue = FormatNumber($this->modified_by_user_id->ViewValue, $this->modified_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1084,6 +1097,9 @@ class MedicineStockEdit extends MedicineStock
             // quantity
             $this->quantity->HrefValue = "";
 
+            // quantity_left
+            $this->quantity_left->HrefValue = "";
+
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
 
@@ -1095,12 +1111,6 @@ class MedicineStockEdit extends MedicineStock
 
             // expiry_date
             $this->expiry_date->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // modified_by_user_id
-            $this->modified_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1114,19 +1124,57 @@ class MedicineStockEdit extends MedicineStock
 
             // supplier_id
             $this->supplier_id->setupEditAttributes();
-            $this->supplier_id->EditValue = $this->supplier_id->CurrentValue;
-            $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
-            if (strval($this->supplier_id->EditValue) != "" && is_numeric($this->supplier_id->EditValue)) {
-                $this->supplier_id->EditValue = FormatNumber($this->supplier_id->EditValue, null);
+            $curVal = trim(strval($this->supplier_id->CurrentValue));
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+            } else {
+                $this->supplier_id->ViewValue = $this->supplier_id->Lookup !== null && is_array($this->supplier_id->lookupOptions()) && count($this->supplier_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->supplier_id->ViewValue !== null) { // Load from cache
+                $this->supplier_id->EditValue = array_values($this->supplier_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->supplier_id->CurrentValue, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->supplier_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->supplier_id->EditValue = $arwrk;
+            }
+            $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
 
             // brand_id
             $this->brand_id->setupEditAttributes();
-            $this->brand_id->EditValue = $this->brand_id->CurrentValue;
-            $this->brand_id->PlaceHolder = RemoveHtml($this->brand_id->caption());
-            if (strval($this->brand_id->EditValue) != "" && is_numeric($this->brand_id->EditValue)) {
-                $this->brand_id->EditValue = FormatNumber($this->brand_id->EditValue, null);
+            $curVal = trim(strval($this->brand_id->CurrentValue));
+            if ($curVal != "") {
+                $this->brand_id->ViewValue = $this->brand_id->lookupCacheOption($curVal);
+            } else {
+                $this->brand_id->ViewValue = $this->brand_id->Lookup !== null && is_array($this->brand_id->lookupOptions()) && count($this->brand_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->brand_id->ViewValue !== null) { // Load from cache
+                $this->brand_id->EditValue = array_values($this->brand_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->brand_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->brand_id->CurrentValue, $this->brand_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->brand_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->brand_id->EditValue = $arwrk;
+            }
+            $this->brand_id->PlaceHolder = RemoveHtml($this->brand_id->caption());
 
             // batch_number
             $this->batch_number->setupEditAttributes();
@@ -1142,6 +1190,14 @@ class MedicineStockEdit extends MedicineStock
             $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
             if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
                 $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
+            }
+
+            // quantity_left
+            $this->quantity_left->setupEditAttributes();
+            $this->quantity_left->EditValue = $this->quantity_left->CurrentValue;
+            $this->quantity_left->PlaceHolder = RemoveHtml($this->quantity_left->caption());
+            if (strval($this->quantity_left->EditValue) != "" && is_numeric($this->quantity_left->EditValue)) {
+                $this->quantity_left->EditValue = FormatNumber($this->quantity_left->EditValue, null);
             }
 
             // measuring_unit
@@ -1173,28 +1229,6 @@ class MedicineStockEdit extends MedicineStock
             $this->expiry_date->EditValue = HtmlEncode(FormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern()));
             $this->expiry_date->PlaceHolder = RemoveHtml($this->expiry_date->caption());
 
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
-
-            // modified_by_user_id
-            $this->modified_by_user_id->setupEditAttributes();
-            $this->modified_by_user_id->EditValue = $this->modified_by_user_id->CurrentValue;
-            $this->modified_by_user_id->PlaceHolder = RemoveHtml($this->modified_by_user_id->caption());
-            if (strval($this->modified_by_user_id->EditValue) != "" && is_numeric($this->modified_by_user_id->EditValue)) {
-                $this->modified_by_user_id->EditValue = FormatNumber($this->modified_by_user_id->EditValue, null);
-            }
-
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -1222,6 +1256,9 @@ class MedicineStockEdit extends MedicineStock
             // quantity
             $this->quantity->HrefValue = "";
 
+            // quantity_left
+            $this->quantity_left->HrefValue = "";
+
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
 
@@ -1233,12 +1270,6 @@ class MedicineStockEdit extends MedicineStock
 
             // expiry_date
             $this->expiry_date->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // modified_by_user_id
-            $this->modified_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1276,16 +1307,10 @@ class MedicineStockEdit extends MedicineStock
                     $this->supplier_id->addErrorMessage(str_replace("%s", $this->supplier_id->caption(), $this->supplier_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->supplier_id->FormValue)) {
-                $this->supplier_id->addErrorMessage($this->supplier_id->getErrorMessage(false));
-            }
             if ($this->brand_id->Visible && $this->brand_id->Required) {
                 if (!$this->brand_id->IsDetailKey && EmptyValue($this->brand_id->FormValue)) {
                     $this->brand_id->addErrorMessage(str_replace("%s", $this->brand_id->caption(), $this->brand_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->brand_id->FormValue)) {
-                $this->brand_id->addErrorMessage($this->brand_id->getErrorMessage(false));
             }
             if ($this->batch_number->Visible && $this->batch_number->Required) {
                 if (!$this->batch_number->IsDetailKey && EmptyValue($this->batch_number->FormValue)) {
@@ -1299,6 +1324,14 @@ class MedicineStockEdit extends MedicineStock
             }
             if (!CheckInteger($this->quantity->FormValue)) {
                 $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
+            }
+            if ($this->quantity_left->Visible && $this->quantity_left->Required) {
+                if (!$this->quantity_left->IsDetailKey && EmptyValue($this->quantity_left->FormValue)) {
+                    $this->quantity_left->addErrorMessage(str_replace("%s", $this->quantity_left->caption(), $this->quantity_left->RequiredErrorMessage));
+                }
+            }
+            if (!CheckNumber($this->quantity_left->FormValue)) {
+                $this->quantity_left->addErrorMessage($this->quantity_left->getErrorMessage(false));
             }
             if ($this->measuring_unit->Visible && $this->measuring_unit->Required) {
                 if (!$this->measuring_unit->IsDetailKey && EmptyValue($this->measuring_unit->FormValue)) {
@@ -1328,22 +1361,6 @@ class MedicineStockEdit extends MedicineStock
             }
             if (!CheckDate($this->expiry_date->FormValue, $this->expiry_date->formatPattern())) {
                 $this->expiry_date->addErrorMessage($this->expiry_date->getErrorMessage(false));
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->modified_by_user_id->Visible && $this->modified_by_user_id->Required) {
-                if (!$this->modified_by_user_id->IsDetailKey && EmptyValue($this->modified_by_user_id->FormValue)) {
-                    $this->modified_by_user_id->addErrorMessage(str_replace("%s", $this->modified_by_user_id->caption(), $this->modified_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->modified_by_user_id->FormValue)) {
-                $this->modified_by_user_id->addErrorMessage($this->modified_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1462,6 +1479,9 @@ class MedicineStockEdit extends MedicineStock
         // quantity
         $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, $this->quantity->ReadOnly);
 
+        // quantity_left
+        $this->quantity_left->setDbValueDef($rsnew, $this->quantity_left->CurrentValue, $this->quantity_left->ReadOnly);
+
         // measuring_unit
         $this->measuring_unit->setDbValueDef($rsnew, $this->measuring_unit->CurrentValue, $this->measuring_unit->ReadOnly);
 
@@ -1473,12 +1493,6 @@ class MedicineStockEdit extends MedicineStock
 
         // expiry_date
         $this->expiry_date->setDbValueDef($rsnew, UnFormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern()), $this->expiry_date->ReadOnly);
-
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
-        // modified_by_user_id
-        $this->modified_by_user_id->setDbValueDef($rsnew, $this->modified_by_user_id->CurrentValue, $this->modified_by_user_id->ReadOnly);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
@@ -1506,6 +1520,9 @@ class MedicineStockEdit extends MedicineStock
         if (isset($row['quantity'])) { // quantity
             $this->quantity->CurrentValue = $row['quantity'];
         }
+        if (isset($row['quantity_left'])) { // quantity_left
+            $this->quantity_left->CurrentValue = $row['quantity_left'];
+        }
         if (isset($row['measuring_unit'])) { // measuring_unit
             $this->measuring_unit->CurrentValue = $row['measuring_unit'];
         }
@@ -1518,28 +1535,12 @@ class MedicineStockEdit extends MedicineStock
         if (isset($row['expiry_date'])) { // expiry_date
             $this->expiry_date->CurrentValue = $row['expiry_date'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
-        if (isset($row['modified_by_user_id'])) { // modified_by_user_id
-            $this->modified_by_user_id->CurrentValue = $row['modified_by_user_id'];
-        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->CurrentValue = $row['date_updated'];
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb
@@ -1566,6 +1567,12 @@ class MedicineStockEdit extends MedicineStock
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_supplier_id":
+                    break;
+                case "x_brand_id":
+                    break;
+                case "x_measuring_unit":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
