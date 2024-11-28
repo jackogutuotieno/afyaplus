@@ -173,9 +173,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
-        <th data-name="lab_test_requests_queue_id" class="<?= $Page->lab_test_requests_queue_id->headerCellClass() ?>"><div id="elh_lab_test_reports_lab_test_requests_queue_id" class="lab_test_reports_lab_test_requests_queue_id"><?= $Page->renderFieldHeader($Page->lab_test_requests_queue_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
         <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
 <?php } ?>
@@ -218,14 +215,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_id" class="el_lab_test_reports_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
-        <td data-name="lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_lab_test_requests_queue_id" class="el_lab_test_reports_lab_test_requests_queue_id">
-<span<?= $Page->lab_test_requests_queue_id->viewAttributes() ?>>
-<?= $Page->lab_test_requests_queue_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

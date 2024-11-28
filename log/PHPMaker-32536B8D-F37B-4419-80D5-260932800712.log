@@ -94,6 +94,7 @@ C:\wamp64\www\afyaplus\models\Diagnosis.php
 C:\wamp64\www\afyaplus\models\DiagnosisAdd.php
 C:\wamp64\www\afyaplus\models\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\models\DiagnosisEdit.php
+C:\wamp64\www\afyaplus\models\DiagnosisGrid.php
 C:\wamp64\www\afyaplus\models\DiagnosisList.php
 C:\wamp64\www\afyaplus\models\DiagnosisView.php
 C:\wamp64\www\afyaplus\models\Diseases.php
@@ -571,7 +572,9 @@ C:\wamp64\www\afyaplus\views\DesignationsView.php
 C:\wamp64\www\afyaplus\views\DiagnosisAdd.php
 C:\wamp64\www\afyaplus\views\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\views\DiagnosisEdit.php
+C:\wamp64\www\afyaplus\views\DiagnosisGrid.php
 C:\wamp64\www\afyaplus\views\DiagnosisList.php
+C:\wamp64\www\afyaplus\views\DiagnosisMaster.php
 C:\wamp64\www\afyaplus\views\DiagnosisView.php
 C:\wamp64\www\afyaplus\views\DiseasesAdd.php
 C:\wamp64\www\afyaplus\views\DiseasesDelete.php
@@ -621,6 +624,7 @@ C:\wamp64\www\afyaplus\views\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestReportsEdit.php
 C:\wamp64\www\afyaplus\views\LabTestReportsGrid.php
 C:\wamp64\www\afyaplus\views\LabTestReportsList.php
+C:\wamp64\www\afyaplus\views\LabTestReportsMaster.php
 C:\wamp64\www\afyaplus\views\LabTestReportsView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsAdd.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsDelete.php

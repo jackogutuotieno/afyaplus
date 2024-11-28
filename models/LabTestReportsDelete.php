@@ -122,7 +122,7 @@ class LabTestReportsDelete extends LabTestReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_requests_queue_id->setVisibility();
+        $this->lab_test_requests_queue_id->Visible = false;
         $this->details->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -710,10 +710,6 @@ class LabTestReportsDelete extends LabTestReports
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // lab_test_requests_queue_id
-            $this->lab_test_requests_queue_id->HrefValue = "";
-            $this->lab_test_requests_queue_id->TooltipValue = "";
 
             // details
             $this->details->HrefValue = "";

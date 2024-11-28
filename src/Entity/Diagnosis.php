@@ -33,20 +33,11 @@ class Diagnosis extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "patient_id", type: "integer")]
-    private int $patientId;
-
-    #[Column(name: "visit_id", type: "integer")]
-    private int $visitId;
-
-    #[Column(name: "report_id", type: "integer")]
-    private int $reportId;
+    #[Column(name: "lab_test_report_id", type: "integer")]
+    private int $labTestReportId;
 
     #[Column(name: "disease_id", type: "integer")]
     private int $diseaseId;
-
-    #[Column(name: "additional_findings", type: "text", nullable: true)]
-    private ?string $additionalFindings;
 
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
@@ -68,36 +59,14 @@ class Diagnosis extends AbstractEntity
         return $this;
     }
 
-    public function getPatientId(): int
+    public function getLabTestReportId(): int
     {
-        return $this->patientId;
+        return $this->labTestReportId;
     }
 
-    public function setPatientId(int $value): static
+    public function setLabTestReportId(int $value): static
     {
-        $this->patientId = $value;
-        return $this;
-    }
-
-    public function getVisitId(): int
-    {
-        return $this->visitId;
-    }
-
-    public function setVisitId(int $value): static
-    {
-        $this->visitId = $value;
-        return $this;
-    }
-
-    public function getReportId(): int
-    {
-        return $this->reportId;
-    }
-
-    public function setReportId(int $value): static
-    {
-        $this->reportId = $value;
+        $this->labTestReportId = $value;
         return $this;
     }
 
@@ -109,17 +78,6 @@ class Diagnosis extends AbstractEntity
     public function setDiseaseId(int $value): static
     {
         $this->diseaseId = $value;
-        return $this;
-    }
-
-    public function getAdditionalFindings(): ?string
-    {
-        return HtmlDecode($this->additionalFindings);
-    }
-
-    public function setAdditionalFindings(?string $value): static
-    {
-        $this->additionalFindings = RemoveXss($value);
         return $this;
     }
 

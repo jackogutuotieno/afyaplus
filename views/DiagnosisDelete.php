@@ -53,20 +53,11 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_diagnosis_id" class="diagnosis_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_diagnosis_patient_id" class="diagnosis_patient_id"><?= $Page->patient_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th class="<?= $Page->visit_id->headerCellClass() ?>"><span id="elh_diagnosis_visit_id" class="diagnosis_visit_id"><?= $Page->visit_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->report_id->Visible) { // report_id ?>
-        <th class="<?= $Page->report_id->headerCellClass() ?>"><span id="elh_diagnosis_report_id" class="diagnosis_report_id"><?= $Page->report_id->caption() ?></span></th>
+<?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
+        <th class="<?= $Page->lab_test_report_id->headerCellClass() ?>"><span id="elh_diagnosis_lab_test_report_id" class="diagnosis_lab_test_report_id"><?= $Page->lab_test_report_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->disease_id->Visible) { // disease_id ?>
         <th class="<?= $Page->disease_id->headerCellClass() ?>"><span id="elh_diagnosis_disease_id" class="diagnosis_disease_id"><?= $Page->disease_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->additional_findings->Visible) { // additional_findings ?>
-        <th class="<?= $Page->additional_findings->headerCellClass() ?>"><span id="elh_diagnosis_additional_findings" class="diagnosis_additional_findings"><?= $Page->additional_findings->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_diagnosis_created_by_user_id" class="diagnosis_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
@@ -106,27 +97,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <td<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
+        <td<?= $Page->lab_test_report_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td<?= $Page->visit_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->report_id->Visible) { // report_id ?>
-        <td<?= $Page->report_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->report_id->viewAttributes() ?>>
-<?= $Page->report_id->getViewValue() ?></span>
+<span<?= $Page->lab_test_report_id->viewAttributes() ?>>
+<?= $Page->lab_test_report_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -135,14 +110,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->disease_id->viewAttributes() ?>>
 <?= $Page->disease_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->additional_findings->Visible) { // additional_findings ?>
-        <td<?= $Page->additional_findings->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->additional_findings->viewAttributes() ?>>
-<?= $Page->additional_findings->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
