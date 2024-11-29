@@ -14,20 +14,11 @@
     <menu id="108">
       <phrase id="menutext" value="Notifications" />
     </menu>
-    <menu id="49">
-      <phrase id="menutext" value="Human Resources" />
-    </menu>
-    <menu id="2">
-      <phrase id="menutext" value="Departments" />
-    </menu>
-    <menu id="3">
-      <phrase id="menutext" value="Designations" />
-    </menu>
     <menu id="51">
       <phrase id="menutext" value="Patients" />
     </menu>
     <menu id="48">
-      <phrase id="menutext" value="All Patients" />
+      <phrase id="menutext" value="Patients List" />
     </menu>
     <menu id="24">
       <phrase id="menutext" value="Visits" />
@@ -175,6 +166,15 @@
     </menu>
     <menu id="35">
       <phrase id="menutext" value="Facility Charges" />
+    </menu>
+    <menu id="49">
+      <phrase id="menutext" value="Human Resources" />
+    </menu>
+    <menu id="2">
+      <phrase id="menutext" value="Departments" />
+    </menu>
+    <menu id="3">
+      <phrase id="menutext" value="Designations" />
     </menu>
     <menu id="104">
       <phrase id="menutext" value="Reports" />

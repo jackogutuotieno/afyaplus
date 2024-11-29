@@ -42,3 +42,5 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-11-29 17:34:32",/afyaplus/login,5,login,::1,,,,
 "2024-11-29 17:34:40",/afyaplus/logout,5,logout,::1,,,,
 "2024-11-29 17:34:56",/afyaplus/login,1,login,::1,,,,
+"2024-11-29 18:54:05",/afyaplus/logout,1,logout,::1,,,,
+"2024-11-29 18:54:14",/afyaplus/login,7,login,::1,,,,
