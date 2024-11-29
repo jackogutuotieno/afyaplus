@@ -154,7 +154,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","4","1868"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","7","328"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","1","0"],
@@ -307,7 +307,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}payment_methods","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}payment_methods","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}payment_methods","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}payment_methods","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}payment_methods","7","1903"],
     ["{32536B8D-F37B-4419-80D5-260932800712}prescription_details","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}prescription_details","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}prescription_details","1","0"],
@@ -523,7 +523,16 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","5","1896"],
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","7","1896"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","7","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}income","7","1903"]];
 
 /**
  * Tables
@@ -543,7 +552,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["diseases","diseases","Diseases",true,"{32536B8D-F37B-4419-80D5-260932800712}","diseaseslist"],
     ["doctor_charges","doctor_charges","doctor charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctorchargeslist"],
     ["doctor_notes","doctor_notes","Medical Notes",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctornoteslist"],
-    ["expenses","expenses","expenses",true,"{32536B8D-F37B-4419-80D5-260932800712}","expenseslist"],
+    ["expenses","expenses","Expenses",true,"{32536B8D-F37B-4419-80D5-260932800712}","expenseslist"],
     ["invoice_details","invoice_details","invoice details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicedetailslist"],
     ["invoice_reports","invoice_reports","invoice reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportslist"],
     ["invoices","invoices","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoiceslist"],
@@ -590,4 +599,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["radiology_billing_report","radiology_billing_report","Radiology Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologybillingreportlist"],
     ["radiology_billing_report_details","radiology_billing_report_details","Radiology Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologybillingreportdetailslist"],
     ["pharmacy_billing_report","pharmacy_billing_report","Pharmacy Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportlist"],
-    ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"]];
+    ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"],
+    ["income","income","Income",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomelist"]];

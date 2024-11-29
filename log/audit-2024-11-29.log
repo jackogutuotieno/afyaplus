@@ -44,3 +44,15 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-11-29 17:34:56",/afyaplus/login,1,login,::1,,,,
 "2024-11-29 18:54:05",/afyaplus/logout,1,logout,::1,,,,
 "2024-11-29 18:54:14",/afyaplus/login,7,login,::1,,,,
+"2024-11-29 19:03:05",/afyaplus/logout,7,logout,::1,,,,
+"2024-11-29 19:03:10",/afyaplus/login,7,login,::1,,,,
+"2024-11-29 19:12:44",/afyaplus/expensesadd,7,A,expenses,expense_title,4,,"Lunch for MD"
+"2024-11-29 19:12:44",/afyaplus/expensesadd,7,A,expenses,description,4,,"<p>Bought Lunch for MD</p>"
+"2024-11-29 19:12:44",/afyaplus/expensesadd,7,A,expenses,cost,4,,500
+"2024-11-29 19:12:44",/afyaplus/expensesadd,7,A,expenses,id,4,,4
+"2024-11-29 19:18:38",/afyaplus/expensesadd,7,A,expenses,expense_title,1,,"Lunch for MD"
+"2024-11-29 19:18:38",/afyaplus/expensesadd,7,A,expenses,description,1,,"<p>Lunch for the managing director</p>"
+"2024-11-29 19:18:38",/afyaplus/expensesadd,7,A,expenses,cost,1,,500
+"2024-11-29 19:18:38",/afyaplus/expensesadd,7,A,expenses,id,1,,1
+"2024-11-29 19:42:06",/afyaplus/logout,7,logout,::1,,,,
+"2024-11-29 19:42:12",/afyaplus/login,7,login,::1,,,,

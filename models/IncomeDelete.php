@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class ExpensesDelete extends Expenses
+class IncomeDelete extends Income
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class ExpensesDelete extends Expenses
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ExpensesDelete";
+    public $PageObjName = "IncomeDelete";
 
     // View file path
     public $View = null;
@@ -38,15 +38,7 @@ class ExpensesDelete extends Expenses
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "expensesdelete";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "incomedelete";
 
     // Page headings
     public $Heading = "";
@@ -129,11 +121,11 @@ class ExpensesDelete extends Expenses
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
-        $this->expense_title->setVisibility();
+        $this->id->setVisibility();
+        $this->income_title->setVisibility();
         $this->description->setVisibility();
         $this->cost->setVisibility();
-        $this->attachment->Visible = false;
+        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -143,8 +135,8 @@ class ExpensesDelete extends Expenses
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'expenses';
-        $this->TableName = 'expenses';
+        $this->TableVar = 'income';
+        $this->TableName = 'income';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -155,14 +147,14 @@ class ExpensesDelete extends Expenses
         // Language object
         $Language = Container("app.language");
 
-        // Table object (expenses)
-        if (!isset($GLOBALS["expenses"]) || $GLOBALS["expenses"]::class == PROJECT_NAMESPACE . "expenses") {
-            $GLOBALS["expenses"] = &$this;
+        // Table object (income)
+        if (!isset($GLOBALS["income"]) || $GLOBALS["income"]::class == PROJECT_NAMESPACE . "income") {
+            $GLOBALS["income"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'expenses');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'income');
         }
 
         // Start timer
@@ -431,7 +423,7 @@ class ExpensesDelete extends Expenses
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("expenseslist"); // Prevent SQL injection, return to list
+            $this->terminate("incomelist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -485,7 +477,7 @@ class ExpensesDelete extends Expenses
             $this->Recordset = $this->loadRecordset();
             if ($this->TotalRecords <= 0) { // No record found, exit
                 $this->Recordset?->free();
-                $this->terminate("expenseslist"); // Return to list
+                $this->terminate("incomelist"); // Return to list
                 return;
             }
         }
@@ -607,12 +599,12 @@ class ExpensesDelete extends Expenses
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->expense_title->setDbValue($row['expense_title']);
+        $this->income_title->setDbValue($row['income_title']);
         $this->description->setDbValue($row['description']);
         $this->cost->setDbValue($row['cost']);
-        $this->attachment->Upload->DbValue = $row['attachment'];
-        if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->attachment->Upload->DbValue = stream_get_contents($this->attachment->Upload->DbValue);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
         }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -623,10 +615,10 @@ class ExpensesDelete extends Expenses
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['expense_title'] = $this->expense_title->DefaultValue;
+        $row['income_title'] = $this->income_title->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['attachment'] = $this->attachment->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -646,13 +638,13 @@ class ExpensesDelete extends Expenses
 
         // id
 
-        // expense_title
+        // income_title
 
         // description
 
         // cost
 
-        // attachment
+        // invoice_attachment
 
         // date_created
 
@@ -663,8 +655,8 @@ class ExpensesDelete extends Expenses
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // expense_title
-            $this->expense_title->ViewValue = $this->expense_title->CurrentValue;
+            // income_title
+            $this->income_title->ViewValue = $this->income_title->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
@@ -681,9 +673,13 @@ class ExpensesDelete extends Expenses
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // expense_title
-            $this->expense_title->HrefValue = "";
-            $this->expense_title->TooltipValue = "";
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
+            // income_title
+            $this->income_title->HrefValue = "";
+            $this->income_title->TooltipValue = "";
 
             // description
             $this->description->HrefValue = "";
@@ -725,9 +721,6 @@ class ExpensesDelete extends Expenses
         }
         if ($this->UseTransaction) {
             $conn->beginTransaction();
-        }
-        if ($this->AuditTrailOnDelete) {
-            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
         }
 
         // Clone old rows
@@ -790,37 +783,11 @@ class ExpensesDelete extends Expenses
             if (count($failKeys) > 0) {
                 $this->setWarningMessage(str_replace("%k", explode(", ", $failKeys), $Language->phrase("DeleteRecordsFailed")));
             }
-            if ($this->AuditTrailOnDelete) {
-                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteSuccess")); // Batch delete success
-            }
-            $table = 'expenses';
-            $subject = $table . " " . $Language->phrase("RecordDeleted");
-            $action = $Language->phrase("ActionDeleted");
-            $email = new Email();
-            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
-                "From" => Config("SENDER_EMAIL"), // Replace Sender
-                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
-                "Subject" => $subject,  // Replace Subject
-                "Table" => $table,
-                "Key" => implode(", ", $successKeys),
-                "Action" => $action
-            ]);
-            $args = ["rs" => $rsold];
-            $emailSent = false;
-            if ($this->emailSending($email, $args)) {
-                $emailSent = $email->send();
-            }
-            if (!$emailSent) {
-                $this->setFailureMessage($email->SendErrDescription);
-            }
         } else {
             if ($this->UseTransaction) { // Rollback transaction
                 if ($conn->isTransactionActive()) {
                     $conn->rollback();
                 }
-            }
-            if ($this->AuditTrailOnDelete) {
-                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteRollback")); // Batch delete rollback
             }
         }
 
@@ -842,7 +809,7 @@ class ExpensesDelete extends Expenses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("expenseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("incomelist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

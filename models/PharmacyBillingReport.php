@@ -72,7 +72,7 @@ class PharmacyBillingReport extends DbTable
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "medicine_dispensation";
+        $this->UpdateTable = "pharmacy_billing_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)

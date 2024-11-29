@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class ExpensesView extends Expenses
+class IncomeView extends Income
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class ExpensesView extends Expenses
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ExpensesView";
+    public $PageObjName = "IncomeView";
 
     // View file path
     public $View = null;
@@ -38,7 +38,7 @@ class ExpensesView extends Expenses
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "expensesview";
+    public $CurrentPageName = "incomeview";
 
     // Page URLs
     public $AddUrl;
@@ -57,14 +57,6 @@ class ExpensesView extends Expenses
     public $MultiEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -148,10 +140,10 @@ class ExpensesView extends Expenses
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->expense_title->setVisibility();
+        $this->income_title->setVisibility();
         $this->description->setVisibility();
         $this->cost->setVisibility();
-        $this->attachment->setVisibility();
+        $this->invoice_attachment->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -161,8 +153,8 @@ class ExpensesView extends Expenses
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'expenses';
-        $this->TableName = 'expenses';
+        $this->TableVar = 'income';
+        $this->TableName = 'income';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
@@ -173,9 +165,9 @@ class ExpensesView extends Expenses
         // Language object
         $Language = Container("app.language");
 
-        // Table object (expenses)
-        if (!isset($GLOBALS["expenses"]) || $GLOBALS["expenses"]::class == PROJECT_NAMESPACE . "expenses") {
-            $GLOBALS["expenses"] = &$this;
+        // Table object (income)
+        if (!isset($GLOBALS["income"]) || $GLOBALS["income"]::class == PROJECT_NAMESPACE . "income") {
+            $GLOBALS["income"] = &$this;
         }
 
         // Set up record key
@@ -185,7 +177,7 @@ class ExpensesView extends Expenses
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'expenses');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'income');
         }
 
         // Start timer
@@ -305,7 +297,7 @@ class ExpensesView extends Expenses
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "expensesview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "incomeview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -587,7 +579,7 @@ class ExpensesView extends Expenses
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
         } elseif (!$loadCurrentRecord) {
-            $returnUrl = "expenseslist"; // Return to list
+            $returnUrl = "incomelist"; // Return to list
         }
 
         // Get action
@@ -609,7 +601,7 @@ class ExpensesView extends Expenses
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "expenseslist"; // No matching record, return to list
+                        $returnUrl = "incomelist"; // No matching record, return to list
                     }
                 break;
         }
@@ -814,16 +806,13 @@ class ExpensesView extends Expenses
 
         // Call Row Selected event
         $this->rowSelected($row);
-        if ($this->AuditTrailOnView) {
-            $this->writeAuditTrailOnView($row);
-        }
         $this->id->setDbValue($row['id']);
-        $this->expense_title->setDbValue($row['expense_title']);
+        $this->income_title->setDbValue($row['income_title']);
         $this->description->setDbValue($row['description']);
         $this->cost->setDbValue($row['cost']);
-        $this->attachment->Upload->DbValue = $row['attachment'];
-        if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->attachment->Upload->DbValue = stream_get_contents($this->attachment->Upload->DbValue);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
         }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -834,10 +823,10 @@ class ExpensesView extends Expenses
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['expense_title'] = $this->expense_title->DefaultValue;
+        $row['income_title'] = $this->income_title->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['attachment'] = $this->attachment->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -863,13 +852,13 @@ class ExpensesView extends Expenses
 
         // id
 
-        // expense_title
+        // income_title
 
         // description
 
         // cost
 
-        // attachment
+        // invoice_attachment
 
         // date_created
 
@@ -880,8 +869,8 @@ class ExpensesView extends Expenses
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // expense_title
-            $this->expense_title->ViewValue = $this->expense_title->CurrentValue;
+            // income_title
+            $this->income_title->ViewValue = $this->income_title->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
@@ -890,12 +879,12 @@ class ExpensesView extends Expenses
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // attachment
-            if (!EmptyValue($this->attachment->Upload->DbValue)) {
-                $this->attachment->ViewValue = $this->id->CurrentValue;
-                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            // invoice_attachment
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
             } else {
-                $this->attachment->ViewValue = "";
+                $this->invoice_attachment->ViewValue = "";
             }
 
             // date_created
@@ -910,9 +899,9 @@ class ExpensesView extends Expenses
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // expense_title
-            $this->expense_title->HrefValue = "";
-            $this->expense_title->TooltipValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
+            $this->income_title->TooltipValue = "";
 
             // description
             $this->description->HrefValue = "";
@@ -922,21 +911,21 @@ class ExpensesView extends Expenses
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
 
-            // attachment
-            if (!empty($this->attachment->Upload->DbValue)) {
-                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
-                $this->attachment->LinkAttrs["target"] = "";
-                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
-                    $this->attachment->LinkAttrs["target"] = "_blank";
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
                 }
                 if ($this->isExport()) {
-                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
                 }
             } else {
-                $this->attachment->HrefValue = "";
+                $this->invoice_attachment->HrefValue = "";
             }
-            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
-            $this->attachment->TooltipValue = "";
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -958,19 +947,19 @@ class ExpensesView extends Expenses
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fexpensesview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fincomeview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fexpensesview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fincomeview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fexpensesview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fincomeview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -982,7 +971,7 @@ class ExpensesView extends Expenses
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fexpensesview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fincomeview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -1111,7 +1100,7 @@ class ExpensesView extends Expenses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("expenseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("incomelist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

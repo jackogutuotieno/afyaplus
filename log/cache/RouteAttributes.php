@@ -127,6 +127,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -256,6 +261,31 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1480,6 +1510,11 @@
                 '/exportlogview[/{FileId:.*}]',
                 '/exportlogedit[/{FileId:.*}]',
                 '/exportlogdelete[/{FileId:.*}]',
+                '/incomelist[/{id}]',
+                '/incomeadd[/{id}]',
+                '/incomeview[/{id}]',
+                '/incomeedit[/{id}]',
+                '/incomedelete[/{id}]',
                 '/invoicedetailslist[/{id}]',
                 '/invoicedetailsadd[/{id}]',
                 '/invoicedetailsview[/{id}]',
@@ -1721,6 +1756,11 @@
                 'PHPMaker2024\\afyaplus\\ExportlogController:view',
                 'PHPMaker2024\\afyaplus\\ExportlogController:edit',
                 'PHPMaker2024\\afyaplus\\ExportlogController:delete',
+                'PHPMaker2024\\afyaplus\\IncomeController:list',
+                'PHPMaker2024\\afyaplus\\IncomeController:add',
+                'PHPMaker2024\\afyaplus\\IncomeController:view',
+                'PHPMaker2024\\afyaplus\\IncomeController:edit',
+                'PHPMaker2024\\afyaplus\\IncomeController:delete',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:list',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:add',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:view',
@@ -1918,6 +1958,21 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2679,6 +2734,11 @@
                 'view.exportlog',
                 'edit.exportlog',
                 'delete.exportlog',
+                'list.income',
+                'add.income',
+                'view.income',
+                'edit.income',
+                'delete.income',
                 'list.invoice_details',
                 'add.invoice_details',
                 'view.invoice_details',
@@ -2876,6 +2936,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3358,6 +3423,11 @@
         $o[236],
         $o[237],
         $o[238],
+        $o[239],
+        $o[240],
+        $o[241],
+        $o[242],
+        $o[243],
     ],
     []
 );

@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$ExpensesList = &$Page;
+$IncomeList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { expenses: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -51,20 +51,20 @@ loadjs.ready("head", function () {
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fexpensessrch" id="fexpensessrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fexpensessrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fincomesrch" id="fincomesrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fincomesrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { expenses: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income: currentTable } });
 var currentForm;
-var fexpensessrch, currentSearchForm, currentAdvancedSearchForm;
+var fincomesrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fexpensessrch")
+        .setId("fincomesrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -95,10 +95,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fexpensessrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fexpensessrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fexpensessrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fexpensessrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fincomesrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fincomesrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fincomesrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fincomesrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -138,13 +138,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="expenses">
+<input type="hidden" name="t" value="income">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_expenses" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_income" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_expenseslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_incomelist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -157,20 +157,23 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->expense_title->Visible) { // expense_title ?>
-        <th data-name="expense_title" class="<?= $Page->expense_title->headerCellClass() ?>"><div id="elh_expenses_expense_title" class="expenses_expense_title"><?= $Page->renderFieldHeader($Page->expense_title) ?></div></th>
+<?php if ($Page->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_income_id" class="income_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+<?php } ?>
+<?php if ($Page->income_title->Visible) { // income_title ?>
+        <th data-name="income_title" class="<?= $Page->income_title->headerCellClass() ?>"><div id="elh_income_income_title" class="income_income_title"><?= $Page->renderFieldHeader($Page->income_title) ?></div></th>
 <?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
-        <th data-name="description" class="<?= $Page->description->headerCellClass() ?>"><div id="elh_expenses_description" class="expenses_description"><?= $Page->renderFieldHeader($Page->description) ?></div></th>
+        <th data-name="description" class="<?= $Page->description->headerCellClass() ?>"><div id="elh_income_description" class="income_description"><?= $Page->renderFieldHeader($Page->description) ?></div></th>
 <?php } ?>
 <?php if ($Page->cost->Visible) { // cost ?>
-        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_expenses_cost" class="expenses_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
+        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_income_cost" class="income_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_expenses_date_created" class="expenses_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_income_date_created" class="income_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_expenses_date_updated" class="expenses_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_income_date_updated" class="income_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -200,17 +203,25 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->expense_title->Visible) { // expense_title ?>
-        <td data-name="expense_title"<?= $Page->expense_title->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_expenses_expense_title" class="el_expenses_expense_title">
-<span<?= $Page->expense_title->viewAttributes() ?>>
-<?= $Page->expense_title->getViewValue() ?></span>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_id" class="el_income_id">
+<span<?= $Page->id->viewAttributes() ?>>
+<?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->income_title->Visible) { // income_title ?>
+        <td data-name="income_title"<?= $Page->income_title->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_income_title" class="el_income_income_title">
+<span<?= $Page->income_title->viewAttributes() ?>>
+<?= $Page->income_title->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
     <?php if ($Page->description->Visible) { // description ?>
         <td data-name="description"<?= $Page->description->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_expenses_description" class="el_expenses_description">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_description" class="el_income_description">
 <span<?= $Page->description->viewAttributes() ?>>
 <?= $Page->description->getViewValue() ?></span>
 </span>
@@ -218,7 +229,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->cost->Visible) { // cost ?>
         <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_expenses_cost" class="el_expenses_cost">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_cost" class="el_income_cost">
 <span<?= $Page->cost->viewAttributes() ?>>
 <?= $Page->cost->getViewValue() ?></span>
 </span>
@@ -226,7 +237,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_expenses_date_created" class="el_expenses_date_created">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_date_created" class="el_income_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
 </span>
@@ -234,7 +245,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_expenses_date_updated" class="el_expenses_date_updated">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_date_updated" class="el_income_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
 </span>
@@ -299,7 +310,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("expenses");
+    ew.addEventHandlers("income");
 });
 </script>
 <script>

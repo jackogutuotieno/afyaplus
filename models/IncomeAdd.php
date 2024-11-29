@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class ExpensesAdd extends Expenses
+class IncomeAdd extends Income
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class ExpensesAdd extends Expenses
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ExpensesAdd";
+    public $PageObjName = "IncomeAdd";
 
     // View file path
     public $View = null;
@@ -38,15 +38,7 @@ class ExpensesAdd extends Expenses
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "expensesadd";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "incomeadd";
 
     // Page headings
     public $Heading = "";
@@ -130,10 +122,10 @@ class ExpensesAdd extends Expenses
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->expense_title->setVisibility();
+        $this->income_title->setVisibility();
         $this->description->setVisibility();
         $this->cost->setVisibility();
-        $this->attachment->setVisibility();
+        $this->invoice_attachment->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -143,8 +135,8 @@ class ExpensesAdd extends Expenses
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'expenses';
-        $this->TableName = 'expenses';
+        $this->TableVar = 'income';
+        $this->TableName = 'income';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-add-table";
@@ -155,14 +147,14 @@ class ExpensesAdd extends Expenses
         // Language object
         $Language = Container("app.language");
 
-        // Table object (expenses)
-        if (!isset($GLOBALS["expenses"]) || $GLOBALS["expenses"]::class == PROJECT_NAMESPACE . "expenses") {
-            $GLOBALS["expenses"] = &$this;
+        // Table object (income)
+        if (!isset($GLOBALS["income"]) || $GLOBALS["income"]::class == PROJECT_NAMESPACE . "income") {
+            $GLOBALS["income"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'expenses');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'income');
         }
 
         // Start timer
@@ -276,7 +268,7 @@ class ExpensesAdd extends Expenses
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "expensesview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "incomeview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -591,7 +583,7 @@ class ExpensesAdd extends Expenses
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("expenseslist"); // No matching record, return to list
+                    $this->terminate("incomelist"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -602,18 +594,18 @@ class ExpensesAdd extends Expenses
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "expenseslist") {
+                    if (GetPageName($returnUrl) == "incomelist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "expensesview") {
+                    } elseif (GetPageName($returnUrl) == "incomeview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
 
                     // Handle UseAjaxActions with return page
                     if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "expenseslist") {
+                        if (GetPageName($returnUrl) != "incomelist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "expenseslist"; // Return list page content
+                            $returnUrl = "incomelist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) { // Return to caller
@@ -674,8 +666,8 @@ class ExpensesAdd extends Expenses
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
-        $this->attachment->Upload->Index = $CurrentForm->Index;
-        $this->attachment->Upload->uploadFile();
+        $this->invoice_attachment->Upload->Index = $CurrentForm->Index;
+        $this->invoice_attachment->Upload->uploadFile();
     }
 
     // Load default values
@@ -690,13 +682,13 @@ class ExpensesAdd extends Expenses
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'expense_title' first before field var 'x_expense_title'
-        $val = $CurrentForm->hasValue("expense_title") ? $CurrentForm->getValue("expense_title") : $CurrentForm->getValue("x_expense_title");
-        if (!$this->expense_title->IsDetailKey) {
+        // Check field name 'income_title' first before field var 'x_income_title'
+        $val = $CurrentForm->hasValue("income_title") ? $CurrentForm->getValue("income_title") : $CurrentForm->getValue("x_income_title");
+        if (!$this->income_title->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->expense_title->Visible = false; // Disable update for API request
+                $this->income_title->Visible = false; // Disable update for API request
             } else {
-                $this->expense_title->setFormValue($val);
+                $this->income_title->setFormValue($val);
             }
         }
 
@@ -729,7 +721,7 @@ class ExpensesAdd extends Expenses
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->expense_title->CurrentValue = $this->expense_title->FormValue;
+        $this->income_title->CurrentValue = $this->income_title->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
     }
@@ -773,12 +765,12 @@ class ExpensesAdd extends Expenses
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->expense_title->setDbValue($row['expense_title']);
+        $this->income_title->setDbValue($row['income_title']);
         $this->description->setDbValue($row['description']);
         $this->cost->setDbValue($row['cost']);
-        $this->attachment->Upload->DbValue = $row['attachment'];
-        if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->attachment->Upload->DbValue = stream_get_contents($this->attachment->Upload->DbValue);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
         }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -789,10 +781,10 @@ class ExpensesAdd extends Expenses
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['expense_title'] = $this->expense_title->DefaultValue;
+        $row['income_title'] = $this->income_title->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['attachment'] = $this->attachment->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -832,8 +824,8 @@ class ExpensesAdd extends Expenses
         // id
         $this->id->RowCssClass = "row";
 
-        // expense_title
-        $this->expense_title->RowCssClass = "row";
+        // income_title
+        $this->income_title->RowCssClass = "row";
 
         // description
         $this->description->RowCssClass = "row";
@@ -841,8 +833,8 @@ class ExpensesAdd extends Expenses
         // cost
         $this->cost->RowCssClass = "row";
 
-        // attachment
-        $this->attachment->RowCssClass = "row";
+        // invoice_attachment
+        $this->invoice_attachment->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -855,8 +847,8 @@ class ExpensesAdd extends Expenses
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // expense_title
-            $this->expense_title->ViewValue = $this->expense_title->CurrentValue;
+            // income_title
+            $this->income_title->ViewValue = $this->income_title->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
@@ -865,12 +857,12 @@ class ExpensesAdd extends Expenses
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // attachment
-            if (!EmptyValue($this->attachment->Upload->DbValue)) {
-                $this->attachment->ViewValue = $this->id->CurrentValue;
-                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            // invoice_attachment
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
             } else {
-                $this->attachment->ViewValue = "";
+                $this->invoice_attachment->ViewValue = "";
             }
 
             // date_created
@@ -881,8 +873,8 @@ class ExpensesAdd extends Expenses
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // expense_title
-            $this->expense_title->HrefValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
 
             // description
             $this->description->HrefValue = "";
@@ -890,28 +882,28 @@ class ExpensesAdd extends Expenses
             // cost
             $this->cost->HrefValue = "";
 
-            // attachment
-            if (!empty($this->attachment->Upload->DbValue)) {
-                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
-                $this->attachment->LinkAttrs["target"] = "";
-                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
-                    $this->attachment->LinkAttrs["target"] = "_blank";
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
                 }
                 if ($this->isExport()) {
-                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
                 }
             } else {
-                $this->attachment->HrefValue = "";
+                $this->invoice_attachment->HrefValue = "";
             }
-            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         } elseif ($this->RowType == RowType::ADD) {
-            // expense_title
-            $this->expense_title->setupEditAttributes();
-            if (!$this->expense_title->Raw) {
-                $this->expense_title->CurrentValue = HtmlDecode($this->expense_title->CurrentValue);
+            // income_title
+            $this->income_title->setupEditAttributes();
+            if (!$this->income_title->Raw) {
+                $this->income_title->CurrentValue = HtmlDecode($this->income_title->CurrentValue);
             }
-            $this->expense_title->EditValue = HtmlEncode($this->expense_title->CurrentValue);
-            $this->expense_title->PlaceHolder = RemoveHtml($this->expense_title->caption());
+            $this->income_title->EditValue = HtmlEncode($this->income_title->CurrentValue);
+            $this->income_title->PlaceHolder = RemoveHtml($this->income_title->caption());
 
             // description
             $this->description->setupEditAttributes();
@@ -926,25 +918,25 @@ class ExpensesAdd extends Expenses
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
-            // attachment
-            $this->attachment->setupEditAttributes();
-            if (!EmptyValue($this->attachment->Upload->DbValue)) {
-                $this->attachment->EditValue = $this->id->CurrentValue;
-                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            // invoice_attachment
+            $this->invoice_attachment->setupEditAttributes();
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->EditValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
             } else {
-                $this->attachment->EditValue = "";
+                $this->invoice_attachment->EditValue = "";
             }
             if (!Config("CREATE_UPLOAD_FILE_ON_COPY")) {
-                $this->attachment->Upload->DbValue = null;
+                $this->invoice_attachment->Upload->DbValue = null;
             }
             if ($this->isShow() || $this->isCopy()) {
-                RenderUploadField($this->attachment);
+                RenderUploadField($this->invoice_attachment);
             }
 
             // Add refer script
 
-            // expense_title
-            $this->expense_title->HrefValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
 
             // description
             $this->description->HrefValue = "";
@@ -952,20 +944,20 @@ class ExpensesAdd extends Expenses
             // cost
             $this->cost->HrefValue = "";
 
-            // attachment
-            if (!empty($this->attachment->Upload->DbValue)) {
-                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
-                $this->attachment->LinkAttrs["target"] = "";
-                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
-                    $this->attachment->LinkAttrs["target"] = "_blank";
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
                 }
                 if ($this->isExport()) {
-                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
                 }
             } else {
-                $this->attachment->HrefValue = "";
+                $this->invoice_attachment->HrefValue = "";
             }
-            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -987,9 +979,9 @@ class ExpensesAdd extends Expenses
             return true;
         }
         $validateForm = true;
-            if ($this->expense_title->Visible && $this->expense_title->Required) {
-                if (!$this->expense_title->IsDetailKey && EmptyValue($this->expense_title->FormValue)) {
-                    $this->expense_title->addErrorMessage(str_replace("%s", $this->expense_title->caption(), $this->expense_title->RequiredErrorMessage));
+            if ($this->income_title->Visible && $this->income_title->Required) {
+                if (!$this->income_title->IsDetailKey && EmptyValue($this->income_title->FormValue)) {
+                    $this->income_title->addErrorMessage(str_replace("%s", $this->income_title->caption(), $this->income_title->RequiredErrorMessage));
                 }
             }
             if ($this->description->Visible && $this->description->Required) {
@@ -1005,9 +997,9 @@ class ExpensesAdd extends Expenses
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
             }
-            if ($this->attachment->Visible && $this->attachment->Required) {
-                if ($this->attachment->Upload->FileName == "" && !$this->attachment->Upload->KeepFile) {
-                    $this->attachment->addErrorMessage(str_replace("%s", $this->attachment->caption(), $this->attachment->RequiredErrorMessage));
+            if ($this->invoice_attachment->Visible && $this->invoice_attachment->Required) {
+                if ($this->invoice_attachment->Upload->FileName == "" && !$this->invoice_attachment->Upload->KeepFile) {
+                    $this->invoice_attachment->addErrorMessage(str_replace("%s", $this->invoice_attachment->caption(), $this->invoice_attachment->RequiredErrorMessage));
                 }
             }
 
@@ -1060,9 +1052,6 @@ class ExpensesAdd extends Expenses
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
-            if ($this->SendEmail) {
-                $this->sendEmailOnAdd($rsnew);
-            }
         }
 
         // Write JSON response
@@ -1084,8 +1073,8 @@ class ExpensesAdd extends Expenses
         global $Security;
         $rsnew = [];
 
-        // expense_title
-        $this->expense_title->setDbValueDef($rsnew, $this->expense_title->CurrentValue, false);
+        // income_title
+        $this->income_title->setDbValueDef($rsnew, $this->income_title->CurrentValue, false);
 
         // description
         $this->description->setDbValueDef($rsnew, $this->description->CurrentValue, false);
@@ -1093,12 +1082,12 @@ class ExpensesAdd extends Expenses
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
 
-        // attachment
-        if ($this->attachment->Visible && !$this->attachment->Upload->KeepFile) {
-            if ($this->attachment->Upload->Value === null) {
-                $rsnew['attachment'] = null;
+        // invoice_attachment
+        if ($this->invoice_attachment->Visible && !$this->invoice_attachment->Upload->KeepFile) {
+            if ($this->invoice_attachment->Upload->Value === null) {
+                $rsnew['invoice_attachment'] = null;
             } else {
-                $rsnew['attachment'] = $this->attachment->Upload->Value;
+                $rsnew['invoice_attachment'] = $this->invoice_attachment->Upload->Value;
             }
         }
         return $rsnew;
@@ -1110,8 +1099,8 @@ class ExpensesAdd extends Expenses
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['expense_title'])) { // expense_title
-            $this->expense_title->setFormValue($row['expense_title']);
+        if (isset($row['income_title'])) { // income_title
+            $this->income_title->setFormValue($row['income_title']);
         }
         if (isset($row['description'])) { // description
             $this->description->setFormValue($row['description']);
@@ -1119,8 +1108,8 @@ class ExpensesAdd extends Expenses
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);
         }
-        if (isset($row['attachment'])) { // attachment
-            $this->attachment->setFormValue($row['attachment']);
+        if (isset($row['invoice_attachment'])) { // invoice_attachment
+            $this->invoice_attachment->setFormValue($row['invoice_attachment']);
         }
     }
 
@@ -1130,7 +1119,7 @@ class ExpensesAdd extends Expenses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("expenseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("incomelist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

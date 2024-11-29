@@ -22,19 +22,19 @@ use function PHPMaker2024\afyaplus\HtmlDecode;
 use function PHPMaker2024\afyaplus\EncryptPassword;
 
 /**
- * Entity class for "expenses" table
+ * Entity class for "income" table
  */
 #[Entity]
-#[Table(name: "expenses")]
-class Expense extends AbstractEntity
+#[Table(name: "income")]
+class Income extends AbstractEntity
 {
     #[Id]
     #[Column(type: "integer", unique: true)]
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "expense_title", type: "string")]
-    private string $expenseTitle;
+    #[Column(name: "income_title", type: "string")]
+    private string $incomeTitle;
 
     #[Column(type: "text")]
     private string $description;
@@ -42,8 +42,8 @@ class Expense extends AbstractEntity
     #[Column(type: "float")]
     private float $cost;
 
-    #[Column(type: "blob", nullable: true)]
-    private mixed $attachment;
+    #[Column(name: "invoice_attachment", type: "blob", nullable: true)]
+    private mixed $invoiceAttachment;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -62,14 +62,14 @@ class Expense extends AbstractEntity
         return $this;
     }
 
-    public function getExpenseTitle(): string
+    public function getIncomeTitle(): string
     {
-        return HtmlDecode($this->expenseTitle);
+        return HtmlDecode($this->incomeTitle);
     }
 
-    public function setExpenseTitle(string $value): static
+    public function setIncomeTitle(string $value): static
     {
-        $this->expenseTitle = RemoveXss($value);
+        $this->incomeTitle = RemoveXss($value);
         return $this;
     }
 
@@ -95,14 +95,14 @@ class Expense extends AbstractEntity
         return $this;
     }
 
-    public function getAttachment(): mixed
+    public function getInvoiceAttachment(): mixed
     {
-        return $this->attachment;
+        return $this->invoiceAttachment;
     }
 
-    public function setAttachment(mixed $value): static
+    public function setInvoiceAttachment(mixed $value): static
     {
-        $this->attachment = $value;
+        $this->invoiceAttachment = $value;
         return $this;
     }
 

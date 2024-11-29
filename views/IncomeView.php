@@ -3,7 +3,7 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$ExpensesView = &$Page;
+$IncomeView = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <div class="btn-toolbar ew-toolbar">
@@ -16,21 +16,21 @@ $ExpensesView = &$Page;
 $Page->showMessage();
 ?>
 <main class="view">
-<form name="fexpensesview" id="fexpensesview" class="ew-form ew-view-form overlay-wrapper" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
+<form name="fincomeview" id="fincomeview" class="ew-form ew-view-form overlay-wrapper" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { expenses: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income: currentTable } });
 var currentPageID = ew.PAGE_ID = "view";
 var currentForm;
-var fexpensesview;
+var fincomeview;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery;
     let fields = currentTable.fields;
 
     // Form object
     let form = new ew.FormBuilder()
-        .setId("fexpensesview")
+        .setId("fincomeview")
         .setPageId("view")
         .build();
     window[form.id] = form;
@@ -48,36 +48,36 @@ loadjs.ready("head", function () {
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="expenses">
+<input type="hidden" name="t" value="income">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <table class="<?= $Page->TableClass ?>">
 <?php if ($Page->id->Visible) { // id ?>
     <tr id="r_id"<?= $Page->id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_expenses_id"><?= $Page->id->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_income_id"><?= $Page->id->caption() ?></span></td>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el_expenses_id">
+<span id="el_income_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->expense_title->Visible) { // expense_title ?>
-    <tr id="r_expense_title"<?= $Page->expense_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_expenses_expense_title"><?= $Page->expense_title->caption() ?></span></td>
-        <td data-name="expense_title"<?= $Page->expense_title->cellAttributes() ?>>
-<span id="el_expenses_expense_title">
-<span<?= $Page->expense_title->viewAttributes() ?>>
-<?= $Page->expense_title->getViewValue() ?></span>
+<?php if ($Page->income_title->Visible) { // income_title ?>
+    <tr id="r_income_title"<?= $Page->income_title->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_income_income_title"><?= $Page->income_title->caption() ?></span></td>
+        <td data-name="income_title"<?= $Page->income_title->cellAttributes() ?>>
+<span id="el_income_income_title">
+<span<?= $Page->income_title->viewAttributes() ?>>
+<?= $Page->income_title->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
     <tr id="r_description"<?= $Page->description->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_expenses_description"><?= $Page->description->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_income_description"><?= $Page->description->caption() ?></span></td>
         <td data-name="description"<?= $Page->description->cellAttributes() ?>>
-<span id="el_expenses_description">
+<span id="el_income_description">
 <span<?= $Page->description->viewAttributes() ?>>
 <?= $Page->description->getViewValue() ?></span>
 </span>
@@ -86,22 +86,22 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->cost->Visible) { // cost ?>
     <tr id="r_cost"<?= $Page->cost->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_expenses_cost"><?= $Page->cost->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_income_cost"><?= $Page->cost->caption() ?></span></td>
         <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
-<span id="el_expenses_cost">
+<span id="el_income_cost">
 <span<?= $Page->cost->viewAttributes() ?>>
 <?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->attachment->Visible) { // attachment ?>
-    <tr id="r_attachment"<?= $Page->attachment->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_expenses_attachment"><?= $Page->attachment->caption() ?></span></td>
-        <td data-name="attachment"<?= $Page->attachment->cellAttributes() ?>>
-<span id="el_expenses_attachment">
-<span<?= $Page->attachment->viewAttributes() ?>>
-<?= GetFileViewTag($Page->attachment, $Page->attachment->getViewValue(), false) ?>
+<?php if ($Page->invoice_attachment->Visible) { // invoice_attachment ?>
+    <tr id="r_invoice_attachment"<?= $Page->invoice_attachment->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_income_invoice_attachment"><?= $Page->invoice_attachment->caption() ?></span></td>
+        <td data-name="invoice_attachment"<?= $Page->invoice_attachment->cellAttributes() ?>>
+<span id="el_income_invoice_attachment">
+<span<?= $Page->invoice_attachment->viewAttributes() ?>>
+<?= GetFileViewTag($Page->invoice_attachment, $Page->invoice_attachment->getViewValue(), false) ?>
 </span>
 </span>
 </td>

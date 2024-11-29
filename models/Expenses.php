@@ -33,6 +33,14 @@ class Expenses extends DbTable
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
 
+    // Audit trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Ajax / Modal
     public $UseAjaxActions = false;
     public $ModalSearch = false;
@@ -51,7 +59,6 @@ class Expenses extends DbTable
     public $description;
     public $cost;
     public $attachment;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -167,7 +174,7 @@ class Expenses extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->description->InputTextType = "text";
         $this->description->Nullable = false; // NOT NULL field
@@ -222,34 +229,10 @@ class Expenses extends DbTable
         $this->attachment->InputTextType = "text";
         $this->attachment->Raw = true;
         $this->attachment->Sortable = false; // Allow sort
+        $this->attachment->UploadAllowedFileExt = "pdf,docx,doc,jpg";
+        $this->attachment->UploadMaxFileSize = 20000000;
         $this->attachment->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['attachment'] = &$this->attachment;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -257,10 +240,10 @@ class Expenses extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -273,7 +256,7 @@ class Expenses extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -283,10 +266,10 @@ class Expenses extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -299,7 +282,7 @@ class Expenses extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -500,11 +483,6 @@ class Expenses extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -720,6 +698,9 @@ class Expenses extends DbTable
         if ($result) {
             $this->id->setDbValue($conn->lastInsertId());
             $rs['id'] = $this->id->DbValue;
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailOnAdd($rs);
+            }
         }
         return $result;
     }
@@ -776,6 +757,14 @@ class Expenses extends DbTable
                 $rs['id'] = $this->id->CurrentValue;
             }
         }
+        if ($success && $this->AuditTrailOnEdit && $rsold) {
+            $rsaudit = $rs;
+            $fldname = 'id';
+            if (!array_key_exists($fldname, $rsaudit)) {
+                $rsaudit[$fldname] = $rsold[$fldname];
+            }
+            $this->writeAuditTrailOnEdit($rsold, $rsaudit);
+        }
         return $success;
     }
 
@@ -817,6 +806,9 @@ class Expenses extends DbTable
                 $this->DbErrorMessage = $e->getMessage();
             }
         }
+        if ($success && $this->AuditTrailOnDelete) {
+            $this->writeAuditTrailOnDelete($rs);
+        }
         return $success;
     }
 
@@ -831,7 +823,6 @@ class Expenses extends DbTable
         $this->description->DbValue = $row['description'];
         $this->cost->DbValue = $row['cost'];
         $this->attachment->Upload->DbValue = $row['attachment'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1191,7 +1182,6 @@ class Expenses extends DbTable
         $this->description->setDbValue($row['description']);
         $this->cost->setDbValue($row['cost']);
         $this->attachment->Upload->DbValue = $row['attachment'];
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1234,8 +1224,6 @@ class Expenses extends DbTable
 
         // attachment
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -1260,10 +1248,6 @@ class Expenses extends DbTable
         } else {
             $this->attachment->ViewValue = "";
         }
-
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1305,10 +1289,6 @@ class Expenses extends DbTable
         $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
         $this->attachment->TooltipValue = "";
 
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
-
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
@@ -1346,9 +1326,6 @@ class Expenses extends DbTable
 
         // description
         $this->description->setupEditAttributes();
-        if (!$this->description->Raw) {
-            $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-        }
         $this->description->EditValue = $this->description->CurrentValue;
         $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
@@ -1367,20 +1344,6 @@ class Expenses extends DbTable
             $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
         } else {
             $this->attachment->EditValue = "";
-        }
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
         }
 
         // date_created
@@ -1426,15 +1389,11 @@ class Expenses extends DbTable
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->cost);
                     $doc->exportCaption($this->attachment);
-                    $doc->exportCaption($this->created_by_user_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->expense_title);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->cost);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1468,15 +1427,11 @@ class Expenses extends DbTable
                         $doc->exportField($this->description);
                         $doc->exportField($this->cost);
                         $doc->exportField($this->attachment);
-                        $doc->exportField($this->created_by_user_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->expense_title);
                         $doc->exportField($this->description);
                         $doc->exportField($this->cost);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1492,52 +1447,6 @@ class Expenses extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM expenses";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data
@@ -1661,6 +1570,192 @@ class Expenses extends DbTable
             return true;
         }
         return false;
+    }
+
+    // Write audit trail start/end for grid update
+    public function writeAuditTrailDummy($typ)
+    {
+        WriteAuditLog(CurrentUserIdentifier(), $typ, 'expenses');
+    }
+
+    // Write audit trail (add page)
+    public function writeAuditTrailOnAdd(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnAdd) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                    $newvalue = $Language->phrase("PasswordMask");
+                } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo Field
+                    $newvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rs[$fldname] : "[MEMO]";
+                } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML Field
+                    $newvalue = "[XML]";
+                } else {
+                    $newvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "A", 'expenses', $fldname, $key, "", $newvalue);
+            }
+        }
+    }
+
+    // Write audit trail (edit page)
+    public function writeAuditTrailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnEdit) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rsnew) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && array_key_exists($fldname, $rsold) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->DataType == DataType::DATE) { // DateTime field
+                    $modified = (FormatDateTime($rsold[$fldname], 0) != FormatDateTime($rsnew[$fldname], 0));
+                } else {
+                    $modified = !CompareValue($rsold[$fldname], $rsnew[$fldname]);
+                }
+                if ($modified) {
+                    if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                        $oldvalue = $Language->phrase("PasswordMask");
+                        $newvalue = $Language->phrase("PasswordMask");
+                    } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo field
+                        $oldvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rsold[$fldname] : "[MEMO]";
+                        $newvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rsnew[$fldname] : "[MEMO]";
+                    } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML field
+                        $oldvalue = "[XML]";
+                        $newvalue = "[XML]";
+                    } else {
+                        $oldvalue = $rsold[$fldname];
+                        $newvalue = $rsnew[$fldname];
+                    }
+                    WriteAuditLog($usr, "U", 'expenses', $fldname, $key, $oldvalue, $newvalue);
+                }
+            }
+        }
+    }
+
+    // Write audit trail (delete page)
+    public function writeAuditTrailOnDelete(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnDelete) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                    $oldvalue = $Language->phrase("PasswordMask");
+                } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo field
+                    $oldvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rs[$fldname] : "[MEMO]";
+                } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML field
+                    $oldvalue = "[XML]";
+                } else {
+                    $oldvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "D", 'expenses', $fldname, $key, $oldvalue);
+            }
+        }
+    }
+
+    // Send email after add success
+    public function sendEmailOnAdd(&$rs)
+    {
+        global $Language;
+        $table = 'expenses';
+        $subject = $table . " " . $Language->phrase("RecordInserted");
+        $action = $Language->phrase("ActionInserted");
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+        $email = new Email();
+        $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+            "From" => Config("SENDER_EMAIL"), // Replace Sender
+            "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+            "Subject" => $subject,  // Replace Subject
+            "Table" => $table,
+            "Key" => $key,
+            "Action" => $action
+        ]);
+        $args = ["rsnew" => $rs];
+        $emailSent = false;
+        if ($this->emailSending($email, $args)) {
+            $emailSent = $email->send();
+        }
+
+        // Send email failed
+        if (!$emailSent) {
+            $this->setFailureMessage($email->SendErrDescription);
+        }
+    }
+
+    // Send email after update success
+    public function sendEmailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        $table = 'expenses';
+        $subject = $table . " ". $Language->phrase("RecordUpdated");
+        $action = $Language->phrase("ActionUpdated");
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+        $email = new Email();
+        $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+            "From" => Config("SENDER_EMAIL"), // Replace Sender
+            "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+            "Subject" => $subject,  // Replace Subject
+            "Table" => $table,
+            "Key" => $key,
+            "Action" => $action
+        ]);
+        $args = ["rsold" => $rsold, "rsnew" => $rsnew];
+        $emailSent = false;
+        if ($this->emailSending($email, $args)) {
+            $emailSent = $email->send();
+        }
+
+        // Send email failed
+        if (!$emailSent) {
+            $this->setFailureMessage($email->SendErrDescription);
+        }
     }
 
     // Table level events

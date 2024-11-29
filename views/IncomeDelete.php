@@ -3,21 +3,21 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$ExpensesDelete = &$Page;
+$IncomeDelete = &$Page;
 ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { expenses: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income: currentTable } });
 var currentPageID = ew.PAGE_ID = "delete";
 var currentForm;
-var fexpensesdelete;
+var fincomedelete;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery;
     let fields = currentTable.fields;
 
     // Form object
     let form = new ew.FormBuilder()
-        .setId("fexpensesdelete")
+        .setId("fincomedelete")
         .setPageId("delete")
         .build();
     window[form.id] = form;
@@ -34,12 +34,12 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fexpensesdelete" id="fexpensesdelete" class="ew-form ew-delete-form" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
+<form name="fincomedelete" id="fincomedelete" class="ew-form ew-delete-form" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="expenses">
+<input type="hidden" name="t" value="income">
 <input type="hidden" name="action" id="action" value="delete">
 <?php foreach ($Page->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode(Config("COMPOSITE_KEY_SEPARATOR"), $key) : $key; ?>
@@ -50,20 +50,23 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->expense_title->Visible) { // expense_title ?>
-        <th class="<?= $Page->expense_title->headerCellClass() ?>"><span id="elh_expenses_expense_title" class="expenses_expense_title"><?= $Page->expense_title->caption() ?></span></th>
+<?php if ($Page->id->Visible) { // id ?>
+        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_income_id" class="income_id"><?= $Page->id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->income_title->Visible) { // income_title ?>
+        <th class="<?= $Page->income_title->headerCellClass() ?>"><span id="elh_income_income_title" class="income_income_title"><?= $Page->income_title->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
-        <th class="<?= $Page->description->headerCellClass() ?>"><span id="elh_expenses_description" class="expenses_description"><?= $Page->description->caption() ?></span></th>
+        <th class="<?= $Page->description->headerCellClass() ?>"><span id="elh_income_description" class="income_description"><?= $Page->description->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->cost->Visible) { // cost ?>
-        <th class="<?= $Page->cost->headerCellClass() ?>"><span id="elh_expenses_cost" class="expenses_cost"><?= $Page->cost->caption() ?></span></th>
+        <th class="<?= $Page->cost->headerCellClass() ?>"><span id="elh_income_cost" class="income_cost"><?= $Page->cost->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_expenses_date_created" class="expenses_date_created"><?= $Page->date_created->caption() ?></span></th>
+        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_income_date_created" class="income_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_expenses_date_updated" class="expenses_date_updated"><?= $Page->date_updated->caption() ?></span></th>
+        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_income_date_updated" class="income_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -86,11 +89,19 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->expense_title->Visible) { // expense_title ?>
-        <td<?= $Page->expense_title->cellAttributes() ?>>
+<?php if ($Page->id->Visible) { // id ?>
+        <td<?= $Page->id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->expense_title->viewAttributes() ?>>
-<?= $Page->expense_title->getViewValue() ?></span>
+<span<?= $Page->id->viewAttributes() ?>>
+<?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->income_title->Visible) { // income_title ?>
+        <td<?= $Page->income_title->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->income_title->viewAttributes() ?>>
+<?= $Page->income_title->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
