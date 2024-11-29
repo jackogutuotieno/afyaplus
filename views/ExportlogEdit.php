@@ -51,6 +51,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "User": <?= $Page->User->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -134,9 +135,43 @@ loadjs.ready(["fexportlogedit", "datetimepicker"], function () {
         <label id="elh_exportlog_User" for="x_User" class="<?= $Page->LeftColumnClass ?>"><?= $Page->User->caption() ?><?= $Page->User->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->User->cellAttributes() ?>>
 <span id="el_exportlog_User">
-<input type="<?= $Page->User->getInputTextType() ?>" name="x_User" id="x_User" data-table="exportlog" data-field="x_User" value="<?= $Page->User->EditValue ?>" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->User->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->User->formatPattern()) ?>"<?= $Page->User->editAttributes() ?> aria-describedby="x_User_help">
-<?= $Page->User->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->User->getErrorMessage() ?></div>
+    <select
+        id="x_User"
+        name="x_User"
+        class="form-select ew-select<?= $Page->User->isInvalidClass() ?>"
+        <?php if (!$Page->User->IsNativeSelect) { ?>
+        data-select2-id="fexportlogedit_x_User"
+        <?php } ?>
+        data-table="exportlog"
+        data-field="x_User"
+        data-value-separator="<?= $Page->User->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->User->getPlaceHolder()) ?>"
+        <?= $Page->User->editAttributes() ?>>
+        <?= $Page->User->selectOptionListHtml("x_User") ?>
+    </select>
+    <?= $Page->User->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->User->getErrorMessage() ?></div>
+<?= $Page->User->Lookup->getParamTag($Page, "p_x_User") ?>
+<?php if (!$Page->User->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fexportlogedit", function() {
+    var options = { name: "x_User", selectId: "fexportlogedit_x_User" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fexportlogedit.lists.User?.lookupOptions.length) {
+        options.data = { id: "x_User", form: "fexportlogedit" };
+    } else {
+        options.ajax = { id: "x_User", form: "fexportlogedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.exportlog.fields.User.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

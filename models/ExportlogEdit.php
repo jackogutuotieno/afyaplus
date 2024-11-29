@@ -525,6 +525,9 @@ class ExportlogEdit extends Exportlog
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->User);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -934,7 +937,27 @@ class ExportlogEdit extends Exportlog
             $this->DateTime->ViewValue = FormatDateTime($this->DateTime->ViewValue, $this->DateTime->formatPattern());
 
             // User
-            $this->User->ViewValue = $this->User->CurrentValue;
+            $curVal = strval($this->User->CurrentValue);
+            if ($curVal != "") {
+                $this->User->ViewValue = $this->User->lookupCacheOption($curVal);
+                if ($this->User->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->User->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->User->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->User->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->User->Lookup->renderViewRow($rswrk[0]);
+                        $this->User->ViewValue = $this->User->displayValue($arwrk);
+                    } else {
+                        $this->User->ViewValue = $this->User->CurrentValue;
+                    }
+                }
+            } else {
+                $this->User->ViewValue = null;
+            }
 
             // ExportType
             $this->_ExportType->ViewValue = $this->_ExportType->CurrentValue;
@@ -990,10 +1013,29 @@ class ExportlogEdit extends Exportlog
 
             // User
             $this->User->setupEditAttributes();
-            if (!$this->User->Raw) {
-                $this->User->CurrentValue = HtmlDecode($this->User->CurrentValue);
+            $curVal = trim(strval($this->User->CurrentValue));
+            if ($curVal != "") {
+                $this->User->ViewValue = $this->User->lookupCacheOption($curVal);
+            } else {
+                $this->User->ViewValue = $this->User->Lookup !== null && is_array($this->User->lookupOptions()) && count($this->User->lookupOptions()) > 0 ? $curVal : null;
             }
-            $this->User->EditValue = HtmlEncode($this->User->CurrentValue);
+            if ($this->User->ViewValue !== null) { // Load from cache
+                $this->User->EditValue = array_values($this->User->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->User->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->User->CurrentValue, $this->User->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->User->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->User->EditValue = $arwrk;
+            }
             $this->User->PlaceHolder = RemoveHtml($this->User->caption());
 
             // ExportType
@@ -1324,6 +1366,8 @@ class ExportlogEdit extends Exportlog
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_User":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

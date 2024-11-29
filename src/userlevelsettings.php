@@ -544,7 +544,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["vaccinationsreport","vaccinationsreport","vaccinationsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vaccinationsreportlist"],
     ["visit_types","visit_types","Visit Types",true,"{32536B8D-F37B-4419-80D5-260932800712}","visittypeslist"],
     ["vitalsreport","vitalsreport","vitalsreport",true,"{32536B8D-F37B-4419-80D5-260932800712}","vitalsreportlist"],
-    ["exportlog","exportlog","exportlog",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"],
+    ["exportlog","exportlog","Export Log",true,"{32536B8D-F37B-4419-80D5-260932800712}","exportloglist"],
     ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"],
     ["Appointments","Appointments","Patients Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointments"],
     ["patient_queue","patient_queue","Patient Flow",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientqueuelist"],

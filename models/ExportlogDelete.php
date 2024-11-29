@@ -414,6 +414,9 @@ class ExportlogDelete extends Exportlog
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->User);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -659,7 +662,27 @@ class ExportlogDelete extends Exportlog
             $this->DateTime->ViewValue = FormatDateTime($this->DateTime->ViewValue, $this->DateTime->formatPattern());
 
             // User
-            $this->User->ViewValue = $this->User->CurrentValue;
+            $curVal = strval($this->User->CurrentValue);
+            if ($curVal != "") {
+                $this->User->ViewValue = $this->User->lookupCacheOption($curVal);
+                if ($this->User->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->User->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->User->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->User->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->User->Lookup->renderViewRow($rswrk[0]);
+                        $this->User->ViewValue = $this->User->displayValue($arwrk);
+                    } else {
+                        $this->User->ViewValue = $this->User->CurrentValue;
+                    }
+                }
+            } else {
+                $this->User->ViewValue = null;
+            }
 
             // ExportType
             $this->_ExportType->ViewValue = $this->_ExportType->CurrentValue;
@@ -831,6 +854,8 @@ class ExportlogDelete extends Exportlog
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_User":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -705,6 +705,9 @@ class ExportlogList extends Exportlog
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->User);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fexportloggrid";
@@ -1350,12 +1353,6 @@ class ExportlogList extends Exportlog
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1446,19 +1443,6 @@ class ExportlogList extends Exportlog
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"exportlog\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
             if ($Security->canDelete()) {
@@ -1534,17 +1518,6 @@ class ExportlogList extends Exportlog
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["addedit"];
-
-        // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"exportlog\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -2086,7 +2059,27 @@ class ExportlogList extends Exportlog
             $this->DateTime->ViewValue = FormatDateTime($this->DateTime->ViewValue, $this->DateTime->formatPattern());
 
             // User
-            $this->User->ViewValue = $this->User->CurrentValue;
+            $curVal = strval($this->User->CurrentValue);
+            if ($curVal != "") {
+                $this->User->ViewValue = $this->User->lookupCacheOption($curVal);
+                if ($this->User->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->User->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->User->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->User->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->User->Lookup->renderViewRow($rswrk[0]);
+                        $this->User->ViewValue = $this->User->displayValue($arwrk);
+                    } else {
+                        $this->User->ViewValue = $this->User->CurrentValue;
+                    }
+                }
+            } else {
+                $this->User->ViewValue = null;
+            }
 
             // ExportType
             $this->_ExportType->ViewValue = $this->_ExportType->CurrentValue;
@@ -2378,6 +2371,8 @@ class ExportlogList extends Exportlog
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_User":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

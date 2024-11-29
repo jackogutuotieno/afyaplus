@@ -168,12 +168,16 @@ class Exportlog extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->User->InputTextType = "text";
         $this->User->Nullable = false; // NOT NULL field
         $this->User->Required = true; // Required field
-        $this->User->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->User->setSelectMultiple(false); // Select one
+        $this->User->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->User->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->User->Lookup = new Lookup($this->User, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->User->SearchOperators = ["=", "<>"];
         $this->Fields['User'] = &$this->User;
 
         // ExportType
@@ -1219,7 +1223,27 @@ class Exportlog extends DbTable
         $this->DateTime->ViewValue = FormatDateTime($this->DateTime->ViewValue, $this->DateTime->formatPattern());
 
         // User
-        $this->User->ViewValue = $this->User->CurrentValue;
+        $curVal = strval($this->User->CurrentValue);
+        if ($curVal != "") {
+            $this->User->ViewValue = $this->User->lookupCacheOption($curVal);
+            if ($this->User->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->User->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->User->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->User->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->User->Lookup->renderViewRow($rswrk[0]);
+                    $this->User->ViewValue = $this->User->displayValue($arwrk);
+                } else {
+                    $this->User->ViewValue = $this->User->CurrentValue;
+                }
+            }
+        } else {
+            $this->User->ViewValue = null;
+        }
 
         // ExportType
         $this->_ExportType->ViewValue = $this->_ExportType->CurrentValue;
@@ -1298,10 +1322,6 @@ class Exportlog extends DbTable
 
         // User
         $this->User->setupEditAttributes();
-        if (!$this->User->Raw) {
-            $this->User->CurrentValue = HtmlDecode($this->User->CurrentValue);
-        }
-        $this->User->EditValue = $this->User->CurrentValue;
         $this->User->PlaceHolder = RemoveHtml($this->User->caption());
 
         // ExportType

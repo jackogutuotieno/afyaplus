@@ -42,9 +42,49 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
+<?php } ?>
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
+<form name="flaboratory_billing_reportsrch" id="flaboratory_billing_reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="flaboratory_billing_reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<script>
+var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
+ew.deepAssign(ew.vars, { tables: { laboratory_billing_report: currentTable } });
+var currentForm;
+var flaboratory_billing_reportsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("flaboratory_billing_reportsrch")
+        .setPageId("list")
+<?php if ($Page->UseAjaxActions) { ?>
+        .setSubmitWithFetch(true)
+<?php } ?>
+
+        // Dynamic selection lists
+        .setLists({
+        })
+
+        // Filters
+        .setFilterList(<?= $Page->getFilterList() ?>)
+        .build();
+    window[form.id] = form;
+    currentSearchForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+</div><!-- /.ew-search-panel -->
+</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php

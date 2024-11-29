@@ -1553,12 +1553,12 @@
       </field>
     </table>
     <table id="exportlog">
-      <phrase id="tblcaption" value="exportlog" />
+      <phrase id="tblcaption" value="Export Log" />
       <field id="fileid">
-        <phrase id="fldcaption" value="File Id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="datetime">
-        <phrase id="fldcaption" value="Date Time" />
+        <phrase id="fldcaption" value="Date" />
       </field>
       <field id="user">
         <phrase id="fldcaption" value="User" />

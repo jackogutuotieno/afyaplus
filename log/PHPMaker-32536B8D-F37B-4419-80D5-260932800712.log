@@ -189,6 +189,7 @@ C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportList.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportSearch.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\models\Laboratoryreports.php
@@ -679,6 +680,7 @@ C:\wamp64\www\afyaplus\views\LaboratoryBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportMaster.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportSearch.php
 C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryreportsList.php
 C:\wamp64\www\afyaplus\views\Login.php
