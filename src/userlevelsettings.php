@@ -468,7 +468,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["radiology_reports","radiology_reports","radiology reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyreportslist"],
     ["radiology_requests","radiology_requests","Radiology Requests",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestslist"],
     ["radiology_requests_details","radiology_requests_details","Radiology Test Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestsdetailslist"],
-    ["radiology_requests_queue","radiology_requests_queue","radiology requests queue",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestsqueuelist"],
+    ["radiology_requests_queue","radiology_requests_queue","Radiology Queue",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyrequestsqueuelist"],
     ["service_categories","service_categories","service categories",true,"{32536B8D-F37B-4419-80D5-260932800712}","servicecategorieslist"],
     ["service_charges","service_charges","Facility Charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","servicechargeslist"],
     ["service_subcategories","service_subcategories","service subcategories",true,"{32536B8D-F37B-4419-80D5-260932800712}","servicesubcategorieslist"],

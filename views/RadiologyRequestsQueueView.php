@@ -62,13 +62,24 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-    <tr id="r_radiology_request_id"<?= $Page->radiology_request_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_queue_radiology_request_id"><?= $Page->radiology_request_id->caption() ?></span></td>
-        <td data-name="radiology_request_id"<?= $Page->radiology_request_id->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_radiology_request_id">
-<span<?= $Page->radiology_request_id->viewAttributes() ?>>
-<?= $Page->radiology_request_id->getViewValue() ?></span>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+    <tr id="r_radiology_requests_details_id"<?= $Page->radiology_requests_details_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_queue_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></td>
+        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<span id="el_radiology_requests_queue_radiology_requests_details_id">
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->test_time->Visible) { // test_time ?>
+    <tr id="r_test_time"<?= $Page->test_time->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_queue_test_time"><?= $Page->test_time->caption() ?></span></td>
+        <td data-name="test_time"<?= $Page->test_time->cellAttributes() ?>>
+<span id="el_radiology_requests_queue_test_time">
+<span<?= $Page->test_time->viewAttributes() ?>>
+<?= $Page->test_time->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -124,17 +135,6 @@ loadjs.ready("head", function () {
 <span id="el_radiology_requests_queue_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_queue_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     </tr>

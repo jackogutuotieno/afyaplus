@@ -311,6 +311,7 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsDetails.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsAdd.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsDelete.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsEdit.php
+C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsEdit.php
@@ -320,6 +321,7 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsQueue.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueDelete.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueEdit.php
+C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsView.php
@@ -768,14 +770,18 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsDelete.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsAdd.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsDelete.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsEdit.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsList.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsMaster.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsEdit.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsList.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsMaster.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueDelete.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueEdit.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsView.php

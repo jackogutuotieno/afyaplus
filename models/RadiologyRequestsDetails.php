@@ -87,8 +87,8 @@ class RadiologyRequestsDetails extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailAdd = true; // Allow detail add
+        $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -119,6 +119,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -144,6 +145,7 @@ class RadiologyRequestsDetails extends DbTable
         );
         $this->radiology_request_id->InputTextType = "text";
         $this->radiology_request_id->Raw = true;
+        $this->radiology_request_id->IsForeignKey = true; // Foreign key field
         $this->radiology_request_id->Nullable = false; // NOT NULL field
         $this->radiology_request_id->Required = true; // Required field
         $this->radiology_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -202,6 +204,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
+        $this->date_created->Sortable = false; // Allow sort
         $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
@@ -228,6 +231,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -288,6 +292,114 @@ class RadiologyRequestsDetails extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "radiology_requests") {
+            $masterTable = Container("radiology_requests");
+            if ($this->radiology_request_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->radiology_request_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "radiology_requests") {
+            $masterTable = Container("radiology_requests");
+            if ($this->radiology_request_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->radiology_request_id, $this->radiology_request_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "radiology_requests":
+                $key = $keys["radiology_request_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["radiology_request_id"], $this->radiology_request_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "radiology_requests":
+                return GetKeyFilter($this->radiology_request_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "radiology_requests_queue") {
+            $detailUrl = Container("radiology_requests_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "radiologyrequestsdetailslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -429,6 +541,13 @@ class RadiologyRequestsDetails extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "radiology_requests" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "radiology_requests"); // Add detail User ID filter
+            }
+        }
         return $filter;
     }
 
@@ -911,7 +1030,11 @@ class RadiologyRequestsDetails extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("radiologyrequestsdetailsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("radiologyrequestsdetailsedit", $parm);
+        } else {
+            $url = $this->keyUrl("radiologyrequestsdetailsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -925,7 +1048,11 @@ class RadiologyRequestsDetails extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("radiologyrequestsdetailsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("radiologyrequestsdetailsadd", $parm);
+        } else {
+            $url = $this->keyUrl("radiologyrequestsdetailsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -949,6 +1076,10 @@ class RadiologyRequestsDetails extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "radiology_requests" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->radiology_request_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1149,8 +1280,10 @@ class RadiologyRequestsDetails extends DbTable
         // service_id
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1231,10 +1364,16 @@ class RadiologyRequestsDetails extends DbTable
 
         // radiology_request_id
         $this->radiology_request_id->setupEditAttributes();
-        $this->radiology_request_id->EditValue = $this->radiology_request_id->CurrentValue;
-        $this->radiology_request_id->PlaceHolder = RemoveHtml($this->radiology_request_id->caption());
-        if (strval($this->radiology_request_id->EditValue) != "" && is_numeric($this->radiology_request_id->EditValue)) {
-            $this->radiology_request_id->EditValue = FormatNumber($this->radiology_request_id->EditValue, null);
+        if ($this->radiology_request_id->getSessionValue() != "") {
+            $this->radiology_request_id->CurrentValue = GetForeignKeyValue($this->radiology_request_id->getSessionValue());
+            $this->radiology_request_id->ViewValue = $this->radiology_request_id->CurrentValue;
+            $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
+        } else {
+            $this->radiology_request_id->EditValue = $this->radiology_request_id->CurrentValue;
+            $this->radiology_request_id->PlaceHolder = RemoveHtml($this->radiology_request_id->caption());
+            if (strval($this->radiology_request_id->EditValue) != "" && is_numeric($this->radiology_request_id->EditValue)) {
+                $this->radiology_request_id->EditValue = FormatNumber($this->radiology_request_id->EditValue, null);
+            }
         }
 
         // service_id
@@ -1282,14 +1421,10 @@ class RadiologyRequestsDetails extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1319,14 +1454,10 @@ class RadiologyRequestsDetails extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1340,6 +1471,30 @@ class RadiologyRequestsDetails extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "radiology_requests") {
+            $filterWrk = Container("radiology_requests")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "radiology_requests") {
+            $mastertable = Container("radiology_requests");
+            if (!$mastertable->userIDAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->radiology_request_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

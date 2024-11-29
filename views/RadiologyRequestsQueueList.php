@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "radiology_requests_details") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/RadiologyRequestsDetailsMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fradiology_requests_queuesrch" id="fradiology_requests_queuesrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fradiology_requests_queuesrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -142,6 +151,10 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "radiology_requests_details" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="radiology_requests_details">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->radiology_requests_details_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_radiology_requests_queue" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_radiology_requests_queuelist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -157,17 +170,11 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_radiology_requests_queue_id" class="radiology_requests_queue_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <th data-name="radiology_requests_details_id" class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><div id="elh_radiology_requests_queue_radiology_requests_details_id" class="radiology_requests_queue_radiology_requests_details_id"><?= $Page->renderFieldHeader($Page->radiology_requests_details_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <th data-name="radiology_request_id" class="<?= $Page->radiology_request_id->headerCellClass() ?>"><div id="elh_radiology_requests_queue_radiology_request_id" class="radiology_requests_queue_radiology_request_id"><?= $Page->renderFieldHeader($Page->radiology_request_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <th data-name="waiting_time" class="<?= $Page->waiting_time->headerCellClass() ?>"><div id="elh_radiology_requests_queue_waiting_time" class="radiology_requests_queue_waiting_time"><?= $Page->renderFieldHeader($Page->waiting_time) ?></div></th>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <th data-name="waiting_interval" class="<?= $Page->waiting_interval->headerCellClass() ?>"><div id="elh_radiology_requests_queue_waiting_interval" class="radiology_requests_queue_waiting_interval"><?= $Page->renderFieldHeader($Page->waiting_interval) ?></div></th>
+<?php if ($Page->test_time->Visible) { // test_time ?>
+        <th data-name="test_time" class="<?= $Page->test_time->headerCellClass() ?>"><div id="elh_radiology_requests_queue_test_time" class="radiology_requests_queue_test_time"><?= $Page->renderFieldHeader($Page->test_time) ?></div></th>
 <?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_radiology_requests_queue_status" class="radiology_requests_queue_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
@@ -177,9 +184,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_radiology_requests_queue_date_created" class="radiology_requests_queue_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_radiology_requests_queue_date_updated" class="radiology_requests_queue_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -209,35 +213,19 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_id" class="el_radiology_requests_queue_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
+    <?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_radiology_requests_details_id" class="el_radiology_requests_queue_radiology_requests_details_id">
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td data-name="radiology_request_id"<?= $Page->radiology_request_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_radiology_request_id" class="el_radiology_requests_queue_radiology_request_id">
-<span<?= $Page->radiology_request_id->viewAttributes() ?>>
-<?= $Page->radiology_request_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <td data-name="waiting_time"<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_waiting_time" class="el_radiology_requests_queue_waiting_time">
-<span<?= $Page->waiting_time->viewAttributes() ?>>
-<?= $Page->waiting_time->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <td data-name="waiting_interval"<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_waiting_interval" class="el_radiology_requests_queue_waiting_interval">
-<span<?= $Page->waiting_interval->viewAttributes() ?>>
-<?= $Page->waiting_interval->getViewValue() ?></span>
+    <?php if ($Page->test_time->Visible) { // test_time ?>
+        <td data-name="test_time"<?= $Page->test_time->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_test_time" class="el_radiology_requests_queue_test_time">
+<span<?= $Page->test_time->viewAttributes() ?>>
+<?= $Page->test_time->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -262,14 +250,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_date_created" class="el_radiology_requests_queue_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_queue_date_updated" class="el_radiology_requests_queue_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

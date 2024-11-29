@@ -50,17 +50,11 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_radiology_requests_queue_id" class="radiology_requests_queue_id"><?= $Page->id->caption() ?></span></th>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <th class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><span id="elh_radiology_requests_queue_radiology_requests_details_id" class="radiology_requests_queue_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <th class="<?= $Page->radiology_request_id->headerCellClass() ?>"><span id="elh_radiology_requests_queue_radiology_request_id" class="radiology_requests_queue_radiology_request_id"><?= $Page->radiology_request_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <th class="<?= $Page->waiting_time->headerCellClass() ?>"><span id="elh_radiology_requests_queue_waiting_time" class="radiology_requests_queue_waiting_time"><?= $Page->waiting_time->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <th class="<?= $Page->waiting_interval->headerCellClass() ?>"><span id="elh_radiology_requests_queue_waiting_interval" class="radiology_requests_queue_waiting_interval"><?= $Page->waiting_interval->caption() ?></span></th>
+<?php if ($Page->test_time->Visible) { // test_time ?>
+        <th class="<?= $Page->test_time->headerCellClass() ?>"><span id="elh_radiology_requests_queue_test_time" class="radiology_requests_queue_test_time"><?= $Page->test_time->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_radiology_requests_queue_status" class="radiology_requests_queue_status"><?= $Page->status->caption() ?></span></th>
@@ -70,9 +64,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_radiology_requests_queue_date_created" class="radiology_requests_queue_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_radiology_requests_queue_date_updated" class="radiology_requests_queue_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -95,35 +86,19 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <td<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td<?= $Page->radiology_request_id->cellAttributes() ?>>
+<?php if ($Page->test_time->Visible) { // test_time ?>
+        <td<?= $Page->test_time->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->radiology_request_id->viewAttributes() ?>>
-<?= $Page->radiology_request_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-        <td<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->waiting_time->viewAttributes() ?>>
-<?= $Page->waiting_time->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-        <td<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->waiting_interval->viewAttributes() ?>>
-<?= $Page->waiting_interval->getViewValue() ?></span>
+<span<?= $Page->test_time->viewAttributes() ?>>
+<?= $Page->test_time->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -148,14 +123,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

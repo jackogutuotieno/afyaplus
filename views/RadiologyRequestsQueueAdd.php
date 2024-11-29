@@ -22,13 +22,12 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["radiology_request_id", [fields.radiology_request_id.visible && fields.radiology_request_id.required ? ew.Validators.required(fields.radiology_request_id.caption) : null, ew.Validators.integer], fields.radiology_request_id.isInvalid],
+            ["radiology_requests_details_id", [fields.radiology_requests_details_id.visible && fields.radiology_requests_details_id.required ? ew.Validators.required(fields.radiology_requests_details_id.caption) : null, ew.Validators.integer], fields.radiology_requests_details_id.isInvalid],
+            ["test_time", [fields.test_time.visible && fields.test_time.required ? ew.Validators.required(fields.test_time.caption) : null], fields.test_time.isInvalid],
             ["waiting_time", [fields.waiting_time.visible && fields.waiting_time.required ? ew.Validators.required(fields.waiting_time.caption) : null, ew.Validators.integer], fields.waiting_time.isInvalid],
             ["waiting_interval", [fields.waiting_interval.visible && fields.waiting_interval.required ? ew.Validators.required(fields.waiting_interval.caption) : null], fields.waiting_interval.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -44,6 +43,9 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "waiting_interval": <?= $Page->waiting_interval->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -72,15 +74,37 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "radiology_requests_details") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="radiology_requests_details">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->radiology_requests_details_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-    <div id="r_radiology_request_id"<?= $Page->radiology_request_id->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_radiology_request_id" for="x_radiology_request_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->radiology_request_id->caption() ?><?= $Page->radiology_request_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->radiology_request_id->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_radiology_request_id">
-<input type="<?= $Page->radiology_request_id->getInputTextType() ?>" name="x_radiology_request_id" id="x_radiology_request_id" data-table="radiology_requests_queue" data-field="x_radiology_request_id" value="<?= $Page->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->radiology_request_id->formatPattern()) ?>"<?= $Page->radiology_request_id->editAttributes() ?> aria-describedby="x_radiology_request_id_help">
-<?= $Page->radiology_request_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->radiology_request_id->getErrorMessage() ?></div>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+    <div id="r_radiology_requests_details_id"<?= $Page->radiology_requests_details_id->rowAttributes() ?>>
+        <label id="elh_radiology_requests_queue_radiology_requests_details_id" for="x_radiology_requests_details_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->radiology_requests_details_id->caption() ?><?= $Page->radiology_requests_details_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<?php if ($Page->radiology_requests_details_id->getSessionValue() != "") { ?>
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->radiology_requests_details_id->getDisplayValue($Page->radiology_requests_details_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_radiology_requests_details_id" name="x_radiology_requests_details_id" value="<?= HtmlEncode($Page->radiology_requests_details_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el_radiology_requests_queue_radiology_requests_details_id">
+<input type="<?= $Page->radiology_requests_details_id->getInputTextType() ?>" name="x_radiology_requests_details_id" id="x_radiology_requests_details_id" data-table="radiology_requests_queue" data-field="x_radiology_requests_details_id" value="<?= $Page->radiology_requests_details_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->radiology_requests_details_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->radiology_requests_details_id->formatPattern()) ?>"<?= $Page->radiology_requests_details_id->editAttributes() ?> aria-describedby="x_radiology_requests_details_id_help">
+<?= $Page->radiology_requests_details_id->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->radiology_requests_details_id->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->test_time->Visible) { // test_time ?>
+    <div id="r_test_time"<?= $Page->test_time->rowAttributes() ?>>
+        <label id="elh_radiology_requests_queue_test_time" for="x_test_time" class="<?= $Page->LeftColumnClass ?>"><?= $Page->test_time->caption() ?><?= $Page->test_time->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->test_time->cellAttributes() ?>>
+<span id="el_radiology_requests_queue_test_time">
+<input type="<?= $Page->test_time->getInputTextType() ?>" name="x_test_time" id="x_test_time" data-table="radiology_requests_queue" data-field="x_test_time" value="<?= $Page->test_time->EditValue ?>" size="30" maxlength="32" placeholder="<?= HtmlEncode($Page->test_time->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->test_time->formatPattern()) ?>"<?= $Page->test_time->editAttributes() ?> aria-describedby="x_test_time_help">
+<?= $Page->test_time->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->test_time->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -102,9 +126,42 @@ $Page->showMessage();
         <label id="elh_radiology_requests_queue_waiting_interval" for="x_waiting_interval" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waiting_interval->caption() ?><?= $Page->waiting_interval->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->waiting_interval->cellAttributes() ?>>
 <span id="el_radiology_requests_queue_waiting_interval">
-<input type="<?= $Page->waiting_interval->getInputTextType() ?>" name="x_waiting_interval" id="x_waiting_interval" data-table="radiology_requests_queue" data-field="x_waiting_interval" value="<?= $Page->waiting_interval->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->waiting_interval->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->waiting_interval->formatPattern()) ?>"<?= $Page->waiting_interval->editAttributes() ?> aria-describedby="x_waiting_interval_help">
-<?= $Page->waiting_interval->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->waiting_interval->getErrorMessage() ?></div>
+    <select
+        id="x_waiting_interval"
+        name="x_waiting_interval"
+        class="form-select ew-select<?= $Page->waiting_interval->isInvalidClass() ?>"
+        <?php if (!$Page->waiting_interval->IsNativeSelect) { ?>
+        data-select2-id="fradiology_requests_queueadd_x_waiting_interval"
+        <?php } ?>
+        data-table="radiology_requests_queue"
+        data-field="x_waiting_interval"
+        data-value-separator="<?= $Page->waiting_interval->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->waiting_interval->getPlaceHolder()) ?>"
+        <?= $Page->waiting_interval->editAttributes() ?>>
+        <?= $Page->waiting_interval->selectOptionListHtml("x_waiting_interval") ?>
+    </select>
+    <?= $Page->waiting_interval->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->waiting_interval->getErrorMessage() ?></div>
+<?php if (!$Page->waiting_interval->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fradiology_requests_queueadd", function() {
+    var options = { name: "x_waiting_interval", selectId: "fradiology_requests_queueadd_x_waiting_interval" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fradiology_requests_queueadd.lists.waiting_interval?.lookupOptions.length) {
+        options.data = { id: "x_waiting_interval", form: "fradiology_requests_queueadd" };
+    } else {
+        options.ajax = { id: "x_waiting_interval", form: "fradiology_requests_queueadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_requests_queue.fields.waiting_interval.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -114,106 +171,39 @@ $Page->showMessage();
         <label id="elh_radiology_requests_queue_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
 <span id="el_radiology_requests_queue_status">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="radiology_requests_queue" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
-<?= $Page->status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="radiology_requests_queue" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_radiology_requests_queue_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="radiology_requests_queue" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="radiology_requests_queue" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+    <select
+        id="x_status"
+        name="x_status"
+        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
+        <?php if (!$Page->status->IsNativeSelect) { ?>
+        data-select2-id="fradiology_requests_queueadd_x_status"
+        <?php } ?>
+        data-table="radiology_requests_queue"
+        data-field="x_status"
+        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+        <?= $Page->status->editAttributes() ?>>
+        <?= $Page->status->selectOptionListHtml("x_status") ?>
+    </select>
+    <?= $Page->status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if (!$Page->status->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fradiology_requests_queueadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fradiology_requests_queueadd", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="radiology_requests_queue" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fradiology_requests_queueadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fradiology_requests_queueadd", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fradiology_requests_queueadd", function() {
+    var options = { name: "x_status", selectId: "fradiology_requests_queueadd_x_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fradiology_requests_queueadd.lists.status?.lookupOptions.length) {
+        options.data = { id: "x_status", form: "fradiology_requests_queueadd" };
+    } else {
+        options.ajax = { id: "x_status", form: "fradiology_requests_queueadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_requests_queue.fields.status.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

@@ -145,14 +145,15 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->radiology_request_id->setVisibility();
-        $this->waiting_time->setVisibility();
-        $this->waiting_interval->setVisibility();
+        $this->id->Visible = false;
+        $this->radiology_requests_details_id->setVisibility();
+        $this->test_time->setVisibility();
+        $this->waiting_time->Visible = false;
+        $this->waiting_interval->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -460,6 +461,9 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -705,8 +709,16 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
             $this->InlineDelete = true;
         }
 
+        // Set up master detail parameters
+        $this->setupMasterParms();
+
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->waiting_interval);
+        $this->setupLookupOptions($this->status);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -841,8 +853,28 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
+
+        // Restore master/detail filter from session
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "radiology_requests_details") {
+            $masterTbl = Container("radiology_requests_details");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("radiologyrequestsdetailslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1050,13 +1082,13 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
             $savedFilterList = Profile()->getSearchFilters("fradiology_requests_queuesrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->radiology_request_id->AdvancedSearch->toJson(), ","); // Field radiology_request_id
+        $filterList = Concat($filterList, $this->radiology_requests_details_id->AdvancedSearch->toJson(), ","); // Field radiology_requests_details_id
+        $filterList = Concat($filterList, $this->test_time->AdvancedSearch->toJson(), ","); // Field test_time
         $filterList = Concat($filterList, $this->waiting_time->AdvancedSearch->toJson(), ","); // Field waiting_time
         $filterList = Concat($filterList, $this->waiting_interval->AdvancedSearch->toJson(), ","); // Field waiting_interval
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1104,13 +1136,21 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field radiology_request_id
-        $this->radiology_request_id->AdvancedSearch->SearchValue = @$filter["x_radiology_request_id"];
-        $this->radiology_request_id->AdvancedSearch->SearchOperator = @$filter["z_radiology_request_id"];
-        $this->radiology_request_id->AdvancedSearch->SearchCondition = @$filter["v_radiology_request_id"];
-        $this->radiology_request_id->AdvancedSearch->SearchValue2 = @$filter["y_radiology_request_id"];
-        $this->radiology_request_id->AdvancedSearch->SearchOperator2 = @$filter["w_radiology_request_id"];
-        $this->radiology_request_id->AdvancedSearch->save();
+        // Field radiology_requests_details_id
+        $this->radiology_requests_details_id->AdvancedSearch->SearchValue = @$filter["x_radiology_requests_details_id"];
+        $this->radiology_requests_details_id->AdvancedSearch->SearchOperator = @$filter["z_radiology_requests_details_id"];
+        $this->radiology_requests_details_id->AdvancedSearch->SearchCondition = @$filter["v_radiology_requests_details_id"];
+        $this->radiology_requests_details_id->AdvancedSearch->SearchValue2 = @$filter["y_radiology_requests_details_id"];
+        $this->radiology_requests_details_id->AdvancedSearch->SearchOperator2 = @$filter["w_radiology_requests_details_id"];
+        $this->radiology_requests_details_id->AdvancedSearch->save();
+
+        // Field test_time
+        $this->test_time->AdvancedSearch->SearchValue = @$filter["x_test_time"];
+        $this->test_time->AdvancedSearch->SearchOperator = @$filter["z_test_time"];
+        $this->test_time->AdvancedSearch->SearchCondition = @$filter["v_test_time"];
+        $this->test_time->AdvancedSearch->SearchValue2 = @$filter["y_test_time"];
+        $this->test_time->AdvancedSearch->SearchOperator2 = @$filter["w_test_time"];
+        $this->test_time->AdvancedSearch->save();
 
         // Field waiting_time
         $this->waiting_time->AdvancedSearch->SearchValue = @$filter["x_waiting_time"];
@@ -1151,14 +1191,6 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
         $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1198,6 +1230,7 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->test_time;
         $searchFlds[] = &$this->waiting_interval;
         $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
@@ -1278,14 +1311,11 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->radiology_request_id); // radiology_request_id
-            $this->updateSort($this->waiting_time); // waiting_time
-            $this->updateSort($this->waiting_interval); // waiting_interval
+            $this->updateSort($this->radiology_requests_details_id); // radiology_requests_details_id
+            $this->updateSort($this->test_time); // test_time
             $this->updateSort($this->status); // status
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1306,12 +1336,21 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
                 $this->resetSearchParms();
             }
 
+            // Reset master/detail keys
+            if ($this->Command == "resetall") {
+                $this->setCurrentMasterTable(""); // Clear master table
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+                        $this->radiology_requests_details_id->setSessionValue("");
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->radiology_request_id->setSort("");
+                $this->radiology_requests_details_id->setSort("");
+                $this->test_time->setSort("");
                 $this->waiting_time->setSort("");
                 $this->waiting_interval->setSort("");
                 $this->status->setSort("");
@@ -1349,12 +1388,6 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1377,6 +1410,14 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1417,6 +1458,10 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1440,19 +1485,6 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"radiology_requests_queue\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"radiology_requests_queue\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1552,14 +1584,11 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "radiology_request_id");
-            $this->createColumnOption($option, "waiting_time");
-            $this->createColumnOption($option, "waiting_interval");
+            $this->createColumnOption($option, "radiology_requests_details_id");
+            $this->createColumnOption($option, "test_time");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1999,7 +2028,8 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->radiology_request_id->setDbValue($row['radiology_request_id']);
+        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->test_time->setDbValue($row['test_time']);
         $this->waiting_time->setDbValue($row['waiting_time']);
         $this->waiting_interval->setDbValue($row['waiting_interval']);
         $this->status->setDbValue($row['status']);
@@ -2013,7 +2043,8 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
+        $row['radiology_requests_details_id'] = $this->radiology_requests_details_id->DefaultValue;
+        $row['test_time'] = $this->test_time->DefaultValue;
         $row['waiting_time'] = $this->waiting_time->DefaultValue;
         $row['waiting_interval'] = $this->waiting_interval->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
@@ -2062,7 +2093,9 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
 
         // id
 
-        // radiology_request_id
+        // radiology_requests_details_id
+
+        // test_time
 
         // waiting_time
 
@@ -2075,53 +2108,73 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // radiology_request_id
-            $this->radiology_request_id->ViewValue = $this->radiology_request_id->CurrentValue;
-            $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
+            $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
+
+            // test_time
+            $this->test_time->ViewValue = $this->test_time->CurrentValue;
 
             // waiting_time
             $this->waiting_time->ViewValue = $this->waiting_time->CurrentValue;
             $this->waiting_time->ViewValue = FormatNumber($this->waiting_time->ViewValue, $this->waiting_time->formatPattern());
 
             // waiting_interval
-            $this->waiting_interval->ViewValue = $this->waiting_interval->CurrentValue;
+            if (strval($this->waiting_interval->CurrentValue) != "") {
+                $this->waiting_interval->ViewValue = $this->waiting_interval->optionCaption($this->waiting_interval->CurrentValue);
+            } else {
+                $this->waiting_interval->ViewValue = null;
+            }
 
             // status
-            $this->status->ViewValue = $this->status->CurrentValue;
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
 
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->HrefValue = "";
+            $this->radiology_requests_details_id->TooltipValue = "";
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-            $this->radiology_request_id->TooltipValue = "";
-
-            // waiting_time
-            $this->waiting_time->HrefValue = "";
-            $this->waiting_time->TooltipValue = "";
-
-            // waiting_interval
-            $this->waiting_interval->HrefValue = "";
-            $this->waiting_interval->TooltipValue = "";
+            // test_time
+            $this->test_time->HrefValue = "";
+            $this->test_time->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -2134,10 +2187,6 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2347,6 +2396,23 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "radiology_requests_details") {
+            $radiology_requests_details = new RadiologyRequestsDetailsList();
+            $rsmaster = $radiology_requests_details->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($radiology_requests_details);
+                    $radiology_requests_details->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2376,6 +2442,90 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
         return true;
     }
 
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "radiology_requests_details") {
+                $validMaster = true;
+                $masterTbl = Container("radiology_requests_details");
+                if (($parm = Get("fk_id", Get("radiology_requests_details_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->radiology_requests_details_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->radiology_requests_details_id->setSessionValue($this->radiology_requests_details_id->QueryStringValue);
+                    $foreignKeys["radiology_requests_details_id"] = $this->radiology_requests_details_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "radiology_requests_details") {
+                $validMaster = true;
+                $masterTbl = Container("radiology_requests_details");
+                if (($parm = Post("fk_id", Post("radiology_requests_details_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->radiology_requests_details_id->FormValue = $masterTbl->id->FormValue;
+                    $this->radiology_requests_details_id->setSessionValue($this->radiology_requests_details_id->FormValue);
+                    $foreignKeys["radiology_requests_details_id"] = $this->radiology_requests_details_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Update URL
+            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
+            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
+            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
+            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
+            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
+
+            // Set up Breadcrumb
+            if (!$this->isExport()) {
+                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
+            }
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "radiology_requests_details") {
+                if (!array_key_exists("radiology_requests_details_id", $foreignKeys)) { // Not current foreign key
+                    $this->radiology_requests_details_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2399,6 +2549,12 @@ class RadiologyRequestsQueueList extends RadiologyRequestsQueue
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_waiting_interval":
+                    break;
+                case "x_status":
+                    break;
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

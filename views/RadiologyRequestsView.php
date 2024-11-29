@@ -95,18 +95,15 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_radiology_requests_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
+<?php
+    if (in_array("radiology_requests_details", explode(",", $Page->getCurrentDetailTable())) && $radiology_requests_details->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "RadiologyRequestsDetailsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

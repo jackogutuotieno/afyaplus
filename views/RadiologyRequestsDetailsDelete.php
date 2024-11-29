@@ -50,20 +50,11 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_radiology_requests_details_id" class="radiology_requests_details_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
         <th class="<?= $Page->radiology_request_id->headerCellClass() ?>"><span id="elh_radiology_requests_details_radiology_request_id" class="radiology_requests_details_radiology_request_id"><?= $Page->radiology_request_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th class="<?= $Page->service_id->headerCellClass() ?>"><span id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Page->service_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_radiology_requests_details_date_created" class="radiology_requests_details_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_radiology_requests_details_date_updated" class="radiology_requests_details_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -86,14 +77,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
         <td<?= $Page->radiology_request_id->cellAttributes() ?>>
 <span id="">
@@ -107,22 +90,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->service_id->viewAttributes() ?>>
 <?= $Page->service_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

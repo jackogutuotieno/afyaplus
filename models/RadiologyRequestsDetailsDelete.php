@@ -121,11 +121,11 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -417,6 +417,9 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->service_id);
 
+        // Set up master/detail parameters
+        $this->setupMasterParms();
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -637,8 +640,10 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         // service_id
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -672,18 +677,6 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // radiology_request_id
             $this->radiology_request_id->HrefValue = "";
             $this->radiology_request_id->TooltipValue = "";
@@ -691,14 +684,6 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -804,6 +789,79 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "radiology_requests") {
+                $validMaster = true;
+                $masterTbl = Container("radiology_requests");
+                if (($parm = Get("fk_id", Get("radiology_request_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->radiology_request_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->radiology_request_id->setSessionValue($this->radiology_request_id->QueryStringValue);
+                    $foreignKeys["radiology_request_id"] = $this->radiology_request_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "radiology_requests") {
+                $validMaster = true;
+                $masterTbl = Container("radiology_requests");
+                if (($parm = Post("fk_id", Post("radiology_request_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->radiology_request_id->FormValue = $masterTbl->id->FormValue;
+                    $this->radiology_request_id->setSessionValue($this->radiology_request_id->FormValue);
+                    $foreignKeys["radiology_request_id"] = $this->radiology_request_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "radiology_requests") {
+                if (!array_key_exists("radiology_request_id", $foreignKeys)) { // Not current foreign key
+                    $this->radiology_request_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

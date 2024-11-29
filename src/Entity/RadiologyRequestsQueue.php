@@ -33,8 +33,8 @@ class RadiologyRequestsQueue extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "radiology_request_id", type: "integer")]
-    private int $radiologyRequestId;
+    #[Column(name: "radiology_requests_details_id", type: "integer")]
+    private int $radiologyRequestsDetailsId;
 
     #[Column(name: "waiting_time", type: "integer")]
     private int $waitingTime;
@@ -65,14 +65,14 @@ class RadiologyRequestsQueue extends AbstractEntity
         return $this;
     }
 
-    public function getRadiologyRequestId(): int
+    public function getRadiologyRequestsDetailsId(): int
     {
-        return $this->radiologyRequestId;
+        return $this->radiologyRequestsDetailsId;
     }
 
-    public function setRadiologyRequestId(int $value): static
+    public function setRadiologyRequestsDetailsId(int $value): static
     {
-        $this->radiologyRequestId = $value;
+        $this->radiologyRequestsDetailsId = $value;
         return $this;
     }
 
