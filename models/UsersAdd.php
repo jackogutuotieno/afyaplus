@@ -1358,11 +1358,10 @@ class UsersAdd extends Users
             $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
 
             // user_role_id
-            $this->user_role_id->setupEditAttributes();
             if (!$Security->canAdmin()) { // System admin
                 $this->user_role_id->EditValue = $Language->phrase("PasswordMask");
             } else {
-                $this->user_role_id->EditValue = $this->user_role_id->options(true);
+                $this->user_role_id->EditValue = $this->user_role_id->options(false);
                 $this->user_role_id->PlaceHolder = RemoveHtml($this->user_role_id->caption());
             }
 
@@ -1535,7 +1534,7 @@ class UsersAdd extends Users
                 $this->_password->addErrorMessage($Language->phrase("InvalidPasswordChars"));
             }
             if ($this->user_role_id->Visible && $this->user_role_id->Required) {
-                if ($Security->canAdmin() && !$this->user_role_id->IsDetailKey && EmptyValue($this->user_role_id->FormValue)) {
+                if ($Security->canAdmin() && $this->user_role_id->FormValue == "") {
                     $this->user_role_id->addErrorMessage(str_replace("%s", $this->user_role_id->caption(), $this->user_role_id->RequiredErrorMessage));
                 }
             }

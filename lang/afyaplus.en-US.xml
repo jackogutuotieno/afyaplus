@@ -1436,6 +1436,8 @@
         <phrase id="fldtagcaption8" value="Pharmacist" />
         <phrase id="fldtagvalue9" value="6" />
         <phrase id="fldtagcaption9" value="Radiologist" />
+        <phrase id="fldtagvalue10" value="7" />
+        <phrase id="fldtagcaption10" value="Accountant" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="Active?" />

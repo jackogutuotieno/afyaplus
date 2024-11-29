@@ -461,18 +461,15 @@ class Users extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'RADIO' // Edit Tag
         );
         $this->user_role_id->addMethod("getDefault", fn() => 0);
         $this->user_role_id->InputTextType = "text";
         $this->user_role_id->Raw = true;
         $this->user_role_id->Nullable = false; // NOT NULL field
         $this->user_role_id->Required = true; // Required field
-        $this->user_role_id->setSelectMultiple(false); // Select one
-        $this->user_role_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->user_role_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->user_role_id->OptionCount = 9;
+        $this->user_role_id->OptionCount = 10;
         $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_role_id'] = &$this->user_role_id;
@@ -1886,11 +1883,10 @@ class Users extends DbTable
         $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
 
         // user_role_id
-        $this->user_role_id->setupEditAttributes();
         if (!$Security->canAdmin()) { // System admin
             $this->user_role_id->EditValue = $Language->phrase("PasswordMask");
         } else {
-            $this->user_role_id->EditValue = $this->user_role_id->options(true);
+            $this->user_role_id->EditValue = $this->user_role_id->options(false);
             $this->user_role_id->PlaceHolder = RemoveHtml($this->user_role_id->caption());
         }
 
