@@ -131,6 +131,8 @@ return [
     "laboratory_minor_report" => \DI\create(LaboratoryMinorReport::class),
     "laboratory_billing_report" => \DI\create(LaboratoryBillingReport::class),
     "laboratory_billing_report_details" => \DI\create(LaboratoryBillingReportDetails::class),
+    "radiology_billing_report" => \DI\create(RadiologyBillingReport::class),
+    "radiology_billing_report_details" => \DI\create(RadiologyBillingReportDetails::class),
 
     // User table
     "usertable" => \DI\get("users"),

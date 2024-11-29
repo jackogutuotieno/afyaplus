@@ -47,6 +47,8 @@ C:\wamp64\www\afyaplus\controllers\PatientsvisitsreportController.php
 C:\wamp64\www\afyaplus\controllers\PaymentMethodsController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionsController.php
+C:\wamp64\www\afyaplus\controllers\RadiologyBillingReportController.php
+C:\wamp64\www\afyaplus\controllers\RadiologyBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyReportsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsDetailsController.php
@@ -309,6 +311,11 @@ C:\wamp64\www\afyaplus\models\PrescriptionsEdit.php
 C:\wamp64\www\afyaplus\models\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\models\PrescriptionsList.php
 C:\wamp64\www\afyaplus\models\PrescriptionsView.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReport.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetails.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportList.php
 C:\wamp64\www\afyaplus\models\RadiologyReports.php
 C:\wamp64\www\afyaplus\models\RadiologyReportsAdd.php
 C:\wamp64\www\afyaplus\models\RadiologyReportsDelete.php
@@ -474,6 +481,8 @@ C:\wamp64\www\afyaplus\src\Entity\Patientsvisitsreport.php
 C:\wamp64\www\afyaplus\src\Entity\PaymentMethod.php
 C:\wamp64\www\afyaplus\src\Entity\Prescription.php
 C:\wamp64\www\afyaplus\src\Entity\PrescriptionDetail.php
+C:\wamp64\www\afyaplus\src\Entity\RadiologyBillingReport.php
+C:\wamp64\www\afyaplus\src\Entity\RadiologyBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyReport.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequest.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsDetail.php
@@ -782,6 +791,10 @@ C:\wamp64\www\afyaplus\views\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\views\PrescriptionsList.php
 C:\wamp64\www\afyaplus\views\PrescriptionsMaster.php
 C:\wamp64\www\afyaplus\views\PrescriptionsView.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportList.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\RadiologyReportsAdd.php
 C:\wamp64\www\afyaplus\views\RadiologyReportsDelete.php
 C:\wamp64\www\afyaplus\views\RadiologyReportsEdit.php

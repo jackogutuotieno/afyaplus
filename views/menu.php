@@ -48,6 +48,7 @@ $sideMenu->addMenuItem(18, "mi_medicine_categories", $Language->menuPhrase("18",
 $sideMenu->addMenuItem(19, "mi_medicine_dispensation", $Language->menuPhrase("19", "MenuText"), "medicinedispensationlist", 54, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(236, "mci_Billing", $Language->menuPhrase("236", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(174, "mi_laboratory_billing_report", $Language->menuPhrase("174", "MenuText"), "laboratorybillingreportlist", 236, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(237, "mi_radiology_billing_report", $Language->menuPhrase("237", "MenuText"), "radiologybillingreportlist", 236, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(53, "mci_Financials", $Language->menuPhrase("53", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(26, "mi_payment_methods", $Language->menuPhrase("26", "MenuText"), "paymentmethodslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}payment_methods'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(10, "mi_invoices", $Language->menuPhrase("10", "MenuText"), "invoiceslist?cmd=resetall", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}invoices'), false, false, "", "", false, true);

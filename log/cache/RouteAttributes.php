@@ -235,6 +235,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1410,6 +1412,16 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -1589,6 +1601,8 @@
                 '/prescriptionsview[/{id}]',
                 '/prescriptionsedit[/{id}]',
                 '/prescriptionsdelete[/{id}]',
+                '/radiologybillingreportlist[/{id}]',
+                '/radiologybillingreportdetailslist[/{id}]',
                 '/radiologyreportslist[/{id}]',
                 '/radiologyreportsadd[/{id}]',
                 '/radiologyreportsview[/{id}]',
@@ -1826,6 +1840,8 @@
                 'PHPMaker2024\\afyaplus\\PrescriptionsController:view',
                 'PHPMaker2024\\afyaplus\\PrescriptionsController:edit',
                 'PHPMaker2024\\afyaplus\\PrescriptionsController:delete',
+                'PHPMaker2024\\afyaplus\\RadiologyBillingReportController:list',
+                'PHPMaker2024\\afyaplus\\RadiologyBillingReportDetailsController:list',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:list',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:add',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:view',
@@ -2589,6 +2605,12 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -2768,6 +2790,8 @@
                 'view.prescriptions',
                 'edit.prescriptions',
                 'delete.prescriptions',
+                'list.radiology_billing_report',
+                'list.radiology_billing_report_details',
                 'list.radiology_reports',
                 'add.radiology_reports',
                 'view.radiology_reports',
@@ -2828,6 +2852,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3302,6 +3328,8 @@
         $o[232],
         $o[233],
         $o[234],
+        $o[235],
+        $o[236],
     ],
     []
 );
