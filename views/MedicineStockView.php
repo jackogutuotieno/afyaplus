@@ -183,6 +183,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+    <tr id="r_expiry_status"<?= $Page->expiry_status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_expiry_status"><?= $Page->expiry_status->caption() ?></span></td>
+        <td data-name="expiry_status"<?= $Page->expiry_status->cellAttributes() ?>>
+<span id="el_medicine_stock_expiry_status">
+<span<?= $Page->expiry_status->viewAttributes() ?>>
+<?= $Page->expiry_status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

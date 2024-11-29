@@ -4,6 +4,7 @@ C:\wamp64\www\afyaplus\api\index.php
 C:\wamp64\www\afyaplus\composer.json
 C:\wamp64\www\afyaplus\controllers\ApiController.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsController.php
+C:\wamp64\www\afyaplus\controllers\AppointmentsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReportController.php
 C:\wamp64\www\afyaplus\controllers\ControllerBase.php
 C:\wamp64\www\afyaplus\controllers\DepartmentsController.php
@@ -43,6 +44,7 @@ C:\wamp64\www\afyaplus\controllers\PatientVaccinationsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVisitsController.php
 C:\wamp64\www\afyaplus\controllers\PatientVitalsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsController.php
+C:\wamp64\www\afyaplus\controllers\PatientsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\PatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\PatientsvisitsreportController.php
 C:\wamp64\www\afyaplus\controllers\PaymentMethodsController.php
@@ -57,6 +59,7 @@ C:\wamp64\www\afyaplus\controllers\RadiologyRequestsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyreportsdetailsController.php
+C:\wamp64\www\afyaplus\controllers\RegisteredPatientsController.php
 C:\wamp64\www\afyaplus\controllers\RolesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
@@ -83,7 +86,10 @@ C:\wamp64\www\afyaplus\models\AppointmentsCalendar.php
 C:\wamp64\www\afyaplus\models\AppointmentsDelete.php
 C:\wamp64\www\afyaplus\models\AppointmentsEdit.php
 C:\wamp64\www\afyaplus\models\AppointmentsReport.php
+C:\wamp64\www\afyaplus\models\AppointmentsReport2.php
+C:\wamp64\www\afyaplus\models\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\models\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\models\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\models\AppointmentsView.php
 C:\wamp64\www\afyaplus\models\ChangePassword.php
 C:\wamp64\www\afyaplus\models\Departments.php
@@ -295,7 +301,10 @@ C:\wamp64\www\afyaplus\models\PatientsDelete.php
 C:\wamp64\www\afyaplus\models\PatientsEdit.php
 C:\wamp64\www\afyaplus\models\PatientsList.php
 C:\wamp64\www\afyaplus\models\PatientsReport.php
+C:\wamp64\www\afyaplus\models\PatientsReport2.php
+C:\wamp64\www\afyaplus\models\PatientsReport2List.php
 C:\wamp64\www\afyaplus\models\PatientsReportList.php
+C:\wamp64\www\afyaplus\models\PatientsReportSummary.php
 C:\wamp64\www\afyaplus\models\PatientsView.php
 C:\wamp64\www\afyaplus\models\Patientsvisitsreport.php
 C:\wamp64\www\afyaplus\models\PatientsvisitsreportList.php
@@ -359,6 +368,8 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsView.php
 C:\wamp64\www\afyaplus\models\Radiologyreportsdetails.php
 C:\wamp64\www\afyaplus\models\RadiologyreportsdetailsList.php
+C:\wamp64\www\afyaplus\models\RegisteredPatients.php
+C:\wamp64\www\afyaplus\models\RegisteredPatientsSummary.php
 C:\wamp64\www\afyaplus\models\ResetPassword.php
 C:\wamp64\www\afyaplus\models\Roles.php
 C:\wamp64\www\afyaplus\models\RolesAdd.php
@@ -606,7 +617,9 @@ C:\wamp64\www\afyaplus\views\AppointmentsAdd.php
 C:\wamp64\www\afyaplus\views\AppointmentsCalendar.php
 C:\wamp64\www\afyaplus\views\AppointmentsDelete.php
 C:\wamp64\www\afyaplus\views\AppointmentsEdit.php
+C:\wamp64\www\afyaplus\views\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\views\AppointmentsReportList.php
+C:\wamp64\www\afyaplus\views\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\views\AppointmentsView.php
 C:\wamp64\www\afyaplus\views\ChangePassword.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php
@@ -791,7 +804,9 @@ C:\wamp64\www\afyaplus\views\PatientsDelete.php
 C:\wamp64\www\afyaplus\views\PatientsEdit.php
 C:\wamp64\www\afyaplus\views\PatientsList.php
 C:\wamp64\www\afyaplus\views\PatientsMaster.php
+C:\wamp64\www\afyaplus\views\PatientsReport2List.php
 C:\wamp64\www\afyaplus\views\PatientsReportList.php
+C:\wamp64\www\afyaplus\views\PatientsReportSummary.php
 C:\wamp64\www\afyaplus\views\PatientsView.php
 C:\wamp64\www\afyaplus\views\PatientsvisitsreportList.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsAdd.php
@@ -847,6 +862,7 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsView.php
 C:\wamp64\www\afyaplus\views\RadiologyreportsdetailsList.php
+C:\wamp64\www\afyaplus\views\RegisteredPatientsSummary.php
 C:\wamp64\www\afyaplus\views\ResetPassword.php
 C:\wamp64\www\afyaplus\views\RolesAdd.php
 C:\wamp64\www\afyaplus\views\RolesDelete.php

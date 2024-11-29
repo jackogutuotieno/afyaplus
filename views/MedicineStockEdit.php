@@ -39,7 +39,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["selling_price_per_unit", [fields.selling_price_per_unit.visible && fields.selling_price_per_unit.required ? ew.Validators.required(fields.selling_price_per_unit.caption) : null, ew.Validators.float], fields.selling_price_per_unit.isInvalid],
             ["expiry_date", [fields.expiry_date.visible && fields.expiry_date.required ? ew.Validators.required(fields.expiry_date.caption) : null, ew.Validators.datetime(fields.expiry_date.clientFormatPattern)], fields.expiry_date.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
+            ["expiry_status", [fields.expiry_status.visible && fields.expiry_status.required ? ew.Validators.required(fields.expiry_status.caption) : null], fields.expiry_status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -390,6 +391,18 @@ loadjs.ready(["fmedicine_stockedit", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+    <div id="r_expiry_status"<?= $Page->expiry_status->rowAttributes() ?>>
+        <label id="elh_medicine_stock_expiry_status" for="x_expiry_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->expiry_status->caption() ?><?= $Page->expiry_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->expiry_status->cellAttributes() ?>>
+<span id="el_medicine_stock_expiry_status">
+<input type="<?= $Page->expiry_status->getInputTextType() ?>" name="x_expiry_status" id="x_expiry_status" data-table="medicine_stock" data-field="x_expiry_status" value="<?= $Page->expiry_status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->expiry_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->expiry_status->formatPattern()) ?>"<?= $Page->expiry_status->editAttributes() ?> aria-describedby="x_expiry_status_help">
+<?= $Page->expiry_status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->expiry_status->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

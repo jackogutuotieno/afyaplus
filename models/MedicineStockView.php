@@ -151,6 +151,7 @@ class MedicineStockView extends MedicineStock
         $this->expiry_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->expiry_status->setVisibility();
     }
 
     // Constructor
@@ -828,6 +829,7 @@ class MedicineStockView extends MedicineStock
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Return a row with default values
@@ -846,6 +848,7 @@ class MedicineStockView extends MedicineStock
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         return $row;
     }
 
@@ -890,6 +893,8 @@ class MedicineStockView extends MedicineStock
         // date_created
 
         // date_updated
+
+        // expiry_status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -976,6 +981,9 @@ class MedicineStockView extends MedicineStock
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // expiry_status
+            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -1023,6 +1031,10 @@ class MedicineStockView extends MedicineStock
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // expiry_status
+            $this->expiry_status->HrefValue = "";
+            $this->expiry_status->TooltipValue = "";
         }
 
         // Call Row Rendered event

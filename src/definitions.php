@@ -79,7 +79,7 @@ return [
     Encrypter::class => fn(ContainerInterface $c) => new Encrypter(AesEncryptionKey(base64_decode(Config("AES_ENCRYPTION_KEY"))), Config("AES_ENCRYPTION_CIPHER")),
 
     // Tables
-    "appointments_report" => \DI\create(AppointmentsReport::class),
+    "appointments_report2" => \DI\create(AppointmentsReport2::class),
     "departments" => \DI\create(Departments::class),
     "designations" => \DI\create(Designations::class),
     "diagnosis" => \DI\create(Diagnosis::class),
@@ -108,7 +108,6 @@ return [
     "patient_visits" => \DI\create(PatientVisits::class),
     "patient_vitals" => \DI\create(PatientVitals::class),
     "patients" => \DI\create(Patients::class),
-    "patients_report" => \DI\create(PatientsReport::class),
     "payment_methods" => \DI\create(PaymentMethods::class),
     "prescription_details" => \DI\create(PrescriptionDetails::class),
     "prescriptions" => \DI\create(Prescriptions::class),
@@ -136,6 +135,8 @@ return [
     "pharmacy_billing_report" => \DI\create(PharmacyBillingReport::class),
     "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
     "income" => \DI\create(Income::class),
+    "Appointments_Report" => \DI\create(AppointmentsReport::class),
+    "appointments_report" => \DI\create(AppointmentsReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

@@ -133,6 +133,7 @@ class MedicineStockAdd extends MedicineStock
         $this->expiry_date->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->expiry_status->setVisibility();
     }
 
     // Constructor
@@ -803,6 +804,16 @@ class MedicineStockAdd extends MedicineStock
             $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         }
 
+        // Check field name 'expiry_status' first before field var 'x_expiry_status'
+        $val = $CurrentForm->hasValue("expiry_status") ? $CurrentForm->getValue("expiry_status") : $CurrentForm->getValue("x_expiry_status");
+        if (!$this->expiry_status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->expiry_status->Visible = false; // Disable update for API request
+            } else {
+                $this->expiry_status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -825,6 +836,7 @@ class MedicineStockAdd extends MedicineStock
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
         $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        $this->expiry_status->CurrentValue = $this->expiry_status->FormValue;
     }
 
     /**
@@ -877,6 +889,7 @@ class MedicineStockAdd extends MedicineStock
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Return a row with default values
@@ -895,6 +908,7 @@ class MedicineStockAdd extends MedicineStock
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         return $row;
     }
 
@@ -964,6 +978,9 @@ class MedicineStockAdd extends MedicineStock
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
+
+        // expiry_status
+        $this->expiry_status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1050,6 +1067,9 @@ class MedicineStockAdd extends MedicineStock
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // expiry_status
+            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
+
             // supplier_id
             $this->supplier_id->HrefValue = "";
 
@@ -1082,6 +1102,9 @@ class MedicineStockAdd extends MedicineStock
 
             // date_updated
             $this->date_updated->HrefValue = "";
+
+            // expiry_status
+            $this->expiry_status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // supplier_id
             $this->supplier_id->setupEditAttributes();
@@ -1200,6 +1223,14 @@ class MedicineStockAdd extends MedicineStock
             $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
             $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
+            // expiry_status
+            $this->expiry_status->setupEditAttributes();
+            if (!$this->expiry_status->Raw) {
+                $this->expiry_status->CurrentValue = HtmlDecode($this->expiry_status->CurrentValue);
+            }
+            $this->expiry_status->EditValue = HtmlEncode($this->expiry_status->CurrentValue);
+            $this->expiry_status->PlaceHolder = RemoveHtml($this->expiry_status->caption());
+
             // Add refer script
 
             // supplier_id
@@ -1234,6 +1265,9 @@ class MedicineStockAdd extends MedicineStock
 
             // date_updated
             $this->date_updated->HrefValue = "";
+
+            // expiry_status
+            $this->expiry_status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1330,6 +1364,11 @@ class MedicineStockAdd extends MedicineStock
             }
             if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
                 $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
+            }
+            if ($this->expiry_status->Visible && $this->expiry_status->Required) {
+                if (!$this->expiry_status->IsDetailKey && EmptyValue($this->expiry_status->FormValue)) {
+                    $this->expiry_status->addErrorMessage(str_replace("%s", $this->expiry_status->caption(), $this->expiry_status->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1434,6 +1473,9 @@ class MedicineStockAdd extends MedicineStock
 
         // date_updated
         $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // expiry_status
+        $this->expiry_status->setDbValueDef($rsnew, $this->expiry_status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1475,6 +1517,9 @@ class MedicineStockAdd extends MedicineStock
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['expiry_status'])) { // expiry_status
+            $this->expiry_status->setFormValue($row['expiry_status']);
         }
     }
 

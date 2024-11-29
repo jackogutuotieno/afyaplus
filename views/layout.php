@@ -75,6 +75,17 @@ ew.ready("head", [
 ], "datetimepicker");
 </script>
 <script>
+// Load chart *.js
+loadjs(ew.PATH_BASE + "js/chart.umd.js?v=24.16.0", "chartjs");
+ew.ready(["chartjs", "luxon"], [
+    ew.PATH_BASE + "js/chartjs-adapter-luxon.umd.min.js?v=24.16.0",
+    ew.PATH_BASE + "js/chartjs-plugin-annotation.min.js?v=24.16.0",
+    ew.PATH_BASE + "js/chartjs-plugin-datalabels.min.js?v=24.16.0",
+    ew.PATH_BASE + "js/chartjs-plugin-stacked100.js?v=24.16.0",
+    ew.PATH_BASE + "js/ewchart.js?v=24.16.0",
+], "chart");
+</script>
+<script>
 ew.ready("head", [ew.PATH_BASE + "tinymce/tinymce.min.js?v=24.16.0", ew.PATH_BASE + "js/eweditor.js?v=24.16.0"], "editor");
 </script>
 <style>

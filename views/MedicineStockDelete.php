@@ -86,6 +86,9 @@ $Page->showMessage();
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_medicine_stock_date_updated" class="medicine_stock_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+        <th class="<?= $Page->expiry_status->headerCellClass() ?>"><span id="elh_medicine_stock_expiry_status" class="medicine_stock_expiry_status"><?= $Page->expiry_status->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -200,6 +203,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+        <td<?= $Page->expiry_status->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->expiry_status->viewAttributes() ?>>
+<?= $Page->expiry_status->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

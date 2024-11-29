@@ -852,10 +852,10 @@ $CONFIG = [
     "CHART_SHOW_BLANK_SERIES" => false, // Show blank series
     "CHART_SHOW_ZERO_IN_STACK_CHART" => false, // Show zero in stack chart
     "CHART_SHOW_MISSING_SERIES_VALUES_AS_ZERO" => true, // Show missing series values as zero
-    "CHART_SCALE_BEGIN_WITH_ZERO" => false, // Chart scale begin with zero
+    "CHART_SCALE_BEGIN_WITH_ZERO" => true, // Chart scale begin with zero
     "CHART_SCALE_MINIMUM_VALUE" => 0, // Chart scale minimum value
     "CHART_SCALE_MAXIMUM_VALUE" => 0, // Chart scale maximum value
-    "CHART_SHOW_PERCENTAGE" => false, // Show percentage in Pie/Doughnut charts
+    "CHART_SHOW_PERCENTAGE" => true, // Show percentage in Pie/Doughnut charts
     "CHART_COLOR_PALETTE" => "", // Color pallette (global)
 
     // Drill down setting

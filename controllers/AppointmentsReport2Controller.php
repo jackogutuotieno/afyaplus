@@ -2,6 +2,7 @@
 
 namespace PHPMaker2024\afyaplus;
 
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use PHPMaker2024\afyaplus\Attributes\Delete;
@@ -12,15 +13,12 @@ use PHPMaker2024\afyaplus\Attributes\Patch;
 use PHPMaker2024\afyaplus\Attributes\Post;
 use PHPMaker2024\afyaplus\Attributes\Put;
 
-/**
- * Patients_Report controller
- */
-class PatientsReportController extends ControllerBase
+class AppointmentsReport2Controller extends ControllerBase
 {
-    // summary
-    #[Map(["GET", "POST", "OPTIONS"], "/patientsreport", [PermissionMiddleware::class], "summary.Patients_Report")]
-    public function summary(Request $request, Response $response, array $args): Response
+    // list
+    #[Map(["GET","POST","OPTIONS"], "/appointmentsreport2list[/{id}]", [PermissionMiddleware::class], "list.appointments_report2")]
+    public function list(Request $request, Response $response, array $args): Response
     {
-        return $this->runPage($request, $response, $args, "PatientsReportSummary");
+        return $this->runPage($request, $response, $args, "AppointmentsReport2List");
     }
 }

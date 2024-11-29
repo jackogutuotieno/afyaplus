@@ -60,6 +60,9 @@ class AppointmentsReport extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
+    #[Column(name: "appointment_month", type: "string", nullable: true)]
+    private ?string $appointmentMonth;
+
     public function getId(): int
     {
         return $this->id;
@@ -167,6 +170,17 @@ class AppointmentsReport extends AbstractEntity
     public function setDateUpdated(DateTime $value): static
     {
         $this->dateUpdated = $value;
+        return $this;
+    }
+
+    public function getAppointmentMonth(): ?string
+    {
+        return HtmlDecode($this->appointmentMonth);
+    }
+
+    public function setAppointmentMonth(?string $value): static
+    {
+        $this->appointmentMonth = RemoveXss($value);
         return $this;
     }
 }

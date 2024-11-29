@@ -193,6 +193,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_medicine_stock_date_updated" class="medicine_stock_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+        <th data-name="expiry_status" class="<?= $Page->expiry_status->headerCellClass() ?>"><div id="elh_medicine_stock_expiry_status" class="medicine_stock_expiry_status"><?= $Page->renderFieldHeader($Page->expiry_status) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -314,6 +317,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_date_updated" class="el_medicine_stock_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+        <td data-name="expiry_status"<?= $Page->expiry_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_expiry_status" class="el_medicine_stock_expiry_status">
+<span<?= $Page->expiry_status->viewAttributes() ?>>
+<?= $Page->expiry_status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

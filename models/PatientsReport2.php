@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for medicine_stock
+ * Table class for patients_report
  */
-class MedicineStock extends DbTable
+class PatientsReport2 extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,18 +47,18 @@ class MedicineStock extends DbTable
 
     // Fields
     public $id;
-    public $supplier_id;
-    public $brand_id;
-    public $batch_number;
-    public $quantity;
-    public $quantity_left;
-    public $measuring_unit;
-    public $buying_price_per_unit;
-    public $selling_price_per_unit;
-    public $expiry_date;
+    public $first_name;
+    public $last_name;
+    public $national_id;
+    public $date_of_birth;
+    public $gender;
+    public $phone;
+    public $email_address;
+    public $physical_address;
+    public $next_of_kin;
+    public $next_of_kin_phone;
     public $date_created;
     public $date_updated;
-    public $expiry_status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -71,14 +71,14 @@ class MedicineStock extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "medicine_stock";
-        $this->TableName = 'medicine_stock';
-        $this->TableType = "TABLE";
+        $this->TableVar = "patients_report2";
+        $this->TableName = 'patients_report';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "medicine_stock";
+        $this->UpdateTable = "patients_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -132,249 +132,243 @@ class MedicineStock extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // supplier_id
-        $this->supplier_id = new DbField(
+        // first_name
+        $this->first_name = new DbField(
             $this, // Table
-            'x_supplier_id', // Variable name
-            'supplier_id', // Name
-            '`supplier_id`', // Expression
-            '`supplier_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`supplier_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->supplier_id->InputTextType = "text";
-        $this->supplier_id->Raw = true;
-        $this->supplier_id->Nullable = false; // NOT NULL field
-        $this->supplier_id->Required = true; // Required field
-        $this->supplier_id->setSelectMultiple(false); // Select one
-        $this->supplier_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->supplier_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->supplier_id->Lookup = new Lookup($this->supplier_id, 'medicine_suppliers', false, 'id', ["supplier_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`supplier_name`");
-        $this->supplier_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->supplier_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['supplier_id'] = &$this->supplier_id;
-
-        // brand_id
-        $this->brand_id = new DbField(
-            $this, // Table
-            'x_brand_id', // Variable name
-            'brand_id', // Name
-            '`brand_id`', // Expression
-            '`brand_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`brand_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->brand_id->InputTextType = "text";
-        $this->brand_id->Raw = true;
-        $this->brand_id->Nullable = false; // NOT NULL field
-        $this->brand_id->Required = true; // Required field
-        $this->brand_id->setSelectMultiple(false); // Select one
-        $this->brand_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->brand_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->brand_id->Lookup = new Lookup($this->brand_id, 'medicine_brands', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
-        $this->brand_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->brand_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['brand_id'] = &$this->brand_id;
-
-        // batch_number
-        $this->batch_number = new DbField(
-            $this, // Table
-            'x_batch_number', // Variable name
-            'batch_number', // Name
-            '`batch_number`', // Expression
-            '`batch_number`', // Basic search expression
+            'x_first_name', // Variable name
+            'first_name', // Name
+            '`first_name`', // Expression
+            '`first_name`', // Basic search expression
             200, // Type
-            20, // Size
+            50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`batch_number`', // Virtual expression
+            '`first_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->batch_number->InputTextType = "text";
-        $this->batch_number->Nullable = false; // NOT NULL field
-        $this->batch_number->Required = true; // Required field
-        $this->batch_number->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['batch_number'] = &$this->batch_number;
+        $this->first_name->InputTextType = "text";
+        $this->first_name->Nullable = false; // NOT NULL field
+        $this->first_name->Required = true; // Required field
+        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['first_name'] = &$this->first_name;
 
-        // quantity
-        $this->quantity = new DbField(
+        // last_name
+        $this->last_name = new DbField(
             $this, // Table
-            'x_quantity', // Variable name
-            'quantity', // Name
-            '`quantity`', // Expression
-            '`quantity`', // Basic search expression
+            'x_last_name', // Variable name
+            'last_name', // Name
+            '`last_name`', // Expression
+            '`last_name`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`last_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->last_name->InputTextType = "text";
+        $this->last_name->Nullable = false; // NOT NULL field
+        $this->last_name->Required = true; // Required field
+        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['last_name'] = &$this->last_name;
+
+        // national_id
+        $this->national_id = new DbField(
+            $this, // Table
+            'x_national_id', // Variable name
+            'national_id', // Name
+            '`national_id`', // Expression
+            '`national_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`quantity`', // Virtual expression
+            '`national_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->quantity->InputTextType = "text";
-        $this->quantity->Raw = true;
-        $this->quantity->Nullable = false; // NOT NULL field
-        $this->quantity->Required = true; // Required field
-        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['quantity'] = &$this->quantity;
+        $this->national_id->InputTextType = "text";
+        $this->national_id->Raw = true;
+        $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['national_id'] = &$this->national_id;
 
-        // quantity_left
-        $this->quantity_left = new DbField(
+        // date_of_birth
+        $this->date_of_birth = new DbField(
             $this, // Table
-            'x_quantity_left', // Variable name
-            'quantity_left', // Name
-            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id)', // Expression
-            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id)', // Basic search expression
-            131, // Type
-            34, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id)', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->quantity_left->addMethod("getSearchDefault", fn() => 0);
-        $this->quantity_left->InputTextType = "text";
-        $this->quantity_left->Raw = true;
-        $this->quantity_left->IsCustom = true; // Custom field
-        $this->quantity_left->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->quantity_left->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->quantity_left->AdvancedSearch->SearchValueDefault = $this->quantity_left->getSearchDefault();
-        $this->quantity_left->AdvancedSearch->SearchOperatorDefault = "=";
-        $this->quantity_left->AdvancedSearch->SearchOperator2Default = "";
-        $this->quantity_left->AdvancedSearch->SearchConditionDefault = "AND";
-        $this->Fields['quantity_left'] = &$this->quantity_left;
-
-        // measuring_unit
-        $this->measuring_unit = new DbField(
-            $this, // Table
-            'x_measuring_unit', // Variable name
-            'measuring_unit', // Name
-            '`measuring_unit`', // Expression
-            '`measuring_unit`', // Basic search expression
-            200, // Type
-            20, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`measuring_unit`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->measuring_unit->InputTextType = "text";
-        $this->measuring_unit->Nullable = false; // NOT NULL field
-        $this->measuring_unit->Required = true; // Required field
-        $this->measuring_unit->Lookup = new Lookup($this->measuring_unit, 'medicine_stock', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->measuring_unit->OptionCount = 5;
-        $this->measuring_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['measuring_unit'] = &$this->measuring_unit;
-
-        // buying_price_per_unit
-        $this->buying_price_per_unit = new DbField(
-            $this, // Table
-            'x_buying_price_per_unit', // Variable name
-            'buying_price_per_unit', // Name
-            '`buying_price_per_unit`', // Expression
-            '`buying_price_per_unit`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`buying_price_per_unit`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->buying_price_per_unit->InputTextType = "text";
-        $this->buying_price_per_unit->Raw = true;
-        $this->buying_price_per_unit->Nullable = false; // NOT NULL field
-        $this->buying_price_per_unit->Required = true; // Required field
-        $this->buying_price_per_unit->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->buying_price_per_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['buying_price_per_unit'] = &$this->buying_price_per_unit;
-
-        // selling_price_per_unit
-        $this->selling_price_per_unit = new DbField(
-            $this, // Table
-            'x_selling_price_per_unit', // Variable name
-            'selling_price_per_unit', // Name
-            '`selling_price_per_unit`', // Expression
-            '`selling_price_per_unit`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`selling_price_per_unit`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->selling_price_per_unit->InputTextType = "text";
-        $this->selling_price_per_unit->Raw = true;
-        $this->selling_price_per_unit->Nullable = false; // NOT NULL field
-        $this->selling_price_per_unit->Required = true; // Required field
-        $this->selling_price_per_unit->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->selling_price_per_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['selling_price_per_unit'] = &$this->selling_price_per_unit;
-
-        // expiry_date
-        $this->expiry_date = new DbField(
-            $this, // Table
-            'x_expiry_date', // Variable name
-            'expiry_date', // Name
-            '`expiry_date`', // Expression
-            CastDateFieldForLike("`expiry_date`", 7, "DB"), // Basic search expression
+            'x_date_of_birth', // Variable name
+            'date_of_birth', // Name
+            '`date_of_birth`', // Expression
+            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
             133, // Type
-            10, // Size
-            7, // Date/Time format
+            40, // Size
+            0, // Date/Time format
             false, // Is upload field
-            '`expiry_date`', // Virtual expression
+            '`date_of_birth`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->expiry_date->InputTextType = "text";
-        $this->expiry_date->Raw = true;
-        $this->expiry_date->Nullable = false; // NOT NULL field
-        $this->expiry_date->Required = true; // Required field
-        $this->expiry_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->expiry_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['expiry_date'] = &$this->expiry_date;
+        $this->date_of_birth->InputTextType = "text";
+        $this->date_of_birth->Raw = true;
+        $this->date_of_birth->Nullable = false; // NOT NULL field
+        $this->date_of_birth->Required = true; // Required field
+        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_of_birth'] = &$this->date_of_birth;
+
+        // gender
+        $this->gender = new DbField(
+            $this, // Table
+            'x_gender', // Variable name
+            'gender', // Name
+            '`gender`', // Expression
+            '`gender`', // Basic search expression
+            200, // Type
+            15, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`gender`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->gender->InputTextType = "text";
+        $this->gender->Nullable = false; // NOT NULL field
+        $this->gender->Required = true; // Required field
+        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['gender'] = &$this->gender;
+
+        // phone
+        $this->phone = new DbField(
+            $this, // Table
+            'x_phone', // Variable name
+            'phone', // Name
+            '`phone`', // Expression
+            '`phone`', // Basic search expression
+            129, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`phone`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->phone->InputTextType = "text";
+        $this->phone->Nullable = false; // NOT NULL field
+        $this->phone->Required = true; // Required field
+        $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['phone'] = &$this->phone;
+
+        // email_address
+        $this->email_address = new DbField(
+            $this, // Table
+            'x_email_address', // Variable name
+            'email_address', // Name
+            '`email_address`', // Expression
+            '`email_address`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`email_address`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->email_address->InputTextType = "text";
+        $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['email_address'] = &$this->email_address;
+
+        // physical_address
+        $this->physical_address = new DbField(
+            $this, // Table
+            'x_physical_address', // Variable name
+            'physical_address', // Name
+            '`physical_address`', // Expression
+            '`physical_address`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`physical_address`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->physical_address->InputTextType = "text";
+        $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['physical_address'] = &$this->physical_address;
+
+        // next_of_kin
+        $this->next_of_kin = new DbField(
+            $this, // Table
+            'x_next_of_kin', // Variable name
+            'next_of_kin', // Name
+            '`next_of_kin`', // Expression
+            '`next_of_kin`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`next_of_kin`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->next_of_kin->InputTextType = "text";
+        $this->next_of_kin->Nullable = false; // NOT NULL field
+        $this->next_of_kin->Required = true; // Required field
+        $this->next_of_kin->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['next_of_kin'] = &$this->next_of_kin;
+
+        // next_of_kin_phone
+        $this->next_of_kin_phone = new DbField(
+            $this, // Table
+            'x_next_of_kin_phone', // Variable name
+            'next_of_kin_phone', // Name
+            '`next_of_kin_phone`', // Expression
+            '`next_of_kin_phone`', // Basic search expression
+            129, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`next_of_kin_phone`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->next_of_kin_phone->InputTextType = "text";
+        $this->next_of_kin_phone->Nullable = false; // NOT NULL field
+        $this->next_of_kin_phone->Required = true; // Required field
+        $this->next_of_kin_phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['next_of_kin_phone'] = &$this->next_of_kin_phone;
 
         // date_created
         $this->date_created = new DbField(
@@ -382,10 +376,10 @@ class MedicineStock extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            0, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -398,7 +392,7 @@ class MedicineStock extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -408,10 +402,10 @@ class MedicineStock extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            0, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -424,32 +418,9 @@ class MedicineStock extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // expiry_status
-        $this->expiry_status = new DbField(
-            $this, // Table
-            'x_expiry_status', // Variable name
-            'expiry_status', // Name
-            '\'\'', // Expression
-            '\'\'', // Basic search expression
-            200, // Type
-            0, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '\'\'', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->expiry_status->InputTextType = "text";
-        $this->expiry_status->IsCustom = true; // Custom field
-        $this->expiry_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['expiry_status'] = &$this->expiry_status;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -518,7 +489,7 @@ class MedicineStock extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "medicine_stock";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "patients_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -542,7 +513,20 @@ class MedicineStock extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id) AS `quantity_left`, '' AS `expiry_status`";
+        $useFieldNames = false;
+        $fieldNames = [];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($this->Fields as $field) {
+            $expr = $field->Expression;
+            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
+            if ($customExpr != $expr) {
+                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
+                $useFieldNames = true;
+            } else {
+                $fieldNames[] = $expr;
+            }
+        }
+        return $useFieldNames ? implode(", ", $fieldNames) : "*";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -957,18 +941,18 @@ class MedicineStock extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->supplier_id->DbValue = $row['supplier_id'];
-        $this->brand_id->DbValue = $row['brand_id'];
-        $this->batch_number->DbValue = $row['batch_number'];
-        $this->quantity->DbValue = $row['quantity'];
-        $this->quantity_left->DbValue = $row['quantity_left'];
-        $this->measuring_unit->DbValue = $row['measuring_unit'];
-        $this->buying_price_per_unit->DbValue = $row['buying_price_per_unit'];
-        $this->selling_price_per_unit->DbValue = $row['selling_price_per_unit'];
-        $this->expiry_date->DbValue = $row['expiry_date'];
+        $this->first_name->DbValue = $row['first_name'];
+        $this->last_name->DbValue = $row['last_name'];
+        $this->national_id->DbValue = $row['national_id'];
+        $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->gender->DbValue = $row['gender'];
+        $this->phone->DbValue = $row['phone'];
+        $this->email_address->DbValue = $row['email_address'];
+        $this->physical_address->DbValue = $row['physical_address'];
+        $this->next_of_kin->DbValue = $row['next_of_kin'];
+        $this->next_of_kin_phone->DbValue = $row['next_of_kin_phone'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->expiry_status->DbValue = $row['expiry_status'];
     }
 
     // Delete uploaded files
@@ -1042,7 +1026,7 @@ class MedicineStock extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("medicinestocklist");
+        return $_SESSION[$name] ?? GetUrl("patientsreport2list");
     }
 
     // Set return page URL
@@ -1056,9 +1040,9 @@ class MedicineStock extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "medicinestockview" => $Language->phrase("View"),
-            "medicinestockedit" => $Language->phrase("Edit"),
-            "medicinestockadd" => $Language->phrase("Add"),
+            "patientsreport2view" => $Language->phrase("View"),
+            "patientsreport2edit" => $Language->phrase("Edit"),
+            "patientsreport2add" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1066,18 +1050,18 @@ class MedicineStock extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "medicinestocklist";
+        return "patientsreport2list";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "MedicineStockView",
-            Config("API_ADD_ACTION") => "MedicineStockAdd",
-            Config("API_EDIT_ACTION") => "MedicineStockEdit",
-            Config("API_DELETE_ACTION") => "MedicineStockDelete",
-            Config("API_LIST_ACTION") => "MedicineStockList",
+            Config("API_VIEW_ACTION") => "PatientsReport2View",
+            Config("API_ADD_ACTION") => "PatientsReport2Add",
+            Config("API_EDIT_ACTION") => "PatientsReport2Edit",
+            Config("API_DELETE_ACTION") => "PatientsReport2Delete",
+            Config("API_LIST_ACTION") => "PatientsReport2List",
             default => ""
         };
     }
@@ -1097,16 +1081,16 @@ class MedicineStock extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "medicinestocklist";
+        return "patientsreport2list";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("medicinestockview", $parm);
+            $url = $this->keyUrl("patientsreport2view", $parm);
         } else {
-            $url = $this->keyUrl("medicinestockview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("patientsreport2view", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1115,9 +1099,9 @@ class MedicineStock extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "medicinestockadd?" . $parm;
+            $url = "patientsreport2add?" . $parm;
         } else {
-            $url = "medicinestockadd";
+            $url = "patientsreport2add";
         }
         return $this->addMasterUrl($url);
     }
@@ -1125,28 +1109,28 @@ class MedicineStock extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinestockedit", $parm);
+        $url = $this->keyUrl("patientsreport2edit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("medicinestocklist", "action=edit");
+        $url = $this->keyUrl("patientsreport2list", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinestockadd", $parm);
+        $url = $this->keyUrl("patientsreport2add", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("medicinestocklist", "action=copy");
+        $url = $this->keyUrl("patientsreport2list", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1156,7 +1140,7 @@ class MedicineStock extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("medicinestockdelete", $parm);
+            return $this->keyUrl("patientsreport2delete", $parm);
         }
     }
 
@@ -1322,25 +1306,25 @@ class MedicineStock extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->brand_id->setDbValue($row['brand_id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->quantity_left->setDbValue($row['quantity_left']);
-        $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
-        $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
-        $this->expiry_date->setDbValue($row['expiry_date']);
+        $this->first_name->setDbValue($row['first_name']);
+        $this->last_name->setDbValue($row['last_name']);
+        $this->national_id->setDbValue($row['national_id']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
+        $this->phone->setDbValue($row['phone']);
+        $this->email_address->setDbValue($row['email_address']);
+        $this->physical_address->setDbValue($row['physical_address']);
+        $this->next_of_kin->setDbValue($row['next_of_kin']);
+        $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "MedicineStockList";
+        $listPage = "PatientsReport2List";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1366,104 +1350,64 @@ class MedicineStock extends DbTable
 
         // id
 
-        // supplier_id
+        // first_name
 
-        // brand_id
+        // last_name
 
-        // batch_number
+        // national_id
 
-        // quantity
+        // date_of_birth
 
-        // quantity_left
+        // gender
 
-        // measuring_unit
+        // phone
 
-        // buying_price_per_unit
+        // email_address
 
-        // selling_price_per_unit
+        // physical_address
 
-        // expiry_date
+        // next_of_kin
+
+        // next_of_kin_phone
 
         // date_created
 
         // date_updated
 
-        // expiry_status
-
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // supplier_id
-        $curVal = strval($this->supplier_id->CurrentValue);
-        if ($curVal != "") {
-            $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-            if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
-                } else {
-                    $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
-                }
-            }
-        } else {
-            $this->supplier_id->ViewValue = null;
-        }
+        // first_name
+        $this->first_name->ViewValue = $this->first_name->CurrentValue;
 
-        // brand_id
-        $curVal = strval($this->brand_id->CurrentValue);
-        if ($curVal != "") {
-            $this->brand_id->ViewValue = $this->brand_id->lookupCacheOption($curVal);
-            if ($this->brand_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->brand_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->brand_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->brand_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->brand_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->brand_id->ViewValue = $this->brand_id->displayValue($arwrk);
-                } else {
-                    $this->brand_id->ViewValue = FormatNumber($this->brand_id->CurrentValue, $this->brand_id->formatPattern());
-                }
-            }
-        } else {
-            $this->brand_id->ViewValue = null;
-        }
+        // last_name
+        $this->last_name->ViewValue = $this->last_name->CurrentValue;
 
-        // batch_number
-        $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+        // national_id
+        $this->national_id->ViewValue = $this->national_id->CurrentValue;
+        $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
-        // quantity
-        $this->quantity->ViewValue = $this->quantity->CurrentValue;
-        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+        // date_of_birth
+        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
-        // quantity_left
-        $this->quantity_left->ViewValue = $this->quantity_left->CurrentValue;
-        $this->quantity_left->ViewValue = FormatNumber($this->quantity_left->ViewValue, $this->quantity_left->formatPattern());
+        // gender
+        $this->gender->ViewValue = $this->gender->CurrentValue;
 
-        // measuring_unit
-        $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
+        // phone
+        $this->phone->ViewValue = $this->phone->CurrentValue;
 
-        // buying_price_per_unit
-        $this->buying_price_per_unit->ViewValue = $this->buying_price_per_unit->CurrentValue;
-        $this->buying_price_per_unit->ViewValue = FormatNumber($this->buying_price_per_unit->ViewValue, $this->buying_price_per_unit->formatPattern());
+        // email_address
+        $this->email_address->ViewValue = $this->email_address->CurrentValue;
 
-        // selling_price_per_unit
-        $this->selling_price_per_unit->ViewValue = $this->selling_price_per_unit->CurrentValue;
-        $this->selling_price_per_unit->ViewValue = FormatNumber($this->selling_price_per_unit->ViewValue, $this->selling_price_per_unit->formatPattern());
+        // physical_address
+        $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-        // expiry_date
-        $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
-        $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
+        // next_of_kin
+        $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
+
+        // next_of_kin_phone
+        $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1473,48 +1417,49 @@ class MedicineStock extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-        // expiry_status
-        $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
-
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // supplier_id
-        $this->supplier_id->HrefValue = "";
-        $this->supplier_id->TooltipValue = "";
+        // first_name
+        $this->first_name->HrefValue = "";
+        $this->first_name->TooltipValue = "";
 
-        // brand_id
-        $this->brand_id->HrefValue = "";
-        $this->brand_id->TooltipValue = "";
+        // last_name
+        $this->last_name->HrefValue = "";
+        $this->last_name->TooltipValue = "";
 
-        // batch_number
-        $this->batch_number->HrefValue = "";
-        $this->batch_number->TooltipValue = "";
+        // national_id
+        $this->national_id->HrefValue = "";
+        $this->national_id->TooltipValue = "";
 
-        // quantity
-        $this->quantity->HrefValue = "";
-        $this->quantity->TooltipValue = "";
+        // date_of_birth
+        $this->date_of_birth->HrefValue = "";
+        $this->date_of_birth->TooltipValue = "";
 
-        // quantity_left
-        $this->quantity_left->HrefValue = "";
-        $this->quantity_left->TooltipValue = "";
+        // gender
+        $this->gender->HrefValue = "";
+        $this->gender->TooltipValue = "";
 
-        // measuring_unit
-        $this->measuring_unit->HrefValue = "";
-        $this->measuring_unit->TooltipValue = "";
+        // phone
+        $this->phone->HrefValue = "";
+        $this->phone->TooltipValue = "";
 
-        // buying_price_per_unit
-        $this->buying_price_per_unit->HrefValue = "";
-        $this->buying_price_per_unit->TooltipValue = "";
+        // email_address
+        $this->email_address->HrefValue = "";
+        $this->email_address->TooltipValue = "";
 
-        // selling_price_per_unit
-        $this->selling_price_per_unit->HrefValue = "";
-        $this->selling_price_per_unit->TooltipValue = "";
+        // physical_address
+        $this->physical_address->HrefValue = "";
+        $this->physical_address->TooltipValue = "";
 
-        // expiry_date
-        $this->expiry_date->HrefValue = "";
-        $this->expiry_date->TooltipValue = "";
+        // next_of_kin
+        $this->next_of_kin->HrefValue = "";
+        $this->next_of_kin->TooltipValue = "";
+
+        // next_of_kin_phone
+        $this->next_of_kin_phone->HrefValue = "";
+        $this->next_of_kin_phone->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1523,10 +1468,6 @@ class MedicineStock extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
-
-        // expiry_status
-        $this->expiry_status->HrefValue = "";
-        $this->expiry_status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1547,66 +1488,82 @@ class MedicineStock extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // supplier_id
-        $this->supplier_id->setupEditAttributes();
-        $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
-
-        // brand_id
-        $this->brand_id->setupEditAttributes();
-        $this->brand_id->PlaceHolder = RemoveHtml($this->brand_id->caption());
-
-        // batch_number
-        $this->batch_number->setupEditAttributes();
-        if (!$this->batch_number->Raw) {
-            $this->batch_number->CurrentValue = HtmlDecode($this->batch_number->CurrentValue);
+        // first_name
+        $this->first_name->setupEditAttributes();
+        if (!$this->first_name->Raw) {
+            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
         }
-        $this->batch_number->EditValue = $this->batch_number->CurrentValue;
-        $this->batch_number->PlaceHolder = RemoveHtml($this->batch_number->caption());
+        $this->first_name->EditValue = $this->first_name->CurrentValue;
+        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
 
-        // quantity
-        $this->quantity->setupEditAttributes();
-        $this->quantity->EditValue = $this->quantity->CurrentValue;
-        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-        if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
-            $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
+        // last_name
+        $this->last_name->setupEditAttributes();
+        if (!$this->last_name->Raw) {
+            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
         }
+        $this->last_name->EditValue = $this->last_name->CurrentValue;
+        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
 
-        // quantity_left
-        $this->quantity_left->setupEditAttributes();
-        $this->quantity_left->EditValue = $this->quantity_left->CurrentValue;
-        $this->quantity_left->PlaceHolder = RemoveHtml($this->quantity_left->caption());
-        if (strval($this->quantity_left->EditValue) != "" && is_numeric($this->quantity_left->EditValue)) {
-            $this->quantity_left->EditValue = FormatNumber($this->quantity_left->EditValue, null);
+        // national_id
+        $this->national_id->setupEditAttributes();
+        $this->national_id->EditValue = $this->national_id->CurrentValue;
+        $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
+        if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
+            $this->national_id->EditValue = FormatNumber($this->national_id->EditValue, null);
         }
 
-        // measuring_unit
-        $this->measuring_unit->setupEditAttributes();
-        if (!$this->measuring_unit->Raw) {
-            $this->measuring_unit->CurrentValue = HtmlDecode($this->measuring_unit->CurrentValue);
-        }
-        $this->measuring_unit->EditValue = $this->measuring_unit->CurrentValue;
-        $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
+        // date_of_birth
+        $this->date_of_birth->setupEditAttributes();
+        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
+        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
 
-        // buying_price_per_unit
-        $this->buying_price_per_unit->setupEditAttributes();
-        $this->buying_price_per_unit->EditValue = $this->buying_price_per_unit->CurrentValue;
-        $this->buying_price_per_unit->PlaceHolder = RemoveHtml($this->buying_price_per_unit->caption());
-        if (strval($this->buying_price_per_unit->EditValue) != "" && is_numeric($this->buying_price_per_unit->EditValue)) {
-            $this->buying_price_per_unit->EditValue = FormatNumber($this->buying_price_per_unit->EditValue, null);
+        // gender
+        $this->gender->setupEditAttributes();
+        if (!$this->gender->Raw) {
+            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
         }
+        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
-        // selling_price_per_unit
-        $this->selling_price_per_unit->setupEditAttributes();
-        $this->selling_price_per_unit->EditValue = $this->selling_price_per_unit->CurrentValue;
-        $this->selling_price_per_unit->PlaceHolder = RemoveHtml($this->selling_price_per_unit->caption());
-        if (strval($this->selling_price_per_unit->EditValue) != "" && is_numeric($this->selling_price_per_unit->EditValue)) {
-            $this->selling_price_per_unit->EditValue = FormatNumber($this->selling_price_per_unit->EditValue, null);
+        // phone
+        $this->phone->setupEditAttributes();
+        if (!$this->phone->Raw) {
+            $this->phone->CurrentValue = HtmlDecode($this->phone->CurrentValue);
         }
+        $this->phone->EditValue = $this->phone->CurrentValue;
+        $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
 
-        // expiry_date
-        $this->expiry_date->setupEditAttributes();
-        $this->expiry_date->EditValue = FormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern());
-        $this->expiry_date->PlaceHolder = RemoveHtml($this->expiry_date->caption());
+        // email_address
+        $this->email_address->setupEditAttributes();
+        if (!$this->email_address->Raw) {
+            $this->email_address->CurrentValue = HtmlDecode($this->email_address->CurrentValue);
+        }
+        $this->email_address->EditValue = $this->email_address->CurrentValue;
+        $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
+
+        // physical_address
+        $this->physical_address->setupEditAttributes();
+        if (!$this->physical_address->Raw) {
+            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
+        }
+        $this->physical_address->EditValue = $this->physical_address->CurrentValue;
+        $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
+
+        // next_of_kin
+        $this->next_of_kin->setupEditAttributes();
+        if (!$this->next_of_kin->Raw) {
+            $this->next_of_kin->CurrentValue = HtmlDecode($this->next_of_kin->CurrentValue);
+        }
+        $this->next_of_kin->EditValue = $this->next_of_kin->CurrentValue;
+        $this->next_of_kin->PlaceHolder = RemoveHtml($this->next_of_kin->caption());
+
+        // next_of_kin_phone
+        $this->next_of_kin_phone->setupEditAttributes();
+        if (!$this->next_of_kin_phone->Raw) {
+            $this->next_of_kin_phone->CurrentValue = HtmlDecode($this->next_of_kin_phone->CurrentValue);
+        }
+        $this->next_of_kin_phone->EditValue = $this->next_of_kin_phone->CurrentValue;
+        $this->next_of_kin_phone->PlaceHolder = RemoveHtml($this->next_of_kin_phone->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1617,14 +1574,6 @@ class MedicineStock extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // expiry_status
-        $this->expiry_status->setupEditAttributes();
-        if (!$this->expiry_status->Raw) {
-            $this->expiry_status->CurrentValue = HtmlDecode($this->expiry_status->CurrentValue);
-        }
-        $this->expiry_status->EditValue = $this->expiry_status->CurrentValue;
-        $this->expiry_status->PlaceHolder = RemoveHtml($this->expiry_status->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1655,32 +1604,32 @@ class MedicineStock extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->supplier_id);
-                    $doc->exportCaption($this->brand_id);
-                    $doc->exportCaption($this->batch_number);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->quantity_left);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->buying_price_per_unit);
-                    $doc->exportCaption($this->selling_price_per_unit);
-                    $doc->exportCaption($this->expiry_date);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->national_id);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->phone);
+                    $doc->exportCaption($this->email_address);
+                    $doc->exportCaption($this->physical_address);
+                    $doc->exportCaption($this->next_of_kin);
+                    $doc->exportCaption($this->next_of_kin_phone);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->expiry_status);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->supplier_id);
-                    $doc->exportCaption($this->brand_id);
-                    $doc->exportCaption($this->batch_number);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->quantity_left);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->buying_price_per_unit);
-                    $doc->exportCaption($this->selling_price_per_unit);
-                    $doc->exportCaption($this->expiry_date);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->national_id);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->phone);
+                    $doc->exportCaption($this->email_address);
+                    $doc->exportCaption($this->physical_address);
+                    $doc->exportCaption($this->next_of_kin);
+                    $doc->exportCaption($this->next_of_kin_phone);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->expiry_status);
                 }
                 $doc->endExportRow();
             }
@@ -1708,32 +1657,32 @@ class MedicineStock extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->supplier_id);
-                        $doc->exportField($this->brand_id);
-                        $doc->exportField($this->batch_number);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->quantity_left);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->buying_price_per_unit);
-                        $doc->exportField($this->selling_price_per_unit);
-                        $doc->exportField($this->expiry_date);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->national_id);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->phone);
+                        $doc->exportField($this->email_address);
+                        $doc->exportField($this->physical_address);
+                        $doc->exportField($this->next_of_kin);
+                        $doc->exportField($this->next_of_kin_phone);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->expiry_status);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->supplier_id);
-                        $doc->exportField($this->brand_id);
-                        $doc->exportField($this->batch_number);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->quantity_left);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->buying_price_per_unit);
-                        $doc->exportField($this->selling_price_per_unit);
-                        $doc->exportField($this->expiry_date);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->national_id);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->phone);
+                        $doc->exportField($this->email_address);
+                        $doc->exportField($this->physical_address);
+                        $doc->exportField($this->next_of_kin);
+                        $doc->exportField($this->next_of_kin_phone);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->expiry_status);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1904,14 +1853,8 @@ class MedicineStock extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        $current_date = CurrentDate();
-        if ($this->expiry_date->CurrentValue > $current_date) {
-            $this->expiry_status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->expiry_status->ViewValue = "Active"; 
-        } else if ($this->expiry_date->CurrentValue < $current_date) {
-            $this->expiry_status->CellAttrs["style"] = "background-color: #e5064b; color: white";
-            $this->expiry_status->ViewValue = "Expired"; 
-        } 
+        // To view properties of field class, use:
+        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

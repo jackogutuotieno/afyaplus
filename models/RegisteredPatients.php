@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for Appointments Report
+ * Table class for Registered Patients
  */
-class AppointmentsReport extends ReportTable
+class RegisteredPatients extends ReportTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -46,20 +46,27 @@ class AppointmentsReport extends ReportTable
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
-    public $AppointmentsSubmittedbyMonth;
 
     // Fields
     public $id;
+    public $photo;
     public $patient_name;
+    public $first_name;
+    public $last_name;
+    public $national_id;
     public $date_of_birth;
+    public $age;
     public $gender;
-    public $_title;
-    public $doctor_name;
-    public $start_date;
-    public $end_date;
+    public $phone;
+    public $email_address;
+    public $physical_address;
+    public $employment_status;
+    public $religion;
+    public $next_of_kin;
+    public $next_of_kin_phone;
+    public $marital_status;
     public $date_created;
     public $date_updated;
-    public $appointment_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -72,11 +79,11 @@ class AppointmentsReport extends ReportTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "Appointments_Report";
-        $this->TableName = 'Appointments Report';
+        $this->TableVar = "Registered_Patients";
+        $this->TableName = 'Registered Patients';
         $this->TableType = "REPORT";
         $this->TableReportType = "summary"; // Report Type
-        $this->ReportSourceTable = 'appointments_report2'; // Report source table
+        $this->ReportSourceTable = 'patients'; // Report source table
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
@@ -120,21 +127,46 @@ class AppointmentsReport extends ReportTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->id->SourceTableVar = 'appointments_report2';
+        $this->id->SourceTableVar = 'patients';
         $this->Fields['id'] = &$this->id;
+
+        // photo
+        $this->photo = new ReportField(
+            $this, // Table
+            'x_photo', // Variable name
+            'photo', // Name
+            '`photo`', // Expression
+            '`photo`', // Basic search expression
+            204, // Type
+            65535, // Size
+            -1, // Date/Time format
+            true, // Is upload field
+            '`photo`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'FILE' // Edit Tag
+        );
+        $this->photo->InputTextType = "text";
+        $this->photo->Raw = true;
+        $this->photo->Sortable = false; // Allow sort
+        $this->photo->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->photo->SourceTableVar = 'patients';
+        $this->Fields['photo'] = &$this->photo;
 
         // patient_name
         $this->patient_name = new ReportField(
             $this, // Table
             'x_patient_name', // Variable name
             'patient_name', // Name
-            '`patient_name`', // Expression
-            '`patient_name`', // Basic search expression
+            'CONCAT(first_name,\' \',last_name)', // Expression
+            'CONCAT(first_name,\' \',last_name)', // Basic search expression
             200, // Type
             101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`patient_name`', // Virtual expression
+            'CONCAT(first_name,\' \',last_name)', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
@@ -142,9 +174,88 @@ class AppointmentsReport extends ReportTable
             'TEXT' // Edit Tag
         );
         $this->patient_name->InputTextType = "text";
+        $this->patient_name->IsCustom = true; // Custom field
         $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->patient_name->SourceTableVar = 'appointments_report2';
+        $this->patient_name->SourceTableVar = 'patients';
         $this->Fields['patient_name'] = &$this->patient_name;
+
+        // first_name
+        $this->first_name = new ReportField(
+            $this, // Table
+            'x_first_name', // Variable name
+            'first_name', // Name
+            '`first_name`', // Expression
+            '`first_name`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`first_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->first_name->InputTextType = "text";
+        $this->first_name->Nullable = false; // NOT NULL field
+        $this->first_name->Required = true; // Required field
+        $this->first_name->Sortable = false; // Allow sort
+        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->first_name->SourceTableVar = 'patients';
+        $this->Fields['first_name'] = &$this->first_name;
+
+        // last_name
+        $this->last_name = new ReportField(
+            $this, // Table
+            'x_last_name', // Variable name
+            'last_name', // Name
+            '`last_name`', // Expression
+            '`last_name`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`last_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->last_name->InputTextType = "text";
+        $this->last_name->Nullable = false; // NOT NULL field
+        $this->last_name->Required = true; // Required field
+        $this->last_name->Sortable = false; // Allow sort
+        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->last_name->SourceTableVar = 'patients';
+        $this->Fields['last_name'] = &$this->last_name;
+
+        // national_id
+        $this->national_id = new ReportField(
+            $this, // Table
+            'x_national_id', // Variable name
+            'national_id', // Name
+            '`national_id`', // Expression
+            '`national_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`national_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->national_id->InputTextType = "text";
+        $this->national_id->Raw = true;
+        $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->national_id->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->national_id->Param, "CustomMsg");
+        $this->national_id->SourceTableVar = 'patients';
+        $this->Fields['national_id'] = &$this->national_id;
 
         // date_of_birth
         $this->date_of_birth = new ReportField(
@@ -154,7 +265,7 @@ class AppointmentsReport extends ReportTable
             '`date_of_birth`', // Expression
             CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
             133, // Type
-            40, // Size
+            10, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
@@ -170,8 +281,34 @@ class AppointmentsReport extends ReportTable
         $this->date_of_birth->Required = true; // Required field
         $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_of_birth->SourceTableVar = 'appointments_report2';
+        $this->date_of_birth->SourceTableVar = 'patients';
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
+
+        // age
+        $this->age = new ReportField(
+            $this, // Table
+            'x_age', // Variable name
+            'age', // Name
+            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Expression
+            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Basic search expression
+            20, // Type
+            21, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->age->InputTextType = "text";
+        $this->age->Raw = true;
+        $this->age->IsCustom = true; // Custom field
+        $this->age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->age->SourceTableVar = 'patients';
+        $this->Fields['age'] = &$this->age;
 
         // gender
         $this->gender = new ReportField(
@@ -189,116 +326,227 @@ class AppointmentsReport extends ReportTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'RADIO' // Edit Tag
         );
         $this->gender->InputTextType = "text";
         $this->gender->Nullable = false; // NOT NULL field
         $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->gender->SourceTableVar = 'appointments_report2';
+        $this->gender->Lookup = new Lookup($this->gender, 'Registered_Patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->gender->OptionCount = 2;
+        $this->gender->SearchOperators = ["=", "<>"];
+        $this->gender->SourceTableVar = 'patients';
         $this->Fields['gender'] = &$this->gender;
 
-        // title
-        $this->_title = new ReportField(
+        // phone
+        $this->phone = new ReportField(
             $this, // Table
-            'x__title', // Variable name
-            'title', // Name
-            '`title`', // Expression
-            '`title`', // Basic search expression
+            'x_phone', // Variable name
+            'phone', // Name
+            '`phone`', // Expression
+            '`phone`', // Basic search expression
+            129, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`phone`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
+        $this->phone->InputTextType = "text";
+        $this->phone->Nullable = false; // NOT NULL field
+        $this->phone->Required = true; // Required field
+        $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->phone->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->phone->Param, "CustomMsg");
+        $this->phone->SourceTableVar = 'patients';
+        $this->Fields['phone'] = &$this->phone;
+
+        // email_address
+        $this->email_address = new ReportField(
+            $this, // Table
+            'x_email_address', // Variable name
+            'email_address', // Name
+            '`email_address`', // Expression
+            '`email_address`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`email_address`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->email_address->addMethod("getLinkPrefix", fn() => "mailto:");
+        $this->email_address->InputTextType = "text";
+        $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->email_address->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->email_address->Param, "CustomMsg");
+        $this->email_address->SourceTableVar = 'patients';
+        $this->Fields['email_address'] = &$this->email_address;
+
+        // physical_address
+        $this->physical_address = new ReportField(
+            $this, // Table
+            'x_physical_address', // Variable name
+            'physical_address', // Name
+            '`physical_address`', // Expression
+            '`physical_address`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`physical_address`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->physical_address->InputTextType = "text";
+        $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->physical_address->SourceTableVar = 'patients';
+        $this->Fields['physical_address'] = &$this->physical_address;
+
+        // employment_status
+        $this->employment_status = new ReportField(
+            $this, // Table
+            'x_employment_status', // Variable name
+            'employment_status', // Name
+            '`employment_status`', // Expression
+            '`employment_status`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`employment_status`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->employment_status->InputTextType = "text";
+        $this->employment_status->setSelectMultiple(false); // Select one
+        $this->employment_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->employment_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->employment_status->Lookup = new Lookup($this->employment_status, 'Registered_Patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->employment_status->OptionCount = 2;
+        $this->employment_status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->employment_status->SourceTableVar = 'patients';
+        $this->Fields['employment_status'] = &$this->employment_status;
+
+        // religion
+        $this->religion = new ReportField(
+            $this, // Table
+            'x_religion', // Variable name
+            'religion', // Name
+            '`religion`', // Expression
+            '`religion`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`religion`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->religion->InputTextType = "text";
+        $this->religion->setSelectMultiple(false); // Select one
+        $this->religion->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->religion->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->religion->Lookup = new Lookup($this->religion, 'Registered_Patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->religion->OptionCount = 5;
+        $this->religion->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->religion->SourceTableVar = 'patients';
+        $this->Fields['religion'] = &$this->religion;
+
+        // next_of_kin
+        $this->next_of_kin = new ReportField(
+            $this, // Table
+            'x_next_of_kin', // Variable name
+            'next_of_kin', // Name
+            '`next_of_kin`', // Expression
+            '`next_of_kin`', // Basic search expression
             200, // Type
             100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`title`', // Virtual expression
+            '`next_of_kin`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->_title->InputTextType = "text";
-        $this->_title->Nullable = false; // NOT NULL field
-        $this->_title->Required = true; // Required field
-        $this->_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->_title->SourceTableVar = 'appointments_report2';
-        $this->Fields['title'] = &$this->_title;
+        $this->next_of_kin->InputTextType = "text";
+        $this->next_of_kin->Nullable = false; // NOT NULL field
+        $this->next_of_kin->Required = true; // Required field
+        $this->next_of_kin->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->next_of_kin->SourceTableVar = 'patients';
+        $this->Fields['next_of_kin'] = &$this->next_of_kin;
 
-        // doctor_name
-        $this->doctor_name = new ReportField(
+        // next_of_kin_phone
+        $this->next_of_kin_phone = new ReportField(
             $this, // Table
-            'x_doctor_name', // Variable name
-            'doctor_name', // Name
-            '`doctor_name`', // Expression
-            '`doctor_name`', // Basic search expression
-            200, // Type
-            101, // Size
+            'x_next_of_kin_phone', // Variable name
+            'next_of_kin_phone', // Name
+            '`next_of_kin_phone`', // Expression
+            '`next_of_kin_phone`', // Basic search expression
+            129, // Type
+            11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`doctor_name`', // Virtual expression
+            '`next_of_kin_phone`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->doctor_name->InputTextType = "text";
-        $this->doctor_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->doctor_name->SourceTableVar = 'appointments_report2';
-        $this->Fields['doctor_name'] = &$this->doctor_name;
+        $this->next_of_kin_phone->InputTextType = "text";
+        $this->next_of_kin_phone->Nullable = false; // NOT NULL field
+        $this->next_of_kin_phone->Required = true; // Required field
+        $this->next_of_kin_phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->next_of_kin_phone->SourceTableVar = 'patients';
+        $this->Fields['next_of_kin_phone'] = &$this->next_of_kin_phone;
 
-        // start_date
-        $this->start_date = new ReportField(
+        // marital_status
+        $this->marital_status = new ReportField(
             $this, // Table
-            'x_start_date', // Variable name
-            'start_date', // Name
-            '`start_date`', // Expression
-            CastDateFieldForLike("`start_date`", 7, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            7, // Date/Time format
+            'x_marital_status', // Variable name
+            'marital_status', // Name
+            '`marital_status`', // Expression
+            '`marital_status`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`start_date`', // Virtual expression
+            '`marital_status`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
-        $this->start_date->InputTextType = "text";
-        $this->start_date->Raw = true;
-        $this->start_date->Nullable = false; // NOT NULL field
-        $this->start_date->Required = true; // Required field
-        $this->start_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->start_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->start_date->SourceTableVar = 'appointments_report2';
-        $this->Fields['start_date'] = &$this->start_date;
-
-        // end_date
-        $this->end_date = new ReportField(
-            $this, // Table
-            'x_end_date', // Variable name
-            'end_date', // Name
-            '`end_date`', // Expression
-            CastDateFieldForLike("`end_date`", 7, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            7, // Date/Time format
-            false, // Is upload field
-            '`end_date`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->end_date->InputTextType = "text";
-        $this->end_date->Raw = true;
-        $this->end_date->Nullable = false; // NOT NULL field
-        $this->end_date->Required = true; // Required field
-        $this->end_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->end_date->SourceTableVar = 'appointments_report2';
-        $this->Fields['end_date'] = &$this->end_date;
+        $this->marital_status->InputTextType = "text";
+        $this->marital_status->Nullable = false; // NOT NULL field
+        $this->marital_status->Required = true; // Required field
+        $this->marital_status->setSelectMultiple(false); // Select one
+        $this->marital_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->marital_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->marital_status->Lookup = new Lookup($this->marital_status, 'Registered_Patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->marital_status->OptionCount = 4;
+        $this->marital_status->SearchOperators = ["=", "<>"];
+        $this->marital_status->SourceTableVar = 'patients';
+        $this->Fields['marital_status'] = &$this->marital_status;
 
         // date_created
         $this->date_created = new ReportField(
@@ -306,10 +554,10 @@ class AppointmentsReport extends ReportTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
-            76, // Size
-            0, // Date/Time format
+            19, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -322,9 +570,9 @@ class AppointmentsReport extends ReportTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_created->SourceTableVar = 'appointments_report2';
+        $this->date_created->SourceTableVar = 'patients';
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
@@ -333,10 +581,10 @@ class AppointmentsReport extends ReportTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
-            76, // Size
-            0, // Date/Time format
+            19, // Size
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -349,64 +597,10 @@ class AppointmentsReport extends ReportTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_updated->SourceTableVar = 'appointments_report2';
+        $this->date_updated->SourceTableVar = 'patients';
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // appointment_month
-        $this->appointment_month = new ReportField(
-            $this, // Table
-            'x_appointment_month', // Variable name
-            'appointment_month', // Name
-            '`appointment_month`', // Expression
-            '`appointment_month`', // Basic search expression
-            200, // Type
-            9, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`appointment_month`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->appointment_month->InputTextType = "text";
-        $this->appointment_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->appointment_month->SourceTableVar = 'appointments_report2';
-        $this->Fields['appointment_month'] = &$this->appointment_month;
-
-        // Appointments Submitted by Month
-        $this->AppointmentsSubmittedbyMonth = new DbChart($this, 'AppointmentsSubmittedbyMonth', 'Appointments Submitted by Month', 'appointment_month', 'appointment_month', 1001, '', 0, 'COUNT', 600, 500);
-        $this->AppointmentsSubmittedbyMonth->Position = 4;
-        $this->AppointmentsSubmittedbyMonth->PageBreakType = "before";
-        $this->AppointmentsSubmittedbyMonth->YAxisFormat = [""];
-        $this->AppointmentsSubmittedbyMonth->YFieldFormat = [""];
-        $this->AppointmentsSubmittedbyMonth->SortType = 0;
-        $this->AppointmentsSubmittedbyMonth->SortSequence = "";
-        $this->AppointmentsSubmittedbyMonth->SqlSelect = $this->getQueryBuilder()->select("`appointment_month`", "''", "COUNT(`appointment_month`)");
-        $this->AppointmentsSubmittedbyMonth->SqlGroupBy = "`appointment_month`";
-        $this->AppointmentsSubmittedbyMonth->SqlOrderBy = "";
-        $this->AppointmentsSubmittedbyMonth->SeriesDateType = "";
-        $this->AppointmentsSubmittedbyMonth->ID = "Appointments_Report_AppointmentsSubmittedbyMonth"; // Chart ID
-        $this->AppointmentsSubmittedbyMonth->setParameters([
-            ["type", "1001"],
-            ["seriestype", "0"]
-        ]); // Chart type / Chart series type
-        $this->AppointmentsSubmittedbyMonth->setParameters([
-            ["caption", $this->AppointmentsSubmittedbyMonth->caption()],
-            ["xaxisname", $this->AppointmentsSubmittedbyMonth->xAxisName()]
-        ]); // Chart caption / X axis name
-        $this->AppointmentsSubmittedbyMonth->setParameter("yaxisname", $this->AppointmentsSubmittedbyMonth->yAxisName()); // Y axis name
-        $this->AppointmentsSubmittedbyMonth->setParameters([
-            ["shownames", "1"],
-            ["showvalues", "1"],
-            ["showhovercap", "1"]
-        ]); // Show names / Show values / Show hover
-        $this->AppointmentsSubmittedbyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
-        $this->AppointmentsSubmittedbyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
-        $this->Charts[$this->AppointmentsSubmittedbyMonth->ID] = &$this->AppointmentsSubmittedbyMonth;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -538,7 +732,7 @@ class AppointmentsReport extends ReportTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "appointments_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "patients";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -566,20 +760,7 @@ class AppointmentsReport extends ReportTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, CONCAT(first_name,' ',last_name) AS patient_name, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS age, CONCAT(first_name,' ',last_name) AS `patient_name`, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS `age`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -836,13 +1017,13 @@ class AppointmentsReport extends ReportTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "appointmentsreport";
+        return "registeredpatients";
     }
 
     // API page name
     public function getApiPageName($action)
     {
-        return "AppointmentsReportSummary";
+        return "RegisteredPatientsSummary";
     }
 
     // Current URL
@@ -1079,8 +1260,121 @@ class AppointmentsReport extends ReportTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'photo') {
+            $fldName = "photo";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $sql = $this->buildReportSql($this->getSqlSelect(), $this->getSqlFrom(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), "", $filter, "");
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

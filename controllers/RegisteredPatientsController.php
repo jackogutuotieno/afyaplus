@@ -13,14 +13,14 @@ use PHPMaker2024\afyaplus\Attributes\Post;
 use PHPMaker2024\afyaplus\Attributes\Put;
 
 /**
- * Patients_Report controller
+ * Registered_Patients controller
  */
-class PatientsReportController extends ControllerBase
+class RegisteredPatientsController extends ControllerBase
 {
     // summary
-    #[Map(["GET", "POST", "OPTIONS"], "/patientsreport", [PermissionMiddleware::class], "summary.Patients_Report")]
+    #[Map(["GET", "POST", "OPTIONS"], "/registeredpatients", [PermissionMiddleware::class], "summary.Registered_Patients")]
     public function summary(Request $request, Response $response, array $args): Response
     {
-        return $this->runPage($request, $response, $args, "PatientsReportSummary");
+        return $this->runPage($request, $response, $args, "RegisteredPatientsSummary");
     }
 }
