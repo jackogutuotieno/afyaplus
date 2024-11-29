@@ -126,8 +126,8 @@ class InvoiceDetailsEdit extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -583,6 +583,9 @@ class InvoiceDetailsEdit extends InvoiceDetails
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -633,7 +636,7 @@ class InvoiceDetailsEdit extends InvoiceDetails
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "invoicedetailslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -753,28 +756,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
                 $this->cost->setFormValue($val, true, $validate);
             }
         }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
     }
 
     // Restore form values
@@ -786,10 +767,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
         $this->item->CurrentValue = $this->item->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -925,14 +902,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
             // id
             $this->id->HrefValue = "";
 
@@ -947,12 +916,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -960,10 +923,16 @@ class InvoiceDetailsEdit extends InvoiceDetails
 
             // invoice_id
             $this->invoice_id->setupEditAttributes();
-            $this->invoice_id->EditValue = $this->invoice_id->CurrentValue;
-            $this->invoice_id->PlaceHolder = RemoveHtml($this->invoice_id->caption());
-            if (strval($this->invoice_id->EditValue) != "" && is_numeric($this->invoice_id->EditValue)) {
-                $this->invoice_id->EditValue = FormatNumber($this->invoice_id->EditValue, null);
+            if ($this->invoice_id->getSessionValue() != "") {
+                $this->invoice_id->CurrentValue = GetForeignKeyValue($this->invoice_id->getSessionValue());
+                $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
+                $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
+            } else {
+                $this->invoice_id->EditValue = $this->invoice_id->CurrentValue;
+                $this->invoice_id->PlaceHolder = RemoveHtml($this->invoice_id->caption());
+                if (strval($this->invoice_id->EditValue) != "" && is_numeric($this->invoice_id->EditValue)) {
+                    $this->invoice_id->EditValue = FormatNumber($this->invoice_id->EditValue, null);
+                }
             }
 
             // item
@@ -990,16 +959,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Edit refer script
 
             // id
@@ -1016,12 +975,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1076,22 +1029,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
             }
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1183,6 +1120,9 @@ class InvoiceDetailsEdit extends InvoiceDetails
         $rsnew = [];
 
         // invoice_id
+        if ($this->invoice_id->getSessionValue() != "") {
+            $this->invoice_id->ReadOnly = true;
+        }
         $this->invoice_id->setDbValueDef($rsnew, $this->invoice_id->CurrentValue, $this->invoice_id->ReadOnly);
 
         // item
@@ -1193,12 +1133,6 @@ class InvoiceDetailsEdit extends InvoiceDetails
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -1220,12 +1154,79 @@ class InvoiceDetailsEdit extends InvoiceDetails
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
         }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "invoices") {
+                $validMaster = true;
+                $masterTbl = Container("invoices");
+                if (($parm = Get("fk_id", Get("invoice_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->invoice_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->invoice_id->setSessionValue($this->invoice_id->QueryStringValue);
+                    $foreignKeys["invoice_id"] = $this->invoice_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "invoices") {
+                $validMaster = true;
+                $masterTbl = Container("invoices");
+                if (($parm = Post("fk_id", Post("invoice_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->invoice_id->FormValue = $masterTbl->id->FormValue;
+                    $this->invoice_id->setSessionValue($this->invoice_id->FormValue);
+                    $foreignKeys["invoice_id"] = $this->invoice_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "invoices") {
+                if (!array_key_exists("invoice_id", $foreignKeys)) { // Not current foreign key
+                    $this->invoice_id->setSessionValue("");
+                }
+            }
         }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

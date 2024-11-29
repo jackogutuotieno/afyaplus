@@ -152,14 +152,6 @@ loadjs.ready("head", function () {
 <?php include_once "DoctorNotesGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
@@ -174,6 +166,22 @@ loadjs.ready("head", function () {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("radiology_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "RadiologyRequestsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("invoices", explode(",", $Page->getCurrentDetailTable())) && $invoices->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("invoices", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("invoices")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "InvoicesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

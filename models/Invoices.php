@@ -49,7 +49,6 @@ class Invoices extends DbTable
     public $id;
     public $patient_id;
     public $visit_id;
-    public $invoice_title;
     public $description;
     public $payment_status;
     public $created_by_user_id;
@@ -91,8 +90,8 @@ class Invoices extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailAdd = true; // Allow detail add
+        $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -123,6 +122,7 @@ class Invoices extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -144,14 +144,19 @@ class Invoices extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
+        $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // visit_id
@@ -174,35 +179,12 @@ class Invoices extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
+        $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
-
-        // invoice_title
-        $this->invoice_title = new DbField(
-            $this, // Table
-            'x_invoice_title', // Variable name
-            'invoice_title', // Name
-            '`invoice_title`', // Expression
-            '`invoice_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`invoice_title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->invoice_title->InputTextType = "text";
-        $this->invoice_title->Nullable = false; // NOT NULL field
-        $this->invoice_title->Required = true; // Required field
-        $this->invoice_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['invoice_title'] = &$this->invoice_title;
 
         // description
         $this->description = new DbField(
@@ -220,7 +202,7 @@ class Invoices extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->description->InputTextType = "text";
         $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
@@ -242,12 +224,17 @@ class Invoices extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->payment_status->InputTextType = "text";
         $this->payment_status->Nullable = false; // NOT NULL field
         $this->payment_status->Required = true; // Required field
-        $this->payment_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->payment_status->setSelectMultiple(false); // Select one
+        $this->payment_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->payment_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->payment_status->Lookup = new Lookup($this->payment_status, 'invoices', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->payment_status->OptionCount = 3;
+        $this->payment_status->SearchOperators = ["=", "<>"];
         $this->Fields['payment_status'] = &$this->payment_status;
 
         // created_by_user_id
@@ -266,14 +253,18 @@ class Invoices extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -282,10 +273,10 @@ class Invoices extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -298,7 +289,7 @@ class Invoices extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -308,10 +299,10 @@ class Invoices extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -324,7 +315,7 @@ class Invoices extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -384,6 +375,133 @@ class Invoices extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $masterTable = Container("patient_visits");
+            if ($this->visit_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $masterFilter .= " AND " . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $masterTable = Container("patient_visits");
+            if ($this->visit_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->visit_id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $detailFilter .= " AND " . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "patient_visits":
+                $key = $keys["visit_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                $key = $keys["patient_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["visit_id"], $this->visit_id->DataType, $this->Dbid) . " AND " . GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "patient_visits":
+                return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+        }
+        return "";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "invoice_details") {
+            $detailUrl = Container("invoice_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "invoiceslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -854,7 +972,6 @@ class Invoices extends DbTable
         $this->id->DbValue = $row['id'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
-        $this->invoice_title->DbValue = $row['invoice_title'];
         $this->description->DbValue = $row['description'];
         $this->payment_status->DbValue = $row['payment_status'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
@@ -1016,7 +1133,11 @@ class Invoices extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("invoicesedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("invoicesedit", $parm);
+        } else {
+            $url = $this->keyUrl("invoicesedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1030,7 +1151,11 @@ class Invoices extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("invoicesadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("invoicesadd", $parm);
+        } else {
+            $url = $this->keyUrl("invoicesadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1054,6 +1179,11 @@ class Invoices extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "patient_visits" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->visit_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1215,7 +1345,6 @@ class Invoices extends DbTable
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->invoice_title->setDbValue($row['invoice_title']);
         $this->description->setDbValue($row['description']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
@@ -1257,8 +1386,6 @@ class Invoices extends DbTable
 
         // visit_id
 
-        // invoice_title
-
         // description
 
         // payment_status
@@ -1273,25 +1400,64 @@ class Invoices extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
 
         // visit_id
         $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
         $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-        // invoice_title
-        $this->invoice_title->ViewValue = $this->invoice_title->CurrentValue;
-
         // description
         $this->description->ViewValue = $this->description->CurrentValue;
 
         // payment_status
-        $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
+        if (strval($this->payment_status->CurrentValue) != "") {
+            $this->payment_status->ViewValue = $this->payment_status->optionCaption($this->payment_status->CurrentValue);
+        } else {
+            $this->payment_status->ViewValue = null;
+        }
 
         // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1312,10 +1478,6 @@ class Invoices extends DbTable
         // visit_id
         $this->visit_id->HrefValue = "";
         $this->visit_id->TooltipValue = "";
-
-        // invoice_title
-        $this->invoice_title->HrefValue = "";
-        $this->invoice_title->TooltipValue = "";
 
         // description
         $this->description->HrefValue = "";
@@ -1358,56 +1520,84 @@ class Invoices extends DbTable
 
         // patient_id
         $this->patient_id->setupEditAttributes();
-        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
+        } else {
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
         }
 
         // visit_id
         $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        } else {
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            }
         }
-
-        // invoice_title
-        $this->invoice_title->setupEditAttributes();
-        if (!$this->invoice_title->Raw) {
-            $this->invoice_title->CurrentValue = HtmlDecode($this->invoice_title->CurrentValue);
-        }
-        $this->invoice_title->EditValue = $this->invoice_title->CurrentValue;
-        $this->invoice_title->PlaceHolder = RemoveHtml($this->invoice_title->caption());
 
         // description
         $this->description->setupEditAttributes();
-        if (!$this->description->Raw) {
-            $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-        }
         $this->description->EditValue = $this->description->CurrentValue;
         $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
         // payment_status
         $this->payment_status->setupEditAttributes();
-        if (!$this->payment_status->Raw) {
-            $this->payment_status->CurrentValue = HtmlDecode($this->payment_status->CurrentValue);
-        }
-        $this->payment_status->EditValue = $this->payment_status->CurrentValue;
+        $this->payment_status->EditValue = $this->payment_status->options(true);
         $this->payment_status->PlaceHolder = RemoveHtml($this->payment_status->caption());
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
         if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
             $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->EditValue = null;
             }
+        } else {
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
         }
 
         // date_created
@@ -1450,8 +1640,6 @@ class Invoices extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->invoice_title);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1461,7 +1649,6 @@ class Invoices extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->invoice_title);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1495,8 +1682,6 @@ class Invoices extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->invoice_title);
                         $doc->exportField($this->description);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->created_by_user_id);
@@ -1506,7 +1691,6 @@ class Invoices extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
-                        $doc->exportField($this->invoice_title);
                         $doc->exportField($this->description);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->created_by_user_id);

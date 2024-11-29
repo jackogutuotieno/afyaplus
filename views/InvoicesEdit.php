@@ -29,14 +29,11 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
-            ["invoice_title", [fields.invoice_title.visible && fields.invoice_title.required ? ew.Validators.required(fields.invoice_title.caption) : null], fields.invoice_title.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
             ["payment_status", [fields.payment_status.visible && fields.payment_status.required ? ew.Validators.required(fields.payment_status.caption) : null], fields.payment_status.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -52,6 +49,9 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "payment_status": <?= $Page->payment_status->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -75,6 +75,11 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -92,11 +97,51 @@ loadjs.ready("head", function () {
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_invoices_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_invoices_patient_id">
-<input type="<?= $Page->patient_id->getInputTextType() ?>" name="x_patient_id" id="x_patient_id" data-table="invoices" data-field="x_patient_id" value="<?= $Page->patient_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
-<?= $Page->patient_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+    <select
+        id="x_patient_id"
+        name="x_patient_id"
+        class="form-select ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+        <?php if (!$Page->patient_id->IsNativeSelect) { ?>
+        data-select2-id="finvoicesedit_x_patient_id"
+        <?php } ?>
+        data-table="invoices"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+        <?= $Page->patient_id->editAttributes() ?>>
+        <?= $Page->patient_id->selectOptionListHtml("x_patient_id") ?>
+    </select>
+    <?= $Page->patient_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
+<?= $Page->patient_id->Lookup->getParamTag($Page, "p_x_patient_id") ?>
+<?php if (!$Page->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("finvoicesedit", function() {
+    var options = { name: "x_patient_id", selectId: "finvoicesedit_x_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (finvoicesedit.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x_patient_id", form: "finvoicesedit" };
+    } else {
+        options.ajax = { id: "x_patient_id", form: "finvoicesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.invoices.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -104,34 +149,34 @@ loadjs.ready("head", function () {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_invoices_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
+<?php if ($Page->visit_id->getSessionValue() != "") { ?>
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visit_id->getDisplayValue($Page->visit_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_invoices_visit_id">
 <input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="invoices" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
 <?= $Page->visit_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
 </span>
-</div></div>
-    </div>
 <?php } ?>
-<?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-    <div id="r_invoice_title"<?= $Page->invoice_title->rowAttributes() ?>>
-        <label id="elh_invoices_invoice_title" for="x_invoice_title" class="<?= $Page->LeftColumnClass ?>"><?= $Page->invoice_title->caption() ?><?= $Page->invoice_title->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->invoice_title->cellAttributes() ?>>
-<span id="el_invoices_invoice_title">
-<input type="<?= $Page->invoice_title->getInputTextType() ?>" name="x_invoice_title" id="x_invoice_title" data-table="invoices" data-field="x_invoice_title" value="<?= $Page->invoice_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->invoice_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->invoice_title->formatPattern()) ?>"<?= $Page->invoice_title->editAttributes() ?> aria-describedby="x_invoice_title_help">
-<?= $Page->invoice_title->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->invoice_title->getErrorMessage() ?></div>
-</span>
 </div></div>
     </div>
 <?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
     <div id="r_description"<?= $Page->description->rowAttributes() ?>>
-        <label id="elh_invoices_description" for="x_description" class="<?= $Page->LeftColumnClass ?>"><?= $Page->description->caption() ?><?= $Page->description->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_invoices_description" class="<?= $Page->LeftColumnClass ?>"><?= $Page->description->caption() ?><?= $Page->description->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->description->cellAttributes() ?>>
 <span id="el_invoices_description">
-<input type="<?= $Page->description->getInputTextType() ?>" name="x_description" id="x_description" data-table="invoices" data-field="x_description" value="<?= $Page->description->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->description->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->description->formatPattern()) ?>"<?= $Page->description->editAttributes() ?> aria-describedby="x_description_help">
+<?php $Page->description->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="invoices" data-field="x_description" name="x_description" id="x_description" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->description->getPlaceHolder()) ?>"<?= $Page->description->editAttributes() ?> aria-describedby="x_description_help"><?= $Page->description->EditValue ?></textarea>
 <?= $Page->description->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->description->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["finvoicesedit", "editor"], function() {
+    ew.createEditor("finvoicesedit", "x_description", 0, 0, <?= $Page->description->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -141,9 +186,42 @@ loadjs.ready("head", function () {
         <label id="elh_invoices_payment_status" for="x_payment_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->payment_status->caption() ?><?= $Page->payment_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->payment_status->cellAttributes() ?>>
 <span id="el_invoices_payment_status">
-<input type="<?= $Page->payment_status->getInputTextType() ?>" name="x_payment_status" id="x_payment_status" data-table="invoices" data-field="x_payment_status" value="<?= $Page->payment_status->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->payment_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->payment_status->formatPattern()) ?>"<?= $Page->payment_status->editAttributes() ?> aria-describedby="x_payment_status_help">
-<?= $Page->payment_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->payment_status->getErrorMessage() ?></div>
+    <select
+        id="x_payment_status"
+        name="x_payment_status"
+        class="form-select ew-select<?= $Page->payment_status->isInvalidClass() ?>"
+        <?php if (!$Page->payment_status->IsNativeSelect) { ?>
+        data-select2-id="finvoicesedit_x_payment_status"
+        <?php } ?>
+        data-table="invoices"
+        data-field="x_payment_status"
+        data-value-separator="<?= $Page->payment_status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->payment_status->getPlaceHolder()) ?>"
+        <?= $Page->payment_status->editAttributes() ?>>
+        <?= $Page->payment_status->selectOptionListHtml("x_payment_status") ?>
+    </select>
+    <?= $Page->payment_status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->payment_status->getErrorMessage() ?></div>
+<?php if (!$Page->payment_status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("finvoicesedit", function() {
+    var options = { name: "x_payment_status", selectId: "finvoicesedit_x_payment_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (finvoicesedit.lists.payment_status?.lookupOptions.length) {
+        options.data = { id: "x_payment_status", form: "finvoicesedit" };
+    } else {
+        options.ajax = { id: "x_payment_status", form: "finvoicesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.invoices.fields.payment_status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -154,101 +232,61 @@ loadjs.ready("head", function () {
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
 <span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
+<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
 <input type="hidden" data-table="invoices" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_invoices_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="invoices" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_invoices_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_invoices_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="invoices" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+    <select
+        id="x_created_by_user_id"
+        name="x_created_by_user_id"
+        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="finvoicesedit_x_created_by_user_id"
+        <?php } ?>
+        data-table="invoices"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Page->created_by_user_id->editAttributes() ?>>
+        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
+    </select>
+    <?= $Page->created_by_user_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
+<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
+<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["finvoicesedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("finvoicesedit", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("finvoicesedit", function() {
+    var options = { name: "x_created_by_user_id", selectId: "finvoicesedit_x_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (finvoicesedit.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x_created_by_user_id", form: "finvoicesedit" };
+    } else {
+        options.ajax = { id: "x_created_by_user_id", form: "finvoicesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.invoices.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>
 </span>
-</div></div>
-    </div>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_invoices_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_invoices_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="invoices" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["finvoicesedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("finvoicesedit", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
 </div></div>
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("invoice_details", explode(",", $Page->getCurrentDetailTable())) && $invoice_details->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("invoice_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "InvoiceDetailsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="finvoicesedit"><?= $Language->phrase("SaveBtn") ?></button>

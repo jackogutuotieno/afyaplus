@@ -456,6 +456,7 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
     public $StartRecord;
     public $Priv = 0;
     public $CopyRecord;
+    public $DetailPages; // Detail pages object
 
     /**
      * Page run
@@ -502,6 +503,9 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
             $this->setUseLookupCache(false);
         }
+
+        // Set up detail page object
+        $this->setupDetailPages();
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -1040,6 +1044,11 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
+        $detailPage = Container("LaboratoryBillingReportGrid");
+        if (in_array("laboratory_billing_report", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1126,6 +1135,16 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
                 $detailPage->lab_test_requests_details_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("LaboratoryBillingReportGrid");
+            if (in_array("laboratory_billing_report", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "laboratory_billing_report"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
         }
@@ -1301,6 +1320,25 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
                     $detailPageObj->lab_test_requests_details_id->setSessionValue($detailPageObj->lab_test_requests_details_id->CurrentValue);
                 }
             }
+            if (in_array("laboratory_billing_report", $detailTblVar)) {
+                $detailPageObj = Container("LaboratoryBillingReportGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->id->IsDetailKey = true;
+                    $detailPageObj->id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->id->setSessionValue($detailPageObj->id->CurrentValue);
+                }
+            }
         }
     }
 
@@ -1313,6 +1351,19 @@ class LabTestRequestsDetailsAdd extends LabTestRequestsDetails
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("labtestrequestsdetailslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
+    }
+
+    // Set up detail pages
+    protected function setupDetailPages()
+    {
+        $pages = new SubPages();
+        $pages->Style = "tabs";
+        if ($pages->isAccordion()) {
+            $pages->Parent = "#accordion_" . $this->PageObjName;
+        }
+        $pages->add('lab_test_requests_queue');
+        $pages->add('laboratory_billing_report');
+        $this->DetailPages = $pages;
     }
 
     // Setup lookup options

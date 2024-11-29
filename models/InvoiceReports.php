@@ -47,7 +47,6 @@ class InvoiceReports extends DbTable
 
     // Fields
     public $id;
-    public $invoice_title;
     public $payment_status;
     public $date_created;
     public $date_updated;
@@ -128,30 +127,6 @@ class InvoiceReports extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // invoice_title
-        $this->invoice_title = new DbField(
-            $this, // Table
-            'x_invoice_title', // Variable name
-            'invoice_title', // Name
-            '`invoice_title`', // Expression
-            '`invoice_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`invoice_title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->invoice_title->InputTextType = "text";
-        $this->invoice_title->Nullable = false; // NOT NULL field
-        $this->invoice_title->Required = true; // Required field
-        $this->invoice_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['invoice_title'] = &$this->invoice_title;
 
         // payment_status
         $this->payment_status = new DbField(
@@ -864,7 +839,6 @@ class InvoiceReports extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->invoice_title->DbValue = $row['invoice_title'];
         $this->payment_status->DbValue = $row['payment_status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1226,7 +1200,6 @@ class InvoiceReports extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->invoice_title->setDbValue($row['invoice_title']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1267,8 +1240,6 @@ class InvoiceReports extends DbTable
 
         // id
 
-        // invoice_title
-
         // payment_status
 
         // date_created
@@ -1287,9 +1258,6 @@ class InvoiceReports extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // invoice_title
-        $this->invoice_title->ViewValue = $this->invoice_title->CurrentValue;
 
         // payment_status
         $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
@@ -1320,10 +1288,6 @@ class InvoiceReports extends DbTable
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // invoice_title
-        $this->invoice_title->HrefValue = "";
-        $this->invoice_title->TooltipValue = "";
 
         // payment_status
         $this->payment_status->HrefValue = "";
@@ -1375,14 +1339,6 @@ class InvoiceReports extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // invoice_title
-        $this->invoice_title->setupEditAttributes();
-        if (!$this->invoice_title->Raw) {
-            $this->invoice_title->CurrentValue = HtmlDecode($this->invoice_title->CurrentValue);
-        }
-        $this->invoice_title->EditValue = $this->invoice_title->CurrentValue;
-        $this->invoice_title->PlaceHolder = RemoveHtml($this->invoice_title->caption());
 
         // payment_status
         $this->payment_status->setupEditAttributes();
@@ -1471,7 +1427,6 @@ class InvoiceReports extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->invoice_title);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1482,7 +1437,6 @@ class InvoiceReports extends DbTable
                     $doc->exportCaption($this->physical_address);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->invoice_title);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1518,7 +1472,6 @@ class InvoiceReports extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->invoice_title);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
@@ -1529,7 +1482,6 @@ class InvoiceReports extends DbTable
                         $doc->exportField($this->physical_address);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->invoice_title);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);

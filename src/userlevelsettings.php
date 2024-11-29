@@ -151,16 +151,16 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","1","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","2","877"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","3","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","4","844"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","4","1868"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests","7","328"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","1","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","2","877"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","3","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","4","840"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","4","1864"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests_details","7","0"],
@@ -469,7 +469,16 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","7","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_minor_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","4","840"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","7","840"]];
 
 /**
  * Tables
@@ -492,7 +501,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["expenses","expenses","expenses",true,"{32536B8D-F37B-4419-80D5-260932800712}","expenseslist"],
     ["invoice_details","invoice_details","invoice details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicedetailslist"],
     ["invoice_reports","invoice_reports","invoice reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportslist"],
-    ["invoices","invoices","invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoiceslist"],
+    ["invoices","invoices","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoiceslist"],
     ["lab_specimens","lab_specimens","Specimens",true,"{32536B8D-F37B-4419-80D5-260932800712}","labspecimenslist"],
     ["lab_test_reports","lab_test_reports","Test Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestreportslist"],
     ["lab_test_requests","lab_test_requests","Laboratory Requests",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestrequestslist"],
@@ -530,4 +539,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["subscriptions","subscriptions","subscriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","subscriptionslist"],
     ["Appointments","Appointments","Patients Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointments"],
     ["patient_queue","patient_queue","Patient Flow",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientqueuelist"],
-    ["laboratory_minor_report","laboratory_minor_report","laboratory minor report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryminorreportlist"]];
+    ["laboratory_minor_report","laboratory_minor_report","laboratory minor report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryminorreportlist"],
+    ["laboratory_billing_report","laboratory_billing_report","laboratory billing report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportlist"]];

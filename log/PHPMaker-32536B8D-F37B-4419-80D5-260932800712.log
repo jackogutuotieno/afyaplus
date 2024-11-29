@@ -23,6 +23,7 @@ C:\wamp64\www\afyaplus\controllers\LabTestRequestsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingController.php
+C:\wamp64\www\afyaplus\controllers\LaboratoryBillingReportController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryMinorReportController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryreportsController.php
 C:\wamp64\www\afyaplus\controllers\MedicalSchemesController.php
@@ -133,6 +134,7 @@ C:\wamp64\www\afyaplus\models\InvoiceDetails.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsAdd.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsDelete.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsEdit.php
+C:\wamp64\www\afyaplus\models\InvoiceDetailsGrid.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsList.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsView.php
 C:\wamp64\www\afyaplus\models\InvoiceReports.php
@@ -141,6 +143,7 @@ C:\wamp64\www\afyaplus\models\Invoices.php
 C:\wamp64\www\afyaplus\models\InvoicesAdd.php
 C:\wamp64\www\afyaplus\models\InvoicesDelete.php
 C:\wamp64\www\afyaplus\models\InvoicesEdit.php
+C:\wamp64\www\afyaplus\models\InvoicesGrid.php
 C:\wamp64\www\afyaplus\models\InvoicesList.php
 C:\wamp64\www\afyaplus\models\InvoicesView.php
 C:\wamp64\www\afyaplus\models\LabSpecimens.php
@@ -179,6 +182,9 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\models\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\models\LaboratoryBilling.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReport.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportGrid.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\models\Laboratoryreports.php
@@ -440,6 +446,7 @@ C:\wamp64\www\afyaplus\src\Entity\LabTestRequest.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryBilling.php
+C:\wamp64\www\afyaplus\src\Entity\LaboratoryBillingReport.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\src\Entity\Laboratoryreport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicalScheme.php
@@ -617,13 +624,16 @@ C:\wamp64\www\afyaplus\views\ExportlogView.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsAdd.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsDelete.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsEdit.php
+C:\wamp64\www\afyaplus\views\InvoiceDetailsGrid.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsList.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsView.php
 C:\wamp64\www\afyaplus\views\InvoiceReportsList.php
 C:\wamp64\www\afyaplus\views\InvoicesAdd.php
 C:\wamp64\www\afyaplus\views\InvoicesDelete.php
 C:\wamp64\www\afyaplus\views\InvoicesEdit.php
+C:\wamp64\www\afyaplus\views\InvoicesGrid.php
 C:\wamp64\www\afyaplus\views\InvoicesList.php
+C:\wamp64\www\afyaplus\views\InvoicesMaster.php
 C:\wamp64\www\afyaplus\views\InvoicesView.php
 C:\wamp64\www\afyaplus\views\LabSpecimensAdd.php
 C:\wamp64\www\afyaplus\views\LabSpecimensDelete.php
@@ -659,6 +669,8 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsQueueMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportGrid.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryreportsList.php
 C:\wamp64\www\afyaplus\views\Login.php

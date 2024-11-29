@@ -124,12 +124,11 @@ class InvoicesAdd extends Invoices
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
-        $this->invoice_title->setVisibility();
         $this->description->setVisibility();
         $this->payment_status->setVisibility();
         $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -523,6 +522,11 @@ class InvoicesAdd extends Invoices
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->payment_status);
+        $this->setupLookupOptions($this->created_by_user_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -559,10 +563,17 @@ class InvoicesAdd extends Invoices
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
         }
+
+        // Set up detail parameters
+        $this->setupDetailParms();
 
         // Validate form if post back
         if ($postBack) {
@@ -588,6 +599,9 @@ class InvoicesAdd extends Invoices
                     $this->terminate("invoiceslist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -595,7 +609,11 @@ class InvoicesAdd extends Invoices
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "invoiceslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "invoicesview") {
@@ -603,7 +621,7 @@ class InvoicesAdd extends Invoices
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "invoiceslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -628,6 +646,9 @@ class InvoicesAdd extends Invoices
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -688,7 +709,7 @@ class InvoicesAdd extends Invoices
             if (IsApi() && $val === null) {
                 $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val, true, $validate);
+                $this->patient_id->setFormValue($val);
             }
         }
 
@@ -699,16 +720,6 @@ class InvoicesAdd extends Invoices
                 $this->visit_id->Visible = false; // Disable update for API request
             } else {
                 $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'invoice_title' first before field var 'x_invoice_title'
-        $val = $CurrentForm->hasValue("invoice_title") ? $CurrentForm->getValue("invoice_title") : $CurrentForm->getValue("x_invoice_title");
-        if (!$this->invoice_title->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->invoice_title->Visible = false; // Disable update for API request
-            } else {
-                $this->invoice_title->setFormValue($val);
             }
         }
 
@@ -738,30 +749,8 @@ class InvoicesAdd extends Invoices
             if (IsApi() && $val === null) {
                 $this->created_by_user_id->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
+                $this->created_by_user_id->setFormValue($val);
             }
-        }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         }
 
         // Check field name 'id' first before field var 'x_id'
@@ -774,14 +763,9 @@ class InvoicesAdd extends Invoices
         global $CurrentForm;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->invoice_title->CurrentValue = $this->invoice_title->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
         $this->payment_status->CurrentValue = $this->payment_status->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -834,7 +818,6 @@ class InvoicesAdd extends Invoices
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->invoice_title->setDbValue($row['invoice_title']);
         $this->description->setDbValue($row['description']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
@@ -849,7 +832,6 @@ class InvoicesAdd extends Invoices
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['invoice_title'] = $this->invoice_title->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['payment_status'] = $this->payment_status->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
@@ -898,9 +880,6 @@ class InvoicesAdd extends Invoices
         // visit_id
         $this->visit_id->RowCssClass = "row";
 
-        // invoice_title
-        $this->invoice_title->RowCssClass = "row";
-
         // description
         $this->description->RowCssClass = "row";
 
@@ -922,25 +901,64 @@ class InvoicesAdd extends Invoices
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // visit_id
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
             $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-            // invoice_title
-            $this->invoice_title->ViewValue = $this->invoice_title->CurrentValue;
-
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
 
             // payment_status
-            $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
+            if (strval($this->payment_status->CurrentValue) != "") {
+                $this->payment_status->ViewValue = $this->payment_status->optionCaption($this->payment_status->CurrentValue);
+            } else {
+                $this->payment_status->ViewValue = null;
+            }
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -956,9 +974,6 @@ class InvoicesAdd extends Invoices
             // visit_id
             $this->visit_id->HrefValue = "";
 
-            // invoice_title
-            $this->invoice_title->HrefValue = "";
-
             // description
             $this->description->HrefValue = "";
 
@@ -967,76 +982,134 @@ class InvoicesAdd extends Invoices
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
+                }
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
             // visit_id
             $this->visit_id->setupEditAttributes();
-            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+            if ($this->visit_id->getSessionValue() != "") {
+                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+            } else {
+                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+                $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+                }
             }
-
-            // invoice_title
-            $this->invoice_title->setupEditAttributes();
-            if (!$this->invoice_title->Raw) {
-                $this->invoice_title->CurrentValue = HtmlDecode($this->invoice_title->CurrentValue);
-            }
-            $this->invoice_title->EditValue = HtmlEncode($this->invoice_title->CurrentValue);
-            $this->invoice_title->PlaceHolder = RemoveHtml($this->invoice_title->caption());
 
             // description
             $this->description->setupEditAttributes();
-            if (!$this->description->Raw) {
-                $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-            }
             $this->description->EditValue = HtmlEncode($this->description->CurrentValue);
             $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
             // payment_status
             $this->payment_status->setupEditAttributes();
-            if (!$this->payment_status->Raw) {
-                $this->payment_status->CurrentValue = HtmlDecode($this->payment_status->CurrentValue);
-            }
-            $this->payment_status->EditValue = HtmlEncode($this->payment_status->CurrentValue);
+            $this->payment_status->EditValue = $this->payment_status->options(true);
             $this->payment_status->PlaceHolder = RemoveHtml($this->payment_status->caption());
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
             if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
                 $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                $curVal = strval($this->created_by_user_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                    if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                        } else {
+                            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->created_by_user_id->EditValue = null;
                 }
+            } else {
+                $curVal = trim(strval($this->created_by_user_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                } else {
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->Lookup !== null && is_array($this->created_by_user_id->lookupOptions()) && count($this->created_by_user_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->created_by_user_id->ViewValue !== null) { // Load from cache
+                    $this->created_by_user_id->EditValue = array_values($this->created_by_user_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->created_by_user_id->CurrentValue, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->created_by_user_id->EditValue = $arwrk;
+                }
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
             }
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
@@ -1046,9 +1119,6 @@ class InvoicesAdd extends Invoices
             // visit_id
             $this->visit_id->HrefValue = "";
 
-            // invoice_title
-            $this->invoice_title->HrefValue = "";
-
             // description
             $this->description->HrefValue = "";
 
@@ -1057,12 +1127,6 @@ class InvoicesAdd extends Invoices
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1089,9 +1153,6 @@ class InvoicesAdd extends Invoices
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
-            }
             if ($this->visit_id->Visible && $this->visit_id->Required) {
                 if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
                     $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
@@ -1099,11 +1160,6 @@ class InvoicesAdd extends Invoices
             }
             if (!CheckInteger($this->visit_id->FormValue)) {
                 $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
-            }
-            if ($this->invoice_title->Visible && $this->invoice_title->Required) {
-                if (!$this->invoice_title->IsDetailKey && EmptyValue($this->invoice_title->FormValue)) {
-                    $this->invoice_title->addErrorMessage(str_replace("%s", $this->invoice_title->caption(), $this->invoice_title->RequiredErrorMessage));
-                }
             }
             if ($this->description->Visible && $this->description->Required) {
                 if (!$this->description->IsDetailKey && EmptyValue($this->description->FormValue)) {
@@ -1120,25 +1176,14 @@ class InvoicesAdd extends Invoices
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
-            }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("InvoiceDetailsGrid");
+        if (in_array("invoice_details", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1176,6 +1221,11 @@ class InvoicesAdd extends Invoices
         }
         $conn = $this->getConnection();
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -1197,6 +1247,38 @@ class InvoicesAdd extends Invoices
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("InvoiceDetailsGrid");
+            if (in_array("invoice_details", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->invoice_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "invoice_details"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->invoice_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                if ($this->UseTransaction) { // Commit transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->commit();
+                    }
+                }
+            } else {
+                if ($this->UseTransaction) { // Rollback transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->rollback();
+                    }
+                }
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1228,9 +1310,6 @@ class InvoicesAdd extends Invoices
         // visit_id
         $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
 
-        // invoice_title
-        $this->invoice_title->setDbValueDef($rsnew, $this->invoice_title->CurrentValue, false);
-
         // description
         $this->description->setDbValueDef($rsnew, $this->description->CurrentValue, false);
 
@@ -1239,12 +1318,6 @@ class InvoicesAdd extends Invoices
 
         // created_by_user_id
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
         return $rsnew;
     }
 
@@ -1260,9 +1333,6 @@ class InvoicesAdd extends Invoices
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->setFormValue($row['visit_id']);
         }
-        if (isset($row['invoice_title'])) { // invoice_title
-            $this->invoice_title->setFormValue($row['invoice_title']);
-        }
         if (isset($row['description'])) { // description
             $this->description->setFormValue($row['description']);
         }
@@ -1271,12 +1341,6 @@ class InvoicesAdd extends Invoices
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
         }
     }
 
@@ -1288,6 +1352,137 @@ class InvoicesAdd extends Invoices
             return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
         }
         return true;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
+                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_visits") {
+                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
+                    $this->visit_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("invoice_details", $detailTblVar)) {
+                $detailPageObj = Container("InvoiceDetailsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->invoice_id->IsDetailKey = true;
+                    $detailPageObj->invoice_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->invoice_id->setSessionValue($detailPageObj->invoice_id->CurrentValue);
+                }
+            }
+        }
     }
 
     // Set up Breadcrumb
@@ -1314,6 +1509,12 @@ class InvoicesAdd extends Invoices
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_payment_status":
+                    break;
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

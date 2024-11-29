@@ -1578,13 +1578,6 @@ class PatientVisitsList extends PatientVisits
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
-        // "detail_lab_test_requests"
-        $item = &$this->ListOptions->add("detail_lab_test_requests");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
         // "detail_prescriptions"
         $item = &$this->ListOptions->add("detail_prescriptions");
         $item->CssClass = "text-nowrap";
@@ -1596,6 +1589,20 @@ class PatientVisitsList extends PatientVisits
         $item = &$this->ListOptions->add("detail_radiology_requests");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->allowList(CurrentProjectID() . 'radiology_requests');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_invoices"
+        $item = &$this->ListOptions->add("detail_invoices");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'invoices');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_lab_test_requests"
+        $item = &$this->ListOptions->add("detail_lab_test_requests");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'lab_test_requests');
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
@@ -1614,9 +1621,10 @@ class PatientVisitsList extends PatientVisits
         $pages->add("patient_queue");
         $pages->add("patient_vitals");
         $pages->add("doctor_notes");
-        $pages->add("lab_test_requests");
         $pages->add("prescriptions");
         $pages->add("radiology_requests");
+        $pages->add("invoices");
+        $pages->add("lab_test_requests");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1910,52 +1918,6 @@ class PatientVisitsList extends PatientVisits
             }
         }
 
-        // "detail_lab_test_requests"
-        $opt = $this->ListOptions["detail_lab_test_requests"];
-        if ($Security->allowList(CurrentProjectID() . 'lab_test_requests')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
-            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
-                $detailTbl = Container("lab_test_requests");
-                $detailFilter = $detailTbl->getDetailFilter($this);
-                $detailTbl->setCurrentMasterTable($this->TableVar);
-                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
-                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
-                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("lab_test_requests")->Count, "red"], $Language->phrase("DetailCount"));
-            }
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("LabTestRequestsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "lab_test_requests";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "lab_test_requests";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
         // "detail_prescriptions"
         $opt = $this->ListOptions["detail_prescriptions"];
         if ($Security->allowList(CurrentProjectID() . 'prescriptions')) {
@@ -2034,6 +1996,98 @@ class PatientVisitsList extends PatientVisits
                     $detailEditTblVar .= ",";
                 }
                 $detailEditTblVar .= "radiology_requests";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_invoices"
+        $opt = $this->ListOptions["detail_invoices"];
+        if ($Security->allowList(CurrentProjectID() . 'invoices')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("invoices", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("invoices");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("invoices")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("invoiceslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("InvoicesGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=invoices");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "invoices";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=invoices");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "invoices";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_lab_test_requests"
+        $opt = $this->ListOptions["detail_lab_test_requests"];
+        if ($Security->allowList(CurrentProjectID() . 'lab_test_requests')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("lab_test_requests", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("lab_test_requests");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("lab_test_requests")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("labtestrequestslist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("LabTestRequestsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "lab_test_requests";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "lab_test_requests";
             }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
@@ -2139,18 +2193,6 @@ class PatientVisitsList extends PatientVisits
             }
             $detailTableLink .= "doctor_notes";
         }
-        $item = &$option->add("detailadd_lab_test_requests");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
-        $detailPage = Container("LabTestRequestsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "lab_test_requests";
-        }
         $item = &$option->add("detailadd_prescriptions");
         $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=prescriptions");
         $detailPage = Container("PrescriptionsGrid");
@@ -2174,6 +2216,30 @@ class PatientVisitsList extends PatientVisits
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "radiology_requests";
+        }
+        $item = &$option->add("detailadd_invoices");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=invoices");
+        $detailPage = Container("InvoicesGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "invoices";
+        }
+        $item = &$option->add("detailadd_lab_test_requests");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=lab_test_requests");
+        $detailPage = Container("LabTestRequestsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_visits') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "lab_test_requests";
         }
 
         // Add multiple details

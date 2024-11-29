@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="174">
+      <phrase id="menutext" value="laboratory billing report" />
+    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -403,9 +406,6 @@
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
-      <field id="invoice_title">
-        <phrase id="fldcaption" value="invoice title" />
-      </field>
       <field id="payment_status">
         <phrase id="fldcaption" value="payment status" />
       </field>
@@ -432,33 +432,36 @@
       </field>
     </table>
     <table id="invoices">
-      <phrase id="tblcaption" value="invoices" />
+      <phrase id="tblcaption" value="Invoices" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="Invoice ID" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Invoice To" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="visit id" />
-      </field>
-      <field id="invoice_title">
-        <phrase id="fldcaption" value="invoice title" />
+        <phrase id="fldcaption" value="Visit ID" />
       </field>
       <field id="description">
-        <phrase id="fldcaption" value="description" />
+        <phrase id="fldcaption" value="Description of Services" />
       </field>
       <field id="payment_status">
-        <phrase id="fldcaption" value="payment status" />
+        <phrase id="fldcaption" value="Payment Status" />
+        <phrase id="fldtagvalue1" value="Paid" />
+        <phrase id="fldtagcaption1" value="Paid" />
+        <phrase id="fldtagvalue2" value="Partially Paid" />
+        <phrase id="fldtagcaption2" value="Partially Paid" />
+        <phrase id="fldtagvalue3" value="Voided" />
+        <phrase id="fldtagcaption3" value="Voided" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Prepared By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="lab_specimens">
@@ -1684,6 +1687,21 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Reort Date" />
+      </field>
+    </table>
+    <table id="laboratory_billing_report">
+      <phrase id="tblcaption" value="laboratory billing report" />
+      <field id="id">
+        <phrase id="fldcaption" value="request_details_id" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="service name" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="cost" />
+      </field>
+      <field id="id1">
+        <phrase id="fldcaption" value="lab_request_id" />
       </field>
     </table>
   </project>

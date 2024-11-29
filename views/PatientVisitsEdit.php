@@ -308,14 +308,6 @@ loadjs.ready("fpatient_visitsedit", function() {
 <?php include_once "DoctorNotesGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailEdit) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("prescriptions", explode(",", $Page->getCurrentDetailTable())) && $prescriptions->DetailEdit) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
@@ -330,6 +322,22 @@ loadjs.ready("fpatient_visitsedit", function() {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "RadiologyRequestsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("invoices", explode(",", $Page->getCurrentDetailTable())) && $invoices->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("invoices", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "InvoicesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

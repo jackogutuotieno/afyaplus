@@ -146,7 +146,6 @@ class InvoiceReportsList extends InvoiceReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->invoice_title->setVisibility();
         $this->payment_status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -1052,7 +1051,6 @@ class InvoiceReportsList extends InvoiceReports
             $savedFilterList = Profile()->getSearchFilters("finvoice_reportssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->invoice_title->AdvancedSearch->toJson(), ","); // Field invoice_title
         $filterList = Concat($filterList, $this->payment_status->AdvancedSearch->toJson(), ","); // Field payment_status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
@@ -1107,14 +1105,6 @@ class InvoiceReportsList extends InvoiceReports
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field invoice_title
-        $this->invoice_title->AdvancedSearch->SearchValue = @$filter["x_invoice_title"];
-        $this->invoice_title->AdvancedSearch->SearchOperator = @$filter["z_invoice_title"];
-        $this->invoice_title->AdvancedSearch->SearchCondition = @$filter["v_invoice_title"];
-        $this->invoice_title->AdvancedSearch->SearchValue2 = @$filter["y_invoice_title"];
-        $this->invoice_title->AdvancedSearch->SearchOperator2 = @$filter["w_invoice_title"];
-        $this->invoice_title->AdvancedSearch->save();
 
         // Field payment_status
         $this->payment_status->AdvancedSearch->SearchValue = @$filter["x_payment_status"];
@@ -1218,7 +1208,6 @@ class InvoiceReportsList extends InvoiceReports
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->invoice_title;
         $searchFlds[] = &$this->payment_status;
         $searchFlds[] = &$this->first_name;
         $searchFlds[] = &$this->last_name;
@@ -1304,7 +1293,6 @@ class InvoiceReportsList extends InvoiceReports
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->invoice_title); // invoice_title
             $this->updateSort($this->payment_status); // payment_status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
@@ -1338,7 +1326,6 @@ class InvoiceReportsList extends InvoiceReports
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->invoice_title->setSort("");
                 $this->payment_status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
@@ -1493,7 +1480,6 @@ class InvoiceReportsList extends InvoiceReports
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "invoice_title");
             $this->createColumnOption($option, "payment_status");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
@@ -1941,7 +1927,6 @@ class InvoiceReportsList extends InvoiceReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->invoice_title->setDbValue($row['invoice_title']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1957,7 +1942,6 @@ class InvoiceReportsList extends InvoiceReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['invoice_title'] = $this->invoice_title->DefaultValue;
         $row['payment_status'] = $this->payment_status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2008,8 +1992,6 @@ class InvoiceReportsList extends InvoiceReports
 
         // id
 
-        // invoice_title
-
         // payment_status
 
         // date_created
@@ -2030,9 +2012,6 @@ class InvoiceReportsList extends InvoiceReports
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // invoice_title
-            $this->invoice_title->ViewValue = $this->invoice_title->CurrentValue;
 
             // payment_status
             $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
@@ -2063,10 +2042,6 @@ class InvoiceReportsList extends InvoiceReports
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // invoice_title
-            $this->invoice_title->HrefValue = "";
-            $this->invoice_title->TooltipValue = "";
 
             // payment_status
             $this->payment_status->HrefValue = "";

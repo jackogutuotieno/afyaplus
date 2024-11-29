@@ -1225,11 +1225,6 @@ class PatientVisitsAdd extends PatientVisits
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("LabTestRequestsGrid");
-        if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
         $detailPage = Container("PrescriptionsGrid");
         if (in_array("prescriptions", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->run();
@@ -1237,6 +1232,16 @@ class PatientVisitsAdd extends PatientVisits
         }
         $detailPage = Container("RadiologyRequestsGrid");
         if (in_array("radiology_requests", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("InvoicesGrid");
+        if (in_array("invoices", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("LabTestRequestsGrid");
+        if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
@@ -1332,18 +1337,6 @@ class PatientVisitsAdd extends PatientVisits
                 $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
-            $detailPage = Container("LabTestRequestsGrid");
-            if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
-                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
             $detailPage = Container("PrescriptionsGrid");
             if (in_array("prescriptions", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
                 $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
@@ -1361,6 +1354,30 @@ class PatientVisitsAdd extends PatientVisits
                 $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
                 $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
                 $Security->loadCurrentUserLevel($this->ProjectID . "radiology_requests"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("InvoicesGrid");
+            if (in_array("invoices", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "invoices"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->visit_id->setSessionValue(""); // Clear master key if insert failed
+                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("LabTestRequestsGrid");
+            if (in_array("lab_test_requests", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->visit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "lab_test_requests"); // Load user level of detail table
                 $addRow = $detailPage->gridInsert();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
@@ -1601,28 +1618,6 @@ class PatientVisitsAdd extends PatientVisits
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
-            if (in_array("lab_test_requests", $detailTblVar)) {
-                $detailPageObj = Container("LabTestRequestsGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
             if (in_array("prescriptions", $detailTblVar)) {
                 $detailPageObj = Container("PrescriptionsGrid");
                 if ($detailPageObj->DetailAdd) {
@@ -1647,6 +1642,50 @@ class PatientVisitsAdd extends PatientVisits
             }
             if (in_array("radiology_requests", $detailTblVar)) {
                 $detailPageObj = Container("RadiologyRequestsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("invoices", $detailTblVar)) {
+                $detailPageObj = Container("InvoicesGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("lab_test_requests", $detailTblVar)) {
+                $detailPageObj = Container("LabTestRequestsGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     if ($this->CopyRecord) {

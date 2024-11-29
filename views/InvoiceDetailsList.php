@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "invoices") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/InvoicesMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="finvoice_detailssrch" id="finvoice_detailssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="finvoice_detailssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -142,6 +151,10 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "invoices" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="invoices">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->invoice_id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_invoice_details" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_invoice_detailslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -171,12 +184,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->cost->Visible) { // cost ?>
         <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_invoice_details_cost" class="invoice_details_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_invoice_details_date_created" class="invoice_details_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_invoice_details_date_updated" class="invoice_details_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -243,22 +250,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_cost" class="el_invoice_details_cost">
 <span<?= $Page->cost->viewAttributes() ?>>
 <?= $Page->cost->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_date_created" class="el_invoice_details_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_date_updated" class="el_invoice_details_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

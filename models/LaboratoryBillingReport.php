@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for invoice_details
+ * Table class for laboratory_billing_report
  */
-class InvoiceDetails extends DbTable
+class LaboratoryBillingReport extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,12 +47,9 @@ class InvoiceDetails extends DbTable
 
     // Fields
     public $id;
-    public $invoice_id;
-    public $item;
-    public $quantity;
+    public $service_name;
     public $cost;
-    public $date_created;
-    public $date_updated;
+    public $id1;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -65,14 +62,14 @@ class InvoiceDetails extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "invoice_details";
-        $this->TableName = 'invoice_details';
-        $this->TableType = "TABLE";
+        $this->TableVar = "laboratory_billing_report";
+        $this->TableName = 'laboratory_billing_report';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "invoice_details";
+        $this->UpdateTable = "laboratory_billing_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -89,8 +86,8 @@ class InvoiceDetails extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = true; // Allow detail add
-        $this->DetailEdit = true; // Allow detail edit
+        $this->DetailAdd = false; // Allow detail add
+        $this->DetailEdit = false; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -121,87 +118,35 @@ class InvoiceDetails extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // invoice_id
-        $this->invoice_id = new DbField(
+        // service_name
+        $this->service_name = new DbField(
             $this, // Table
-            'x_invoice_id', // Variable name
-            'invoice_id', // Name
-            '`invoice_id`', // Expression
-            '`invoice_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`invoice_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->invoice_id->InputTextType = "text";
-        $this->invoice_id->Raw = true;
-        $this->invoice_id->IsForeignKey = true; // Foreign key field
-        $this->invoice_id->Nullable = false; // NOT NULL field
-        $this->invoice_id->Required = true; // Required field
-        $this->invoice_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->invoice_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['invoice_id'] = &$this->invoice_id;
-
-        // item
-        $this->item = new DbField(
-            $this, // Table
-            'x_item', // Variable name
-            'item', // Name
-            '`item`', // Expression
-            '`item`', // Basic search expression
+            'x_service_name', // Variable name
+            'service_name', // Name
+            '`service_name`', // Expression
+            '`service_name`', // Basic search expression
             200, // Type
-            200, // Size
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`item`', // Virtual expression
+            '`service_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->item->InputTextType = "text";
-        $this->item->Nullable = false; // NOT NULL field
-        $this->item->Required = true; // Required field
-        $this->item->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['item'] = &$this->item;
-
-        // quantity
-        $this->quantity = new DbField(
-            $this, // Table
-            'x_quantity', // Variable name
-            'quantity', // Name
-            '`quantity`', // Expression
-            '`quantity`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`quantity`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->quantity->InputTextType = "text";
-        $this->quantity->Raw = true;
-        $this->quantity->Nullable = false; // NOT NULL field
-        $this->quantity->Required = true; // Required field
-        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['quantity'] = &$this->quantity;
+        $this->service_name->InputTextType = "text";
+        $this->service_name->Nullable = false; // NOT NULL field
+        $this->service_name->Required = true; // Required field
+        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['service_name'] = &$this->service_name;
 
         // cost
         $this->cost = new DbField(
@@ -229,59 +174,31 @@ class InvoiceDetails extends DbTable
         $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['cost'] = &$this->cost;
 
-        // date_created
-        $this->date_created = new DbField(
+        // id1
+        $this->id1 = new DbField(
             $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            0, // Date/Time format
+            'x_id1', // Variable name
+            'id1', // Name
+            '`id1`', // Expression
+            '`id1`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`date_created`', // Virtual expression
+            '`id1`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'NO' // Edit Tag
         );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->Sortable = false; // Allow sort
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->Sortable = false; // Allow sort
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
+        $this->id1->InputTextType = "text";
+        $this->id1->Raw = true;
+        $this->id1->IsAutoIncrement = true; // Autoincrement field
+        $this->id1->Nullable = false; // NOT NULL field
+        $this->id1->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id1->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['id1'] = &$this->id1;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -357,10 +274,10 @@ class InvoiceDetails extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "invoices") {
-            $masterTable = Container("invoices");
-            if ($this->invoice_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->invoice_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+        if ($this->getCurrentMasterTable() == "lab_test_requests_details") {
+            $masterTable = Container("lab_test_requests_details");
+            if ($this->id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
             } else {
                 return "";
             }
@@ -373,10 +290,10 @@ class InvoiceDetails extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "invoices") {
-            $masterTable = Container("invoices");
-            if ($this->invoice_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->invoice_id, $this->invoice_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+        if ($this->getCurrentMasterTable() == "lab_test_requests_details") {
+            $masterTable = Container("lab_test_requests_details");
+            if ($this->id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->id, $this->id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
                 return "";
             }
@@ -395,8 +312,8 @@ class InvoiceDetails extends DbTable
     {
         $validKeys = true;
         switch ($masterTable->TableVar) {
-            case "invoices":
-                $key = $keys["invoice_id"] ?? "";
+            case "lab_test_requests_details":
+                $key = $keys["id"] ?? "";
                 if (EmptyValue($key)) {
                     if ($masterTable->id->Required) { // Required field and empty value
                         return ""; // Return empty filter
@@ -406,7 +323,7 @@ class InvoiceDetails extends DbTable
                     return ""; // Return empty filter
                 }
                 if ($validKeys) {
-                    return GetKeyFilter($masterTable->id, $keys["invoice_id"], $this->invoice_id->DataType, $this->Dbid);
+                    return GetKeyFilter($masterTable->id, $keys["id"], $this->id->DataType, $this->Dbid);
                 }
                 break;
         }
@@ -417,8 +334,8 @@ class InvoiceDetails extends DbTable
     public function getDetailFilter($masterTable)
     {
         switch ($masterTable->TableVar) {
-            case "invoices":
-                return GetKeyFilter($this->invoice_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+            case "lab_test_requests_details":
+                return GetKeyFilter($this->id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
     }
@@ -432,7 +349,7 @@ class InvoiceDetails extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "invoice_details";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "laboratory_billing_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -562,13 +479,6 @@ class InvoiceDetails extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "invoices" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "invoices"); // Add detail User ID filter
-            }
-        }
         return $filter;
     }
 
@@ -784,6 +694,8 @@ class InvoiceDetails extends DbTable
         if ($result) {
             $this->id->setDbValue($conn->lastInsertId());
             $rs['id'] = $this->id->DbValue;
+            $this->id1->setDbValue($conn->lastInsertId());
+            $rs['id1'] = $this->id1->DbValue;
         }
         return $result;
     }
@@ -840,6 +752,13 @@ class InvoiceDetails extends DbTable
                 $rs['id'] = $this->id->CurrentValue;
             }
         }
+
+        // Return auto increment field
+        if ($success) {
+            if (!isset($rs['id1']) && !EmptyValue($this->id1->CurrentValue)) {
+                $rs['id1'] = $this->id1->CurrentValue;
+            }
+        }
         return $success;
     }
 
@@ -891,12 +810,9 @@ class InvoiceDetails extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->invoice_id->DbValue = $row['invoice_id'];
-        $this->item->DbValue = $row['item'];
-        $this->quantity->DbValue = $row['quantity'];
+        $this->service_name->DbValue = $row['service_name'];
         $this->cost->DbValue = $row['cost'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
+        $this->id1->DbValue = $row['id1'];
     }
 
     // Delete uploaded files
@@ -970,7 +886,7 @@ class InvoiceDetails extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("invoicedetailslist");
+        return $_SESSION[$name] ?? GetUrl("laboratorybillingreportlist");
     }
 
     // Set return page URL
@@ -984,9 +900,9 @@ class InvoiceDetails extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "invoicedetailsview" => $Language->phrase("View"),
-            "invoicedetailsedit" => $Language->phrase("Edit"),
-            "invoicedetailsadd" => $Language->phrase("Add"),
+            "laboratorybillingreportview" => $Language->phrase("View"),
+            "laboratorybillingreportedit" => $Language->phrase("Edit"),
+            "laboratorybillingreportadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -994,18 +910,18 @@ class InvoiceDetails extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "invoicedetailslist";
+        return "laboratorybillingreportlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "InvoiceDetailsView",
-            Config("API_ADD_ACTION") => "InvoiceDetailsAdd",
-            Config("API_EDIT_ACTION") => "InvoiceDetailsEdit",
-            Config("API_DELETE_ACTION") => "InvoiceDetailsDelete",
-            Config("API_LIST_ACTION") => "InvoiceDetailsList",
+            Config("API_VIEW_ACTION") => "LaboratoryBillingReportView",
+            Config("API_ADD_ACTION") => "LaboratoryBillingReportAdd",
+            Config("API_EDIT_ACTION") => "LaboratoryBillingReportEdit",
+            Config("API_DELETE_ACTION") => "LaboratoryBillingReportDelete",
+            Config("API_LIST_ACTION") => "LaboratoryBillingReportList",
             default => ""
         };
     }
@@ -1025,16 +941,16 @@ class InvoiceDetails extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "invoicedetailslist";
+        return "laboratorybillingreportlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("invoicedetailsview", $parm);
+            $url = $this->keyUrl("laboratorybillingreportview", $parm);
         } else {
-            $url = $this->keyUrl("invoicedetailsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("laboratorybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1043,9 +959,9 @@ class InvoiceDetails extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "invoicedetailsadd?" . $parm;
+            $url = "laboratorybillingreportadd?" . $parm;
         } else {
-            $url = "invoicedetailsadd";
+            $url = "laboratorybillingreportadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1053,28 +969,28 @@ class InvoiceDetails extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("invoicedetailsedit", $parm);
+        $url = $this->keyUrl("laboratorybillingreportedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("invoicedetailslist", "action=edit");
+        $url = $this->keyUrl("laboratorybillingreportlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("invoicedetailsadd", $parm);
+        $url = $this->keyUrl("laboratorybillingreportadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("invoicedetailslist", "action=copy");
+        $url = $this->keyUrl("laboratorybillingreportlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1084,16 +1000,16 @@ class InvoiceDetails extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("invoicedetailsdelete", $parm);
+            return $this->keyUrl("laboratorybillingreportdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "invoices" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+        if ($this->getCurrentMasterTable() == "lab_test_requests_details" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->invoice_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->id->getSessionValue()); // Use Session Value
         }
         return $url;
     }
@@ -1254,19 +1170,16 @@ class InvoiceDetails extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->invoice_id->setDbValue($row['invoice_id']);
-        $this->item->setDbValue($row['item']);
-        $this->quantity->setDbValue($row['quantity']);
+        $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->id1->setDbValue($row['id1']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "InvoiceDetailsList";
+        $listPage = "LaboratoryBillingReportList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1292,73 +1205,40 @@ class InvoiceDetails extends DbTable
 
         // id
 
-        // invoice_id
-
-        // item
-
-        // quantity
+        // service_name
 
         // cost
 
-        // date_created
-        $this->date_created->CellCssStyle = "white-space: nowrap;";
-
-        // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
+        // id1
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // invoice_id
-        $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
-        $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
-
-        // item
-        $this->item->ViewValue = $this->item->CurrentValue;
-
-        // quantity
-        $this->quantity->ViewValue = $this->quantity->CurrentValue;
-        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+        // service_name
+        $this->service_name->ViewValue = $this->service_name->CurrentValue;
 
         // cost
         $this->cost->ViewValue = $this->cost->CurrentValue;
         $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+        // id1
+        $this->id1->ViewValue = $this->id1->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // invoice_id
-        $this->invoice_id->HrefValue = "";
-        $this->invoice_id->TooltipValue = "";
-
-        // item
-        $this->item->HrefValue = "";
-        $this->item->TooltipValue = "";
-
-        // quantity
-        $this->quantity->HrefValue = "";
-        $this->quantity->TooltipValue = "";
+        // service_name
+        $this->service_name->HrefValue = "";
+        $this->service_name->TooltipValue = "";
 
         // cost
         $this->cost->HrefValue = "";
         $this->cost->TooltipValue = "";
 
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
+        // id1
+        $this->id1->HrefValue = "";
+        $this->id1->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1379,35 +1259,13 @@ class InvoiceDetails extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // invoice_id
-        $this->invoice_id->setupEditAttributes();
-        if ($this->invoice_id->getSessionValue() != "") {
-            $this->invoice_id->CurrentValue = GetForeignKeyValue($this->invoice_id->getSessionValue());
-            $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
-            $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
-        } else {
-            $this->invoice_id->EditValue = $this->invoice_id->CurrentValue;
-            $this->invoice_id->PlaceHolder = RemoveHtml($this->invoice_id->caption());
-            if (strval($this->invoice_id->EditValue) != "" && is_numeric($this->invoice_id->EditValue)) {
-                $this->invoice_id->EditValue = FormatNumber($this->invoice_id->EditValue, null);
-            }
+        // service_name
+        $this->service_name->setupEditAttributes();
+        if (!$this->service_name->Raw) {
+            $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
         }
-
-        // item
-        $this->item->setupEditAttributes();
-        if (!$this->item->Raw) {
-            $this->item->CurrentValue = HtmlDecode($this->item->CurrentValue);
-        }
-        $this->item->EditValue = $this->item->CurrentValue;
-        $this->item->PlaceHolder = RemoveHtml($this->item->caption());
-
-        // quantity
-        $this->quantity->setupEditAttributes();
-        $this->quantity->EditValue = $this->quantity->CurrentValue;
-        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-        if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
-            $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
-        }
+        $this->service_name->EditValue = $this->service_name->CurrentValue;
+        $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
 
         // cost
         $this->cost->setupEditAttributes();
@@ -1417,15 +1275,13 @@ class InvoiceDetails extends DbTable
             $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
         }
 
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+        // id1
+        $this->id1->setupEditAttributes();
+        $this->id1->EditValue = $this->id1->CurrentValue;
+        $this->id1->PlaceHolder = RemoveHtml($this->id1->caption());
+        if (strval($this->id1->EditValue) != "" && is_numeric($this->id1->EditValue)) {
+            $this->id1->EditValue = $this->id1->EditValue;
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1456,16 +1312,14 @@ class InvoiceDetails extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->invoice_id);
-                    $doc->exportCaption($this->item);
-                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->id1);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->invoice_id);
-                    $doc->exportCaption($this->item);
-                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->id1);
                 }
                 $doc->endExportRow();
             }
@@ -1493,16 +1347,14 @@ class InvoiceDetails extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->invoice_id);
-                        $doc->exportField($this->item);
-                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->service_name);
                         $doc->exportField($this->cost);
+                        $doc->exportField($this->id1);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->invoice_id);
-                        $doc->exportField($this->item);
-                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->service_name);
                         $doc->exportField($this->cost);
+                        $doc->exportField($this->id1);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1516,30 +1368,6 @@ class InvoiceDetails extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add master User ID filter
-    public function addMasterUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "invoices") {
-            $filterWrk = Container("invoices")->addUserIDFilter($filterWrk);
-        }
-        return $filterWrk;
-    }
-
-    // Add detail User ID filter
-    public function addDetailUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "invoices") {
-            $mastertable = Container("invoices");
-            if (!$mastertable->userIDAllow()) {
-                $subqueryWrk = $mastertable->getUserIDSubquery($this->invoice_id, $mastertable->id);
-                AddFilter($filterWrk, $subqueryWrk);
-            }
-        }
-        return $filterWrk;
     }
 
     // Get file data

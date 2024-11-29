@@ -56,12 +56,6 @@ $Page->showMessage();
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_invoices_patient_id" class="invoices_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th class="<?= $Page->visit_id->headerCellClass() ?>"><span id="elh_invoices_visit_id" class="invoices_visit_id"><?= $Page->visit_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-        <th class="<?= $Page->invoice_title->headerCellClass() ?>"><span id="elh_invoices_invoice_title" class="invoices_invoice_title"><?= $Page->invoice_title->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
         <th class="<?= $Page->description->headerCellClass() ?>"><span id="elh_invoices_description" class="invoices_description"><?= $Page->description->caption() ?></span></th>
 <?php } ?>
@@ -111,22 +105,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td<?= $Page->visit_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-        <td<?= $Page->invoice_title->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->invoice_title->viewAttributes() ?>>
-<?= $Page->invoice_title->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -160,9 +160,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_invoice_reports_id" class="invoice_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-        <th data-name="invoice_title" class="<?= $Page->invoice_title->headerCellClass() ?>"><div id="elh_invoice_reports_invoice_title" class="invoice_reports_invoice_title"><?= $Page->renderFieldHeader($Page->invoice_title) ?></div></th>
-<?php } ?>
 <?php if ($Page->payment_status->Visible) { // payment_status ?>
         <th data-name="payment_status" class="<?= $Page->payment_status->headerCellClass() ?>"><div id="elh_invoice_reports_payment_status" class="invoice_reports_payment_status"><?= $Page->renderFieldHeader($Page->payment_status) ?></div></th>
 <?php } ?>
@@ -220,14 +217,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_reports_id" class="el_invoice_reports_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-        <td data-name="invoice_title"<?= $Page->invoice_title->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_reports_invoice_title" class="el_invoice_reports_invoice_title">
-<span<?= $Page->invoice_title->viewAttributes() ?>>
-<?= $Page->invoice_title->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

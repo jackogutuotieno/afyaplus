@@ -33,9 +33,6 @@ class InvoiceReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "invoice_title", type: "string")]
-    private string $invoiceTitle;
-
     #[Column(name: "payment_status", type: "string")]
     private string $paymentStatus;
 
@@ -68,17 +65,6 @@ class InvoiceReport extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getInvoiceTitle(): string
-    {
-        return HtmlDecode($this->invoiceTitle);
-    }
-
-    public function setInvoiceTitle(string $value): static
-    {
-        $this->invoiceTitle = RemoveXss($value);
         return $this;
     }
 

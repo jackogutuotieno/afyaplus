@@ -1411,6 +1411,13 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
+        // "detail_laboratory_billing_report"
+        $item = &$this->ListOptions->add("detail_laboratory_billing_report");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'laboratory_billing_report');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $item = &$this->ListOptions->add("details");
@@ -1424,6 +1431,7 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         // Set up detail pages
         $pages = new SubPages();
         $pages->add("lab_test_requests_queue");
+        $pages->add("laboratory_billing_report");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1636,6 +1644,44 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $opt->Visible = false;
             }
         }
+
+        // "detail_laboratory_billing_report"
+        $opt = $this->ListOptions["detail_laboratory_billing_report"];
+        if ($Security->allowList(CurrentProjectID() . 'laboratory_billing_report')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("laboratory_billing_report", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("laboratorybillingreportlist?" . Config("TABLE_SHOW_MASTER") . "=lab_test_requests_details&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("LaboratoryBillingReportGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'lab_test_requests_details')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=laboratory_billing_report");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "laboratory_billing_report";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'lab_test_requests_details')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=laboratory_billing_report");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "laboratory_billing_report";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
             $links = "";
@@ -1710,6 +1756,18 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "lab_test_requests_queue";
+        }
+        $item = &$option->add("detailadd_laboratory_billing_report");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=laboratory_billing_report");
+        $detailPage = Container("LaboratoryBillingReportGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'lab_test_requests_details') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "laboratory_billing_report";
         }
 
         // Add multiple details

@@ -73,28 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <tr id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_invoices_visit_id"><?= $Page->visit_id->caption() ?></span></td>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el_invoices_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->invoice_title->Visible) { // invoice_title ?>
-    <tr id="r_invoice_title"<?= $Page->invoice_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_invoices_invoice_title"><?= $Page->invoice_title->caption() ?></span></td>
-        <td data-name="invoice_title"<?= $Page->invoice_title->cellAttributes() ?>>
-<span id="el_invoices_invoice_title">
-<span<?= $Page->invoice_title->viewAttributes() ?>>
-<?= $Page->invoice_title->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
     <tr id="r_description"<?= $Page->description->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_invoices_description"><?= $Page->description->caption() ?></span></td>
@@ -151,6 +129,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("invoice_details", explode(",", $Page->getCurrentDetailTable())) && $invoice_details->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("invoice_details", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "InvoiceDetailsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class InvoiceDetailsList extends InvoiceDetails
+class LaboratoryBillingReportList extends LaboratoryBillingReport
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class InvoiceDetailsList extends InvoiceDetails
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "InvoiceDetailsList";
+    public $PageObjName = "LaboratoryBillingReportList";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class InvoiceDetailsList extends InvoiceDetails
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "finvoice_detailslist";
+    public $FormName = "flaboratory_billing_reportlist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "invoicedetailslist";
+    public $CurrentPageName = "laboratorybillingreportlist";
 
     // Page URLs
     public $AddUrl;
@@ -146,12 +146,9 @@ class InvoiceDetailsList extends InvoiceDetails
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->invoice_id->setVisibility();
-        $this->item->setVisibility();
-        $this->quantity->setVisibility();
+        $this->service_name->setVisibility();
         $this->cost->setVisibility();
-        $this->date_created->Visible = false;
-        $this->date_updated->Visible = false;
+        $this->id1->setVisibility();
     }
 
     // Constructor
@@ -162,8 +159,8 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'invoice_details';
-        $this->TableName = 'invoice_details';
+        $this->TableVar = 'laboratory_billing_report';
+        $this->TableName = 'laboratory_billing_report';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -183,26 +180,26 @@ class InvoiceDetailsList extends InvoiceDetails
         // Language object
         $Language = Container("app.language");
 
-        // Table object (invoice_details)
-        if (!isset($GLOBALS["invoice_details"]) || $GLOBALS["invoice_details"]::class == PROJECT_NAMESPACE . "invoice_details") {
-            $GLOBALS["invoice_details"] = &$this;
+        // Table object (laboratory_billing_report)
+        if (!isset($GLOBALS["laboratory_billing_report"]) || $GLOBALS["laboratory_billing_report"]::class == PROJECT_NAMESPACE . "laboratory_billing_report") {
+            $GLOBALS["laboratory_billing_report"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "invoicedetailsadd";
+        $this->AddUrl = "laboratorybillingreportadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "invoicedetailsdelete";
-        $this->MultiUpdateUrl = "invoicedetailsupdate";
+        $this->MultiDeleteUrl = "laboratorybillingreportdelete";
+        $this->MultiUpdateUrl = "laboratorybillingreportupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'invoice_details');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'laboratory_billing_report');
         }
 
         // Start timer
@@ -353,7 +350,7 @@ class InvoiceDetailsList extends InvoiceDetails
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "invoicedetailsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "laboratorybillingreportview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -458,6 +455,9 @@ class InvoiceDetailsList extends InvoiceDetails
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
+            $this->id1->Visible = false;
         }
     }
 
@@ -712,7 +712,7 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "finvoice_detailsgrid";
+            $this->FormName = "flaboratory_billing_reportgrid";
         }
 
         // Set up page action
@@ -847,24 +847,17 @@ class InvoiceDetailsList extends InvoiceDetails
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "invoices") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "invoices"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "invoices") {
-            $masterTbl = Container("invoices");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests_details") {
+            $masterTbl = Container("lab_test_requests_details");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("invoiceslist"); // Return to master page
+                $this->terminate("labtestrequestsdetailslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1076,15 +1069,12 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("finvoice_detailssrch");
+            $savedFilterList = Profile()->getSearchFilters("flaboratory_billing_reportsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->invoice_id->AdvancedSearch->toJson(), ","); // Field invoice_id
-        $filterList = Concat($filterList, $this->item->AdvancedSearch->toJson(), ","); // Field item
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
+        $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
         $filterList = Concat($filterList, $this->cost->AdvancedSearch->toJson(), ","); // Field cost
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+        $filterList = Concat($filterList, $this->id1->AdvancedSearch->toJson(), ","); // Field id1
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1105,7 +1095,7 @@ class InvoiceDetailsList extends InvoiceDetails
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("finvoice_detailssrch", $filters);
+            Profile()->setSearchFilters("flaboratory_billing_reportsrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1132,29 +1122,13 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field invoice_id
-        $this->invoice_id->AdvancedSearch->SearchValue = @$filter["x_invoice_id"];
-        $this->invoice_id->AdvancedSearch->SearchOperator = @$filter["z_invoice_id"];
-        $this->invoice_id->AdvancedSearch->SearchCondition = @$filter["v_invoice_id"];
-        $this->invoice_id->AdvancedSearch->SearchValue2 = @$filter["y_invoice_id"];
-        $this->invoice_id->AdvancedSearch->SearchOperator2 = @$filter["w_invoice_id"];
-        $this->invoice_id->AdvancedSearch->save();
-
-        // Field item
-        $this->item->AdvancedSearch->SearchValue = @$filter["x_item"];
-        $this->item->AdvancedSearch->SearchOperator = @$filter["z_item"];
-        $this->item->AdvancedSearch->SearchCondition = @$filter["v_item"];
-        $this->item->AdvancedSearch->SearchValue2 = @$filter["y_item"];
-        $this->item->AdvancedSearch->SearchOperator2 = @$filter["w_item"];
-        $this->item->AdvancedSearch->save();
-
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
+        // Field service_name
+        $this->service_name->AdvancedSearch->SearchValue = @$filter["x_service_name"];
+        $this->service_name->AdvancedSearch->SearchOperator = @$filter["z_service_name"];
+        $this->service_name->AdvancedSearch->SearchCondition = @$filter["v_service_name"];
+        $this->service_name->AdvancedSearch->SearchValue2 = @$filter["y_service_name"];
+        $this->service_name->AdvancedSearch->SearchOperator2 = @$filter["w_service_name"];
+        $this->service_name->AdvancedSearch->save();
 
         // Field cost
         $this->cost->AdvancedSearch->SearchValue = @$filter["x_cost"];
@@ -1164,21 +1138,13 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->cost->AdvancedSearch->SearchOperator2 = @$filter["w_cost"];
         $this->cost->AdvancedSearch->save();
 
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
+        // Field id1
+        $this->id1->AdvancedSearch->SearchValue = @$filter["x_id1"];
+        $this->id1->AdvancedSearch->SearchOperator = @$filter["z_id1"];
+        $this->id1->AdvancedSearch->SearchCondition = @$filter["v_id1"];
+        $this->id1->AdvancedSearch->SearchValue2 = @$filter["y_id1"];
+        $this->id1->AdvancedSearch->SearchOperator2 = @$filter["w_id1"];
+        $this->id1->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1218,7 +1184,7 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->item;
+        $searchFlds[] = &$this->service_name;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1298,10 +1264,9 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->invoice_id); // invoice_id
-            $this->updateSort($this->item); // item
-            $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->cost); // cost
+            $this->updateSort($this->id1); // id1
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1327,7 +1292,7 @@ class InvoiceDetailsList extends InvoiceDetails
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->invoice_id->setSessionValue("");
+                        $this->id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1335,12 +1300,9 @@ class InvoiceDetailsList extends InvoiceDetails
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->invoice_id->setSort("");
-                $this->item->setSort("");
-                $this->quantity->setSort("");
+                $this->service_name->setSort("");
                 $this->cost->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
+                $this->id1->setSort("");
             }
 
             // Reset start position
@@ -1359,30 +1321,6 @@ class InvoiceDetailsList extends InvoiceDetails
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
-
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1441,61 +1379,7 @@ class InvoiceDetailsList extends InvoiceDetails
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"invoice_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"invoice_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"invoice_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
 
         // Set up list action buttons
@@ -1514,12 +1398,12 @@ class InvoiceDetailsList extends InvoiceDetails
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"finvoice_detailslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_billing_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"finvoice_detailslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_billing_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1556,17 +1440,6 @@ class InvoiceDetailsList extends InvoiceDetails
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["addedit"];
-
-        // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"invoice_details\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1576,10 +1449,9 @@ class InvoiceDetailsList extends InvoiceDetails
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "invoice_id");
-            $this->createColumnOption($option, "item");
-            $this->createColumnOption($option, "quantity");
+            $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "cost");
+            $this->createColumnOption($option, "id1");
         }
 
         // Set up custom actions
@@ -1604,10 +1476,10 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"finvoice_detailssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"flaboratory_billing_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"finvoice_detailssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"flaboratory_billing_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1667,7 +1539,7 @@ class InvoiceDetailsList extends InvoiceDetails
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="finvoice_detailslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flaboratory_billing_reportlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1838,7 +1710,7 @@ class InvoiceDetailsList extends InvoiceDetails
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_invoice_details", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_billing_report", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1899,7 +1771,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_invoice_details",
+            "id" => "r" . $this->RowCount . "_laboratory_billing_report",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2019,12 +1891,9 @@ class InvoiceDetailsList extends InvoiceDetails
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->invoice_id->setDbValue($row['invoice_id']);
-        $this->item->setDbValue($row['item']);
-        $this->quantity->setDbValue($row['quantity']);
+        $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->id1->setDbValue($row['id1']);
     }
 
     // Return a row with default values
@@ -2032,12 +1901,9 @@ class InvoiceDetailsList extends InvoiceDetails
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['invoice_id'] = $this->invoice_id->DefaultValue;
-        $row['item'] = $this->item->DefaultValue;
-        $row['quantity'] = $this->quantity->DefaultValue;
+        $row['service_name'] = $this->service_name->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['id1'] = $this->id1->DefaultValue;
         return $row;
     }
 
@@ -2080,59 +1946,42 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // id
 
-        // invoice_id
-
-        // item
-
-        // quantity
+        // service_name
 
         // cost
 
-        // date_created
-        $this->date_created->CellCssStyle = "white-space: nowrap;";
-
-        // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
+        // id1
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // invoice_id
-            $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
-            $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
-
-            // item
-            $this->item->ViewValue = $this->item->CurrentValue;
-
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+            // service_name
+            $this->service_name->ViewValue = $this->service_name->CurrentValue;
 
             // cost
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
+            // id1
+            $this->id1->ViewValue = $this->id1->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // invoice_id
-            $this->invoice_id->HrefValue = "";
-            $this->invoice_id->TooltipValue = "";
-
-            // item
-            $this->item->HrefValue = "";
-            $this->item->TooltipValue = "";
-
-            // quantity
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
+            // service_name
+            $this->service_name->HrefValue = "";
+            $this->service_name->TooltipValue = "";
 
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
+
+            // id1
+            $this->id1->HrefValue = "";
+            $this->id1->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2153,19 +2002,19 @@ class InvoiceDetailsList extends InvoiceDetails
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"finvoice_detailslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"flaboratory_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"finvoice_detailslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"flaboratory_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"finvoice_detailslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"flaboratory_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2177,7 +2026,7 @@ class InvoiceDetailsList extends InvoiceDetails
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="finvoice_detailslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="flaboratory_billing_reportlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2255,7 +2104,7 @@ class InvoiceDetailsList extends InvoiceDetails
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"finvoice_detailssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"flaboratory_billing_reportsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2343,15 +2192,15 @@ class InvoiceDetailsList extends InvoiceDetails
         $doc->ExportCustom = !$this->pageExporting($doc);
 
         // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "invoices") {
-            $invoices = new InvoicesList();
-            $rsmaster = $invoices->loadRs($this->DbMasterFilter); // Load master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests_details") {
+            $lab_test_requests_details = new LabTestRequestsDetailsList();
+            $rsmaster = $lab_test_requests_details->loadRs($this->DbMasterFilter); // Load master record
             if ($rsmaster) {
                 $exportStyle = $doc->Style;
                 $doc->setStyle("v"); // Change to vertical
                 if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($invoices);
-                    $invoices->exportDocument($doc, $rsmaster);
+                    $doc->setTable($lab_test_requests_details);
+                    $lab_test_requests_details->exportDocument($doc, $rsmaster);
                     $doc->exportEmptyRow();
                     $doc->setTable($this);
                 }
@@ -2391,14 +2240,14 @@ class InvoiceDetailsList extends InvoiceDetails
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "invoices") {
+            if ($masterTblVar == "lab_test_requests_details") {
                 $validMaster = true;
-                $masterTbl = Container("invoices");
-                if (($parm = Get("fk_id", Get("invoice_id"))) !== null) {
+                $masterTbl = Container("lab_test_requests_details");
+                if (($parm = Get("fk_id", Get("id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
-                    $this->invoice_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->invoice_id->setSessionValue($this->invoice_id->QueryStringValue);
-                    $foreignKeys["invoice_id"] = $this->invoice_id->QueryStringValue;
+                    $this->id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->id->setSessionValue($this->id->QueryStringValue);
+                    $foreignKeys["id"] = $this->id->QueryStringValue;
                     if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
@@ -2413,14 +2262,14 @@ class InvoiceDetailsList extends InvoiceDetails
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "invoices") {
+            if ($masterTblVar == "lab_test_requests_details") {
                 $validMaster = true;
-                $masterTbl = Container("invoices");
-                if (($parm = Post("fk_id", Post("invoice_id"))) !== null) {
+                $masterTbl = Container("lab_test_requests_details");
+                if (($parm = Post("fk_id", Post("id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
-                    $this->invoice_id->FormValue = $masterTbl->id->FormValue;
-                    $this->invoice_id->setSessionValue($this->invoice_id->FormValue);
-                    $foreignKeys["invoice_id"] = $this->invoice_id->FormValue;
+                    $this->id->FormValue = $masterTbl->id->FormValue;
+                    $this->id->setSessionValue($this->id->FormValue);
+                    $foreignKeys["id"] = $this->id->FormValue;
                     if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
@@ -2452,9 +2301,9 @@ class InvoiceDetailsList extends InvoiceDetails
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "invoices") {
-                if (!array_key_exists("invoice_id", $foreignKeys)) { // Not current foreign key
-                    $this->invoice_id->setSessionValue("");
+            if ($masterTblVar != "lab_test_requests_details") {
+                if (!array_key_exists("id", $foreignKeys)) { // Not current foreign key
+                    $this->id->setSessionValue("");
                 }
             }
         }
@@ -2657,10 +2506,7 @@ class InvoiceDetailsList extends InvoiceDetails
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add details");
+        //Log("Page Load");
     }
 
     // Page Unload event

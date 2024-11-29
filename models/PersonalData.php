@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "laboratoryminorreportlist";
+    public $CurrentPageName = "laboratorybillingreportgrid";
 
     // Page headings
     public $Heading = "";

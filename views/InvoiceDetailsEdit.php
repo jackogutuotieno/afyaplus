@@ -32,9 +32,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["invoice_id", [fields.invoice_id.visible && fields.invoice_id.required ? ew.Validators.required(fields.invoice_id.caption) : null, ew.Validators.integer], fields.invoice_id.isInvalid],
             ["item", [fields.item.visible && fields.item.required ? ew.Validators.required(fields.item.caption) : null], fields.item.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -73,6 +71,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "invoices") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="invoices">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->invoice_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -90,11 +92,17 @@ loadjs.ready("head", function () {
     <div id="r_invoice_id"<?= $Page->invoice_id->rowAttributes() ?>>
         <label id="elh_invoice_details_invoice_id" for="x_invoice_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->invoice_id->caption() ?><?= $Page->invoice_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->invoice_id->cellAttributes() ?>>
+<?php if ($Page->invoice_id->getSessionValue() != "") { ?>
+<span<?= $Page->invoice_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->invoice_id->getDisplayValue($Page->invoice_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_invoice_id" name="x_invoice_id" value="<?= HtmlEncode($Page->invoice_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_invoice_details_invoice_id">
 <input type="<?= $Page->invoice_id->getInputTextType() ?>" name="x_invoice_id" id="x_invoice_id" data-table="invoice_details" data-field="x_invoice_id" value="<?= $Page->invoice_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->invoice_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->invoice_id->formatPattern()) ?>"<?= $Page->invoice_id->editAttributes() ?> aria-describedby="x_invoice_id_help">
 <?= $Page->invoice_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->invoice_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -130,88 +138,6 @@ loadjs.ready("head", function () {
 <input type="<?= $Page->cost->getInputTextType() ?>" name="x_cost" id="x_cost" data-table="invoice_details" data-field="x_cost" value="<?= $Page->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->cost->formatPattern()) ?>"<?= $Page->cost->editAttributes() ?> aria-describedby="x_cost_help">
 <?= $Page->cost->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->cost->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <label id="elh_invoice_details_date_created" for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_created->caption() ?><?= $Page->date_created->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_invoice_details_date_created">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="invoice_details" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?> aria-describedby="x_date_created_help">
-<?= $Page->date_created->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage() ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["finvoice_detailsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("finvoice_detailsedit", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <label id="elh_invoice_details_date_updated" for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><?= $Page->date_updated->caption() ?><?= $Page->date_updated->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_invoice_details_date_updated">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="invoice_details" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?> aria-describedby="x_date_updated_help">
-<?= $Page->date_updated->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage() ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["finvoice_detailsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("finvoice_detailsedit", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>
