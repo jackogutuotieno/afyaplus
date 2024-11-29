@@ -91,7 +91,7 @@ class LabTestRequestsDetails extends DbTable
         $this->DetailAdd = true; // Allow detail add
         $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
-        $this->ShowMultipleDetails = true; // Show multiple details
+        $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
@@ -425,10 +425,6 @@ class LabTestRequestsDetails extends DbTable
         $detailUrl = "";
         if ($this->getCurrentDetailTable() == "lab_test_requests_queue") {
             $detailUrl = Container("lab_test_requests_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "laboratory_billing_report") {
-            $detailUrl = Container("laboratory_billing_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {

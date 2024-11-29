@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class LaboratoryBillingReportGrid extends LaboratoryBillingReport
+class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LaboratoryBillingReportGrid";
+    public $PageObjName = "LaboratoryBillingReportDetailsGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "flaboratory_billing_reportgrid";
+    public $FormName = "flaboratory_billing_report_detailsgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "laboratorybillingreportgrid";
+    public $CurrentPageName = "laboratorybillingreportdetailsgrid";
 
     // Page URLs
     public $AddUrl;
@@ -136,7 +136,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
+        $this->lab_test_request_id->Visible = false;
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
     }
@@ -149,8 +149,8 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'laboratory_billing_report';
-        $this->TableName = 'laboratory_billing_report';
+        $this->TableVar = 'laboratory_billing_report_details';
+        $this->TableName = 'laboratory_billing_report_details';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -174,15 +174,15 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         // Language object
         $Language = Container("app.language");
 
-        // Table object (laboratory_billing_report)
-        if (!isset($GLOBALS["laboratory_billing_report"]) || $GLOBALS["laboratory_billing_report"]::class == PROJECT_NAMESPACE . "laboratory_billing_report") {
-            $GLOBALS["laboratory_billing_report"] = &$this;
+        // Table object (laboratory_billing_report_details)
+        if (!isset($GLOBALS["laboratory_billing_report_details"]) || $GLOBALS["laboratory_billing_report_details"]::class == PROJECT_NAMESPACE . "laboratory_billing_report_details") {
+            $GLOBALS["laboratory_billing_report_details"] = &$this;
         }
-        $this->AddUrl = "laboratorybillingreportadd";
+        $this->AddUrl = "laboratorybillingreportdetailsadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'laboratory_billing_report');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'laboratory_billing_report_details');
         }
 
         // Start timer
@@ -624,7 +624,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "flaboratory_billing_reportgrid";
+            $this->FormName = "flaboratory_billing_report_detailsgrid";
         }
 
         // Set up page action
@@ -697,24 +697,17 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_requests") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests") {
-            $masterTbl = Container("lab_test_requests");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "laboratory_billing_report") {
+            $masterTbl = Container("laboratory_billing_report");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestrequestslist"); // Return to master page
+                $this->terminate("laboratorybillingreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1098,14 +1091,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_lab_test_request_id") &&
-            $CurrentForm->hasValue("o_lab_test_request_id") &&
-            $this->lab_test_request_id->CurrentValue != $this->lab_test_request_id->DefaultValue &&
-            !($this->lab_test_request_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->lab_test_request_id->CurrentValue == $this->lab_test_request_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_service_name") &&
             $CurrentForm->hasValue("o_service_name") &&
             $this->service_name->CurrentValue != $this->service_name->DefaultValue &&
@@ -1464,7 +1449,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_billing_report", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_billing_report_details", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1552,7 +1537,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_laboratory_billing_report",
+            "id" => "r" . $this->RowCount . "_laboratory_billing_report_details",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1593,19 +1578,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'lab_test_request_id' first before field var 'x_lab_test_request_id'
-        $val = $CurrentForm->hasValue("lab_test_request_id") ? $CurrentForm->getValue("lab_test_request_id") : $CurrentForm->getValue("x_lab_test_request_id");
-        if (!$this->lab_test_request_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->lab_test_request_id->Visible = false; // Disable update for API request
-            } else {
-                $this->lab_test_request_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_lab_test_request_id")) {
-            $this->lab_test_request_id->setOldValue($CurrentForm->getValue("o_lab_test_request_id"));
-        }
-
         // Check field name 'service_name' first before field var 'x_service_name'
         $val = $CurrentForm->hasValue("service_name") ? $CurrentForm->getValue("service_name") : $CurrentForm->getValue("x_service_name");
         if (!$this->service_name->IsDetailKey) {
@@ -1640,7 +1612,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->FormValue;
         $this->service_name->CurrentValue = $this->service_name->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
     }
@@ -1825,10 +1796,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
-
             // service_name
             $this->service_name->HrefValue = "";
             $this->service_name->TooltipValue = "";
@@ -1838,21 +1805,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
             $this->cost->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
-
-            // lab_test_request_id
-            $this->lab_test_request_id->setupEditAttributes();
-            if ($this->lab_test_request_id->getSessionValue() != "") {
-                $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
-                $this->lab_test_request_id->OldValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-            } else {
-                $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-                if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-                    $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
-                }
-            }
 
             // service_name
             $this->service_name->setupEditAttributes();
@@ -1875,9 +1827,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
             // id
             $this->id->HrefValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-
             // service_name
             $this->service_name->HrefValue = "";
 
@@ -1887,21 +1836,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
-
-            // lab_test_request_id
-            $this->lab_test_request_id->setupEditAttributes();
-            if ($this->lab_test_request_id->getSessionValue() != "") {
-                $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
-                $this->lab_test_request_id->OldValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-            } else {
-                $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-                $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-                if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-                    $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
-                }
-            }
 
             // service_name
             $this->service_name->setupEditAttributes();
@@ -1923,9 +1857,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
 
             // id
             $this->id->HrefValue = "";
-
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -1964,14 +1895,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
                 if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
-            }
-            if ($this->lab_test_request_id->Visible && $this->lab_test_request_id->Required) {
-                if (!$this->lab_test_request_id->IsDetailKey && EmptyValue($this->lab_test_request_id->FormValue)) {
-                    $this->lab_test_request_id->addErrorMessage(str_replace("%s", $this->lab_test_request_id->caption(), $this->lab_test_request_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->lab_test_request_id->FormValue)) {
-                $this->lab_test_request_id->addErrorMessage($this->lab_test_request_id->getErrorMessage(false));
             }
             if ($this->service_name->Visible && $this->service_name->Required) {
                 if (!$this->service_name->IsDetailKey && EmptyValue($this->service_name->FormValue)) {
@@ -2136,12 +2059,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         global $Security;
         $rsnew = [];
 
-        // lab_test_request_id
-        if ($this->lab_test_request_id->getSessionValue() != "") {
-            $this->lab_test_request_id->ReadOnly = true;
-        }
-        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, $this->lab_test_request_id->ReadOnly);
-
         // service_name
         $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, $this->service_name->ReadOnly);
 
@@ -2156,9 +2073,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
-            $this->lab_test_request_id->CurrentValue = $row['lab_test_request_id'];
-        }
         if (isset($row['service_name'])) { // service_name
             $this->service_name->CurrentValue = $row['service_name'];
         }
@@ -2173,7 +2087,7 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "lab_test_requests") {
+        if ($this->getCurrentMasterTable() == "laboratory_billing_report") {
             $this->lab_test_request_id->Visible = true; // Need to insert foreign key
             $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->getSessionValue();
         }
@@ -2183,28 +2097,6 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->CurrentValue;
-            $masterTable = Container("lab_test_requests");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_requests") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2246,14 +2138,16 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
         global $Security;
         $rsnew = [];
 
-        // lab_test_request_id
-        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, false);
-
         // service_name
         $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, false);
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
+
+        // lab_test_request_id
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $rsnew['lab_test_request_id'] = $this->lab_test_request_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2263,14 +2157,14 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
-            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
-        }
         if (isset($row['service_name'])) { // service_name
             $this->service_name->setFormValue($row['service_name']);
         }
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);
+        }
+        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
+            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
         }
     }
 
@@ -2279,8 +2173,8 @@ class LaboratoryBillingReportGrid extends LaboratoryBillingReport
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "lab_test_requests") {
-            $masterTbl = Container("lab_test_requests");
+        if ($masterTblVar == "laboratory_billing_report") {
+            $masterTbl = Container("laboratory_billing_report");
             $this->lab_test_request_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;

@@ -33,15 +33,17 @@ class LaboratoryBillingReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "service_name", type: "string")]
-    private string $serviceName;
+    #[Column(name: "patient_id", type: "integer")]
+    private int $patientId;
 
-    #[Column(type: "float")]
-    private float $cost;
+    #[Column(name: "visit_id", type: "integer")]
+    private int $visitId;
 
-    #[Column(type: "integer")]
-    #[GeneratedValue]
-    private int $id1;
+    #[Column(name: "date_created", type: "datetime")]
+    private DateTime $dateCreated;
+
+    #[Column(name: "date_updated", type: "datetime")]
+    private DateTime $dateUpdated;
 
     public function getId(): int
     {
@@ -54,36 +56,47 @@ class LaboratoryBillingReport extends AbstractEntity
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getPatientId(): int
     {
-        return HtmlDecode($this->serviceName);
+        return $this->patientId;
     }
 
-    public function setServiceName(string $value): static
+    public function setPatientId(int $value): static
     {
-        $this->serviceName = RemoveXss($value);
+        $this->patientId = $value;
         return $this;
     }
 
-    public function getCost(): float
+    public function getVisitId(): int
     {
-        return $this->cost;
+        return $this->visitId;
     }
 
-    public function setCost(float $value): static
+    public function setVisitId(int $value): static
     {
-        $this->cost = $value;
+        $this->visitId = $value;
         return $this;
     }
 
-    public function getId1(): int
+    public function getDateCreated(): DateTime
     {
-        return $this->id1;
+        return $this->dateCreated;
     }
 
-    public function setId1(int $value): static
+    public function setDateCreated(DateTime $value): static
     {
-        $this->id1 = $value;
+        $this->dateCreated = $value;
+        return $this;
+    }
+
+    public function getDateUpdated(): DateTime
+    {
+        return $this->dateUpdated;
+    }
+
+    public function setDateUpdated(DateTime $value): static
+    {
+        $this->dateUpdated = $value;
         return $this;
     }
 }

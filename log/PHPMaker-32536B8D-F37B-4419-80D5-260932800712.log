@@ -24,6 +24,7 @@ C:\wamp64\www\afyaplus\controllers\LabTestRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LabTestRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingReportController.php
+C:\wamp64\www\afyaplus\controllers\LaboratoryBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryMinorReportController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryreportsController.php
 C:\wamp64\www\afyaplus\controllers\MedicalSchemesController.php
@@ -183,6 +184,9 @@ C:\wamp64\www\afyaplus\models\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\models\LaboratoryBilling.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReport.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetails.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
@@ -447,6 +451,7 @@ C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsQueue.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryBilling.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryBillingReport.php
+C:\wamp64\www\afyaplus\src\Entity\LaboratoryBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\src\Entity\Laboratoryreport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicalScheme.php
@@ -669,8 +674,11 @@ C:\wamp64\www\afyaplus\views\LabTestRequestsQueueMaster.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\LabTestRequestsView.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingList.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportList.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryreportsList.php
 C:\wamp64\www\afyaplus\views\Login.php

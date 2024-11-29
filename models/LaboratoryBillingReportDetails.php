@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for laboratory_billing_report
+ * Table class for laboratory_billing_report_details
  */
-class LaboratoryBillingReport extends DbTable
+class LaboratoryBillingReportDetails extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,10 +47,9 @@ class LaboratoryBillingReport extends DbTable
 
     // Fields
     public $id;
-    public $patient_id;
-    public $visit_id;
-    public $date_created;
-    public $date_updated;
+    public $lab_test_request_id;
+    public $service_name;
+    public $cost;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -63,14 +62,14 @@ class LaboratoryBillingReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "laboratory_billing_report";
-        $this->TableName = 'laboratory_billing_report';
+        $this->TableVar = "laboratory_billing_report_details";
+        $this->TableName = 'laboratory_billing_report_details';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "laboratory_billing_report";
+        $this->UpdateTable = "laboratory_billing_report_details";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -119,119 +118,87 @@ class LaboratoryBillingReport extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_id
-        $this->patient_id = new DbField(
+        // lab_test_request_id
+        $this->lab_test_request_id = new DbField(
             $this, // Table
-            'x_patient_id', // Variable name
-            'patient_id', // Name
-            '`patient_id`', // Expression
-            '`patient_id`', // Basic search expression
+            'x_lab_test_request_id', // Variable name
+            'lab_test_request_id', // Name
+            '`lab_test_request_id`', // Expression
+            '`lab_test_request_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`patient_id`', // Virtual expression
+            '`lab_test_request_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->patient_id->InputTextType = "text";
-        $this->patient_id->Raw = true;
-        $this->patient_id->Nullable = false; // NOT NULL field
-        $this->patient_id->Required = true; // Required field
-        $this->patient_id->setSelectMultiple(false); // Select one
-        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_id'] = &$this->patient_id;
+        $this->lab_test_request_id->InputTextType = "text";
+        $this->lab_test_request_id->Raw = true;
+        $this->lab_test_request_id->IsForeignKey = true; // Foreign key field
+        $this->lab_test_request_id->Nullable = false; // NOT NULL field
+        $this->lab_test_request_id->Required = true; // Required field
+        $this->lab_test_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lab_test_request_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['lab_test_request_id'] = &$this->lab_test_request_id;
 
-        // visit_id
-        $this->visit_id = new DbField(
+        // service_name
+        $this->service_name = new DbField(
             $this, // Table
-            'x_visit_id', // Variable name
-            'visit_id', // Name
-            '`visit_id`', // Expression
-            '`visit_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_service_name', // Variable name
+            'service_name', // Name
+            '`service_name`', // Expression
+            '`service_name`', // Basic search expression
+            200, // Type
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`visit_id`', // Virtual expression
+            '`service_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->visit_id->InputTextType = "text";
-        $this->visit_id->Raw = true;
-        $this->visit_id->Nullable = false; // NOT NULL field
-        $this->visit_id->Required = true; // Required field
-        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_id'] = &$this->visit_id;
+        $this->service_name->InputTextType = "text";
+        $this->service_name->Nullable = false; // NOT NULL field
+        $this->service_name->Required = true; // Required field
+        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['service_name'] = &$this->service_name;
 
-        // date_created
-        $this->date_created = new DbField(
+        // cost
+        $this->cost = new DbField(
             $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            7, // Date/Time format
+            'x_cost', // Variable name
+            'cost', // Name
+            '`cost`', // Expression
+            '`cost`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`date_created`', // Virtual expression
+            '`cost`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            7, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
+        $this->cost->InputTextType = "text";
+        $this->cost->Raw = true;
+        $this->cost->Nullable = false; // NOT NULL field
+        $this->cost->Required = true; // Required field
+        $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['cost'] = &$this->cost;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -291,30 +258,86 @@ class LaboratoryBillingReport extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
+    // Current master table name
+    public function getCurrentMasterTable()
     {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
-    public function setCurrentDetailTable($v)
+    public function setCurrentMasterTable($v)
     {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
     }
 
-    // Get detail url
-    public function getDetailUrl()
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
     {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "laboratory_billing_report_details") {
-            $detailUrl = Container("laboratory_billing_report_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "laboratory_billing_report") {
+            $masterTable = Container("laboratory_billing_report");
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_request_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
         }
-        if ($detailUrl == "") {
-            $detailUrl = "laboratorybillingreportlist";
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "laboratory_billing_report") {
+            $masterTable = Container("laboratory_billing_report");
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_request_id, $this->lab_test_request_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
         }
-        return $detailUrl;
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "laboratory_billing_report":
+                $key = $keys["lab_test_request_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_request_id"], $this->lab_test_request_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "laboratory_billing_report":
+                return GetKeyFilter($this->lab_test_request_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -326,7 +349,7 @@ class LaboratoryBillingReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "laboratory_billing_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "laboratory_billing_report_details";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -778,10 +801,9 @@ class LaboratoryBillingReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_id->DbValue = $row['patient_id'];
-        $this->visit_id->DbValue = $row['visit_id'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
+        $this->lab_test_request_id->DbValue = $row['lab_test_request_id'];
+        $this->service_name->DbValue = $row['service_name'];
+        $this->cost->DbValue = $row['cost'];
     }
 
     // Delete uploaded files
@@ -855,7 +877,7 @@ class LaboratoryBillingReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("laboratorybillingreportlist");
+        return $_SESSION[$name] ?? GetUrl("laboratorybillingreportdetailslist");
     }
 
     // Set return page URL
@@ -869,9 +891,9 @@ class LaboratoryBillingReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "laboratorybillingreportview" => $Language->phrase("View"),
-            "laboratorybillingreportedit" => $Language->phrase("Edit"),
-            "laboratorybillingreportadd" => $Language->phrase("Add"),
+            "laboratorybillingreportdetailsview" => $Language->phrase("View"),
+            "laboratorybillingreportdetailsedit" => $Language->phrase("Edit"),
+            "laboratorybillingreportdetailsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -879,18 +901,18 @@ class LaboratoryBillingReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "laboratorybillingreportlist";
+        return "laboratorybillingreportdetailslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "LaboratoryBillingReportView",
-            Config("API_ADD_ACTION") => "LaboratoryBillingReportAdd",
-            Config("API_EDIT_ACTION") => "LaboratoryBillingReportEdit",
-            Config("API_DELETE_ACTION") => "LaboratoryBillingReportDelete",
-            Config("API_LIST_ACTION") => "LaboratoryBillingReportList",
+            Config("API_VIEW_ACTION") => "LaboratoryBillingReportDetailsView",
+            Config("API_ADD_ACTION") => "LaboratoryBillingReportDetailsAdd",
+            Config("API_EDIT_ACTION") => "LaboratoryBillingReportDetailsEdit",
+            Config("API_DELETE_ACTION") => "LaboratoryBillingReportDetailsDelete",
+            Config("API_LIST_ACTION") => "LaboratoryBillingReportDetailsList",
             default => ""
         };
     }
@@ -910,16 +932,16 @@ class LaboratoryBillingReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "laboratorybillingreportlist";
+        return "laboratorybillingreportdetailslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportview", $parm);
+            $url = $this->keyUrl("laboratorybillingreportdetailsview", $parm);
         } else {
-            $url = $this->keyUrl("laboratorybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("laboratorybillingreportdetailsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -928,9 +950,9 @@ class LaboratoryBillingReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "laboratorybillingreportadd?" . $parm;
+            $url = "laboratorybillingreportdetailsadd?" . $parm;
         } else {
-            $url = "laboratorybillingreportadd";
+            $url = "laboratorybillingreportdetailsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -938,36 +960,28 @@ class LaboratoryBillingReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportedit", $parm);
-        } else {
-            $url = $this->keyUrl("laboratorybillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("laboratorybillingreportdetailsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("laboratorybillingreportlist", "action=edit");
+        $url = $this->keyUrl("laboratorybillingreportdetailslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportadd", $parm);
-        } else {
-            $url = $this->keyUrl("laboratorybillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("laboratorybillingreportdetailsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("laboratorybillingreportlist", "action=copy");
+        $url = $this->keyUrl("laboratorybillingreportdetailslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -977,13 +991,17 @@ class LaboratoryBillingReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("laboratorybillingreportdelete", $parm);
+            return $this->keyUrl("laboratorybillingreportdetailsdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "laboratory_billing_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_request_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1143,17 +1161,16 @@ class LaboratoryBillingReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
+        $this->service_name->setDbValue($row['service_name']);
+        $this->cost->setDbValue($row['cost']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "LaboratoryBillingReportList";
+        $listPage = "LaboratoryBillingReportDetailsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1179,71 +1196,41 @@ class LaboratoryBillingReport extends DbTable
 
         // id
 
-        // patient_id
+        // lab_test_request_id
 
-        // visit_id
+        // service_name
 
-        // date_created
-
-        // date_updated
+        // cost
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // patient_id
-        $curVal = strval($this->patient_id->CurrentValue);
-        if ($curVal != "") {
-            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            if ($this->patient_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                } else {
-                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                }
-            }
-        } else {
-            $this->patient_id->ViewValue = null;
-        }
+        // lab_test_request_id
+        $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+        $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
 
-        // visit_id
-        $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-        $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        // service_name
+        $this->service_name->ViewValue = $this->service_name->CurrentValue;
 
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+        // cost
+        $this->cost->ViewValue = $this->cost->CurrentValue;
+        $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_id
-        $this->patient_id->HrefValue = "";
-        $this->patient_id->TooltipValue = "";
+        // lab_test_request_id
+        $this->lab_test_request_id->HrefValue = "";
+        $this->lab_test_request_id->TooltipValue = "";
 
-        // visit_id
-        $this->visit_id->HrefValue = "";
-        $this->visit_id->TooltipValue = "";
+        // service_name
+        $this->service_name->HrefValue = "";
+        $this->service_name->TooltipValue = "";
 
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
+        // cost
+        $this->cost->HrefValue = "";
+        $this->cost->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1264,27 +1251,35 @@ class LaboratoryBillingReport extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // patient_id
-        $this->patient_id->setupEditAttributes();
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        // lab_test_request_id
+        $this->lab_test_request_id->setupEditAttributes();
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
+            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+        } else {
+            $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
+            if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
+                $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+            }
         }
 
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+        // service_name
+        $this->service_name->setupEditAttributes();
+        if (!$this->service_name->Raw) {
+            $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
+        }
+        $this->service_name->EditValue = $this->service_name->CurrentValue;
+        $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
 
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+        // cost
+        $this->cost->setupEditAttributes();
+        $this->cost->EditValue = $this->cost->CurrentValue;
+        $this->cost->PlaceHolder = RemoveHtml($this->cost->caption());
+        if (strval($this->cost->EditValue) != "" && is_numeric($this->cost->EditValue)) {
+            $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1293,11 +1288,19 @@ class LaboratoryBillingReport extends DbTable
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->cost->CurrentValue)) {
+                $this->cost->Total += $this->cost->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->cost->CurrentValue = $this->cost->Total;
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
+            $this->cost->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1315,16 +1318,14 @@ class LaboratoryBillingReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->lab_test_request_id);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->cost);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->lab_test_request_id);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->cost);
                 }
                 $doc->endExportRow();
             }
@@ -1343,6 +1344,7 @@ class LaboratoryBillingReport extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1352,16 +1354,14 @@ class LaboratoryBillingReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->lab_test_request_id);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->cost);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->lab_test_request_id);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->cost);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1370,6 +1370,21 @@ class LaboratoryBillingReport extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
+            }
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = RowType::AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->id, '');
+                $doc->exportAggregate($this->lab_test_request_id, '');
+                $doc->exportAggregate($this->service_name, '');
+                $doc->exportAggregate($this->cost, 'TOTAL');
+                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {

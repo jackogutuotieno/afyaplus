@@ -42,84 +42,9 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
-<?php if ($Page->SearchOptions->visible()) { ?>
-<?php $Page->SearchOptions->render("body") ?>
-<?php } ?>
-<?php if ($Page->FilterOptions->visible()) { ?>
-<?php $Page->FilterOptions->render("body") ?>
-<?php } ?>
 </div>
-<?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests_details") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/LabTestRequestsDetailsMaster.php";
-    }
-}
-?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="flaboratory_billing_reportsrch" id="flaboratory_billing_reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="flaboratory_billing_reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
-<script>
-var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { laboratory_billing_report: currentTable } });
-var currentForm;
-var flaboratory_billing_reportsrch, currentSearchForm, currentAdvancedSearchForm;
-loadjs.ready(["wrapper", "head"], function () {
-    let $ = jQuery,
-        fields = currentTable.fields;
-
-    // Form object for search
-    let form = new ew.FormBuilder()
-        .setId("flaboratory_billing_reportsrch")
-        .setPageId("list")
-<?php if ($Page->UseAjaxActions) { ?>
-        .setSubmitWithFetch(true)
-<?php } ?>
-
-        // Dynamic selection lists
-        .setLists({
-        })
-
-        // Filters
-        .setFilterList(<?= $Page->getFilterList() ?>)
-        .build();
-    window[form.id] = form;
-    currentSearchForm = form;
-    loadjs.done(form.id);
-});
-</script>
-<input type="hidden" name="cmd" value="search">
-<?php if ($Security->canSearch()) { ?>
-<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
-<div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0">
-    <div class="col-sm-auto px-0 pe-sm-2">
-        <div class="ew-basic-search input-group">
-            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
-            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
-            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
-                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-auto mb-3">
-        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-    </div>
-</div>
-</div><!-- /.ew-extended-search -->
-<?php } ?>
-<?php } ?>
-</div><!-- /.ew-search-panel -->
-</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -151,10 +76,6 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "lab_test_requests_details" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests_details">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->id->getSessionValue()) ?>">
-<?php } ?>
 <div id="gmp_laboratory_billing_report" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_laboratory_billing_reportlist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -173,14 +94,17 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_id" class="laboratory_billing_report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->service_name->Visible) { // service_name ?>
-        <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_laboratory_billing_report_service_name" class="laboratory_billing_report_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+        <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_patient_id" class="laboratory_billing_report_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->cost->Visible) { // cost ?>
-        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_laboratory_billing_report_cost" class="laboratory_billing_report_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
+<?php if ($Page->visit_id->Visible) { // visit_id ?>
+        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_visit_id" class="laboratory_billing_report_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->id1->Visible) { // id1 ?>
-        <th data-name="id1" class="<?= $Page->id1->headerCellClass() ?>"><div id="elh_laboratory_billing_report_id1" class="laboratory_billing_report_id1"><?= $Page->renderFieldHeader($Page->id1) ?></div></th>
+<?php if ($Page->date_created->Visible) { // date_created ?>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_laboratory_billing_report_date_created" class="laboratory_billing_report_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_laboratory_billing_report_date_updated" class="laboratory_billing_report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -218,27 +142,35 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->service_name->Visible) { // service_name ?>
-        <td data-name="service_name"<?= $Page->service_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_service_name" class="el_laboratory_billing_report_service_name">
-<span<?= $Page->service_name->viewAttributes() ?>>
-<?= $Page->service_name->getViewValue() ?></span>
+    <?php if ($Page->patient_id->Visible) { // patient_id ?>
+        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_patient_id" class="el_laboratory_billing_report_patient_id">
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<?= $Page->patient_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->cost->Visible) { // cost ?>
-        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_cost" class="el_laboratory_billing_report_cost">
-<span<?= $Page->cost->viewAttributes() ?>>
-<?= $Page->cost->getViewValue() ?></span>
+    <?php if ($Page->visit_id->Visible) { // visit_id ?>
+        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_visit_id" class="el_laboratory_billing_report_visit_id">
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->id1->Visible) { // id1 ?>
-        <td data-name="id1"<?= $Page->id1->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_id1" class="el_laboratory_billing_report_id1">
-<span<?= $Page->id1->viewAttributes() ?>>
-<?= $Page->id1->getViewValue() ?></span>
+    <?php if ($Page->date_created->Visible) { // date_created ?>
+        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_date_created" class="el_laboratory_billing_report_date_created">
+<span<?= $Page->date_created->viewAttributes() ?>>
+<?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_date_updated" class="el_laboratory_billing_report_date_updated">
+<span<?= $Page->date_updated->viewAttributes() ?>>
+<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

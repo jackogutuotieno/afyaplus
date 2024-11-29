@@ -130,6 +130,7 @@ return [
     "patient_queue" => \DI\create(PatientQueue::class),
     "laboratory_minor_report" => \DI\create(LaboratoryMinorReport::class),
     "laboratory_billing_report" => \DI\create(LaboratoryBillingReport::class),
+    "laboratory_billing_report_details" => \DI\create(LaboratoryBillingReportDetails::class),
 
     // User table
     "usertable" => \DI\get("users"),

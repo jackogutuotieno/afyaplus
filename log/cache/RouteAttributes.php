@@ -127,6 +127,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -252,6 +253,11 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1471,6 +1477,7 @@
                 '/invoicesdelete[/{id}]',
                 '/laboratorybillinglist[/{id}]',
                 '/laboratorybillingreportlist[/{id}]',
+                '/laboratorybillingreportdetailslist[/{id}]',
                 '/laboratoryminorreportlist[/{id}]',
                 '/laboratoryreportslist[/{id}]',
                 '/labspecimenslist[/{id}]',
@@ -1708,6 +1715,7 @@
                 'PHPMaker2024\\afyaplus\\InvoicesController:delete',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingController:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportController:list',
+                'PHPMaker2024\\afyaplus\\LaboratoryBillingReportDetailsController:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryMinorReportController:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryreportsController:list',
                 'PHPMaker2024\\afyaplus\\LabSpecimensController:list',
@@ -1886,6 +1894,9 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2650,6 +2661,7 @@
                 'delete.invoices',
                 'list.laboratory_billing',
                 'list.laboratory_billing_report',
+                'list.laboratory_billing_report_details',
                 'list.laboratory_minor_report',
                 'list.laboratoryreports',
                 'list.lab_specimens',
@@ -2828,6 +2840,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -3302,6 +3315,7 @@
         $o[232],
         $o[233],
         $o[234],
+        $o[235],
     ],
     []
 );

@@ -478,7 +478,16 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","4","840"],
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","7","840"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report","7","840"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report_details","7","0"]];
 
 /**
  * Tables
@@ -540,4 +549,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["Appointments","Appointments","Patients Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointments"],
     ["patient_queue","patient_queue","Patient Flow",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientqueuelist"],
     ["laboratory_minor_report","laboratory_minor_report","laboratory minor report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryminorreportlist"],
-    ["laboratory_billing_report","laboratory_billing_report","laboratory billing report",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportlist"]];
+    ["laboratory_billing_report","laboratory_billing_report","Laboratory Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportlist"],
+    ["laboratory_billing_report_details","laboratory_billing_report_details","Laboratory Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportdetailslist"]];

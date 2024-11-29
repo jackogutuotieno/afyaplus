@@ -2,9 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="174">
-      <phrase id="menutext" value="laboratory billing report" />
-    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -130,6 +127,15 @@
     </menu>
     <menu id="20">
       <phrase id="menutext" value="medicine dispensation details" />
+    </menu>
+    <menu id="236">
+      <phrase id="menutext" value="Billing" />
+    </menu>
+    <menu id="174">
+      <phrase id="menutext" value="Laboratory" />
+    </menu>
+    <menu id="175">
+      <phrase id="menutext" value="Laboratory Bill" />
     </menu>
     <menu id="53">
       <phrase id="menutext" value="Financials" />
@@ -1690,18 +1696,36 @@
       </field>
     </table>
     <table id="laboratory_billing_report">
-      <phrase id="tblcaption" value="laboratory billing report" />
+      <phrase id="tblcaption" value="Laboratory Billing" />
       <field id="id">
-        <phrase id="fldcaption" value="request_details_id" />
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="visit_id">
+        <phrase id="fldcaption" value="Visit ID" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Date Added" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="laboratory_billing_report_details">
+      <phrase id="tblcaption" value="Laboratory Bill" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="lab_test_request_id">
+        <phrase id="fldcaption" value="lab test request id" />
       </field>
       <field id="service_name">
-        <phrase id="fldcaption" value="service name" />
+        <phrase id="fldcaption" value="Test Name" />
       </field>
       <field id="cost">
-        <phrase id="fldcaption" value="cost" />
-      </field>
-      <field id="id1">
-        <phrase id="fldcaption" value="lab_request_id" />
+        <phrase id="fldcaption" value="Cost (Kshs)" />
       </field>
     </table>
   </project>
