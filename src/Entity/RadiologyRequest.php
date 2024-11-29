@@ -33,17 +33,11 @@ class RadiologyRequest extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "test_title", type: "string")]
-    private string $testTitle;
-
     #[Column(name: "patient_id", type: "integer")]
     private int $patientId;
 
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
-
-    #[Column(type: "string")]
-    private string $status;
 
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
@@ -54,11 +48,6 @@ class RadiologyRequest extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
-    public function __construct()
-    {
-        $this->status = "Pending";
-    }
-
     public function getId(): int
     {
         return $this->id;
@@ -67,17 +56,6 @@ class RadiologyRequest extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getTestTitle(): string
-    {
-        return HtmlDecode($this->testTitle);
-    }
-
-    public function setTestTitle(string $value): static
-    {
-        $this->testTitle = RemoveXss($value);
         return $this;
     }
 
@@ -100,17 +78,6 @@ class RadiologyRequest extends AbstractEntity
     public function setVisitId(int $value): static
     {
         $this->visitId = $value;
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return HtmlDecode($this->status);
-    }
-
-    public function setStatus(string $value): static
-    {
-        $this->status = RemoveXss($value);
         return $this;
     }
 

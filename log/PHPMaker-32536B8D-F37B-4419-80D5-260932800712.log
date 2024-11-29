@@ -314,6 +314,7 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsEdit.php
+C:\wamp64\www\afyaplus\models\RadiologyRequestsGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsList.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueue.php
 C:\wamp64\www\afyaplus\models\RadiologyRequestsQueueAdd.php
@@ -770,6 +771,7 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsEdit.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsDetailsView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsEdit.php
+C:\wamp64\www\afyaplus\views\RadiologyRequestsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueAdd.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueDelete.php

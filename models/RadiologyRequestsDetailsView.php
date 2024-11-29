@@ -142,7 +142,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $this->id->setVisibility();
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -559,6 +558,9 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -691,7 +693,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Copy
         $item = &$option->add("copy");
@@ -701,7 +703,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         } else {
             $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
         }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd() && $this->showOptionLink("add");
+        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
 
         // Delete
         $item = &$option->add("delete");
@@ -710,7 +712,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete");
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
 
         // Set up action default
         $option = $options["action"];
@@ -818,7 +820,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -830,7 +831,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -860,8 +860,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
 
         // service_id
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -876,12 +874,27 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
             $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
 
             // service_id
-            $this->service_id->ViewValue = $this->service_id->CurrentValue;
-            $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->service_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+                if ($this->service_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                    } else {
+                        $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -902,10 +915,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1082,16 +1091,6 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1116,6 +1115,8 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

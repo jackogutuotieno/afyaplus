@@ -1,0 +1,4 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-11-29 06:09:50",/afyaplus/login,6,login,::1,,,,
+"2024-11-29 06:44:35",/afyaplus/logout,6,logout,::1,,,,
+"2024-11-29 06:44:49",/afyaplus/login,1,login,::1,,,,

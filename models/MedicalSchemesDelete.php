@@ -121,12 +121,11 @@ class MedicalSchemesDelete extends MedicalSchemes
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->company->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
         $this->physical_address->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -431,25 +430,6 @@ class MedicalSchemesDelete extends MedicalSchemes
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
 
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("medicalschemeslist"); // Return to list
-            return;
-        }
-
         // Get action
         if (IsApi()) {
             $this->CurrentAction = "delete"; // Delete record directly
@@ -623,7 +603,6 @@ class MedicalSchemesDelete extends MedicalSchemes
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -637,7 +616,6 @@ class MedicalSchemesDelete extends MedicalSchemes
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -665,8 +643,6 @@ class MedicalSchemesDelete extends MedicalSchemes
 
         // physical_address
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -688,10 +664,6 @@ class MedicalSchemesDelete extends MedicalSchemes
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -700,29 +672,37 @@ class MedicalSchemesDelete extends MedicalSchemes
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // company
             $this->company->HrefValue = "";
             $this->company->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
             $this->email_address->TooltipValue = "";
 
             // physical_address
             $this->physical_address->HrefValue = "";
             $this->physical_address->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -836,16 +816,6 @@ class MedicalSchemesDelete extends MedicalSchemes
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

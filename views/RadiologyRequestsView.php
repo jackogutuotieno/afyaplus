@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->test_title->Visible) { // test_title ?>
-    <tr id="r_test_title"<?= $Page->test_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_test_title"><?= $Page->test_title->caption() ?></span></td>
-        <td data-name="test_title"<?= $Page->test_title->cellAttributes() ?>>
-<span id="el_radiology_requests_test_title">
-<span<?= $Page->test_title->viewAttributes() ?>>
-<?= $Page->test_title->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <tr id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_patient_id"><?= $Page->patient_id->caption() ?></span></td>
@@ -80,17 +69,6 @@ loadjs.ready("head", function () {
 <span id="el_radiology_requests_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_status"><?= $Page->status->caption() ?></span></td>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el_radiology_requests_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     </tr>

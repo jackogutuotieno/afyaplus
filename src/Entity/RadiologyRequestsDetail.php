@@ -39,9 +39,6 @@ class RadiologyRequestsDetail extends AbstractEntity
     #[Column(name: "service_id", type: "integer")]
     private int $serviceId;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -78,17 +75,6 @@ class RadiologyRequestsDetail extends AbstractEntity
     public function setServiceId(int $value): static
     {
         $this->serviceId = $value;
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

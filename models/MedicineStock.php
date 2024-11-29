@@ -259,11 +259,16 @@ class MedicineStock extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->quantity_left->addMethod("getSearchDefault", fn() => 0);
         $this->quantity_left->InputTextType = "text";
         $this->quantity_left->Raw = true;
         $this->quantity_left->IsCustom = true; // Custom field
         $this->quantity_left->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->quantity_left->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->quantity_left->AdvancedSearch->SearchValueDefault = $this->quantity_left->getSearchDefault();
+        $this->quantity_left->AdvancedSearch->SearchOperatorDefault = "=";
+        $this->quantity_left->AdvancedSearch->SearchOperator2Default = "";
+        $this->quantity_left->AdvancedSearch->SearchConditionDefault = "AND";
         $this->Fields['quantity_left'] = &$this->quantity_left;
 
         // measuring_unit

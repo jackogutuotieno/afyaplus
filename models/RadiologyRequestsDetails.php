@@ -49,7 +49,6 @@ class RadiologyRequestsDetails extends DbTable
     public $id;
     public $radiology_request_id;
     public $service_id;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -167,41 +166,19 @@ class RadiologyRequestsDetails extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->service_id->InputTextType = "text";
         $this->service_id->Raw = true;
         $this->service_id->Nullable = false; // NOT NULL field
         $this->service_id->Required = true; // Required field
+        $this->service_id->setSelectMultiple(false); // Select one
+        $this->service_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->service_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->service_id->Lookup = new Lookup($this->service_id, 'service_charges', false, 'id', ["service_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`service_name`");
         $this->service_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->service_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->service_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_id'] = &$this->service_id;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -209,10 +186,10 @@ class RadiologyRequestsDetails extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -225,7 +202,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -235,10 +212,10 @@ class RadiologyRequestsDetails extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -251,7 +228,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -452,11 +429,6 @@ class RadiologyRequestsDetails extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -781,7 +753,6 @@ class RadiologyRequestsDetails extends DbTable
         $this->id->DbValue = $row['id'];
         $this->radiology_request_id->DbValue = $row['radiology_request_id'];
         $this->service_id->DbValue = $row['service_id'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1139,7 +1110,6 @@ class RadiologyRequestsDetails extends DbTable
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1178,8 +1148,6 @@ class RadiologyRequestsDetails extends DbTable
 
         // service_id
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -1192,12 +1160,27 @@ class RadiologyRequestsDetails extends DbTable
         $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
 
         // service_id
-        $this->service_id->ViewValue = $this->service_id->CurrentValue;
-        $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->service_id->CurrentValue);
+        if ($curVal != "") {
+            $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+            if ($this->service_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                } else {
+                    $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                }
+            }
+        } else {
+            $this->service_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1218,10 +1201,6 @@ class RadiologyRequestsDetails extends DbTable
         // service_id
         $this->service_id->HrefValue = "";
         $this->service_id->TooltipValue = "";
-
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1260,25 +1239,7 @@ class RadiologyRequestsDetails extends DbTable
 
         // service_id
         $this->service_id->setupEditAttributes();
-        $this->service_id->EditValue = $this->service_id->CurrentValue;
         $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
-        if (strval($this->service_id->EditValue) != "" && is_numeric($this->service_id->EditValue)) {
-            $this->service_id->EditValue = FormatNumber($this->service_id->EditValue, null);
-        }
-
-        // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1321,14 +1282,12 @@ class RadiologyRequestsDetails extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1360,14 +1319,12 @@ class RadiologyRequestsDetails extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1383,52 +1340,6 @@ class RadiologyRequestsDetails extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM radiology_requests_details";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data

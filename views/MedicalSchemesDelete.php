@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_medical_schemes_id" class="medical_schemes_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->company->Visible) { // company ?>
         <th class="<?= $Page->company->headerCellClass() ?>"><span id="elh_medical_schemes_company" class="medical_schemes_company"><?= $Page->company->caption() ?></span></th>
 <?php } ?>
@@ -64,9 +61,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->physical_address->Visible) { // physical_address ?>
         <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_medical_schemes_physical_address" class="medical_schemes_physical_address"><?= $Page->physical_address->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_medical_schemes_created_by_user_id" class="medical_schemes_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_medical_schemes_date_created" class="medical_schemes_date_created"><?= $Page->date_created->caption() ?></span></th>
@@ -95,14 +89,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->company->Visible) { // company ?>
         <td<?= $Page->company->cellAttributes() ?>>
 <span id="">
@@ -115,7 +101,12 @@ while ($Page->fetch()) {
         <td<?= $Page->phone->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -123,7 +114,12 @@ while ($Page->fetch()) {
         <td<?= $Page->email_address->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -132,14 +128,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->physical_address->viewAttributes() ?>>
 <?= $Page->physical_address->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -124,7 +124,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         $this->id->Visible = false;
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -520,6 +519,9 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -695,17 +697,7 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
             if (IsApi() && $val === null) {
                 $this->service_id->Visible = false; // Disable update for API request
             } else {
-                $this->service_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
+                $this->service_id->setFormValue($val);
             }
         }
 
@@ -741,7 +733,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         global $CurrentForm;
         $this->radiology_request_id->CurrentValue = $this->radiology_request_id->FormValue;
         $this->service_id->CurrentValue = $this->service_id->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -771,15 +762,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("add");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -798,7 +780,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -810,7 +791,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -856,9 +836,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         // service_id
         $this->service_id->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -875,12 +852,27 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
             $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
 
             // service_id
-            $this->service_id->ViewValue = $this->service_id->CurrentValue;
-            $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->service_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+                if ($this->service_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                    } else {
+                        $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -895,9 +887,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
 
             // service_id
             $this->service_id->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -915,25 +904,30 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
 
             // service_id
             $this->service_id->setupEditAttributes();
-            $this->service_id->EditValue = $this->service_id->CurrentValue;
-            $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
-            if (strval($this->service_id->EditValue) != "" && is_numeric($this->service_id->EditValue)) {
-                $this->service_id->EditValue = FormatNumber($this->service_id->EditValue, null);
-            }
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
+            $curVal = trim(strval($this->service_id->CurrentValue));
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
             } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
+                $this->service_id->ViewValue = $this->service_id->Lookup !== null && is_array($this->service_id->lookupOptions()) && count($this->service_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->service_id->ViewValue !== null) { // Load from cache
+                $this->service_id->EditValue = array_values($this->service_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->service_id->CurrentValue, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->service_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->service_id->EditValue = $arwrk;
+            }
+            $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -952,9 +946,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
 
             // service_id
             $this->service_id->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -995,17 +986,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
                     $this->service_id->addErrorMessage(str_replace("%s", $this->service_id->caption(), $this->service_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->service_id->FormValue)) {
-                $this->service_id->addErrorMessage($this->service_id->getErrorMessage(false));
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
                     $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
@@ -1045,18 +1025,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid User ID
-        if (
-            !EmptyValue($Security->currentUserID()) &&
-            !$Security->isAdmin() && // Non system admin
-            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
-        ) {
-            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
-            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
-            $this->setFailureMessage($userIdMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1111,9 +1079,6 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, false);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
@@ -1134,25 +1099,12 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
         if (isset($row['service_id'])) { // service_id
             $this->service_id->setFormValue($row['service_id']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb
@@ -1179,6 +1131,8 @@ class RadiologyRequestsDetailsAdd extends RadiologyRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

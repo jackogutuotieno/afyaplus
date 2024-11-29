@@ -472,7 +472,7 @@ class Users extends DbTable
         $this->user_role_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->user_role_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->user_role_id->OptionCount = 8;
+        $this->user_role_id->OptionCount = 9;
         $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_role_id'] = &$this->user_role_id;

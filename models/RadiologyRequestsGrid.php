@@ -15,18 +15,18 @@ use Closure;
 /**
  * Page class
  */
-class RadiologyRequestsList extends RadiologyRequests
+class RadiologyRequestsGrid extends RadiologyRequests
 {
     use MessagesTrait;
 
     // Page ID
-    public $PageID = "list";
+    public $PageID = "grid";
 
     // Project ID
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "RadiologyRequestsList";
+    public $PageObjName = "RadiologyRequestsGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class RadiologyRequestsList extends RadiologyRequests
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fradiology_requestslist";
+    public $FormName = "fradiology_requestsgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "radiologyrequestslist";
+    public $CurrentPageName = "radiologyrequestsgrid";
 
     // Page URLs
     public $AddUrl;
@@ -53,16 +53,6 @@ class RadiologyRequestsList extends RadiologyRequests
     public $ViewUrl;
     public $CopyUrl;
     public $ListUrl;
-
-    // Update URLs
-    public $InlineAddUrl;
-    public $InlineCopyUrl;
-    public $InlineEditUrl;
-    public $GridAddUrl;
-    public $GridEditUrl;
-    public $MultiEditUrl;
-    public $MultiDeleteUrl;
-    public $MultiUpdateUrl;
 
     // Page headings
     public $Heading = "";
@@ -177,7 +167,11 @@ class RadiologyRequestsList extends RadiologyRequests
         }
 
         // Initialize
-        $GLOBALS["Page"] = &$this;
+        $this->FormActionName .= "_" . $this->FormName;
+        $this->OldKeyName .= "_" . $this->FormName;
+        $this->FormBlankRowName .= "_" . $this->FormName;
+        $this->FormKeyCountName .= "_" . $this->FormName;
+        $GLOBALS["Grid"] = &$this;
 
         // Language object
         $Language = Container("app.language");
@@ -186,18 +180,7 @@ class RadiologyRequestsList extends RadiologyRequests
         if (!isset($GLOBALS["radiology_requests"]) || $GLOBALS["radiology_requests"]::class == PROJECT_NAMESPACE . "radiology_requests") {
             $GLOBALS["radiology_requests"] = &$this;
         }
-
-        // Page URL
-        $pageUrl = $this->pageUrl(false);
-
-        // Initialize URLs
         $this->AddUrl = "radiologyrequestsadd";
-        $this->InlineAddUrl = $pageUrl . "action=add";
-        $this->GridAddUrl = $pageUrl . "action=gridadd";
-        $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "radiologyrequestsdelete";
-        $this->MultiUpdateUrl = "radiologyrequestsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -219,12 +202,6 @@ class RadiologyRequestsList extends RadiologyRequests
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
 
-        // Export options
-        $this->ExportOptions = new ListOptions(TagClassName: "ew-export-option");
-
-        // Import options
-        $this->ImportOptions = new ListOptions(TagClassName: "ew-import-option");
-
         // Other options
         $this->OtherOptions = new ListOptionsArray();
 
@@ -235,28 +212,6 @@ class RadiologyRequestsList extends RadiologyRequests
             DropDownButtonPhrase: $Language->phrase("ButtonAddEdit"),
             UseButtonGroup: true
         );
-
-        // Detail tables
-        $this->OtherOptions["detail"] = new ListOptions(TagClassName: "ew-detail-option");
-        // Actions
-        $this->OtherOptions["action"] = new ListOptions(TagClassName: "ew-action-option");
-
-        // Column visibility
-        $this->OtherOptions["column"] = new ListOptions(
-            TableVar: $this->TableVar,
-            TagClassName: "ew-column-option",
-            ButtonGroupClass: "ew-column-dropdown",
-            UseDropDownButton: true,
-            DropDownButtonPhrase: $Language->phrase("Columns"),
-            DropDownAutoClose: "outside",
-            UseButtonGroup: false
-        );
-
-        // Filter options
-        $this->FilterOptions = new ListOptions(TagClassName: "ew-filter-option");
-
-        // List actions
-        $this->ListActions = new ListActions();
     }
 
     // Get content from stream
@@ -311,18 +266,13 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Page is terminated
         $this->terminated = true;
-
-        // Page Unload event
-        if (method_exists($this, "pageUnload")) {
-            $this->pageUnload();
+        unset($GLOBALS["Grid"]);
+        if ($url === "") {
+            return;
         }
-        DispatchEvent(new PageUnloadedEvent($this), PageUnloadedEvent::NAME);
         if (!IsApi() && method_exists($this, "pageRedirecting")) {
             $this->pageRedirecting($url);
         }
-
-        // Close connection
-        CloseConnections();
 
         // Return for API
         if (IsApi()) {
@@ -345,23 +295,8 @@ class RadiologyRequestsList extends RadiologyRequests
             if (!Config("DEBUG") && ob_get_length()) {
                 ob_end_clean();
             }
-
-            // Handle modal response
-            if ($this->IsModal) { // Show as modal
-                $pageName = GetPageName($url);
-                $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
-                if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
-                    $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "radiologyrequestsview"); // If View page, no primary button
-                } else { // List page
-                    $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
-                    $this->clearFailureMessage();
-                }
-                WriteJson($result);
-            } else {
-                SaveDebugMessage();
-                Redirect(GetUrl($url));
-            }
+            SaveDebugMessage();
+            Redirect(GetUrl($url));
         }
         return; // Return to controller
     }
@@ -427,9 +362,6 @@ class RadiologyRequestsList extends RadiologyRequests
                             }
                         }
                     } else {
-                        if ($fld->DataType == DataType::MEMO && $fld->MemoMaxLength > 0) {
-                            $val = TruncateMemo($val, $fld->MemoMaxLength, $fld->TruncateMemoRemoveHtml);
-                        }
                         $row[$fldname] = $val;
                     }
                 }
@@ -545,6 +477,7 @@ class RadiologyRequestsList extends RadiologyRequests
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
+    public $ShowOtherOptions = false;
     public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
@@ -575,9 +508,6 @@ class RadiologyRequestsList extends RadiologyRequests
     public $RestoreSearch = false;
     public $HashValue; // Hash value
     public $DetailPages;
-    public $TopContentClass = "ew-top";
-    public $MiddleContentClass = "ew-middle";
-    public $BottomContentClass = "ew-bottom";
     public $PageAction;
     public $RecKeys = [];
     public $IsModal = false;
@@ -627,9 +557,6 @@ class RadiologyRequestsList extends RadiologyRequests
         $this->MultiColumnListOptionsPosition = Config("MULTI_COLUMN_LIST_OPTIONS_POSITION");
         $DashboardReport ??= Param(Config("PAGE_DASHBOARD"));
 
-        // Is modal
-        $this->IsModal = ConvertToBool(Param("modal"));
-
         // Use layout
         $this->UseLayout = $this->UseLayout && ConvertToBool(Param(Config("PAGE_LAYOUT"), true));
 
@@ -652,21 +579,9 @@ class RadiologyRequestsList extends RadiologyRequests
                 return;
             }
         }
-
-        // Get export parameters
-        $custom = "";
         if (Param("export") !== null) {
             $this->Export = Param("export");
-            $custom = Param("custom", "");
-        } else {
-            $this->setExportReturnUrl(CurrentUrl());
         }
-        $ExportType = $this->Export; // Get export parameter, used in header
-        if ($ExportType != "") {
-            global $SkipHeaderFooter;
-            $SkipHeaderFooter = true;
-        }
-        $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
         $gridaddcnt = Get(Config("TABLE_GRID_ADD_ROW_COUNT"), "");
@@ -676,9 +591,6 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Set up list options
         $this->setupListOptions();
-
-        // Setup export options
-        $this->setupExportOptions();
         $this->setVisibility();
 
         // Set lookup cache
@@ -712,6 +624,9 @@ class RadiologyRequestsList extends RadiologyRequests
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
 
+        // Load default values for add
+        $this->loadDefaultValues();
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fradiology_requestsgrid";
@@ -736,22 +651,11 @@ class RadiologyRequestsList extends RadiologyRequests
         // Get command
         $this->Command = strtolower(Get("cmd", ""));
 
-        // Process list action first
-        if ($this->processListAction()) { // Ajax request
-            $this->terminate();
-            return;
-        }
-
         // Set up records per page
         $this->setupDisplayRecords();
 
         // Handle reset command
         $this->resetCmd();
-
-        // Set up Breadcrumb
-        if (!$this->isExport()) {
-            $this->setupBreadcrumb();
-        }
 
         // Hide list options
         if ($this->isExport()) {
@@ -764,16 +668,19 @@ class RadiologyRequestsList extends RadiologyRequests
             $this->ListOptions->UseButtonGroup = false; // Disable button group
         }
 
-        // Hide options
-        if ($this->isExport() || !(EmptyValue($this->CurrentAction) || $this->isSearch())) {
-            $this->ExportOptions->hideAllOptions();
-            $this->FilterOptions->hideAllOptions();
-            $this->ImportOptions->hideAllOptions();
-        }
-
         // Hide other options
         if ($this->isExport()) {
             $this->OtherOptions->hideAllOptions();
+        }
+
+        // Show grid delete link for grid add / grid edit
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $item = $this->ListOptions["griddelete"];
+                if ($item) {
+                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                }
+            }
         }
 
         // Set up sorting order
@@ -828,9 +735,16 @@ class RadiologyRequestsList extends RadiologyRequests
         }
         $this->Filter = $this->applyUserIDFilters($this->Filter);
         if ($this->isGridAdd()) {
-            $this->CurrentFilter = "0=1";
-            $this->StartRecord = 1;
-            $this->DisplayRecords = $this->GridAddRowCount;
+            if ($this->CurrentMode == "copy") {
+                $this->TotalRecords = $this->listRecordCount();
+                $this->StartRecord = 1;
+                $this->DisplayRecords = $this->TotalRecords;
+                $this->Recordset = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords);
+            } else {
+                $this->CurrentFilter = "0=1";
+                $this->StartRecord = 1;
+                $this->DisplayRecords = $this->GridAddRowCount;
+            }
             $this->TotalRecords = $this->DisplayRecords;
             $this->StopRecord = $this->DisplayRecords;
         } elseif (($this->isEdit() || $this->isCopy() || $this->isInlineInserted() || $this->isInlineUpdated()) && $this->UseInfiniteScroll) { // Get current record only
@@ -853,48 +767,8 @@ class RadiologyRequestsList extends RadiologyRequests
         } else {
             $this->TotalRecords = $this->listRecordCount();
             $this->StartRecord = 1;
-            if ($this->DisplayRecords <= 0 || ($this->isExport() && $this->ExportAll)) { // Display all records
-                $this->DisplayRecords = $this->TotalRecords;
-            }
-            if (!($this->isExport() && $this->ExportAll)) { // Set up start record position
-                $this->setupStartRecord();
-            }
+            $this->DisplayRecords = $this->TotalRecords; // Display all records
             $this->Recordset = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords);
-
-            // Set no record found message
-            if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
-                if (!$Security->canList()) {
-                    $this->setWarningMessage(DeniedMessage());
-                }
-                if ($this->SearchWhere == "0=101") {
-                    $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
-                } else {
-                    $this->setWarningMessage($Language->phrase("NoRecord"));
-                }
-            }
-        }
-
-        // Set up list action columns
-        foreach ($this->ListActions as $listAction) {
-            if ($listAction->Allowed) {
-                if ($listAction->Select == ACTION_MULTIPLE) { // Show checkbox column if multiple action
-                    $this->ListOptions["checkbox"]->Visible = true;
-                } elseif ($listAction->Select == ACTION_SINGLE) { // Show list action column
-                        $this->ListOptions["listactions"]->Visible = true; // Set visible if any list action is allowed
-                }
-            }
-        }
-
-        // Search options
-        $this->setupSearchOptions();
-
-        // Set up search panel class
-        if ($this->SearchWhere != "") {
-            if ($query) { // Hide search panel if using QueryBuilder
-                RemoveClass($this->SearchPanelClass, "show");
-            } else {
-                AppendClass($this->SearchPanelClass, "show");
-            }
         }
 
         // API list action
@@ -981,6 +855,130 @@ class RadiologyRequestsList extends RadiologyRequests
         }
     }
 
+    // Exit inline mode
+    protected function clearInlineMode()
+    {
+        $this->LastAction = $this->CurrentAction; // Save last action
+        $this->CurrentAction = ""; // Clear action
+        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to grid add mode
+    protected function gridAddMode()
+    {
+        $this->CurrentAction = "gridadd";
+        $_SESSION[SESSION_INLINE_MODE] = "gridadd";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Switch to grid edit mode
+    protected function gridEditMode()
+    {
+        $this->CurrentAction = "gridedit";
+        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Perform update to grid
+    public function gridUpdate()
+    {
+        global $Language, $CurrentForm;
+        $gridUpdate = true;
+
+        // Get old result set
+        $this->CurrentFilter = $this->buildKeyFilter();
+        if ($this->CurrentFilter == "") {
+            $this->CurrentFilter = "0=1";
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        if ($rs = $conn->executeQuery($sql)) {
+            $rsold = $rs->fetchAllAssociative();
+        }
+
+        // Call Grid Updating event
+        if (!$this->gridUpdating($rsold)) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
+            }
+            $this->EventCancelled = true;
+            return false;
+        }
+        $this->loadDefaultValues();
+        $wrkfilter = "";
+        $key = "";
+
+        // Update row index and get row key
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Update all rows based on key
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            $CurrentForm->Index = $rowindex;
+            $this->setKey($CurrentForm->getValue($this->OldKeyName));
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+
+            // Load all values and keys
+            if ($rowaction != "insertdelete" && $rowaction != "hide") { // Skip insert then deleted rows / hidden rows for grid edit
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
+                } else {
+                    $gridUpdate = true;
+                }
+
+                // Skip empty row
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                // Validate form and insert/update/delete record
+                } elseif ($gridUpdate) {
+                    if ($rowaction == "delete") {
+                        $this->CurrentFilter = $this->getRecordFilter();
+                        $gridUpdate = $this->deleteRows(); // Delete this row
+                    } else {
+                        if ($rowaction == "insert") {
+                            $gridUpdate = $this->addRow(); // Insert this row
+                        } else {
+                            if ($this->OldKey != "") {
+                                $this->SendEmail = false; // Do not send email on update success
+                                $gridUpdate = $this->editRow(); // Update this row
+                            }
+                        } // End update
+                        if ($gridUpdate) { // Get inserted or updated filter
+                            AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
+                        }
+                    }
+                }
+                if ($gridUpdate) {
+                    if ($key != "") {
+                        $key .= ", ";
+                    }
+                    $key .= $this->OldKey;
+                } else {
+                    $this->EventCancelled = true;
+                    break;
+                }
+            }
+        }
+        if ($gridUpdate) {
+            $this->FilterForModalActions = $wrkfilter;
+
+            // Get new records
+            $rsnew = $conn->fetchAllAssociative($sql);
+
+            // Call Grid_Updated event
+            $this->gridUpdated($rsold, $rsnew);
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+        }
+        return $gridUpdate;
+    }
+
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -1012,6 +1010,218 @@ class RadiologyRequestsList extends RadiologyRequests
         return $wrkFilter;
     }
 
+    // Perform grid add
+    public function gridInsert()
+    {
+        global $Language, $CurrentForm;
+        $rowindex = 1;
+        $gridInsert = false;
+        $conn = $this->getConnection();
+
+        // Call Grid Inserting event
+        if (!$this->gridInserting()) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridAddCancelled")); // Set grid add cancelled message
+            }
+            $this->EventCancelled = true;
+            return false;
+        }
+        $this->loadDefaultValues();
+
+        // Init key filter
+        $wrkfilter = "";
+        $addcnt = 0;
+        $key = "";
+
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Insert all rows
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "" && $rowaction != "insert") {
+                continue; // Skip
+            }
+            $rsold = null;
+            if ($rowaction == "insert") {
+                $this->OldKey = strval($CurrentForm->getValue($this->OldKeyName));
+                $rsold = $this->loadOldRecord(); // Load old record
+            }
+            $this->loadFormValues(); // Get form values
+            if (!$this->emptyRow()) {
+                $addcnt++;
+                $this->SendEmail = false; // Do not send email on insert success
+                $gridInsert = $this->addRow($rsold); // Insert row (already validated by validateGridForm())
+                if ($gridInsert) {
+                    if ($key != "") {
+                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
+                    }
+                    $key .= $this->id->CurrentValue;
+
+                    // Add filter for this record
+                    AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
+                } else {
+                    $this->EventCancelled = true;
+                    break;
+                }
+            }
+        }
+        if ($addcnt == 0) { // No record inserted
+            $this->clearInlineMode(); // Clear grid add mode and return
+            return true;
+        }
+        if ($gridInsert) {
+            // Get new records
+            $this->CurrentFilter = $wrkfilter;
+            $this->FilterForModalActions = $wrkfilter;
+            $sql = $this->getCurrentSql();
+            $rsnew = $conn->fetchAllAssociative($sql);
+
+            // Call Grid_Inserted event
+            $this->gridInserted($rsnew);
+            $this->clearInlineMode(); // Clear grid add mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
+            }
+        }
+        return $gridInsert;
+    }
+
+    // Check if empty row
+    public function emptyRow()
+    {
+        global $CurrentForm;
+        if (
+            $CurrentForm->hasValue("x_patient_id") &&
+            $CurrentForm->hasValue("o_patient_id") &&
+            $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
+            !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_created_by_user_id") &&
+            $CurrentForm->hasValue("o_created_by_user_id") &&
+            $this->created_by_user_id->CurrentValue != $this->created_by_user_id->DefaultValue &&
+            !($this->created_by_user_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->created_by_user_id->CurrentValue == $this->created_by_user_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_date_created") &&
+            $CurrentForm->hasValue("o_date_created") &&
+            $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
+            !($this->date_created->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_created->CurrentValue == $this->date_created->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_date_updated") &&
+            $CurrentForm->hasValue("o_date_updated") &&
+            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
+            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate grid form
+    public function validateGridForm()
+    {
+        global $CurrentForm;
+
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Load default values for emptyRow checking
+        $this->loadDefaultValues();
+
+        // Validate all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete" && $rowaction != "hide") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } elseif (!$this->validateForm()) {
+                    $this->ValidationErrors[$rowindex] = $this->getValidationErrors();
+                    $this->EventCancelled = true;
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Get all form values of the grid
+    public function getGridFormValues()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+        $rows = [];
+
+        // Loop through all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } else {
+                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
+                }
+            }
+        }
+        return $rows; // Return as array of array
+    }
+
+    // Restore form values for current row
+    public function restoreCurrentRowFormValues($idx)
+    {
+        global $CurrentForm;
+
+        // Get row based on current index
+        $CurrentForm->Index = $idx;
+        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+        $this->loadFormValues(); // Load form values
+        // Set up invalid status correctly
+        $this->resetFormError();
+        if ($rowaction == "insert" && $this->emptyRow()) {
+            // Ignore
+        } else {
+            $this->validateForm();
+        }
+    }
+
+    // Reset form status
+    public function resetFormError()
+    {
+        foreach ($this->Fields as $field) {
+            $field->clearErrorMessage();
+        }
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1027,10 +1237,6 @@ class RadiologyRequestsList extends RadiologyRequests
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1059,12 +1265,6 @@ class RadiologyRequestsList extends RadiologyRequests
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->id->setSort("");
-                $this->patient_id->setSort("");
-                $this->visit_id->setSort("");
-                $this->created_by_user_id->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
             }
 
             // Reset start position
@@ -1077,6 +1277,14 @@ class RadiologyRequestsList extends RadiologyRequests
     protected function setupListOptions()
     {
         global $Security, $Language;
+
+        // "griddelete"
+        if ($this->AllowAddDeleteRow) {
+            $item = &$this->ListOptions->add("griddelete");
+            $item->CssClass = "text-nowrap";
+            $item->OnLeft = false;
+            $item->Visible = false; // Default hidden
+        }
 
         // Add group option item ("button")
         $item = &$this->ListOptions->addGroupOption();
@@ -1108,25 +1316,6 @@ class RadiologyRequestsList extends RadiologyRequests
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
-        // List actions
-        $item = &$this->ListOptions->add("listactions");
-        $item->CssClass = "text-nowrap";
-        $item->OnLeft = false;
-        $item->Visible = false;
-        $item->ShowInButtonGroup = false;
-        $item->ShowInDropDown = false;
-
-        // "checkbox"
-        $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
-        $item->OnLeft = false;
-        $item->Header = "<div class=\"form-check\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"form-check-input\" data-ew-action=\"select-all-keys\"></div>";
-        if ($item->OnLeft) {
-            $item->moveTo(0);
-        }
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
-
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1139,7 +1328,6 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Call ListOptions_Load event
         $this->listOptionsLoad();
-        $this->setupListOptionsExt();
         $item = $this->ListOptions[$this->ListOptions->GroupOptionName];
         $item->Visible = $this->ListOptions->groupOptionVisible();
     }
@@ -1164,7 +1352,38 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
-        $pageUrl = $this->pageUrl(false);
+
+        // Set up row action and key
+        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
+            $CurrentForm->Index = $this->RowIndex;
+            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
+            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+            if ($this->RowAction != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
+            }
+            $oldKey = $this->getKey(false); // Get from OldValue
+            if ($oldKeyName != "" && $oldKey != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
+            }
+            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
+            }
+        }
+
+        // "delete"
+        if ($this->AllowAddDeleteRow) {
+            if ($this->CurrentMode == "add" || $this->CurrentMode == "copy" || $this->CurrentMode == "edit") {
+                $options = &$this->ListOptions;
+                $options->UseButtonGroup = true; // Use button group for grid delete button
+                $opt = $options["griddelete"];
+                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                    $opt->Body = "&nbsp;";
+                } else {
+                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
+                }
+            }
+        }
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1221,47 +1440,6 @@ class RadiologyRequestsList extends RadiologyRequests
                 $opt->Body = "";
             }
         } // End View mode
-
-        // Set up list action buttons
-        $opt = $this->ListOptions["listactions"];
-        if ($opt && !$this->isExport() && !$this->CurrentAction) {
-            $body = "";
-            $links = [];
-            foreach ($this->ListActions as $listAction) {
-                $action = $listAction->Action;
-                $allowed = $listAction->Allowed;
-                $disabled = false;
-                if ($listAction->Select == ACTION_SINGLE && $allowed) {
-                    $caption = $listAction->Caption;
-                    $title = HtmlTitle($caption);
-                    if ($action != "") {
-                        $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
-                        $link = $disabled
-                            ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fradiology_requestslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
-                        $links[] = $link;
-                        if ($body == "") { // Setup first button
-                            $body = $disabled
-                            ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fradiology_requestslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
-                        }
-                    }
-                }
-            }
-            if (count($links) > 1) { // More than one buttons, use dropdown
-                $body = "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-actions\" title=\"" . HtmlTitle($Language->phrase("ListActionButton")) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("ListActionButton") . "</button>";
-                $content = implode(array_map(fn($link) => "<li>" . $link . "</li>", $links));
-                $body .= "<ul class=\"dropdown-menu" . ($opt->OnLeft ? "" : " dropdown-menu-right") . "\">" . $content . "</ul>";
-                $body = "<div class=\"btn-group btn-group-sm\">" . $body . "</div>";
-            }
-            if (count($links) > 0) {
-                $opt->Body = $body;
-            }
-        }
-
-        // "checkbox"
-        $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1279,79 +1457,23 @@ class RadiologyRequestsList extends RadiologyRequests
     protected function setupOtherOptions()
     {
         global $Language, $Security;
-        $options = &$this->OtherOptions;
-        $option = $options["addedit"];
+        $option = $this->OtherOptions["addedit"];
+        $item = &$option->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
 
         // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"radiology_requests\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        $option = $options["action"];
-
-        // Show column list for column visibility
-        if ($this->UseColumnVisibility) {
-            $option = $this->OtherOptions["column"];
-            $item = &$option->addGroupOption();
-            $item->Body = "";
-            $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "created_by_user_id");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
-        }
-
-        // Set up custom actions
-        foreach ($this->CustomActions as $name => $action) {
-            $this->ListActions[$name] = $action;
-        }
-
-        // Set up options default
-        foreach ($options as $name => $option) {
-            if ($name != "column") { // Always use dropdown for column
-                $option->UseDropDownButton = false;
-                $option->UseButtonGroup = true;
+        if ($this->CurrentMode == "view") { // Check view mode
+            $item = &$option->add("add");
+            $addcaption = HtmlTitle($Language->phrase("AddLink"));
+            $this->AddUrl = $this->getAddUrl();
+            if ($this->ModalAdd && !IsMobile()) {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"radiology_requests\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            } else {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
-            //$option->ButtonClass = ""; // Class for button group
-            $item = &$option->addGroupOption();
-            $item->Body = "";
-            $item->Visible = false;
+            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         }
-        $options["addedit"]->DropDownButtonPhrase = $Language->phrase("ButtonAddEdit");
-        $options["detail"]->DropDownButtonPhrase = $Language->phrase("ButtonDetails");
-        $options["action"]->DropDownButtonPhrase = $Language->phrase("ButtonActions");
-
-        // Filter button
-        $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fradiology_requestssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
-        $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fradiology_requestssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
-        $this->FilterOptions->UseDropDownButton = true;
-        $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
-        $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
-
-        // Add group option item
-        $item = &$this->FilterOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-
-        // Page header/footer options
-        $this->HeaderOptions = new ListOptions(TagClassName: "ew-header-option", UseDropDownButton: false, UseButtonGroup: false);
-        $item = &$this->HeaderOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        $this->FooterOptions = new ListOptions(TagClassName: "ew-footer-option", UseDropDownButton: false, UseButtonGroup: false);
-        $item = &$this->FooterOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-
-        // Show active user count from SQL
     }
 
     // Active user filter
@@ -1383,154 +1505,36 @@ class RadiologyRequestsList extends RadiologyRequests
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["action"];
-        // Set up list action buttons
-        foreach ($this->ListActions as $listAction) {
-            if ($listAction->Select == ACTION_MULTIPLE) {
-                $item = &$option->add("custom_" . $listAction->Action);
-                $caption = $listAction->Caption;
-                $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fradiology_requestslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
-                $item->Visible = $listAction->Allowed;
-            }
-        }
-
-        // Hide multi edit, grid edit and other options
-        if ($this->TotalRecords <= 0) {
-            $option = $options["addedit"];
-            $item = $option["gridedit"];
-            if ($item) {
-                $item->Visible = false;
-            }
-            $option = $options["action"];
-            $option->hideAllOptions();
-        }
-    }
-
-    // Process list action
-    protected function processListAction()
-    {
-        global $Language, $Security, $Response;
-        $users = [];
-        $user = "";
-        $filter = $this->getFilterFromRecordKeys();
-        $userAction = Post("action", "");
-        if ($filter != "" && $userAction != "") {
-            $conn = $this->getConnection();
-            // Clear current action
-            $this->CurrentAction = "";
-            // Check permission first
-            $actionCaption = $userAction;
-            $listAction = $this->ListActions[$userAction] ?? null;
-            if ($listAction) {
-                $this->UserAction = $userAction;
-                $actionCaption = $listAction->Caption ?: $listAction->Action;
-                if (!$listAction->Allowed) {
-                    $errmsg = str_replace('%s', $actionCaption, $Language->phrase("CustomActionNotAllowed"));
-                    if (Post("ajax") == $userAction) { // Ajax
-                        echo "<p class=\"text-danger\">" . $errmsg . "</p>";
-                        return true;
-                    } else {
-                        $this->setFailureMessage($errmsg);
-                        return false;
-                    }
-                }
-            } else {
-                $errmsg = str_replace('%s', $userAction, $Language->phrase("CustomActionNotFound"));
-                if (Post("ajax") == $userAction) { // Ajax
-                    echo "<p class=\"text-danger\">" . $errmsg . "</p>";
-                    return true;
-                } else {
-                    $this->setFailureMessage($errmsg);
-                    return false;
+            if (in_array($this->CurrentMode, ["add", "copy", "edit"]) && !$this->isConfirm()) { // Check add/copy/edit mode
+                if ($this->AllowAddDeleteRow) {
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = $Security->canAdd();
+                    $this->ShowOtherOptions = $item->Visible;
                 }
             }
-            $rows = $this->loadRs($filter)->fetchAllAssociative();
-            $this->SelectedCount = count($rows);
-            $this->ActionValue = Post("actionvalue");
-
-            // Call row action event
-            if ($this->SelectedCount > 0) {
-                if ($this->UseTransaction) {
-                    $conn->beginTransaction();
-                }
-                $this->SelectedIndex = 0;
-                foreach ($rows as $row) {
-                    $this->SelectedIndex++;
-                    $processed = $listAction->handle($row, $this);
-                    if (!$processed) {
-                        break;
-                    }
-                    $processed = $this->rowCustomAction($userAction, $row);
-                    if (!$processed) {
-                        break;
-                    }
-                }
-                if ($processed) {
-                    if ($this->UseTransaction) { // Commit transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->commit();
-                        }
-                    }
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage($listAction->SuccessMessage);
-                    }
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage(str_replace("%s", $actionCaption, $Language->phrase("CustomActionCompleted"))); // Set up success message
-                    }
-                } else {
-                    if ($this->UseTransaction) { // Rollback transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->rollback();
-                        }
-                    }
-                    if ($this->getFailureMessage() == "") {
-                        $this->setFailureMessage($listAction->FailureMessage);
-                    }
-
-                    // Set up error message
-                    if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                        // Use the message, do nothing
-                    } elseif ($this->CancelMessage != "") {
-                        $this->setFailureMessage($this->CancelMessage);
-                        $this->CancelMessage = "";
-                    } else {
-                        $this->setFailureMessage(str_replace('%s', $actionCaption, $Language->phrase("CustomActionFailed")));
-                    }
-                }
+            if ($this->CurrentMode == "view") { // Check view mode
+                $option = $options["addedit"];
+                $item = $option["add"];
+                $this->ShowOtherOptions = $item?->Visible ?? false;
             }
-            if (Post("ajax") == $userAction) { // Ajax
-                if (WithJsonResponse()) { // List action returns JSON
-                    $this->clearSuccessMessage(); // Clear success message
-                    $this->clearFailureMessage(); // Clear failure message
-                } else {
-                    if ($this->getSuccessMessage() != "") {
-                        echo "<p class=\"text-success\">" . $this->getSuccessMessage() . "</p>";
-                        $this->clearSuccessMessage(); // Clear success message
-                    }
-                    if ($this->getFailureMessage() != "") {
-                        echo "<p class=\"text-danger\">" . $this->getFailureMessage() . "</p>";
-                        $this->clearFailureMessage(); // Clear failure message
-                    }
-                }
-                return true;
-            }
-        }
-        return false; // Not ajax request
     }
 
     // Set up Grid
     public function setupGrid()
     {
         global $CurrentForm;
-        if ($this->ExportAll && $this->isExport()) {
-            $this->StopRecord = $this->TotalRecords;
-        } else {
-            // Set the last record to display
-            if ($this->TotalRecords > $this->StartRecord + $this->DisplayRecords - 1) {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
-            } else {
-                $this->StopRecord = $this->TotalRecords;
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->TotalRecords; // Show all records
+
+        // Restore number of post back records
+        if ($CurrentForm && ($this->isConfirm() || $this->EventCancelled)) {
+            $CurrentForm->resetIndex();
+            if ($CurrentForm->hasValue($this->FormKeyCountName) && ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm())) {
+                $this->KeyCount = $CurrentForm->getValue($this->FormKeyCountName);
+                $this->StopRecord = $this->StartRecord + $this->KeyCount - 1;
             }
         }
         $this->RecordCount = $this->StartRecord - 1;
@@ -1575,6 +1579,17 @@ class RadiologyRequestsList extends RadiologyRequests
                 return;
             }
         }
+        if ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm() || $this->isMultiEdit()) {
+            $this->RowIndex++;
+            $CurrentForm->Index = $this->RowIndex;
+            if ($CurrentForm->hasValue($this->FormActionName) && ($this->isConfirm() || $this->EventCancelled)) {
+                $this->RowAction = strval($CurrentForm->getValue($this->FormActionName));
+            } elseif ($this->isGridAdd()) {
+                $this->RowAction = "insert";
+            } else {
+                $this->RowAction = "";
+            }
+        }
 
         // Set up key count
         $this->KeyCount = $this->RowIndex;
@@ -1582,25 +1597,41 @@ class RadiologyRequestsList extends RadiologyRequests
         // Init row class and style
         $this->resetAttributes();
         $this->CssClass = "";
-        if ($this->isCopy() && $this->InlineRowCount == 0 && !$this->loadRow()) { // Inline copy
-            $this->CurrentAction = "add";
-        }
-        if ($this->isAdd() && $this->InlineRowCount == 0 || $this->isGridAdd()) {
-            $this->loadRowValues(); // Load default values
-            $this->OldKey = "";
-            $this->setKey($this->OldKey);
-        } elseif ($this->isInlineInserted() && $this->UseInfiniteScroll) {
-            // Nothing to do, just use current values
-        } elseif (!($this->isCopy() && $this->InlineRowCount == 0)) {
-            $this->loadRowValues($this->CurrentRow); // Load row values
-            if ($this->isGridEdit() || $this->isMultiEdit()) {
+        if ($this->isGridAdd()) {
+            if ($this->CurrentMode == "copy") {
+                $this->loadRowValues($this->CurrentRow); // Load row values
                 $this->OldKey = $this->getKey(true); // Get from CurrentValue
-                $this->setKey($this->OldKey);
+            } else {
+                $this->loadRowValues(); // Load default values
+                $this->OldKey = "";
             }
+        } else {
+            $this->loadRowValues($this->CurrentRow); // Load row values
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
         }
+        $this->setKey($this->OldKey);
         $this->RowType = RowType::VIEW; // Render view
         if (($this->isAdd() || $this->isCopy()) && $this->InlineRowCount == 0 || $this->isGridAdd()) { // Add
             $this->RowType = RowType::ADD; // Render add
+        }
+        if ($this->isGridAdd() && $this->EventCancelled && !$CurrentForm->hasValue($this->FormBlankRowName)) { // Insert failed
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+        }
+        if ($this->isGridEdit()) { // Grid edit
+            if ($this->EventCancelled) {
+                $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+            }
+            if ($this->RowAction == "insert") {
+                $this->RowType = RowType::ADD; // Render add
+            } else {
+                $this->RowType = RowType::EDIT; // Render edit
+            }
+        }
+        if ($this->isGridEdit() && ($this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) && $this->EventCancelled) { // Update failed
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+        }
+        if ($this->isConfirm()) { // Confirm row
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
         }
 
         // Inline Add/Copy row (row 0)
@@ -1636,6 +1667,103 @@ class RadiologyRequestsList extends RadiologyRequests
 
         // Render list options
         $this->renderListOptions();
+    }
+
+    // Get upload files
+    protected function getUploadFiles()
+    {
+        global $CurrentForm, $Language;
+    }
+
+    // Load default values
+    protected function loadDefaultValues()
+    {
+        $this->created_by_user_id->DefaultValue = CurrentUserID();
+        $this->created_by_user_id->OldValue = $this->created_by_user_id->DefaultValue;
+    }
+
+    // Load form values
+    protected function loadFormValues()
+    {
+        // Load from form
+        global $CurrentForm;
+        $CurrentForm->FormName = $this->FormName;
+        $validate = !Config("SERVER_VALIDATE");
+
+        // Check field name 'patient_id' first before field var 'x_patient_id'
+        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
+        if (!$this->patient_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->patient_id->Visible = false; // Disable update for API request
+            } else {
+                $this->patient_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_patient_id")) {
+            $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
+        }
+
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_created_by_user_id")) {
+            $this->created_by_user_id->setOldValue($CurrentForm->getValue("o_created_by_user_id"));
+        }
+
+        // Check field name 'date_created' first before field var 'x_date_created'
+        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
+        if (!$this->date_created->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->date_created->Visible = false; // Disable update for API request
+            } else {
+                $this->date_created->setFormValue($val, true, $validate);
+            }
+            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_date_created")) {
+            $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
+        }
+
+        // Check field name 'date_updated' first before field var 'x_date_updated'
+        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
+        if (!$this->date_updated->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->date_updated->Visible = false; // Disable update for API request
+            } else {
+                $this->date_updated->setFormValue($val, true, $validate);
+            }
+            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_date_updated")) {
+            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+    }
+
+    // Restore form values
+    public function restoreFormValues()
+    {
+        global $CurrentForm;
+        if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->CurrentValue = $this->id->FormValue;
+        }
+        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->date_created->CurrentValue = $this->date_created->FormValue;
+        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
+        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1779,9 +1907,7 @@ class RadiologyRequestsList extends RadiologyRequests
         // Initialize URLs
         $this->ViewUrl = $this->getViewUrl();
         $this->EditUrl = $this->getEditUrl();
-        $this->InlineEditUrl = $this->getInlineEditUrl();
         $this->CopyUrl = $this->getCopyUrl();
-        $this->InlineCopyUrl = $this->getInlineCopyUrl();
         $this->DeleteUrl = $this->getDeleteUrl();
 
         // Call Row_Rendering event
@@ -1857,6 +1983,177 @@ class RadiologyRequestsList extends RadiologyRequests
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
+                }
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            }
+
+            // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->CurrentValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            }
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+            // Add refer script
+
+            // patient_id
+            $this->patient_id->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+        } elseif ($this->RowType == RowType::EDIT) {
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
+                }
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            }
+
+            // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->CurrentValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
+                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            }
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+            // Edit refer script
+
+            // patient_id
+            $this->patient_id->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+        }
+        if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
@@ -1865,226 +2162,340 @@ class RadiologyRequestsList extends RadiologyRequests
         }
     }
 
-    // Get export HTML tag
-    protected function getExportTag($type, $custom = false)
-    {
-        global $Language;
-        if ($type == "print" || $custom) { // Printer friendly / custom export
-            $pageUrl = $this->pageUrl(false);
-            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
-        } else { // Export API URL
-            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
-        }
-        if (SameText($type, "excel")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fradiology_requestslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
-            }
-        } elseif (SameText($type, "word")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fradiology_requestslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
-            }
-        } elseif (SameText($type, "pdf")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fradiology_requestslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
-            }
-        } elseif (SameText($type, "html")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
-        } elseif (SameText($type, "xml")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
-        } elseif (SameText($type, "csv")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
-        } elseif (SameText($type, "email")) {
-            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fradiology_requestslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
-        } elseif (SameText($type, "print")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
-        }
-    }
-
-    // Set up export options
-    protected function setupExportOptions()
+    // Validate form
+    protected function validateForm()
     {
         global $Language, $Security;
 
-        // Printer friendly
-        $item = &$this->ExportOptions->add("print");
-        $item->Body = $this->getExportTag("print");
-        $item->Visible = true;
-
-        // Export to Excel
-        $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
-        $item->Visible = true;
-
-        // Export to Word
-        $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
-        $item->Visible = true;
-
-        // Export to HTML
-        $item = &$this->ExportOptions->add("html");
-        $item->Body = $this->getExportTag("html");
-        $item->Visible = false;
-
-        // Export to XML
-        $item = &$this->ExportOptions->add("xml");
-        $item->Body = $this->getExportTag("xml");
-        $item->Visible = false;
-
-        // Export to CSV
-        $item = &$this->ExportOptions->add("csv");
-        $item->Body = $this->getExportTag("csv");
-        $item->Visible = true;
-
-        // Export to PDF
-        $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
-        $item->Visible = false;
-
-        // Export to Email
-        $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
-        $item->Visible = true;
-
-        // Drop down button for export
-        $this->ExportOptions->UseButtonGroup = true;
-        $this->ExportOptions->UseDropDownButton = false;
-        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
-            $this->ExportOptions->UseDropDownButton = true;
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
         }
-        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+        $validateForm = true;
+            if ($this->patient_id->Visible && $this->patient_id->Required) {
+                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
+                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->date_created->Visible && $this->date_created->Required) {
+                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
+                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
+                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+            }
+            if ($this->date_updated->Visible && $this->date_updated->Required) {
+                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
+                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
+                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
+            }
 
-        // Add group option item
-        $item = &$this->ExportOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        if (!$Security->canExport()) { // Export not allowed
-            $this->ExportOptions->hideAllOptions();
+        // Return validate result
+        $validateForm = $validateForm && !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
         }
+        return $validateForm;
     }
 
-    // Set up search options
-    protected function setupSearchOptions()
+    // Delete records based on current filter
+    protected function deleteRows()
     {
         global $Language, $Security;
-        $pageUrl = $this->pageUrl(false);
-        $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
-
-        // Button group for search
-        $this->SearchOptions->UseDropDownButton = false;
-        $this->SearchOptions->UseButtonGroup = true;
-        $this->SearchOptions->DropDownButtonPhrase = $Language->phrase("ButtonSearch");
-
-        // Add group option item
-        $item = &$this->SearchOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-
-        // Hide search options
-        if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
-            $this->SearchOptions->hideAllOptions();
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
         }
-        if (!$Security->canSearch()) {
-            $this->SearchOptions->hideAllOptions();
-            $this->FilterOptions->hideAllOptions();
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $rows = $conn->fetchAllAssociative($sql);
+        if (count($rows) == 0) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
+            return false;
         }
+
+        // Clone old rows
+        $rsold = $rows;
+        $successKeys = [];
+        $failKeys = [];
+        foreach ($rsold as $row) {
+            $thisKey = "";
+            if ($thisKey != "") {
+                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+            }
+            $thisKey .= $row['id'];
+
+            // Call row deleting event
+            $deleteRow = $this->rowDeleting($row);
+            if ($deleteRow) { // Delete
+                $deleteRow = $this->delete($row);
+                if (!$deleteRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
+                    $this->setFailureMessage($this->DbErrorMessage);
+                }
+            }
+            if ($deleteRow === false) {
+                if ($this->UseTransaction) {
+                    $successKeys = []; // Reset success keys
+                    break;
+                }
+                $failKeys[] = $thisKey;
+            } else {
+                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
+                    $this->deleteUploadedFiles($row);
+                }
+
+                // Call Row Deleted event
+                $this->rowDeleted($row);
+                $successKeys[] = $thisKey;
+            }
+        }
+
+        // Any records deleted
+        $deleteRows = count($successKeys) > 0;
+        if (!$deleteRows) {
+            // Set up error message
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
+            }
+        }
+        return $deleteRows;
     }
 
-    // Check if any search fields
-    public function hasSearchFields()
+    // Update record based on key values
+    protected function editRow()
     {
-        return false;
-    }
+        global $Security, $Language;
+        $oldKeyFilter = $this->getRecordFilter();
+        $filter = $this->applyUserIDFilters($oldKeyFilter);
+        $conn = $this->getConnection();
 
-    // Render search options
-    protected function renderSearchOptions()
-    {
-        if (!$this->hasSearchFields() && $this->SearchOptions["searchtoggle"]) {
-            $this->SearchOptions["searchtoggle"]->Visible = false;
+        // Load old row
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $rsold = $conn->fetchAssociative($sql);
+        if (!$rsold) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+            return false; // Update Failed
+        } else {
+            // Load old values
+            $this->loadDbValues($rsold);
         }
+
+        // Get new row
+        $rsnew = $this->getEditRow($rsold);
+
+        // Update current values
+        $this->setCurrentValues($rsnew);
+
+        // Call Row Updating event
+        $updateRow = $this->rowUpdating($rsold, $rsnew);
+        if ($updateRow) {
+            if (count($rsnew) > 0) {
+                $this->CurrentFilter = $filter; // Set up current filter
+                $editRow = $this->update($rsnew, "", $rsold);
+                if (!$editRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
+                    $this->setFailureMessage($this->DbErrorMessage);
+                }
+            } else {
+                $editRow = true; // No field to update
+            }
+            if ($editRow) {
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+            }
+            $editRow = false;
+        }
+
+        // Call Row_Updated event
+        if ($editRow) {
+            $this->rowUpdated($rsold, $rsnew);
+        }
+        return $editRow;
     }
 
     /**
-    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
-    *
-    * @param bool $return Return the data rather than output it
-    * @return mixed
-    */
-    public function exportData($doc)
+     * Get edit row
+     *
+     * @return array
+     */
+    protected function getEditRow($rsold)
     {
-        global $Language;
-        $rs = null;
-        $this->TotalRecords = $this->listRecordCount();
+        global $Security;
+        $rsnew = [];
 
-        // Export all
-        if ($this->ExportAll) {
-            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
-                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+        // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->ReadOnly = true;
+        }
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
+
+        // created_by_user_id
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
+
+        // date_created
+        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
+
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
+        return $rsnew;
+    }
+
+    /**
+     * Restore edit form from row
+     * @param array $row Row
+     */
+    protected function restoreEditFormFromRow($row)
+    {
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->CurrentValue = $row['patient_id'];
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
+        }
+        if (isset($row['date_created'])) { // date_created
+            $this->date_created->CurrentValue = $row['date_created'];
+        }
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->CurrentValue = $row['date_updated'];
+        }
+    }
+
+    // Add record
+    protected function addRow($rsold = null)
+    {
+        global $Language, $Security;
+
+        // Set up foreign key field value from Session
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $this->visit_id->Visible = true; // Need to insert foreign key
+            $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+        }
+
+        // Get new row
+        $rsnew = $this->getAddRow();
+
+        // Update current values
+        $this->setCurrentValues($rsnew);
+
+        // Check if valid User ID
+        if (
+            !EmptyValue($Security->currentUserID()) &&
+            !$Security->isAdmin() && // Non system admin
+            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
+        ) {
+            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
+            $this->setFailureMessage($userIdMsg);
+            return false;
+        }
+        $conn = $this->getConnection();
+
+        // Load db values from old row
+        $this->loadDbValues($rsold);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
+                $this->setFailureMessage($this->DbErrorMessage);
             }
-            $this->DisplayRecords = $this->TotalRecords;
-            $this->StopRecord = $this->TotalRecords;
-        } else { // Export one page only
-            $this->setupStartRecord(); // Set up start record position
-            // Set the last record to display
-            if ($this->DisplayRecords <= 0) {
-                $this->StopRecord = $this->TotalRecords;
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
             } else {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
+            $addRow = false;
         }
-        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
-        if (!$rs || !$doc) {
-            RemoveHeader("Content-Type"); // Remove header
-            RemoveHeader("Content-Disposition");
-            $this->showMessage();
-            return;
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
         }
-        $this->StartRecord = 1;
-        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+        return $addRow;
+    }
 
-        // Call Page Exporting server event
-        $doc->ExportCustom = !$this->pageExporting($doc);
+    /**
+     * Get add row
+     *
+     * @return array
+     */
+    protected function getAddRow()
+    {
+        global $Security;
+        $rsnew = [];
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $patient_visits = new PatientVisitsList();
-            $rsmaster = $patient_visits->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($patient_visits);
-                    $patient_visits->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
+        // patient_id
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
+
+        // created_by_user_id
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // date_created
+        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
+
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
         }
+        return $rsnew;
+    }
 
-        // Page header
-        $header = $this->PageHeader;
-        $this->pageDataRendering($header);
-        $doc->Text .= $header;
-        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
-        $rs->free();
-
-        // Page footer
-        $footer = $this->PageFooter;
-        $this->pageDataRendered($footer);
-        $doc->Text .= $footer;
-
-        // Export header and footer
-        $doc->exportHeaderAndFooter();
-
-        // Call Page Exported server event
-        $this->pageExported($doc);
+    /**
+     * Restore add form from row
+     * @param array $row Row
+     */
+    protected function restoreAddFormFromRow($row)
+    {
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        }
+        if (isset($row['date_created'])) { // date_created
+            $this->date_created->setFormValue($row['date_created']);
+        }
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
     }
 
     // Show link optionally based on User ID
@@ -2100,120 +2511,21 @@ class RadiologyRequestsList extends RadiologyRequests
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
+        // Hide foreign keys
+        $masterTblVar = $this->getCurrentMasterTable();
+        if ($masterTblVar == "patient_visits") {
+            $masterTbl = Container("patient_visits");
+            $this->visit_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
             }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
-                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
-                    $this->visit_id->setSessionValue("");
-                }
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
+            $this->patient_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
             }
         }
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
-    // Set up Breadcrumb
-    protected function setupBreadcrumb()
-    {
-        global $Breadcrumb, $Language;
-        $Breadcrumb = new Breadcrumb("index");
-        $url = CurrentUrl();
-        $url = preg_replace('/\?cmd=reset(all){0,1}$/i', '', $url); // Remove cmd=reset(all)
-        $Breadcrumb->add("list", $this->TableVar, $url, "", $this->TableVar, true);
     }
 
     // Setup lookup options
@@ -2258,146 +2570,6 @@ class RadiologyRequestsList extends RadiologyRequests
                 $fld->Lookup->Options = $ar;
             }
         }
-    }
-
-    // Set up starting record parameters
-    public function setupStartRecord()
-    {
-        if ($this->DisplayRecords == 0) {
-            return;
-        }
-        $pageNo = Get(Config("TABLE_PAGE_NUMBER"));
-        $startRec = Get(Config("TABLE_START_REC"));
-        $infiniteScroll = ConvertToBool(Param("infinitescroll"));
-        if ($pageNo !== null) { // Check for "pageno" parameter first
-            $pageNo = ParseInteger($pageNo);
-            if (is_numeric($pageNo)) {
-                $this->StartRecord = ($pageNo - 1) * $this->DisplayRecords + 1;
-                if ($this->StartRecord <= 0) {
-                    $this->StartRecord = 1;
-                } elseif ($this->StartRecord >= (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1) {
-                    $this->StartRecord = (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1;
-                }
-            }
-        } elseif ($startRec !== null && is_numeric($startRec)) { // Check for "start" parameter
-            $this->StartRecord = $startRec;
-        } elseif (!$infiniteScroll) {
-            $this->StartRecord = $this->getStartRecordNumber();
-        }
-
-        // Check if correct start record counter
-        if (!is_numeric($this->StartRecord) || intval($this->StartRecord) <= 0) { // Avoid invalid start record counter
-            $this->StartRecord = 1; // Reset start record counter
-        } elseif ($this->StartRecord > $this->TotalRecords) { // Avoid starting record > total records
-            $this->StartRecord = (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to last page first record
-        } elseif (($this->StartRecord - 1) % $this->DisplayRecords != 0) {
-            $this->StartRecord = (int)(($this->StartRecord - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to page boundary
-        }
-        if (!$infiniteScroll) {
-            $this->setStartRecordNumber($this->StartRecord);
-        }
-    }
-
-    // Get page count
-    public function pageCount() {
-        return ceil($this->TotalRecords / $this->DisplayRecords);
-    }
-
-    // Parse query builder rule
-    protected function parseRules($group, $fieldName = "", $itemName = "") {
-        $group["condition"] ??= "AND";
-        if (!in_array($group["condition"], ["AND", "OR"])) {
-            throw new \Exception("Unable to build SQL query with condition '" . $group["condition"] . "'");
-        }
-        if (!is_array($group["rules"] ?? null)) {
-            return "";
-        }
-        $parts = [];
-        foreach ($group["rules"] as $rule) {
-            if (is_array($rule["rules"] ?? null) && count($rule["rules"]) > 0) {
-                $part = $this->parseRules($rule, $fieldName, $itemName);
-                if ($part) {
-                    $parts[] = "(" . " " . $part . " " . ")" . " ";
-                }
-            } else {
-                $field = $rule["field"];
-                $fld = $this->fieldByParam($field);
-                $dbid = $this->Dbid;
-                if ($fld instanceof ReportField && is_array($fld->DashboardSearchSourceFields)) {
-                    $item = $fld->DashboardSearchSourceFields[$itemName] ?? null;
-                    if ($item) {
-                        $tbl = Container($item["table"]);
-                        $dbid = $tbl->Dbid;
-                        $fld = $tbl->Fields[$item["field"]];
-                    } else {
-                        $fld = null;
-                    }
-                }
-                if ($fld && ($fieldName == "" || $fld->Name == $fieldName)) { // Field name not specified or matched field name
-                    $fldOpr = array_search($rule["operator"], Config("CLIENT_SEARCH_OPERATORS"));
-                    $ope = Config("QUERY_BUILDER_OPERATORS")[$rule["operator"]] ?? null;
-                    if (!$ope || !$fldOpr) {
-                        throw new \Exception("Unknown SQL operation for operator '" . $rule["operator"] . "'");
-                    }
-                    if ($ope["nb_inputs"] > 0 && isset($rule["value"]) && !EmptyValue($rule["value"]) || IsNullOrEmptyOperator($fldOpr)) {
-                        $fldVal = $rule["value"];
-                        if (is_array($fldVal)) {
-                            $fldVal = $fld->isMultiSelect() ? implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal) : $fldVal[0];
-                        }
-                        $useFilter = $fld->UseFilter; // Query builder does not use filter
-                        try {
-                            if ($fld instanceof ReportField) { // Search report fields
-                                if ($fld->SearchType == "dropdown") {
-                                    if (is_array($fldVal)) {
-                                        $sql = "";
-                                        foreach ($fldVal as $val) {
-                                            AddFilter($sql, DropDownFilter($fld, $val, $fldOpr, $dbid), "OR");
-                                        }
-                                        $parts[] = $sql;
-                                    } else {
-                                        $parts[] = DropDownFilter($fld, $fldVal, $fldOpr, $dbid);
-                                    }
-                                } else {
-                                    $fld->AdvancedSearch->SearchOperator = $fldOpr;
-                                    $fld->AdvancedSearch->SearchValue = $fldVal;
-                                    $parts[] = GetReportFilter($fld, false, $dbid);
-                                }
-                            } else { // Search normal fields
-                                if ($fld->isMultiSelect()) {
-                                    $parts[] = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, ConvertSearchValue($fldVal, $fldOpr, $fld), $this->Dbid) : "";
-                                } else {
-                                    $fldVal2 = ContainsString($fldOpr, "BETWEEN") ? $rule["value"][1] : ""; // BETWEEN
-                                    if (is_array($fldVal2)) {
-                                        $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
-                                    }
-                                    $fld->AdvancedSearch->SearchValue = ConvertSearchValue($fldVal, $fldOpr, $fld);
-                                    $fld->AdvancedSearch->SearchValue2 = ConvertSearchValue($fldVal2, $fldOpr, $fld);
-                                    $parts[] = GetSearchSql(
-                                        $fld,
-                                        $fld->AdvancedSearch->SearchValue, // SearchValue
-                                        $fldOpr,
-                                        "", // $fldCond not used
-                                        $fld->AdvancedSearch->SearchValue2, // SearchValue2
-                                        "", // $fldOpr2 not used
-                                        $this->Dbid
-                                    );
-                                }
-                            }
-                        } finally {
-                            $fld->UseFilter = $useFilter;
-                        }
-                    }
-                }
-            }
-        }
-        $where = "";
-        foreach ($parts as $part) {
-            AddFilter($where, $part, $group["condition"]);
-        }
-        if ($where && ($group["not"] ?? false)) {
-            $where = "NOT (" . $where . ")";
-        }
-        return $where;
     }
 
     // Page Load event
@@ -2495,61 +2667,5 @@ class RadiologyRequestsList extends RadiologyRequests
     {
         // Example:
         //$this->ListOptions["new"]->Body = "xxx";
-    }
-
-    // Row Custom Action event
-    public function rowCustomAction($action, $row)
-    {
-        // Return false to abort
-        return true;
-    }
-
-    // Page Exporting event
-    // $doc = export object
-    public function pageExporting(&$doc)
-    {
-        //$doc->Text = "my header"; // Export header
-        //return false; // Return false to skip default export and use Row_Export event
-        return true; // Return true to use default export and skip Row_Export event
-    }
-
-    // Row Export event
-    // $doc = export document object
-    public function rowExport($doc, $rs)
-    {
-        //$doc->Text .= "my content"; // Build HTML with field value: $rs["MyField"] or $this->MyField->ViewValue
-    }
-
-    // Page Exported event
-    // $doc = export document object
-    public function pageExported($doc)
-    {
-        //$doc->Text .= "my footer"; // Export footer
-        //Log($doc->Text);
-    }
-
-    // Page Importing event
-    public function pageImporting(&$builder, &$options)
-    {
-        //var_dump($options); // Show all options for importing
-        //$builder = fn($workflow) => $workflow->addStep($myStep);
-        //return false; // Return false to skip import
-        return true;
-    }
-
-    // Row Import event
-    public function rowImport(&$row, $cnt)
-    {
-        //Log($cnt); // Import record count
-        //var_dump($row); // Import row
-        //return false; // Return false to skip import
-        return true;
-    }
-
-    // Page Imported event
-    public function pageImported($obj, $results)
-    {
-        //var_dump($obj); // Workflow result object
-        //var_dump($results); // Import results
     }
 }

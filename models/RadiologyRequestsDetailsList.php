@@ -148,7 +148,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         $this->id->setVisibility();
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -706,6 +705,9 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_id);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fradiology_requests_detailsgrid";
@@ -1000,7 +1002,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             $this->updateSort($this->id); // id
             $this->updateSort($this->radiology_request_id); // radiology_request_id
             $this->updateSort($this->service_id); // service_id
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1025,7 +1026,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
                 $this->id->setSort("");
                 $this->radiology_request_id->setSort("");
                 $this->service_id->setSort("");
-                $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1132,7 +1132,7 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"radiology_requests_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1145,7 +1145,7 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"radiology_requests_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1158,7 +1158,7 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             // "copy"
             $opt = $this->ListOptions["copy"];
             $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd() && $this->showOptionLink("add")) {
+            if ($Security->canAdd()) {
                 if ($this->ModalAdd && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"radiology_requests_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
                 } else {
@@ -1170,7 +1170,7 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1265,7 +1265,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "radiology_request_id");
             $this->createColumnOption($option, "service_id");
-            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -1699,7 +1698,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1711,7 +1709,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1760,8 +1757,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
 
         // service_id
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -1776,12 +1771,27 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
 
             // service_id
-            $this->service_id->ViewValue = $this->service_id->CurrentValue;
-            $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->service_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_id->ViewValue = $this->service_id->lookupCacheOption($curVal);
+                if ($this->service_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_id->ViewValue = $this->service_id->displayValue($arwrk);
+                    } else {
+                        $this->service_id->ViewValue = FormatNumber($this->service_id->CurrentValue, $this->service_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1802,10 +1812,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2027,16 +2033,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2060,6 +2056,8 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2232,7 +2230,10 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add request details");
     }
 
     // Page Unload event

@@ -23,8 +23,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["radiology_request_id", [fields.radiology_request_id.visible && fields.radiology_request_id.required ? ew.Validators.required(fields.radiology_request_id.caption) : null, ew.Validators.integer], fields.radiology_request_id.isInvalid],
-            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null, ew.Validators.integer], fields.service_id.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null, ew.Validators.integer], fields.created_by_user_id.isInvalid],
+            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -42,6 +41,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "service_id": <?= $Page->service_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -88,28 +88,44 @@ $Page->showMessage();
         <label id="elh_radiology_requests_details_service_id" for="x_service_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->service_id->caption() ?><?= $Page->service_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->service_id->cellAttributes() ?>>
 <span id="el_radiology_requests_details_service_id">
-<input type="<?= $Page->service_id->getInputTextType() ?>" name="x_service_id" id="x_service_id" data-table="radiology_requests_details" data-field="x_service_id" value="<?= $Page->service_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->service_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->service_id->formatPattern()) ?>"<?= $Page->service_id->editAttributes() ?> aria-describedby="x_service_id_help">
-<?= $Page->service_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->service_id->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
+    <select
+        id="x_service_id"
+        name="x_service_id"
+        class="form-select ew-select<?= $Page->service_id->isInvalidClass() ?>"
+        <?php if (!$Page->service_id->IsNativeSelect) { ?>
+        data-select2-id="fradiology_requests_detailsadd_x_service_id"
+        <?php } ?>
+        data-table="radiology_requests_details"
+        data-field="x_service_id"
+        data-value-separator="<?= $Page->service_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->service_id->getPlaceHolder()) ?>"
+        <?= $Page->service_id->editAttributes() ?>>
+        <?= $Page->service_id->selectOptionListHtml("x_service_id") ?>
+    </select>
+    <?= $Page->service_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->service_id->getErrorMessage() ?></div>
+<?= $Page->service_id->Lookup->getParamTag($Page, "p_x_service_id") ?>
+<?php if (!$Page->service_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fradiology_requests_detailsadd", function() {
+    var options = { name: "x_service_id", selectId: "fradiology_requests_detailsadd_x_service_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fradiology_requests_detailsadd.lists.service_id?.lookupOptions.length) {
+        options.data = { id: "x_service_id", form: "fradiology_requests_detailsadd" };
+    } else {
+        options.ajax = { id: "x_service_id", form: "fradiology_requests_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_requests_details.fields.service_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_radiology_requests_details_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue))) ?>"></span>
-<input type="hidden" data-table="radiology_requests_details" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_radiology_requests_details_created_by_user_id">
-<input type="<?= $Page->created_by_user_id->getInputTextType() ?>" name="x_created_by_user_id" id="x_created_by_user_id" data-table="radiology_requests_details" data-field="x_created_by_user_id" value="<?= $Page->created_by_user_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_by_user_id->formatPattern()) ?>"<?= $Page->created_by_user_id->editAttributes() ?> aria-describedby="x_created_by_user_id_help">
-<?= $Page->created_by_user_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -124,7 +140,7 @@ $Page->showMessage();
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fradiology_requests_detailsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -165,7 +181,7 @@ loadjs.ready(["fradiology_requests_detailsadd", "datetimepicker"], function () {
 <?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fradiology_requests_detailsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

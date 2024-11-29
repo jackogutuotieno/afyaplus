@@ -126,7 +126,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
         $this->physical_address->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -755,16 +754,6 @@ class MedicalSchemesEdit extends MedicalSchemes
             }
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -797,7 +786,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         $this->phone->CurrentValue = $this->phone->FormValue;
         $this->email_address->CurrentValue = $this->email_address->FormValue;
         $this->physical_address->CurrentValue = $this->physical_address->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -827,15 +815,6 @@ class MedicalSchemesEdit extends MedicalSchemes
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -856,7 +835,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -870,7 +848,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -922,9 +899,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         // physical_address
         $this->physical_address->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -948,10 +922,6 @@ class MedicalSchemesEdit extends MedicalSchemes
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -967,16 +937,29 @@ class MedicalSchemesEdit extends MedicalSchemes
             $this->company->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1020,20 +1003,6 @@ class MedicalSchemesEdit extends MedicalSchemes
             $this->physical_address->EditValue = HtmlEncode($this->physical_address->CurrentValue);
             $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
 
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
-
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -1053,16 +1022,29 @@ class MedicalSchemesEdit extends MedicalSchemes
             $this->company->HrefValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
 
             // physical_address
             $this->physical_address->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1114,14 +1096,6 @@ class MedicalSchemesEdit extends MedicalSchemes
                 if (!$this->physical_address->IsDetailKey && EmptyValue($this->physical_address->FormValue)) {
                     $this->physical_address->addErrorMessage(str_replace("%s", $this->physical_address->caption(), $this->physical_address->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1240,9 +1214,6 @@ class MedicalSchemesEdit extends MedicalSchemes
         // physical_address
         $this->physical_address->setDbValueDef($rsnew, $this->physical_address->CurrentValue, $this->physical_address->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
 
@@ -1269,25 +1240,12 @@ class MedicalSchemesEdit extends MedicalSchemes
         if (isset($row['physical_address'])) { // physical_address
             $this->physical_address->CurrentValue = $row['physical_address'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->CurrentValue = $row['date_updated'];
         }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

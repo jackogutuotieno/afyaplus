@@ -100,9 +100,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Page->service_id->headerCellClass() ?>"><div id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Page->renderFieldHeader($Page->service_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_radiology_requests_details_created_by_user_id" class="radiology_requests_details_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_radiology_requests_details_date_created" class="radiology_requests_details_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -158,14 +155,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_details_service_id" class="el_radiology_requests_details_service_id">
 <span<?= $Page->service_id->viewAttributes() ?>>
 <?= $Page->service_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_requests_details_created_by_user_id" class="el_radiology_requests_details_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
