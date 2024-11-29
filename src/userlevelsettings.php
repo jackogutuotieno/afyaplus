@@ -504,7 +504,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["departments","departments","Departments",true,"{32536B8D-F37B-4419-80D5-260932800712}","departmentslist"],
     ["designations","designations","Designations",true,"{32536B8D-F37B-4419-80D5-260932800712}","designationslist"],
     ["diagnosis","diagnosis","Diagnosis",true,"{32536B8D-F37B-4419-80D5-260932800712}","diagnosislist"],
-    ["diseases","diseases","diseases",true,"{32536B8D-F37B-4419-80D5-260932800712}","diseaseslist"],
+    ["diseases","diseases","Diseases",true,"{32536B8D-F37B-4419-80D5-260932800712}","diseaseslist"],
     ["doctor_charges","doctor_charges","doctor charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctorchargeslist"],
     ["doctor_notes","doctor_notes","Medical Notes",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctornoteslist"],
     ["expenses","expenses","expenses",true,"{32536B8D-F37B-4419-80D5-260932800712}","expenseslist"],

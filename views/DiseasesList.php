@@ -157,9 +157,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_diseases_id" class="diseases_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->icd10_code->Visible) { // icd10_code ?>
         <th data-name="icd10_code" class="<?= $Page->icd10_code->headerCellClass() ?>"><div id="elh_diseases_icd10_code" class="diseases_icd10_code"><?= $Page->renderFieldHeader($Page->icd10_code) ?></div></th>
 <?php } ?>
@@ -200,14 +197,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_diseases_id" class="el_diseases_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->icd10_code->Visible) { // icd10_code ?>
         <td data-name="icd10_code"<?= $Page->icd10_code->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_diseases_icd10_code" class="el_diseases_icd10_code">

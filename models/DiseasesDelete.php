@@ -121,7 +121,7 @@ class DiseasesDelete extends Diseases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->icd10_code->setVisibility();
         $this->disease_name->setVisibility();
         $this->date_created->setVisibility();
@@ -655,10 +655,6 @@ class DiseasesDelete extends Diseases
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // icd10_code
             $this->icd10_code->HrefValue = "";

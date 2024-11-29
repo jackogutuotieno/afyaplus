@@ -22,13 +22,6 @@ class DiseasesController extends ControllerBase
         return $this->runPage($request, $response, $args, "DiseasesList");
     }
 
-    // add
-    #[Map(["GET","POST","OPTIONS"], "/diseasesadd[/{id}]", [PermissionMiddleware::class], "add.diseases")]
-    public function add(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "DiseasesAdd");
-    }
-
     // view
     #[Map(["GET","POST","OPTIONS"], "/diseasesview[/{id}]", [PermissionMiddleware::class], "view.diseases")]
     public function view(Request $request, Response $response, array $args): Response

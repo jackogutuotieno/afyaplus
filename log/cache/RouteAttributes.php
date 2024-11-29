@@ -127,7 +127,6 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
-        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -253,11 +252,6 @@
                 ],
                 [
                     'GET',
-                    'OPTIONS',
-                ],
-                [
-                    'GET',
-                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1440,7 +1434,6 @@
                 '/diagnosisedit[/{id}]',
                 '/diagnosisdelete[/{id}]',
                 '/diseaseslist[/{id}]',
-                '/diseasesadd[/{id}]',
                 '/diseasesview[/{id}]',
                 '/diseasesedit[/{id}]',
                 '/diseasesdelete[/{id}]',
@@ -1678,7 +1671,6 @@
                 'PHPMaker2024\\afyaplus\\DiagnosisController:edit',
                 'PHPMaker2024\\afyaplus\\DiagnosisController:delete',
                 'PHPMaker2024\\afyaplus\\DiseasesController:list',
-                'PHPMaker2024\\afyaplus\\DiseasesController:add',
                 'PHPMaker2024\\afyaplus\\DiseasesController:view',
                 'PHPMaker2024\\afyaplus\\DiseasesController:edit',
                 'PHPMaker2024\\afyaplus\\DiseasesController:delete',
@@ -1894,9 +1886,6 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
-                [
-                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
-                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2624,7 +2613,6 @@
                 'edit.diagnosis',
                 'delete.diagnosis',
                 'list.diseases',
-                'add.diseases',
                 'view.diseases',
                 'edit.diseases',
                 'delete.diseases',
@@ -2840,7 +2828,6 @@
                 'list.vitalsreport',
             ],
             'options' => [
-                [],
                 [],
                 [],
                 [],
@@ -3315,7 +3302,6 @@
         $o[232],
         $o[233],
         $o[234],
-        $o[235],
     ],
     []
 );

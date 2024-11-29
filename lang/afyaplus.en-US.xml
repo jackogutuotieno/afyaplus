@@ -279,21 +279,21 @@
       </field>
     </table>
     <table id="diseases">
-      <phrase id="tblcaption" value="diseases" />
+      <phrase id="tblcaption" value="Diseases" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
       <field id="icd10_code">
-        <phrase id="fldcaption" value="icd 10 code" />
+        <phrase id="fldcaption" value="ICD10 Code" />
       </field>
       <field id="disease_name">
-        <phrase id="fldcaption" value="disease name" />
+        <phrase id="fldcaption" value="Disease" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="LAst Updated" />
       </field>
     </table>
     <table id="doctor_charges">
