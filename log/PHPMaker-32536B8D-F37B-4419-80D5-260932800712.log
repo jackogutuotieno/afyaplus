@@ -45,6 +45,8 @@ C:\wamp64\www\afyaplus\controllers\PatientsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\PatientsvisitsreportController.php
 C:\wamp64\www\afyaplus\controllers\PaymentMethodsController.php
+C:\wamp64\www\afyaplus\controllers\PharmacyBillingReportController.php
+C:\wamp64\www\afyaplus\controllers\PharmacyBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyBillingReportController.php
@@ -297,6 +299,11 @@ C:\wamp64\www\afyaplus\models\PaymentMethodsEdit.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsList.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsView.php
 C:\wamp64\www\afyaplus\models\PersonalData.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReport.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetails.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportList.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetails.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetailsAdd.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetailsDelete.php
@@ -479,6 +486,8 @@ C:\wamp64\www\afyaplus\src\Entity\PatientVital.php
 C:\wamp64\www\afyaplus\src\Entity\PatientsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Patientsvisitsreport.php
 C:\wamp64\www\afyaplus\src\Entity\PaymentMethod.php
+C:\wamp64\www\afyaplus\src\Entity\PharmacyBillingReport.php
+C:\wamp64\www\afyaplus\src\Entity\PharmacyBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\Prescription.php
 C:\wamp64\www\afyaplus\src\Entity\PrescriptionDetail.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyBillingReport.php
@@ -778,6 +787,10 @@ C:\wamp64\www\afyaplus\views\PaymentMethodsEdit.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsList.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsView.php
 C:\wamp64\www\afyaplus\views\PersonalData.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsGrid.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportList.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsAdd.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsDelete.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsEdit.php

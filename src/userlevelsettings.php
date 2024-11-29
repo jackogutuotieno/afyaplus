@@ -505,7 +505,25 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report_details","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report_details","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report_details","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report_details","7","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report_details","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","7","0"]];
 
 /**
  * Tables
@@ -570,4 +588,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report","Apporintment
     ["laboratory_billing_report","laboratory_billing_report","Laboratory Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportlist"],
     ["laboratory_billing_report_details","laboratory_billing_report_details","Laboratory Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratorybillingreportdetailslist"],
     ["radiology_billing_report","radiology_billing_report","Radiology Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologybillingreportlist"],
-    ["radiology_billing_report_details","radiology_billing_report_details","Radiology Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologybillingreportdetailslist"]];
+    ["radiology_billing_report_details","radiology_billing_report_details","Radiology Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologybillingreportdetailslist"],
+    ["pharmacy_billing_report","pharmacy_billing_report","Pharmacy Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportlist"],
+    ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"]];

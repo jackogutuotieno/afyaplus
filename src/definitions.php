@@ -133,6 +133,8 @@ return [
     "laboratory_billing_report_details" => \DI\create(LaboratoryBillingReportDetails::class),
     "radiology_billing_report" => \DI\create(RadiologyBillingReport::class),
     "radiology_billing_report_details" => \DI\create(RadiologyBillingReportDetails::class),
+    "pharmacy_billing_report" => \DI\create(PharmacyBillingReport::class),
+    "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
 
     // User table
     "usertable" => \DI\get("users"),

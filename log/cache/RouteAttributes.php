@@ -237,6 +237,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1422,6 +1424,16 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -1591,6 +1603,8 @@
                 '/paymentmethodsview[/{id}]',
                 '/paymentmethodsedit[/{id}]',
                 '/paymentmethodsdelete[/{id}]',
+                '/pharmacybillingreportlist[/{id}]',
+                '/pharmacybillingreportdetailslist[/{id}]',
                 '/prescriptiondetailslist[/{id}]',
                 '/prescriptiondetailsadd[/{id}]',
                 '/prescriptiondetailsview[/{id}]',
@@ -1830,6 +1844,8 @@
                 'PHPMaker2024\\afyaplus\\PaymentMethodsController:view',
                 'PHPMaker2024\\afyaplus\\PaymentMethodsController:edit',
                 'PHPMaker2024\\afyaplus\\PaymentMethodsController:delete',
+                'PHPMaker2024\\afyaplus\\PharmacyBillingReportController:list',
+                'PHPMaker2024\\afyaplus\\PharmacyBillingReportDetailsController:list',
                 'PHPMaker2024\\afyaplus\\PrescriptionDetailsController:list',
                 'PHPMaker2024\\afyaplus\\PrescriptionDetailsController:add',
                 'PHPMaker2024\\afyaplus\\PrescriptionDetailsController:view',
@@ -2611,6 +2627,12 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -2780,6 +2802,8 @@
                 'view.payment_methods',
                 'edit.payment_methods',
                 'delete.payment_methods',
+                'list.pharmacy_billing_report',
+                'list.pharmacy_billing_report_details',
                 'list.prescription_details',
                 'add.prescription_details',
                 'view.prescription_details',
@@ -2852,6 +2876,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3330,6 +3356,8 @@
         $o[234],
         $o[235],
         $o[236],
+        $o[237],
+        $o[238],
     ],
     []
 );

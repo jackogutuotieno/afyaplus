@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for radiology_billing_report
+ * Table class for pharmacy_billing_report_details
  */
-class RadiologyBillingReport extends DbTable
+class PharmacyBillingReportDetails extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,10 +47,11 @@ class RadiologyBillingReport extends DbTable
 
     // Fields
     public $id;
-    public $patient_id;
-    public $visit_id;
-    public $date_created;
-    public $date_updated;
+    public $medicine_dispensation_id;
+    public $brand_name;
+    public $selling_price_per_unit;
+    public $quantity;
+    public $line_total;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -63,14 +64,14 @@ class RadiologyBillingReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "radiology_billing_report";
-        $this->TableName = 'radiology_billing_report';
+        $this->TableVar = "pharmacy_billing_report_details";
+        $this->TableName = 'pharmacy_billing_report_details';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "radiology_requests";
+        $this->UpdateTable = "pharmacy_billing_report_details";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -119,119 +120,138 @@ class RadiologyBillingReport extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_id
-        $this->patient_id = new DbField(
+        // medicine_dispensation_id
+        $this->medicine_dispensation_id = new DbField(
             $this, // Table
-            'x_patient_id', // Variable name
-            'patient_id', // Name
-            '`patient_id`', // Expression
-            '`patient_id`', // Basic search expression
+            'x_medicine_dispensation_id', // Variable name
+            'medicine_dispensation_id', // Name
+            '`medicine_dispensation_id`', // Expression
+            '`medicine_dispensation_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`patient_id`', // Virtual expression
+            '`medicine_dispensation_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->patient_id->InputTextType = "text";
-        $this->patient_id->Raw = true;
-        $this->patient_id->Nullable = false; // NOT NULL field
-        $this->patient_id->Required = true; // Required field
-        $this->patient_id->setSelectMultiple(false); // Select one
-        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_id'] = &$this->patient_id;
+        $this->medicine_dispensation_id->InputTextType = "text";
+        $this->medicine_dispensation_id->Raw = true;
+        $this->medicine_dispensation_id->IsForeignKey = true; // Foreign key field
+        $this->medicine_dispensation_id->Nullable = false; // NOT NULL field
+        $this->medicine_dispensation_id->Required = true; // Required field
+        $this->medicine_dispensation_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->medicine_dispensation_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['medicine_dispensation_id'] = &$this->medicine_dispensation_id;
 
-        // visit_id
-        $this->visit_id = new DbField(
+        // brand_name
+        $this->brand_name = new DbField(
             $this, // Table
-            'x_visit_id', // Variable name
-            'visit_id', // Name
-            '`visit_id`', // Expression
-            '`visit_id`', // Basic search expression
+            'x_brand_name', // Variable name
+            'brand_name', // Name
+            '`brand_name`', // Expression
+            '`brand_name`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`brand_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->brand_name->InputTextType = "text";
+        $this->brand_name->Nullable = false; // NOT NULL field
+        $this->brand_name->Required = true; // Required field
+        $this->brand_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['brand_name'] = &$this->brand_name;
+
+        // selling_price_per_unit
+        $this->selling_price_per_unit = new DbField(
+            $this, // Table
+            'x_selling_price_per_unit', // Variable name
+            'selling_price_per_unit', // Name
+            '`selling_price_per_unit`', // Expression
+            '`selling_price_per_unit`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`selling_price_per_unit`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->selling_price_per_unit->InputTextType = "text";
+        $this->selling_price_per_unit->Raw = true;
+        $this->selling_price_per_unit->Nullable = false; // NOT NULL field
+        $this->selling_price_per_unit->Required = true; // Required field
+        $this->selling_price_per_unit->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->selling_price_per_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['selling_price_per_unit'] = &$this->selling_price_per_unit;
+
+        // quantity
+        $this->quantity = new DbField(
+            $this, // Table
+            'x_quantity', // Variable name
+            'quantity', // Name
+            '`quantity`', // Expression
+            '`quantity`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`visit_id`', // Virtual expression
+            '`quantity`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->visit_id->InputTextType = "text";
-        $this->visit_id->Raw = true;
-        $this->visit_id->Nullable = false; // NOT NULL field
-        $this->visit_id->Required = true; // Required field
-        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_id'] = &$this->visit_id;
+        $this->quantity->InputTextType = "text";
+        $this->quantity->Raw = true;
+        $this->quantity->Nullable = false; // NOT NULL field
+        $this->quantity->Required = true; // Required field
+        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['quantity'] = &$this->quantity;
 
-        // date_created
-        $this->date_created = new DbField(
+        // line_total
+        $this->line_total = new DbField(
             $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            11, // Date/Time format
+            'x_line_total', // Variable name
+            'line_total', // Name
+            'selling_price_per_unit * quantity', // Expression
+            'selling_price_per_unit * quantity', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`date_created`', // Virtual expression
+            'selling_price_per_unit * quantity', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
+        $this->line_total->InputTextType = "text";
+        $this->line_total->Raw = true;
+        $this->line_total->IsCustom = true; // Custom field
+        $this->line_total->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->line_total->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['line_total'] = &$this->line_total;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -291,30 +311,86 @@ class RadiologyBillingReport extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
+    // Current master table name
+    public function getCurrentMasterTable()
     {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
-    public function setCurrentDetailTable($v)
+    public function setCurrentMasterTable($v)
     {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
     }
 
-    // Get detail url
-    public function getDetailUrl()
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
     {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "radiology_billing_report_details") {
-            $detailUrl = Container("radiology_billing_report_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "pharmacy_billing_report") {
+            $masterTable = Container("pharmacy_billing_report");
+            if ($this->medicine_dispensation_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->medicine_dispensation_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
         }
-        if ($detailUrl == "") {
-            $detailUrl = "radiologybillingreportlist";
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "pharmacy_billing_report") {
+            $masterTable = Container("pharmacy_billing_report");
+            if ($this->medicine_dispensation_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->medicine_dispensation_id, $this->medicine_dispensation_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
         }
-        return $detailUrl;
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "pharmacy_billing_report":
+                $key = $keys["medicine_dispensation_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["medicine_dispensation_id"], $this->medicine_dispensation_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "pharmacy_billing_report":
+                return GetKeyFilter($this->medicine_dispensation_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -326,7 +402,7 @@ class RadiologyBillingReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "radiology_billing_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "pharmacy_billing_report_details";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -350,20 +426,7 @@ class RadiologyBillingReport extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, selling_price_per_unit * quantity AS `line_total`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -778,10 +841,11 @@ class RadiologyBillingReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_id->DbValue = $row['patient_id'];
-        $this->visit_id->DbValue = $row['visit_id'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
+        $this->medicine_dispensation_id->DbValue = $row['medicine_dispensation_id'];
+        $this->brand_name->DbValue = $row['brand_name'];
+        $this->selling_price_per_unit->DbValue = $row['selling_price_per_unit'];
+        $this->quantity->DbValue = $row['quantity'];
+        $this->line_total->DbValue = $row['line_total'];
     }
 
     // Delete uploaded files
@@ -855,7 +919,7 @@ class RadiologyBillingReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("radiologybillingreportlist");
+        return $_SESSION[$name] ?? GetUrl("pharmacybillingreportdetailslist");
     }
 
     // Set return page URL
@@ -869,9 +933,9 @@ class RadiologyBillingReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "radiologybillingreportview" => $Language->phrase("View"),
-            "radiologybillingreportedit" => $Language->phrase("Edit"),
-            "radiologybillingreportadd" => $Language->phrase("Add"),
+            "pharmacybillingreportdetailsview" => $Language->phrase("View"),
+            "pharmacybillingreportdetailsedit" => $Language->phrase("Edit"),
+            "pharmacybillingreportdetailsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -879,18 +943,18 @@ class RadiologyBillingReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "radiologybillingreportlist";
+        return "pharmacybillingreportdetailslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "RadiologyBillingReportView",
-            Config("API_ADD_ACTION") => "RadiologyBillingReportAdd",
-            Config("API_EDIT_ACTION") => "RadiologyBillingReportEdit",
-            Config("API_DELETE_ACTION") => "RadiologyBillingReportDelete",
-            Config("API_LIST_ACTION") => "RadiologyBillingReportList",
+            Config("API_VIEW_ACTION") => "PharmacyBillingReportDetailsView",
+            Config("API_ADD_ACTION") => "PharmacyBillingReportDetailsAdd",
+            Config("API_EDIT_ACTION") => "PharmacyBillingReportDetailsEdit",
+            Config("API_DELETE_ACTION") => "PharmacyBillingReportDetailsDelete",
+            Config("API_LIST_ACTION") => "PharmacyBillingReportDetailsList",
             default => ""
         };
     }
@@ -910,16 +974,16 @@ class RadiologyBillingReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "radiologybillingreportlist";
+        return "pharmacybillingreportdetailslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportview", $parm);
+            $url = $this->keyUrl("pharmacybillingreportdetailsview", $parm);
         } else {
-            $url = $this->keyUrl("radiologybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("pharmacybillingreportdetailsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -928,9 +992,9 @@ class RadiologyBillingReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "radiologybillingreportadd?" . $parm;
+            $url = "pharmacybillingreportdetailsadd?" . $parm;
         } else {
-            $url = "radiologybillingreportadd";
+            $url = "pharmacybillingreportdetailsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -938,36 +1002,28 @@ class RadiologyBillingReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportedit", $parm);
-        } else {
-            $url = $this->keyUrl("radiologybillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("pharmacybillingreportdetailsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("radiologybillingreportlist", "action=edit");
+        $url = $this->keyUrl("pharmacybillingreportdetailslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportadd", $parm);
-        } else {
-            $url = $this->keyUrl("radiologybillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("pharmacybillingreportdetailsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("radiologybillingreportlist", "action=copy");
+        $url = $this->keyUrl("pharmacybillingreportdetailslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -977,13 +1033,17 @@ class RadiologyBillingReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("radiologybillingreportdelete", $parm);
+            return $this->keyUrl("pharmacybillingreportdetailsdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "pharmacy_billing_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->medicine_dispensation_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1143,17 +1203,18 @@ class RadiologyBillingReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->medicine_dispensation_id->setDbValue($row['medicine_dispensation_id']);
+        $this->brand_name->setDbValue($row['brand_name']);
+        $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
+        $this->quantity->setDbValue($row['quantity']);
+        $this->line_total->setDbValue($row['line_total']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "RadiologyBillingReportList";
+        $listPage = "PharmacyBillingReportDetailsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1179,71 +1240,61 @@ class RadiologyBillingReport extends DbTable
 
         // id
 
-        // patient_id
+        // medicine_dispensation_id
 
-        // visit_id
+        // brand_name
 
-        // date_created
+        // selling_price_per_unit
 
-        // date_updated
+        // quantity
+
+        // line_total
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // patient_id
-        $curVal = strval($this->patient_id->CurrentValue);
-        if ($curVal != "") {
-            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            if ($this->patient_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                } else {
-                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                }
-            }
-        } else {
-            $this->patient_id->ViewValue = null;
-        }
+        // medicine_dispensation_id
+        $this->medicine_dispensation_id->ViewValue = $this->medicine_dispensation_id->CurrentValue;
+        $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
 
-        // visit_id
-        $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-        $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        // brand_name
+        $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
 
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+        // selling_price_per_unit
+        $this->selling_price_per_unit->ViewValue = $this->selling_price_per_unit->CurrentValue;
+        $this->selling_price_per_unit->ViewValue = FormatNumber($this->selling_price_per_unit->ViewValue, $this->selling_price_per_unit->formatPattern());
 
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+        // quantity
+        $this->quantity->ViewValue = $this->quantity->CurrentValue;
+        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+
+        // line_total
+        $this->line_total->ViewValue = $this->line_total->CurrentValue;
+        $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_id
-        $this->patient_id->HrefValue = "";
-        $this->patient_id->TooltipValue = "";
+        // medicine_dispensation_id
+        $this->medicine_dispensation_id->HrefValue = "";
+        $this->medicine_dispensation_id->TooltipValue = "";
 
-        // visit_id
-        $this->visit_id->HrefValue = "";
-        $this->visit_id->TooltipValue = "";
+        // brand_name
+        $this->brand_name->HrefValue = "";
+        $this->brand_name->TooltipValue = "";
 
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
+        // selling_price_per_unit
+        $this->selling_price_per_unit->HrefValue = "";
+        $this->selling_price_per_unit->TooltipValue = "";
 
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
+        // quantity
+        $this->quantity->HrefValue = "";
+        $this->quantity->TooltipValue = "";
+
+        // line_total
+        $this->line_total->HrefValue = "";
+        $this->line_total->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1264,27 +1315,51 @@ class RadiologyBillingReport extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // patient_id
-        $this->patient_id->setupEditAttributes();
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        // medicine_dispensation_id
+        $this->medicine_dispensation_id->setupEditAttributes();
+        if ($this->medicine_dispensation_id->getSessionValue() != "") {
+            $this->medicine_dispensation_id->CurrentValue = GetForeignKeyValue($this->medicine_dispensation_id->getSessionValue());
+            $this->medicine_dispensation_id->ViewValue = $this->medicine_dispensation_id->CurrentValue;
+            $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
+        } else {
+            $this->medicine_dispensation_id->EditValue = $this->medicine_dispensation_id->CurrentValue;
+            $this->medicine_dispensation_id->PlaceHolder = RemoveHtml($this->medicine_dispensation_id->caption());
+            if (strval($this->medicine_dispensation_id->EditValue) != "" && is_numeric($this->medicine_dispensation_id->EditValue)) {
+                $this->medicine_dispensation_id->EditValue = FormatNumber($this->medicine_dispensation_id->EditValue, null);
+            }
         }
 
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+        // brand_name
+        $this->brand_name->setupEditAttributes();
+        if (!$this->brand_name->Raw) {
+            $this->brand_name->CurrentValue = HtmlDecode($this->brand_name->CurrentValue);
+        }
+        $this->brand_name->EditValue = $this->brand_name->CurrentValue;
+        $this->brand_name->PlaceHolder = RemoveHtml($this->brand_name->caption());
 
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+        // selling_price_per_unit
+        $this->selling_price_per_unit->setupEditAttributes();
+        $this->selling_price_per_unit->EditValue = $this->selling_price_per_unit->CurrentValue;
+        $this->selling_price_per_unit->PlaceHolder = RemoveHtml($this->selling_price_per_unit->caption());
+        if (strval($this->selling_price_per_unit->EditValue) != "" && is_numeric($this->selling_price_per_unit->EditValue)) {
+            $this->selling_price_per_unit->EditValue = FormatNumber($this->selling_price_per_unit->EditValue, null);
+        }
+
+        // quantity
+        $this->quantity->setupEditAttributes();
+        $this->quantity->EditValue = $this->quantity->CurrentValue;
+        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+        if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
+            $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
+        }
+
+        // line_total
+        $this->line_total->setupEditAttributes();
+        $this->line_total->EditValue = $this->line_total->CurrentValue;
+        $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
+        if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
+            $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1293,11 +1368,19 @@ class RadiologyBillingReport extends DbTable
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->line_total->CurrentValue)) {
+                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->line_total->CurrentValue = $this->line_total->Total;
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+            $this->line_total->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1315,16 +1398,18 @@ class RadiologyBillingReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->medicine_dispensation_id);
+                    $doc->exportCaption($this->brand_name);
+                    $doc->exportCaption($this->selling_price_per_unit);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->line_total);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->medicine_dispensation_id);
+                    $doc->exportCaption($this->brand_name);
+                    $doc->exportCaption($this->selling_price_per_unit);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->line_total);
                 }
                 $doc->endExportRow();
             }
@@ -1343,6 +1428,7 @@ class RadiologyBillingReport extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1352,16 +1438,18 @@ class RadiologyBillingReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->medicine_dispensation_id);
+                        $doc->exportField($this->brand_name);
+                        $doc->exportField($this->selling_price_per_unit);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->line_total);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->medicine_dispensation_id);
+                        $doc->exportField($this->brand_name);
+                        $doc->exportField($this->selling_price_per_unit);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->line_total);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1370,6 +1458,23 @@ class RadiologyBillingReport extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
+            }
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = RowType::AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->id, '');
+                $doc->exportAggregate($this->medicine_dispensation_id, '');
+                $doc->exportAggregate($this->brand_name, '');
+                $doc->exportAggregate($this->selling_price_per_unit, '');
+                $doc->exportAggregate($this->quantity, '');
+                $doc->exportAggregate($this->line_total, 'TOTAL');
+                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {

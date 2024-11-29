@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for radiology_billing_report
+ * Table class for pharmacy_billing_report
  */
-class RadiologyBillingReport extends DbTable
+class PharmacyBillingReport extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,7 +48,9 @@ class RadiologyBillingReport extends DbTable
     // Fields
     public $id;
     public $patient_id;
-    public $visit_id;
+    public $prescription_id;
+    public $dispensation_type;
+    public $status;
     public $date_created;
     public $date_updated;
 
@@ -63,14 +65,14 @@ class RadiologyBillingReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "radiology_billing_report";
-        $this->TableName = 'radiology_billing_report';
+        $this->TableVar = "pharmacy_billing_report";
+        $this->TableName = 'pharmacy_billing_report';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "radiology_requests";
+        $this->UpdateTable = "medicine_dispensation";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -155,31 +157,79 @@ class RadiologyBillingReport extends DbTable
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
-        // visit_id
-        $this->visit_id = new DbField(
+        // prescription_id
+        $this->prescription_id = new DbField(
             $this, // Table
-            'x_visit_id', // Variable name
-            'visit_id', // Name
-            '`visit_id`', // Expression
-            '`visit_id`', // Basic search expression
+            'x_prescription_id', // Variable name
+            'prescription_id', // Name
+            '`prescription_id`', // Expression
+            '`prescription_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`visit_id`', // Virtual expression
+            '`prescription_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->visit_id->InputTextType = "text";
-        $this->visit_id->Raw = true;
-        $this->visit_id->Nullable = false; // NOT NULL field
-        $this->visit_id->Required = true; // Required field
-        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_id'] = &$this->visit_id;
+        $this->prescription_id->InputTextType = "text";
+        $this->prescription_id->Raw = true;
+        $this->prescription_id->Nullable = false; // NOT NULL field
+        $this->prescription_id->Required = true; // Required field
+        $this->prescription_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->prescription_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['prescription_id'] = &$this->prescription_id;
+
+        // dispensation_type
+        $this->dispensation_type = new DbField(
+            $this, // Table
+            'x_dispensation_type', // Variable name
+            'dispensation_type', // Name
+            '`dispensation_type`', // Expression
+            '`dispensation_type`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`dispensation_type`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->dispensation_type->InputTextType = "text";
+        $this->dispensation_type->Nullable = false; // NOT NULL field
+        $this->dispensation_type->Required = true; // Required field
+        $this->dispensation_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['dispensation_type'] = &$this->dispensation_type;
+
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '`status`', // Expression
+            '`status`', // Basic search expression
+            200, // Type
+            20, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`status`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->status->InputTextType = "text";
+        $this->status->Nullable = false; // NOT NULL field
+        $this->status->Required = true; // Required field
+        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['status'] = &$this->status;
 
         // date_created
         $this->date_created = new DbField(
@@ -307,12 +357,12 @@ class RadiologyBillingReport extends DbTable
     {
         // Detail url
         $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "radiology_billing_report_details") {
-            $detailUrl = Container("radiology_billing_report_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+        if ($this->getCurrentDetailTable() == "pharmacy_billing_report_details") {
+            $detailUrl = Container("pharmacy_billing_report_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "radiologybillingreportlist";
+            $detailUrl = "pharmacybillingreportlist";
         }
         return $detailUrl;
     }
@@ -326,7 +376,7 @@ class RadiologyBillingReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "radiology_billing_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "pharmacy_billing_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -779,7 +829,9 @@ class RadiologyBillingReport extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->patient_id->DbValue = $row['patient_id'];
-        $this->visit_id->DbValue = $row['visit_id'];
+        $this->prescription_id->DbValue = $row['prescription_id'];
+        $this->dispensation_type->DbValue = $row['dispensation_type'];
+        $this->status->DbValue = $row['status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -855,7 +907,7 @@ class RadiologyBillingReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("radiologybillingreportlist");
+        return $_SESSION[$name] ?? GetUrl("pharmacybillingreportlist");
     }
 
     // Set return page URL
@@ -869,9 +921,9 @@ class RadiologyBillingReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "radiologybillingreportview" => $Language->phrase("View"),
-            "radiologybillingreportedit" => $Language->phrase("Edit"),
-            "radiologybillingreportadd" => $Language->phrase("Add"),
+            "pharmacybillingreportview" => $Language->phrase("View"),
+            "pharmacybillingreportedit" => $Language->phrase("Edit"),
+            "pharmacybillingreportadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -879,18 +931,18 @@ class RadiologyBillingReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "radiologybillingreportlist";
+        return "pharmacybillingreportlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "RadiologyBillingReportView",
-            Config("API_ADD_ACTION") => "RadiologyBillingReportAdd",
-            Config("API_EDIT_ACTION") => "RadiologyBillingReportEdit",
-            Config("API_DELETE_ACTION") => "RadiologyBillingReportDelete",
-            Config("API_LIST_ACTION") => "RadiologyBillingReportList",
+            Config("API_VIEW_ACTION") => "PharmacyBillingReportView",
+            Config("API_ADD_ACTION") => "PharmacyBillingReportAdd",
+            Config("API_EDIT_ACTION") => "PharmacyBillingReportEdit",
+            Config("API_DELETE_ACTION") => "PharmacyBillingReportDelete",
+            Config("API_LIST_ACTION") => "PharmacyBillingReportList",
             default => ""
         };
     }
@@ -910,16 +962,16 @@ class RadiologyBillingReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "radiologybillingreportlist";
+        return "pharmacybillingreportlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportview", $parm);
+            $url = $this->keyUrl("pharmacybillingreportview", $parm);
         } else {
-            $url = $this->keyUrl("radiologybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("pharmacybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -928,9 +980,9 @@ class RadiologyBillingReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "radiologybillingreportadd?" . $parm;
+            $url = "pharmacybillingreportadd?" . $parm;
         } else {
-            $url = "radiologybillingreportadd";
+            $url = "pharmacybillingreportadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -939,9 +991,9 @@ class RadiologyBillingReport extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportedit", $parm);
+            $url = $this->keyUrl("pharmacybillingreportedit", $parm);
         } else {
-            $url = $this->keyUrl("radiologybillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("pharmacybillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -949,7 +1001,7 @@ class RadiologyBillingReport extends DbTable
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("radiologybillingreportlist", "action=edit");
+        $url = $this->keyUrl("pharmacybillingreportlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
@@ -957,9 +1009,9 @@ class RadiologyBillingReport extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("radiologybillingreportadd", $parm);
+            $url = $this->keyUrl("pharmacybillingreportadd", $parm);
         } else {
-            $url = $this->keyUrl("radiologybillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("pharmacybillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -967,7 +1019,7 @@ class RadiologyBillingReport extends DbTable
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("radiologybillingreportlist", "action=copy");
+        $url = $this->keyUrl("pharmacybillingreportlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -977,7 +1029,7 @@ class RadiologyBillingReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("radiologybillingreportdelete", $parm);
+            return $this->keyUrl("pharmacybillingreportdelete", $parm);
         }
     }
 
@@ -1144,7 +1196,9 @@ class RadiologyBillingReport extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
+        $this->prescription_id->setDbValue($row['prescription_id']);
+        $this->dispensation_type->setDbValue($row['dispensation_type']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1153,7 +1207,7 @@ class RadiologyBillingReport extends DbTable
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "RadiologyBillingReportList";
+        $listPage = "PharmacyBillingReportList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1181,7 +1235,11 @@ class RadiologyBillingReport extends DbTable
 
         // patient_id
 
-        // visit_id
+        // prescription_id
+
+        // dispensation_type
+
+        // status
 
         // date_created
 
@@ -1213,9 +1271,15 @@ class RadiologyBillingReport extends DbTable
             $this->patient_id->ViewValue = null;
         }
 
-        // visit_id
-        $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-        $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        // prescription_id
+        $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
+        $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+
+        // dispensation_type
+        $this->dispensation_type->ViewValue = $this->dispensation_type->CurrentValue;
+
+        // status
+        $this->status->ViewValue = $this->status->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1233,9 +1297,17 @@ class RadiologyBillingReport extends DbTable
         $this->patient_id->HrefValue = "";
         $this->patient_id->TooltipValue = "";
 
-        // visit_id
-        $this->visit_id->HrefValue = "";
-        $this->visit_id->TooltipValue = "";
+        // prescription_id
+        $this->prescription_id->HrefValue = "";
+        $this->prescription_id->TooltipValue = "";
+
+        // dispensation_type
+        $this->dispensation_type->HrefValue = "";
+        $this->dispensation_type->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1268,13 +1340,29 @@ class RadiologyBillingReport extends DbTable
         $this->patient_id->setupEditAttributes();
         $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
 
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        // prescription_id
+        $this->prescription_id->setupEditAttributes();
+        $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
+        $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
+        if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
+            $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
         }
+
+        // dispensation_type
+        $this->dispensation_type->setupEditAttributes();
+        if (!$this->dispensation_type->Raw) {
+            $this->dispensation_type->CurrentValue = HtmlDecode($this->dispensation_type->CurrentValue);
+        }
+        $this->dispensation_type->EditValue = $this->dispensation_type->CurrentValue;
+        $this->dispensation_type->PlaceHolder = RemoveHtml($this->dispensation_type->caption());
+
+        // status
+        $this->status->setupEditAttributes();
+        if (!$this->status->Raw) {
+            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        }
+        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1316,13 +1404,17 @@ class RadiologyBillingReport extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
+                    $doc->exportCaption($this->prescription_id);
+                    $doc->exportCaption($this->dispensation_type);
+                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
+                    $doc->exportCaption($this->prescription_id);
+                    $doc->exportCaption($this->dispensation_type);
+                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1353,13 +1445,17 @@ class RadiologyBillingReport extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
+                        $doc->exportField($this->prescription_id);
+                        $doc->exportField($this->dispensation_type);
+                        $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
+                        $doc->exportField($this->prescription_id);
+                        $doc->exportField($this->dispensation_type);
+                        $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
