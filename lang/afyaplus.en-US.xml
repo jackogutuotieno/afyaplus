@@ -412,8 +412,11 @@
       <field id="cost">
         <phrase id="fldcaption" value="cost" />
       </field>
+      <field id="line_total">
+        <phrase id="fldcaption" value="Line Total (Kshs)" />
+      </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />

@@ -51,6 +51,7 @@ class InvoiceDetails extends DbTable
     public $item;
     public $quantity;
     public $cost;
+    public $line_total;
     public $date_created;
     public $date_updated;
 
@@ -228,6 +229,31 @@ class InvoiceDetails extends DbTable
         $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['cost'] = &$this->cost;
+
+        // line_total
+        $this->line_total = new DbField(
+            $this, // Table
+            'x_line_total', // Variable name
+            'line_total', // Name
+            'quantity * cost', // Expression
+            'quantity * cost', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'quantity * cost', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->line_total->InputTextType = "text";
+        $this->line_total->Raw = true;
+        $this->line_total->IsCustom = true; // Custom field
+        $this->line_total->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->line_total->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['line_total'] = &$this->line_total;
 
         // date_created
         $this->date_created = new DbField(
@@ -456,20 +482,7 @@ class InvoiceDetails extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, quantity * cost AS `line_total`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -895,6 +908,7 @@ class InvoiceDetails extends DbTable
         $this->item->DbValue = $row['item'];
         $this->quantity->DbValue = $row['quantity'];
         $this->cost->DbValue = $row['cost'];
+        $this->line_total->DbValue = $row['line_total'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1258,6 +1272,7 @@ class InvoiceDetails extends DbTable
         $this->item->setDbValue($row['item']);
         $this->quantity->setDbValue($row['quantity']);
         $this->cost->setDbValue($row['cost']);
+        $this->line_total->setDbValue($row['line_total']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1300,6 +1315,8 @@ class InvoiceDetails extends DbTable
 
         // cost
 
+        // line_total
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
@@ -1323,6 +1340,10 @@ class InvoiceDetails extends DbTable
         // cost
         $this->cost->ViewValue = $this->cost->CurrentValue;
         $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
+
+        // line_total
+        $this->line_total->ViewValue = $this->line_total->CurrentValue;
+        $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1351,6 +1372,10 @@ class InvoiceDetails extends DbTable
         // cost
         $this->cost->HrefValue = "";
         $this->cost->TooltipValue = "";
+
+        // line_total
+        $this->line_total->HrefValue = "";
+        $this->line_total->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1417,6 +1442,14 @@ class InvoiceDetails extends DbTable
             $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
         }
 
+        // line_total
+        $this->line_total->setupEditAttributes();
+        $this->line_total->EditValue = $this->line_total->CurrentValue;
+        $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
+        if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
+            $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
+        }
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1434,11 +1467,19 @@ class InvoiceDetails extends DbTable
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->line_total->CurrentValue)) {
+                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->line_total->CurrentValue = $this->line_total->Total;
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+            $this->line_total->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1460,12 +1501,14 @@ class InvoiceDetails extends DbTable
                     $doc->exportCaption($this->item);
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->line_total);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->invoice_id);
                     $doc->exportCaption($this->item);
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->line_total);
                 }
                 $doc->endExportRow();
             }
@@ -1484,6 +1527,7 @@ class InvoiceDetails extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1497,12 +1541,14 @@ class InvoiceDetails extends DbTable
                         $doc->exportField($this->item);
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->cost);
+                        $doc->exportField($this->line_total);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->invoice_id);
                         $doc->exportField($this->item);
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->cost);
+                        $doc->exportField($this->line_total);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1511,6 +1557,23 @@ class InvoiceDetails extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
+            }
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = RowType::AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->id, '');
+                $doc->exportAggregate($this->invoice_id, '');
+                $doc->exportAggregate($this->item, '');
+                $doc->exportAggregate($this->quantity, '');
+                $doc->exportAggregate($this->cost, '');
+                $doc->exportAggregate($this->line_total, 'TOTAL');
+                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {

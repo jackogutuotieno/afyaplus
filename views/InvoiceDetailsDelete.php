@@ -65,6 +65,9 @@ $Page->showMessage();
 <?php if ($Page->cost->Visible) { // cost ?>
         <th class="<?= $Page->cost->headerCellClass() ?>"><span id="elh_invoice_details_cost" class="invoice_details_cost"><?= $Page->cost->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->line_total->Visible) { // line_total ?>
+        <th class="<?= $Page->line_total->headerCellClass() ?>"><span id="elh_invoice_details_line_total" class="invoice_details_line_total"><?= $Page->line_total->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -123,6 +126,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->cost->viewAttributes() ?>>
 <?= $Page->cost->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->line_total->Visible) { // line_total ?>
+        <td<?= $Page->line_total->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->line_total->viewAttributes() ?>>
+<?= $Page->line_total->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

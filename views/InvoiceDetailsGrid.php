@@ -27,14 +27,15 @@ loadjs.ready(["wrapper", "head"], function () {
             ["invoice_id", [fields.invoice_id.visible && fields.invoice_id.required ? ew.Validators.required(fields.invoice_id.caption) : null, ew.Validators.integer], fields.invoice_id.isInvalid],
             ["item", [fields.item.visible && fields.item.required ? ew.Validators.required(fields.item.caption) : null], fields.item.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
+            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
+            ["line_total", [fields.line_total.visible && fields.line_total.required ? ew.Validators.required(fields.line_total.caption) : null, ew.Validators.float], fields.line_total.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["invoice_id",false],["item",false],["quantity",false],["cost",false]];
+                    fields = [["invoice_id",false],["item",false],["quantity",false],["cost",false],["line_total",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -102,6 +103,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->cost->Visible) { // cost ?>
         <th data-name="cost" class="<?= $Grid->cost->headerCellClass() ?>"><div id="elh_invoice_details_cost" class="invoice_details_cost"><?= $Grid->renderFieldHeader($Grid->cost) ?></div></th>
+<?php } ?>
+<?php if ($Grid->line_total->Visible) { // line_total ?>
+        <th data-name="line_total" class="<?= $Grid->line_total->headerCellClass() ?>"><div id="elh_invoice_details_line_total" class="invoice_details_line_total"><?= $Grid->renderFieldHeader($Grid->line_total) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -286,6 +290,33 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->line_total->Visible) { // line_total ?>
+        <td data-name="line_total"<?= $Grid->line_total->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_line_total" class="el_invoice_details_line_total">
+<input type="<?= $Grid->line_total->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_line_total" id="x<?= $Grid->RowIndex ?>_line_total" data-table="invoice_details" data-field="x_line_total" value="<?= $Grid->line_total->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->line_total->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->line_total->formatPattern()) ?>"<?= $Grid->line_total->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->line_total->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="invoice_details" data-field="x_line_total" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_line_total" id="o<?= $Grid->RowIndex ?>_line_total" value="<?= HtmlEncode($Grid->line_total->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_line_total" class="el_invoice_details_line_total">
+<input type="<?= $Grid->line_total->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_line_total" id="x<?= $Grid->RowIndex ?>_line_total" data-table="invoice_details" data-field="x_line_total" value="<?= $Grid->line_total->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->line_total->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->line_total->formatPattern()) ?>"<?= $Grid->line_total->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->line_total->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_line_total" class="el_invoice_details_line_total">
+<span<?= $Grid->line_total->viewAttributes() ?>>
+<?= $Grid->line_total->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="invoice_details" data-field="x_line_total" data-hidden="1" name="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_line_total" id="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_line_total" value="<?= HtmlEncode($Grid->line_total->FormValue) ?>">
+<input type="hidden" data-table="invoice_details" data-field="x_line_total" data-hidden="1" data-old name="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_line_total" id="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_line_total" value="<?= HtmlEncode($Grid->line_total->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Grid->ListOptions->render("body", "right", $Grid->RowCount);
@@ -311,6 +342,55 @@ loadjs.ready(["finvoice_detailsgrid","load"], () => finvoice_detailsgrid.updateL
 }
 ?>
 </tbody>
+<?php
+// Render aggregate row
+$Grid->RowType = RowType::AGGREGATE;
+$Grid->resetAttributes();
+$Grid->renderRow();
+?>
+<?php if ($Grid->TotalRecords > 0 && $Grid->CurrentMode == "view") { ?>
+<tfoot><!-- Table footer -->
+    <tr class="ew-table-footer">
+<?php
+// Render list options
+$Grid->renderListOptions();
+
+// Render list options (footer, left)
+$Grid->ListOptions->render("footer", "left");
+?>
+    <?php if ($Grid->id->Visible) { // id ?>
+        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_invoice_details_id" class="invoice_details_id">
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->invoice_id->Visible) { // invoice_id ?>
+        <td data-name="invoice_id" class="<?= $Grid->invoice_id->footerCellClass() ?>"><span id="elf_invoice_details_invoice_id" class="invoice_details_invoice_id">
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->item->Visible) { // item ?>
+        <td data-name="item" class="<?= $Grid->item->footerCellClass() ?>"><span id="elf_invoice_details_item" class="invoice_details_item">
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->quantity->Visible) { // quantity ?>
+        <td data-name="quantity" class="<?= $Grid->quantity->footerCellClass() ?>"><span id="elf_invoice_details_quantity" class="invoice_details_quantity">
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->cost->Visible) { // cost ?>
+        <td data-name="cost" class="<?= $Grid->cost->footerCellClass() ?>"><span id="elf_invoice_details_cost" class="invoice_details_cost">
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->line_total->Visible) { // line_total ?>
+        <td data-name="line_total" class="<?= $Grid->line_total->footerCellClass() ?>"><span id="elf_invoice_details_line_total" class="invoice_details_line_total">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Grid->line_total->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+<?php
+// Render list options (footer, right)
+$Grid->ListOptions->render("footer", "right");
+?>
+    </tr>
+</tfoot>
+<?php } ?>
 </table><!-- /.ew-table -->
 <?php if ($Grid->CurrentMode == "add" || $Grid->CurrentMode == "copy") { ?>
 <input type="hidden" name="<?= $Grid->FormKeyCountName ?>" id="<?= $Grid->FormKeyCountName ?>" value="<?= $Grid->KeyCount ?>">

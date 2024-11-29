@@ -150,6 +150,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
+        $this->line_total->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -1083,6 +1084,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $filterList = Concat($filterList, $this->item->AdvancedSearch->toJson(), ","); // Field item
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
         $filterList = Concat($filterList, $this->cost->AdvancedSearch->toJson(), ","); // Field cost
+        $filterList = Concat($filterList, $this->line_total->AdvancedSearch->toJson(), ","); // Field line_total
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1163,6 +1165,14 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->cost->AdvancedSearch->SearchValue2 = @$filter["y_cost"];
         $this->cost->AdvancedSearch->SearchOperator2 = @$filter["w_cost"];
         $this->cost->AdvancedSearch->save();
+
+        // Field line_total
+        $this->line_total->AdvancedSearch->SearchValue = @$filter["x_line_total"];
+        $this->line_total->AdvancedSearch->SearchOperator = @$filter["z_line_total"];
+        $this->line_total->AdvancedSearch->SearchCondition = @$filter["v_line_total"];
+        $this->line_total->AdvancedSearch->SearchValue2 = @$filter["y_line_total"];
+        $this->line_total->AdvancedSearch->SearchOperator2 = @$filter["w_line_total"];
+        $this->line_total->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1302,6 +1312,7 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->updateSort($this->item); // item
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->cost); // cost
+            $this->updateSort($this->line_total); // line_total
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1339,6 +1350,7 @@ class InvoiceDetailsList extends InvoiceDetails
                 $this->item->setSort("");
                 $this->quantity->setSort("");
                 $this->cost->setSort("");
+                $this->line_total->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1580,6 +1592,7 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->createColumnOption($option, "item");
             $this->createColumnOption($option, "quantity");
             $this->createColumnOption($option, "cost");
+            $this->createColumnOption($option, "line_total");
         }
 
         // Set up custom actions
@@ -2023,6 +2036,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->item->setDbValue($row['item']);
         $this->quantity->setDbValue($row['quantity']);
         $this->cost->setDbValue($row['cost']);
+        $this->line_total->setDbValue($row['line_total']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2036,6 +2050,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $row['item'] = $this->item->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
+        $row['line_total'] = $this->line_total->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2088,11 +2103,20 @@ class InvoiceDetailsList extends InvoiceDetails
 
         // cost
 
+        // line_total
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
         $this->date_updated->CellCssStyle = "white-space: nowrap;";
+
+        // Accumulate aggregate value
+        if ($this->RowType != RowType::AGGREGATEINIT && $this->RowType != RowType::AGGREGATE && $this->RowType != RowType::PREVIEWFIELD) {
+            if (is_numeric($this->line_total->CurrentValue)) {
+                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
+            }
+        }
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2114,6 +2138,10 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
+            // line_total
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2133,6 +2161,17 @@ class InvoiceDetailsList extends InvoiceDetails
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
+
+            // line_total
+            $this->line_total->HrefValue = "";
+            $this->line_total->TooltipValue = "";
+        } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
+                    $this->line_total->Total = 0; // Initialize total
+        } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
+            $this->line_total->CurrentValue = $this->line_total->Total;
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+            $this->line_total->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event

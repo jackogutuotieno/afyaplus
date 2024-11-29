@@ -140,6 +140,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
+        $this->line_total->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -860,6 +861,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
     protected function clearInlineMode()
     {
         $this->cost->FormValue = ""; // Clear form value
+        $this->line_total->FormValue = ""; // Clear form value
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1129,6 +1131,14 @@ class InvoiceDetailsGrid extends InvoiceDetails
             $CurrentForm->hasValue("o_cost") &&
             $this->cost->CurrentValue != $this->cost->DefaultValue &&
             !($this->cost->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->cost->CurrentValue == $this->cost->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_line_total") &&
+            $CurrentForm->hasValue("o_line_total") &&
+            $this->line_total->CurrentValue != $this->line_total->DefaultValue &&
+            !($this->line_total->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->line_total->CurrentValue == $this->line_total->getSessionValue())
         ) {
             return false;
         }
@@ -1746,6 +1756,19 @@ class InvoiceDetailsGrid extends InvoiceDetails
         if ($CurrentForm->hasValue("o_cost")) {
             $this->cost->setOldValue($CurrentForm->getValue("o_cost"));
         }
+
+        // Check field name 'line_total' first before field var 'x_line_total'
+        $val = $CurrentForm->hasValue("line_total") ? $CurrentForm->getValue("line_total") : $CurrentForm->getValue("x_line_total");
+        if (!$this->line_total->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->line_total->Visible = false; // Disable update for API request
+            } else {
+                $this->line_total->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_line_total")) {
+            $this->line_total->setOldValue($CurrentForm->getValue("o_line_total"));
+        }
     }
 
     // Restore form values
@@ -1759,6 +1782,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $this->item->CurrentValue = $this->item->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
+        $this->line_total->CurrentValue = $this->line_total->FormValue;
     }
 
     /**
@@ -1859,6 +1883,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $this->item->setDbValue($row['item']);
         $this->quantity->setDbValue($row['quantity']);
         $this->cost->setDbValue($row['cost']);
+        $this->line_total->setDbValue($row['line_total']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1872,6 +1897,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $row['item'] = $this->item->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
+        $row['line_total'] = $this->line_total->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1922,11 +1948,20 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
         // cost
 
+        // line_total
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
         $this->date_updated->CellCssStyle = "white-space: nowrap;";
+
+        // Accumulate aggregate value
+        if ($this->RowType != RowType::AGGREGATEINIT && $this->RowType != RowType::AGGREGATE && $this->RowType != RowType::PREVIEWFIELD) {
+            if (is_numeric($this->line_total->CurrentValue)) {
+                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
+            }
+        }
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1948,6 +1983,10 @@ class InvoiceDetailsGrid extends InvoiceDetails
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
+            // line_total
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -1967,6 +2006,10 @@ class InvoiceDetailsGrid extends InvoiceDetails
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
+
+            // line_total
+            $this->line_total->HrefValue = "";
+            $this->line_total->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
@@ -2009,6 +2052,14 @@ class InvoiceDetailsGrid extends InvoiceDetails
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
+            // line_total
+            $this->line_total->setupEditAttributes();
+            $this->line_total->EditValue = $this->line_total->CurrentValue;
+            $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
+            if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
+                $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
+            }
+
             // Add refer script
 
             // id
@@ -2025,6 +2076,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
+
+            // line_total
+            $this->line_total->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -2069,6 +2123,14 @@ class InvoiceDetailsGrid extends InvoiceDetails
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
+            // line_total
+            $this->line_total->setupEditAttributes();
+            $this->line_total->EditValue = $this->line_total->CurrentValue;
+            $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
+            if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
+                $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
+            }
+
             // Edit refer script
 
             // id
@@ -2085,6 +2147,16 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
+
+            // line_total
+            $this->line_total->HrefValue = "";
+        } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
+                    $this->line_total->Total = 0; // Initialize total
+        } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
+            $this->line_total->CurrentValue = $this->line_total->Total;
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+            $this->line_total->HrefValue = ""; // Clear href value
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2139,6 +2211,14 @@ class InvoiceDetailsGrid extends InvoiceDetails
             }
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
+            }
+            if ($this->line_total->Visible && $this->line_total->Required) {
+                if (!$this->line_total->IsDetailKey && EmptyValue($this->line_total->FormValue)) {
+                    $this->line_total->addErrorMessage(str_replace("%s", $this->line_total->caption(), $this->line_total->RequiredErrorMessage));
+                }
+            }
+            if (!CheckNumber($this->line_total->FormValue)) {
+                $this->line_total->addErrorMessage($this->line_total->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2304,6 +2384,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
+
+        // line_total
+        $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, $this->line_total->ReadOnly);
         return $rsnew;
     }
 
@@ -2324,6 +2407,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
         }
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
+        }
+        if (isset($row['line_total'])) { // line_total
+            $this->line_total->CurrentValue = $row['line_total'];
         }
     }
 
@@ -2417,6 +2503,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
+
+        // line_total
+        $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2437,6 +2526,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
         }
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);
+        }
+        if (isset($row['line_total'])) { // line_total
+            $this->line_total->setFormValue($row['line_total']);
         }
     }
 

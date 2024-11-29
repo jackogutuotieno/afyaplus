@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->line_total->Visible) { // line_total ?>
+    <tr id="r_line_total"<?= $Page->line_total->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_invoice_details_line_total"><?= $Page->line_total->caption() ?></span></td>
+        <td data-name="line_total"<?= $Page->line_total->cellAttributes() ?>>
+<span id="el_invoice_details_line_total">
+<span<?= $Page->line_total->viewAttributes() ?>>
+<?= $Page->line_total->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

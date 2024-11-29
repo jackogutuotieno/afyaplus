@@ -144,6 +144,7 @@ class InvoiceDetailsView extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
+        $this->line_total->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -824,6 +825,7 @@ class InvoiceDetailsView extends InvoiceDetails
         $this->item->setDbValue($row['item']);
         $this->quantity->setDbValue($row['quantity']);
         $this->cost->setDbValue($row['cost']);
+        $this->line_total->setDbValue($row['line_total']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -837,6 +839,7 @@ class InvoiceDetailsView extends InvoiceDetails
         $row['item'] = $this->item->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
+        $row['line_total'] = $this->line_total->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -870,6 +873,8 @@ class InvoiceDetailsView extends InvoiceDetails
 
         // cost
 
+        // line_total
+
         // date_created
 
         // date_updated
@@ -894,6 +899,10 @@ class InvoiceDetailsView extends InvoiceDetails
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
+            // line_total
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -913,6 +922,10 @@ class InvoiceDetailsView extends InvoiceDetails
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
+
+            // line_total
+            $this->line_total->HrefValue = "";
+            $this->line_total->TooltipValue = "";
         }
 
         // Call Row Rendered event
