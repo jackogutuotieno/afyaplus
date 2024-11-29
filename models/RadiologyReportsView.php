@@ -140,9 +140,9 @@ class RadiologyReportsView extends RadiologyReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
-        $this->report_title->setVisibility();
-        $this->details->setVisibility();
+        $this->radiology_requests_details_id->setVisibility();
+        $this->findings->setVisibility();
+        $this->attachment->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -560,6 +560,9 @@ class RadiologyReportsView extends RadiologyReports
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->created_by_user_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -694,16 +697,6 @@ class RadiologyReportsView extends RadiologyReports
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
 
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd() && $this->showOptionLink("add");
-
         // Delete
         $item = &$option->add("delete");
         $url = GetUrl($this->DeleteUrl);
@@ -817,9 +810,12 @@ class RadiologyReportsView extends RadiologyReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->report_title->setDbValue($row['report_title']);
-        $this->details->setDbValue($row['details']);
+        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->findings->setDbValue($row['findings']);
+        $this->attachment->Upload->DbValue = $row['attachment'];
+        if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->attachment->Upload->DbValue = stream_get_contents($this->attachment->Upload->DbValue);
+        }
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -830,9 +826,9 @@ class RadiologyReportsView extends RadiologyReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
-        $row['report_title'] = $this->report_title->DefaultValue;
-        $row['details'] = $this->details->DefaultValue;
+        $row['radiology_requests_details_id'] = $this->radiology_requests_details_id->DefaultValue;
+        $row['findings'] = $this->findings->DefaultValue;
+        $row['attachment'] = $this->attachment->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -859,11 +855,11 @@ class RadiologyReportsView extends RadiologyReports
 
         // id
 
-        // lab_test_request_id
+        // radiology_requests_details_id
 
-        // report_title
+        // findings
 
-        // details
+        // attachment
 
         // created_by_user_id
 
@@ -876,19 +872,43 @@ class RadiologyReportsView extends RadiologyReports
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_request_id
-            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
+            $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
 
-            // report_title
-            $this->report_title->ViewValue = $this->report_title->CurrentValue;
+            // findings
+            $this->findings->ViewValue = $this->findings->CurrentValue;
 
-            // details
-            $this->details->ViewValue = $this->details->CurrentValue;
+            // attachment
+            if (!EmptyValue($this->attachment->Upload->DbValue)) {
+                $this->attachment->ViewValue = $this->id->CurrentValue;
+                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            } else {
+                $this->attachment->ViewValue = "";
+            }
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -902,17 +922,29 @@ class RadiologyReportsView extends RadiologyReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->HrefValue = "";
+            $this->radiology_requests_details_id->TooltipValue = "";
 
-            // report_title
-            $this->report_title->HrefValue = "";
-            $this->report_title->TooltipValue = "";
+            // findings
+            $this->findings->HrefValue = "";
+            $this->findings->TooltipValue = "";
 
-            // details
-            $this->details->HrefValue = "";
-            $this->details->TooltipValue = "";
+            // attachment
+            if (!empty($this->attachment->Upload->DbValue)) {
+                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+                $this->attachment->LinkAttrs["target"] = "";
+                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
+                    $this->attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                }
+            } else {
+                $this->attachment->HrefValue = "";
+            }
+            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+            $this->attachment->TooltipValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1127,6 +1159,8 @@ class RadiologyReportsView extends RadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

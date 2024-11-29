@@ -33,14 +33,14 @@ class RadiologyReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "lab_test_request_id", type: "integer")]
-    private int $labTestRequestId;
-
-    #[Column(name: "report_title", type: "string")]
-    private string $reportTitle;
+    #[Column(name: "radiology_requests_details_id", type: "integer")]
+    private int $radiologyRequestsDetailsId;
 
     #[Column(type: "text")]
-    private string $details;
+    private string $findings;
+
+    #[Column(type: "blob", nullable: true)]
+    private mixed $attachment;
 
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
@@ -62,36 +62,36 @@ class RadiologyReport extends AbstractEntity
         return $this;
     }
 
-    public function getLabTestRequestId(): int
+    public function getRadiologyRequestsDetailsId(): int
     {
-        return $this->labTestRequestId;
+        return $this->radiologyRequestsDetailsId;
     }
 
-    public function setLabTestRequestId(int $value): static
+    public function setRadiologyRequestsDetailsId(int $value): static
     {
-        $this->labTestRequestId = $value;
+        $this->radiologyRequestsDetailsId = $value;
         return $this;
     }
 
-    public function getReportTitle(): string
+    public function getFindings(): string
     {
-        return HtmlDecode($this->reportTitle);
+        return HtmlDecode($this->findings);
     }
 
-    public function setReportTitle(string $value): static
+    public function setFindings(string $value): static
     {
-        $this->reportTitle = RemoveXss($value);
+        $this->findings = RemoveXss($value);
         return $this;
     }
 
-    public function getDetails(): string
+    public function getAttachment(): mixed
     {
-        return HtmlDecode($this->details);
+        return $this->attachment;
     }
 
-    public function setDetails(string $value): static
+    public function setAttachment(mixed $value): static
     {
-        $this->details = RemoveXss($value);
+        $this->attachment = $value;
         return $this;
     }
 

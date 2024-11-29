@@ -1197,27 +1197,27 @@
       </field>
     </table>
     <table id="radiology_reports">
-      <phrase id="tblcaption" value="radiology reports" />
+      <phrase id="tblcaption" value="Radiology Reports" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
-      <field id="lab_test_request_id">
-        <phrase id="fldcaption" value="lab test request id" />
+      <field id="radiology_requests_details_id">
+        <phrase id="fldcaption" value="Request Details ID" />
       </field>
-      <field id="report_title">
-        <phrase id="fldcaption" value="report title" />
+      <field id="findings">
+        <phrase id="fldcaption" value="Findings" />
       </field>
-      <field id="details">
-        <phrase id="fldcaption" value="details" />
+      <field id="attachment">
+        <phrase id="fldcaption" value="Attachment" />
       </field>
       <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
+        <phrase id="fldcaption" value="Report By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="radiology_requests">

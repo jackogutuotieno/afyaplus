@@ -53,14 +53,11 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_radiology_reports_lab_test_request_id" class="radiology_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <th class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><span id="elh_radiology_reports_radiology_requests_details_id" class="radiology_reports_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-        <th class="<?= $Page->report_title->headerCellClass() ?>"><span id="elh_radiology_reports_report_title" class="radiology_reports_report_title"><?= $Page->report_title->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-        <th class="<?= $Page->details->headerCellClass() ?>"><span id="elh_radiology_reports_details" class="radiology_reports_details"><?= $Page->details->caption() ?></span></th>
+<?php if ($Page->findings->Visible) { // findings ?>
+        <th class="<?= $Page->findings->headerCellClass() ?>"><span id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->findings->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_radiology_reports_created_by_user_id" class="radiology_reports_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
@@ -100,27 +97,19 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <td<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-        <td<?= $Page->report_title->cellAttributes() ?>>
+<?php if ($Page->findings->Visible) { // findings ?>
+        <td<?= $Page->findings->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->report_title->viewAttributes() ?>>
-<?= $Page->report_title->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-        <td<?= $Page->details->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->details->viewAttributes() ?>>
-<?= $Page->details->getViewValue() ?></span>
+<span<?= $Page->findings->viewAttributes() ?>>
+<?= $Page->findings->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

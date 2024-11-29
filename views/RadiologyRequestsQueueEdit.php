@@ -29,12 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["radiology_requests_details_id", [fields.radiology_requests_details_id.visible && fields.radiology_requests_details_id.required ? ew.Validators.required(fields.radiology_requests_details_id.caption) : null, ew.Validators.integer], fields.radiology_requests_details_id.isInvalid],
-            ["test_time", [fields.test_time.visible && fields.test_time.required ? ew.Validators.required(fields.test_time.caption) : null], fields.test_time.isInvalid],
-            ["waiting_time", [fields.waiting_time.visible && fields.waiting_time.required ? ew.Validators.required(fields.waiting_time.caption) : null, ew.Validators.integer], fields.waiting_time.isInvalid],
-            ["waiting_interval", [fields.waiting_interval.visible && fields.waiting_interval.required ? ew.Validators.required(fields.waiting_interval.caption) : null], fields.waiting_interval.isInvalid],
-            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -50,9 +45,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "waiting_interval": <?= $Page->waiting_interval->toClientList($Page) ?>,
             "status": <?= $Page->status->toClientList($Page) ?>,
-            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -89,93 +82,6 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="radiology_requests_queue" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-    <div id="r_radiology_requests_details_id"<?= $Page->radiology_requests_details_id->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_radiology_requests_details_id" for="x_radiology_requests_details_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->radiology_requests_details_id->caption() ?><?= $Page->radiology_requests_details_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
-<?php if ($Page->radiology_requests_details_id->getSessionValue() != "") { ?>
-<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->radiology_requests_details_id->getDisplayValue($Page->radiology_requests_details_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x_radiology_requests_details_id" name="x_radiology_requests_details_id" value="<?= HtmlEncode($Page->radiology_requests_details_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el_radiology_requests_queue_radiology_requests_details_id">
-<input type="<?= $Page->radiology_requests_details_id->getInputTextType() ?>" name="x_radiology_requests_details_id" id="x_radiology_requests_details_id" data-table="radiology_requests_queue" data-field="x_radiology_requests_details_id" value="<?= $Page->radiology_requests_details_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->radiology_requests_details_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->radiology_requests_details_id->formatPattern()) ?>"<?= $Page->radiology_requests_details_id->editAttributes() ?> aria-describedby="x_radiology_requests_details_id_help">
-<?= $Page->radiology_requests_details_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->radiology_requests_details_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->test_time->Visible) { // test_time ?>
-    <div id="r_test_time"<?= $Page->test_time->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_test_time" for="x_test_time" class="<?= $Page->LeftColumnClass ?>"><?= $Page->test_time->caption() ?><?= $Page->test_time->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->test_time->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_test_time">
-<input type="<?= $Page->test_time->getInputTextType() ?>" name="x_test_time" id="x_test_time" data-table="radiology_requests_queue" data-field="x_test_time" value="<?= $Page->test_time->EditValue ?>" size="30" maxlength="32" placeholder="<?= HtmlEncode($Page->test_time->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->test_time->formatPattern()) ?>"<?= $Page->test_time->editAttributes() ?> aria-describedby="x_test_time_help">
-<?= $Page->test_time->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->test_time->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->waiting_time->Visible) { // waiting_time ?>
-    <div id="r_waiting_time"<?= $Page->waiting_time->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_waiting_time" for="x_waiting_time" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waiting_time->caption() ?><?= $Page->waiting_time->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->waiting_time->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_waiting_time">
-<input type="<?= $Page->waiting_time->getInputTextType() ?>" name="x_waiting_time" id="x_waiting_time" data-table="radiology_requests_queue" data-field="x_waiting_time" value="<?= $Page->waiting_time->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->waiting_time->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->waiting_time->formatPattern()) ?>"<?= $Page->waiting_time->editAttributes() ?> aria-describedby="x_waiting_time_help">
-<?= $Page->waiting_time->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->waiting_time->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->waiting_interval->Visible) { // waiting_interval ?>
-    <div id="r_waiting_interval"<?= $Page->waiting_interval->rowAttributes() ?>>
-        <label id="elh_radiology_requests_queue_waiting_interval" for="x_waiting_interval" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waiting_interval->caption() ?><?= $Page->waiting_interval->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->waiting_interval->cellAttributes() ?>>
-<span id="el_radiology_requests_queue_waiting_interval">
-    <select
-        id="x_waiting_interval"
-        name="x_waiting_interval"
-        class="form-select ew-select<?= $Page->waiting_interval->isInvalidClass() ?>"
-        <?php if (!$Page->waiting_interval->IsNativeSelect) { ?>
-        data-select2-id="fradiology_requests_queueedit_x_waiting_interval"
-        <?php } ?>
-        data-table="radiology_requests_queue"
-        data-field="x_waiting_interval"
-        data-value-separator="<?= $Page->waiting_interval->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->waiting_interval->getPlaceHolder()) ?>"
-        <?= $Page->waiting_interval->editAttributes() ?>>
-        <?= $Page->waiting_interval->selectOptionListHtml("x_waiting_interval") ?>
-    </select>
-    <?= $Page->waiting_interval->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->waiting_interval->getErrorMessage() ?></div>
-<?php if (!$Page->waiting_interval->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fradiology_requests_queueedit", function() {
-    var options = { name: "x_waiting_interval", selectId: "fradiology_requests_queueedit_x_waiting_interval" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fradiology_requests_queueedit.lists.waiting_interval?.lookupOptions.length) {
-        options.data = { id: "x_waiting_interval", form: "fradiology_requests_queueedit" };
-    } else {
-        options.ajax = { id: "x_waiting_interval", form: "fradiology_requests_queueedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_requests_queue.fields.waiting_interval.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>

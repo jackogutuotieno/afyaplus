@@ -47,9 +47,9 @@ class RadiologyReports extends DbTable
 
     // Fields
     public $id;
-    public $lab_test_request_id;
-    public $report_title;
-    public $details;
+    public $radiology_requests_details_id;
+    public $findings;
+    public $attachment;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
@@ -126,79 +126,79 @@ class RadiologyReports extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // lab_test_request_id
-        $this->lab_test_request_id = new DbField(
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id = new DbField(
             $this, // Table
-            'x_lab_test_request_id', // Variable name
-            'lab_test_request_id', // Name
-            '`lab_test_request_id`', // Expression
-            '`lab_test_request_id`', // Basic search expression
+            'x_radiology_requests_details_id', // Variable name
+            'radiology_requests_details_id', // Name
+            '`radiology_requests_details_id`', // Expression
+            '`radiology_requests_details_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`lab_test_request_id`', // Virtual expression
+            '`radiology_requests_details_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->lab_test_request_id->InputTextType = "text";
-        $this->lab_test_request_id->Raw = true;
-        $this->lab_test_request_id->Nullable = false; // NOT NULL field
-        $this->lab_test_request_id->Required = true; // Required field
-        $this->lab_test_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->lab_test_request_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['lab_test_request_id'] = &$this->lab_test_request_id;
+        $this->radiology_requests_details_id->InputTextType = "text";
+        $this->radiology_requests_details_id->Raw = true;
+        $this->radiology_requests_details_id->Nullable = false; // NOT NULL field
+        $this->radiology_requests_details_id->Required = true; // Required field
+        $this->radiology_requests_details_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->radiology_requests_details_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['radiology_requests_details_id'] = &$this->radiology_requests_details_id;
 
-        // report_title
-        $this->report_title = new DbField(
+        // findings
+        $this->findings = new DbField(
             $this, // Table
-            'x_report_title', // Variable name
-            'report_title', // Name
-            '`report_title`', // Expression
-            '`report_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`report_title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->report_title->InputTextType = "text";
-        $this->report_title->Nullable = false; // NOT NULL field
-        $this->report_title->Required = true; // Required field
-        $this->report_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['report_title'] = &$this->report_title;
-
-        // details
-        $this->details = new DbField(
-            $this, // Table
-            'x_details', // Variable name
-            'details', // Name
-            '`details`', // Expression
-            '`details`', // Basic search expression
+            'x_findings', // Variable name
+            'findings', // Name
+            '`findings`', // Expression
+            '`findings`', // Basic search expression
             200, // Type
             65535, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`details`', // Virtual expression
+            '`findings`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
-        $this->details->InputTextType = "text";
-        $this->details->Nullable = false; // NOT NULL field
-        $this->details->Required = true; // Required field
-        $this->details->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['details'] = &$this->details;
+        $this->findings->InputTextType = "text";
+        $this->findings->Nullable = false; // NOT NULL field
+        $this->findings->Required = true; // Required field
+        $this->findings->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['findings'] = &$this->findings;
+
+        // attachment
+        $this->attachment = new DbField(
+            $this, // Table
+            'x_attachment', // Variable name
+            'attachment', // Name
+            '`attachment`', // Expression
+            '`attachment`', // Basic search expression
+            205, // Type
+            2147483647, // Size
+            -1, // Date/Time format
+            true, // Is upload field
+            '`attachment`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'FILE' // Edit Tag
+        );
+        $this->attachment->InputTextType = "text";
+        $this->attachment->Raw = true;
+        $this->attachment->Sortable = false; // Allow sort
+        $this->attachment->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->Fields['attachment'] = &$this->attachment;
 
         // created_by_user_id
         $this->created_by_user_id = new DbField(
@@ -216,14 +216,18 @@ class RadiologyReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
@@ -232,10 +236,10 @@ class RadiologyReports extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -248,7 +252,7 @@ class RadiologyReports extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -258,10 +262,10 @@ class RadiologyReports extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -274,7 +278,7 @@ class RadiologyReports extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -802,9 +806,9 @@ class RadiologyReports extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->lab_test_request_id->DbValue = $row['lab_test_request_id'];
-        $this->report_title->DbValue = $row['report_title'];
-        $this->details->DbValue = $row['details'];
+        $this->radiology_requests_details_id->DbValue = $row['radiology_requests_details_id'];
+        $this->findings->DbValue = $row['findings'];
+        $this->attachment->Upload->DbValue = $row['attachment'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1161,9 +1165,9 @@ class RadiologyReports extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->report_title->setDbValue($row['report_title']);
-        $this->details->setDbValue($row['details']);
+        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->findings->setDbValue($row['findings']);
+        $this->attachment->Upload->DbValue = $row['attachment'];
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1199,11 +1203,11 @@ class RadiologyReports extends DbTable
 
         // id
 
-        // lab_test_request_id
+        // radiology_requests_details_id
 
-        // report_title
+        // findings
 
-        // details
+        // attachment
 
         // created_by_user_id
 
@@ -1214,19 +1218,43 @@ class RadiologyReports extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // lab_test_request_id
-        $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-        $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
+        $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
 
-        // report_title
-        $this->report_title->ViewValue = $this->report_title->CurrentValue;
+        // findings
+        $this->findings->ViewValue = $this->findings->CurrentValue;
 
-        // details
-        $this->details->ViewValue = $this->details->CurrentValue;
+        // attachment
+        if (!EmptyValue($this->attachment->Upload->DbValue)) {
+            $this->attachment->ViewValue = $this->id->CurrentValue;
+            $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+        } else {
+            $this->attachment->ViewValue = "";
+        }
 
         // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1240,17 +1268,29 @@ class RadiologyReports extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // lab_test_request_id
-        $this->lab_test_request_id->HrefValue = "";
-        $this->lab_test_request_id->TooltipValue = "";
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id->HrefValue = "";
+        $this->radiology_requests_details_id->TooltipValue = "";
 
-        // report_title
-        $this->report_title->HrefValue = "";
-        $this->report_title->TooltipValue = "";
+        // findings
+        $this->findings->HrefValue = "";
+        $this->findings->TooltipValue = "";
 
-        // details
-        $this->details->HrefValue = "";
-        $this->details->TooltipValue = "";
+        // attachment
+        if (!empty($this->attachment->Upload->DbValue)) {
+            $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+            $this->attachment->LinkAttrs["target"] = "";
+            if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
+                $this->attachment->LinkAttrs["target"] = "_blank";
+            }
+            if ($this->isExport()) {
+                $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+            }
+        } else {
+            $this->attachment->HrefValue = "";
+        }
+        $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+        $this->attachment->TooltipValue = "";
 
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
@@ -1283,42 +1323,55 @@ class RadiologyReports extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // lab_test_request_id
-        $this->lab_test_request_id->setupEditAttributes();
-        $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-        $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-        if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-            $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id->setupEditAttributes();
+        $this->radiology_requests_details_id->EditValue = $this->radiology_requests_details_id->CurrentValue;
+        $this->radiology_requests_details_id->PlaceHolder = RemoveHtml($this->radiology_requests_details_id->caption());
+        if (strval($this->radiology_requests_details_id->EditValue) != "" && is_numeric($this->radiology_requests_details_id->EditValue)) {
+            $this->radiology_requests_details_id->EditValue = FormatNumber($this->radiology_requests_details_id->EditValue, null);
         }
 
-        // report_title
-        $this->report_title->setupEditAttributes();
-        if (!$this->report_title->Raw) {
-            $this->report_title->CurrentValue = HtmlDecode($this->report_title->CurrentValue);
-        }
-        $this->report_title->EditValue = $this->report_title->CurrentValue;
-        $this->report_title->PlaceHolder = RemoveHtml($this->report_title->caption());
+        // findings
+        $this->findings->setupEditAttributes();
+        $this->findings->EditValue = $this->findings->CurrentValue;
+        $this->findings->PlaceHolder = RemoveHtml($this->findings->caption());
 
-        // details
-        $this->details->setupEditAttributes();
-        if (!$this->details->Raw) {
-            $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
+        // attachment
+        $this->attachment->setupEditAttributes();
+        if (!EmptyValue($this->attachment->Upload->DbValue)) {
+            $this->attachment->EditValue = $this->id->CurrentValue;
+            $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+        } else {
+            $this->attachment->EditValue = "";
         }
-        $this->details->EditValue = $this->details->CurrentValue;
-        $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
         if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
             $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-        } else {
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->EditValue = null;
             }
+        } else {
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
         }
 
         // date_created
@@ -1360,17 +1413,16 @@ class RadiologyReports extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->lab_test_request_id);
-                    $doc->exportCaption($this->report_title);
-                    $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->radiology_requests_details_id);
+                    $doc->exportCaption($this->findings);
+                    $doc->exportCaption($this->attachment);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->lab_test_request_id);
-                    $doc->exportCaption($this->report_title);
-                    $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->radiology_requests_details_id);
+                    $doc->exportCaption($this->findings);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1401,17 +1453,16 @@ class RadiologyReports extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->lab_test_request_id);
-                        $doc->exportField($this->report_title);
-                        $doc->exportField($this->details);
+                        $doc->exportField($this->radiology_requests_details_id);
+                        $doc->exportField($this->findings);
+                        $doc->exportField($this->attachment);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->lab_test_request_id);
-                        $doc->exportField($this->report_title);
-                        $doc->exportField($this->details);
+                        $doc->exportField($this->radiology_requests_details_id);
+                        $doc->exportField($this->findings);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
@@ -1480,8 +1531,122 @@ class RadiologyReports extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'attachment') {
+            $fldName = "attachment";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

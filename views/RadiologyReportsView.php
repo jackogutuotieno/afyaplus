@@ -62,35 +62,36 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el_radiology_reports_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+    <tr id="r_radiology_requests_details_id"<?= $Page->radiology_requests_details_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></td>
+        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<span id="el_radiology_reports_radiology_requests_details_id">
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-    <tr id="r_report_title"<?= $Page->report_title->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_report_title"><?= $Page->report_title->caption() ?></span></td>
-        <td data-name="report_title"<?= $Page->report_title->cellAttributes() ?>>
-<span id="el_radiology_reports_report_title">
-<span<?= $Page->report_title->viewAttributes() ?>>
-<?= $Page->report_title->getViewValue() ?></span>
+<?php if ($Page->findings->Visible) { // findings ?>
+    <tr id="r_findings"<?= $Page->findings->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_findings"><?= $Page->findings->caption() ?></span></td>
+        <td data-name="findings"<?= $Page->findings->cellAttributes() ?>>
+<span id="el_radiology_reports_findings">
+<span<?= $Page->findings->viewAttributes() ?>>
+<?= $Page->findings->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-    <tr id="r_details"<?= $Page->details->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_details"><?= $Page->details->caption() ?></span></td>
-        <td data-name="details"<?= $Page->details->cellAttributes() ?>>
-<span id="el_radiology_reports_details">
-<span<?= $Page->details->viewAttributes() ?>>
-<?= $Page->details->getViewValue() ?></span>
+<?php if ($Page->attachment->Visible) { // attachment ?>
+    <tr id="r_attachment"<?= $Page->attachment->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_attachment"><?= $Page->attachment->caption() ?></span></td>
+        <td data-name="attachment"<?= $Page->attachment->cellAttributes() ?>>
+<span id="el_radiology_reports_attachment">
+<span<?= $Page->attachment->viewAttributes() ?>>
+<?= GetFileViewTag($Page->attachment, $Page->attachment->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     </tr>

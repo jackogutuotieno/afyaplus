@@ -122,12 +122,12 @@ class RadiologyReportsAdd extends RadiologyReports
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->lab_test_request_id->setVisibility();
-        $this->report_title->setVisibility();
-        $this->details->setVisibility();
+        $this->radiology_requests_details_id->setVisibility();
+        $this->findings->setVisibility();
+        $this->attachment->setVisibility();
         $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -521,6 +521,9 @@ class RadiologyReportsAdd extends RadiologyReports
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->created_by_user_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -666,6 +669,8 @@ class RadiologyReportsAdd extends RadiologyReports
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->attachment->Upload->Index = $CurrentForm->Index;
+        $this->attachment->Upload->uploadFile();
     }
 
     // Load default values
@@ -680,33 +685,23 @@ class RadiologyReportsAdd extends RadiologyReports
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'lab_test_request_id' first before field var 'x_lab_test_request_id'
-        $val = $CurrentForm->hasValue("lab_test_request_id") ? $CurrentForm->getValue("lab_test_request_id") : $CurrentForm->getValue("x_lab_test_request_id");
-        if (!$this->lab_test_request_id->IsDetailKey) {
+        // Check field name 'radiology_requests_details_id' first before field var 'x_radiology_requests_details_id'
+        $val = $CurrentForm->hasValue("radiology_requests_details_id") ? $CurrentForm->getValue("radiology_requests_details_id") : $CurrentForm->getValue("x_radiology_requests_details_id");
+        if (!$this->radiology_requests_details_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->lab_test_request_id->Visible = false; // Disable update for API request
+                $this->radiology_requests_details_id->Visible = false; // Disable update for API request
             } else {
-                $this->lab_test_request_id->setFormValue($val, true, $validate);
+                $this->radiology_requests_details_id->setFormValue($val, true, $validate);
             }
         }
 
-        // Check field name 'report_title' first before field var 'x_report_title'
-        $val = $CurrentForm->hasValue("report_title") ? $CurrentForm->getValue("report_title") : $CurrentForm->getValue("x_report_title");
-        if (!$this->report_title->IsDetailKey) {
+        // Check field name 'findings' first before field var 'x_findings'
+        $val = $CurrentForm->hasValue("findings") ? $CurrentForm->getValue("findings") : $CurrentForm->getValue("x_findings");
+        if (!$this->findings->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->report_title->Visible = false; // Disable update for API request
+                $this->findings->Visible = false; // Disable update for API request
             } else {
-                $this->report_title->setFormValue($val);
-            }
-        }
-
-        // Check field name 'details' first before field var 'x_details'
-        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
-        if (!$this->details->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->details->Visible = false; // Disable update for API request
-            } else {
-                $this->details->setFormValue($val);
+                $this->findings->setFormValue($val);
             }
         }
 
@@ -716,48 +711,22 @@ class RadiologyReportsAdd extends RadiologyReports
             if (IsApi() && $val === null) {
                 $this->created_by_user_id->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
+                $this->created_by_user_id->setFormValue($val);
             }
-        }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         }
 
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->FormValue;
-        $this->report_title->CurrentValue = $this->report_title->FormValue;
-        $this->details->CurrentValue = $this->details->FormValue;
+        $this->radiology_requests_details_id->CurrentValue = $this->radiology_requests_details_id->FormValue;
+        $this->findings->CurrentValue = $this->findings->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -808,9 +777,12 @@ class RadiologyReportsAdd extends RadiologyReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->report_title->setDbValue($row['report_title']);
-        $this->details->setDbValue($row['details']);
+        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->findings->setDbValue($row['findings']);
+        $this->attachment->Upload->DbValue = $row['attachment'];
+        if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->attachment->Upload->DbValue = stream_get_contents($this->attachment->Upload->DbValue);
+        }
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -821,9 +793,9 @@ class RadiologyReportsAdd extends RadiologyReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
-        $row['report_title'] = $this->report_title->DefaultValue;
-        $row['details'] = $this->details->DefaultValue;
+        $row['radiology_requests_details_id'] = $this->radiology_requests_details_id->DefaultValue;
+        $row['findings'] = $this->findings->DefaultValue;
+        $row['attachment'] = $this->attachment->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -864,14 +836,14 @@ class RadiologyReportsAdd extends RadiologyReports
         // id
         $this->id->RowCssClass = "row";
 
-        // lab_test_request_id
-        $this->lab_test_request_id->RowCssClass = "row";
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id->RowCssClass = "row";
 
-        // report_title
-        $this->report_title->RowCssClass = "row";
+        // findings
+        $this->findings->RowCssClass = "row";
 
-        // details
-        $this->details->RowCssClass = "row";
+        // attachment
+        $this->attachment->RowCssClass = "row";
 
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
@@ -887,19 +859,43 @@ class RadiologyReportsAdd extends RadiologyReports
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_request_id
-            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
-            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
+            $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
 
-            // report_title
-            $this->report_title->ViewValue = $this->report_title->CurrentValue;
+            // findings
+            $this->findings->ViewValue = $this->findings->CurrentValue;
 
-            // details
-            $this->details->ViewValue = $this->details->CurrentValue;
+            // attachment
+            if (!EmptyValue($this->attachment->Upload->DbValue)) {
+                $this->attachment->ViewValue = $this->id->CurrentValue;
+                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            } else {
+                $this->attachment->ViewValue = "";
+            }
 
             // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -909,91 +905,135 @@ class RadiologyReportsAdd extends RadiologyReports
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->HrefValue = "";
 
-            // report_title
-            $this->report_title->HrefValue = "";
+            // findings
+            $this->findings->HrefValue = "";
 
-            // details
-            $this->details->HrefValue = "";
+            // attachment
+            if (!empty($this->attachment->Upload->DbValue)) {
+                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+                $this->attachment->LinkAttrs["target"] = "";
+                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
+                    $this->attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                }
+            } else {
+                $this->attachment->HrefValue = "";
+            }
+            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // lab_test_request_id
-            $this->lab_test_request_id->setupEditAttributes();
-            $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
-            $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
-            if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
-                $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->setupEditAttributes();
+            $this->radiology_requests_details_id->EditValue = $this->radiology_requests_details_id->CurrentValue;
+            $this->radiology_requests_details_id->PlaceHolder = RemoveHtml($this->radiology_requests_details_id->caption());
+            if (strval($this->radiology_requests_details_id->EditValue) != "" && is_numeric($this->radiology_requests_details_id->EditValue)) {
+                $this->radiology_requests_details_id->EditValue = FormatNumber($this->radiology_requests_details_id->EditValue, null);
             }
 
-            // report_title
-            $this->report_title->setupEditAttributes();
-            if (!$this->report_title->Raw) {
-                $this->report_title->CurrentValue = HtmlDecode($this->report_title->CurrentValue);
-            }
-            $this->report_title->EditValue = HtmlEncode($this->report_title->CurrentValue);
-            $this->report_title->PlaceHolder = RemoveHtml($this->report_title->caption());
+            // findings
+            $this->findings->setupEditAttributes();
+            $this->findings->EditValue = HtmlEncode($this->findings->CurrentValue);
+            $this->findings->PlaceHolder = RemoveHtml($this->findings->caption());
 
-            // details
-            $this->details->setupEditAttributes();
-            if (!$this->details->Raw) {
-                $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
+            // attachment
+            $this->attachment->setupEditAttributes();
+            if (!EmptyValue($this->attachment->Upload->DbValue)) {
+                $this->attachment->EditValue = $this->id->CurrentValue;
+                $this->attachment->IsBlobImage = IsImageFile(ContentExtension($this->attachment->Upload->DbValue));
+            } else {
+                $this->attachment->EditValue = "";
             }
-            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
-            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+            if (!Config("CREATE_UPLOAD_FILE_ON_COPY")) {
+                $this->attachment->Upload->DbValue = null;
+            }
+            if ($this->isShow() || $this->isCopy()) {
+                RenderUploadField($this->attachment);
+            }
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
             if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
                 $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
+                $curVal = strval($this->created_by_user_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                    if ($this->created_by_user_id->EditValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
+                        } else {
+                            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->created_by_user_id->EditValue = null;
                 }
+            } else {
+                $curVal = trim(strval($this->created_by_user_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                } else {
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->Lookup !== null && is_array($this->created_by_user_id->lookupOptions()) && count($this->created_by_user_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->created_by_user_id->ViewValue !== null) { // Load from cache
+                    $this->created_by_user_id->EditValue = array_values($this->created_by_user_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->created_by_user_id->CurrentValue, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->created_by_user_id->EditValue = $arwrk;
+                }
+                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
             }
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
+            // radiology_requests_details_id
+            $this->radiology_requests_details_id->HrefValue = "";
 
-            // report_title
-            $this->report_title->HrefValue = "";
+            // findings
+            $this->findings->HrefValue = "";
 
-            // details
-            $this->details->HrefValue = "";
+            // attachment
+            if (!empty($this->attachment->Upload->DbValue)) {
+                $this->attachment->HrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
+                $this->attachment->LinkAttrs["target"] = "";
+                if ($this->attachment->IsBlobImage && empty($this->attachment->LinkAttrs["target"])) {
+                    $this->attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->attachment->HrefValue = FullUrl($this->attachment->HrefValue, "href");
+                }
+            } else {
+                $this->attachment->HrefValue = "";
+            }
+            $this->attachment->ExportHrefValue = GetFileUploadUrl($this->attachment, $this->id->CurrentValue);
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1015,47 +1055,28 @@ class RadiologyReportsAdd extends RadiologyReports
             return true;
         }
         $validateForm = true;
-            if ($this->lab_test_request_id->Visible && $this->lab_test_request_id->Required) {
-                if (!$this->lab_test_request_id->IsDetailKey && EmptyValue($this->lab_test_request_id->FormValue)) {
-                    $this->lab_test_request_id->addErrorMessage(str_replace("%s", $this->lab_test_request_id->caption(), $this->lab_test_request_id->RequiredErrorMessage));
+            if ($this->radiology_requests_details_id->Visible && $this->radiology_requests_details_id->Required) {
+                if (!$this->radiology_requests_details_id->IsDetailKey && EmptyValue($this->radiology_requests_details_id->FormValue)) {
+                    $this->radiology_requests_details_id->addErrorMessage(str_replace("%s", $this->radiology_requests_details_id->caption(), $this->radiology_requests_details_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->lab_test_request_id->FormValue)) {
-                $this->lab_test_request_id->addErrorMessage($this->lab_test_request_id->getErrorMessage(false));
+            if (!CheckInteger($this->radiology_requests_details_id->FormValue)) {
+                $this->radiology_requests_details_id->addErrorMessage($this->radiology_requests_details_id->getErrorMessage(false));
             }
-            if ($this->report_title->Visible && $this->report_title->Required) {
-                if (!$this->report_title->IsDetailKey && EmptyValue($this->report_title->FormValue)) {
-                    $this->report_title->addErrorMessage(str_replace("%s", $this->report_title->caption(), $this->report_title->RequiredErrorMessage));
+            if ($this->findings->Visible && $this->findings->Required) {
+                if (!$this->findings->IsDetailKey && EmptyValue($this->findings->FormValue)) {
+                    $this->findings->addErrorMessage(str_replace("%s", $this->findings->caption(), $this->findings->RequiredErrorMessage));
                 }
             }
-            if ($this->details->Visible && $this->details->Required) {
-                if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
-                    $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
+            if ($this->attachment->Visible && $this->attachment->Required) {
+                if ($this->attachment->Upload->FileName == "" && !$this->attachment->Upload->KeepFile) {
+                    $this->attachment->addErrorMessage(str_replace("%s", $this->attachment->caption(), $this->attachment->RequiredErrorMessage));
                 }
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1140,23 +1161,23 @@ class RadiologyReportsAdd extends RadiologyReports
         global $Security;
         $rsnew = [];
 
-        // lab_test_request_id
-        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, false);
+        // radiology_requests_details_id
+        $this->radiology_requests_details_id->setDbValueDef($rsnew, $this->radiology_requests_details_id->CurrentValue, false);
 
-        // report_title
-        $this->report_title->setDbValueDef($rsnew, $this->report_title->CurrentValue, false);
+        // findings
+        $this->findings->setDbValueDef($rsnew, $this->findings->CurrentValue, false);
 
-        // details
-        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, false);
+        // attachment
+        if ($this->attachment->Visible && !$this->attachment->Upload->KeepFile) {
+            if ($this->attachment->Upload->Value === null) {
+                $rsnew['attachment'] = null;
+            } else {
+                $rsnew['attachment'] = $this->attachment->Upload->Value;
+            }
+        }
 
         // created_by_user_id
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
         return $rsnew;
     }
 
@@ -1166,23 +1187,17 @@ class RadiologyReportsAdd extends RadiologyReports
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
-            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
+        if (isset($row['radiology_requests_details_id'])) { // radiology_requests_details_id
+            $this->radiology_requests_details_id->setFormValue($row['radiology_requests_details_id']);
         }
-        if (isset($row['report_title'])) { // report_title
-            $this->report_title->setFormValue($row['report_title']);
+        if (isset($row['findings'])) { // findings
+            $this->findings->setFormValue($row['findings']);
         }
-        if (isset($row['details'])) { // details
-            $this->details->setFormValue($row['details']);
+        if (isset($row['attachment'])) { // attachment
+            $this->attachment->setFormValue($row['attachment']);
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
         }
     }
 
@@ -1220,6 +1235,8 @@ class RadiologyReportsAdd extends RadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

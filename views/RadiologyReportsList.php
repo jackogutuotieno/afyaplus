@@ -160,14 +160,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th data-name="lab_test_request_id" class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><div id="elh_radiology_reports_lab_test_request_id" class="radiology_reports_lab_test_request_id"><?= $Page->renderFieldHeader($Page->lab_test_request_id) ?></div></th>
+<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <th data-name="radiology_requests_details_id" class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><div id="elh_radiology_reports_radiology_requests_details_id" class="radiology_reports_radiology_requests_details_id"><?= $Page->renderFieldHeader($Page->radiology_requests_details_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->report_title->Visible) { // report_title ?>
-        <th data-name="report_title" class="<?= $Page->report_title->headerCellClass() ?>"><div id="elh_radiology_reports_report_title" class="radiology_reports_report_title"><?= $Page->renderFieldHeader($Page->report_title) ?></div></th>
-<?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-        <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_radiology_reports_details" class="radiology_reports_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
+<?php if ($Page->findings->Visible) { // findings ?>
+        <th data-name="findings" class="<?= $Page->findings->headerCellClass() ?>"><div id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->renderFieldHeader($Page->findings) ?></div></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_radiology_reports_created_by_user_id" class="radiology_reports_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
@@ -214,27 +211,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_lab_test_request_id" class="el_radiology_reports_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
+    <?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
+        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_radiology_requests_details_id" class="el_radiology_reports_radiology_requests_details_id">
+<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->report_title->Visible) { // report_title ?>
-        <td data-name="report_title"<?= $Page->report_title->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_report_title" class="el_radiology_reports_report_title">
-<span<?= $Page->report_title->viewAttributes() ?>>
-<?= $Page->report_title->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->details->Visible) { // details ?>
-        <td data-name="details"<?= $Page->details->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_details" class="el_radiology_reports_details">
-<span<?= $Page->details->viewAttributes() ?>>
-<?= $Page->details->getViewValue() ?></span>
+    <?php if ($Page->findings->Visible) { // findings ?>
+        <td data-name="findings"<?= $Page->findings->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_findings" class="el_radiology_reports_findings">
+<span<?= $Page->findings->viewAttributes() ?>>
+<?= $Page->findings->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
