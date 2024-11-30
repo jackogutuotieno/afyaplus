@@ -21,13 +21,13 @@ $radiology_billing_report->TableClass = "table table-bordered table-hover table-
 </td>
         </tr>
 <?php } ?>
-<?php if ($radiology_billing_report->patient_id->Visible) { // patient_id ?>
-        <tr id="r_patient_id"<?= $radiology_billing_report->patient_id->rowAttributes() ?>>
-            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->patient_id->caption() ?></td>
-            <td<?= $radiology_billing_report->patient_id->cellAttributes() ?>>
-<span id="el_radiology_billing_report_patient_id">
-<span<?= $radiology_billing_report->patient_id->viewAttributes() ?>>
-<?= $radiology_billing_report->patient_id->getViewValue() ?></span>
+<?php if ($radiology_billing_report->status->Visible) { // status ?>
+        <tr id="r_status"<?= $radiology_billing_report->status->rowAttributes() ?>>
+            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->status->caption() ?></td>
+            <td<?= $radiology_billing_report->status->cellAttributes() ?>>
+<span id="el_radiology_billing_report_status">
+<span<?= $radiology_billing_report->status->viewAttributes() ?>>
+<?= $radiology_billing_report->status->getViewValue() ?></span>
 </span>
 </td>
         </tr>

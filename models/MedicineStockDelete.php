@@ -677,6 +677,7 @@ class MedicineStockDelete extends MedicineStock
         // expiry_date
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
 

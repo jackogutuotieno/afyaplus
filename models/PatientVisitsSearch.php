@@ -129,6 +129,7 @@ class PatientVisitsSearch extends PatientVisits
         $this->user_role->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -585,6 +586,7 @@ class PatientVisitsSearch extends PatientVisits
         $this->buildSearchUrl($srchUrl, $this->user_role); // user_role
         $this->buildSearchUrl($srchUrl, $this->date_created); // date_created
         $this->buildSearchUrl($srchUrl, $this->date_updated); // date_updated
+        $this->buildSearchUrl($srchUrl, $this->status); // status
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -694,6 +696,11 @@ class PatientVisitsSearch extends PatientVisits
         if ($this->date_updated->AdvancedSearch->get()) {
             $hasValue = true;
         }
+
+        // status
+        if ($this->status->AdvancedSearch->get()) {
+            $hasValue = true;
+        }
         return $hasValue;
     }
 
@@ -732,6 +739,9 @@ class PatientVisitsSearch extends PatientVisits
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -841,6 +851,9 @@ class PatientVisitsSearch extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -872,6 +885,10 @@ class PatientVisitsSearch extends PatientVisits
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         } elseif ($this->RowType == RowType::SEARCH) {
             // id
             $this->id->setupEditAttributes();
@@ -1003,6 +1020,14 @@ class PatientVisitsSearch extends PatientVisits
             $this->date_updated->setupEditAttributes();
             $this->date_updated->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern()), $this->date_updated->formatPattern()));
             $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1054,6 +1079,7 @@ class PatientVisitsSearch extends PatientVisits
         $this->user_role->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
         $this->date_updated->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb

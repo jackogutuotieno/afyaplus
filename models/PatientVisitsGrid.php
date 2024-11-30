@@ -143,6 +143,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->user_role->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -1142,6 +1143,14 @@ class PatientVisitsGrid extends PatientVisits
         ) {
             return false;
         }
+        if (
+            $CurrentForm->hasValue("x_status") &&
+            $CurrentForm->hasValue("o_status") &&
+            $this->status->CurrentValue != $this->status->DefaultValue &&
+            !($this->status->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->status->CurrentValue == $this->status->getSessionValue())
+        ) {
+            return false;
+        }
         return true;
     }
 
@@ -1758,6 +1767,19 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_status")) {
+            $this->status->setOldValue($CurrentForm->getValue("o_status"));
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
@@ -1778,6 +1800,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -1881,6 +1904,7 @@ class PatientVisitsGrid extends PatientVisits
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -1895,6 +1919,7 @@ class PatientVisitsGrid extends PatientVisits
         $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -1948,6 +1973,8 @@ class PatientVisitsGrid extends PatientVisits
         // date_created
 
         // date_updated
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2054,6 +2081,9 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -2073,6 +2103,10 @@ class PatientVisitsGrid extends PatientVisits
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -2213,6 +2247,14 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Add refer script
 
             // patient_id
@@ -2229,6 +2271,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -2369,6 +2414,14 @@ class PatientVisitsGrid extends PatientVisits
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Edit refer script
 
             // patient_id
@@ -2385,6 +2438,9 @@ class PatientVisitsGrid extends PatientVisits
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2433,6 +2489,11 @@ class PatientVisitsGrid extends PatientVisits
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -2601,6 +2662,9 @@ class PatientVisitsGrid extends PatientVisits
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
         return $rsnew;
     }
 
@@ -2624,6 +2688,9 @@ class PatientVisitsGrid extends PatientVisits
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
     }
 
@@ -2698,6 +2765,9 @@ class PatientVisitsGrid extends PatientVisits
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2721,6 +2791,9 @@ class PatientVisitsGrid extends PatientVisits
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
     }
 

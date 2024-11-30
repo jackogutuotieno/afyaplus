@@ -65,6 +65,17 @@ $patient_visits->TableClass = "table table-bordered table-hover table-sm ew-tabl
 </td>
         </tr>
 <?php } ?>
+<?php if ($patient_visits->status->Visible) { // status ?>
+        <tr id="r_status"<?= $patient_visits->status->rowAttributes() ?>>
+            <td class="<?= $patient_visits->TableLeftColumnClass ?>"><?= $patient_visits->status->caption() ?></td>
+            <td<?= $patient_visits->status->cellAttributes() ?>>
+<span id="el_patient_visits_status">
+<span<?= $patient_visits->status->viewAttributes() ?>>
+<?= $patient_visits->status->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
     </tbody>
 </table>
 </div>

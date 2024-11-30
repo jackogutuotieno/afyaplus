@@ -83,6 +83,32 @@ loadjs.ready(["wrapper", "head"], function () {
 });
 </script>
 <input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
+            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="flaboratory_billing_reportsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+    </div>
+</div>
+</div><!-- /.ew-extended-search -->
+<?php } ?>
+<?php } ?>
 </div><!-- /.ew-search-panel -->
 </form>
 <?php } ?>
@@ -137,8 +163,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_patient_id" class="laboratory_billing_report_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_visit_id" class="laboratory_billing_report_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
+<?php if ($Page->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_laboratory_billing_report_status" class="laboratory_billing_report_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_laboratory_billing_report_date_created" class="laboratory_billing_report_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -190,11 +216,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_visit_id" class="el_laboratory_billing_report_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
+    <?php if ($Page->status->Visible) { // status ?>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_billing_report_status" class="el_laboratory_billing_report_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

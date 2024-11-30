@@ -129,6 +129,7 @@ class PatientVisitsEdit extends PatientVisits
         $this->user_role->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -776,6 +777,16 @@ class PatientVisitsEdit extends PatientVisits
                 $this->medical_scheme_id->setFormValue($val);
             }
         }
+
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -787,6 +798,7 @@ class PatientVisitsEdit extends PatientVisits
         $this->visit_type_id->CurrentValue = $this->visit_type_id->FormValue;
         $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -835,6 +847,7 @@ class PatientVisitsEdit extends PatientVisits
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -849,6 +862,7 @@ class PatientVisitsEdit extends PatientVisits
         $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -906,6 +920,9 @@ class PatientVisitsEdit extends PatientVisits
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1012,6 +1029,9 @@ class PatientVisitsEdit extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
 
@@ -1026,6 +1046,9 @@ class PatientVisitsEdit extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1164,6 +1187,14 @@ class PatientVisitsEdit extends PatientVisits
             }
             $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Edit refer script
 
             // id
@@ -1180,6 +1211,9 @@ class PatientVisitsEdit extends PatientVisits
 
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1224,6 +1258,11 @@ class PatientVisitsEdit extends PatientVisits
             if ($this->medical_scheme_id->Visible && $this->medical_scheme_id->Required) {
                 if (!$this->medical_scheme_id->IsDetailKey && EmptyValue($this->medical_scheme_id->FormValue)) {
                     $this->medical_scheme_id->addErrorMessage(str_replace("%s", $this->medical_scheme_id->caption(), $this->medical_scheme_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1434,6 +1473,9 @@ class PatientVisitsEdit extends PatientVisits
 
         // medical_scheme_id
         $this->medical_scheme_id->setDbValueDef($rsnew, $this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->ReadOnly);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
         return $rsnew;
     }
 
@@ -1454,6 +1496,9 @@ class PatientVisitsEdit extends PatientVisits
         }
         if (isset($row['medical_scheme_id'])) { // medical_scheme_id
             $this->medical_scheme_id->CurrentValue = $row['medical_scheme_id'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
     }
 

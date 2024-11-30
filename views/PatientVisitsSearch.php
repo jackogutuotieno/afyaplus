@@ -32,7 +32,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["medical_scheme_id", [], fields.medical_scheme_id.isInvalid],
             ["user_role", [], fields.user_role.isInvalid],
             ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
+            ["status", [], fields.status.isInvalid]
         ])
         // Validate form
         .setValidate(
@@ -450,6 +451,26 @@ loadjs.ready(["fpatient_visitssearch", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status" class="row"<?= $Page->status->rowAttributes() ?>>
+        <label for="x_status" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_status"><?= $Page->status->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_status" id="z_status" value="LIKE">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div<?= $Page->status->cellAttributes() ?>>
+                <div class="d-flex align-items-start">
+                <span id="el_patient_visits_status" class="ew-search-field ew-search-field-single">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="patient_visits" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage(false) ?></div>
 </span>
                 </div>
             </div>

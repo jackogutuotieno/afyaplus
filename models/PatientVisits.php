@@ -54,6 +54,7 @@ class PatientVisits extends DbTable
     public $user_role;
     public $date_created;
     public $date_updated;
+    public $status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -324,6 +325,29 @@ class PatientVisits extends DbTable
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->status->InputTextType = "text";
+        $this->status->IsCustom = true; // Custom field
+        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['status'] = &$this->status;
+
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
         $this->CacheProfile = new \Doctrine\DBAL\Cache\QueryCacheProfile(0, $this->TableVar);
@@ -554,20 +578,7 @@ class PatientVisits extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, '' AS `status`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -989,6 +1000,7 @@ class PatientVisits extends DbTable
         $this->user_role->DbValue = $row['user_role'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
+        $this->status->DbValue = $row['status'];
     }
 
     // Delete uploaded files
@@ -1361,6 +1373,7 @@ class PatientVisits extends DbTable
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Render list content
@@ -1406,6 +1419,8 @@ class PatientVisits extends DbTable
         // date_created
 
         // date_updated
+
+        // status
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1513,6 +1528,9 @@ class PatientVisits extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+        // status
+        $this->status->ViewValue = $this->status->CurrentValue;
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
@@ -1544,6 +1562,10 @@ class PatientVisits extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1617,6 +1639,14 @@ class PatientVisits extends DbTable
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
+        // status
+        $this->status->setupEditAttributes();
+        if (!$this->status->Raw) {
+            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        }
+        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1650,6 +1680,7 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->visit_type_id);
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
+                    $doc->exportCaption($this->status);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
@@ -1658,6 +1689,7 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->medical_scheme_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->status);
                 }
                 $doc->endExportRow();
             }
@@ -1689,6 +1721,7 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->visit_type_id);
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
+                        $doc->exportField($this->status);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
@@ -1697,6 +1730,7 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->medical_scheme_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->status);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1872,8 +1906,14 @@ class PatientVisits extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $current_date = CurrentDate();
+        if ($this->date_created->CurrentValue > $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->status->ViewValue = "New"; 
+        } else if ($this->date_created->CurrentValue < $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #e5064b; color: white";
+            $this->status->ViewValue = "Lapsed"; 
+        } 
     }
 
     // User ID Filtering event

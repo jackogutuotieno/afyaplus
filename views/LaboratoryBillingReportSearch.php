@@ -28,6 +28,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [ew.Validators.integer], fields.id.isInvalid],
             ["patient_id", [], fields.patient_id.isInvalid],
             ["visit_id", [ew.Validators.integer], fields.visit_id.isInvalid],
+            ["status", [], fields.status.isInvalid],
             ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -190,6 +191,26 @@ loadjs.ready("flaboratory_billing_reportsearch", function() {
         </div>
     </div>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status" class="row"<?= $Page->status->rowAttributes() ?>>
+        <label for="x_status" class="<?= $Page->LeftColumnClass ?>"><span id="elh_laboratory_billing_report_status"><?= $Page->status->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_status" id="z_status" value="LIKE">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div<?= $Page->status->cellAttributes() ?>>
+                <div class="d-flex align-items-start">
+                <span id="el_laboratory_billing_report_status" class="ew-search-field ew-search-field-single">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="laboratory_billing_report" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage(false) ?></div>
+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <div id="r_date_created" class="row"<?= $Page->date_created->rowAttributes() ?>>
         <label for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><span id="elh_laboratory_billing_report_date_created"><?= $Page->date_created->caption() ?></span>
@@ -207,7 +228,7 @@ loadjs.ready("flaboratory_billing_reportsearch", function() {
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -256,7 +277,7 @@ loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function ()
 <?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

@@ -147,6 +147,7 @@ class PatientVisitsView extends PatientVisits
         $this->user_role->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -1195,6 +1196,7 @@ class PatientVisitsView extends PatientVisits
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -1209,6 +1211,7 @@ class PatientVisitsView extends PatientVisits
         $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -1245,6 +1248,8 @@ class PatientVisitsView extends PatientVisits
         // date_created
 
         // date_updated
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1351,6 +1356,9 @@ class PatientVisitsView extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -1370,6 +1378,10 @@ class PatientVisitsView extends PatientVisits
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
             $this->medical_scheme_id->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event

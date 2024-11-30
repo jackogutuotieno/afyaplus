@@ -129,6 +129,7 @@ class PatientVisitsDelete extends PatientVisits
         $this->user_role->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -616,6 +617,7 @@ class PatientVisitsDelete extends PatientVisits
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -630,6 +632,7 @@ class PatientVisitsDelete extends PatientVisits
         $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -660,6 +663,8 @@ class PatientVisitsDelete extends PatientVisits
         // date_created
 
         // date_updated
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -766,6 +771,9 @@ class PatientVisitsDelete extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -785,6 +793,10 @@ class PatientVisitsDelete extends PatientVisits
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event

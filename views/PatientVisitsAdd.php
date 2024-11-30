@@ -26,7 +26,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["visit_type_id", [fields.visit_type_id.visible && fields.visit_type_id.required ? ew.Validators.required(fields.visit_type_id.caption) : null], fields.visit_type_id.isInvalid],
             ["payment_method_id", [fields.payment_method_id.visible && fields.payment_method_id.required ? ew.Validators.required(fields.payment_method_id.caption) : null], fields.payment_method_id.isInvalid],
             ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid],
-            ["user_role", [fields.user_role.visible && fields.user_role.required ? ew.Validators.required(fields.user_role.caption) : null], fields.user_role.isInvalid]
+            ["user_role", [fields.user_role.visible && fields.user_role.required ? ew.Validators.required(fields.user_role.caption) : null], fields.user_role.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -265,6 +266,18 @@ loadjs.ready("fpatient_visitsadd", function() {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_patient_visits_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_patient_visits_status">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="patient_visits" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
+<?= $Page->status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

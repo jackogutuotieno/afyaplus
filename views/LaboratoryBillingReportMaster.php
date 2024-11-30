@@ -32,13 +32,13 @@ $laboratory_billing_report->TableClass = "table table-bordered table-hover table
 </td>
         </tr>
 <?php } ?>
-<?php if ($laboratory_billing_report->visit_id->Visible) { // visit_id ?>
-        <tr id="r_visit_id"<?= $laboratory_billing_report->visit_id->rowAttributes() ?>>
-            <td class="<?= $laboratory_billing_report->TableLeftColumnClass ?>"><?= $laboratory_billing_report->visit_id->caption() ?></td>
-            <td<?= $laboratory_billing_report->visit_id->cellAttributes() ?>>
-<span id="el_laboratory_billing_report_visit_id">
-<span<?= $laboratory_billing_report->visit_id->viewAttributes() ?>>
-<?= $laboratory_billing_report->visit_id->getViewValue() ?></span>
+<?php if ($laboratory_billing_report->status->Visible) { // status ?>
+        <tr id="r_status"<?= $laboratory_billing_report->status->rowAttributes() ?>>
+            <td class="<?= $laboratory_billing_report->TableLeftColumnClass ?>"><?= $laboratory_billing_report->status->caption() ?></td>
+            <td<?= $laboratory_billing_report->status->cellAttributes() ?>>
+<span id="el_laboratory_billing_report_status">
+<span<?= $laboratory_billing_report->status->viewAttributes() ?>>
+<?= $laboratory_billing_report->status->getViewValue() ?></span>
 </span>
 </td>
         </tr>

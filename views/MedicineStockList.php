@@ -188,7 +188,7 @@ $Page->ListOptions->render("header", "left");
         <th data-name="expiry_date" class="<?= $Page->expiry_date->headerCellClass() ?>"><div id="elh_medicine_stock_expiry_date" class="medicine_stock_expiry_date"><?= $Page->renderFieldHeader($Page->expiry_date) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_stock_date_created" class="medicine_stock_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_medicine_stock_date_created" class="medicine_stock_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_medicine_stock_date_updated" class="medicine_stock_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>

@@ -1,4 +1,4 @@
-<ew-language date="2024/11/29" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/11/30" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -947,6 +947,9 @@
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
       </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
     </table>
     <table id="patient_vitals">
       <phrase id="tblcaption" value="Vitals" />
@@ -1685,6 +1688,9 @@
       <field id="visit_id">
         <phrase id="fldcaption" value="Visit ID" />
       </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Date Added" />
       </field>
@@ -1714,6 +1720,9 @@
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
       </field>
       <field id="visit_id">
         <phrase id="fldcaption" value="Visit ID" />

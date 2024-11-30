@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_visits_status"><template id="tpc_patient_visits_status"><?= $Page->status->caption() ?></template></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<template id="tpx_patient_visits_status"><span id="el_patient_visits_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <div id="tpd_patient_visitsview" class="ew-custom-template"></div>
 <template id="tpm_patient_visitsview">

@@ -129,6 +129,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->user_role->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -754,6 +755,16 @@ class PatientVisitsAdd extends PatientVisits
             }
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -767,6 +778,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
         $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
         $this->user_role->CurrentValue = $this->user_role->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -815,6 +827,7 @@ class PatientVisitsAdd extends PatientVisits
         $this->user_role->setDbValue($row['user_role']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -829,6 +842,7 @@ class PatientVisitsAdd extends PatientVisits
         $row['user_role'] = $this->user_role->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -886,6 +900,9 @@ class PatientVisitsAdd extends PatientVisits
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -995,6 +1012,9 @@ class PatientVisitsAdd extends PatientVisits
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -1009,6 +1029,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // user_role
             $this->user_role->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -1145,6 +1168,14 @@ class PatientVisitsAdd extends PatientVisits
 
             // user_role
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Add refer script
 
             // patient_id
@@ -1161,6 +1192,9 @@ class PatientVisitsAdd extends PatientVisits
 
             // user_role
             $this->user_role->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1205,6 +1239,11 @@ class PatientVisitsAdd extends PatientVisits
             if ($this->user_role->Visible && $this->user_role->Required) {
                 if (!$this->user_role->IsDetailKey && EmptyValue($this->user_role->FormValue)) {
                     $this->user_role->addErrorMessage(str_replace("%s", $this->user_role->caption(), $this->user_role->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1442,6 +1481,9 @@ class PatientVisitsAdd extends PatientVisits
         // user_role
         $this->user_role->CurrentValue = $this->user_role->getAutoUpdateValue(); // PHP
         $this->user_role->setDbValueDef($rsnew, $this->user_role->CurrentValue, false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1465,6 +1507,9 @@ class PatientVisitsAdd extends PatientVisits
         }
         if (isset($row['user_role'])) { // user_role
             $this->user_role->setFormValue($row['user_role']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
     }
 

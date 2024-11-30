@@ -124,6 +124,7 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -574,6 +575,7 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
         $this->buildSearchUrl($srchUrl, $this->id); // id
         $this->buildSearchUrl($srchUrl, $this->patient_id); // patient_id
         $this->buildSearchUrl($srchUrl, $this->visit_id); // visit_id
+        $this->buildSearchUrl($srchUrl, $this->status); // status
         $this->buildSearchUrl($srchUrl, $this->date_created); // date_created
         $this->buildSearchUrl($srchUrl, $this->date_updated); // date_updated
         if ($srchUrl != "") {
@@ -661,6 +663,11 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             $hasValue = true;
         }
 
+        // status
+        if ($this->status->AdvancedSearch->get()) {
+            $hasValue = true;
+        }
+
         // date_created
         if ($this->date_created->AdvancedSearch->get()) {
             $hasValue = true;
@@ -693,6 +700,9 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
 
         // visit_id
         $this->visit_id->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -732,6 +742,9 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
             $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -751,6 +764,10 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             // visit_id
             $this->visit_id->HrefValue = "";
             $this->visit_id->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -796,6 +813,14 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             $this->visit_id->setupEditAttributes();
             $this->visit_id->EditValue = $this->visit_id->AdvancedSearch->SearchValue;
             $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -855,6 +880,7 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
         $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
         $this->visit_id->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
         $this->date_updated->AdvancedSearch->load();
     }
