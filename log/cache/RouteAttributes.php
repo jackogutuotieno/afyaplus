@@ -136,6 +136,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -269,6 +271,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1640,6 +1652,8 @@
                 '/medicinestockreport2list[/{id}]',
                 '/medicinestockreport',
                 '/medicinestockreport/StockUpdatebyMonth',
+                '/medicinestockreport/StockbySupplier',
+                '/medicinestockreport/StockbyExpiryStatus',
                 '/medicinesupplierslist[/{id}]',
                 '/medicinesuppliersadd[/{id}]',
                 '/medicinesuppliersview[/{id}]',
@@ -1894,6 +1908,8 @@
                 'PHPMaker2024\\afyaplus\\MedicineStockReport2Controller:list',
                 'PHPMaker2024\\afyaplus\\MedicineStockReportController:summary',
                 'PHPMaker2024\\afyaplus\\MedicineStockReportController:StockUpdatebyMonth',
+                'PHPMaker2024\\afyaplus\\MedicineStockReportController:StockbySupplier',
+                'PHPMaker2024\\afyaplus\\MedicineStockReportController:StockbyExpiryStatus',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:list',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:add',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:view',
@@ -2022,6 +2038,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2904,6 +2926,8 @@
                 'list.medicine_stock_report2',
                 'summary.Medicine_Stock_Report',
                 'summary.Medicine_Stock_Report.StockUpdatebyMonth',
+                'summary.Medicine_Stock_Report.StockbySupplier',
+                'summary.Medicine_Stock_Report.StockbyExpiryStatus',
                 'list.medicine_suppliers',
                 'add.medicine_suppliers',
                 'view.medicine_suppliers',
@@ -3032,6 +3056,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3540,6 +3566,8 @@
         $o[249],
         $o[250],
         $o[251],
+        $o[252],
+        $o[253],
     ],
     []
 );

@@ -47,6 +47,8 @@ class MedicineStockReport extends ReportTable
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
     public $StockUpdatebyMonth;
+    public $StockbySupplier;
+    public $StockbyExpiryStatus;
 
     // Fields
     public $id;
@@ -617,6 +619,68 @@ class MedicineStockReport extends ReportTable
         $this->StockUpdatebyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
         $this->StockUpdatebyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
         $this->Charts[$this->StockUpdatebyMonth->ID] = &$this->StockUpdatebyMonth;
+
+        // Stock by Supplier
+        $this->StockbySupplier = new DbChart($this, 'StockbySupplier', 'Stock by Supplier', 'supplier_name', 'supplier_name', 1004, '', 0, 'COUNT', 600, 500);
+        $this->StockbySupplier->Position = 4;
+        $this->StockbySupplier->PageBreakType = "before";
+        $this->StockbySupplier->YAxisFormat = [""];
+        $this->StockbySupplier->YFieldFormat = [""];
+        $this->StockbySupplier->SortType = 0;
+        $this->StockbySupplier->SortSequence = "";
+        $this->StockbySupplier->SqlSelect = $this->getQueryBuilder()->select("`supplier_name`", "''", "COUNT(`supplier_name`)");
+        $this->StockbySupplier->SqlGroupBy = "`supplier_name`";
+        $this->StockbySupplier->SqlOrderBy = "";
+        $this->StockbySupplier->SeriesDateType = "";
+        $this->StockbySupplier->ID = "Medicine_Stock_Report_StockbySupplier"; // Chart ID
+        $this->StockbySupplier->setParameters([
+            ["type", "1004"],
+            ["seriestype", "0"]
+        ]); // Chart type / Chart series type
+        $this->StockbySupplier->setParameters([
+            ["caption", $this->StockbySupplier->caption()],
+            ["xaxisname", $this->StockbySupplier->xAxisName()]
+        ]); // Chart caption / X axis name
+        $this->StockbySupplier->setParameter("yaxisname", $this->StockbySupplier->yAxisName()); // Y axis name
+        $this->StockbySupplier->setParameters([
+            ["shownames", "1"],
+            ["showvalues", "1"],
+            ["showhovercap", "1"]
+        ]); // Show names / Show values / Show hover
+        $this->StockbySupplier->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->StockbySupplier->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->StockbySupplier->ID] = &$this->StockbySupplier;
+
+        // Stock by Expiry Status
+        $this->StockbyExpiryStatus = new DbChart($this, 'StockbyExpiryStatus', 'Stock by Expiry Status', 'expiry_status_o', 'expiry_status_o', 1006, '', 0, 'COUNT', 600, 500);
+        $this->StockbyExpiryStatus->Position = 4;
+        $this->StockbyExpiryStatus->PageBreakType = "before";
+        $this->StockbyExpiryStatus->YAxisFormat = [""];
+        $this->StockbyExpiryStatus->YFieldFormat = [""];
+        $this->StockbyExpiryStatus->SortType = 0;
+        $this->StockbyExpiryStatus->SortSequence = "";
+        $this->StockbyExpiryStatus->SqlSelect = $this->getQueryBuilder()->select("''", "''", "COUNT('')");
+        $this->StockbyExpiryStatus->SqlGroupBy = "''";
+        $this->StockbyExpiryStatus->SqlOrderBy = "";
+        $this->StockbyExpiryStatus->SeriesDateType = "";
+        $this->StockbyExpiryStatus->ID = "Medicine_Stock_Report_StockbyExpiryStatus"; // Chart ID
+        $this->StockbyExpiryStatus->setParameters([
+            ["type", "1006"],
+            ["seriestype", "0"]
+        ]); // Chart type / Chart series type
+        $this->StockbyExpiryStatus->setParameters([
+            ["caption", $this->StockbyExpiryStatus->caption()],
+            ["xaxisname", $this->StockbyExpiryStatus->xAxisName()]
+        ]); // Chart caption / X axis name
+        $this->StockbyExpiryStatus->setParameter("yaxisname", $this->StockbyExpiryStatus->yAxisName()); // Y axis name
+        $this->StockbyExpiryStatus->setParameters([
+            ["shownames", "1"],
+            ["showvalues", "1"],
+            ["showhovercap", "1"]
+        ]); // Show names / Show values / Show hover
+        $this->StockbyExpiryStatus->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->StockbyExpiryStatus->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->StockbyExpiryStatus->ID] = &$this->StockbyExpiryStatus;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();

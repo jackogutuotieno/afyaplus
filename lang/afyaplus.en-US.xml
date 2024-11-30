@@ -1992,6 +1992,16 @@
         <phrase id="chartxaxisname" value="stockadd month" />
         <phrase id="chartyaxisname" value="stockadd month" />
       </chart>
+      <chart id="stockbysupplier">
+        <phrase id="chartcaption" value="Stock by Supplier" />
+        <phrase id="chartxaxisname" value="supplier name" />
+        <phrase id="chartyaxisname" value="supplier name" />
+      </chart>
+      <chart id="stockbyexpirystatus">
+        <phrase id="chartcaption" value="Stock by Expiry Status" />
+        <phrase id="chartxaxisname" value="Expiry Status" />
+        <phrase id="chartyaxisname" value="Expiry Status" />
+      </chart>
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>

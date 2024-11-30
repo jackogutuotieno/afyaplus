@@ -247,6 +247,20 @@ if (!$DashboardReport) {
     echo $Page->StockUpdatebyMonth->render("ew-chart-bottom");
 }
 ?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->StockbySupplier->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->StockbySupplier->render("ew-chart-bottom");
+}
+?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->StockbyExpiryStatus->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->StockbyExpiryStatus->render("ew-chart-bottom");
+}
+?>
 <?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
 </div>
 <!-- /#ew-bottom -->
