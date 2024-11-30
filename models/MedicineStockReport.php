@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for medicine_stock_report
+ * Table class for Medicine Stock Report
  */
-class MedicineStockReport extends DbTable
+class MedicineStockReport extends ReportTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -32,6 +32,8 @@ class MedicineStockReport extends DbTable
     public $RightColumnClass = "col-sm-10";
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
+    public $ShowGroupHeaderAsRow = false;
+    public $ShowCompactSummaryFooter = true;
 
     // Ajax / Modal
     public $UseAjaxActions = false;
@@ -44,21 +46,28 @@ class MedicineStockReport extends DbTable
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
+    public $StockUpdatebyMonth;
 
     // Fields
     public $id;
+    public $batch_number;
+    public $brand_name;
     public $quantity;
+    public $qty_left_o;
     public $measuring_unit;
     public $buying_price_per_unit;
     public $selling_price_per_unit;
     public $expiry_date;
+    public $expiry_status_o;
     public $date_created;
     public $date_updated;
     public $supplier_name;
     public $phone;
     public $email_address;
     public $physical_address;
-    public $brand_name;
+    public $qty_left;
+    public $expiry_status;
+    public $stockadd_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -71,17 +80,14 @@ class MedicineStockReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "medicine_stock_report";
-        $this->TableName = 'medicine_stock_report';
-        $this->TableType = "VIEW";
-        $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
-        $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
-
-        // Update Table
-        $this->UpdateTable = "medicine_stock_report";
+        $this->TableVar = "Medicine_Stock_Report";
+        $this->TableName = 'Medicine Stock Report';
+        $this->TableType = "REPORT";
+        $this->TableReportType = "summary"; // Report Type
+        $this->ReportSourceTable = 'medicine_stock_report2'; // Report source table
         $this->Dbid = 'DB';
         $this->ExportAll = true;
-        $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
+        $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
 
         // PDF
         $this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
@@ -95,18 +101,10 @@ class MedicineStockReport extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
-        $this->ShowMultipleDetails = false; // Show multiple details
-        $this->GridAddRowCount = 5;
-        $this->AllowAddDeleteRow = true; // Allow add/delete row
-        $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
-        $this->BasicSearch = new BasicSearch($this);
 
         // id
-        $this->id = new DbField(
+        $this->id = new ReportField(
             $this, // Table
             'x_id', // Variable name
             'id', // Name
@@ -130,10 +128,61 @@ class MedicineStockReport extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['id'] = &$this->id;
 
+        // batch_number
+        $this->batch_number = new ReportField(
+            $this, // Table
+            'x_batch_number', // Variable name
+            'batch_number', // Name
+            '`batch_number`', // Expression
+            '`batch_number`', // Basic search expression
+            200, // Type
+            20, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`batch_number`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->batch_number->InputTextType = "text";
+        $this->batch_number->Nullable = false; // NOT NULL field
+        $this->batch_number->Required = true; // Required field
+        $this->batch_number->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->batch_number->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['batch_number'] = &$this->batch_number;
+
+        // brand_name
+        $this->brand_name = new ReportField(
+            $this, // Table
+            'x_brand_name', // Variable name
+            'brand_name', // Name
+            '`brand_name`', // Expression
+            '`brand_name`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`brand_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->brand_name->InputTextType = "text";
+        $this->brand_name->Nullable = false; // NOT NULL field
+        $this->brand_name->Required = true; // Required field
+        $this->brand_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->brand_name->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['brand_name'] = &$this->brand_name;
+
         // quantity
-        $this->quantity = new DbField(
+        $this->quantity = new ReportField(
             $this, // Table
             'x_quantity', // Variable name
             'quantity', // Name
@@ -156,10 +205,37 @@ class MedicineStockReport extends DbTable
         $this->quantity->Required = true; // Required field
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->quantity->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['quantity'] = &$this->quantity;
 
+        // qty_left_o
+        $this->qty_left_o = new ReportField(
+            $this, // Table
+            'x_qty_left_o', // Variable name
+            'qty_left_o', // Name
+            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock_report.id)', // Expression
+            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock_report.id)', // Basic search expression
+            131, // Type
+            34, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock_report.id)', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->qty_left_o->InputTextType = "text";
+        $this->qty_left_o->Raw = true;
+        $this->qty_left_o->IsCustom = true; // Custom field
+        $this->qty_left_o->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->qty_left_o->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->qty_left_o->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['qty_left_o'] = &$this->qty_left_o;
+
         // measuring_unit
-        $this->measuring_unit = new DbField(
+        $this->measuring_unit = new ReportField(
             $this, // Table
             'x_measuring_unit', // Variable name
             'measuring_unit', // Name
@@ -180,10 +256,11 @@ class MedicineStockReport extends DbTable
         $this->measuring_unit->Nullable = false; // NOT NULL field
         $this->measuring_unit->Required = true; // Required field
         $this->measuring_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->measuring_unit->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['measuring_unit'] = &$this->measuring_unit;
 
         // buying_price_per_unit
-        $this->buying_price_per_unit = new DbField(
+        $this->buying_price_per_unit = new ReportField(
             $this, // Table
             'x_buying_price_per_unit', // Variable name
             'buying_price_per_unit', // Name
@@ -206,10 +283,11 @@ class MedicineStockReport extends DbTable
         $this->buying_price_per_unit->Required = true; // Required field
         $this->buying_price_per_unit->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->buying_price_per_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->buying_price_per_unit->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['buying_price_per_unit'] = &$this->buying_price_per_unit;
 
         // selling_price_per_unit
-        $this->selling_price_per_unit = new DbField(
+        $this->selling_price_per_unit = new ReportField(
             $this, // Table
             'x_selling_price_per_unit', // Variable name
             'selling_price_per_unit', // Name
@@ -232,18 +310,19 @@ class MedicineStockReport extends DbTable
         $this->selling_price_per_unit->Required = true; // Required field
         $this->selling_price_per_unit->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->selling_price_per_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->selling_price_per_unit->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['selling_price_per_unit'] = &$this->selling_price_per_unit;
 
         // expiry_date
-        $this->expiry_date = new DbField(
+        $this->expiry_date = new ReportField(
             $this, // Table
             'x_expiry_date', // Variable name
             'expiry_date', // Name
             '`expiry_date`', // Expression
-            CastDateFieldForLike("`expiry_date`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`expiry_date`", 7, "DB"), // Basic search expression
             133, // Type
             40, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`expiry_date`', // Virtual expression
             false, // Is virtual
@@ -256,20 +335,45 @@ class MedicineStockReport extends DbTable
         $this->expiry_date->Raw = true;
         $this->expiry_date->Nullable = false; // NOT NULL field
         $this->expiry_date->Required = true; // Required field
-        $this->expiry_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->expiry_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->expiry_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->expiry_date->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['expiry_date'] = &$this->expiry_date;
 
+        // expiry_status_o
+        $this->expiry_status_o = new ReportField(
+            $this, // Table
+            'x_expiry_status_o', // Variable name
+            'expiry_status_o', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->expiry_status_o->InputTextType = "text";
+        $this->expiry_status_o->IsCustom = true; // Custom field
+        $this->expiry_status_o->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->expiry_status_o->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['expiry_status_o'] = &$this->expiry_status_o;
+
         // date_created
-        $this->date_created = new DbField(
+        $this->date_created = new ReportField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -282,20 +386,21 @@ class MedicineStockReport extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_created->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
-        $this->date_updated = new DbField(
+        $this->date_updated = new ReportField(
             $this, // Table
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -308,12 +413,13 @@ class MedicineStockReport extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_updated->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['date_updated'] = &$this->date_updated;
 
         // supplier_name
-        $this->supplier_name = new DbField(
+        $this->supplier_name = new ReportField(
             $this, // Table
             'x_supplier_name', // Variable name
             'supplier_name', // Name
@@ -334,10 +440,11 @@ class MedicineStockReport extends DbTable
         $this->supplier_name->Nullable = false; // NOT NULL field
         $this->supplier_name->Required = true; // Required field
         $this->supplier_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->supplier_name->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['supplier_name'] = &$this->supplier_name;
 
         // phone
-        $this->phone = new DbField(
+        $this->phone = new ReportField(
             $this, // Table
             'x_phone', // Variable name
             'phone', // Name
@@ -358,10 +465,11 @@ class MedicineStockReport extends DbTable
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
         $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->phone->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['phone'] = &$this->phone;
 
         // email_address
-        $this->email_address = new DbField(
+        $this->email_address = new ReportField(
             $this, // Table
             'x_email_address', // Variable name
             'email_address', // Name
@@ -382,10 +490,11 @@ class MedicineStockReport extends DbTable
         $this->email_address->Nullable = false; // NOT NULL field
         $this->email_address->Required = true; // Required field
         $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->email_address->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['email_address'] = &$this->email_address;
 
         // physical_address
-        $this->physical_address = new DbField(
+        $this->physical_address = new ReportField(
             $this, // Table
             'x_physical_address', // Variable name
             'physical_address', // Name
@@ -404,31 +513,110 @@ class MedicineStockReport extends DbTable
         );
         $this->physical_address->InputTextType = "text";
         $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->physical_address->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['physical_address'] = &$this->physical_address;
 
-        // brand_name
-        $this->brand_name = new DbField(
+        // qty_left
+        $this->qty_left = new ReportField(
             $this, // Table
-            'x_brand_name', // Variable name
-            'brand_name', // Name
-            '`brand_name`', // Expression
-            '`brand_name`', // Basic search expression
-            200, // Type
-            100, // Size
+            'x_qty_left', // Variable name
+            'qty_left', // Name
+            '`qty_left`', // Expression
+            '`qty_left`', // Basic search expression
+            131, // Type
+            34, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`brand_name`', // Virtual expression
+            '`qty_left`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->brand_name->InputTextType = "text";
-        $this->brand_name->Nullable = false; // NOT NULL field
-        $this->brand_name->Required = true; // Required field
-        $this->brand_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['brand_name'] = &$this->brand_name;
+        $this->qty_left->InputTextType = "text";
+        $this->qty_left->Raw = true;
+        $this->qty_left->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->qty_left->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->qty_left->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['qty_left'] = &$this->qty_left;
+
+        // expiry_status
+        $this->expiry_status = new ReportField(
+            $this, // Table
+            'x_expiry_status', // Variable name
+            'expiry_status', // Name
+            '`expiry_status`', // Expression
+            '`expiry_status`', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`expiry_status`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->expiry_status->InputTextType = "text";
+        $this->expiry_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->expiry_status->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['expiry_status'] = &$this->expiry_status;
+
+        // stockadd_month
+        $this->stockadd_month = new ReportField(
+            $this, // Table
+            'x_stockadd_month', // Variable name
+            'stockadd_month', // Name
+            '`stockadd_month`', // Expression
+            '`stockadd_month`', // Basic search expression
+            200, // Type
+            9, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`stockadd_month`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->stockadd_month->InputTextType = "text";
+        $this->stockadd_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->stockadd_month->SourceTableVar = 'medicine_stock_report2';
+        $this->Fields['stockadd_month'] = &$this->stockadd_month;
+
+        // Stock Update by Month
+        $this->StockUpdatebyMonth = new DbChart($this, 'StockUpdatebyMonth', 'Stock Update by Month', 'stockadd_month', 'stockadd_month', 1001, '', 0, 'COUNT', 600, 500);
+        $this->StockUpdatebyMonth->Position = 4;
+        $this->StockUpdatebyMonth->PageBreakType = "before";
+        $this->StockUpdatebyMonth->YAxisFormat = [""];
+        $this->StockUpdatebyMonth->YFieldFormat = [""];
+        $this->StockUpdatebyMonth->SortType = 0;
+        $this->StockUpdatebyMonth->SortSequence = "";
+        $this->StockUpdatebyMonth->SqlSelect = $this->getQueryBuilder()->select("`stockadd_month`", "''", "COUNT(`stockadd_month`)");
+        $this->StockUpdatebyMonth->SqlGroupBy = "`stockadd_month`";
+        $this->StockUpdatebyMonth->SqlOrderBy = "";
+        $this->StockUpdatebyMonth->SeriesDateType = "";
+        $this->StockUpdatebyMonth->ID = "Medicine_Stock_Report_StockUpdatebyMonth"; // Chart ID
+        $this->StockUpdatebyMonth->setParameters([
+            ["type", "1001"],
+            ["seriestype", "0"]
+        ]); // Chart type / Chart series type
+        $this->StockUpdatebyMonth->setParameters([
+            ["caption", $this->StockUpdatebyMonth->caption()],
+            ["xaxisname", $this->StockUpdatebyMonth->xAxisName()]
+        ]); // Chart caption / X axis name
+        $this->StockUpdatebyMonth->setParameter("yaxisname", $this->StockUpdatebyMonth->yAxisName()); // Y axis name
+        $this->StockUpdatebyMonth->setParameters([
+            ["shownames", "1"],
+            ["showvalues", "1"],
+            ["showhovercap", "1"]
+        ]); // Show names / Show values / Show hover
+        $this->StockUpdatebyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->StockUpdatebyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->StockUpdatebyMonth->ID] = &$this->StockUpdatebyMonth;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -445,19 +633,8 @@ class MedicineStockReport extends DbTable
         return $this->$fldParm->Visible; // Returns original value
     }
 
-    // Set left column class (must be predefined col-*-* classes of Bootstrap grid system)
-    public function setLeftColumnClass($class)
-    {
-        if (preg_match('/^col\-(\w+)\-(\d+)$/', $class, $match)) {
-            $this->LeftColumnClass = $class . " col-form-label ew-label";
-            $this->RightColumnClass = "col-" . $match[1] . "-" . strval(12 - (int)$match[2]);
-            $this->OffsetColumnClass = $this->RightColumnClass . " " . str_replace("col-", "offset-", $class);
-            $this->TableLeftColumnClass = preg_replace('/^col-\w+-(\d+)$/', "w-col-$1", $class); // Change to w-col-*
-        }
-    }
-
     // Single column sort
-    public function updateSort(&$fld)
+    protected function updateSort(&$fld)
     {
         if ($this->CurrentOrder == $fld->Name) {
             $sortField = $fld->Expression;
@@ -467,25 +644,99 @@ class MedicineStockReport extends DbTable
             } else {
                 $curSort = $lastSort;
             }
-            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            $this->setSessionOrderBy($orderBy); // Save to Session
+            $fld->setSort($curSort);
+            $lastOrderBy = in_array($lastSort, ["ASC", "DESC"]) ? $sortField . " " . $lastSort : "";
+            $curOrderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
+            if ($fld->GroupingFieldId == 0) {
+                $this->setDetailOrderBy($curOrderBy); // Save to Session
+            }
+        } else {
+            if ($fld->GroupingFieldId == 0) {
+                $fld->setSort("");
+            }
         }
     }
 
-    // Update field sort
-    public function updateFieldSort()
+    // Get Sort SQL
+    protected function sortSql()
     {
-        $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
-        $flds = GetSortFields($orderBy);
-        foreach ($this->Fields as $field) {
-            $fldSort = "";
-            foreach ($flds as $fld) {
-                if ($fld[0] == $field->Expression || $fld[0] == $field->VirtualExpression) {
-                    $fldSort = $fld[1];
+        $dtlSortSql = $this->getDetailOrderBy(); // Get ORDER BY for detail fields from session
+        $grps = [];
+        foreach ($this->Fields as $fld) {
+            if (in_array($fld->getSort(), ["ASC", "DESC"])) {
+                $fldsql = $fld->Expression;
+                if ($fld->GroupingFieldId > 0) {
+                    if ($fld->GroupSql != "") {
+                        $grps[$fld->GroupingFieldId] = str_replace("%s", $fldsql, $fld->GroupSql) . " " . $fld->getSort();
+                    } else {
+                        $grps[$fld->GroupingFieldId] = $fldsql . " " . $fld->getSort();
+                    }
                 }
             }
-            $field->setSort($fldSort);
         }
+        $sortSql = implode(", ", array_values($grps));
+        if ($dtlSortSql != "") {
+            if ($sortSql != "") {
+                $sortSql .= ", ";
+            }
+            $sortSql .= $dtlSortSql;
+        }
+        return $sortSql;
+    }
+
+    // Summary properties
+    private $sqlSelectAggregate = null;
+    private $sqlAggregatePrefix = "";
+    private $sqlAggregateSuffix = "";
+    private $sqlSelectCount = null;
+
+    // Select Aggregate
+    public function getSqlSelectAggregate()
+    {
+        return $this->sqlSelectAggregate ?? $this->getQueryBuilder()->select("*");
+    }
+
+    public function setSqlSelectAggregate($v)
+    {
+        $this->sqlSelectAggregate = $v;
+    }
+
+    // Aggregate Prefix
+    public function getSqlAggregatePrefix()
+    {
+        return ($this->sqlAggregatePrefix != "") ? $this->sqlAggregatePrefix : "";
+    }
+
+    public function setSqlAggregatePrefix($v)
+    {
+        $this->sqlAggregatePrefix = $v;
+    }
+
+    // Aggregate Suffix
+    public function getSqlAggregateSuffix()
+    {
+        return ($this->sqlAggregateSuffix != "") ? $this->sqlAggregateSuffix : "";
+    }
+
+    public function setSqlAggregateSuffix($v)
+    {
+        $this->sqlAggregateSuffix = $v;
+    }
+
+    // Select Count
+    public function getSqlSelectCount()
+    {
+        return $this->sqlSelectCount ?? $this->getQueryBuilder()->select("COUNT(*)");
+    }
+
+    public function setSqlSelectCount($v)
+    {
+        $this->sqlSelectCount = $v;
+    }
+
+    // Render for lookup
+    public function renderLookup()
+    {
     }
 
     // Render X Axis for chart
@@ -513,28 +764,19 @@ class MedicineStockReport extends DbTable
     }
 
     // Get SELECT clause
-    public function getSqlSelect() // Select
+    public function getSqlSelect()
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select($this->sqlSelectFields());
+        if ($this->SqlSelect) {
+            return $this->SqlSelect;
+        }
+        $select = $this->getQueryBuilder()->select($this->sqlSelectFields());
+        return $select;
     }
 
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock_report.id) AS qty_left, '' AS expiry_status, quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock_report.id) AS `qty_left_o`, '' AS `expiry_status_o`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -702,273 +944,6 @@ class MedicineStockReport extends DbTable
         return $cnt;
     }
 
-    // Get SQL
-    public function getSql($where, $orderBy = "")
-    {
-        return $this->getSqlAsQueryBuilder($where, $orderBy)->getSQL();
-    }
-
-    // Get QueryBuilder
-    public function getSqlAsQueryBuilder($where, $orderBy = "")
-    {
-        return $this->buildSelectSql(
-            $this->getSqlSelect(),
-            $this->getSqlFrom(),
-            $this->getSqlWhere(),
-            $this->getSqlGroupBy(),
-            $this->getSqlHaving(),
-            $this->getSqlOrderBy(),
-            $where,
-            $orderBy
-        );
-    }
-
-    // Table SQL
-    public function getCurrentSql()
-    {
-        $filter = $this->CurrentFilter;
-        $filter = $this->applyUserIDFilters($filter);
-        $sort = $this->getSessionOrderBy();
-        return $this->getSql($filter, $sort);
-    }
-
-    /**
-     * Table SQL with List page filter
-     *
-     * @return QueryBuilder
-     */
-    public function getListSql()
-    {
-        $filter = $this->UseSessionForListSql ? $this->getSessionWhere() : "";
-        AddFilter($filter, $this->CurrentFilter);
-        $filter = $this->applyUserIDFilters($filter);
-        $this->recordsetSelecting($filter);
-        $select = $this->getSqlSelect();
-        $from = $this->getSqlFrom();
-        $sort = $this->UseSessionForListSql ? $this->getSessionOrderBy() : "";
-        $this->Sort = $sort;
-        return $this->buildSelectSql(
-            $select,
-            $from,
-            $this->getSqlWhere(),
-            $this->getSqlGroupBy(),
-            $this->getSqlHaving(),
-            $this->getSqlOrderBy(),
-            $filter,
-            $sort
-        );
-    }
-
-    // Get ORDER BY clause
-    public function getOrderBy()
-    {
-        $orderBy = $this->getSqlOrderBy();
-        $sort = $this->getSessionOrderBy();
-        if ($orderBy != "" && $sort != "") {
-            $orderBy .= ", " . $sort;
-        } elseif ($sort != "") {
-            $orderBy = $sort;
-        }
-        return $orderBy;
-    }
-
-    // Get record count based on filter (for detail record count in master table pages)
-    public function loadRecordCount($filter)
-    {
-        $origFilter = $this->CurrentFilter;
-        $this->CurrentFilter = $filter;
-        $this->recordsetSelecting($this->CurrentFilter);
-        $isCustomView = $this->TableType == "CUSTOMVIEW";
-        $select = $isCustomView ? $this->getSqlSelect() : $this->getQueryBuilder()->select("*");
-        $groupBy = $isCustomView ? $this->getSqlGroupBy() : "";
-        $having = $isCustomView ? $this->getSqlHaving() : "";
-        $sql = $this->buildSelectSql($select, $this->getSqlFrom(), $this->getSqlWhere(), $groupBy, $having, "", $this->CurrentFilter, "");
-        $cnt = $this->getRecordCount($sql);
-        $this->CurrentFilter = $origFilter;
-        return $cnt;
-    }
-
-    // Get record count (for current List page)
-    public function listRecordCount()
-    {
-        $filter = $this->getSessionWhere();
-        AddFilter($filter, $this->CurrentFilter);
-        $filter = $this->applyUserIDFilters($filter);
-        $this->recordsetSelecting($filter);
-        $isCustomView = $this->TableType == "CUSTOMVIEW";
-        $select = $isCustomView ? $this->getSqlSelect() : $this->getQueryBuilder()->select("*");
-        $groupBy = $isCustomView ? $this->getSqlGroupBy() : "";
-        $having = $isCustomView ? $this->getSqlHaving() : "";
-        $sql = $this->buildSelectSql($select, $this->getSqlFrom(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
-        $cnt = $this->getRecordCount($sql);
-        return $cnt;
-    }
-
-    /**
-     * INSERT statement
-     *
-     * @param mixed $rs
-     * @return QueryBuilder
-     */
-    public function insertSql(&$rs)
-    {
-        $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->insert($this->UpdateTable);
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($rs as $name => $value) {
-            if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom) {
-                continue;
-            }
-            $field = $this->Fields[$name];
-            $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
-            $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
-            $queryBuilder->setValue($field->Expression, $parm);
-        }
-        return $queryBuilder;
-    }
-
-    // Insert
-    public function insert(&$rs)
-    {
-        $conn = $this->getConnection();
-        try {
-            $queryBuilder = $this->insertSql($rs);
-            $result = $queryBuilder->executeStatement();
-            $this->DbErrorMessage = "";
-        } catch (\Exception $e) {
-            $result = false;
-            $this->DbErrorMessage = $e->getMessage();
-        }
-        if ($result) {
-            $this->id->setDbValue($conn->lastInsertId());
-            $rs['id'] = $this->id->DbValue;
-        }
-        return $result;
-    }
-
-    /**
-     * UPDATE statement
-     *
-     * @param array $rs Data to be updated
-     * @param string|array $where WHERE clause
-     * @param string $curfilter Filter
-     * @return QueryBuilder
-     */
-    public function updateSql(&$rs, $where = "", $curfilter = true)
-    {
-        $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->update($this->UpdateTable);
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($rs as $name => $value) {
-            if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom || $this->Fields[$name]->IsAutoIncrement) {
-                continue;
-            }
-            $field = $this->Fields[$name];
-            $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
-            $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
-            $queryBuilder->set($field->Expression, $parm);
-        }
-        $filter = $curfilter ? $this->CurrentFilter : "";
-        if (is_array($where)) {
-            $where = $this->arrayToFilter($where);
-        }
-        AddFilter($filter, $where);
-        if ($filter != "") {
-            $queryBuilder->where($filter);
-        }
-        return $queryBuilder;
-    }
-
-    // Update
-    public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
-    {
-        // If no field is updated, execute may return 0. Treat as success
-        try {
-            $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
-            $success = $success > 0 ? $success : true;
-            $this->DbErrorMessage = "";
-        } catch (\Exception $e) {
-            $success = false;
-            $this->DbErrorMessage = $e->getMessage();
-        }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
-                $rs['id'] = $this->id->CurrentValue;
-            }
-        }
-        return $success;
-    }
-
-    /**
-     * DELETE statement
-     *
-     * @param array $rs Key values
-     * @param string|array $where WHERE clause
-     * @param string $curfilter Filter
-     * @return QueryBuilder
-     */
-    public function deleteSql(&$rs, $where = "", $curfilter = true)
-    {
-        $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->delete($this->UpdateTable);
-        if (is_array($where)) {
-            $where = $this->arrayToFilter($where);
-        }
-        if ($rs) {
-            if (array_key_exists('id', $rs)) {
-                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
-            }
-        }
-        $filter = $curfilter ? $this->CurrentFilter : "";
-        AddFilter($filter, $where);
-        return $queryBuilder->where($filter != "" ? $filter : "0=1");
-    }
-
-    // Delete
-    public function delete(&$rs, $where = "", $curfilter = false)
-    {
-        $success = true;
-        if ($success) {
-            try {
-                $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();
-                $this->DbErrorMessage = "";
-            } catch (\Exception $e) {
-                $success = false;
-                $this->DbErrorMessage = $e->getMessage();
-            }
-        }
-        return $success;
-    }
-
-    // Load DbValue from result set or array
-    protected function loadDbValues($row)
-    {
-        if (!is_array($row)) {
-            return;
-        }
-        $this->id->DbValue = $row['id'];
-        $this->quantity->DbValue = $row['quantity'];
-        $this->measuring_unit->DbValue = $row['measuring_unit'];
-        $this->buying_price_per_unit->DbValue = $row['buying_price_per_unit'];
-        $this->selling_price_per_unit->DbValue = $row['selling_price_per_unit'];
-        $this->expiry_date->DbValue = $row['expiry_date'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
-        $this->supplier_name->DbValue = $row['supplier_name'];
-        $this->phone->DbValue = $row['phone'];
-        $this->email_address->DbValue = $row['email_address'];
-        $this->physical_address->DbValue = $row['physical_address'];
-        $this->brand_name->DbValue = $row['brand_name'];
-    }
-
-    // Delete uploaded files
-    public function deleteUploadedFiles($row)
-    {
-        $this->loadDbValues($row);
-    }
-
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
@@ -1034,7 +1009,7 @@ class MedicineStockReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("medicinestockreportlist");
+        return $_SESSION[$name] ?? GetUrl("");
     }
 
     // Set return page URL
@@ -1048,9 +1023,9 @@ class MedicineStockReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "medicinestockreportview" => $Language->phrase("View"),
-            "medicinestockreportedit" => $Language->phrase("Edit"),
-            "medicinestockreportadd" => $Language->phrase("Add"),
+            "" => $Language->phrase("View"),
+            "" => $Language->phrase("Edit"),
+            "" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1058,20 +1033,13 @@ class MedicineStockReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "medicinestockreportlist";
+        return "medicinestockreport";
     }
 
     // API page name
     public function getApiPageName($action)
     {
-        return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "MedicineStockReportView",
-            Config("API_ADD_ACTION") => "MedicineStockReportAdd",
-            Config("API_EDIT_ACTION") => "MedicineStockReportEdit",
-            Config("API_DELETE_ACTION") => "MedicineStockReportDelete",
-            Config("API_LIST_ACTION") => "MedicineStockReportList",
-            default => ""
-        };
+        return "MedicineStockReportSummary";
     }
 
     // Current URL
@@ -1089,16 +1057,16 @@ class MedicineStockReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "medicinestockreportlist";
+        return "";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("medicinestockreportview", $parm);
+            $url = $this->keyUrl("", $parm);
         } else {
-            $url = $this->keyUrl("medicinestockreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1107,9 +1075,9 @@ class MedicineStockReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "medicinestockreportadd?" . $parm;
+            $url = "?" . $parm;
         } else {
-            $url = "medicinestockreportadd";
+            $url = "";
         }
         return $this->addMasterUrl($url);
     }
@@ -1117,28 +1085,28 @@ class MedicineStockReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinestockreportedit", $parm);
+        $url = $this->keyUrl("", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("medicinestockreportlist", "action=edit");
+        $url = $this->keyUrl("", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("medicinestockreportadd", $parm);
+        $url = $this->keyUrl("", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("medicinestockreportlist", "action=copy");
+        $url = $this->keyUrl("", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1148,7 +1116,7 @@ class MedicineStockReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("medicinestockreportdelete", $parm);
+            return $this->keyUrl("", $parm);
         }
     }
 
@@ -1220,6 +1188,7 @@ class MedicineStockReport extends DbTable
         global $DashboardReport;
         if (
             $this->CurrentAction || $this->isExport() ||
+            $this->DrillDown ||
             in_array($fld->Type, [128, 204, 205])
         ) { // Unsortable data type
                 return "";
@@ -1303,411 +1272,6 @@ class MedicineStockReport extends DbTable
         return $conn->executeQuery($sql);
     }
 
-    // Load row values from record
-    public function loadListRowValues(&$rs)
-    {
-        if (is_array($rs)) {
-            $row = $rs;
-        } elseif ($rs && property_exists($rs, "fields")) { // Recordset
-            $row = $rs->fields;
-        } else {
-            return;
-        }
-        $this->id->setDbValue($row['id']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
-        $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
-        $this->expiry_date->setDbValue($row['expiry_date']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
-        $this->supplier_name->setDbValue($row['supplier_name']);
-        $this->phone->setDbValue($row['phone']);
-        $this->email_address->setDbValue($row['email_address']);
-        $this->physical_address->setDbValue($row['physical_address']);
-        $this->brand_name->setDbValue($row['brand_name']);
-    }
-
-    // Render list content
-    public function renderListContent($filter)
-    {
-        global $Response;
-        $listPage = "MedicineStockReportList";
-        $listClass = PROJECT_NAMESPACE . $listPage;
-        $page = new $listClass();
-        $page->loadRecordsetFromFilter($filter);
-        $view = Container("app.view");
-        $template = $listPage . ".php"; // View
-        $GLOBALS["Title"] ??= $page->Title; // Title
-        try {
-            $Response = $view->render($Response, $template, $GLOBALS);
-        } finally {
-            $page->terminate(); // Terminate page and clean up
-        }
-    }
-
-    // Render list row values
-    public function renderListRow()
-    {
-        global $Security, $CurrentLanguage, $Language;
-
-        // Call Row Rendering event
-        $this->rowRendering();
-
-        // Common render codes
-
-        // id
-
-        // quantity
-
-        // measuring_unit
-
-        // buying_price_per_unit
-
-        // selling_price_per_unit
-
-        // expiry_date
-
-        // date_created
-
-        // date_updated
-
-        // supplier_name
-
-        // phone
-
-        // email_address
-
-        // physical_address
-
-        // brand_name
-
-        // id
-        $this->id->ViewValue = $this->id->CurrentValue;
-
-        // quantity
-        $this->quantity->ViewValue = $this->quantity->CurrentValue;
-        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
-
-        // measuring_unit
-        $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
-
-        // buying_price_per_unit
-        $this->buying_price_per_unit->ViewValue = $this->buying_price_per_unit->CurrentValue;
-        $this->buying_price_per_unit->ViewValue = FormatNumber($this->buying_price_per_unit->ViewValue, $this->buying_price_per_unit->formatPattern());
-
-        // selling_price_per_unit
-        $this->selling_price_per_unit->ViewValue = $this->selling_price_per_unit->CurrentValue;
-        $this->selling_price_per_unit->ViewValue = FormatNumber($this->selling_price_per_unit->ViewValue, $this->selling_price_per_unit->formatPattern());
-
-        // expiry_date
-        $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
-        $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
-
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-        // supplier_name
-        $this->supplier_name->ViewValue = $this->supplier_name->CurrentValue;
-
-        // phone
-        $this->phone->ViewValue = $this->phone->CurrentValue;
-
-        // email_address
-        $this->email_address->ViewValue = $this->email_address->CurrentValue;
-
-        // physical_address
-        $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
-
-        // brand_name
-        $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
-
-        // id
-        $this->id->HrefValue = "";
-        $this->id->TooltipValue = "";
-
-        // quantity
-        $this->quantity->HrefValue = "";
-        $this->quantity->TooltipValue = "";
-
-        // measuring_unit
-        $this->measuring_unit->HrefValue = "";
-        $this->measuring_unit->TooltipValue = "";
-
-        // buying_price_per_unit
-        $this->buying_price_per_unit->HrefValue = "";
-        $this->buying_price_per_unit->TooltipValue = "";
-
-        // selling_price_per_unit
-        $this->selling_price_per_unit->HrefValue = "";
-        $this->selling_price_per_unit->TooltipValue = "";
-
-        // expiry_date
-        $this->expiry_date->HrefValue = "";
-        $this->expiry_date->TooltipValue = "";
-
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
-
-        // supplier_name
-        $this->supplier_name->HrefValue = "";
-        $this->supplier_name->TooltipValue = "";
-
-        // phone
-        $this->phone->HrefValue = "";
-        $this->phone->TooltipValue = "";
-
-        // email_address
-        $this->email_address->HrefValue = "";
-        $this->email_address->TooltipValue = "";
-
-        // physical_address
-        $this->physical_address->HrefValue = "";
-        $this->physical_address->TooltipValue = "";
-
-        // brand_name
-        $this->brand_name->HrefValue = "";
-        $this->brand_name->TooltipValue = "";
-
-        // Call Row Rendered event
-        $this->rowRendered();
-
-        // Save data for Custom Template
-        $this->Rows[] = $this->customTemplateFieldValues();
-    }
-
-    // Render edit row values
-    public function renderEditRow()
-    {
-        global $Security, $CurrentLanguage, $Language;
-
-        // Call Row Rendering event
-        $this->rowRendering();
-
-        // id
-        $this->id->setupEditAttributes();
-        $this->id->EditValue = $this->id->CurrentValue;
-
-        // quantity
-        $this->quantity->setupEditAttributes();
-        $this->quantity->EditValue = $this->quantity->CurrentValue;
-        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-        if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
-            $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
-        }
-
-        // measuring_unit
-        $this->measuring_unit->setupEditAttributes();
-        if (!$this->measuring_unit->Raw) {
-            $this->measuring_unit->CurrentValue = HtmlDecode($this->measuring_unit->CurrentValue);
-        }
-        $this->measuring_unit->EditValue = $this->measuring_unit->CurrentValue;
-        $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
-
-        // buying_price_per_unit
-        $this->buying_price_per_unit->setupEditAttributes();
-        $this->buying_price_per_unit->EditValue = $this->buying_price_per_unit->CurrentValue;
-        $this->buying_price_per_unit->PlaceHolder = RemoveHtml($this->buying_price_per_unit->caption());
-        if (strval($this->buying_price_per_unit->EditValue) != "" && is_numeric($this->buying_price_per_unit->EditValue)) {
-            $this->buying_price_per_unit->EditValue = FormatNumber($this->buying_price_per_unit->EditValue, null);
-        }
-
-        // selling_price_per_unit
-        $this->selling_price_per_unit->setupEditAttributes();
-        $this->selling_price_per_unit->EditValue = $this->selling_price_per_unit->CurrentValue;
-        $this->selling_price_per_unit->PlaceHolder = RemoveHtml($this->selling_price_per_unit->caption());
-        if (strval($this->selling_price_per_unit->EditValue) != "" && is_numeric($this->selling_price_per_unit->EditValue)) {
-            $this->selling_price_per_unit->EditValue = FormatNumber($this->selling_price_per_unit->EditValue, null);
-        }
-
-        // expiry_date
-        $this->expiry_date->setupEditAttributes();
-        $this->expiry_date->EditValue = FormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern());
-        $this->expiry_date->PlaceHolder = RemoveHtml($this->expiry_date->caption());
-
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // supplier_name
-        $this->supplier_name->setupEditAttributes();
-        if (!$this->supplier_name->Raw) {
-            $this->supplier_name->CurrentValue = HtmlDecode($this->supplier_name->CurrentValue);
-        }
-        $this->supplier_name->EditValue = $this->supplier_name->CurrentValue;
-        $this->supplier_name->PlaceHolder = RemoveHtml($this->supplier_name->caption());
-
-        // phone
-        $this->phone->setupEditAttributes();
-        if (!$this->phone->Raw) {
-            $this->phone->CurrentValue = HtmlDecode($this->phone->CurrentValue);
-        }
-        $this->phone->EditValue = $this->phone->CurrentValue;
-        $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
-
-        // email_address
-        $this->email_address->setupEditAttributes();
-        if (!$this->email_address->Raw) {
-            $this->email_address->CurrentValue = HtmlDecode($this->email_address->CurrentValue);
-        }
-        $this->email_address->EditValue = $this->email_address->CurrentValue;
-        $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
-
-        // physical_address
-        $this->physical_address->setupEditAttributes();
-        if (!$this->physical_address->Raw) {
-            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-        }
-        $this->physical_address->EditValue = $this->physical_address->CurrentValue;
-        $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
-
-        // brand_name
-        $this->brand_name->setupEditAttributes();
-        if (!$this->brand_name->Raw) {
-            $this->brand_name->CurrentValue = HtmlDecode($this->brand_name->CurrentValue);
-        }
-        $this->brand_name->EditValue = $this->brand_name->CurrentValue;
-        $this->brand_name->PlaceHolder = RemoveHtml($this->brand_name->caption());
-
-        // Call Row Rendered event
-        $this->rowRendered();
-    }
-
-    // Aggregate list row values
-    public function aggregateListRowValues()
-    {
-    }
-
-    // Aggregate list row (for rendering)
-    public function aggregateListRow()
-    {
-        // Call Row Rendered event
-        $this->rowRendered();
-    }
-
-    // Export data in HTML/CSV/Word/Excel/Email/PDF format
-    public function exportDocument($doc, $result, $startRec = 1, $stopRec = 1, $exportPageType = "")
-    {
-        if (!$result || !$doc) {
-            return;
-        }
-        if (!$doc->ExportCustom) {
-            // Write header
-            $doc->exportTableHeader();
-            if ($doc->Horizontal) { // Horizontal format, write header
-                $doc->beginExportRow();
-                if ($exportPageType == "view") {
-                    $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->buying_price_per_unit);
-                    $doc->exportCaption($this->selling_price_per_unit);
-                    $doc->exportCaption($this->expiry_date);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->supplier_name);
-                    $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->email_address);
-                    $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->brand_name);
-                } else {
-                    $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->buying_price_per_unit);
-                    $doc->exportCaption($this->selling_price_per_unit);
-                    $doc->exportCaption($this->expiry_date);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->supplier_name);
-                    $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->email_address);
-                    $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->brand_name);
-                }
-                $doc->endExportRow();
-            }
-        }
-        $recCnt = $startRec - 1;
-        $stopRec = $stopRec > 0 ? $stopRec : PHP_INT_MAX;
-        while (($row = $result->fetch()) && $recCnt < $stopRec) {
-            $recCnt++;
-            if ($recCnt >= $startRec) {
-                $rowCnt = $recCnt - $startRec + 1;
-
-                // Page break
-                if ($this->ExportPageBreakCount > 0) {
-                    if ($rowCnt > 1 && ($rowCnt - 1) % $this->ExportPageBreakCount == 0) {
-                        $doc->exportPageBreak();
-                    }
-                }
-                $this->loadListRowValues($row);
-
-                // Render row
-                $this->RowType = RowType::VIEW; // Render view
-                $this->resetAttributes();
-                $this->renderListRow();
-                if (!$doc->ExportCustom) {
-                    $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
-                    if ($exportPageType == "view") {
-                        $doc->exportField($this->id);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->buying_price_per_unit);
-                        $doc->exportField($this->selling_price_per_unit);
-                        $doc->exportField($this->expiry_date);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->supplier_name);
-                        $doc->exportField($this->phone);
-                        $doc->exportField($this->email_address);
-                        $doc->exportField($this->physical_address);
-                        $doc->exportField($this->brand_name);
-                    } else {
-                        $doc->exportField($this->id);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->buying_price_per_unit);
-                        $doc->exportField($this->selling_price_per_unit);
-                        $doc->exportField($this->expiry_date);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->supplier_name);
-                        $doc->exportField($this->phone);
-                        $doc->exportField($this->email_address);
-                        $doc->exportField($this->physical_address);
-                        $doc->exportField($this->brand_name);
-                    }
-                    $doc->endExportRow($rowCnt);
-                }
-            }
-
-            // Call Row Export server event
-            if ($doc->ExportCustom) {
-                $this->rowExport($doc, $row);
-            }
-        }
-        if (!$doc->ExportCustom) {
-            $doc->exportTableFooter();
-        }
-    }
-
     // Get file data
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
@@ -1723,121 +1287,6 @@ class MedicineStockReport extends DbTable
     public function tableLoad()
     {
         // Enter your code here
-    }
-
-    // Recordset Selecting event
-    public function recordsetSelecting(&$filter)
-    {
-        // Enter your code here
-    }
-
-    // Recordset Selected event
-    public function recordsetSelected($rs)
-    {
-        //Log("Recordset Selected");
-    }
-
-    // Recordset Search Validated event
-    public function recordsetSearchValidated()
-    {
-        // Example:
-        //$this->MyField1->AdvancedSearch->SearchValue = "your search criteria"; // Search value
-    }
-
-    // Recordset Searching event
-    public function recordsetSearching(&$filter)
-    {
-        // Enter your code here
-    }
-
-    // Row_Selecting event
-    public function rowSelecting(&$filter)
-    {
-        // Enter your code here
-    }
-
-    // Row Selected event
-    public function rowSelected(&$rs)
-    {
-        //Log("Row Selected");
-    }
-
-    // Row Inserting event
-    public function rowInserting($rsold, &$rsnew)
-    {
-        // Enter your code here
-        // To cancel, set return value to false
-        return true;
-    }
-
-    // Row Inserted event
-    public function rowInserted($rsold, $rsnew)
-    {
-        //Log("Row Inserted");
-    }
-
-    // Row Updating event
-    public function rowUpdating($rsold, &$rsnew)
-    {
-        // Enter your code here
-        // To cancel, set return value to false
-        return true;
-    }
-
-    // Row Updated event
-    public function rowUpdated($rsold, $rsnew)
-    {
-        //Log("Row Updated");
-    }
-
-    // Row Update Conflict event
-    public function rowUpdateConflict($rsold, &$rsnew)
-    {
-        // Enter your code here
-        // To ignore conflict, set return value to false
-        return true;
-    }
-
-    // Grid Inserting event
-    public function gridInserting()
-    {
-        // Enter your code here
-        // To reject grid insert, set return value to false
-        return true;
-    }
-
-    // Grid Inserted event
-    public function gridInserted($rsnew)
-    {
-        //Log("Grid Inserted");
-    }
-
-    // Grid Updating event
-    public function gridUpdating($rsold)
-    {
-        // Enter your code here
-        // To reject grid update, set return value to false
-        return true;
-    }
-
-    // Grid Updated event
-    public function gridUpdated($rsold, $rsnew)
-    {
-        //Log("Grid Updated");
-    }
-
-    // Row Deleting event
-    public function rowDeleting(&$rs)
-    {
-        // Enter your code here
-        // To cancel, set return value to False
-        return true;
-    }
-
-    // Row Deleted event
-    public function rowDeleted($rs)
-    {
-        //Log("Row Deleted");
     }
 
     // Email Sending event
@@ -1863,8 +1312,20 @@ class MedicineStockReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $current_date = CurrentDate();
+        if ($this->expiry_date->CurrentValue > $current_date) {
+            $this->expiry_status_o->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->expiry_status_o->ViewValue = "Active"; 
+        } else if ($this->expiry_date->CurrentValue < $current_date) {
+            $this->expiry_status_o->CellAttrs["style"] = "background-color: #e5064b; color: white";
+            $this->expiry_status_o->ViewValue = "Expired"; 
+        } 
+        $batch_quantity = $this->quantity->ViewValue;
+        if ($this->qty_left->CurrentValue == 0) {
+            $this->qty_left->ViewValue = $batch_quantity; 
+        } else if ($this->qty_left_o->CurrentValue == 0) {
+            $this->qty_left_o->ViewValue = $batch_quantity; 
+        }
     }
 
     // User ID Filtering event

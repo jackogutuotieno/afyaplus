@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class RegisteredPatientsSummary extends RegisteredPatients
+class MedicineStockReportSummary extends MedicineStockReport
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class RegisteredPatientsSummary extends RegisteredPatients
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "RegisteredPatientsSummary";
+    public $PageObjName = "MedicineStockReportSummary";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class RegisteredPatientsSummary extends RegisteredPatients
 
     // CSS class/style
     public $ReportContainerClass = "ew-grid";
-    public $CurrentPageName = "registeredpatients";
+    public $CurrentPageName = "medicinestockreport";
 
     // Page headings
     public $Heading = "";
@@ -121,8 +121,8 @@ class RegisteredPatientsSummary extends RegisteredPatients
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'Registered_Patients';
-        $this->TableName = 'Registered Patients';
+        $this->TableVar = 'Medicine_Stock_Report';
+        $this->TableName = 'Medicine Stock Report';
 
         // CSS class name as context
         $this->ContextClass = CheckClassName($this->TableVar);
@@ -139,9 +139,9 @@ class RegisteredPatientsSummary extends RegisteredPatients
         // Language object
         $Language = Container("app.language");
 
-        // Table object (Registered_Patients)
-        if (!isset($GLOBALS["Registered_Patients"]) || $GLOBALS["Registered_Patients"]::class == PROJECT_NAMESPACE . "Registered_Patients") {
-            $GLOBALS["Registered_Patients"] = &$this;
+        // Table object (Medicine_Stock_Report)
+        if (!isset($GLOBALS["Medicine_Stock_Report"]) || $GLOBALS["Medicine_Stock_Report"]::class == PROJECT_NAMESPACE . "Medicine_Stock_Report") {
+            $GLOBALS["Medicine_Stock_Report"] = &$this;
         }
 
         // Page URL
@@ -151,7 +151,7 @@ class RegisteredPatientsSummary extends RegisteredPatients
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'Registered Patients');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'Medicine Stock Report');
         }
 
         // Start timer
@@ -455,18 +455,16 @@ class RegisteredPatientsSummary extends RegisteredPatients
 
         // Set field visibility for detail fields
         $this->id->setVisibility();
-        $this->patient_full_name->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->patient_age->setVisibility();
-        $this->gender->setVisibility();
-        $this->phone->setVisibility();
-        $this->email_address->setVisibility();
-        $this->marital_status->setVisibility();
-        $this->next_of_kin->setVisibility();
-        $this->next_of_kin_phone->setVisibility();
+        $this->batch_number->setVisibility();
+        $this->brand_name->setVisibility();
+        $this->quantity->setVisibility();
+        $this->measuring_unit->setVisibility();
+        $this->buying_price_per_unit->setVisibility();
+        $this->selling_price_per_unit->setVisibility();
+        $this->expiry_date->setVisibility();
+        $this->expiry_status_o->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->registration_month->setVisibility();
 
         // Set up groups per page dynamically
         $this->setupDisplayGroups();
@@ -476,27 +474,15 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $this->setupBreadcrumb();
         }
 
-        // Check if search command
-        $this->SearchCommand = (Get("cmd", "") == "search");
-
         // Load custom filters
         $this->pageFilterLoad();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
 
         // Extended filter
         $extendedFilter = "";
 
-        // Restore filter list
-        $this->restoreFilterList();
-
-        // Build extended filter
-        $extendedFilter = $this->getExtendedFilter();
-        AddFilter($this->SearchWhere, $extendedFilter);
+        // No filter
+        $this->FilterOptions["savecurrentfilter"]->Visible = false;
+        $this->FilterOptions["deletefilter"]->Visible = false;
 
         // Call Page Selecting event
         $this->pageSelecting($this->SearchWhere);
@@ -615,36 +601,44 @@ class RegisteredPatientsSummary extends RegisteredPatients
     {
         $data = [];
         $data["id"] = $record['id'];
-        $data["patient_full_name"] = $record['patient_full_name'];
-        $data["first_name"] = $record['first_name'];
-        $data["last_name"] = $record['last_name'];
-        $data["date_of_birth"] = $record['date_of_birth'];
-        $data["patient_age"] = $record['patient_age'];
-        $data["gender"] = $record['gender'];
-        $data["phone"] = $record['phone'];
-        $data["email_address"] = $record['email_address'];
-        $data["marital_status"] = $record['marital_status'];
-        $data["next_of_kin"] = $record['next_of_kin'];
-        $data["next_of_kin_phone"] = $record['next_of_kin_phone'];
+        $data["batch_number"] = $record['batch_number'];
+        $data["brand_name"] = $record['brand_name'];
+        $data["quantity"] = $record['quantity'];
+        $data["qty_left_o"] = $record['qty_left_o'];
+        $data["measuring_unit"] = $record['measuring_unit'];
+        $data["buying_price_per_unit"] = $record['buying_price_per_unit'];
+        $data["selling_price_per_unit"] = $record['selling_price_per_unit'];
+        $data["expiry_date"] = $record['expiry_date'];
+        $data["expiry_status_o"] = $record['expiry_status_o'];
         $data["date_created"] = $record['date_created'];
         $data["date_updated"] = $record['date_updated'];
-        $data["registration_month"] = $record['registration_month'];
+        $data["supplier_name"] = $record['supplier_name'];
+        $data["phone"] = $record['phone'];
+        $data["email_address"] = $record['email_address'];
+        $data["physical_address"] = $record['physical_address'];
+        $data["qty_left"] = $record['qty_left'];
+        $data["expiry_status"] = $record['expiry_status'];
+        $data["stockadd_month"] = $record['stockadd_month'];
         $this->Rows[] = $data;
         $this->id->setDbValue($record['id']);
-        $this->patient_full_name->setDbValue($record['patient_full_name']);
-        $this->first_name->setDbValue($record['first_name']);
-        $this->last_name->setDbValue($record['last_name']);
-        $this->date_of_birth->setDbValue($record['date_of_birth']);
-        $this->patient_age->setDbValue($record['patient_age']);
-        $this->gender->setDbValue($record['gender']);
-        $this->phone->setDbValue($record['phone']);
-        $this->email_address->setDbValue($record['email_address']);
-        $this->marital_status->setDbValue($record['marital_status']);
-        $this->next_of_kin->setDbValue($record['next_of_kin']);
-        $this->next_of_kin_phone->setDbValue($record['next_of_kin_phone']);
+        $this->batch_number->setDbValue($record['batch_number']);
+        $this->brand_name->setDbValue($record['brand_name']);
+        $this->quantity->setDbValue($record['quantity']);
+        $this->qty_left_o->setDbValue($record['qty_left_o']);
+        $this->measuring_unit->setDbValue($record['measuring_unit']);
+        $this->buying_price_per_unit->setDbValue($record['buying_price_per_unit']);
+        $this->selling_price_per_unit->setDbValue($record['selling_price_per_unit']);
+        $this->expiry_date->setDbValue($record['expiry_date']);
+        $this->expiry_status_o->setDbValue($record['expiry_status_o']);
         $this->date_created->setDbValue($record['date_created']);
         $this->date_updated->setDbValue($record['date_updated']);
-        $this->registration_month->setDbValue($record['registration_month']);
+        $this->supplier_name->setDbValue($record['supplier_name']);
+        $this->phone->setDbValue($record['phone']);
+        $this->email_address->setDbValue($record['email_address']);
+        $this->physical_address->setDbValue($record['physical_address']);
+        $this->qty_left->setDbValue($record['qty_left']);
+        $this->expiry_status->setDbValue($record['expiry_status']);
+        $this->stockadd_month->setDbValue($record['stockadd_month']);
     }
 
     // Render row
@@ -683,100 +677,61 @@ class RegisteredPatientsSummary extends RegisteredPatients
 
         // id
 
-        // patient_full_name
+        // batch_number
 
-        // date_of_birth
+        // brand_name
 
-        // patient_age
+        // quantity
 
-        // gender
+        // measuring_unit
 
-        // phone
+        // buying_price_per_unit
 
-        // email_address
+        // selling_price_per_unit
 
-        // marital_status
+        // expiry_date
 
-        // next_of_kin
-
-        // next_of_kin_phone
+        // expiry_status_o
 
         // date_created
 
         // date_updated
-
-        // registration_month
-        if ($this->RowType == RowType::SEARCH) {
-            // gender
-            if ($this->gender->UseFilter && !EmptyValue($this->gender->AdvancedSearch->SearchValue)) {
-                if (is_array($this->gender->AdvancedSearch->SearchValue)) {
-                    $this->gender->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
-                }
-                $this->gender->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
-            }
-            $this->gender->setupEditAttributes();
-            if (!$this->gender->Raw) {
-                $this->gender->AdvancedSearch->SearchValue2 = HtmlDecode($this->gender->AdvancedSearch->SearchValue2);
-            }
-            $this->gender->EditValue2 = HtmlEncode($this->gender->AdvancedSearch->SearchValue2);
-            $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
+        if ($this->RowType == RowType::SEARCH) { // Search row
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
 
             // id
             $this->id->HrefValue = "";
 
-            // patient_full_name
-            $this->patient_full_name->HrefValue = "";
+            // batch_number
+            $this->batch_number->HrefValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
+            // brand_name
+            $this->brand_name->HrefValue = "";
 
-            // patient_age
-            $this->patient_age->HrefValue = "";
+            // quantity
+            $this->quantity->HrefValue = "";
 
-            // gender
-            $this->gender->HrefValue = "";
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
 
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-                }
-            } else {
-                $this->phone->HrefValue = "";
-            }
+            // buying_price_per_unit
+            $this->buying_price_per_unit->HrefValue = "";
 
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-                }
-            } else {
-                $this->email_address->HrefValue = "";
-            }
+            // selling_price_per_unit
+            $this->selling_price_per_unit->HrefValue = "";
 
-            // marital_status
-            $this->marital_status->HrefValue = "";
+            // expiry_date
+            $this->expiry_date->HrefValue = "";
 
-            // next_of_kin
-            $this->next_of_kin->HrefValue = "";
-
-            // next_of_kin_phone
-            $this->next_of_kin_phone->HrefValue = "";
+            // expiry_status_o
+            $this->expiry_status_o->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
 
             // date_updated
             $this->date_updated->HrefValue = "";
-
-            // registration_month
-            $this->registration_month->HrefValue = "";
         } else {
             if ($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER) {
             } else {
@@ -791,43 +746,41 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // patient_full_name
-            $this->patient_full_name->ViewValue = $this->patient_full_name->CurrentValue;
-            $this->patient_full_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // batch_number
+            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+            $this->batch_number->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-            $this->date_of_birth->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // brand_name
+            $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
+            $this->brand_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // patient_age
-            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
-            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
-            $this->patient_age->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+            $this->quantity->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
-            $this->gender->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // measuring_unit
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
+            $this->measuring_unit->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // phone
-            $this->phone->ViewValue = $this->phone->CurrentValue;
-            $this->phone->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // buying_price_per_unit
+            $this->buying_price_per_unit->ViewValue = $this->buying_price_per_unit->CurrentValue;
+            $this->buying_price_per_unit->ViewValue = FormatNumber($this->buying_price_per_unit->ViewValue, $this->buying_price_per_unit->formatPattern());
+            $this->buying_price_per_unit->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // email_address
-            $this->email_address->ViewValue = $this->email_address->CurrentValue;
-            $this->email_address->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // selling_price_per_unit
+            $this->selling_price_per_unit->ViewValue = $this->selling_price_per_unit->CurrentValue;
+            $this->selling_price_per_unit->ViewValue = FormatNumber($this->selling_price_per_unit->ViewValue, $this->selling_price_per_unit->formatPattern());
+            $this->selling_price_per_unit->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // marital_status
-            $this->marital_status->ViewValue = $this->marital_status->CurrentValue;
-            $this->marital_status->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // expiry_date
+            $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
+            $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
+            $this->expiry_date->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // next_of_kin
-            $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
-            $this->next_of_kin->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // next_of_kin_phone
-            $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
-            $this->next_of_kin_phone->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // expiry_status_o
+            $this->expiry_status_o->ViewValue = $this->expiry_status_o->CurrentValue;
+            $this->expiry_status_o->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -839,65 +792,41 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
             $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // registration_month
-            $this->registration_month->ViewValue = $this->registration_month->CurrentValue;
-            $this->registration_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // patient_full_name
-            $this->patient_full_name->HrefValue = "";
-            $this->patient_full_name->TooltipValue = "";
+            // batch_number
+            $this->batch_number->HrefValue = "";
+            $this->batch_number->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // brand_name
+            $this->brand_name->HrefValue = "";
+            $this->brand_name->TooltipValue = "";
 
-            // patient_age
-            $this->patient_age->HrefValue = "";
-            $this->patient_age->TooltipValue = "";
+            // quantity
+            $this->quantity->HrefValue = "";
+            $this->quantity->TooltipValue = "";
 
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
+            $this->measuring_unit->TooltipValue = "";
 
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-                }
-            } else {
-                $this->phone->HrefValue = "";
-            }
-            $this->phone->TooltipValue = "";
+            // buying_price_per_unit
+            $this->buying_price_per_unit->HrefValue = "";
+            $this->buying_price_per_unit->TooltipValue = "";
 
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-                }
-            } else {
-                $this->email_address->HrefValue = "";
-            }
-            $this->email_address->TooltipValue = "";
+            // selling_price_per_unit
+            $this->selling_price_per_unit->HrefValue = "";
+            $this->selling_price_per_unit->TooltipValue = "";
 
-            // marital_status
-            $this->marital_status->HrefValue = "";
-            $this->marital_status->TooltipValue = "";
+            // expiry_date
+            $this->expiry_date->HrefValue = "";
+            $this->expiry_date->TooltipValue = "";
 
-            // next_of_kin
-            $this->next_of_kin->HrefValue = "";
-            $this->next_of_kin->TooltipValue = "";
-
-            // next_of_kin_phone
-            $this->next_of_kin_phone->HrefValue = "";
-            $this->next_of_kin_phone->TooltipValue = "";
+            // expiry_status_o
+            $this->expiry_status_o->HrefValue = "";
+            $this->expiry_status_o->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -906,10 +835,6 @@ class RegisteredPatientsSummary extends RegisteredPatients
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // registration_month
-            $this->registration_month->HrefValue = "";
-            $this->registration_month->TooltipValue = "";
         }
 
         // Call Cell_Rendered event
@@ -924,86 +849,77 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $linkAttrs = &$this->id->LinkAttrs;
             $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // patient_full_name
-            $currentValue = $this->patient_full_name->CurrentValue;
-            $viewValue = &$this->patient_full_name->ViewValue;
-            $viewAttrs = &$this->patient_full_name->ViewAttrs;
-            $cellAttrs = &$this->patient_full_name->CellAttrs;
-            $hrefValue = &$this->patient_full_name->HrefValue;
-            $linkAttrs = &$this->patient_full_name->LinkAttrs;
-            $this->cellRendered($this->patient_full_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // batch_number
+            $currentValue = $this->batch_number->CurrentValue;
+            $viewValue = &$this->batch_number->ViewValue;
+            $viewAttrs = &$this->batch_number->ViewAttrs;
+            $cellAttrs = &$this->batch_number->CellAttrs;
+            $hrefValue = &$this->batch_number->HrefValue;
+            $linkAttrs = &$this->batch_number->LinkAttrs;
+            $this->cellRendered($this->batch_number, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // date_of_birth
-            $currentValue = $this->date_of_birth->CurrentValue;
-            $viewValue = &$this->date_of_birth->ViewValue;
-            $viewAttrs = &$this->date_of_birth->ViewAttrs;
-            $cellAttrs = &$this->date_of_birth->CellAttrs;
-            $hrefValue = &$this->date_of_birth->HrefValue;
-            $linkAttrs = &$this->date_of_birth->LinkAttrs;
-            $this->cellRendered($this->date_of_birth, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // brand_name
+            $currentValue = $this->brand_name->CurrentValue;
+            $viewValue = &$this->brand_name->ViewValue;
+            $viewAttrs = &$this->brand_name->ViewAttrs;
+            $cellAttrs = &$this->brand_name->CellAttrs;
+            $hrefValue = &$this->brand_name->HrefValue;
+            $linkAttrs = &$this->brand_name->LinkAttrs;
+            $this->cellRendered($this->brand_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // patient_age
-            $currentValue = $this->patient_age->CurrentValue;
-            $viewValue = &$this->patient_age->ViewValue;
-            $viewAttrs = &$this->patient_age->ViewAttrs;
-            $cellAttrs = &$this->patient_age->CellAttrs;
-            $hrefValue = &$this->patient_age->HrefValue;
-            $linkAttrs = &$this->patient_age->LinkAttrs;
-            $this->cellRendered($this->patient_age, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // quantity
+            $currentValue = $this->quantity->CurrentValue;
+            $viewValue = &$this->quantity->ViewValue;
+            $viewAttrs = &$this->quantity->ViewAttrs;
+            $cellAttrs = &$this->quantity->CellAttrs;
+            $hrefValue = &$this->quantity->HrefValue;
+            $linkAttrs = &$this->quantity->LinkAttrs;
+            $this->cellRendered($this->quantity, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // gender
-            $currentValue = $this->gender->CurrentValue;
-            $viewValue = &$this->gender->ViewValue;
-            $viewAttrs = &$this->gender->ViewAttrs;
-            $cellAttrs = &$this->gender->CellAttrs;
-            $hrefValue = &$this->gender->HrefValue;
-            $linkAttrs = &$this->gender->LinkAttrs;
-            $this->cellRendered($this->gender, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // measuring_unit
+            $currentValue = $this->measuring_unit->CurrentValue;
+            $viewValue = &$this->measuring_unit->ViewValue;
+            $viewAttrs = &$this->measuring_unit->ViewAttrs;
+            $cellAttrs = &$this->measuring_unit->CellAttrs;
+            $hrefValue = &$this->measuring_unit->HrefValue;
+            $linkAttrs = &$this->measuring_unit->LinkAttrs;
+            $this->cellRendered($this->measuring_unit, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // phone
-            $currentValue = $this->phone->CurrentValue;
-            $viewValue = &$this->phone->ViewValue;
-            $viewAttrs = &$this->phone->ViewAttrs;
-            $cellAttrs = &$this->phone->CellAttrs;
-            $hrefValue = &$this->phone->HrefValue;
-            $linkAttrs = &$this->phone->LinkAttrs;
-            $this->cellRendered($this->phone, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // buying_price_per_unit
+            $currentValue = $this->buying_price_per_unit->CurrentValue;
+            $viewValue = &$this->buying_price_per_unit->ViewValue;
+            $viewAttrs = &$this->buying_price_per_unit->ViewAttrs;
+            $cellAttrs = &$this->buying_price_per_unit->CellAttrs;
+            $hrefValue = &$this->buying_price_per_unit->HrefValue;
+            $linkAttrs = &$this->buying_price_per_unit->LinkAttrs;
+            $this->cellRendered($this->buying_price_per_unit, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // email_address
-            $currentValue = $this->email_address->CurrentValue;
-            $viewValue = &$this->email_address->ViewValue;
-            $viewAttrs = &$this->email_address->ViewAttrs;
-            $cellAttrs = &$this->email_address->CellAttrs;
-            $hrefValue = &$this->email_address->HrefValue;
-            $linkAttrs = &$this->email_address->LinkAttrs;
-            $this->cellRendered($this->email_address, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // selling_price_per_unit
+            $currentValue = $this->selling_price_per_unit->CurrentValue;
+            $viewValue = &$this->selling_price_per_unit->ViewValue;
+            $viewAttrs = &$this->selling_price_per_unit->ViewAttrs;
+            $cellAttrs = &$this->selling_price_per_unit->CellAttrs;
+            $hrefValue = &$this->selling_price_per_unit->HrefValue;
+            $linkAttrs = &$this->selling_price_per_unit->LinkAttrs;
+            $this->cellRendered($this->selling_price_per_unit, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // marital_status
-            $currentValue = $this->marital_status->CurrentValue;
-            $viewValue = &$this->marital_status->ViewValue;
-            $viewAttrs = &$this->marital_status->ViewAttrs;
-            $cellAttrs = &$this->marital_status->CellAttrs;
-            $hrefValue = &$this->marital_status->HrefValue;
-            $linkAttrs = &$this->marital_status->LinkAttrs;
-            $this->cellRendered($this->marital_status, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // expiry_date
+            $currentValue = $this->expiry_date->CurrentValue;
+            $viewValue = &$this->expiry_date->ViewValue;
+            $viewAttrs = &$this->expiry_date->ViewAttrs;
+            $cellAttrs = &$this->expiry_date->CellAttrs;
+            $hrefValue = &$this->expiry_date->HrefValue;
+            $linkAttrs = &$this->expiry_date->LinkAttrs;
+            $this->cellRendered($this->expiry_date, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // next_of_kin
-            $currentValue = $this->next_of_kin->CurrentValue;
-            $viewValue = &$this->next_of_kin->ViewValue;
-            $viewAttrs = &$this->next_of_kin->ViewAttrs;
-            $cellAttrs = &$this->next_of_kin->CellAttrs;
-            $hrefValue = &$this->next_of_kin->HrefValue;
-            $linkAttrs = &$this->next_of_kin->LinkAttrs;
-            $this->cellRendered($this->next_of_kin, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // next_of_kin_phone
-            $currentValue = $this->next_of_kin_phone->CurrentValue;
-            $viewValue = &$this->next_of_kin_phone->ViewValue;
-            $viewAttrs = &$this->next_of_kin_phone->ViewAttrs;
-            $cellAttrs = &$this->next_of_kin_phone->CellAttrs;
-            $hrefValue = &$this->next_of_kin_phone->HrefValue;
-            $linkAttrs = &$this->next_of_kin_phone->LinkAttrs;
-            $this->cellRendered($this->next_of_kin_phone, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // expiry_status_o
+            $currentValue = $this->expiry_status_o->CurrentValue;
+            $viewValue = &$this->expiry_status_o->ViewValue;
+            $viewAttrs = &$this->expiry_status_o->ViewAttrs;
+            $cellAttrs = &$this->expiry_status_o->CellAttrs;
+            $hrefValue = &$this->expiry_status_o->HrefValue;
+            $linkAttrs = &$this->expiry_status_o->LinkAttrs;
+            $this->cellRendered($this->expiry_status_o, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // date_created
             $currentValue = $this->date_created->CurrentValue;
@@ -1022,15 +938,6 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $hrefValue = &$this->date_updated->HrefValue;
             $linkAttrs = &$this->date_updated->LinkAttrs;
             $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // registration_month
-            $currentValue = $this->registration_month->CurrentValue;
-            $viewValue = &$this->registration_month->ViewValue;
-            $viewAttrs = &$this->registration_month->ViewAttrs;
-            $cellAttrs = &$this->registration_month->CellAttrs;
-            $hrefValue = &$this->registration_month->HrefValue;
-            $linkAttrs = &$this->registration_month->LinkAttrs;
-            $this->cellRendered($this->registration_month, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
         }
 
         // Call Row_Rendered event
@@ -1074,40 +981,34 @@ class RegisteredPatientsSummary extends RegisteredPatients
         if ($this->id->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->patient_full_name->Visible) {
+        if ($this->batch_number->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->date_of_birth->Visible) {
+        if ($this->brand_name->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->patient_age->Visible) {
+        if ($this->quantity->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->gender->Visible) {
+        if ($this->measuring_unit->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->phone->Visible) {
+        if ($this->buying_price_per_unit->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->email_address->Visible) {
+        if ($this->selling_price_per_unit->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->marital_status->Visible) {
+        if ($this->expiry_date->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->next_of_kin->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->next_of_kin_phone->Visible) {
+        if ($this->expiry_status_o->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->date_created->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->date_updated->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->registration_month->Visible) {
             $this->DetailColumnCount += 1;
         }
     }
@@ -1201,15 +1102,6 @@ class RegisteredPatientsSummary extends RegisteredPatients
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -1233,7 +1125,7 @@ class RegisteredPatientsSummary extends RegisteredPatients
     // Check if any search fields
     public function hasSearchFields()
     {
-        return $this->gender->Visible;
+        return false;
     }
 
     // Render search options
@@ -1303,11 +1195,11 @@ class RegisteredPatientsSummary extends RegisteredPatients
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fRegistered_Patientssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fMedicine_Stock_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fRegistered_Patientssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fMedicine_Stock_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1402,7 +1294,7 @@ class RegisteredPatientsSummary extends RegisteredPatients
     protected function getSort()
     {
         if ($this->DrillDown) {
-            return "id ASC";
+            return "";
         }
         $resetSort = Param("cmd") === "resetsort";
         $orderBy = Param("order", "");
@@ -1413,310 +1305,37 @@ class RegisteredPatientsSummary extends RegisteredPatients
             $this->setOrderBy("");
             $this->setStartGroup(1);
             $this->id->setSort("");
-            $this->patient_full_name->setSort("");
-            $this->date_of_birth->setSort("");
-            $this->patient_age->setSort("");
-            $this->gender->setSort("");
-            $this->phone->setSort("");
-            $this->email_address->setSort("");
-            $this->marital_status->setSort("");
-            $this->next_of_kin->setSort("");
-            $this->next_of_kin_phone->setSort("");
+            $this->batch_number->setSort("");
+            $this->brand_name->setSort("");
+            $this->quantity->setSort("");
+            $this->measuring_unit->setSort("");
+            $this->buying_price_per_unit->setSort("");
+            $this->selling_price_per_unit->setSort("");
+            $this->expiry_date->setSort("");
+            $this->expiry_status_o->setSort("");
             $this->date_created->setSort("");
             $this->date_updated->setSort("");
-            $this->registration_month->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
             $this->updateSort($this->id); // id
-            $this->updateSort($this->patient_full_name); // patient_full_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->patient_age); // patient_age
-            $this->updateSort($this->gender); // gender
-            $this->updateSort($this->phone); // phone
-            $this->updateSort($this->email_address); // email_address
-            $this->updateSort($this->marital_status); // marital_status
-            $this->updateSort($this->next_of_kin); // next_of_kin
-            $this->updateSort($this->next_of_kin_phone); // next_of_kin_phone
+            $this->updateSort($this->batch_number); // batch_number
+            $this->updateSort($this->brand_name); // brand_name
+            $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->measuring_unit); // measuring_unit
+            $this->updateSort($this->buying_price_per_unit); // buying_price_per_unit
+            $this->updateSort($this->selling_price_per_unit); // selling_price_per_unit
+            $this->updateSort($this->expiry_date); // expiry_date
+            $this->updateSort($this->expiry_status_o); // expiry_status_o
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->registration_month); // registration_month
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);
         }
-
-        // Set up default sort
-        if ($this->getOrderBy() == "") {
-            $useDefaultSort = true;
-            if ($useDefaultSort) {
-                $this->setOrderBy("id ASC");
-            }
-        }
         return $this->getOrderBy();
-    }
-
-    // Return extended filter
-    protected function getExtendedFilter()
-    {
-        $filter = "";
-        if ($this->DrillDown) {
-            return "";
-        }
-        $restoreSession = false;
-        $restoreDefault = false;
-        // Reset search command
-        if (Get("cmd") == "reset") {
-            // Set default values
-            $this->gender->AdvancedSearch->unsetSession();
-            $restoreDefault = true;
-        } else {
-            $restoreSession = !$this->SearchCommand;
-
-            // Field gender
-            $this->getDropDownValue($this->gender);
-            if (!$this->validateForm()) {
-                return $filter;
-            }
-        }
-
-        // Restore session
-        if ($restoreSession) {
-            $restoreDefault = true;
-            if ($this->gender->AdvancedSearch->issetSession()) { // Field gender
-                $this->gender->AdvancedSearch->load();
-                $restoreDefault = false;
-            }
-        }
-
-        // Restore default
-        if ($restoreDefault) {
-            $this->loadDefaultFilters();
-        }
-
-        // Call page filter validated event
-        $this->pageFilterValidated();
-
-        // Build SQL and save to session
-        $this->buildDropDownFilter($this->gender, $filter, false, true); // Field gender
-        $this->gender->AdvancedSearch->save();
-        return $filter;
-    }
-
-    // Build dropdown filter
-    protected function buildDropDownFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
-    {
-        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
-        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
-        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
-        if (!EmptyValue($fld->DateFilter)) {
-            $fldVal2 = "";
-        } elseif ($fld->UseFilter) {
-            $fldOpr = "";
-            $fldVal2 = "";
-        }
-        $sql = "";
-        if (is_array($fldVal)) {
-            foreach ($fldVal as $val) {
-                $wrk = DropDownFilter($fld, $val, $fldOpr, $this->Dbid);
-
-                // Call Page Filtering event
-                if (StartsString("@@", $val)) {
-                    $this->pageFiltering($fld, $wrk, "custom", substr($val, 2));
-                } else {
-                    $this->pageFiltering($fld, $wrk, "dropdown", $fldOpr, $val);
-                }
-                AddFilter($sql, $wrk, "OR");
-            }
-        } else {
-            $sql = DropDownFilter($fld, $fldVal, $fldOpr, $this->Dbid, $fldVal2);
-
-            // Call Page Filtering event
-            if (StartsString("@@", $fldVal)) {
-                $this->pageFiltering($fld, $sql, "custom", substr($fldVal, 2));
-            } else {
-                $this->pageFiltering($fld, $sql, "dropdown", $fldOpr, $fldVal, "", "", $fldVal2);
-            }
-        }
-        if ($sql != "") {
-            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
-            AddFilter($filterClause, $sql, $cond);
-            if ($saveFilter) {
-                $fld->CurrentFilter = $sql;
-            }
-        }
-    }
-
-    // Build extended filter
-    protected function buildExtendedFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
-    {
-        $wrk = GetReportFilter($fld, $default, $this->Dbid);
-        if (!$default) {
-            $this->pageFiltering($fld, $wrk, "extended", $fld->AdvancedSearch->SearchOperator, $fld->AdvancedSearch->SearchValue, $fld->AdvancedSearch->SearchCondition, $fld->AdvancedSearch->SearchOperator2, $fld->AdvancedSearch->SearchValue2);
-        }
-        if ($wrk != "") {
-            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
-            AddFilter($filterClause, $wrk, $cond);
-            if ($saveFilter) {
-                $fld->CurrentFilter = $wrk;
-            }
-        }
-    }
-
-    // Get drop down value from querystring
-    protected function getDropDownValue(&$fld)
-    {
-        if (IsPost()) {
-            return false; // Skip post back
-        }
-        $res = false;
-        $parm = $fld->Param;
-        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
-        $opr = Get("z_$parm");
-        if ($opr !== null) {
-            $fld->AdvancedSearch->SearchOperator = $opr;
-        }
-        $val = Get("x_$parm");
-        if ($val !== null) {
-            if (is_array($val)) {
-                $val = implode($sep, $val);
-            }
-            $fld->AdvancedSearch->setSearchValue($val);
-            $res = true;
-        }
-        $val2 = Get("y_$parm");
-        if ($val2 !== null) {
-            if (is_array($val2)) {
-                $val2 = implode($sep, $val2);
-            }
-            $fld->AdvancedSearch->setSearchValue2($val2);
-            $res = true;
-        }
-        return $res;
-    }
-
-    // Dropdown filter exist
-    protected function dropDownFilterExist(&$fld)
-    {
-        $wrk = "";
-        $this->buildDropDownFilter($fld, $wrk);
-        return ($wrk != "");
-    }
-
-    // Extended filter exist
-    protected function extendedFilterExist(&$fld)
-    {
-        $extWrk = "";
-        $this->buildExtendedFilter($fld, $extWrk);
-        return ($extWrk != "");
-    }
-
-    // Validate form
-    protected function validateForm()
-    {
-        global $Language;
-
-        // Check if validation required
-        if (!Config("SERVER_VALIDATE")) {
-            return true;
-        }
-
-        // Return validate result
-        $validateForm = !$this->hasInvalidFields();
-
-        // Call Form_CustomValidate event
-        $formCustomError = "";
-        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
-        if ($formCustomError != "") {
-            $this->setFailureMessage($formCustomError);
-        }
-        return $validateForm;
-    }
-
-    // Load default value for filters
-    protected function loadDefaultFilters()
-    {
-        // Field gender
-        $this->gender->AdvancedSearch->loadDefault();
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fRegistered_Patientssrch");
-        }
-
-        // Return filter list in json
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("fRegistered_Patientssrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd", "") != "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter", ""), true);
-        return $this->setupFilterList($filter);
-    }
-
-    // Setup list of filters
-    protected function setupFilterList($filter)
-    {
-        if (!is_array($filter)) {
-            return false;
-        }
-        return true;
     }
 
     // Page Load event

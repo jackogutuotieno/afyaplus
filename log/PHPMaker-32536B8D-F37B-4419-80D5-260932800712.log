@@ -35,6 +35,7 @@ C:\wamp64\www\afyaplus\controllers\MedicineCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\MedicineDispensationController.php
 C:\wamp64\www\afyaplus\controllers\MedicineDispensationDetailsController.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockController.php
+C:\wamp64\www\afyaplus\controllers\MedicineStockReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockReportController.php
 C:\wamp64\www\afyaplus\controllers\MedicineSuppliersController.php
 C:\wamp64\www\afyaplus\controllers\OthersController.php
@@ -60,6 +61,7 @@ C:\wamp64\www\afyaplus\controllers\RadiologyRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsQueueController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyreportsdetailsController.php
 C:\wamp64\www\afyaplus\controllers\RegisteredPatientsController.php
+C:\wamp64\www\afyaplus\controllers\RegisteredPatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\RolesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
@@ -251,7 +253,10 @@ C:\wamp64\www\afyaplus\models\MedicineStockDelete.php
 C:\wamp64\www\afyaplus\models\MedicineStockEdit.php
 C:\wamp64\www\afyaplus\models\MedicineStockList.php
 C:\wamp64\www\afyaplus\models\MedicineStockReport.php
+C:\wamp64\www\afyaplus\models\MedicineStockReport2.php
+C:\wamp64\www\afyaplus\models\MedicineStockReport2List.php
 C:\wamp64\www\afyaplus\models\MedicineStockReportList.php
+C:\wamp64\www\afyaplus\models\MedicineStockReportSummary.php
 C:\wamp64\www\afyaplus\models\MedicineStockView.php
 C:\wamp64\www\afyaplus\models\MedicineSuppliers.php
 C:\wamp64\www\afyaplus\models\MedicineSuppliersAdd.php
@@ -369,6 +374,8 @@ C:\wamp64\www\afyaplus\models\RadiologyRequestsView.php
 C:\wamp64\www\afyaplus\models\Radiologyreportsdetails.php
 C:\wamp64\www\afyaplus\models\RadiologyreportsdetailsList.php
 C:\wamp64\www\afyaplus\models\RegisteredPatients.php
+C:\wamp64\www\afyaplus\models\RegisteredPatientsReport.php
+C:\wamp64\www\afyaplus\models\RegisteredPatientsReportList.php
 C:\wamp64\www\afyaplus\models\RegisteredPatientsSummary.php
 C:\wamp64\www\afyaplus\models\ResetPassword.php
 C:\wamp64\www\afyaplus\models\Roles.php
@@ -516,6 +523,7 @@ C:\wamp64\www\afyaplus\src\Entity\RadiologyRequest.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsQueue.php
 C:\wamp64\www\afyaplus\src\Entity\Radiologyreportsdetail.php
+C:\wamp64\www\afyaplus\src\Entity\RegisteredPatientsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Role.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
@@ -760,7 +768,9 @@ C:\wamp64\www\afyaplus\views\MedicineStockAdd.php
 C:\wamp64\www\afyaplus\views\MedicineStockDelete.php
 C:\wamp64\www\afyaplus\views\MedicineStockEdit.php
 C:\wamp64\www\afyaplus\views\MedicineStockList.php
+C:\wamp64\www\afyaplus\views\MedicineStockReport2List.php
 C:\wamp64\www\afyaplus\views\MedicineStockReportList.php
+C:\wamp64\www\afyaplus\views\MedicineStockReportSummary.php
 C:\wamp64\www\afyaplus\views\MedicineStockView.php
 C:\wamp64\www\afyaplus\views\MedicineSuppliersAdd.php
 C:\wamp64\www\afyaplus\views\MedicineSuppliersDelete.php
@@ -862,6 +872,7 @@ C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueList.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsQueueView.php
 C:\wamp64\www\afyaplus\views\RadiologyRequestsView.php
 C:\wamp64\www\afyaplus\views\RadiologyreportsdetailsList.php
+C:\wamp64\www\afyaplus\views\RegisteredPatientsReportList.php
 C:\wamp64\www\afyaplus\views\RegisteredPatientsSummary.php
 C:\wamp64\www\afyaplus\views\ResetPassword.php
 C:\wamp64\www\afyaplus\views\RolesAdd.php

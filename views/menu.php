@@ -8,6 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(243, "mi_registered_patients_report", $Language->menuPhrase("243", "MenuText"), "registeredpatientsreportlist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "", "", false, true);
@@ -60,10 +61,13 @@ $sideMenu->addMenuItem(49, "mci_Human_Resources", $Language->menuPhrase("49", "M
 $sideMenu->addMenuItem(2, "mi_departments", $Language->menuPhrase("2", "MenuText"), "departmentslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}departments'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(3, "mi_designations", $Language->menuPhrase("3", "MenuText"), "designationslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}designations'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(104, "mci_Reports", $Language->menuPhrase("104", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
-$sideMenu->addMenuItem(242, "mi_Appointments_Report", $Language->menuPhrase("242", "MenuText"), "appointmentsreport", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Appointments Report'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(312, "mci_Internal", $Language->menuPhrase("312", "MenuText"), "", 104, "", true, false, true, "", "", false, true);
+$sideMenu->addMenuItem(244, "mi_Registered_Patients", $Language->menuPhrase("244", "MenuText"), "registeredpatients", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Registered Patients'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(242, "mi_Appointments_Report", $Language->menuPhrase("242", "MenuText"), "appointmentsreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Appointments Report'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(313, "mi_Medicine_Stock_Report", $Language->menuPhrase("313", "MenuText"), "medicinestockreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(39, "mi_appointments_report2", $Language->menuPhrase("39", "MenuText"), "appointmentsreport2list", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}appointments_report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(111, "mi_vitalsreport", $Language->menuPhrase("111", "MenuText"), "vitalsreportlist", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}vitalsreport'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(110, "mi_vaccinationsreport", $Language->menuPhrase("110", "MenuText"), "vaccinationsreportlist", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}vaccinationsreport'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(40, "mi_invoice_reports", $Language->menuPhrase("40", "MenuText"), "invoicereportslist", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}invoice_reports'), false, false, "", "", false, true);
-$sideMenu->addMenuItem(42, "mi_medicine_stock_report", $Language->menuPhrase("42", "MenuText"), "medicinestockreportlist", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}medicine_stock_report'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(42, "mi_medicine_stock_report2", $Language->menuPhrase("42", "MenuText"), "medicinestockreport2list", 104, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}medicine_stock_report'), false, false, "", "", false, true);
 echo $sideMenu->toScript();

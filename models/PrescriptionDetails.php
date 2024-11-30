@@ -181,7 +181,7 @@ class PrescriptionDetails extends DbTable
         $this->medicine_stock_id->setSelectMultiple(false); // Select one
         $this->medicine_stock_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->medicine_stock_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->medicine_stock_id->Lookup = new Lookup($this->medicine_stock_id, 'medicine_stock_report', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
+        $this->medicine_stock_id->Lookup = new Lookup($this->medicine_stock_id, 'medicine_stock_report2', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
         $this->medicine_stock_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->medicine_stock_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['medicine_stock_id'] = &$this->medicine_stock_id;

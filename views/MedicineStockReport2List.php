@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$MedicineStockReportList = &$Page;
+$MedicineStockReport2List = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { medicine_stock_report: currentTable } });
+ew.deepAssign(ew.vars, { tables: { medicine_stock_report2: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -51,20 +51,20 @@ loadjs.ready("head", function () {
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fmedicine_stock_reportsrch" id="fmedicine_stock_reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fmedicine_stock_reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fmedicine_stock_report2srch" id="fmedicine_stock_report2srch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fmedicine_stock_report2srch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { medicine_stock_report: currentTable } });
+ew.deepAssign(ew.vars, { tables: { medicine_stock_report2: currentTable } });
 var currentForm;
-var fmedicine_stock_reportsrch, currentSearchForm, currentAdvancedSearchForm;
+var fmedicine_stock_report2srch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fmedicine_stock_reportsrch")
+        .setId("fmedicine_stock_report2srch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -95,10 +95,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fmedicine_stock_reportsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fmedicine_stock_reportsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fmedicine_stock_reportsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fmedicine_stock_reportsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fmedicine_stock_report2srch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fmedicine_stock_report2srch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fmedicine_stock_report2srch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fmedicine_stock_report2srch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -138,13 +138,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="medicine_stock_report">
+<input type="hidden" name="t" value="medicine_stock_report2">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_medicine_stock_report" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_medicine_stock_report2" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_medicine_stock_reportlist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_medicine_stock_report2list" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -158,40 +158,43 @@ $Page->renderListOptions();
 $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_stock_report_id" class="medicine_stock_report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_stock_report2_id" class="medicine_stock_report2_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
 <?php if ($Page->batch_number->Visible) { // batch_number ?>
-        <th data-name="batch_number" class="<?= $Page->batch_number->headerCellClass() ?>"><div id="elh_medicine_stock_report_batch_number" class="medicine_stock_report_batch_number"><?= $Page->renderFieldHeader($Page->batch_number) ?></div></th>
+        <th data-name="batch_number" class="<?= $Page->batch_number->headerCellClass() ?>"><div id="elh_medicine_stock_report2_batch_number" class="medicine_stock_report2_batch_number"><?= $Page->renderFieldHeader($Page->batch_number) ?></div></th>
 <?php } ?>
 <?php if ($Page->brand_name->Visible) { // brand_name ?>
-        <th data-name="brand_name" class="<?= $Page->brand_name->headerCellClass() ?>"><div id="elh_medicine_stock_report_brand_name" class="medicine_stock_report_brand_name"><?= $Page->renderFieldHeader($Page->brand_name) ?></div></th>
+        <th data-name="brand_name" class="<?= $Page->brand_name->headerCellClass() ?>"><div id="elh_medicine_stock_report2_brand_name" class="medicine_stock_report2_brand_name"><?= $Page->renderFieldHeader($Page->brand_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_medicine_stock_report_quantity" class="medicine_stock_report_quantity"><?= $Page->renderFieldHeader($Page->quantity) ?></div></th>
+        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_medicine_stock_report2_quantity" class="medicine_stock_report2_quantity"><?= $Page->renderFieldHeader($Page->quantity) ?></div></th>
 <?php } ?>
 <?php if ($Page->qty_left->Visible) { // qty_left ?>
-        <th data-name="qty_left" class="<?= $Page->qty_left->headerCellClass() ?>"><div id="elh_medicine_stock_report_qty_left" class="medicine_stock_report_qty_left"><?= $Page->renderFieldHeader($Page->qty_left) ?></div></th>
+        <th data-name="qty_left" class="<?= $Page->qty_left->headerCellClass() ?>"><div id="elh_medicine_stock_report2_qty_left" class="medicine_stock_report2_qty_left"><?= $Page->renderFieldHeader($Page->qty_left) ?></div></th>
 <?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
-        <th data-name="measuring_unit" class="<?= $Page->measuring_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report_measuring_unit" class="medicine_stock_report_measuring_unit"><?= $Page->renderFieldHeader($Page->measuring_unit) ?></div></th>
+        <th data-name="measuring_unit" class="<?= $Page->measuring_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report2_measuring_unit" class="medicine_stock_report2_measuring_unit"><?= $Page->renderFieldHeader($Page->measuring_unit) ?></div></th>
 <?php } ?>
 <?php if ($Page->buying_price_per_unit->Visible) { // buying_price_per_unit ?>
-        <th data-name="buying_price_per_unit" class="<?= $Page->buying_price_per_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report_buying_price_per_unit" class="medicine_stock_report_buying_price_per_unit"><?= $Page->renderFieldHeader($Page->buying_price_per_unit) ?></div></th>
+        <th data-name="buying_price_per_unit" class="<?= $Page->buying_price_per_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report2_buying_price_per_unit" class="medicine_stock_report2_buying_price_per_unit"><?= $Page->renderFieldHeader($Page->buying_price_per_unit) ?></div></th>
 <?php } ?>
 <?php if ($Page->selling_price_per_unit->Visible) { // selling_price_per_unit ?>
-        <th data-name="selling_price_per_unit" class="<?= $Page->selling_price_per_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report_selling_price_per_unit" class="medicine_stock_report_selling_price_per_unit"><?= $Page->renderFieldHeader($Page->selling_price_per_unit) ?></div></th>
+        <th data-name="selling_price_per_unit" class="<?= $Page->selling_price_per_unit->headerCellClass() ?>"><div id="elh_medicine_stock_report2_selling_price_per_unit" class="medicine_stock_report2_selling_price_per_unit"><?= $Page->renderFieldHeader($Page->selling_price_per_unit) ?></div></th>
 <?php } ?>
 <?php if ($Page->expiry_date->Visible) { // expiry_date ?>
-        <th data-name="expiry_date" class="<?= $Page->expiry_date->headerCellClass() ?>"><div id="elh_medicine_stock_report_expiry_date" class="medicine_stock_report_expiry_date"><?= $Page->renderFieldHeader($Page->expiry_date) ?></div></th>
+        <th data-name="expiry_date" class="<?= $Page->expiry_date->headerCellClass() ?>"><div id="elh_medicine_stock_report2_expiry_date" class="medicine_stock_report2_expiry_date"><?= $Page->renderFieldHeader($Page->expiry_date) ?></div></th>
 <?php } ?>
 <?php if ($Page->expiry_status->Visible) { // expiry_status ?>
-        <th data-name="expiry_status" class="<?= $Page->expiry_status->headerCellClass() ?>"><div id="elh_medicine_stock_report_expiry_status" class="medicine_stock_report_expiry_status"><?= $Page->renderFieldHeader($Page->expiry_status) ?></div></th>
+        <th data-name="expiry_status" class="<?= $Page->expiry_status->headerCellClass() ?>"><div id="elh_medicine_stock_report2_expiry_status" class="medicine_stock_report2_expiry_status"><?= $Page->renderFieldHeader($Page->expiry_status) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_stock_report_date_created" class="medicine_stock_report_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_stock_report2_date_created" class="medicine_stock_report2_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_medicine_stock_report_date_updated" class="medicine_stock_report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_medicine_stock_report2_date_updated" class="medicine_stock_report2_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+<?php } ?>
+<?php if ($Page->stockadd_month->Visible) { // stockadd_month ?>
+        <th data-name="stockadd_month" class="<?= $Page->stockadd_month->headerCellClass() ?>"><div id="elh_medicine_stock_report2_stockadd_month" class="medicine_stock_report2_stockadd_month"><?= $Page->renderFieldHeader($Page->stockadd_month) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -223,7 +226,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
     <?php if ($Page->id->Visible) { // id ?>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_id" class="el_medicine_stock_report_id">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_id" class="el_medicine_stock_report2_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
@@ -231,7 +234,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->batch_number->Visible) { // batch_number ?>
         <td data-name="batch_number"<?= $Page->batch_number->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_batch_number" class="el_medicine_stock_report_batch_number">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_batch_number" class="el_medicine_stock_report2_batch_number">
 <span<?= $Page->batch_number->viewAttributes() ?>>
 <?= $Page->batch_number->getViewValue() ?></span>
 </span>
@@ -239,7 +242,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <td data-name="brand_name"<?= $Page->brand_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_brand_name" class="el_medicine_stock_report_brand_name">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_brand_name" class="el_medicine_stock_report2_brand_name">
 <span<?= $Page->brand_name->viewAttributes() ?>>
 <?= $Page->brand_name->getViewValue() ?></span>
 </span>
@@ -247,7 +250,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->quantity->Visible) { // quantity ?>
         <td data-name="quantity"<?= $Page->quantity->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_quantity" class="el_medicine_stock_report_quantity">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_quantity" class="el_medicine_stock_report2_quantity">
 <span<?= $Page->quantity->viewAttributes() ?>>
 <?= $Page->quantity->getViewValue() ?></span>
 </span>
@@ -255,7 +258,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->qty_left->Visible) { // qty_left ?>
         <td data-name="qty_left"<?= $Page->qty_left->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_qty_left" class="el_medicine_stock_report_qty_left">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_qty_left" class="el_medicine_stock_report2_qty_left">
 <span<?= $Page->qty_left->viewAttributes() ?>>
 <?= $Page->qty_left->getViewValue() ?></span>
 </span>
@@ -263,7 +266,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
         <td data-name="measuring_unit"<?= $Page->measuring_unit->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_measuring_unit" class="el_medicine_stock_report_measuring_unit">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_measuring_unit" class="el_medicine_stock_report2_measuring_unit">
 <span<?= $Page->measuring_unit->viewAttributes() ?>>
 <?= $Page->measuring_unit->getViewValue() ?></span>
 </span>
@@ -271,7 +274,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->buying_price_per_unit->Visible) { // buying_price_per_unit ?>
         <td data-name="buying_price_per_unit"<?= $Page->buying_price_per_unit->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_buying_price_per_unit" class="el_medicine_stock_report_buying_price_per_unit">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_buying_price_per_unit" class="el_medicine_stock_report2_buying_price_per_unit">
 <span<?= $Page->buying_price_per_unit->viewAttributes() ?>>
 <?= $Page->buying_price_per_unit->getViewValue() ?></span>
 </span>
@@ -279,7 +282,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->selling_price_per_unit->Visible) { // selling_price_per_unit ?>
         <td data-name="selling_price_per_unit"<?= $Page->selling_price_per_unit->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_selling_price_per_unit" class="el_medicine_stock_report_selling_price_per_unit">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_selling_price_per_unit" class="el_medicine_stock_report2_selling_price_per_unit">
 <span<?= $Page->selling_price_per_unit->viewAttributes() ?>>
 <?= $Page->selling_price_per_unit->getViewValue() ?></span>
 </span>
@@ -287,7 +290,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->expiry_date->Visible) { // expiry_date ?>
         <td data-name="expiry_date"<?= $Page->expiry_date->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_expiry_date" class="el_medicine_stock_report_expiry_date">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_expiry_date" class="el_medicine_stock_report2_expiry_date">
 <span<?= $Page->expiry_date->viewAttributes() ?>>
 <?= $Page->expiry_date->getViewValue() ?></span>
 </span>
@@ -295,7 +298,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->expiry_status->Visible) { // expiry_status ?>
         <td data-name="expiry_status"<?= $Page->expiry_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_expiry_status" class="el_medicine_stock_report_expiry_status">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_expiry_status" class="el_medicine_stock_report2_expiry_status">
 <span<?= $Page->expiry_status->viewAttributes() ?>>
 <?= $Page->expiry_status->getViewValue() ?></span>
 </span>
@@ -303,7 +306,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_date_created" class="el_medicine_stock_report_date_created">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_date_created" class="el_medicine_stock_report2_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
 </span>
@@ -311,9 +314,17 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report_date_updated" class="el_medicine_stock_report_date_updated">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_date_updated" class="el_medicine_stock_report2_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->stockadd_month->Visible) { // stockadd_month ?>
+        <td data-name="stockadd_month"<?= $Page->stockadd_month->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_stock_report2_stockadd_month" class="el_medicine_stock_report2_stockadd_month">
+<span<?= $Page->stockadd_month->viewAttributes() ?>>
+<?= $Page->stockadd_month->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -376,7 +387,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("medicine_stock_report");
+    ew.addEventHandlers("medicine_stock_report2");
 });
 </script>
 <script>

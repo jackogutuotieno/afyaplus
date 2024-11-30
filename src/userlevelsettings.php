@@ -532,7 +532,34 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Appointments Report","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Appointments Report","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Appointments Report","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Appointments Report","7","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Appointments Report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}registered_patients_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Registered Patients","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","5","864"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report","7","0"]];
 
 /**
  * Tables
@@ -567,7 +594,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Apporintmen
     ["medicine_dispensation","medicine_dispensation","medicine dispensation",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinedispensationlist"],
     ["medicine_dispensation_details","medicine_dispensation_details","medicine dispensation details",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinedispensationdetailslist"],
     ["medicine_stock","medicine_stock","Medicine Stock",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestocklist"],
-    ["medicine_stock_report","medicine_stock_report","medicine stock report",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockreportlist"],
+    ["medicine_stock_report","medicine_stock_report2","medicine stock report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockreport2list"],
     ["medicine_suppliers","medicine_suppliers","medicine suppliers",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinesupplierslist"],
     ["patient_appointments","patient_appointments","Appointments",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientappointmentslist"],
     ["patient_vaccinations","patient_vaccinations","Vaccinations",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientvaccinationslist"],
@@ -600,4 +627,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Apporintmen
     ["pharmacy_billing_report","pharmacy_billing_report","Pharmacy Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportlist"],
     ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"],
     ["income","income","Income",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomelist"],
-    ["Appointments Report","Appointments_Report","Appointments Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointmentsreport"]];
+    ["Appointments Report","Appointments_Report","Appointments Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","appointmentsreport"],
+    ["registered_patients_report","registered_patients_report","registered patients report",true,"{32536B8D-F37B-4419-80D5-260932800712}","registeredpatientsreportlist"],
+    ["Registered Patients","Registered_Patients","Registered Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","registeredpatients"],
+    ["Medicine Stock Report","Medicine_Stock_Report","Medicine Stock Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockreport"]];

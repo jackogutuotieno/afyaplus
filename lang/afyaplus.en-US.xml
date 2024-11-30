@@ -1,7 +1,10 @@
-<ew-language date="2024/11/30" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/1" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="243">
+      <phrase id="menutext" value="registered patients report" />
+    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -182,8 +185,17 @@
     <menu id="104">
       <phrase id="menutext" value="Reports" />
     </menu>
+    <menu id="312">
+      <phrase id="menutext" value="Internal" />
+    </menu>
+    <menu id="244">
+      <phrase id="menutext" value="Patients" />
+    </menu>
     <menu id="242">
-      <phrase id="menutext" value="Appointments Report" />
+      <phrase id="menutext" value="Appointment" />
+    </menu>
+    <menu id="313">
+      <phrase id="menutext" value="Medicine Stock" />
     </menu>
     <menu id="39">
       <phrase id="menutext" value="Appointments" />
@@ -782,25 +794,37 @@
         <phrase id="fldcaption" value="Expiry Status" />
       </field>
     </table>
-    <table id="medicine_stock_report">
-      <phrase id="tblcaption" value="medicine stock report" />
+    <table id="medicine_stock_report2">
+      <phrase id="tblcaption" value="medicine stock report 2" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No" />
+      </field>
+      <field id="brand_name">
+        <phrase id="fldcaption" value="Medicine Name" />
       </field>
       <field id="quantity">
         <phrase id="fldcaption" value="quantity" />
       </field>
+      <field id="qty_left">
+        <phrase id="fldcaption" value="Qty Left" />
+      </field>
       <field id="measuring_unit">
-        <phrase id="fldcaption" value="measuring unit" />
+        <phrase id="fldcaption" value="Measuring Unit" />
       </field>
       <field id="buying_price_per_unit">
-        <phrase id="fldcaption" value="buying price per unit" />
+        <phrase id="fldcaption" value="PB/Unit (Kshs)" />
       </field>
       <field id="selling_price_per_unit">
-        <phrase id="fldcaption" value="selling price per unit" />
+        <phrase id="fldcaption" value="SP/Unit (Kshs)" />
       </field>
       <field id="expiry_date">
-        <phrase id="fldcaption" value="expiry date" />
+        <phrase id="fldcaption" value="Expiry Date" />
+      </field>
+      <field id="expiry_status">
+        <phrase id="fldcaption" value="Expiry Status" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="date created" />
@@ -820,8 +844,8 @@
       <field id="physical_address">
         <phrase id="fldcaption" value="physical address" />
       </field>
-      <field id="brand_name">
-        <phrase id="fldcaption" value="brand name" />
+      <field id="stockadd_month">
+        <phrase id="fldcaption" value="stockadd month" />
       </field>
     </table>
     <table id="medicine_suppliers">
@@ -1858,6 +1882,172 @@
       </field>
       <field id="appointment_month">
         <phrase id="fldcaption" value="appointment month" />
+      </field>
+    </table>
+    <table id="registered_patients_report">
+      <phrase id="tblcaption" value="registered patients report" />
+      <field id="id">
+        <phrase id="fldcaption" value="Patient ID" />
+      </field>
+      <field id="patient_full_name">
+        <phrase id="fldcaption" value="Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="first name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="last name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DB" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="Phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="Email" />
+      </field>
+      <field id="marital_status">
+        <phrase id="fldcaption" value="Marital Status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Registration Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="next_of_kin">
+        <phrase id="fldcaption" value="next of kin" />
+      </field>
+      <field id="next_of_kin_phone">
+        <phrase id="fldcaption" value="next of kin phone" />
+      </field>
+      <field id="registration_month">
+        <phrase id="fldcaption" value="registration month" />
+      </field>
+    </table>
+    <table id="registered_patients">
+      <phrase id="tblcaption" value="Registered Patients" />
+      <chart id="registeredpatientsbymonth">
+        <phrase id="chartcaption" value="Registered Patients by Month" />
+        <phrase id="chartxaxisname" value="registration month" />
+        <phrase id="chartyaxisname" value="registration month" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="Patient ID" />
+      </field>
+      <field id="patient_full_name">
+        <phrase id="fldcaption" value="Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="first name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="last name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DB" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="Phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="Email" />
+      </field>
+      <field id="marital_status">
+        <phrase id="fldcaption" value="Marital Status" />
+      </field>
+      <field id="next_of_kin">
+        <phrase id="fldcaption" value="next of kin" />
+      </field>
+      <field id="next_of_kin_phone">
+        <phrase id="fldcaption" value="next of kin phone" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Registration Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="registration_month">
+        <phrase id="fldcaption" value="registration month" />
+      </field>
+    </table>
+    <table id="medicine_stock_report">
+      <phrase id="tblcaption" value="Medicine Stock Report" />
+      <chart id="stockupdatebymonth">
+        <phrase id="chartcaption" value="Stock Update by Month" />
+        <phrase id="chartxaxisname" value="stockadd month" />
+        <phrase id="chartyaxisname" value="stockadd month" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No" />
+      </field>
+      <field id="brand_name">
+        <phrase id="fldcaption" value="Medicine Name" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="quantity" />
+      </field>
+      <field id="qty_left_o">
+        <phrase id="fldcaption" value="Qty Left" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+      </field>
+      <field id="buying_price_per_unit">
+        <phrase id="fldcaption" value="PB/Unit (Kshs)" />
+      </field>
+      <field id="selling_price_per_unit">
+        <phrase id="fldcaption" value="SP/Unit (Kshs)" />
+      </field>
+      <field id="expiry_date">
+        <phrase id="fldcaption" value="Expiry Date" />
+      </field>
+      <field id="expiry_status_o">
+        <phrase id="fldcaption" value="Expiry Status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="supplier_name">
+        <phrase id="fldcaption" value="supplier name" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="email address" />
+      </field>
+      <field id="physical_address">
+        <phrase id="fldcaption" value="physical address" />
+      </field>
+      <field id="qty_left">
+        <phrase id="fldcaption" value="Qty Left" />
+      </field>
+      <field id="expiry_status">
+        <phrase id="fldcaption" value="Expiry Status" />
+      </field>
+      <field id="stockadd_month">
+        <phrase id="fldcaption" value="stockadd month" />
       </field>
     </table>
   </project>

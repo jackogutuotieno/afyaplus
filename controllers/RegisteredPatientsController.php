@@ -23,4 +23,11 @@ class RegisteredPatientsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "RegisteredPatientsSummary");
     }
+
+    // RegisteredPatientsbyMonth (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/registeredpatients/RegisteredPatientsbyMonth", [PermissionMiddleware::class], "summary.Registered_Patients.RegisteredPatientsbyMonth")]
+    public function RegisteredPatientsbyMonth(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "RegisteredPatientsSummary", "RegisteredPatientsbyMonth");
+    }
 }

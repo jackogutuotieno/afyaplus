@@ -2,7 +2,6 @@
 
 namespace PHPMaker2024\afyaplus;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use PHPMaker2024\afyaplus\Attributes\Delete;
@@ -13,12 +12,22 @@ use PHPMaker2024\afyaplus\Attributes\Patch;
 use PHPMaker2024\afyaplus\Attributes\Post;
 use PHPMaker2024\afyaplus\Attributes\Put;
 
+/**
+ * Medicine_Stock_Report controller
+ */
 class MedicineStockReportController extends ControllerBase
 {
-    // list
-    #[Map(["GET","POST","OPTIONS"], "/medicinestockreportlist[/{id}]", [PermissionMiddleware::class], "list.medicine_stock_report")]
-    public function list(Request $request, Response $response, array $args): Response
+    // summary
+    #[Map(["GET", "POST", "OPTIONS"], "/medicinestockreport", [PermissionMiddleware::class], "summary.Medicine_Stock_Report")]
+    public function summary(Request $request, Response $response, array $args): Response
     {
-        return $this->runPage($request, $response, $args, "MedicineStockReportList");
+        return $this->runPage($request, $response, $args, "MedicineStockReportSummary");
+    }
+
+    // StockUpdatebyMonth (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/medicinestockreport/StockUpdatebyMonth", [PermissionMiddleware::class], "summary.Medicine_Stock_Report.StockUpdatebyMonth")]
+    public function StockUpdatebyMonth(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "MedicineStockReportSummary", "StockUpdatebyMonth");
     }
 }

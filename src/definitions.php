@@ -101,7 +101,7 @@ return [
     "medicine_dispensation" => \DI\create(MedicineDispensation::class),
     "medicine_dispensation_details" => \DI\create(MedicineDispensationDetails::class),
     "medicine_stock" => \DI\create(MedicineStock::class),
-    "medicine_stock_report" => \DI\create(MedicineStockReport::class),
+    "medicine_stock_report2" => \DI\create(MedicineStockReport2::class),
     "medicine_suppliers" => \DI\create(MedicineSuppliers::class),
     "patient_appointments" => \DI\create(PatientAppointments::class),
     "patient_vaccinations" => \DI\create(PatientVaccinations::class),
@@ -137,6 +137,11 @@ return [
     "income" => \DI\create(Income::class),
     "Appointments_Report" => \DI\create(AppointmentsReport::class),
     "appointments_report" => \DI\create(AppointmentsReport::class),
+    "registered_patients_report" => \DI\create(RegisteredPatientsReport::class),
+    "Registered_Patients" => \DI\create(RegisteredPatients::class),
+    "registered_patients" => \DI\create(RegisteredPatients::class),
+    "Medicine_Stock_Report" => \DI\create(MedicineStockReport::class),
+    "medicine_stock_report" => \DI\create(MedicineStockReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

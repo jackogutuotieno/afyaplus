@@ -33,6 +33,12 @@ class MedicineStockReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "batch_number", type: "string")]
+    private string $batchNumber;
+
+    #[Column(name: "brand_name", type: "string")]
+    private string $brandName;
+
     #[Column(type: "integer")]
     private int $quantity;
 
@@ -66,8 +72,8 @@ class MedicineStockReport extends AbstractEntity
     #[Column(name: "physical_address", type: "text", nullable: true)]
     private ?string $physicalAddress;
 
-    #[Column(name: "brand_name", type: "string")]
-    private string $brandName;
+    #[Column(name: "stockadd_month", type: "string", nullable: true)]
+    private ?string $stockaddMonth;
 
     public function getId(): int
     {
@@ -77,6 +83,28 @@ class MedicineStockReport extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
+        return $this;
+    }
+
+    public function getBatchNumber(): string
+    {
+        return HtmlDecode($this->batchNumber);
+    }
+
+    public function setBatchNumber(string $value): static
+    {
+        $this->batchNumber = RemoveXss($value);
+        return $this;
+    }
+
+    public function getBrandName(): string
+    {
+        return HtmlDecode($this->brandName);
+    }
+
+    public function setBrandName(string $value): static
+    {
+        $this->brandName = RemoveXss($value);
         return $this;
     }
 
@@ -201,14 +229,14 @@ class MedicineStockReport extends AbstractEntity
         return $this;
     }
 
-    public function getBrandName(): string
+    public function getStockaddMonth(): ?string
     {
-        return HtmlDecode($this->brandName);
+        return HtmlDecode($this->stockaddMonth);
     }
 
-    public function setBrandName(string $value): static
+    public function setStockaddMonth(?string $value): static
     {
-        $this->brandName = RemoveXss($value);
+        $this->stockaddMonth = RemoveXss($value);
         return $this;
     }
 }

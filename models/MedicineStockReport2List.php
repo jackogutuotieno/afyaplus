@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class MedicineStockReportList extends MedicineStockReport
+class MedicineStockReport2List extends MedicineStockReport2
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class MedicineStockReportList extends MedicineStockReport
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "MedicineStockReportList";
+    public $PageObjName = "MedicineStockReport2List";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class MedicineStockReportList extends MedicineStockReport
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fmedicine_stock_reportlist";
+    public $FormName = "fmedicine_stock_report2list";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "medicinestockreportlist";
+    public $CurrentPageName = "medicinestockreport2list";
 
     // Page URLs
     public $AddUrl;
@@ -161,6 +161,7 @@ class MedicineStockReportList extends MedicineStockReport
         $this->phone->Visible = false;
         $this->email_address->Visible = false;
         $this->physical_address->Visible = false;
+        $this->stockadd_month->setVisibility();
     }
 
     // Constructor
@@ -171,7 +172,7 @@ class MedicineStockReportList extends MedicineStockReport
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'medicine_stock_report';
+        $this->TableVar = 'medicine_stock_report2';
         $this->TableName = 'medicine_stock_report';
 
         // Table CSS class
@@ -192,22 +193,22 @@ class MedicineStockReportList extends MedicineStockReport
         // Language object
         $Language = Container("app.language");
 
-        // Table object (medicine_stock_report)
-        if (!isset($GLOBALS["medicine_stock_report"]) || $GLOBALS["medicine_stock_report"]::class == PROJECT_NAMESPACE . "medicine_stock_report") {
-            $GLOBALS["medicine_stock_report"] = &$this;
+        // Table object (medicine_stock_report2)
+        if (!isset($GLOBALS["medicine_stock_report2"]) || $GLOBALS["medicine_stock_report2"]::class == PROJECT_NAMESPACE . "medicine_stock_report2") {
+            $GLOBALS["medicine_stock_report2"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "medicinestockreportadd";
+        $this->AddUrl = "medicinestockreport2add";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "medicinestockreportdelete";
-        $this->MultiUpdateUrl = "medicinestockreportupdate";
+        $this->MultiDeleteUrl = "medicinestockreport2delete";
+        $this->MultiUpdateUrl = "medicinestockreport2update";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -362,7 +363,7 @@ class MedicineStockReportList extends MedicineStockReport
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "medicinestockreportview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "medicinestockreport2view"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -718,7 +719,7 @@ class MedicineStockReportList extends MedicineStockReport
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fmedicine_stock_reportgrid";
+            $this->FormName = "fmedicine_stock_report2grid";
         }
 
         // Set up page action
@@ -1055,7 +1056,7 @@ class MedicineStockReportList extends MedicineStockReport
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fmedicine_stock_reportsrch");
+            $savedFilterList = Profile()->getSearchFilters("fmedicine_stock_report2srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->batch_number->AdvancedSearch->toJson(), ","); // Field batch_number
@@ -1073,6 +1074,7 @@ class MedicineStockReportList extends MedicineStockReport
         $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
         $filterList = Concat($filterList, $this->email_address->AdvancedSearch->toJson(), ","); // Field email_address
         $filterList = Concat($filterList, $this->physical_address->AdvancedSearch->toJson(), ","); // Field physical_address
+        $filterList = Concat($filterList, $this->stockadd_month->AdvancedSearch->toJson(), ","); // Field stockadd_month
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1093,7 +1095,7 @@ class MedicineStockReportList extends MedicineStockReport
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fmedicine_stock_reportsrch", $filters);
+            Profile()->setSearchFilters("fmedicine_stock_report2srch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1239,6 +1241,14 @@ class MedicineStockReportList extends MedicineStockReport
         $this->physical_address->AdvancedSearch->SearchValue2 = @$filter["y_physical_address"];
         $this->physical_address->AdvancedSearch->SearchOperator2 = @$filter["w_physical_address"];
         $this->physical_address->AdvancedSearch->save();
+
+        // Field stockadd_month
+        $this->stockadd_month->AdvancedSearch->SearchValue = @$filter["x_stockadd_month"];
+        $this->stockadd_month->AdvancedSearch->SearchOperator = @$filter["z_stockadd_month"];
+        $this->stockadd_month->AdvancedSearch->SearchCondition = @$filter["v_stockadd_month"];
+        $this->stockadd_month->AdvancedSearch->SearchValue2 = @$filter["y_stockadd_month"];
+        $this->stockadd_month->AdvancedSearch->SearchOperator2 = @$filter["w_stockadd_month"];
+        $this->stockadd_month->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1286,6 +1296,7 @@ class MedicineStockReportList extends MedicineStockReport
         $searchFlds[] = &$this->phone;
         $searchFlds[] = &$this->email_address;
         $searchFlds[] = &$this->physical_address;
+        $searchFlds[] = &$this->stockadd_month;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1376,6 +1387,7 @@ class MedicineStockReportList extends MedicineStockReport
             $this->updateSort($this->expiry_status); // expiry_status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
+            $this->updateSort($this->stockadd_month); // stockadd_month
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1416,6 +1428,7 @@ class MedicineStockReportList extends MedicineStockReport
                 $this->phone->setSort("");
                 $this->email_address->setSort("");
                 $this->physical_address->setSort("");
+                $this->stockadd_month->setSort("");
             }
 
             // Reset start position
@@ -1511,12 +1524,12 @@ class MedicineStockReportList extends MedicineStockReport
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fmedicine_stock_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fmedicine_stock_report2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fmedicine_stock_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fmedicine_stock_report2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1573,6 +1586,7 @@ class MedicineStockReportList extends MedicineStockReport
             $this->createColumnOption($option, "expiry_status");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
+            $this->createColumnOption($option, "stockadd_month");
         }
 
         // Set up custom actions
@@ -1597,10 +1611,10 @@ class MedicineStockReportList extends MedicineStockReport
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fmedicine_stock_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fmedicine_stock_report2srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fmedicine_stock_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fmedicine_stock_report2srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1660,7 +1674,7 @@ class MedicineStockReportList extends MedicineStockReport
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fmedicine_stock_reportlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fmedicine_stock_report2list"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1831,7 +1845,7 @@ class MedicineStockReportList extends MedicineStockReport
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_medicine_stock_report", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_medicine_stock_report2", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1892,7 +1906,7 @@ class MedicineStockReportList extends MedicineStockReport
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_medicine_stock_report",
+            "id" => "r" . $this->RowCount . "_medicine_stock_report2",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2027,6 +2041,7 @@ class MedicineStockReportList extends MedicineStockReport
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
+        $this->stockadd_month->setDbValue($row['stockadd_month']);
     }
 
     // Return a row with default values
@@ -2049,6 +2064,7 @@ class MedicineStockReportList extends MedicineStockReport
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
+        $row['stockadd_month'] = $this->stockadd_month->DefaultValue;
         return $row;
     }
 
@@ -2121,6 +2137,8 @@ class MedicineStockReportList extends MedicineStockReport
 
         // physical_address
 
+        // stockadd_month
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -2178,6 +2196,9 @@ class MedicineStockReportList extends MedicineStockReport
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
 
+            // stockadd_month
+            $this->stockadd_month->ViewValue = $this->stockadd_month->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2225,6 +2246,10 @@ class MedicineStockReportList extends MedicineStockReport
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // stockadd_month
+            $this->stockadd_month->HrefValue = "";
+            $this->stockadd_month->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2245,19 +2270,19 @@ class MedicineStockReportList extends MedicineStockReport
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fmedicine_stock_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fmedicine_stock_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fmedicine_stock_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fmedicine_stock_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fmedicine_stock_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fmedicine_stock_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2269,7 +2294,7 @@ class MedicineStockReportList extends MedicineStockReport
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fmedicine_stock_reportlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fmedicine_stock_report2list" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2347,7 +2372,7 @@ class MedicineStockReportList extends MedicineStockReport
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fmedicine_stock_reportsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fmedicine_stock_report2srch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button

@@ -134,8 +134,12 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -924,9 +928,29 @@
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
@@ -1613,7 +1637,9 @@
                 '/medicinestockview[/{id}]',
                 '/medicinestockedit[/{id}]',
                 '/medicinestockdelete[/{id}]',
-                '/medicinestockreportlist[/{id}]',
+                '/medicinestockreport2list[/{id}]',
+                '/medicinestockreport',
+                '/medicinestockreport/StockUpdatebyMonth',
                 '/medicinesupplierslist[/{id}]',
                 '/medicinesuppliersadd[/{id}]',
                 '/medicinesuppliersview[/{id}]',
@@ -1701,6 +1727,8 @@
                 '/radiologyrequestsqueueedit[/{id}]',
                 '/radiologyrequestsqueuedelete[/{id}]',
                 '/registeredpatients',
+                '/registeredpatients/RegisteredPatientsbyMonth',
+                '/registeredpatientsreportlist[/{id}]',
                 '/roleslist[/{role_id}]',
                 '/rolesadd[/{role_id}]',
                 '/rolesview[/{role_id}]',
@@ -1863,7 +1891,9 @@
                 'PHPMaker2024\\afyaplus\\MedicineStockController:view',
                 'PHPMaker2024\\afyaplus\\MedicineStockController:edit',
                 'PHPMaker2024\\afyaplus\\MedicineStockController:delete',
-                'PHPMaker2024\\afyaplus\\MedicineStockReportController:list',
+                'PHPMaker2024\\afyaplus\\MedicineStockReport2Controller:list',
+                'PHPMaker2024\\afyaplus\\MedicineStockReportController:summary',
+                'PHPMaker2024\\afyaplus\\MedicineStockReportController:StockUpdatebyMonth',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:list',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:add',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:view',
@@ -1951,6 +1981,8 @@
                 'PHPMaker2024\\afyaplus\\RadiologyRequestsQueueController:edit',
                 'PHPMaker2024\\afyaplus\\RadiologyRequestsQueueController:delete',
                 'PHPMaker2024\\afyaplus\\RegisteredPatientsController:summary',
+                'PHPMaker2024\\afyaplus\\RegisteredPatientsController:RegisteredPatientsbyMonth',
+                'PHPMaker2024\\afyaplus\\RegisteredPatientsReportController:list',
                 'PHPMaker2024\\afyaplus\\RolesController:list',
                 'PHPMaker2024\\afyaplus\\RolesController:add',
                 'PHPMaker2024\\afyaplus\\RolesController:view',
@@ -1990,6 +2022,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2732,6 +2770,12 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -2857,7 +2901,9 @@
                 'view.medicine_stock',
                 'edit.medicine_stock',
                 'delete.medicine_stock',
-                'list.medicine_stock_report',
+                'list.medicine_stock_report2',
+                'summary.Medicine_Stock_Report',
+                'summary.Medicine_Stock_Report.StockUpdatebyMonth',
                 'list.medicine_suppliers',
                 'add.medicine_suppliers',
                 'view.medicine_suppliers',
@@ -2945,6 +2991,8 @@
                 'edit.radiology_requests_queue',
                 'delete.radiology_requests_queue',
                 'summary.Registered_Patients',
+                'summary.Registered_Patients.RegisteredPatientsbyMonth',
+                'list.registered_patients_report',
                 'list.roles',
                 'add.roles',
                 'view.roles',
@@ -2984,6 +3032,10 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3484,6 +3536,10 @@
         $o[245],
         $o[246],
         $o[247],
+        $o[248],
+        $o[249],
+        $o[250],
+        $o[251],
     ],
     []
 );
