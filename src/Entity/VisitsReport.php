@@ -22,11 +22,11 @@ use function PHPMaker2024\afyaplus\HtmlDecode;
 use function PHPMaker2024\afyaplus\EncryptPassword;
 
 /**
- * Entity class for "vaccinations_report" table
+ * Entity class for "visits_report" table
  */
 #[Entity]
-#[Table(name: "vaccinations_report")]
-class VaccinationsReport extends AbstractEntity
+#[Table(name: "visits_report")]
+class VisitsReport extends AbstractEntity
 {
     #[Id]
     #[Column(type: "integer")]
@@ -39,23 +39,23 @@ class VaccinationsReport extends AbstractEntity
     #[Column(name: "last_name", type: "string")]
     private string $lastName;
 
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
+    #[Column(name: "visit_type", type: "string")]
+    private string $visitType;
+
+    #[Column(name: "payment_method", type: "string")]
+    private string $paymentMethod;
 
     #[Column(type: "string")]
-    private string $gender;
-
-    #[Column(name: "service_name", type: "string")]
-    private string $serviceName;
-
-    #[Column(type: "string")]
-    private string $status;
+    private string $company;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    #[Column(name: "visit_month", type: "string", nullable: true)]
+    private ?string $visitMonth;
 
     public function getId(): int
     {
@@ -90,47 +90,36 @@ class VaccinationsReport extends AbstractEntity
         return $this;
     }
 
-    public function getDateOfBirth(): DateTime
+    public function getVisitType(): string
     {
-        return $this->dateOfBirth;
+        return HtmlDecode($this->visitType);
     }
 
-    public function setDateOfBirth(DateTime $value): static
+    public function setVisitType(string $value): static
     {
-        $this->dateOfBirth = $value;
+        $this->visitType = RemoveXss($value);
         return $this;
     }
 
-    public function getGender(): string
+    public function getPaymentMethod(): string
     {
-        return HtmlDecode($this->gender);
+        return HtmlDecode($this->paymentMethod);
     }
 
-    public function setGender(string $value): static
+    public function setPaymentMethod(string $value): static
     {
-        $this->gender = RemoveXss($value);
+        $this->paymentMethod = RemoveXss($value);
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getCompany(): string
     {
-        return HtmlDecode($this->serviceName);
+        return HtmlDecode($this->company);
     }
 
-    public function setServiceName(string $value): static
+    public function setCompany(string $value): static
     {
-        $this->serviceName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return HtmlDecode($this->status);
-    }
-
-    public function setStatus(string $value): static
-    {
-        $this->status = RemoveXss($value);
+        $this->company = RemoveXss($value);
         return $this;
     }
 
@@ -155,41 +144,15 @@ class VaccinationsReport extends AbstractEntity
         $this->dateUpdated = $value;
         return $this;
     }
-}
-= $value;
-        return $this;
+
+    public function getVisitMonth(): ?string
+    {
+        return HtmlDecode($this->visitMonth);
     }
 
-    public function getCategoryName(): ?string
+    public function setVisitMonth(?string $value): static
     {
-        return HtmlDecode($this->categoryName);
-    }
-
-    public function setCategoryName(?string $value): static
-    {
-        $this->categoryName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getSubcategory(): ?string
-    {
-        return HtmlDecode($this->subcategory);
-    }
-
-    public function setSubcategory(?string $value): static
-    {
-        $this->subcategory = RemoveXss($value);
-        return $this;
-    }
-
-    public function getNurse(): ?string
-    {
-        return HtmlDecode($this->nurse);
-    }
-
-    public function setNurse(?string $value): static
-    {
-        $this->nurse = RemoveXss($value);
+        $this->visitMonth = RemoveXss($value);
         return $this;
     }
 }

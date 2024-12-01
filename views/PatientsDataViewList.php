@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$LaboratoryReportsList = &$Page;
+$PatientsDataViewList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { laboratory_reports: currentTable } });
+ew.deepAssign(ew.vars, { tables: { patients_data_view: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -51,20 +51,20 @@ loadjs.ready("head", function () {
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="flaboratory_reportssrch" id="flaboratory_reportssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="flaboratory_reportssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fpatients_data_viewsrch" id="fpatients_data_viewsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fpatients_data_viewsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { laboratory_reports: currentTable } });
+ew.deepAssign(ew.vars, { tables: { patients_data_view: currentTable } });
 var currentForm;
-var flaboratory_reportssrch, currentSearchForm, currentAdvancedSearchForm;
+var fpatients_data_viewsrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("flaboratory_reportssrch")
+        .setId("fpatients_data_viewsrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -95,10 +95,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="flaboratory_reportssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="flaboratory_reportssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="flaboratory_reportssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="flaboratory_reportssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fpatients_data_viewsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fpatients_data_viewsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fpatients_data_viewsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fpatients_data_viewsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -138,13 +138,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="laboratory_reports">
+<input type="hidden" name="t" value="patients_data_view">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_laboratory_reports" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_patients_data_view" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_laboratory_reportslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_patients_data_viewlist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -158,34 +158,19 @@ $Page->renderListOptions();
 $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_laboratory_reports_id" class="laboratory_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_laboratory_reports_first_name" class="laboratory_reports_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patients_data_view_id" class="patients_data_view_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
 <?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_laboratory_reports_last_name" class="laboratory_reports_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_patients_data_view_last_name" class="patients_data_view_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_laboratory_reports_gender" class="laboratory_reports_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
+<?php if ($Page->first_name->Visible) { // first_name ?>
+        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_patients_data_view_first_name" class="patients_data_view_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_laboratory_reports_date_of_birth" class="laboratory_reports_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_patients_data_view_date_of_birth" class="patients_data_view_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
 <?php } ?>
-<?php if ($Page->p_age->Visible) { // p_age ?>
-        <th data-name="p_age" class="<?= $Page->p_age->headerCellClass() ?>"><div id="elh_laboratory_reports_p_age" class="laboratory_reports_p_age"><?= $Page->renderFieldHeader($Page->p_age) ?></div></th>
-<?php } ?>
-<?php if ($Page->specimen->Visible) { // specimen ?>
-        <th data-name="specimen" class="<?= $Page->specimen->headerCellClass() ?>"><div id="elh_laboratory_reports_specimen" class="laboratory_reports_specimen"><?= $Page->renderFieldHeader($Page->specimen) ?></div></th>
-<?php } ?>
-<?php if ($Page->service_name->Visible) { // service_name ?>
-        <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_laboratory_reports_service_name" class="laboratory_reports_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_laboratory_reports_date_created" class="laboratory_reports_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_laboratory_reports_date_updated" class="laboratory_reports_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+<?php if ($Page->gender->Visible) { // gender ?>
+        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_patients_data_view_gender" class="patients_data_view_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -217,81 +202,41 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
     <?php if ($Page->id->Visible) { // id ?>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_id" class="el_laboratory_reports_id">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_data_view_id" class="el_patients_data_view_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_first_name" class="el_laboratory_reports_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->last_name->Visible) { // last_name ?>
         <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_last_name" class="el_laboratory_reports_last_name">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_data_view_last_name" class="el_patients_data_view_last_name">
 <span<?= $Page->last_name->viewAttributes() ?>>
 <?= $Page->last_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_gender" class="el_laboratory_reports_gender">
-<span<?= $Page->gender->viewAttributes() ?>>
-<?= $Page->gender->getViewValue() ?></span>
+    <?php if ($Page->first_name->Visible) { // first_name ?>
+        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_data_view_first_name" class="el_patients_data_view_first_name">
+<span<?= $Page->first_name->viewAttributes() ?>>
+<?= $Page->first_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
     <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
         <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_date_of_birth" class="el_laboratory_reports_date_of_birth">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_data_view_date_of_birth" class="el_patients_data_view_date_of_birth">
 <span<?= $Page->date_of_birth->viewAttributes() ?>>
 <?= $Page->date_of_birth->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->p_age->Visible) { // p_age ?>
-        <td data-name="p_age"<?= $Page->p_age->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_p_age" class="el_laboratory_reports_p_age">
-<span<?= $Page->p_age->viewAttributes() ?>>
-<?= $Page->p_age->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->specimen->Visible) { // specimen ?>
-        <td data-name="specimen"<?= $Page->specimen->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_specimen" class="el_laboratory_reports_specimen">
-<span<?= $Page->specimen->viewAttributes() ?>>
-<?= $Page->specimen->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->service_name->Visible) { // service_name ?>
-        <td data-name="service_name"<?= $Page->service_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_service_name" class="el_laboratory_reports_service_name">
-<span<?= $Page->service_name->viewAttributes() ?>>
-<?= $Page->service_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_date_created" class="el_laboratory_reports_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports_date_updated" class="el_laboratory_reports_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
+    <?php if ($Page->gender->Visible) { // gender ?>
+        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_data_view_gender" class="el_patients_data_view_gender">
+<span<?= $Page->gender->viewAttributes() ?>>
+<?= $Page->gender->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -354,7 +299,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("laboratory_reports");
+    ew.addEventHandlers("patients_data_view");
 });
 </script>
 <script>

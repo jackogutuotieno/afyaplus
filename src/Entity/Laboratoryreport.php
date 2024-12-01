@@ -22,37 +22,31 @@ use function PHPMaker2024\afyaplus\HtmlDecode;
 use function PHPMaker2024\afyaplus\EncryptPassword;
 
 /**
- * Entity class for "laboratoryreports" table
+ * Entity class for "laboratory_reports" table
  */
 #[Entity]
-#[Table(name: "laboratoryreports")]
-class Laboratoryreport extends AbstractEntity
+#[Table(name: "laboratory_reports")]
+class LaboratoryReport extends AbstractEntity
 {
     #[Id]
     #[Column(type: "integer")]
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "report_title", type: "string")]
-    private string $reportTitle;
+    #[Column(name: "patient_id", type: "integer")]
+    private int $patientId;
 
-    #[Column(type: "text")]
-    private string $details;
+    #[Column(name: "first_name", type: "string")]
+    private string $firstName;
 
-    #[Column(name: "date_created", type: "datetime")]
-    private DateTime $dateCreated;
-
-    #[Column(name: "date_updated", type: "datetime")]
-    private DateTime $dateUpdated;
-
-    #[Column(name: "patient_name", type: "string", nullable: true)]
-    private ?string $patientName;
-
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
+    #[Column(name: "last_name", type: "string")]
+    private string $lastName;
 
     #[Column(type: "string")]
     private string $gender;
+
+    #[Column(name: "date_of_birth", type: "date")]
+    private DateTime $dateOfBirth;
 
     #[Column(type: "string")]
     private string $specimen;
@@ -60,17 +54,14 @@ class Laboratoryreport extends AbstractEntity
     #[Column(name: "service_name", type: "string")]
     private string $serviceName;
 
-    #[Column(type: "float")]
-    private float $cost;
+    #[Column(name: "date_created", type: "datetime")]
+    private DateTime $dateCreated;
 
-    #[Column(type: "string")]
-    private string $subcategory;
+    #[Column(name: "date_updated", type: "datetime")]
+    private DateTime $dateUpdated;
 
-    #[Column(name: "additional_findings", type: "text", nullable: true)]
-    private ?string $additionalFindings;
-
-    #[Column(name: "disease_name", type: "string", nullable: true)]
-    private ?string $diseaseName;
+    #[Column(name: "report_month", type: "string", nullable: true)]
+    private ?string $reportMonth;
 
     public function getId(): int
     {
@@ -83,69 +74,36 @@ class Laboratoryreport extends AbstractEntity
         return $this;
     }
 
-    public function getReportTitle(): string
+    public function getPatientId(): int
     {
-        return HtmlDecode($this->reportTitle);
+        return $this->patientId;
     }
 
-    public function setReportTitle(string $value): static
+    public function setPatientId(int $value): static
     {
-        $this->reportTitle = RemoveXss($value);
+        $this->patientId = $value;
         return $this;
     }
 
-    public function getDetails(): string
+    public function getFirstName(): string
     {
-        return HtmlDecode($this->details);
+        return HtmlDecode($this->firstName);
     }
 
-    public function setDetails(string $value): static
+    public function setFirstName(string $value): static
     {
-        $this->details = RemoveXss($value);
+        $this->firstName = RemoveXss($value);
         return $this;
     }
 
-    public function getDateCreated(): DateTime
+    public function getLastName(): string
     {
-        return $this->dateCreated;
+        return HtmlDecode($this->lastName);
     }
 
-    public function setDateCreated(DateTime $value): static
+    public function setLastName(string $value): static
     {
-        $this->dateCreated = $value;
-        return $this;
-    }
-
-    public function getDateUpdated(): DateTime
-    {
-        return $this->dateUpdated;
-    }
-
-    public function setDateUpdated(DateTime $value): static
-    {
-        $this->dateUpdated = $value;
-        return $this;
-    }
-
-    public function getPatientName(): ?string
-    {
-        return HtmlDecode($this->patientName);
-    }
-
-    public function setPatientName(?string $value): static
-    {
-        $this->patientName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getDateOfBirth(): DateTime
-    {
-        return $this->dateOfBirth;
-    }
-
-    public function setDateOfBirth(DateTime $value): static
-    {
-        $this->dateOfBirth = $value;
+        $this->lastName = RemoveXss($value);
         return $this;
     }
 
@@ -157,6 +115,17 @@ class Laboratoryreport extends AbstractEntity
     public function setGender(string $value): static
     {
         $this->gender = RemoveXss($value);
+        return $this;
+    }
+
+    public function getDateOfBirth(): DateTime
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function setDateOfBirth(DateTime $value): static
+    {
+        $this->dateOfBirth = $value;
         return $this;
     }
 
@@ -182,47 +151,36 @@ class Laboratoryreport extends AbstractEntity
         return $this;
     }
 
-    public function getCost(): float
+    public function getDateCreated(): DateTime
     {
-        return $this->cost;
+        return $this->dateCreated;
     }
 
-    public function setCost(float $value): static
+    public function setDateCreated(DateTime $value): static
     {
-        $this->cost = $value;
+        $this->dateCreated = $value;
         return $this;
     }
 
-    public function getSubcategory(): string
+    public function getDateUpdated(): DateTime
     {
-        return HtmlDecode($this->subcategory);
+        return $this->dateUpdated;
     }
 
-    public function setSubcategory(string $value): static
+    public function setDateUpdated(DateTime $value): static
     {
-        $this->subcategory = RemoveXss($value);
+        $this->dateUpdated = $value;
         return $this;
     }
 
-    public function getAdditionalFindings(): ?string
+    public function getReportMonth(): ?string
     {
-        return HtmlDecode($this->additionalFindings);
+        return HtmlDecode($this->reportMonth);
     }
 
-    public function setAdditionalFindings(?string $value): static
+    public function setReportMonth(?string $value): static
     {
-        $this->additionalFindings = RemoveXss($value);
-        return $this;
-    }
-
-    public function getDiseaseName(): ?string
-    {
-        return HtmlDecode($this->diseaseName);
-    }
-
-    public function setDiseaseName(?string $value): static
-    {
-        $this->diseaseName = RemoveXss($value);
+        $this->reportMonth = RemoveXss($value);
         return $this;
     }
 }

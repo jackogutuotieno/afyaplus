@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for Vitals Report
+ * Table class for Visits Report1
  */
-class VitalsReport extends ReportTable
+class VisitsReport1 extends ReportTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -46,18 +46,19 @@ class VitalsReport extends ReportTable
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
+    public $VisitsbyMonth;
 
     // Fields
     public $id;
-    public $patient_name;
-    public $height;
-    public $weight;
-    public $temperature;
-    public $pulse;
-    public $blood_pressure;
-    public $nurse;
+    public $patient_name_visits;
+    public $first_name;
+    public $last_name;
+    public $visit_type;
+    public $payment_method;
+    public $company;
     public $date_created;
     public $date_updated;
+    public $visit_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -70,11 +71,11 @@ class VitalsReport extends ReportTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "Vitals_Report";
-        $this->TableName = 'Vitals Report';
+        $this->TableVar = "Visits_Report1";
+        $this->TableName = 'Visits Report1';
         $this->TableType = "REPORT";
         $this->TableReportType = "summary"; // Report Type
-        $this->ReportSourceTable = 'vitalsreport2'; // Report source table
+        $this->ReportSourceTable = 'visits_report'; // Report source table
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
@@ -109,183 +110,165 @@ class VitalsReport extends ReportTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'NO' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
+        $this->id->IsAutoIncrement = true; // Autoincrement field
+        $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->id->SourceTableVar = 'vitalsreport2';
+        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SourceTableVar = 'visits_report';
         $this->Fields['id'] = &$this->id;
 
-        // patient_name
-        $this->patient_name = new ReportField(
+        // patient_name_visits
+        $this->patient_name_visits = new ReportField(
             $this, // Table
-            'x_patient_name', // Variable name
-            'patient_name', // Name
-            '`patient_name`', // Expression
-            '`patient_name`', // Basic search expression
+            'x_patient_name_visits', // Variable name
+            'patient_name_visits', // Name
+            '`patient_name_visits`', // Expression
+            '`patient_name_visits`', // Basic search expression
             200, // Type
             101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`patient_name`', // Virtual expression
+            '`patient_name_visits`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->patient_name->InputTextType = "text";
-        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->patient_name->SourceTableVar = 'vitalsreport2';
-        $this->Fields['patient_name'] = &$this->patient_name;
+        $this->patient_name_visits->InputTextType = "text";
+        $this->patient_name_visits->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->patient_name_visits->SourceTableVar = 'visits_report';
+        $this->Fields['patient_name_visits'] = &$this->patient_name_visits;
 
-        // height
-        $this->height = new ReportField(
+        // first_name
+        $this->first_name = new ReportField(
             $this, // Table
-            'x_height', // Variable name
-            'height', // Name
-            '`height`', // Expression
-            '`height`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`height`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->height->InputTextType = "text";
-        $this->height->Raw = true;
-        $this->height->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->height->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->height->SourceTableVar = 'vitalsreport2';
-        $this->Fields['height'] = &$this->height;
-
-        // weight
-        $this->weight = new ReportField(
-            $this, // Table
-            'x_weight', // Variable name
-            'weight', // Name
-            '`weight`', // Expression
-            '`weight`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`weight`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->weight->InputTextType = "text";
-        $this->weight->Raw = true;
-        $this->weight->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->weight->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->weight->SourceTableVar = 'vitalsreport2';
-        $this->Fields['weight'] = &$this->weight;
-
-        // temperature
-        $this->temperature = new ReportField(
-            $this, // Table
-            'x_temperature', // Variable name
-            'temperature', // Name
-            '`temperature`', // Expression
-            '`temperature`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`temperature`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->temperature->InputTextType = "text";
-        $this->temperature->Raw = true;
-        $this->temperature->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->temperature->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->temperature->SourceTableVar = 'vitalsreport2';
-        $this->Fields['temperature'] = &$this->temperature;
-
-        // pulse
-        $this->pulse = new ReportField(
-            $this, // Table
-            'x_pulse', // Variable name
-            'pulse', // Name
-            '`pulse`', // Expression
-            '`pulse`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`pulse`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->pulse->InputTextType = "text";
-        $this->pulse->Raw = true;
-        $this->pulse->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->pulse->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->pulse->SourceTableVar = 'vitalsreport2';
-        $this->Fields['pulse'] = &$this->pulse;
-
-        // blood_pressure
-        $this->blood_pressure = new ReportField(
-            $this, // Table
-            'x_blood_pressure', // Variable name
-            'blood_pressure', // Name
-            '`blood_pressure`', // Expression
-            '`blood_pressure`', // Basic search expression
+            'x_first_name', // Variable name
+            'first_name', // Name
+            '`first_name`', // Expression
+            '`first_name`', // Basic search expression
             200, // Type
-            15, // Size
+            50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`blood_pressure`', // Virtual expression
+            '`first_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->blood_pressure->InputTextType = "text";
-        $this->blood_pressure->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->blood_pressure->SourceTableVar = 'vitalsreport2';
-        $this->Fields['blood_pressure'] = &$this->blood_pressure;
+        $this->first_name->InputTextType = "text";
+        $this->first_name->Nullable = false; // NOT NULL field
+        $this->first_name->Required = true; // Required field
+        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->first_name->SourceTableVar = 'visits_report';
+        $this->Fields['first_name'] = &$this->first_name;
 
-        // nurse
-        $this->nurse = new ReportField(
+        // last_name
+        $this->last_name = new ReportField(
             $this, // Table
-            'x_nurse', // Variable name
-            'nurse', // Name
-            '`nurse`', // Expression
-            '`nurse`', // Basic search expression
+            'x_last_name', // Variable name
+            'last_name', // Name
+            '`last_name`', // Expression
+            '`last_name`', // Basic search expression
             200, // Type
-            101, // Size
+            50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`nurse`', // Virtual expression
+            '`last_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->nurse->InputTextType = "text";
-        $this->nurse->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->nurse->SourceTableVar = 'vitalsreport2';
-        $this->Fields['nurse'] = &$this->nurse;
+        $this->last_name->InputTextType = "text";
+        $this->last_name->Nullable = false; // NOT NULL field
+        $this->last_name->Required = true; // Required field
+        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->last_name->SourceTableVar = 'visits_report';
+        $this->Fields['last_name'] = &$this->last_name;
+
+        // visit_type
+        $this->visit_type = new ReportField(
+            $this, // Table
+            'x_visit_type', // Variable name
+            'visit_type', // Name
+            '`visit_type`', // Expression
+            '`visit_type`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`visit_type`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->visit_type->InputTextType = "text";
+        $this->visit_type->Nullable = false; // NOT NULL field
+        $this->visit_type->Required = true; // Required field
+        $this->visit_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->visit_type->SourceTableVar = 'visits_report';
+        $this->Fields['visit_type'] = &$this->visit_type;
+
+        // payment_method
+        $this->payment_method = new ReportField(
+            $this, // Table
+            'x_payment_method', // Variable name
+            'payment_method', // Name
+            '`payment_method`', // Expression
+            '`payment_method`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`payment_method`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->payment_method->InputTextType = "text";
+        $this->payment_method->Nullable = false; // NOT NULL field
+        $this->payment_method->Required = true; // Required field
+        $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->payment_method->SourceTableVar = 'visits_report';
+        $this->Fields['payment_method'] = &$this->payment_method;
+
+        // company
+        $this->company = new ReportField(
+            $this, // Table
+            'x_company', // Variable name
+            'company', // Name
+            '`company`', // Expression
+            '`company`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`company`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->company->InputTextType = "text";
+        $this->company->Nullable = false; // NOT NULL field
+        $this->company->Required = true; // Required field
+        $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->company->SourceTableVar = 'visits_report';
+        $this->Fields['company'] = &$this->company;
 
         // date_created
         $this->date_created = new ReportField(
@@ -293,10 +276,10 @@ class VitalsReport extends ReportTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -307,9 +290,11 @@ class VitalsReport extends ReportTable
         );
         $this->date_created->InputTextType = "text";
         $this->date_created->Raw = true;
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->date_created->SourceTableVar = 'vitalsreport2';
+        $this->date_created->Nullable = false; // NOT NULL field
+        $this->date_created->Required = true; // Required field
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_created->SourceTableVar = 'visits_report';
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
@@ -318,10 +303,10 @@ class VitalsReport extends ReportTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -332,10 +317,66 @@ class VitalsReport extends ReportTable
         );
         $this->date_updated->InputTextType = "text";
         $this->date_updated->Raw = true;
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->date_updated->SourceTableVar = 'vitalsreport2';
+        $this->date_updated->Nullable = false; // NOT NULL field
+        $this->date_updated->Required = true; // Required field
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->date_updated->SourceTableVar = 'visits_report';
         $this->Fields['date_updated'] = &$this->date_updated;
+
+        // visit_month
+        $this->visit_month = new ReportField(
+            $this, // Table
+            'x_visit_month', // Variable name
+            'visit_month', // Name
+            '`visit_month`', // Expression
+            '`visit_month`', // Basic search expression
+            200, // Type
+            9, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`visit_month`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->visit_month->InputTextType = "text";
+        $this->visit_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->visit_month->SourceTableVar = 'visits_report';
+        $this->Fields['visit_month'] = &$this->visit_month;
+
+        // Visits by Month
+        $this->VisitsbyMonth = new DbChart($this, 'VisitsbyMonth', 'Visits by Month', 'visit_month', 'visit_month', 1001, '', 0, 'COUNT', 600, 500);
+        $this->VisitsbyMonth->Position = 4;
+        $this->VisitsbyMonth->PageBreakType = "before";
+        $this->VisitsbyMonth->YAxisFormat = [""];
+        $this->VisitsbyMonth->YFieldFormat = [""];
+        $this->VisitsbyMonth->SortType = 0;
+        $this->VisitsbyMonth->SortSequence = "";
+        $this->VisitsbyMonth->SqlSelect = $this->getQueryBuilder()->select("`visit_month`", "''", "COUNT(`visit_month`)");
+        $this->VisitsbyMonth->SqlGroupBy = "`visit_month`";
+        $this->VisitsbyMonth->SqlOrderBy = "";
+        $this->VisitsbyMonth->SeriesDateType = "";
+        $this->VisitsbyMonth->ID = "Visits_Report1_VisitsbyMonth"; // Chart ID
+        $this->VisitsbyMonth->setParameters([
+            ["type", "1001"],
+            ["seriestype", "0"]
+        ]); // Chart type / Chart series type
+        $this->VisitsbyMonth->setParameters([
+            ["caption", $this->VisitsbyMonth->caption()],
+            ["xaxisname", $this->VisitsbyMonth->xAxisName()]
+        ]); // Chart caption / X axis name
+        $this->VisitsbyMonth->setParameter("yaxisname", $this->VisitsbyMonth->yAxisName()); // Y axis name
+        $this->VisitsbyMonth->setParameters([
+            ["shownames", "1"],
+            ["showvalues", "1"],
+            ["showhovercap", "1"]
+        ]); // Show names / Show values / Show hover
+        $this->VisitsbyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->VisitsbyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->VisitsbyMonth->ID] = &$this->VisitsbyMonth;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -467,7 +508,7 @@ class VitalsReport extends ReportTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "vitalsreport";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "visits_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -495,20 +536,7 @@ class VitalsReport extends ReportTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, CONCAT(first_name,' ',last_name) AS patient_name_visits";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -679,13 +707,19 @@ class VitalsReport extends ReportTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "";
+        return "`id` = @id@";
     }
 
     // Get Key
     public function getKey($current = false, $keySeparator = null)
     {
         $keys = [];
+        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
+        if (EmptyValue($val)) {
+            return "";
+        } else {
+            $keys[] = $val;
+        }
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         return implode($keySeparator, $keys);
     }
@@ -696,7 +730,12 @@ class VitalsReport extends ReportTable
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         $this->OldKey = strval($key);
         $keys = explode($keySeparator, $this->OldKey);
-        if (count($keys) == 0) {
+        if (count($keys) == 1) {
+            if ($current) {
+                $this->id->CurrentValue = $keys[0];
+            } else {
+                $this->id->OldValue = $keys[0];
+            }
         }
     }
 
@@ -704,6 +743,19 @@ class VitalsReport extends ReportTable
     public function getRecordFilter($row = null, $current = false)
     {
         $keyFilter = $this->sqlKeyFilter();
+        if (is_array($row)) {
+            $val = array_key_exists('id', $row) ? $row['id'] : null;
+        } else {
+            $val = !EmptyValue($this->id->OldValue) && !$current ? $this->id->OldValue : $this->id->CurrentValue;
+        }
+        if (!is_numeric($val)) {
+            return "0=1"; // Invalid key
+        }
+        if ($val === null) {
+            return "0=1"; // Invalid key
+        } else {
+            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+        }
         return $keyFilter;
     }
 
@@ -741,13 +793,13 @@ class VitalsReport extends ReportTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "vitalsreport";
+        return "visitsreport1";
     }
 
     // API page name
     public function getApiPageName($action)
     {
-        return "VitalsReportSummary";
+        return "VisitsReport1Summary";
     }
 
     // Current URL
@@ -837,6 +889,7 @@ class VitalsReport extends ReportTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
+        $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -847,6 +900,11 @@ class VitalsReport extends ReportTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
+        if ($this->id->CurrentValue !== null) {
+            $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
+        } else {
+            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
+        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -917,14 +975,24 @@ class VitalsReport extends ReportTable
             $isApi = IsApi();
             $keyValues = $isApi
                 ? (Route(0) == "export"
-                    ? array_map(fn ($i) => Route($i + 3), range(0, -1))  // Export API
-                    : array_map(fn ($i) => Route($i + 2), range(0, -1))) // Other API
+                    ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
+                    : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
                 : []; // Non-API
+            if (($keyValue = Param("id") ?? Route("id")) !== null) {
+                $arKeys[] = $keyValue;
+            } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
+                $arKeys[] = $keyValue;
+            } else {
+                $arKeys = null; // Do not setup
+            }
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
+                if (!is_numeric($key)) {
+                    continue;
+                }
                 $ar[] = $key;
             }
         }
@@ -945,6 +1013,11 @@ class VitalsReport extends ReportTable
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
+            }
+            if ($setCurrent) {
+                $this->id->CurrentValue = $key;
+            } else {
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }

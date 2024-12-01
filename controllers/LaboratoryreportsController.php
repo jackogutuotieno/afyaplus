@@ -2,7 +2,6 @@
 
 namespace PHPMaker2024\afyaplus;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use PHPMaker2024\afyaplus\Attributes\Delete;
@@ -13,12 +12,22 @@ use PHPMaker2024\afyaplus\Attributes\Patch;
 use PHPMaker2024\afyaplus\Attributes\Post;
 use PHPMaker2024\afyaplus\Attributes\Put;
 
-class LaboratoryreportsController extends ControllerBase
+/**
+ * Laboratory_Reports controller
+ */
+class LaboratoryReportsController extends ControllerBase
 {
-    // list
-    #[Map(["GET","POST","OPTIONS"], "/laboratoryreportslist[/{id}]", [PermissionMiddleware::class], "list.laboratoryreports")]
-    public function list(Request $request, Response $response, array $args): Response
+    // summary
+    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports", [PermissionMiddleware::class], "summary.Laboratory_Reports")]
+    public function summary(Request $request, Response $response, array $args): Response
     {
-        return $this->runPage($request, $response, $args, "LaboratoryreportsList");
+        return $this->runPage($request, $response, $args, "LaboratoryReportsSummary");
+    }
+
+    // ReportbySubmissionMonth (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports/ReportbySubmissionMonth", [PermissionMiddleware::class], "summary.Laboratory_Reports.ReportbySubmissionMonth")]
+    public function ReportbySubmissionMonth(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "LaboratoryReportsSummary", "ReportbySubmissionMonth");
     }
 }

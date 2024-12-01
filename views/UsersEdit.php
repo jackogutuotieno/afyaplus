@@ -351,7 +351,7 @@ loadjs.ready(["fusersedit", "editor"], function() {
 <?php } ?>
 <?php if ($Page->user_role_id->Visible) { // user_role_id ?>
     <div id="r_user_role_id"<?= $Page->user_role_id->rowAttributes() ?>>
-        <label id="elh_users_user_role_id" for="x_user_role_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->user_role_id->caption() ?><?= $Page->user_role_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_users_user_role_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->user_role_id->caption() ?><?= $Page->user_role_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->user_role_id->cellAttributes() ?>>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
 <span id="el_users_user_role_id">
@@ -359,42 +359,28 @@ loadjs.ready(["fusersedit", "editor"], function() {
 </span>
 <?php } else { ?>
 <span id="el_users_user_role_id">
-    <select
-        id="x_user_role_id"
-        name="x_user_role_id"
-        class="form-select ew-select<?= $Page->user_role_id->isInvalidClass() ?>"
-        <?php if (!$Page->user_role_id->IsNativeSelect) { ?>
-        data-select2-id="fusersedit_x_user_role_id"
-        <?php } ?>
-        data-table="users"
-        data-field="x_user_role_id"
-        data-value-separator="<?= $Page->user_role_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->user_role_id->getPlaceHolder()) ?>"
-        <?= $Page->user_role_id->editAttributes() ?>>
-        <?= $Page->user_role_id->selectOptionListHtml("x_user_role_id") ?>
-    </select>
-    <?= $Page->user_role_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->user_role_id->getErrorMessage() ?></div>
-<?php if (!$Page->user_role_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fusersedit", function() {
-    var options = { name: "x_user_role_id", selectId: "fusersedit_x_user_role_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fusersedit.lists.user_role_id?.lookupOptions.length) {
-        options.data = { id: "x_user_role_id", form: "fusersedit" };
-    } else {
-        options.ajax = { id: "x_user_role_id", form: "fusersedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.users.fields.user_role_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
+<template id="tp_x_user_role_id">
+    <div class="form-check">
+        <input type="radio" class="form-check-input" data-table="users" data-field="x_user_role_id" name="x_user_role_id" id="x_user_role_id"<?= $Page->user_role_id->editAttributes() ?>>
+        <label class="form-check-label"></label>
+    </div>
+</template>
+<div id="dsl_x_user_role_id" class="ew-item-list"></div>
+<selection-list hidden
+    id="x_user_role_id"
+    name="x_user_role_id"
+    value="<?= HtmlEncode($Page->user_role_id->CurrentValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_user_role_id"
+    data-target="dsl_x_user_role_id"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->user_role_id->isInvalidClass() ?>"
+    data-table="users"
+    data-field="x_user_role_id"
+    data-value-separator="<?= $Page->user_role_id->displayValueSeparatorAttribute() ?>"
+    <?= $Page->user_role_id->editAttributes() ?>></selection-list>
+<?= $Page->user_role_id->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->user_role_id->getErrorMessage() ?></div>
 </span>
 <?php } ?>
 </div></div>

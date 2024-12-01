@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for Laboratory Reports
+ * Table class for laboratory_reports
  */
-class LaboratoryReports extends ReportTable
+class LaboratoryReports2 extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -32,8 +32,6 @@ class LaboratoryReports extends ReportTable
     public $RightColumnClass = "col-sm-10";
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
-    public $ShowGroupHeaderAsRow = false;
-    public $ShowCompactSummaryFooter = true;
 
     // Ajax / Modal
     public $UseAjaxActions = false;
@@ -46,7 +44,6 @@ class LaboratoryReports extends ReportTable
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
-    public $ReportbySubmissionMonth;
 
     // Fields
     public $id;
@@ -55,12 +52,11 @@ class LaboratoryReports extends ReportTable
     public $last_name;
     public $gender;
     public $date_of_birth;
-    public $patient_age_1;
+    public $p_age;
     public $specimen;
     public $service_name;
     public $date_created;
     public $date_updated;
-    public $p_age;
     public $report_month;
 
     // Page ID
@@ -74,14 +70,17 @@ class LaboratoryReports extends ReportTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "Laboratory_Reports";
-        $this->TableName = 'Laboratory Reports';
-        $this->TableType = "REPORT";
-        $this->TableReportType = "summary"; // Report Type
-        $this->ReportSourceTable = 'laboratory_reports2'; // Report source table
+        $this->TableVar = "laboratory_reports2";
+        $this->TableName = 'laboratory_reports';
+        $this->TableType = "VIEW";
+        $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
+        $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
+
+        // Update Table
+        $this->UpdateTable = "laboratory_reports";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
-        $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
+        $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
         $this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
@@ -95,10 +94,18 @@ class LaboratoryReports extends ReportTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
+        $this->DetailAdd = false; // Allow detail add
+        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailView = false; // Allow detail view
+        $this->ShowMultipleDetails = false; // Show multiple details
+        $this->GridAddRowCount = 5;
+        $this->AllowAddDeleteRow = true; // Allow add/delete row
+        $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
+        $this->BasicSearch = new BasicSearch($this);
 
         // id
-        $this->id = new ReportField(
+        $this->id = new DbField(
             $this, // Table
             'x_id', // Variable name
             'id', // Name
@@ -122,11 +129,10 @@ class LaboratoryReports extends ReportTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->id->SourceTableVar = 'laboratory_reports2';
         $this->Fields['id'] = &$this->id;
 
         // patient_id
-        $this->patient_id = new ReportField(
+        $this->patient_id = new DbField(
             $this, // Table
             'x_patient_id', // Variable name
             'patient_id', // Name
@@ -149,11 +155,10 @@ class LaboratoryReports extends ReportTable
         $this->patient_id->Required = true; // Required field
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->patient_id->SourceTableVar = 'laboratory_reports2';
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // first_name
-        $this->first_name = new ReportField(
+        $this->first_name = new DbField(
             $this, // Table
             'x_first_name', // Variable name
             'first_name', // Name
@@ -174,11 +179,10 @@ class LaboratoryReports extends ReportTable
         $this->first_name->Nullable = false; // NOT NULL field
         $this->first_name->Required = true; // Required field
         $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->first_name->SourceTableVar = 'laboratory_reports2';
         $this->Fields['first_name'] = &$this->first_name;
 
         // last_name
-        $this->last_name = new ReportField(
+        $this->last_name = new DbField(
             $this, // Table
             'x_last_name', // Variable name
             'last_name', // Name
@@ -199,11 +203,10 @@ class LaboratoryReports extends ReportTable
         $this->last_name->Nullable = false; // NOT NULL field
         $this->last_name->Required = true; // Required field
         $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->last_name->SourceTableVar = 'laboratory_reports2';
         $this->Fields['last_name'] = &$this->last_name;
 
         // gender
-        $this->gender = new ReportField(
+        $this->gender = new DbField(
             $this, // Table
             'x_gender', // Variable name
             'gender', // Name
@@ -224,11 +227,10 @@ class LaboratoryReports extends ReportTable
         $this->gender->Nullable = false; // NOT NULL field
         $this->gender->Required = true; // Required field
         $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->gender->SourceTableVar = 'laboratory_reports2';
         $this->Fields['gender'] = &$this->gender;
 
         // date_of_birth
-        $this->date_of_birth = new ReportField(
+        $this->date_of_birth = new DbField(
             $this, // Table
             'x_date_of_birth', // Variable name
             'date_of_birth', // Name
@@ -251,14 +253,13 @@ class LaboratoryReports extends ReportTable
         $this->date_of_birth->Required = true; // Required field
         $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_of_birth->SourceTableVar = 'laboratory_reports2';
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
 
-        // patient_age_1
-        $this->patient_age_1 = new ReportField(
+        // p_age
+        $this->p_age = new DbField(
             $this, // Table
-            'x_patient_age_1', // Variable name
-            'patient_age_1', // Name
+            'x_p_age', // Variable name
+            'p_age', // Name
             '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Expression
             '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Basic search expression
             20, // Type
@@ -272,16 +273,15 @@ class LaboratoryReports extends ReportTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->patient_age_1->InputTextType = "text";
-        $this->patient_age_1->Raw = true;
-        $this->patient_age_1->IsCustom = true; // Custom field
-        $this->patient_age_1->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_age_1->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->patient_age_1->SourceTableVar = 'laboratory_reports2';
-        $this->Fields['patient_age_1'] = &$this->patient_age_1;
+        $this->p_age->InputTextType = "text";
+        $this->p_age->Raw = true;
+        $this->p_age->IsCustom = true; // Custom field
+        $this->p_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->p_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['p_age'] = &$this->p_age;
 
         // specimen
-        $this->specimen = new ReportField(
+        $this->specimen = new DbField(
             $this, // Table
             'x_specimen', // Variable name
             'specimen', // Name
@@ -302,11 +302,10 @@ class LaboratoryReports extends ReportTable
         $this->specimen->Nullable = false; // NOT NULL field
         $this->specimen->Required = true; // Required field
         $this->specimen->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->specimen->SourceTableVar = 'laboratory_reports2';
         $this->Fields['specimen'] = &$this->specimen;
 
         // service_name
-        $this->service_name = new ReportField(
+        $this->service_name = new DbField(
             $this, // Table
             'x_service_name', // Variable name
             'service_name', // Name
@@ -327,11 +326,10 @@ class LaboratoryReports extends ReportTable
         $this->service_name->Nullable = false; // NOT NULL field
         $this->service_name->Required = true; // Required field
         $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->service_name->SourceTableVar = 'laboratory_reports2';
         $this->Fields['service_name'] = &$this->service_name;
 
         // date_created
-        $this->date_created = new ReportField(
+        $this->date_created = new DbField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
@@ -354,11 +352,10 @@ class LaboratoryReports extends ReportTable
         $this->date_created->Required = true; // Required field
         $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_created->SourceTableVar = 'laboratory_reports2';
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
-        $this->date_updated = new ReportField(
+        $this->date_updated = new DbField(
             $this, // Table
             'x_date_updated', // Variable name
             'date_updated', // Name
@@ -381,36 +378,10 @@ class LaboratoryReports extends ReportTable
         $this->date_updated->Required = true; // Required field
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_updated->SourceTableVar = 'laboratory_reports2';
         $this->Fields['date_updated'] = &$this->date_updated;
 
-        // p_age
-        $this->p_age = new ReportField(
-            $this, // Table
-            'x_p_age', // Variable name
-            'p_age', // Name
-            '`p_age`', // Expression
-            '`p_age`', // Basic search expression
-            20, // Type
-            21, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`p_age`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->p_age->InputTextType = "text";
-        $this->p_age->Raw = true;
-        $this->p_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->p_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->p_age->SourceTableVar = 'laboratory_reports2';
-        $this->Fields['p_age'] = &$this->p_age;
-
         // report_month
-        $this->report_month = new ReportField(
+        $this->report_month = new DbField(
             $this, // Table
             'x_report_month', // Variable name
             'report_month', // Name
@@ -429,39 +400,7 @@ class LaboratoryReports extends ReportTable
         );
         $this->report_month->InputTextType = "text";
         $this->report_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->report_month->SourceTableVar = 'laboratory_reports2';
         $this->Fields['report_month'] = &$this->report_month;
-
-        // Report by Submission Month
-        $this->ReportbySubmissionMonth = new DbChart($this, 'ReportbySubmissionMonth', 'Report by Submission Month', 'report_month', 'report_month', 1001, '', 0, 'COUNT', 600, 500);
-        $this->ReportbySubmissionMonth->Position = 4;
-        $this->ReportbySubmissionMonth->PageBreakType = "before";
-        $this->ReportbySubmissionMonth->YAxisFormat = [""];
-        $this->ReportbySubmissionMonth->YFieldFormat = [""];
-        $this->ReportbySubmissionMonth->SortType = 0;
-        $this->ReportbySubmissionMonth->SortSequence = "";
-        $this->ReportbySubmissionMonth->SqlSelect = $this->getQueryBuilder()->select("`report_month`", "''", "COUNT(`report_month`)");
-        $this->ReportbySubmissionMonth->SqlGroupBy = "`report_month`";
-        $this->ReportbySubmissionMonth->SqlOrderBy = "";
-        $this->ReportbySubmissionMonth->SeriesDateType = "";
-        $this->ReportbySubmissionMonth->ID = "Laboratory_Reports_ReportbySubmissionMonth"; // Chart ID
-        $this->ReportbySubmissionMonth->setParameters([
-            ["type", "1001"],
-            ["seriestype", "0"]
-        ]); // Chart type / Chart series type
-        $this->ReportbySubmissionMonth->setParameters([
-            ["caption", $this->ReportbySubmissionMonth->caption()],
-            ["xaxisname", $this->ReportbySubmissionMonth->xAxisName()]
-        ]); // Chart caption / X axis name
-        $this->ReportbySubmissionMonth->setParameter("yaxisname", $this->ReportbySubmissionMonth->yAxisName()); // Y axis name
-        $this->ReportbySubmissionMonth->setParameters([
-            ["shownames", "1"],
-            ["showvalues", "1"],
-            ["showhovercap", "1"]
-        ]); // Show names / Show values / Show hover
-        $this->ReportbySubmissionMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
-        $this->ReportbySubmissionMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
-        $this->Charts[$this->ReportbySubmissionMonth->ID] = &$this->ReportbySubmissionMonth;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -478,8 +417,19 @@ class LaboratoryReports extends ReportTable
         return $this->$fldParm->Visible; // Returns original value
     }
 
+    // Set left column class (must be predefined col-*-* classes of Bootstrap grid system)
+    public function setLeftColumnClass($class)
+    {
+        if (preg_match('/^col\-(\w+)\-(\d+)$/', $class, $match)) {
+            $this->LeftColumnClass = $class . " col-form-label ew-label";
+            $this->RightColumnClass = "col-" . $match[1] . "-" . strval(12 - (int)$match[2]);
+            $this->OffsetColumnClass = $this->RightColumnClass . " " . str_replace("col-", "offset-", $class);
+            $this->TableLeftColumnClass = preg_replace('/^col-\w+-(\d+)$/', "w-col-$1", $class); // Change to w-col-*
+        }
+    }
+
     // Single column sort
-    protected function updateSort(&$fld)
+    public function updateSort(&$fld)
     {
         if ($this->CurrentOrder == $fld->Name) {
             $sortField = $fld->Expression;
@@ -489,99 +439,25 @@ class LaboratoryReports extends ReportTable
             } else {
                 $curSort = $lastSort;
             }
-            $fld->setSort($curSort);
-            $lastOrderBy = in_array($lastSort, ["ASC", "DESC"]) ? $sortField . " " . $lastSort : "";
-            $curOrderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            if ($fld->GroupingFieldId == 0) {
-                $this->setDetailOrderBy($curOrderBy); // Save to Session
-            }
-        } else {
-            if ($fld->GroupingFieldId == 0) {
-                $fld->setSort("");
-            }
+            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
+            $this->setSessionOrderBy($orderBy); // Save to Session
         }
     }
 
-    // Get Sort SQL
-    protected function sortSql()
+    // Update field sort
+    public function updateFieldSort()
     {
-        $dtlSortSql = $this->getDetailOrderBy(); // Get ORDER BY for detail fields from session
-        $grps = [];
-        foreach ($this->Fields as $fld) {
-            if (in_array($fld->getSort(), ["ASC", "DESC"])) {
-                $fldsql = $fld->Expression;
-                if ($fld->GroupingFieldId > 0) {
-                    if ($fld->GroupSql != "") {
-                        $grps[$fld->GroupingFieldId] = str_replace("%s", $fldsql, $fld->GroupSql) . " " . $fld->getSort();
-                    } else {
-                        $grps[$fld->GroupingFieldId] = $fldsql . " " . $fld->getSort();
-                    }
+        $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
+        $flds = GetSortFields($orderBy);
+        foreach ($this->Fields as $field) {
+            $fldSort = "";
+            foreach ($flds as $fld) {
+                if ($fld[0] == $field->Expression || $fld[0] == $field->VirtualExpression) {
+                    $fldSort = $fld[1];
                 }
             }
+            $field->setSort($fldSort);
         }
-        $sortSql = implode(", ", array_values($grps));
-        if ($dtlSortSql != "") {
-            if ($sortSql != "") {
-                $sortSql .= ", ";
-            }
-            $sortSql .= $dtlSortSql;
-        }
-        return $sortSql;
-    }
-
-    // Summary properties
-    private $sqlSelectAggregate = null;
-    private $sqlAggregatePrefix = "";
-    private $sqlAggregateSuffix = "";
-    private $sqlSelectCount = null;
-
-    // Select Aggregate
-    public function getSqlSelectAggregate()
-    {
-        return $this->sqlSelectAggregate ?? $this->getQueryBuilder()->select("*");
-    }
-
-    public function setSqlSelectAggregate($v)
-    {
-        $this->sqlSelectAggregate = $v;
-    }
-
-    // Aggregate Prefix
-    public function getSqlAggregatePrefix()
-    {
-        return ($this->sqlAggregatePrefix != "") ? $this->sqlAggregatePrefix : "";
-    }
-
-    public function setSqlAggregatePrefix($v)
-    {
-        $this->sqlAggregatePrefix = $v;
-    }
-
-    // Aggregate Suffix
-    public function getSqlAggregateSuffix()
-    {
-        return ($this->sqlAggregateSuffix != "") ? $this->sqlAggregateSuffix : "";
-    }
-
-    public function setSqlAggregateSuffix($v)
-    {
-        $this->sqlAggregateSuffix = $v;
-    }
-
-    // Select Count
-    public function getSqlSelectCount()
-    {
-        return $this->sqlSelectCount ?? $this->getQueryBuilder()->select("COUNT(*)");
-    }
-
-    public function setSqlSelectCount($v)
-    {
-        $this->sqlSelectCount = $v;
-    }
-
-    // Render for lookup
-    public function renderLookup()
-    {
     }
 
     // Render X Axis for chart
@@ -609,19 +485,15 @@ class LaboratoryReports extends ReportTable
     }
 
     // Get SELECT clause
-    public function getSqlSelect()
+    public function getSqlSelect() // Select
     {
-        if ($this->SqlSelect) {
-            return $this->SqlSelect;
-        }
-        $select = $this->getQueryBuilder()->select($this->sqlSelectFields());
-        return $select;
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select($this->sqlSelectFields());
     }
 
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS p_age, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS `patient_age_1`";
+        return "*, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS `p_age`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -789,6 +661,272 @@ class LaboratoryReports extends ReportTable
         return $cnt;
     }
 
+    // Get SQL
+    public function getSql($where, $orderBy = "")
+    {
+        return $this->getSqlAsQueryBuilder($where, $orderBy)->getSQL();
+    }
+
+    // Get QueryBuilder
+    public function getSqlAsQueryBuilder($where, $orderBy = "")
+    {
+        return $this->buildSelectSql(
+            $this->getSqlSelect(),
+            $this->getSqlFrom(),
+            $this->getSqlWhere(),
+            $this->getSqlGroupBy(),
+            $this->getSqlHaving(),
+            $this->getSqlOrderBy(),
+            $where,
+            $orderBy
+        );
+    }
+
+    // Table SQL
+    public function getCurrentSql()
+    {
+        $filter = $this->CurrentFilter;
+        $filter = $this->applyUserIDFilters($filter);
+        $sort = $this->getSessionOrderBy();
+        return $this->getSql($filter, $sort);
+    }
+
+    /**
+     * Table SQL with List page filter
+     *
+     * @return QueryBuilder
+     */
+    public function getListSql()
+    {
+        $filter = $this->UseSessionForListSql ? $this->getSessionWhere() : "";
+        AddFilter($filter, $this->CurrentFilter);
+        $filter = $this->applyUserIDFilters($filter);
+        $this->recordsetSelecting($filter);
+        $select = $this->getSqlSelect();
+        $from = $this->getSqlFrom();
+        $sort = $this->UseSessionForListSql ? $this->getSessionOrderBy() : "";
+        $this->Sort = $sort;
+        return $this->buildSelectSql(
+            $select,
+            $from,
+            $this->getSqlWhere(),
+            $this->getSqlGroupBy(),
+            $this->getSqlHaving(),
+            $this->getSqlOrderBy(),
+            $filter,
+            $sort
+        );
+    }
+
+    // Get ORDER BY clause
+    public function getOrderBy()
+    {
+        $orderBy = $this->getSqlOrderBy();
+        $sort = $this->getSessionOrderBy();
+        if ($orderBy != "" && $sort != "") {
+            $orderBy .= ", " . $sort;
+        } elseif ($sort != "") {
+            $orderBy = $sort;
+        }
+        return $orderBy;
+    }
+
+    // Get record count based on filter (for detail record count in master table pages)
+    public function loadRecordCount($filter)
+    {
+        $origFilter = $this->CurrentFilter;
+        $this->CurrentFilter = $filter;
+        $this->recordsetSelecting($this->CurrentFilter);
+        $isCustomView = $this->TableType == "CUSTOMVIEW";
+        $select = $isCustomView ? $this->getSqlSelect() : $this->getQueryBuilder()->select("*");
+        $groupBy = $isCustomView ? $this->getSqlGroupBy() : "";
+        $having = $isCustomView ? $this->getSqlHaving() : "";
+        $sql = $this->buildSelectSql($select, $this->getSqlFrom(), $this->getSqlWhere(), $groupBy, $having, "", $this->CurrentFilter, "");
+        $cnt = $this->getRecordCount($sql);
+        $this->CurrentFilter = $origFilter;
+        return $cnt;
+    }
+
+    // Get record count (for current List page)
+    public function listRecordCount()
+    {
+        $filter = $this->getSessionWhere();
+        AddFilter($filter, $this->CurrentFilter);
+        $filter = $this->applyUserIDFilters($filter);
+        $this->recordsetSelecting($filter);
+        $isCustomView = $this->TableType == "CUSTOMVIEW";
+        $select = $isCustomView ? $this->getSqlSelect() : $this->getQueryBuilder()->select("*");
+        $groupBy = $isCustomView ? $this->getSqlGroupBy() : "";
+        $having = $isCustomView ? $this->getSqlHaving() : "";
+        $sql = $this->buildSelectSql($select, $this->getSqlFrom(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+        $cnt = $this->getRecordCount($sql);
+        return $cnt;
+    }
+
+    /**
+     * INSERT statement
+     *
+     * @param mixed $rs
+     * @return QueryBuilder
+     */
+    public function insertSql(&$rs)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder->insert($this->UpdateTable);
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($rs as $name => $value) {
+            if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom) {
+                continue;
+            }
+            $field = $this->Fields[$name];
+            $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
+            $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
+            $queryBuilder->setValue($field->Expression, $parm);
+        }
+        return $queryBuilder;
+    }
+
+    // Insert
+    public function insert(&$rs)
+    {
+        $conn = $this->getConnection();
+        try {
+            $queryBuilder = $this->insertSql($rs);
+            $result = $queryBuilder->executeStatement();
+            $this->DbErrorMessage = "";
+        } catch (\Exception $e) {
+            $result = false;
+            $this->DbErrorMessage = $e->getMessage();
+        }
+        if ($result) {
+            $this->id->setDbValue($conn->lastInsertId());
+            $rs['id'] = $this->id->DbValue;
+        }
+        return $result;
+    }
+
+    /**
+     * UPDATE statement
+     *
+     * @param array $rs Data to be updated
+     * @param string|array $where WHERE clause
+     * @param string $curfilter Filter
+     * @return QueryBuilder
+     */
+    public function updateSql(&$rs, $where = "", $curfilter = true)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder->update($this->UpdateTable);
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($rs as $name => $value) {
+            if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom || $this->Fields[$name]->IsAutoIncrement) {
+                continue;
+            }
+            $field = $this->Fields[$name];
+            $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
+            $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
+            $queryBuilder->set($field->Expression, $parm);
+        }
+        $filter = $curfilter ? $this->CurrentFilter : "";
+        if (is_array($where)) {
+            $where = $this->arrayToFilter($where);
+        }
+        AddFilter($filter, $where);
+        if ($filter != "") {
+            $queryBuilder->where($filter);
+        }
+        return $queryBuilder;
+    }
+
+    // Update
+    public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
+    {
+        // If no field is updated, execute may return 0. Treat as success
+        try {
+            $success = $this->updateSql($rs, $where, $curfilter)->executeStatement();
+            $success = $success > 0 ? $success : true;
+            $this->DbErrorMessage = "";
+        } catch (\Exception $e) {
+            $success = false;
+            $this->DbErrorMessage = $e->getMessage();
+        }
+
+        // Return auto increment field
+        if ($success) {
+            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
+                $rs['id'] = $this->id->CurrentValue;
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * DELETE statement
+     *
+     * @param array $rs Key values
+     * @param string|array $where WHERE clause
+     * @param string $curfilter Filter
+     * @return QueryBuilder
+     */
+    public function deleteSql(&$rs, $where = "", $curfilter = true)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder->delete($this->UpdateTable);
+        if (is_array($where)) {
+            $where = $this->arrayToFilter($where);
+        }
+        if ($rs) {
+            if (array_key_exists('id', $rs)) {
+                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
+            }
+        }
+        $filter = $curfilter ? $this->CurrentFilter : "";
+        AddFilter($filter, $where);
+        return $queryBuilder->where($filter != "" ? $filter : "0=1");
+    }
+
+    // Delete
+    public function delete(&$rs, $where = "", $curfilter = false)
+    {
+        $success = true;
+        if ($success) {
+            try {
+                $success = $this->deleteSql($rs, $where, $curfilter)->executeStatement();
+                $this->DbErrorMessage = "";
+            } catch (\Exception $e) {
+                $success = false;
+                $this->DbErrorMessage = $e->getMessage();
+            }
+        }
+        return $success;
+    }
+
+    // Load DbValue from result set or array
+    protected function loadDbValues($row)
+    {
+        if (!is_array($row)) {
+            return;
+        }
+        $this->id->DbValue = $row['id'];
+        $this->patient_id->DbValue = $row['patient_id'];
+        $this->first_name->DbValue = $row['first_name'];
+        $this->last_name->DbValue = $row['last_name'];
+        $this->gender->DbValue = $row['gender'];
+        $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->p_age->DbValue = $row['p_age'];
+        $this->specimen->DbValue = $row['specimen'];
+        $this->service_name->DbValue = $row['service_name'];
+        $this->date_created->DbValue = $row['date_created'];
+        $this->date_updated->DbValue = $row['date_updated'];
+        $this->report_month->DbValue = $row['report_month'];
+    }
+
+    // Delete uploaded files
+    public function deleteUploadedFiles($row)
+    {
+        $this->loadDbValues($row);
+    }
+
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
@@ -854,7 +992,7 @@ class LaboratoryReports extends ReportTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("");
+        return $_SESSION[$name] ?? GetUrl("laboratoryreports2list");
     }
 
     // Set return page URL
@@ -868,9 +1006,9 @@ class LaboratoryReports extends ReportTable
     {
         global $Language;
         return match ($pageName) {
-            "" => $Language->phrase("View"),
-            "" => $Language->phrase("Edit"),
-            "" => $Language->phrase("Add"),
+            "laboratoryreports2view" => $Language->phrase("View"),
+            "laboratoryreports2edit" => $Language->phrase("Edit"),
+            "laboratoryreports2add" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -878,13 +1016,20 @@ class LaboratoryReports extends ReportTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "laboratoryreports";
+        return "laboratoryreports2list";
     }
 
     // API page name
     public function getApiPageName($action)
     {
-        return "LaboratoryReportsSummary";
+        return match (strtolower($action)) {
+            Config("API_VIEW_ACTION") => "LaboratoryReports2View",
+            Config("API_ADD_ACTION") => "LaboratoryReports2Add",
+            Config("API_EDIT_ACTION") => "LaboratoryReports2Edit",
+            Config("API_DELETE_ACTION") => "LaboratoryReports2Delete",
+            Config("API_LIST_ACTION") => "LaboratoryReports2List",
+            default => ""
+        };
     }
 
     // Current URL
@@ -902,16 +1047,16 @@ class LaboratoryReports extends ReportTable
     // List URL
     public function getListUrl()
     {
-        return "";
+        return "laboratoryreports2list";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("", $parm);
+            $url = $this->keyUrl("laboratoryreports2view", $parm);
         } else {
-            $url = $this->keyUrl("", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("laboratoryreports2view", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -920,9 +1065,9 @@ class LaboratoryReports extends ReportTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "?" . $parm;
+            $url = "laboratoryreports2add?" . $parm;
         } else {
-            $url = "";
+            $url = "laboratoryreports2add";
         }
         return $this->addMasterUrl($url);
     }
@@ -930,28 +1075,28 @@ class LaboratoryReports extends ReportTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("", $parm);
+        $url = $this->keyUrl("laboratoryreports2edit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("", "action=edit");
+        $url = $this->keyUrl("laboratoryreports2list", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("", $parm);
+        $url = $this->keyUrl("laboratoryreports2add", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("", "action=copy");
+        $url = $this->keyUrl("laboratoryreports2list", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -961,7 +1106,7 @@ class LaboratoryReports extends ReportTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("", $parm);
+            return $this->keyUrl("laboratoryreports2delete", $parm);
         }
     }
 
@@ -1033,7 +1178,6 @@ class LaboratoryReports extends ReportTable
         global $DashboardReport;
         if (
             $this->CurrentAction || $this->isExport() ||
-            $this->DrillDown ||
             in_array($fld->Type, [128, 204, 205])
         ) { // Unsortable data type
                 return "";
@@ -1117,6 +1261,388 @@ class LaboratoryReports extends ReportTable
         return $conn->executeQuery($sql);
     }
 
+    // Load row values from record
+    public function loadListRowValues(&$rs)
+    {
+        if (is_array($rs)) {
+            $row = $rs;
+        } elseif ($rs && property_exists($rs, "fields")) { // Recordset
+            $row = $rs->fields;
+        } else {
+            return;
+        }
+        $this->id->setDbValue($row['id']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->first_name->setDbValue($row['first_name']);
+        $this->last_name->setDbValue($row['last_name']);
+        $this->gender->setDbValue($row['gender']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->p_age->setDbValue($row['p_age']);
+        $this->specimen->setDbValue($row['specimen']);
+        $this->service_name->setDbValue($row['service_name']);
+        $this->date_created->setDbValue($row['date_created']);
+        $this->date_updated->setDbValue($row['date_updated']);
+        $this->report_month->setDbValue($row['report_month']);
+    }
+
+    // Render list content
+    public function renderListContent($filter)
+    {
+        global $Response;
+        $listPage = "LaboratoryReports2List";
+        $listClass = PROJECT_NAMESPACE . $listPage;
+        $page = new $listClass();
+        $page->loadRecordsetFromFilter($filter);
+        $view = Container("app.view");
+        $template = $listPage . ".php"; // View
+        $GLOBALS["Title"] ??= $page->Title; // Title
+        try {
+            $Response = $view->render($Response, $template, $GLOBALS);
+        } finally {
+            $page->terminate(); // Terminate page and clean up
+        }
+    }
+
+    // Render list row values
+    public function renderListRow()
+    {
+        global $Security, $CurrentLanguage, $Language;
+
+        // Call Row Rendering event
+        $this->rowRendering();
+
+        // Common render codes
+
+        // id
+
+        // patient_id
+
+        // first_name
+
+        // last_name
+
+        // gender
+
+        // date_of_birth
+
+        // p_age
+
+        // specimen
+
+        // service_name
+
+        // date_created
+
+        // date_updated
+
+        // report_month
+
+        // id
+        $this->id->ViewValue = $this->id->CurrentValue;
+
+        // patient_id
+        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+
+        // first_name
+        $this->first_name->ViewValue = $this->first_name->CurrentValue;
+
+        // last_name
+        $this->last_name->ViewValue = $this->last_name->CurrentValue;
+
+        // gender
+        $this->gender->ViewValue = $this->gender->CurrentValue;
+
+        // date_of_birth
+        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+        // p_age
+        $this->p_age->ViewValue = $this->p_age->CurrentValue;
+        $this->p_age->ViewValue = FormatNumber($this->p_age->ViewValue, $this->p_age->formatPattern());
+
+        // specimen
+        $this->specimen->ViewValue = $this->specimen->CurrentValue;
+
+        // service_name
+        $this->service_name->ViewValue = $this->service_name->CurrentValue;
+
+        // date_created
+        $this->date_created->ViewValue = $this->date_created->CurrentValue;
+        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+
+        // date_updated
+        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+        // report_month
+        $this->report_month->ViewValue = $this->report_month->CurrentValue;
+
+        // id
+        $this->id->HrefValue = "";
+        $this->id->TooltipValue = "";
+
+        // patient_id
+        $this->patient_id->HrefValue = "";
+        $this->patient_id->TooltipValue = "";
+
+        // first_name
+        $this->first_name->HrefValue = "";
+        $this->first_name->TooltipValue = "";
+
+        // last_name
+        $this->last_name->HrefValue = "";
+        $this->last_name->TooltipValue = "";
+
+        // gender
+        $this->gender->HrefValue = "";
+        $this->gender->TooltipValue = "";
+
+        // date_of_birth
+        $this->date_of_birth->HrefValue = "";
+        $this->date_of_birth->TooltipValue = "";
+
+        // p_age
+        $this->p_age->HrefValue = "";
+        $this->p_age->TooltipValue = "";
+
+        // specimen
+        $this->specimen->HrefValue = "";
+        $this->specimen->TooltipValue = "";
+
+        // service_name
+        $this->service_name->HrefValue = "";
+        $this->service_name->TooltipValue = "";
+
+        // date_created
+        $this->date_created->HrefValue = "";
+        $this->date_created->TooltipValue = "";
+
+        // date_updated
+        $this->date_updated->HrefValue = "";
+        $this->date_updated->TooltipValue = "";
+
+        // report_month
+        $this->report_month->HrefValue = "";
+        $this->report_month->TooltipValue = "";
+
+        // Call Row Rendered event
+        $this->rowRendered();
+
+        // Save data for Custom Template
+        $this->Rows[] = $this->customTemplateFieldValues();
+    }
+
+    // Render edit row values
+    public function renderEditRow()
+    {
+        global $Security, $CurrentLanguage, $Language;
+
+        // Call Row Rendering event
+        $this->rowRendering();
+
+        // id
+        $this->id->setupEditAttributes();
+        $this->id->EditValue = $this->id->CurrentValue;
+
+        // patient_id
+        $this->patient_id->setupEditAttributes();
+        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+        }
+
+        // first_name
+        $this->first_name->setupEditAttributes();
+        if (!$this->first_name->Raw) {
+            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
+        }
+        $this->first_name->EditValue = $this->first_name->CurrentValue;
+        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
+
+        // last_name
+        $this->last_name->setupEditAttributes();
+        if (!$this->last_name->Raw) {
+            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
+        }
+        $this->last_name->EditValue = $this->last_name->CurrentValue;
+        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
+
+        // gender
+        $this->gender->setupEditAttributes();
+        if (!$this->gender->Raw) {
+            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
+        }
+        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
+
+        // date_of_birth
+        $this->date_of_birth->setupEditAttributes();
+        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
+        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
+
+        // p_age
+        $this->p_age->setupEditAttributes();
+        $this->p_age->EditValue = $this->p_age->CurrentValue;
+        $this->p_age->PlaceHolder = RemoveHtml($this->p_age->caption());
+        if (strval($this->p_age->EditValue) != "" && is_numeric($this->p_age->EditValue)) {
+            $this->p_age->EditValue = FormatNumber($this->p_age->EditValue, null);
+        }
+
+        // specimen
+        $this->specimen->setupEditAttributes();
+        if (!$this->specimen->Raw) {
+            $this->specimen->CurrentValue = HtmlDecode($this->specimen->CurrentValue);
+        }
+        $this->specimen->EditValue = $this->specimen->CurrentValue;
+        $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
+
+        // service_name
+        $this->service_name->setupEditAttributes();
+        if (!$this->service_name->Raw) {
+            $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
+        }
+        $this->service_name->EditValue = $this->service_name->CurrentValue;
+        $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
+
+        // date_created
+        $this->date_created->setupEditAttributes();
+        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+        // date_updated
+        $this->date_updated->setupEditAttributes();
+        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+        // report_month
+        $this->report_month->setupEditAttributes();
+        if (!$this->report_month->Raw) {
+            $this->report_month->CurrentValue = HtmlDecode($this->report_month->CurrentValue);
+        }
+        $this->report_month->EditValue = $this->report_month->CurrentValue;
+        $this->report_month->PlaceHolder = RemoveHtml($this->report_month->caption());
+
+        // Call Row Rendered event
+        $this->rowRendered();
+    }
+
+    // Aggregate list row values
+    public function aggregateListRowValues()
+    {
+    }
+
+    // Aggregate list row (for rendering)
+    public function aggregateListRow()
+    {
+        // Call Row Rendered event
+        $this->rowRendered();
+    }
+
+    // Export data in HTML/CSV/Word/Excel/Email/PDF format
+    public function exportDocument($doc, $result, $startRec = 1, $stopRec = 1, $exportPageType = "")
+    {
+        if (!$result || !$doc) {
+            return;
+        }
+        if (!$doc->ExportCustom) {
+            // Write header
+            $doc->exportTableHeader();
+            if ($doc->Horizontal) { // Horizontal format, write header
+                $doc->beginExportRow();
+                if ($exportPageType == "view") {
+                    $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->p_age);
+                    $doc->exportCaption($this->specimen);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->date_created);
+                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->report_month);
+                } else {
+                    $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->p_age);
+                    $doc->exportCaption($this->specimen);
+                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->date_created);
+                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->report_month);
+                }
+                $doc->endExportRow();
+            }
+        }
+        $recCnt = $startRec - 1;
+        $stopRec = $stopRec > 0 ? $stopRec : PHP_INT_MAX;
+        while (($row = $result->fetch()) && $recCnt < $stopRec) {
+            $recCnt++;
+            if ($recCnt >= $startRec) {
+                $rowCnt = $recCnt - $startRec + 1;
+
+                // Page break
+                if ($this->ExportPageBreakCount > 0) {
+                    if ($rowCnt > 1 && ($rowCnt - 1) % $this->ExportPageBreakCount == 0) {
+                        $doc->exportPageBreak();
+                    }
+                }
+                $this->loadListRowValues($row);
+
+                // Render row
+                $this->RowType = RowType::VIEW; // Render view
+                $this->resetAttributes();
+                $this->renderListRow();
+                if (!$doc->ExportCustom) {
+                    $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
+                    if ($exportPageType == "view") {
+                        $doc->exportField($this->id);
+                        $doc->exportField($this->patient_id);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->p_age);
+                        $doc->exportField($this->specimen);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->date_created);
+                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->report_month);
+                    } else {
+                        $doc->exportField($this->id);
+                        $doc->exportField($this->patient_id);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->p_age);
+                        $doc->exportField($this->specimen);
+                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->date_created);
+                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->report_month);
+                    }
+                    $doc->endExportRow($rowCnt);
+                }
+            }
+
+            // Call Row Export server event
+            if ($doc->ExportCustom) {
+                $this->rowExport($doc, $row);
+            }
+        }
+        if (!$doc->ExportCustom) {
+            $doc->exportTableFooter();
+        }
+    }
+
     // Get file data
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
@@ -1132,6 +1658,121 @@ class LaboratoryReports extends ReportTable
     public function tableLoad()
     {
         // Enter your code here
+    }
+
+    // Recordset Selecting event
+    public function recordsetSelecting(&$filter)
+    {
+        // Enter your code here
+    }
+
+    // Recordset Selected event
+    public function recordsetSelected($rs)
+    {
+        //Log("Recordset Selected");
+    }
+
+    // Recordset Search Validated event
+    public function recordsetSearchValidated()
+    {
+        // Example:
+        //$this->MyField1->AdvancedSearch->SearchValue = "your search criteria"; // Search value
+    }
+
+    // Recordset Searching event
+    public function recordsetSearching(&$filter)
+    {
+        // Enter your code here
+    }
+
+    // Row_Selecting event
+    public function rowSelecting(&$filter)
+    {
+        // Enter your code here
+    }
+
+    // Row Selected event
+    public function rowSelected(&$rs)
+    {
+        //Log("Row Selected");
+    }
+
+    // Row Inserting event
+    public function rowInserting($rsold, &$rsnew)
+    {
+        // Enter your code here
+        // To cancel, set return value to false
+        return true;
+    }
+
+    // Row Inserted event
+    public function rowInserted($rsold, $rsnew)
+    {
+        //Log("Row Inserted");
+    }
+
+    // Row Updating event
+    public function rowUpdating($rsold, &$rsnew)
+    {
+        // Enter your code here
+        // To cancel, set return value to false
+        return true;
+    }
+
+    // Row Updated event
+    public function rowUpdated($rsold, $rsnew)
+    {
+        //Log("Row Updated");
+    }
+
+    // Row Update Conflict event
+    public function rowUpdateConflict($rsold, &$rsnew)
+    {
+        // Enter your code here
+        // To ignore conflict, set return value to false
+        return true;
+    }
+
+    // Grid Inserting event
+    public function gridInserting()
+    {
+        // Enter your code here
+        // To reject grid insert, set return value to false
+        return true;
+    }
+
+    // Grid Inserted event
+    public function gridInserted($rsnew)
+    {
+        //Log("Grid Inserted");
+    }
+
+    // Grid Updating event
+    public function gridUpdating($rsold)
+    {
+        // Enter your code here
+        // To reject grid update, set return value to false
+        return true;
+    }
+
+    // Grid Updated event
+    public function gridUpdated($rsold, $rsnew)
+    {
+        //Log("Grid Updated");
+    }
+
+    // Row Deleting event
+    public function rowDeleting(&$rs)
+    {
+        // Enter your code here
+        // To cancel, set return value to False
+        return true;
+    }
+
+    // Row Deleted event
+    public function rowDeleted($rs)
+    {
+        //Log("Row Deleted");
     }
 
     // Email Sending event

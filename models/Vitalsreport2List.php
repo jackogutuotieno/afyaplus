@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class LaboratoryReportsList extends LaboratoryReports
+class Vitalsreport2List extends Vitalsreport2
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class LaboratoryReportsList extends LaboratoryReports
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LaboratoryReportsList";
+    public $PageObjName = "Vitalsreport2List";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class LaboratoryReportsList extends LaboratoryReports
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "flaboratory_reportslist";
+    public $FormName = "fvitalsreport2list";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "laboratoryreportslist";
+    public $CurrentPageName = "vitalsreport2list";
 
     // Page URLs
     public $AddUrl;
@@ -146,16 +146,15 @@ class LaboratoryReportsList extends LaboratoryReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->Visible = false;
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
-        $this->gender->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->p_age->setVisibility();
-        $this->specimen->setVisibility();
-        $this->service_name->setVisibility();
+        $this->height->setVisibility();
+        $this->weight->setVisibility();
+        $this->temperature->setVisibility();
+        $this->pulse->setVisibility();
+        $this->blood_pressure->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->patient_name->setVisibility();
+        $this->nurse->setVisibility();
     }
 
     // Constructor
@@ -166,8 +165,8 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'laboratory_reports';
-        $this->TableName = 'laboratory_reports';
+        $this->TableVar = 'vitalsreport2';
+        $this->TableName = 'vitalsreport';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -187,26 +186,26 @@ class LaboratoryReportsList extends LaboratoryReports
         // Language object
         $Language = Container("app.language");
 
-        // Table object (laboratory_reports)
-        if (!isset($GLOBALS["laboratory_reports"]) || $GLOBALS["laboratory_reports"]::class == PROJECT_NAMESPACE . "laboratory_reports") {
-            $GLOBALS["laboratory_reports"] = &$this;
+        // Table object (vitalsreport2)
+        if (!isset($GLOBALS["vitalsreport2"]) || $GLOBALS["vitalsreport2"]::class == PROJECT_NAMESPACE . "vitalsreport2") {
+            $GLOBALS["vitalsreport2"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "laboratoryreportsadd";
+        $this->AddUrl = "vitalsreport2add";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "laboratoryreportsdelete";
-        $this->MultiUpdateUrl = "laboratoryreportsupdate";
+        $this->MultiDeleteUrl = "vitalsreport2delete";
+        $this->MultiUpdateUrl = "vitalsreport2update";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'laboratory_reports');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'vitalsreport');
         }
 
         // Start timer
@@ -357,7 +356,7 @@ class LaboratoryReportsList extends LaboratoryReports
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "laboratoryreportsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "vitalsreport2view"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -448,7 +447,6 @@ class LaboratoryReportsList extends LaboratoryReports
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -460,9 +458,6 @@ class LaboratoryReportsList extends LaboratoryReports
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -713,7 +708,7 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "flaboratory_reportsgrid";
+            $this->FormName = "fvitalsreport2grid";
         }
 
         // Set up page action
@@ -1050,19 +1045,18 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("flaboratory_reportssrch");
+            $savedFilterList = Profile()->getSearchFilters("fvitalsreport2srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
-        $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
-        $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
-        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
-        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
-        $filterList = Concat($filterList, $this->p_age->AdvancedSearch->toJson(), ","); // Field p_age
-        $filterList = Concat($filterList, $this->specimen->AdvancedSearch->toJson(), ","); // Field specimen
-        $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
+        $filterList = Concat($filterList, $this->height->AdvancedSearch->toJson(), ","); // Field height
+        $filterList = Concat($filterList, $this->weight->AdvancedSearch->toJson(), ","); // Field weight
+        $filterList = Concat($filterList, $this->temperature->AdvancedSearch->toJson(), ","); // Field temperature
+        $filterList = Concat($filterList, $this->pulse->AdvancedSearch->toJson(), ","); // Field pulse
+        $filterList = Concat($filterList, $this->blood_pressure->AdvancedSearch->toJson(), ","); // Field blood_pressure
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
+        $filterList = Concat($filterList, $this->nurse->AdvancedSearch->toJson(), ","); // Field nurse
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1083,7 +1077,7 @@ class LaboratoryReportsList extends LaboratoryReports
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("flaboratory_reportssrch", $filters);
+            Profile()->setSearchFilters("fvitalsreport2srch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1110,69 +1104,45 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field patient_id
-        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
-        $this->patient_id->AdvancedSearch->save();
+        // Field height
+        $this->height->AdvancedSearch->SearchValue = @$filter["x_height"];
+        $this->height->AdvancedSearch->SearchOperator = @$filter["z_height"];
+        $this->height->AdvancedSearch->SearchCondition = @$filter["v_height"];
+        $this->height->AdvancedSearch->SearchValue2 = @$filter["y_height"];
+        $this->height->AdvancedSearch->SearchOperator2 = @$filter["w_height"];
+        $this->height->AdvancedSearch->save();
 
-        // Field first_name
-        $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator = @$filter["z_first_name"];
-        $this->first_name->AdvancedSearch->SearchCondition = @$filter["v_first_name"];
-        $this->first_name->AdvancedSearch->SearchValue2 = @$filter["y_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator2 = @$filter["w_first_name"];
-        $this->first_name->AdvancedSearch->save();
+        // Field weight
+        $this->weight->AdvancedSearch->SearchValue = @$filter["x_weight"];
+        $this->weight->AdvancedSearch->SearchOperator = @$filter["z_weight"];
+        $this->weight->AdvancedSearch->SearchCondition = @$filter["v_weight"];
+        $this->weight->AdvancedSearch->SearchValue2 = @$filter["y_weight"];
+        $this->weight->AdvancedSearch->SearchOperator2 = @$filter["w_weight"];
+        $this->weight->AdvancedSearch->save();
 
-        // Field last_name
-        $this->last_name->AdvancedSearch->SearchValue = @$filter["x_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator = @$filter["z_last_name"];
-        $this->last_name->AdvancedSearch->SearchCondition = @$filter["v_last_name"];
-        $this->last_name->AdvancedSearch->SearchValue2 = @$filter["y_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator2 = @$filter["w_last_name"];
-        $this->last_name->AdvancedSearch->save();
+        // Field temperature
+        $this->temperature->AdvancedSearch->SearchValue = @$filter["x_temperature"];
+        $this->temperature->AdvancedSearch->SearchOperator = @$filter["z_temperature"];
+        $this->temperature->AdvancedSearch->SearchCondition = @$filter["v_temperature"];
+        $this->temperature->AdvancedSearch->SearchValue2 = @$filter["y_temperature"];
+        $this->temperature->AdvancedSearch->SearchOperator2 = @$filter["w_temperature"];
+        $this->temperature->AdvancedSearch->save();
 
-        // Field gender
-        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
-        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
-        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
-        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
-        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
-        $this->gender->AdvancedSearch->save();
+        // Field pulse
+        $this->pulse->AdvancedSearch->SearchValue = @$filter["x_pulse"];
+        $this->pulse->AdvancedSearch->SearchOperator = @$filter["z_pulse"];
+        $this->pulse->AdvancedSearch->SearchCondition = @$filter["v_pulse"];
+        $this->pulse->AdvancedSearch->SearchValue2 = @$filter["y_pulse"];
+        $this->pulse->AdvancedSearch->SearchOperator2 = @$filter["w_pulse"];
+        $this->pulse->AdvancedSearch->save();
 
-        // Field date_of_birth
-        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->save();
-
-        // Field p_age
-        $this->p_age->AdvancedSearch->SearchValue = @$filter["x_p_age"];
-        $this->p_age->AdvancedSearch->SearchOperator = @$filter["z_p_age"];
-        $this->p_age->AdvancedSearch->SearchCondition = @$filter["v_p_age"];
-        $this->p_age->AdvancedSearch->SearchValue2 = @$filter["y_p_age"];
-        $this->p_age->AdvancedSearch->SearchOperator2 = @$filter["w_p_age"];
-        $this->p_age->AdvancedSearch->save();
-
-        // Field specimen
-        $this->specimen->AdvancedSearch->SearchValue = @$filter["x_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator = @$filter["z_specimen"];
-        $this->specimen->AdvancedSearch->SearchCondition = @$filter["v_specimen"];
-        $this->specimen->AdvancedSearch->SearchValue2 = @$filter["y_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator2 = @$filter["w_specimen"];
-        $this->specimen->AdvancedSearch->save();
-
-        // Field service_name
-        $this->service_name->AdvancedSearch->SearchValue = @$filter["x_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator = @$filter["z_service_name"];
-        $this->service_name->AdvancedSearch->SearchCondition = @$filter["v_service_name"];
-        $this->service_name->AdvancedSearch->SearchValue2 = @$filter["y_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator2 = @$filter["w_service_name"];
-        $this->service_name->AdvancedSearch->save();
+        // Field blood_pressure
+        $this->blood_pressure->AdvancedSearch->SearchValue = @$filter["x_blood_pressure"];
+        $this->blood_pressure->AdvancedSearch->SearchOperator = @$filter["z_blood_pressure"];
+        $this->blood_pressure->AdvancedSearch->SearchCondition = @$filter["v_blood_pressure"];
+        $this->blood_pressure->AdvancedSearch->SearchValue2 = @$filter["y_blood_pressure"];
+        $this->blood_pressure->AdvancedSearch->SearchOperator2 = @$filter["w_blood_pressure"];
+        $this->blood_pressure->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1189,6 +1159,22 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
+
+        // Field patient_name
+        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
+        $this->patient_name->AdvancedSearch->save();
+
+        // Field nurse
+        $this->nurse->AdvancedSearch->SearchValue = @$filter["x_nurse"];
+        $this->nurse->AdvancedSearch->SearchOperator = @$filter["z_nurse"];
+        $this->nurse->AdvancedSearch->SearchCondition = @$filter["v_nurse"];
+        $this->nurse->AdvancedSearch->SearchValue2 = @$filter["y_nurse"];
+        $this->nurse->AdvancedSearch->SearchOperator2 = @$filter["w_nurse"];
+        $this->nurse->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1228,11 +1214,9 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->first_name;
-        $searchFlds[] = &$this->last_name;
-        $searchFlds[] = &$this->gender;
-        $searchFlds[] = &$this->specimen;
-        $searchFlds[] = &$this->service_name;
+        $searchFlds[] = &$this->blood_pressure;
+        $searchFlds[] = &$this->patient_name;
+        $searchFlds[] = &$this->nurse;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1312,15 +1296,15 @@ class LaboratoryReportsList extends LaboratoryReports
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
-            $this->updateSort($this->gender); // gender
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->p_age); // p_age
-            $this->updateSort($this->specimen); // specimen
-            $this->updateSort($this->service_name); // service_name
+            $this->updateSort($this->height); // height
+            $this->updateSort($this->weight); // weight
+            $this->updateSort($this->temperature); // temperature
+            $this->updateSort($this->pulse); // pulse
+            $this->updateSort($this->blood_pressure); // blood_pressure
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
+            $this->updateSort($this->patient_name); // patient_name
+            $this->updateSort($this->nurse); // nurse
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1346,16 +1330,15 @@ class LaboratoryReportsList extends LaboratoryReports
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->patient_id->setSort("");
-                $this->first_name->setSort("");
-                $this->last_name->setSort("");
-                $this->gender->setSort("");
-                $this->date_of_birth->setSort("");
-                $this->p_age->setSort("");
-                $this->specimen->setSort("");
-                $this->service_name->setSort("");
+                $this->height->setSort("");
+                $this->weight->setSort("");
+                $this->temperature->setSort("");
+                $this->pulse->setSort("");
+                $this->blood_pressure->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
+                $this->patient_name->setSort("");
+                $this->nurse->setSort("");
             }
 
             // Reset start position
@@ -1451,12 +1434,12 @@ class LaboratoryReportsList extends LaboratoryReports
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reportslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fvitalsreport2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reportslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fvitalsreport2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1474,7 +1457,6 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1502,15 +1484,15 @@ class LaboratoryReportsList extends LaboratoryReports
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "first_name");
-            $this->createColumnOption($option, "last_name");
-            $this->createColumnOption($option, "gender");
-            $this->createColumnOption($option, "date_of_birth");
-            $this->createColumnOption($option, "p_age");
-            $this->createColumnOption($option, "specimen");
-            $this->createColumnOption($option, "service_name");
+            $this->createColumnOption($option, "height");
+            $this->createColumnOption($option, "weight");
+            $this->createColumnOption($option, "temperature");
+            $this->createColumnOption($option, "pulse");
+            $this->createColumnOption($option, "blood_pressure");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
+            $this->createColumnOption($option, "patient_name");
+            $this->createColumnOption($option, "nurse");
         }
 
         // Set up custom actions
@@ -1535,10 +1517,10 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"flaboratory_reportssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fvitalsreport2srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"flaboratory_reportssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fvitalsreport2srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1598,7 +1580,7 @@ class LaboratoryReportsList extends LaboratoryReports
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flaboratory_reportslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fvitalsreport2list"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1769,7 +1751,7 @@ class LaboratoryReportsList extends LaboratoryReports
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_reports", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_vitalsreport2", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1830,7 +1812,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_laboratory_reports",
+            "id" => "r" . $this->RowCount . "_vitalsreport2",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1950,16 +1932,15 @@ class LaboratoryReportsList extends LaboratoryReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->gender->setDbValue($row['gender']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->p_age->setDbValue($row['p_age']);
-        $this->specimen->setDbValue($row['specimen']);
-        $this->service_name->setDbValue($row['service_name']);
+        $this->height->setDbValue($row['height']);
+        $this->weight->setDbValue($row['weight']);
+        $this->temperature->setDbValue($row['temperature']);
+        $this->pulse->setDbValue($row['pulse']);
+        $this->blood_pressure->setDbValue($row['blood_pressure']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->nurse->setDbValue($row['nurse']);
     }
 
     // Return a row with default values
@@ -1967,34 +1948,21 @@ class LaboratoryReportsList extends LaboratoryReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
-        $row['gender'] = $this->gender->DefaultValue;
-        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
-        $row['p_age'] = $this->p_age->DefaultValue;
-        $row['specimen'] = $this->specimen->DefaultValue;
-        $row['service_name'] = $this->service_name->DefaultValue;
+        $row['height'] = $this->height->DefaultValue;
+        $row['weight'] = $this->weight->DefaultValue;
+        $row['temperature'] = $this->temperature->DefaultValue;
+        $row['pulse'] = $this->pulse->DefaultValue;
+        $row['blood_pressure'] = $this->blood_pressure->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['nurse'] = $this->nurse->DefaultValue;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        // Load old record
-        if ($this->OldKey != "") {
-            $this->setKey($this->OldKey);
-            $this->CurrentFilter = $this->getRecordFilter();
-            $sql = $this->getCurrentSql();
-            $conn = $this->getConnection();
-            $rs = ExecuteQuery($sql, $conn);
-            if ($row = $rs->fetch()) {
-                $this->loadRowValues($row); // Load row values
-                return $row;
-            }
-        }
         $this->loadRowValues(); // Load default row values
         return null;
     }
@@ -2019,57 +1987,48 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // id
 
-        // patient_id
+        // height
 
-        // first_name
+        // weight
 
-        // last_name
+        // temperature
 
-        // gender
+        // pulse
 
-        // date_of_birth
-
-        // p_age
-
-        // specimen
-
-        // service_name
+        // blood_pressure
 
         // date_created
 
         // date_updated
 
+        // patient_name
+
+        // nurse
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
-            // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            // height
+            $this->height->ViewValue = $this->height->CurrentValue;
+            $this->height->ViewValue = FormatNumber($this->height->ViewValue, $this->height->formatPattern());
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
+            // weight
+            $this->weight->ViewValue = $this->weight->CurrentValue;
+            $this->weight->ViewValue = FormatNumber($this->weight->ViewValue, $this->weight->formatPattern());
 
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // temperature
+            $this->temperature->ViewValue = $this->temperature->CurrentValue;
+            $this->temperature->ViewValue = FormatNumber($this->temperature->ViewValue, $this->temperature->formatPattern());
 
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
+            // pulse
+            $this->pulse->ViewValue = $this->pulse->CurrentValue;
+            $this->pulse->ViewValue = FormatNumber($this->pulse->ViewValue, $this->pulse->formatPattern());
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-
-            // p_age
-            $this->p_age->ViewValue = $this->p_age->CurrentValue;
-            $this->p_age->ViewValue = FormatNumber($this->p_age->ViewValue, $this->p_age->formatPattern());
-
-            // specimen
-            $this->specimen->ViewValue = $this->specimen->CurrentValue;
-
-            // service_name
-            $this->service_name->ViewValue = $this->service_name->CurrentValue;
+            // blood_pressure
+            $this->blood_pressure->ViewValue = $this->blood_pressure->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2079,37 +2038,35 @@ class LaboratoryReportsList extends LaboratoryReports
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // nurse
+            $this->nurse->ViewValue = $this->nurse->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
+            // height
+            $this->height->HrefValue = "";
+            $this->height->TooltipValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // weight
+            $this->weight->HrefValue = "";
+            $this->weight->TooltipValue = "";
 
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // temperature
+            $this->temperature->HrefValue = "";
+            $this->temperature->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // pulse
+            $this->pulse->HrefValue = "";
+            $this->pulse->TooltipValue = "";
 
-            // p_age
-            $this->p_age->HrefValue = "";
-            $this->p_age->TooltipValue = "";
-
-            // specimen
-            $this->specimen->HrefValue = "";
-            $this->specimen->TooltipValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-            $this->service_name->TooltipValue = "";
+            // blood_pressure
+            $this->blood_pressure->HrefValue = "";
+            $this->blood_pressure->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2118,6 +2075,14 @@ class LaboratoryReportsList extends LaboratoryReports
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
+
+            // nurse
+            $this->nurse->HrefValue = "";
+            $this->nurse->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2138,19 +2103,19 @@ class LaboratoryReportsList extends LaboratoryReports
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fvitalsreport2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fvitalsreport2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fvitalsreport2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2162,7 +2127,7 @@ class LaboratoryReportsList extends LaboratoryReports
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="flaboratory_reportslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fvitalsreport2list" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2240,7 +2205,7 @@ class LaboratoryReportsList extends LaboratoryReports
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"flaboratory_reportssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fvitalsreport2srch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button

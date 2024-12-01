@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class LaboratoryReportsList extends LaboratoryReports
+class LaboratoryReports2List extends LaboratoryReports2
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class LaboratoryReportsList extends LaboratoryReports
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LaboratoryReportsList";
+    public $PageObjName = "LaboratoryReports2List";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class LaboratoryReportsList extends LaboratoryReports
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "flaboratory_reportslist";
+    public $FormName = "flaboratory_reports2list";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "laboratoryreportslist";
+    public $CurrentPageName = "laboratoryreports2list";
 
     // Page URLs
     public $AddUrl;
@@ -156,6 +156,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->service_name->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->report_month->setVisibility();
     }
 
     // Constructor
@@ -166,7 +167,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'laboratory_reports';
+        $this->TableVar = 'laboratory_reports2';
         $this->TableName = 'laboratory_reports';
 
         // Table CSS class
@@ -187,22 +188,22 @@ class LaboratoryReportsList extends LaboratoryReports
         // Language object
         $Language = Container("app.language");
 
-        // Table object (laboratory_reports)
-        if (!isset($GLOBALS["laboratory_reports"]) || $GLOBALS["laboratory_reports"]::class == PROJECT_NAMESPACE . "laboratory_reports") {
-            $GLOBALS["laboratory_reports"] = &$this;
+        // Table object (laboratory_reports2)
+        if (!isset($GLOBALS["laboratory_reports2"]) || $GLOBALS["laboratory_reports2"]::class == PROJECT_NAMESPACE . "laboratory_reports2") {
+            $GLOBALS["laboratory_reports2"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "laboratoryreportsadd";
+        $this->AddUrl = "laboratoryreports2add";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "laboratoryreportsdelete";
-        $this->MultiUpdateUrl = "laboratoryreportsupdate";
+        $this->MultiDeleteUrl = "laboratoryreports2delete";
+        $this->MultiUpdateUrl = "laboratoryreports2update";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -357,7 +358,7 @@ class LaboratoryReportsList extends LaboratoryReports
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "laboratoryreportsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "laboratoryreports2view"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -713,7 +714,7 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "flaboratory_reportsgrid";
+            $this->FormName = "flaboratory_reports2grid";
         }
 
         // Set up page action
@@ -1050,7 +1051,7 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("flaboratory_reportssrch");
+            $savedFilterList = Profile()->getSearchFilters("flaboratory_reports2srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
@@ -1063,6 +1064,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+        $filterList = Concat($filterList, $this->report_month->AdvancedSearch->toJson(), ","); // Field report_month
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1083,7 +1085,7 @@ class LaboratoryReportsList extends LaboratoryReports
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("flaboratory_reportssrch", $filters);
+            Profile()->setSearchFilters("flaboratory_reports2srch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1189,6 +1191,14 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
+
+        // Field report_month
+        $this->report_month->AdvancedSearch->SearchValue = @$filter["x_report_month"];
+        $this->report_month->AdvancedSearch->SearchOperator = @$filter["z_report_month"];
+        $this->report_month->AdvancedSearch->SearchCondition = @$filter["v_report_month"];
+        $this->report_month->AdvancedSearch->SearchValue2 = @$filter["y_report_month"];
+        $this->report_month->AdvancedSearch->SearchOperator2 = @$filter["w_report_month"];
+        $this->report_month->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1233,6 +1243,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->specimen;
         $searchFlds[] = &$this->service_name;
+        $searchFlds[] = &$this->report_month;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1321,6 +1332,7 @@ class LaboratoryReportsList extends LaboratoryReports
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
+            $this->updateSort($this->report_month); // report_month
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1356,6 +1368,7 @@ class LaboratoryReportsList extends LaboratoryReports
                 $this->service_name->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
+                $this->report_month->setSort("");
             }
 
             // Reset start position
@@ -1451,12 +1464,12 @@ class LaboratoryReportsList extends LaboratoryReports
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reportslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reports2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reportslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"flaboratory_reports2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1511,6 +1524,7 @@ class LaboratoryReportsList extends LaboratoryReports
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
+            $this->createColumnOption($option, "report_month");
         }
 
         // Set up custom actions
@@ -1535,10 +1549,10 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"flaboratory_reportssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"flaboratory_reports2srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"flaboratory_reportssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"flaboratory_reports2srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1598,7 +1612,7 @@ class LaboratoryReportsList extends LaboratoryReports
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flaboratory_reportslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="flaboratory_reports2list"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1769,7 +1783,7 @@ class LaboratoryReportsList extends LaboratoryReports
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_reports", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_laboratory_reports2", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1830,7 +1844,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_laboratory_reports",
+            "id" => "r" . $this->RowCount . "_laboratory_reports2",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1960,6 +1974,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $this->service_name->setDbValue($row['service_name']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->report_month->setDbValue($row['report_month']);
     }
 
     // Return a row with default values
@@ -1977,6 +1992,7 @@ class LaboratoryReportsList extends LaboratoryReports
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['report_month'] = $this->report_month->DefaultValue;
         return $row;
     }
 
@@ -2039,6 +2055,8 @@ class LaboratoryReportsList extends LaboratoryReports
 
         // date_updated
 
+        // report_month
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -2079,6 +2097,9 @@ class LaboratoryReportsList extends LaboratoryReports
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // report_month
+            $this->report_month->ViewValue = $this->report_month->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2118,6 +2139,10 @@ class LaboratoryReportsList extends LaboratoryReports
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // report_month
+            $this->report_month->HrefValue = "";
+            $this->report_month->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2138,19 +2163,19 @@ class LaboratoryReportsList extends LaboratoryReports
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"flaboratory_reports2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"flaboratory_reports2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"flaboratory_reportslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"flaboratory_reports2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2162,7 +2187,7 @@ class LaboratoryReportsList extends LaboratoryReports
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="flaboratory_reportslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="flaboratory_reports2list" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2240,7 +2265,7 @@ class LaboratoryReportsList extends LaboratoryReports
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"flaboratory_reportssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"flaboratory_reports2srch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button

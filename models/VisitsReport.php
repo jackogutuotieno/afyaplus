@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for users
+ * Table class for visits_report
  */
-class Users extends DbTable
+class VisitsReport extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,23 +47,15 @@ class Users extends DbTable
 
     // Fields
     public $id;
-    public $photo;
-    public $full_name;
+    public $patient_name_visits;
     public $first_name;
     public $last_name;
-    public $national_id;
-    public $gender;
-    public $phone;
-    public $_email;
-    public $department_id;
-    public $designation_id;
-    public $physical_address;
-    public $_password;
-    public $user_role_id;
-    public $is_verified;
-    public $user_profile;
+    public $visit_type;
+    public $payment_method;
+    public $company;
     public $date_created;
     public $date_updated;
+    public $visit_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -76,14 +68,14 @@ class Users extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "users";
-        $this->TableName = 'users';
-        $this->TableType = "TABLE";
+        $this->TableVar = "visits_report";
+        $this->TableName = 'visits_report';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "users";
+        $this->UpdateTable = "visits_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -137,35 +129,11 @@ class Users extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // photo
-        $this->photo = new DbField(
+        // patient_name_visits
+        $this->patient_name_visits = new DbField(
             $this, // Table
-            'x_photo', // Variable name
-            'photo', // Name
-            '`photo`', // Expression
-            '`photo`', // Basic search expression
-            205, // Type
-            2147483647, // Size
-            -1, // Date/Time format
-            true, // Is upload field
-            '`photo`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'IMAGE', // View Tag
-            'FILE' // Edit Tag
-        );
-        $this->photo->InputTextType = "text";
-        $this->photo->Raw = true;
-        $this->photo->Sortable = false; // Allow sort
-        $this->photo->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
-        $this->Fields['photo'] = &$this->photo;
-
-        // full_name
-        $this->full_name = new DbField(
-            $this, // Table
-            'x_full_name', // Variable name
-            'full_name', // Name
+            'x_patient_name_visits', // Variable name
+            'patient_name_visits', // Name
             'CONCAT(first_name,\' \',last_name)', // Expression
             'CONCAT(first_name,\' \',last_name)', // Basic search expression
             200, // Type
@@ -179,10 +147,10 @@ class Users extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->full_name->InputTextType = "text";
-        $this->full_name->IsCustom = true; // Custom field
-        $this->full_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['full_name'] = &$this->full_name;
+        $this->patient_name_visits->InputTextType = "text";
+        $this->patient_name_visits->IsCustom = true; // Custom field
+        $this->patient_name_visits->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_name_visits'] = &$this->patient_name_visits;
 
         // first_name
         $this->first_name = new DbField(
@@ -205,7 +173,6 @@ class Users extends DbTable
         $this->first_name->InputTextType = "text";
         $this->first_name->Nullable = false; // NOT NULL field
         $this->first_name->Required = true; // Required field
-        $this->first_name->Sortable = false; // Allow sort
         $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['first_name'] = &$this->first_name;
 
@@ -230,300 +197,80 @@ class Users extends DbTable
         $this->last_name->InputTextType = "text";
         $this->last_name->Nullable = false; // NOT NULL field
         $this->last_name->Required = true; // Required field
-        $this->last_name->Sortable = false; // Allow sort
         $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['last_name'] = &$this->last_name;
 
-        // national_id
-        $this->national_id = new DbField(
+        // visit_type
+        $this->visit_type = new DbField(
             $this, // Table
-            'x_national_id', // Variable name
-            'national_id', // Name
-            '`national_id`', // Expression
-            '`national_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`national_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->national_id->InputTextType = "text";
-        $this->national_id->Raw = true;
-        $this->national_id->Nullable = false; // NOT NULL field
-        $this->national_id->Required = true; // Required field
-        $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['national_id'] = &$this->national_id;
-
-        // gender
-        $this->gender = new DbField(
-            $this, // Table
-            'x_gender', // Variable name
-            'gender', // Name
-            '`gender`', // Expression
-            '`gender`', // Basic search expression
+            'x_visit_type', // Variable name
+            'visit_type', // Name
+            '`visit_type`', // Expression
+            '`visit_type`', // Basic search expression
             200, // Type
-            20, // Size
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`gender`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'RADIO' // Edit Tag
-        );
-        $this->gender->InputTextType = "text";
-        $this->gender->Nullable = false; // NOT NULL field
-        $this->gender->Required = true; // Required field
-        $this->gender->Lookup = new Lookup($this->gender, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->gender->OptionCount = 2;
-        $this->gender->SearchOperators = ["=", "<>"];
-        $this->Fields['gender'] = &$this->gender;
-
-        // phone
-        $this->phone = new DbField(
-            $this, // Table
-            'x_phone', // Variable name
-            'phone', // Name
-            '`phone`', // Expression
-            '`phone`', // Basic search expression
-            129, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`phone`', // Virtual expression
+            '`visit_type`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
-        $this->phone->InputTextType = "text";
-        $this->phone->Nullable = false; // NOT NULL field
-        $this->phone->Required = true; // Required field
-        $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['phone'] = &$this->phone;
+        $this->visit_type->InputTextType = "text";
+        $this->visit_type->Nullable = false; // NOT NULL field
+        $this->visit_type->Required = true; // Required field
+        $this->visit_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['visit_type'] = &$this->visit_type;
 
-        // email
-        $this->_email = new DbField(
+        // payment_method
+        $this->payment_method = new DbField(
             $this, // Table
-            'x__email', // Variable name
-            'email', // Name
-            '`email`', // Expression
-            '`email`', // Basic search expression
+            'x_payment_method', // Variable name
+            'payment_method', // Name
+            '`payment_method`', // Expression
+            '`payment_method`', // Basic search expression
             200, // Type
             50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`email`', // Virtual expression
+            '`payment_method`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->_email->addMethod("getLinkPrefix", fn() => "mailto:");
-        $this->_email->InputTextType = "text";
-        $this->_email->Raw = true;
-        $this->_email->Nullable = false; // NOT NULL field
-        $this->_email->Required = true; // Required field
-        $this->_email->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['email'] = &$this->_email;
+        $this->payment_method->InputTextType = "text";
+        $this->payment_method->Nullable = false; // NOT NULL field
+        $this->payment_method->Required = true; // Required field
+        $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['payment_method'] = &$this->payment_method;
 
-        // department_id
-        $this->department_id = new DbField(
+        // company
+        $this->company = new DbField(
             $this, // Table
-            'x_department_id', // Variable name
-            'department_id', // Name
-            '`department_id`', // Expression
-            '`department_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`department_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->department_id->InputTextType = "text";
-        $this->department_id->Raw = true;
-        $this->department_id->Nullable = false; // NOT NULL field
-        $this->department_id->Required = true; // Required field
-        $this->department_id->setSelectMultiple(false); // Select one
-        $this->department_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->department_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->department_id->Lookup = new Lookup($this->department_id, 'departments', false, 'id', ["department_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`department_name`");
-        $this->department_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->department_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['department_id'] = &$this->department_id;
-
-        // designation_id
-        $this->designation_id = new DbField(
-            $this, // Table
-            'x_designation_id', // Variable name
-            'designation_id', // Name
-            '`designation_id`', // Expression
-            '`designation_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`designation_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->designation_id->InputTextType = "text";
-        $this->designation_id->Raw = true;
-        $this->designation_id->Nullable = false; // NOT NULL field
-        $this->designation_id->Required = true; // Required field
-        $this->designation_id->setSelectMultiple(false); // Select one
-        $this->designation_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->designation_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->designation_id->Lookup = new Lookup($this->designation_id, 'designations', false, 'id', ["designation","","",""], '', '', [], [], [], [], [], [], false, '', '', "`designation`");
-        $this->designation_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->designation_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['designation_id'] = &$this->designation_id;
-
-        // physical_address
-        $this->physical_address = new DbField(
-            $this, // Table
-            'x_physical_address', // Variable name
-            'physical_address', // Name
-            '`physical_address`', // Expression
-            '`physical_address`', // Basic search expression
+            'x_company', // Variable name
+            'company', // Name
+            '`company`', // Expression
+            '`company`', // Basic search expression
             200, // Type
-            65535, // Size
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`physical_address`', // Virtual expression
+            '`company`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXTAREA' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->physical_address->InputTextType = "text";
-        $this->physical_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['physical_address'] = &$this->physical_address;
-
-        // password
-        $this->_password = new DbField(
-            $this, // Table
-            'x__password', // Variable name
-            'password', // Name
-            '`password`', // Expression
-            '`password`', // Basic search expression
-            200, // Type
-            255, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`password`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'PASSWORD' // Edit Tag
-        );
-        $this->_password->InputTextType = "text";
-        $this->_password->Raw = true;
-        $this->_password->Nullable = false; // NOT NULL field
-        $this->_password->Required = true; // Required field
-        $this->_password->Sortable = false; // Allow sort
-        $this->_password->SearchOperators = ["=", "<>"];
-        $this->Fields['password'] = &$this->_password;
-
-        // user_role_id
-        $this->user_role_id = new DbField(
-            $this, // Table
-            'x_user_role_id', // Variable name
-            'user_role_id', // Name
-            '`user_role_id`', // Expression
-            '`user_role_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`user_role_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'RADIO' // Edit Tag
-        );
-        $this->user_role_id->addMethod("getDefault", fn() => 0);
-        $this->user_role_id->InputTextType = "text";
-        $this->user_role_id->Raw = true;
-        $this->user_role_id->Nullable = false; // NOT NULL field
-        $this->user_role_id->Required = true; // Required field
-        $this->user_role_id->Lookup = new Lookup($this->user_role_id, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->user_role_id->OptionCount = 12;
-        $this->user_role_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->user_role_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['user_role_id'] = &$this->user_role_id;
-
-        // is_verified
-        $this->is_verified = new DbField(
-            $this, // Table
-            'x_is_verified', // Variable name
-            'is_verified', // Name
-            '`is_verified`', // Expression
-            '`is_verified`', // Basic search expression
-            16, // Type
-            1, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`is_verified`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'CHECKBOX' // Edit Tag
-        );
-        $this->is_verified->addMethod("getDefault", fn() => 0);
-        $this->is_verified->InputTextType = "text";
-        $this->is_verified->Raw = true;
-        $this->is_verified->Nullable = false; // NOT NULL field
-        $this->is_verified->setDataType(DataType::BOOLEAN);
-        $this->is_verified->Lookup = new Lookup($this->is_verified, 'users', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->is_verified->OptionCount = 2;
-        $this->is_verified->DefaultErrorMessage = $Language->phrase("IncorrectField");
-        $this->is_verified->SearchOperators = ["=", "<>"];
-        $this->Fields['is_verified'] = &$this->is_verified;
-
-        // user_profile
-        $this->user_profile = new DbField(
-            $this, // Table
-            'x_user_profile', // Variable name
-            'user_profile', // Name
-            '`user_profile`', // Expression
-            '`user_profile`', // Basic search expression
-            200, // Type
-            65535, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`user_profile`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'HIDDEN' // Edit Tag
-        );
-        $this->user_profile->InputTextType = "text";
-        $this->user_profile->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
-        $this->Fields['user_profile'] = &$this->user_profile;
+        $this->company->InputTextType = "text";
+        $this->company->Nullable = false; // NOT NULL field
+        $this->company->Required = true; // Required field
+        $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['company'] = &$this->company;
 
         // date_created
         $this->date_created = new DbField(
@@ -531,10 +278,10 @@ class Users extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -547,7 +294,7 @@ class Users extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -557,10 +304,10 @@ class Users extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -573,9 +320,31 @@ class Users extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
+
+        // visit_month
+        $this->visit_month = new DbField(
+            $this, // Table
+            'x_visit_month', // Variable name
+            'visit_month', // Name
+            '`visit_month`', // Expression
+            '`visit_month`', // Basic search expression
+            200, // Type
+            9, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`visit_month`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->visit_month->InputTextType = "text";
+        $this->visit_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['visit_month'] = &$this->visit_month;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -644,7 +413,7 @@ class Users extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "users";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "visits_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -668,7 +437,7 @@ class Users extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, CONCAT(first_name,' ',last_name) AS `full_name`";
+        return "*, CONCAT(first_name,' ',last_name) AS `patient_name_visits`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -761,11 +530,6 @@ class Users extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -958,9 +722,6 @@ class Users extends DbTable
             if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom) {
                 continue;
             }
-            if (Config("ENCRYPTED_PASSWORD") && $name == Config("LOGIN_PASSWORD_FIELD_NAME")) {
-                $value = EncryptPassword(Config("CASE_SENSITIVE_PASSWORD") ? $value : strtolower($value));
-            }
             $field = $this->Fields[$name];
             $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
             $parm = $field->CustomDataType?->convertToDatabaseValueSQL($parm, $platform) ?? $parm; // Convert database SQL
@@ -1004,12 +765,6 @@ class Users extends DbTable
         foreach ($rs as $name => $value) {
             if (!isset($this->Fields[$name]) || $this->Fields[$name]->IsCustom || $this->Fields[$name]->IsAutoIncrement) {
                 continue;
-            }
-            if (Config("ENCRYPTED_PASSWORD") && $name == Config("LOGIN_PASSWORD_FIELD_NAME")) {
-                if ($value == $this->Fields[$name]->OldValue) { // No need to update hashed password if not changed
-                    continue;
-                }
-                $value = EncryptPassword(Config("CASE_SENSITIVE_PASSWORD") ? $value : strtolower($value));
             }
             $field = $this->Fields[$name];
             $parm = $queryBuilder->createPositionalParameter($value, $field->getParameterType());
@@ -1097,23 +852,15 @@ class Users extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->photo->Upload->DbValue = $row['photo'];
-        $this->full_name->DbValue = $row['full_name'];
+        $this->patient_name_visits->DbValue = $row['patient_name_visits'];
         $this->first_name->DbValue = $row['first_name'];
         $this->last_name->DbValue = $row['last_name'];
-        $this->national_id->DbValue = $row['national_id'];
-        $this->gender->DbValue = $row['gender'];
-        $this->phone->DbValue = $row['phone'];
-        $this->_email->DbValue = $row['email'];
-        $this->department_id->DbValue = $row['department_id'];
-        $this->designation_id->DbValue = $row['designation_id'];
-        $this->physical_address->DbValue = $row['physical_address'];
-        $this->_password->DbValue = $row['password'];
-        $this->user_role_id->DbValue = $row['user_role_id'];
-        $this->is_verified->DbValue = $row['is_verified'];
-        $this->user_profile->DbValue = $row['user_profile'];
+        $this->visit_type->DbValue = $row['visit_type'];
+        $this->payment_method->DbValue = $row['payment_method'];
+        $this->company->DbValue = $row['company'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
+        $this->visit_month->DbValue = $row['visit_month'];
     }
 
     // Delete uploaded files
@@ -1187,7 +934,7 @@ class Users extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("userslist");
+        return $_SESSION[$name] ?? GetUrl("visitsreportlist");
     }
 
     // Set return page URL
@@ -1201,9 +948,9 @@ class Users extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "usersview" => $Language->phrase("View"),
-            "usersedit" => $Language->phrase("Edit"),
-            "usersadd" => $Language->phrase("Add"),
+            "visitsreportview" => $Language->phrase("View"),
+            "visitsreportedit" => $Language->phrase("Edit"),
+            "visitsreportadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1211,18 +958,18 @@ class Users extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "userslist";
+        return "visitsreportlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "UsersView",
-            Config("API_ADD_ACTION") => "UsersAdd",
-            Config("API_EDIT_ACTION") => "UsersEdit",
-            Config("API_DELETE_ACTION") => "UsersDelete",
-            Config("API_LIST_ACTION") => "UsersList",
+            Config("API_VIEW_ACTION") => "VisitsReportView",
+            Config("API_ADD_ACTION") => "VisitsReportAdd",
+            Config("API_EDIT_ACTION") => "VisitsReportEdit",
+            Config("API_DELETE_ACTION") => "VisitsReportDelete",
+            Config("API_LIST_ACTION") => "VisitsReportList",
             default => ""
         };
     }
@@ -1242,16 +989,16 @@ class Users extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "userslist";
+        return "visitsreportlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("usersview", $parm);
+            $url = $this->keyUrl("visitsreportview", $parm);
         } else {
-            $url = $this->keyUrl("usersview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("visitsreportview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1260,9 +1007,9 @@ class Users extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "usersadd?" . $parm;
+            $url = "visitsreportadd?" . $parm;
         } else {
-            $url = "usersadd";
+            $url = "visitsreportadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1270,28 +1017,28 @@ class Users extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("usersedit", $parm);
+        $url = $this->keyUrl("visitsreportedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("userslist", "action=edit");
+        $url = $this->keyUrl("visitsreportlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("usersadd", $parm);
+        $url = $this->keyUrl("visitsreportadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("userslist", "action=copy");
+        $url = $this->keyUrl("visitsreportlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1301,7 +1048,7 @@ class Users extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("usersdelete", $parm);
+            return $this->keyUrl("visitsreportdelete", $parm);
         }
     }
 
@@ -1467,30 +1214,22 @@ class Users extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->photo->Upload->DbValue = $row['photo'];
-        $this->full_name->setDbValue($row['full_name']);
+        $this->patient_name_visits->setDbValue($row['patient_name_visits']);
         $this->first_name->setDbValue($row['first_name']);
         $this->last_name->setDbValue($row['last_name']);
-        $this->national_id->setDbValue($row['national_id']);
-        $this->gender->setDbValue($row['gender']);
-        $this->phone->setDbValue($row['phone']);
-        $this->_email->setDbValue($row['email']);
-        $this->department_id->setDbValue($row['department_id']);
-        $this->designation_id->setDbValue($row['designation_id']);
-        $this->physical_address->setDbValue($row['physical_address']);
-        $this->_password->setDbValue($row['password']);
-        $this->user_role_id->setDbValue($row['user_role_id']);
-        $this->is_verified->setDbValue($row['is_verified']);
-        $this->user_profile->setDbValue($row['user_profile']);
+        $this->visit_type->setDbValue($row['visit_type']);
+        $this->payment_method->setDbValue($row['payment_method']);
+        $this->company->setDbValue($row['company']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->visit_month->setDbValue($row['visit_month']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "UsersList";
+        $listPage = "VisitsReportList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1516,59 +1255,30 @@ class Users extends DbTable
 
         // id
 
-        // photo
-
-        // full_name
+        // patient_name_visits
 
         // first_name
 
         // last_name
 
-        // national_id
+        // visit_type
 
-        // gender
+        // payment_method
 
-        // phone
-
-        // email
-
-        // department_id
-
-        // designation_id
-
-        // physical_address
-
-        // password
-        $this->_password->CellCssStyle = "white-space: nowrap;";
-
-        // user_role_id
-
-        // is_verified
-
-        // user_profile
-        $this->user_profile->CellCssStyle = "white-space: nowrap;";
+        // company
 
         // date_created
 
         // date_updated
 
+        // visit_month
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+        $this->id->CssClass = "fw-bold";
 
-        // photo
-        if (!EmptyValue($this->photo->Upload->DbValue)) {
-            $this->photo->ImageWidth = 70;
-            $this->photo->ImageHeight = 70;
-            $this->photo->ImageAlt = $this->photo->alt();
-            $this->photo->ImageCssClass = "ew-image";
-            $this->photo->ViewValue = $this->id->CurrentValue;
-            $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
-        } else {
-            $this->photo->ViewValue = "";
-        }
-
-        // full_name
-        $this->full_name->ViewValue = $this->full_name->CurrentValue;
+        // patient_name_visits
+        $this->patient_name_visits->ViewValue = $this->patient_name_visits->CurrentValue;
 
         // first_name
         $this->first_name->ViewValue = $this->first_name->CurrentValue;
@@ -1576,94 +1286,14 @@ class Users extends DbTable
         // last_name
         $this->last_name->ViewValue = $this->last_name->CurrentValue;
 
-        // national_id
-        $this->national_id->ViewValue = $this->national_id->CurrentValue;
+        // visit_type
+        $this->visit_type->ViewValue = $this->visit_type->CurrentValue;
 
-        // gender
-        if (strval($this->gender->CurrentValue) != "") {
-            $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
-        } else {
-            $this->gender->ViewValue = null;
-        }
+        // payment_method
+        $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
 
-        // phone
-        $this->phone->ViewValue = $this->phone->CurrentValue;
-
-        // email
-        $this->_email->ViewValue = $this->_email->CurrentValue;
-
-        // department_id
-        $curVal = strval($this->department_id->CurrentValue);
-        if ($curVal != "") {
-            $this->department_id->ViewValue = $this->department_id->lookupCacheOption($curVal);
-            if ($this->department_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->department_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->department_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->department_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->department_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->department_id->ViewValue = $this->department_id->displayValue($arwrk);
-                } else {
-                    $this->department_id->ViewValue = FormatNumber($this->department_id->CurrentValue, $this->department_id->formatPattern());
-                }
-            }
-        } else {
-            $this->department_id->ViewValue = null;
-        }
-
-        // designation_id
-        $curVal = strval($this->designation_id->CurrentValue);
-        if ($curVal != "") {
-            $this->designation_id->ViewValue = $this->designation_id->lookupCacheOption($curVal);
-            if ($this->designation_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->designation_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->designation_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->designation_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->designation_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->designation_id->ViewValue = $this->designation_id->displayValue($arwrk);
-                } else {
-                    $this->designation_id->ViewValue = FormatNumber($this->designation_id->CurrentValue, $this->designation_id->formatPattern());
-                }
-            }
-        } else {
-            $this->designation_id->ViewValue = null;
-        }
-
-        // physical_address
-        $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
-
-        // password
-        $this->_password->ViewValue = $Language->phrase("PasswordMask");
-
-        // user_role_id
-        if ($Security->canAdmin()) { // System admin
-            if (strval($this->user_role_id->CurrentValue) != "") {
-                $this->user_role_id->ViewValue = $this->user_role_id->optionCaption($this->user_role_id->CurrentValue);
-            } else {
-                $this->user_role_id->ViewValue = null;
-            }
-        } else {
-            $this->user_role_id->ViewValue = $Language->phrase("PasswordMask");
-        }
-
-        // is_verified
-        if (ConvertToBool($this->is_verified->CurrentValue)) {
-            $this->is_verified->ViewValue = $this->is_verified->tagCaption(1) != "" ? $this->is_verified->tagCaption(1) : "Yes";
-        } else {
-            $this->is_verified->ViewValue = $this->is_verified->tagCaption(2) != "" ? $this->is_verified->tagCaption(2) : "No";
-        }
-
-        // user_profile
-        $this->user_profile->ViewValue = $this->user_profile->CurrentValue;
+        // company
+        $this->company->ViewValue = $this->company->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1673,36 +1303,16 @@ class Users extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+        // visit_month
+        $this->visit_month->ViewValue = $this->visit_month->CurrentValue;
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // photo
-        if (!empty($this->photo->Upload->DbValue)) {
-            $this->photo->HrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-            $this->photo->LinkAttrs["target"] = "";
-            if ($this->photo->IsBlobImage && empty($this->photo->LinkAttrs["target"])) {
-                $this->photo->LinkAttrs["target"] = "_blank";
-            }
-            if ($this->isExport()) {
-                $this->photo->HrefValue = FullUrl($this->photo->HrefValue, "href");
-            }
-        } else {
-            $this->photo->HrefValue = "";
-        }
-        $this->photo->ExportHrefValue = GetFileUploadUrl($this->photo, $this->id->CurrentValue);
-        $this->photo->TooltipValue = "";
-        if ($this->photo->UseColorbox) {
-            if (EmptyValue($this->photo->TooltipValue)) {
-                $this->photo->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
-            }
-            $this->photo->LinkAttrs["data-rel"] = "users_x_photo";
-            $this->photo->LinkAttrs->appendClass("ew-lightbox");
-        }
-
-        // full_name
-        $this->full_name->HrefValue = "";
-        $this->full_name->TooltipValue = "";
+        // patient_name_visits
+        $this->patient_name_visits->HrefValue = "";
+        $this->patient_name_visits->TooltipValue = "";
 
         // first_name
         $this->first_name->HrefValue = "";
@@ -1712,65 +1322,17 @@ class Users extends DbTable
         $this->last_name->HrefValue = "";
         $this->last_name->TooltipValue = "";
 
-        // national_id
-        $this->national_id->HrefValue = "";
-        $this->national_id->TooltipValue = "";
+        // visit_type
+        $this->visit_type->HrefValue = "";
+        $this->visit_type->TooltipValue = "";
 
-        // gender
-        $this->gender->HrefValue = "";
-        $this->gender->TooltipValue = "";
+        // payment_method
+        $this->payment_method->HrefValue = "";
+        $this->payment_method->TooltipValue = "";
 
-        // phone
-        if (!EmptyValue($this->phone->CurrentValue)) {
-            $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
-            $this->phone->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-            }
-        } else {
-            $this->phone->HrefValue = "";
-        }
-        $this->phone->TooltipValue = "";
-
-        // email
-        if (!EmptyValue($this->_email->CurrentValue)) {
-            $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
-            $this->_email->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
-            }
-        } else {
-            $this->_email->HrefValue = "";
-        }
-        $this->_email->TooltipValue = "";
-
-        // department_id
-        $this->department_id->HrefValue = "";
-        $this->department_id->TooltipValue = "";
-
-        // designation_id
-        $this->designation_id->HrefValue = "";
-        $this->designation_id->TooltipValue = "";
-
-        // physical_address
-        $this->physical_address->HrefValue = "";
-        $this->physical_address->TooltipValue = "";
-
-        // password
-        $this->_password->HrefValue = "";
-        $this->_password->TooltipValue = "";
-
-        // user_role_id
-        $this->user_role_id->HrefValue = "";
-        $this->user_role_id->TooltipValue = "";
-
-        // is_verified
-        $this->is_verified->HrefValue = "";
-        $this->is_verified->TooltipValue = "";
-
-        // user_profile
-        $this->user_profile->HrefValue = "";
-        $this->user_profile->TooltipValue = "";
+        // company
+        $this->company->HrefValue = "";
+        $this->company->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1779,6 +1341,10 @@ class Users extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
+
+        // visit_month
+        $this->visit_month->HrefValue = "";
+        $this->visit_month->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1798,27 +1364,15 @@ class Users extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->CssClass = "fw-bold";
 
-        // photo
-        $this->photo->setupEditAttributes();
-        if (!EmptyValue($this->photo->Upload->DbValue)) {
-            $this->photo->ImageWidth = 70;
-            $this->photo->ImageHeight = 70;
-            $this->photo->ImageAlt = $this->photo->alt();
-            $this->photo->ImageCssClass = "ew-image";
-            $this->photo->EditValue = $this->id->CurrentValue;
-            $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
-        } else {
-            $this->photo->EditValue = "";
+        // patient_name_visits
+        $this->patient_name_visits->setupEditAttributes();
+        if (!$this->patient_name_visits->Raw) {
+            $this->patient_name_visits->CurrentValue = HtmlDecode($this->patient_name_visits->CurrentValue);
         }
-
-        // full_name
-        $this->full_name->setupEditAttributes();
-        if (!$this->full_name->Raw) {
-            $this->full_name->CurrentValue = HtmlDecode($this->full_name->CurrentValue);
-        }
-        $this->full_name->EditValue = $this->full_name->CurrentValue;
-        $this->full_name->PlaceHolder = RemoveHtml($this->full_name->caption());
+        $this->patient_name_visits->EditValue = $this->patient_name_visits->CurrentValue;
+        $this->patient_name_visits->PlaceHolder = RemoveHtml($this->patient_name_visits->caption());
 
         // first_name
         $this->first_name->setupEditAttributes();
@@ -1836,66 +1390,29 @@ class Users extends DbTable
         $this->last_name->EditValue = $this->last_name->CurrentValue;
         $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
 
-        // national_id
-        $this->national_id->setupEditAttributes();
-        $this->national_id->EditValue = $this->national_id->CurrentValue;
-        $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
-        if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
-            $this->national_id->EditValue = $this->national_id->EditValue;
+        // visit_type
+        $this->visit_type->setupEditAttributes();
+        if (!$this->visit_type->Raw) {
+            $this->visit_type->CurrentValue = HtmlDecode($this->visit_type->CurrentValue);
         }
+        $this->visit_type->EditValue = $this->visit_type->CurrentValue;
+        $this->visit_type->PlaceHolder = RemoveHtml($this->visit_type->caption());
 
-        // gender
-        $this->gender->EditValue = $this->gender->options(false);
-        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
-
-        // phone
-        $this->phone->setupEditAttributes();
-        if (!$this->phone->Raw) {
-            $this->phone->CurrentValue = HtmlDecode($this->phone->CurrentValue);
+        // payment_method
+        $this->payment_method->setupEditAttributes();
+        if (!$this->payment_method->Raw) {
+            $this->payment_method->CurrentValue = HtmlDecode($this->payment_method->CurrentValue);
         }
-        $this->phone->EditValue = $this->phone->CurrentValue;
-        $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
+        $this->payment_method->EditValue = $this->payment_method->CurrentValue;
+        $this->payment_method->PlaceHolder = RemoveHtml($this->payment_method->caption());
 
-        // email
-        $this->_email->setupEditAttributes();
-        if (!$this->_email->Raw) {
-            $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+        // company
+        $this->company->setupEditAttributes();
+        if (!$this->company->Raw) {
+            $this->company->CurrentValue = HtmlDecode($this->company->CurrentValue);
         }
-        $this->_email->EditValue = $this->_email->CurrentValue;
-        $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
-
-        // department_id
-        $this->department_id->setupEditAttributes();
-        $this->department_id->PlaceHolder = RemoveHtml($this->department_id->caption());
-
-        // designation_id
-        $this->designation_id->setupEditAttributes();
-        $this->designation_id->PlaceHolder = RemoveHtml($this->designation_id->caption());
-
-        // physical_address
-        $this->physical_address->setupEditAttributes();
-        $this->physical_address->EditValue = $this->physical_address->CurrentValue;
-        $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
-
-        // password
-        $this->_password->setupEditAttributes();
-        $this->_password->EditValue = $this->_password->CurrentValue;
-        $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
-
-        // user_role_id
-        if (!$Security->canAdmin()) { // System admin
-            $this->user_role_id->EditValue = $Language->phrase("PasswordMask");
-        } else {
-            $this->user_role_id->EditValue = $this->user_role_id->options(false);
-            $this->user_role_id->PlaceHolder = RemoveHtml($this->user_role_id->caption());
-        }
-
-        // is_verified
-        $this->is_verified->EditValue = $this->is_verified->options(false);
-        $this->is_verified->PlaceHolder = RemoveHtml($this->is_verified->caption());
-
-        // user_profile
-        $this->user_profile->setupEditAttributes();
+        $this->company->EditValue = $this->company->CurrentValue;
+        $this->company->PlaceHolder = RemoveHtml($this->company->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1906,6 +1423,14 @@ class Users extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+        // visit_month
+        $this->visit_month->setupEditAttributes();
+        if (!$this->visit_month->Raw) {
+            $this->visit_month->CurrentValue = HtmlDecode($this->visit_month->CurrentValue);
+        }
+        $this->visit_month->EditValue = $this->visit_month->CurrentValue;
+        $this->visit_month->PlaceHolder = RemoveHtml($this->visit_month->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1936,33 +1461,26 @@ class Users extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->full_name);
-                    $doc->exportCaption($this->national_id);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->_email);
-                    $doc->exportCaption($this->department_id);
-                    $doc->exportCaption($this->designation_id);
-                    $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->_password);
-                    $doc->exportCaption($this->user_role_id);
-                    $doc->exportCaption($this->is_verified);
+                    $doc->exportCaption($this->patient_name_visits);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->visit_type);
+                    $doc->exportCaption($this->payment_method);
+                    $doc->exportCaption($this->company);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->visit_month);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->full_name);
-                    $doc->exportCaption($this->national_id);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->_email);
-                    $doc->exportCaption($this->department_id);
-                    $doc->exportCaption($this->designation_id);
-                    $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->user_role_id);
-                    $doc->exportCaption($this->is_verified);
+                    $doc->exportCaption($this->patient_name_visits);
+                    $doc->exportCaption($this->first_name);
+                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->visit_type);
+                    $doc->exportCaption($this->payment_method);
+                    $doc->exportCaption($this->company);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->visit_month);
                 }
                 $doc->endExportRow();
             }
@@ -1990,33 +1508,26 @@ class Users extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->full_name);
-                        $doc->exportField($this->national_id);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->phone);
-                        $doc->exportField($this->_email);
-                        $doc->exportField($this->department_id);
-                        $doc->exportField($this->designation_id);
-                        $doc->exportField($this->physical_address);
-                        $doc->exportField($this->_password);
-                        $doc->exportField($this->user_role_id);
-                        $doc->exportField($this->is_verified);
+                        $doc->exportField($this->patient_name_visits);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->visit_type);
+                        $doc->exportField($this->payment_method);
+                        $doc->exportField($this->company);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->visit_month);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->full_name);
-                        $doc->exportField($this->national_id);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->phone);
-                        $doc->exportField($this->_email);
-                        $doc->exportField($this->department_id);
-                        $doc->exportField($this->designation_id);
-                        $doc->exportField($this->physical_address);
-                        $doc->exportField($this->user_role_id);
-                        $doc->exportField($this->is_verified);
+                        $doc->exportField($this->patient_name_visits);
+                        $doc->exportField($this->first_name);
+                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->visit_type);
+                        $doc->exportField($this->payment_method);
+                        $doc->exportField($this->company);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->visit_month);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -2032,180 +1543,12 @@ class Users extends DbTable
         }
     }
 
-    // User ID filter
-    public function getUserIDFilter($userId)
-    {
-        global $Security;
-        $userIdFilter = '`id` = ' . QuotedValue($userId, DataType::NUMBER, Config("USER_TABLE_DBID"));
-        return $userIdFilter;
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM users";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
-    }
-
     // Get file data
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
-        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
-        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // Set up field name / file name field / file type field
-        $fldName = "";
-        $fileNameFld = "";
-        $fileTypeFld = "";
-        if ($fldparm == 'photo') {
-            $fldName = "photo";
-        } else {
-            return false; // Incorrect field
-        }
-
-        // Set up key values
-        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
-        if (count($ar) == 1) {
-            $this->id->CurrentValue = $ar[0];
-        } else {
-            return false; // Incorrect key
-        }
-
-        // Set up filter (WHERE Clause)
-        $filter = $this->getRecordFilter();
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        $dbtype = GetConnectionType($this->Dbid);
-        if ($row = $conn->fetchAssociative($sql)) {
-            $val = $row[$fldName];
-            if (!EmptyValue($val)) {
-                $fld = $this->Fields[$fldName];
-
-                // Binary data
-                if ($fld->DataType == DataType::BLOB) {
-                    if ($dbtype != "MYSQL") {
-                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
-                            $val = stream_get_contents($val);
-                        }
-                    }
-                    if ($resize) {
-                        ResizeBinary($val, $width, $height, $plugins);
-                    }
-
-                    // Write file type
-                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
-                        AddHeader("Content-type", $row[$fileTypeFld]);
-                    } else {
-                        AddHeader("Content-type", ContentType($val));
-                    }
-
-                    // Write file name
-                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
-                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
-                        $fileName = $row[$fileNameFld];
-                        $pathinfo = pathinfo($fileName);
-                        $ext = strtolower($pathinfo["extension"] ?? "");
-                        $isPdf = SameText($ext, "pdf");
-                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
-                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
-                        }
-                    } else {
-                        $ext = ContentExtension($val);
-                        $isPdf = SameText($ext, ".pdf");
-                        if ($isPdf && $downloadPdf) { // Add header if download PDF
-                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
-                        }
-                    }
-
-                    // Write file data
-                    if (
-                        StartsString("PK", $val) &&
-                        ContainsString($val, "[Content_Types].xml") &&
-                        ContainsString($val, "_rels") &&
-                        ContainsString($val, "docProps")
-                    ) { // Fix Office 2007 documents
-                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
-                            $val .= "\0\0\0\0";
-                        }
-                    }
-
-                    // Clear any debug message
-                    if (ob_get_length()) {
-                        ob_end_clean();
-                    }
-
-                    // Write binary data
-                    Write($val);
-
-                // Upload to folder
-                } else {
-                    if ($fld->UploadMultiple) {
-                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
-                    } else {
-                        $files = [$val];
-                    }
-                    $data = [];
-                    $ar = [];
-                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
-                        $fld->UploadPath = $fld->getUploadPath();
-                    }
-                    foreach ($files as $file) {
-                        if (!EmptyValue($file)) {
-                            if (Config("ENCRYPT_FILE_PATH")) {
-                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
-                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
-                            } else {
-                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
-                            }
-                        }
-                    }
-                    $data[$fld->Param] = $ar;
-                    WriteJson($data);
-                }
-            }
-            return true;
-        }
+        // No binary fields
         return false;
     }
 

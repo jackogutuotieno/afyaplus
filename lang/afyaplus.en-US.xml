@@ -2,9 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="243">
-      <phrase id="menutext" value="registered patients report" />
-    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -191,32 +188,56 @@
     <menu id="244">
       <phrase id="menutext" value="Patients" />
     </menu>
+    <menu id="320">
+      <phrase id="menutext" value="Visits Report" />
+    </menu>
     <menu id="242">
-      <phrase id="menutext" value="Appointment" />
-    </menu>
-    <menu id="313">
-      <phrase id="menutext" value="Medicine Stock" />
-    </menu>
-    <menu id="39">
       <phrase id="menutext" value="Appointments" />
-    </menu>
-    <menu id="111">
-      <phrase id="menutext" value="Vitals" />
     </menu>
     <menu id="110">
       <phrase id="menutext" value="Vaccinations" />
     </menu>
+    <menu id="313">
+      <phrase id="menutext" value="Medicine Stock" />
+    </menu>
+    <menu id="316">
+      <phrase id="menutext" value="Laboratory Reports" />
+    </menu>
+    <menu id="318">
+      <phrase id="menutext" value="Vaccinations Report" />
+    </menu>
+    <menu id="317">
+      <phrase id="menutext" value="vaccinations report 3" />
+    </menu>
+    <menu id="39">
+      <phrase id="menutext" value="Appointments" />
+    </menu>
     <menu id="40">
       <phrase id="menutext" value="Invoices" />
+    </menu>
+    <menu id="111">
+      <phrase id="menutext" value="Vitals" />
     </menu>
     <menu id="42">
       <phrase id="menutext" value="Medicine Stock" />
     </menu>
+    <menu id="315">
+      <phrase id="menutext" value="patients data view" />
+    </menu>
     <menu id="115">
       <phrase id="menutext" value="Lab Report Minor" />
     </menu>
+    <menu id="243">
+      <phrase id="menutext" value="registered patients report" />
+    </menu>
+    <menu id="314">
+      <phrase id="menutext" value="Laboratory Reports" />
+    </menu>
+    <menu id="319">
+      <phrase id="menutext" value="Visits Report" />
+    </menu>
     <table id="appointments_report2">
-      <phrase id="tblcaption" value="Apporintments Report" />
+      <phrase id="tblcaption" value="Appointments Report" />
       <field id="id">
         <phrase id="fldcaption" value="Appointment ID" />
       </field>
@@ -1453,6 +1474,10 @@
         <phrase id="fldtagcaption9" value="Radiologist" />
         <phrase id="fldtagvalue10" value="7" />
         <phrase id="fldtagcaption10" value="Accountant" />
+        <phrase id="fldtagvalue11" value="8" />
+        <phrase id="fldtagcaption11" value="Human Resources" />
+        <phrase id="fldtagvalue12" value="9" />
+        <phrase id="fldtagcaption12" value="Records Officer" />
       </field>
       <field id="is_verified">
         <phrase id="fldcaption" value="Active?" />
@@ -1471,8 +1496,8 @@
         <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
-    <table id="vaccinationsreport">
-      <phrase id="tblcaption" value="vaccinationsreport" />
+    <table id="vaccinationsreport2">
+      <phrase id="tblcaption" value="vaccinationsreport 2" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -1525,8 +1550,8 @@
         <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
-    <table id="vitalsreport">
-      <phrase id="tblcaption" value="vitalsreport" />
+    <table id="vitalsreport2">
+      <phrase id="tblcaption" value="vitalsreport 2" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -2058,6 +2083,241 @@
       </field>
       <field id="stockadd_month">
         <phrase id="fldcaption" value="stockadd month" />
+      </field>
+    </table>
+    <table id="laboratory_reports2">
+      <phrase id="tblcaption" value="Laboratory Reports" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="patient id" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DoB" />
+      </field>
+      <field id="p_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="specimen">
+        <phrase id="fldcaption" value="Specimen" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="Test Name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="report_month">
+        <phrase id="fldcaption" value="report month" />
+      </field>
+    </table>
+    <table id="patients_data_view">
+      <phrase id="tblcaption" value="patients data view" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="last name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="first name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+    </table>
+    <table id="laboratory_reports">
+      <phrase id="tblcaption" value="Laboratory Reports" />
+      <chart id="reportbysubmissionmonth">
+        <phrase id="chartcaption" value="Report by Submission Month" />
+        <phrase id="chartxaxisname" value="report month" />
+        <phrase id="chartyaxisname" value="report month" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="patient id" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DoB" />
+      </field>
+      <field id="patient_age_1">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="specimen">
+        <phrase id="fldcaption" value="Specimen" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="Test Name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="p_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="report_month">
+        <phrase id="fldcaption" value="report month" />
+      </field>
+    </table>
+    <table id="vaccinations_report3">
+      <phrase id="tblcaption" value="vaccinations report 3" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DoB" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="Vaccination" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Vaacination Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="vaccinations_report">
+      <phrase id="tblcaption" value="Vaccinations Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="DoB" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="Vaccination" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Vaacination Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="visits_report">
+      <phrase id="tblcaption" value="Visits Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="patient_name_visits">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="visit_type">
+        <phrase id="fldcaption" value="Visit Type" />
+      </field>
+      <field id="payment_method">
+        <phrase id="fldcaption" value="Payment Method" />
+      </field>
+      <field id="company">
+        <phrase id="fldcaption" value="Company" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Visit Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="visit_month">
+        <phrase id="fldcaption" value="visit month" />
+      </field>
+    </table>
+    <table id="visits_report1">
+      <phrase id="tblcaption" value="Visits Report" />
+      <chart id="visitsbymonth">
+        <phrase id="chartcaption" value="Visits by Month" />
+        <phrase id="chartxaxisname" value="visit month" />
+        <phrase id="chartyaxisname" value="visit month" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="patient_name_visits">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="First Name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="Last Name" />
+      </field>
+      <field id="visit_type">
+        <phrase id="fldcaption" value="Visit Type" />
+      </field>
+      <field id="payment_method">
+        <phrase id="fldcaption" value="Payment Method" />
+      </field>
+      <field id="company">
+        <phrase id="fldcaption" value="Company" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Visit Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="visit_month">
+        <phrase id="fldcaption" value="visit month" />
       </field>
     </table>
   </project>
