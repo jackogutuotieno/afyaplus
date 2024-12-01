@@ -8,7 +8,8 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(325, "mi_Faciity_Overview", $Language->menuPhrase("325", "MenuText"), "faciityoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "", "", false, true);

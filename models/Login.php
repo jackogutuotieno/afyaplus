@@ -582,8 +582,13 @@ class Login extends Users
     // Page Redirecting event
     public function pageRedirecting(&$url)
     {
-        // Example:
-        //$url = "your URL";
+        if (IsLoggedIn()) {
+            if (CurrentUserlevel() == -1) {
+                $url= "facilityoverview";
+            } if (CurrentUserlevel() == 1) {
+                $url= "frontofficeoverview";
+            } 
+        }
     }
 
     // Message Showing event

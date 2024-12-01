@@ -801,17 +801,28 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","9","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","-2","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","0","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","1","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","2","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","3","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","4","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","5","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","6","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","7","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Facility Overview","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","1","1096"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview","9","0"]];
 
 /**
  * Tables
@@ -894,4 +905,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Income Report","Income_Report","Income Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomereport"],
     ["expenses_report","expenses_report2","expenses report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport2list"],
     ["Expenses Report","Expenses_Report","Expenses Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport"],
-    ["Faciity Overview","Faciity_Overview","Faciity Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","faciityoverview"]];
+    ["Facility Overview","Facility_Overview","Faciity Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","facilityoverview"],
+    ["Front Office Overview","Front_Office_Overview","Front Office Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","frontofficeoverview"]];

@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "faciityoverview";
+    public $CurrentPageName = "frontofficeoverview";
 
     // Page headings
     public $Heading = "";

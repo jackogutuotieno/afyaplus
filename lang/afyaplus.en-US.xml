@@ -2,8 +2,11 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="326">
+      <phrase id="menutext" value="Front Office Overview" />
+    </menu>
     <menu id="325">
-      <phrase id="menutext" value="Faciity Overview" />
+      <phrase id="menutext" value="Facility Overview" />
     </menu>
     <menu id="323">
       <phrase id="menutext" value="expenses report 2" />
@@ -2465,8 +2468,11 @@
         <phrase id="fldcaption" value="expenses month" />
       </field>
     </table>
-    <table id="faciity_overview">
+    <table id="facility_overview">
       <phrase id="tblcaption" value="Faciity Overview" />
+    </table>
+    <table id="front_office_overview">
+      <phrase id="tblcaption" value="Front Office Overview" />
     </table>
   </project>
 </ew-language>

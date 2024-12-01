@@ -158,8 +158,10 @@ return [
     "expenses_report2" => \DI\create(ExpensesReport2::class),
     "Expenses_Report" => \DI\create(ExpensesReport::class),
     "expenses_report" => \DI\create(ExpensesReport::class),
-    "Faciity_Overview" => \DI\create(FaciityOverview::class),
-    "faciity_overview" => \DI\create(FaciityOverview::class),
+    "Facility_Overview" => \DI\create(FacilityOverview::class),
+    "facility_overview" => \DI\create(FacilityOverview::class),
+    "Front_Office_Overview" => \DI\create(FrontOfficeOverview::class),
+    "front_office_overview" => \DI\create(FrontOfficeOverview::class),
 
     // User table
     "usertable" => \DI\get("users"),

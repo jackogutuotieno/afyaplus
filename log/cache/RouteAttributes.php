@@ -147,6 +147,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -289,6 +291,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1684,6 +1696,8 @@
                 '/exportlogedit[/{FileId:.*}]',
                 '/exportlogdelete[/{FileId:.*}]',
                 '/faciityoverview',
+                '/facilityoverview',
+                '/frontofficeoverview',
                 '/incomelist[/{id}]',
                 '/incomeadd[/{id}]',
                 '/incomeview[/{id}]',
@@ -1958,6 +1972,8 @@
                 'PHPMaker2024\\afyaplus\\ExportlogController:edit',
                 'PHPMaker2024\\afyaplus\\ExportlogController:delete',
                 'PHPMaker2024\\afyaplus\\FaciityOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\FacilityOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\FrontOfficeOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\IncomeController:list',
                 'PHPMaker2024\\afyaplus\\IncomeController:add',
                 'PHPMaker2024\\afyaplus\\IncomeController:view',
@@ -2182,6 +2198,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3048,6 +3070,8 @@
                 'edit.exportlog',
                 'delete.exportlog',
                 'dashboard.Faciity_Overview',
+                'dashboard.Facility_Overview',
+                'dashboard.Front_Office_Overview',
                 'list.income',
                 'add.income',
                 'view.income',
@@ -3272,6 +3296,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3820,6 +3846,8 @@
         $o[269],
         $o[270],
         $o[271],
+        $o[272],
+        $o[273],
     ],
     []
 );
