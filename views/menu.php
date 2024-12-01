@@ -8,6 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(325, "mi_Faciity_Overview", $Language->menuPhrase("325", "MenuText"), "faciityoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Faciity Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "", "", false, true);

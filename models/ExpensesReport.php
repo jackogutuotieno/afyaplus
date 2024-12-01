@@ -274,7 +274,7 @@ class ExpensesReport extends ReportTable
         $this->Fields['expenses_month'] = &$this->expenses_month;
 
         // Expenses by Month
-        $this->ExpensesbyMonth = new DbChart($this, 'ExpensesbyMonth', 'Expenses by Month', 'expenses_month', 'cost', 1004, '', 0, 'SUM', 600, 500);
+        $this->ExpensesbyMonth = new DbChart($this, 'ExpensesbyMonth', 'Expenses by Month', 'expenses_month', 'cost', 1001, '', 0, 'SUM', 600, 500);
         $this->ExpensesbyMonth->Position = 4;
         $this->ExpensesbyMonth->PageBreakType = "before";
         $this->ExpensesbyMonth->YAxisFormat = ["Number"];
@@ -287,7 +287,7 @@ class ExpensesReport extends ReportTable
         $this->ExpensesbyMonth->SeriesDateType = "";
         $this->ExpensesbyMonth->ID = "Expenses_Report_ExpensesbyMonth"; // Chart ID
         $this->ExpensesbyMonth->setParameters([
-            ["type", "1004"],
+            ["type", "1001"],
             ["seriestype", "0"]
         ]); // Chart type / Chart series type
         $this->ExpensesbyMonth->setParameters([

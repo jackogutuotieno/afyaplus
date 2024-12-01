@@ -17,6 +17,7 @@ C:\wamp64\www\afyaplus\controllers\ExpensesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReportController.php
 C:\wamp64\www\afyaplus\controllers\ExportlogController.php
+C:\wamp64\www\afyaplus\controllers\FaciityOverviewController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\IncomeReportController.php
@@ -163,6 +164,7 @@ C:\wamp64\www\afyaplus\models\ExportlogDelete.php
 C:\wamp64\www\afyaplus\models\ExportlogEdit.php
 C:\wamp64\www\afyaplus\models\ExportlogList.php
 C:\wamp64\www\afyaplus\models\ExportlogView.php
+C:\wamp64\www\afyaplus\models\FaciityOverview.php
 C:\wamp64\www\afyaplus\models\Income.php
 C:\wamp64\www\afyaplus\models\IncomeAdd.php
 C:\wamp64\www\afyaplus\models\IncomeDelete.php
@@ -728,6 +730,7 @@ C:\wamp64\www\afyaplus\views\ExportlogDelete.php
 C:\wamp64\www\afyaplus\views\ExportlogEdit.php
 C:\wamp64\www\afyaplus\views\ExportlogList.php
 C:\wamp64\www\afyaplus\views\ExportlogView.php
+C:\wamp64\www\afyaplus\views\FaciityOverview.php
 C:\wamp64\www\afyaplus\views\IncomeAdd.php
 C:\wamp64\www\afyaplus\views\IncomeDelete.php
 C:\wamp64\www\afyaplus\views\IncomeEdit.php

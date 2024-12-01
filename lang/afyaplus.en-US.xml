@@ -1,7 +1,10 @@
-<ew-language date="2024/12/1" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/2" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="325">
+      <phrase id="menutext" value="Faciity Overview" />
+    </menu>
     <menu id="323">
       <phrase id="menutext" value="expenses report 2" />
     </menu>
@@ -2461,6 +2464,9 @@
       <field id="expenses_month">
         <phrase id="fldcaption" value="expenses month" />
       </field>
+    </table>
+    <table id="faciity_overview">
+      <phrase id="tblcaption" value="Faciity Overview" />
     </table>
   </project>
 </ew-language>

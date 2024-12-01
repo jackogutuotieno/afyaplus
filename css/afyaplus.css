@@ -20179,15 +20179,14 @@ hr.divider-vertical-blurry {
 
 .counters .record-count {
   position: relative;
-  left: 60px;
-  font-size: 2rem;
+  left: 10px;
+  font-size: 1.5rem;
   font-weight: 900;
   margin-bottom: 5px;
 }
 
 .counters i {
-  font-size: 1.6rem;
-  rotate: -25deg;
+  font-size: 1.4rem;
   opacity: 0.6;
 }
 
@@ -20627,6 +20626,11 @@ td button, .btn-primary {
 
 [type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
   background-color: #08819a;
+}
+
+.counters .card-header {
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /*END_USER_STYLES*/
