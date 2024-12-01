@@ -1849,7 +1849,7 @@
                 '/visittypesedit[/{id}]',
                 '/visittypesdelete[/{id}]',
                 '/vitalsreport2list',
-                '/vitalsreport',
+                '/vitalsreportlist',
             ],
             'handler' => [
                 'PHPMaker2024\\afyaplus\\AppointmentsController:calendar',
@@ -2115,7 +2115,7 @@
                 'PHPMaker2024\\afyaplus\\VisitTypesController:edit',
                 'PHPMaker2024\\afyaplus\\VisitTypesController:delete',
                 'PHPMaker2024\\afyaplus\\Vitalsreport2Controller:list',
-                'PHPMaker2024\\afyaplus\\VitalsReportController:summary',
+                'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
                 [
@@ -3173,7 +3173,7 @@
                 'edit.visit_types',
                 'delete.visit_types',
                 'list.vitalsreport2',
-                'summary.Vitals_Report',
+                'list.vitalsreport',
             ],
             'options' => [
                 [],

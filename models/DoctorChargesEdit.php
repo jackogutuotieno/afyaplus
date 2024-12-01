@@ -125,7 +125,7 @@ class DoctorChargesEdit extends DoctorCharges
         $this->doctor_id->setVisibility();
         $this->item_title->setVisibility();
         $this->cost->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -527,6 +527,9 @@ class DoctorChargesEdit extends DoctorCharges
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->doctor_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -720,7 +723,7 @@ class DoctorChargesEdit extends DoctorCharges
             if (IsApi() && $val === null) {
                 $this->doctor_id->Visible = false; // Disable update for API request
             } else {
-                $this->doctor_id->setFormValue($val, true, $validate);
+                $this->doctor_id->setFormValue($val);
             }
         }
 
@@ -741,16 +744,6 @@ class DoctorChargesEdit extends DoctorCharges
                 $this->cost->Visible = false; // Disable update for API request
             } else {
                 $this->cost->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
             }
         }
 
@@ -785,7 +778,6 @@ class DoctorChargesEdit extends DoctorCharges
         $this->doctor_id->CurrentValue = $this->doctor_id->FormValue;
         $this->item_title->CurrentValue = $this->item_title->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_updated->CurrentValue = $this->date_updated->FormValue;
@@ -920,8 +912,27 @@ class DoctorChargesEdit extends DoctorCharges
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // doctor_id
-            $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+            $curVal = strval($this->doctor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+                if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                    } else {
+                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->doctor_id->ViewValue = null;
+            }
 
             // item_title
             $this->item_title->ViewValue = $this->item_title->CurrentValue;
@@ -929,10 +940,6 @@ class DoctorChargesEdit extends DoctorCharges
             // cost
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -954,9 +961,6 @@ class DoctorChargesEdit extends DoctorCharges
             // cost
             $this->cost->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
             // date_created
             $this->date_created->HrefValue = "";
 
@@ -969,11 +973,30 @@ class DoctorChargesEdit extends DoctorCharges
 
             // doctor_id
             $this->doctor_id->setupEditAttributes();
-            $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-            if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-                $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
+            $curVal = trim(strval($this->doctor_id->CurrentValue));
+            if ($curVal != "") {
+                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+            } else {
+                $this->doctor_id->ViewValue = $this->doctor_id->Lookup !== null && is_array($this->doctor_id->lookupOptions()) && count($this->doctor_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->doctor_id->ViewValue !== null) { // Load from cache
+                $this->doctor_id->EditValue = array_values($this->doctor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->doctor_id->CurrentValue, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->doctor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->doctor_id->EditValue = $arwrk;
+            }
+            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
 
             // item_title
             $this->item_title->setupEditAttributes();
@@ -989,20 +1012,6 @@ class DoctorChargesEdit extends DoctorCharges
             $this->cost->PlaceHolder = RemoveHtml($this->cost->caption());
             if (strval($this->cost->EditValue) != "" && is_numeric($this->cost->EditValue)) {
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
-            }
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
             }
 
             // date_created
@@ -1028,9 +1037,6 @@ class DoctorChargesEdit extends DoctorCharges
 
             // cost
             $this->cost->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1068,9 +1074,6 @@ class DoctorChargesEdit extends DoctorCharges
                     $this->doctor_id->addErrorMessage(str_replace("%s", $this->doctor_id->caption(), $this->doctor_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->doctor_id->FormValue)) {
-                $this->doctor_id->addErrorMessage($this->doctor_id->getErrorMessage(false));
-            }
             if ($this->item_title->Visible && $this->item_title->Required) {
                 if (!$this->item_title->IsDetailKey && EmptyValue($this->item_title->FormValue)) {
                     $this->item_title->addErrorMessage(str_replace("%s", $this->item_title->caption(), $this->item_title->RequiredErrorMessage));
@@ -1083,14 +1086,6 @@ class DoctorChargesEdit extends DoctorCharges
             }
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
                 if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
@@ -1206,9 +1201,6 @@ class DoctorChargesEdit extends DoctorCharges
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
 
@@ -1231,9 +1223,6 @@ class DoctorChargesEdit extends DoctorCharges
         }
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
-        }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -1277,6 +1266,8 @@ class DoctorChargesEdit extends DoctorCharges
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_doctor_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

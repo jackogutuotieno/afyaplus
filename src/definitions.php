@@ -121,7 +121,7 @@ return [
     "users" => \DI\create(Users::class),
     "vaccinationsreport2" => \DI\create(Vaccinationsreport2::class),
     "visit_types" => \DI\create(VisitTypes::class),
-    "vitalsreport2" => \DI\create(Vitalsreport2::class),
+    "vitalsreport" => \DI\create(Vitalsreport::class),
     "exportlog" => \DI\create(Exportlog::class),
     "subscriptions" => \DI\create(Subscriptions::class),
     "Appointments" => \DI\create(Appointments::class),

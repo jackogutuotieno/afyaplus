@@ -157,9 +157,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_doctor_charges_id" class="doctor_charges_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->doctor_id->Visible) { // doctor_id ?>
         <th data-name="doctor_id" class="<?= $Page->doctor_id->headerCellClass() ?>"><div id="elh_doctor_charges_doctor_id" class="doctor_charges_doctor_id"><?= $Page->renderFieldHeader($Page->doctor_id) ?></div></th>
 <?php } ?>
@@ -168,9 +165,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->cost->Visible) { // cost ?>
         <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_doctor_charges_cost" class="doctor_charges_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_doctor_charges_created_by_user_id" class="doctor_charges_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_doctor_charges_date_created" class="doctor_charges_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -206,14 +200,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_charges_id" class="el_doctor_charges_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->doctor_id->Visible) { // doctor_id ?>
         <td data-name="doctor_id"<?= $Page->doctor_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_charges_doctor_id" class="el_doctor_charges_doctor_id">
@@ -235,14 +221,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_charges_cost" class="el_doctor_charges_cost">
 <span<?= $Page->cost->viewAttributes() ?>>
 <?= $Page->cost->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_charges_created_by_user_id" class="el_doctor_charges_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

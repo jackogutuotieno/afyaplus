@@ -142,14 +142,18 @@ class DoctorCharges extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->doctor_id->InputTextType = "text";
         $this->doctor_id->Raw = true;
         $this->doctor_id->Nullable = false; // NOT NULL field
         $this->doctor_id->Required = true; // Required field
+        $this->doctor_id->setSelectMultiple(false); // Select one
+        $this->doctor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->doctor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->doctor_id->Lookup = new Lookup($this->doctor_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->doctor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->doctor_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->doctor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['doctor_id'] = &$this->doctor_id;
 
         // item_title
@@ -224,6 +228,7 @@ class DoctorCharges extends DbTable
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
         $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->Sortable = false; // Allow sort
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
@@ -234,10 +239,10 @@ class DoctorCharges extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -250,7 +255,7 @@ class DoctorCharges extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -260,10 +265,10 @@ class DoctorCharges extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -276,7 +281,7 @@ class DoctorCharges extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -1208,6 +1213,7 @@ class DoctorCharges extends DbTable
         // cost
 
         // created_by_user_id
+        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1217,8 +1223,27 @@ class DoctorCharges extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // doctor_id
-        $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+        $curVal = strval($this->doctor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+            if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                } else {
+                    $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                }
+            }
+        } else {
+            $this->doctor_id->ViewValue = null;
+        }
 
         // item_title
         $this->item_title->ViewValue = $this->item_title->CurrentValue;
@@ -1288,11 +1313,7 @@ class DoctorCharges extends DbTable
 
         // doctor_id
         $this->doctor_id->setupEditAttributes();
-        $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
         $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-        if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-            $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
-        }
 
         // item_title
         $this->item_title->setupEditAttributes();
@@ -1366,7 +1387,6 @@ class DoctorCharges extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->cost);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
@@ -1374,7 +1394,6 @@ class DoctorCharges extends DbTable
                     $doc->exportCaption($this->doctor_id);
                     $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->cost);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1407,7 +1426,6 @@ class DoctorCharges extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->item_title);
                         $doc->exportField($this->cost);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
@@ -1415,7 +1433,6 @@ class DoctorCharges extends DbTable
                         $doc->exportField($this->doctor_id);
                         $doc->exportField($this->item_title);
                         $doc->exportField($this->cost);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }

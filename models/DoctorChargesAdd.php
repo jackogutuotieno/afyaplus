@@ -521,6 +521,9 @@ class DoctorChargesAdd extends DoctorCharges
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->doctor_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -686,7 +689,7 @@ class DoctorChargesAdd extends DoctorCharges
             if (IsApi() && $val === null) {
                 $this->doctor_id->Visible = false; // Disable update for API request
             } else {
-                $this->doctor_id->setFormValue($val, true, $validate);
+                $this->doctor_id->setFormValue($val);
             }
         }
 
@@ -888,8 +891,27 @@ class DoctorChargesAdd extends DoctorCharges
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // doctor_id
-            $this->doctor_id->ViewValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->ViewValue, $this->doctor_id->formatPattern());
+            $curVal = strval($this->doctor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+                if ($this->doctor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->doctor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->doctor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->doctor_id->ViewValue = $this->doctor_id->displayValue($arwrk);
+                    } else {
+                        $this->doctor_id->ViewValue = FormatNumber($this->doctor_id->CurrentValue, $this->doctor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->doctor_id->ViewValue = null;
+            }
 
             // item_title
             $this->item_title->ViewValue = $this->item_title->CurrentValue;
@@ -930,11 +952,30 @@ class DoctorChargesAdd extends DoctorCharges
         } elseif ($this->RowType == RowType::ADD) {
             // doctor_id
             $this->doctor_id->setupEditAttributes();
-            $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-            if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-                $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
+            $curVal = trim(strval($this->doctor_id->CurrentValue));
+            if ($curVal != "") {
+                $this->doctor_id->ViewValue = $this->doctor_id->lookupCacheOption($curVal);
+            } else {
+                $this->doctor_id->ViewValue = $this->doctor_id->Lookup !== null && is_array($this->doctor_id->lookupOptions()) && count($this->doctor_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->doctor_id->ViewValue !== null) { // Load from cache
+                $this->doctor_id->EditValue = array_values($this->doctor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->doctor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->doctor_id->CurrentValue, $this->doctor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->doctor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->doctor_id->EditValue = $arwrk;
+            }
+            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
 
             // item_title
             $this->item_title->setupEditAttributes();
@@ -1020,9 +1061,6 @@ class DoctorChargesAdd extends DoctorCharges
                 if (!$this->doctor_id->IsDetailKey && EmptyValue($this->doctor_id->FormValue)) {
                     $this->doctor_id->addErrorMessage(str_replace("%s", $this->doctor_id->caption(), $this->doctor_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->doctor_id->FormValue)) {
-                $this->doctor_id->addErrorMessage($this->doctor_id->getErrorMessage(false));
             }
             if ($this->item_title->Visible && $this->item_title->Required) {
                 if (!$this->item_title->IsDetailKey && EmptyValue($this->item_title->FormValue)) {
@@ -1224,6 +1262,8 @@ class DoctorChargesAdd extends DoctorCharges
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_doctor_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
