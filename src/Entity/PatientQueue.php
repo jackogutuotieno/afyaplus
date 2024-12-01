@@ -51,6 +51,11 @@ class PatientQueue extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
+    public function __construct()
+    {
+        $this->status = "Pending";
+    }
+
     public function getId(): int
     {
         return $this->id;

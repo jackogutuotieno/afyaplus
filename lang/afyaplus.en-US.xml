@@ -197,23 +197,23 @@
     <menu id="242">
       <phrase id="menutext" value="Appointments" />
     </menu>
-    <menu id="110">
+    <menu id="318">
       <phrase id="menutext" value="Vaccinations" />
+    </menu>
+    <menu id="316">
+      <phrase id="menutext" value="Laboratory" />
     </menu>
     <menu id="313">
       <phrase id="menutext" value="Medicine Stock" />
-    </menu>
-    <menu id="316">
-      <phrase id="menutext" value="Laboratory Reports" />
-    </menu>
-    <menu id="318">
-      <phrase id="menutext" value="Vaccinations Report" />
     </menu>
     <menu id="322">
       <phrase id="menutext" value="Income Report" />
     </menu>
     <menu id="317">
       <phrase id="menutext" value="vaccinations report 3" />
+    </menu>
+    <menu id="110">
+      <phrase id="menutext" value="Vaccinations" />
     </menu>
     <menu id="39">
       <phrase id="menutext" value="Appointments" />

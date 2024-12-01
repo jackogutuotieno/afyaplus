@@ -231,9 +231,9 @@ class PatientQueue extends DbTable
             'FORMATTED TEXT', // View Tag
             'SELECT' // Edit Tag
         );
+        $this->status->addMethod("getDefault", fn() => "Pending");
         $this->status->InputTextType = "text";
         $this->status->Nullable = false; // NOT NULL field
-        $this->status->Required = true; // Required field
         $this->status->setSelectMultiple(false); // Select one
         $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text

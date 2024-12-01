@@ -680,6 +680,8 @@ class PatientQueueAdd extends PatientQueue
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->status->DefaultValue = $this->status->getDefault(); // PHP
+        $this->status->OldValue = $this->status->DefaultValue;
     }
 
     // Load form values
@@ -1132,7 +1134,7 @@ class PatientQueueAdd extends PatientQueue
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, false);
 
         // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, strval($this->status->CurrentValue) == "");
         return $rsnew;
     }
 

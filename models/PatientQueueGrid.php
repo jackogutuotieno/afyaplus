@@ -1670,6 +1670,8 @@ class PatientQueueGrid extends PatientQueue
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->status->DefaultValue = $this->status->getDefault(); // PHP
+        $this->status->OldValue = $this->status->DefaultValue;
     }
 
     // Load form values
@@ -2446,7 +2448,7 @@ class PatientQueueGrid extends PatientQueue
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, false);
 
         // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, strval($this->status->CurrentValue) == "");
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
