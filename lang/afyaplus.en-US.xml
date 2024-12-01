@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="323">
+      <phrase id="menutext" value="expenses report 2" />
+    </menu>
     <menu id="321">
       <phrase id="menutext" value="income report 2" />
     </menu>
@@ -207,7 +210,10 @@
       <phrase id="menutext" value="Medicine Stock" />
     </menu>
     <menu id="322">
-      <phrase id="menutext" value="Income Report" />
+      <phrase id="menutext" value="Income" />
+    </menu>
+    <menu id="324">
+      <phrase id="menutext" value="Expenses" />
     </menu>
     <menu id="317">
       <phrase id="menutext" value="vaccinations report 3" />
@@ -2401,6 +2407,59 @@
       </field>
       <field id="income_month">
         <phrase id="fldcaption" value="income month" />
+      </field>
+    </table>
+    <table id="expenses_report2">
+      <phrase id="tblcaption" value="expenses report 2" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="expense_title">
+        <phrase id="fldcaption" value="expense title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="cost" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="expenses_month">
+        <phrase id="fldcaption" value="expenses month" />
+      </field>
+    </table>
+    <table id="expenses_report">
+      <phrase id="tblcaption" value="Expenses Report" />
+      <chart id="expensesbymonth">
+        <phrase id="chartcaption" value="Expenses by Month" />
+        <phrase id="chartxaxisname" value="expenses month" />
+        <phrase id="chartyaxisname" value="cost" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="expense_title">
+        <phrase id="fldcaption" value="expense title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="cost" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="expenses_month">
+        <phrase id="fldcaption" value="expenses month" />
       </field>
     </table>
   </project>

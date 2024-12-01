@@ -143,6 +143,9 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -285,6 +288,21 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1652,6 +1670,9 @@
                 '/expensesview[/{id}]',
                 '/expensesedit[/{id}]',
                 '/expensesdelete[/{id}]',
+                '/expensesreport2list[/{id}]',
+                '/expensesreport',
+                '/expensesreport/ExpensesbyMonth',
                 '/exportloglist[/{FileId:.*}]',
                 '/exportlogview[/{FileId:.*}]',
                 '/exportlogedit[/{FileId:.*}]',
@@ -1922,6 +1943,9 @@
                 'PHPMaker2024\\afyaplus\\ExpensesController:view',
                 'PHPMaker2024\\afyaplus\\ExpensesController:edit',
                 'PHPMaker2024\\afyaplus\\ExpensesController:delete',
+                'PHPMaker2024\\afyaplus\\ExpensesReport2Controller:list',
+                'PHPMaker2024\\afyaplus\\ExpensesReportController:summary',
+                'PHPMaker2024\\afyaplus\\ExpensesReportController:ExpensesbyMonth',
                 'PHPMaker2024\\afyaplus\\ExportlogController:list',
                 'PHPMaker2024\\afyaplus\\ExportlogController:view',
                 'PHPMaker2024\\afyaplus\\ExportlogController:edit',
@@ -2150,6 +2174,15 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2996,6 +3029,9 @@
                 'view.expenses',
                 'edit.expenses',
                 'delete.expenses',
+                'list.expenses_report2',
+                'summary.Expenses_Report',
+                'summary.Expenses_Report.ExpensesbyMonth',
                 'list.exportlog',
                 'view.exportlog',
                 'edit.exportlog',
@@ -3224,6 +3260,9 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3764,6 +3803,9 @@
         $o[265],
         $o[266],
         $o[267],
+        $o[268],
+        $o[269],
+        $o[270],
     ],
     []
 );

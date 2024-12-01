@@ -155,6 +155,9 @@ return [
     "income_report2" => \DI\create(IncomeReport2::class),
     "Income_Report" => \DI\create(IncomeReport::class),
     "income_report" => \DI\create(IncomeReport::class),
+    "expenses_report2" => \DI\create(ExpensesReport2::class),
+    "Expenses_Report" => \DI\create(ExpensesReport::class),
+    "expenses_report" => \DI\create(ExpensesReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

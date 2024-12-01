@@ -778,7 +778,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Income Report","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Income Report","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Income Report","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Income Report","9","1096"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Income Report","9","1096"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}expenses_report","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Expenses Report","9","0"]];
 
 /**
  * Tables
@@ -858,4 +880,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["visits_report","visits_report","Visits Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","visitsreportlist"],
     ["Visits Report1","Visits_Report1","Visits Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","visitsreport1"],
     ["income_report","income_report2","income report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomereport2list"],
-    ["Income Report","Income_Report","Income Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomereport"]];
+    ["Income Report","Income_Report","Income Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomereport"],
+    ["expenses_report","expenses_report2","expenses report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport2list"],
+    ["Expenses Report","Expenses_Report","Expenses Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport"]];

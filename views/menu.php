@@ -68,4 +68,5 @@ $sideMenu->addMenuItem(318, "mi_Vaccinations_Report", $Language->menuPhrase("318
 $sideMenu->addMenuItem(316, "mi_Laboratory_Reports", $Language->menuPhrase("316", "MenuText"), "laboratoryreports", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(313, "mi_Medicine_Stock_Report", $Language->menuPhrase("313", "MenuText"), "medicinestockreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(322, "mi_Income_Report", $Language->menuPhrase("322", "MenuText"), "incomereport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Income Report'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(324, "mi_Expenses_Report", $Language->menuPhrase("324", "MenuText"), "expensesreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Expenses Report'), false, false, "", "", false, true);
 echo $sideMenu->toScript();

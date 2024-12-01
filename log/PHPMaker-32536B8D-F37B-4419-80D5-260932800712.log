@@ -14,6 +14,8 @@ C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesController.php
+C:\wamp64\www\afyaplus\controllers\ExpensesReport2Controller.php
+C:\wamp64\www\afyaplus\controllers\ExpensesReportController.php
 C:\wamp64\www\afyaplus\controllers\ExportlogController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
@@ -150,6 +152,10 @@ C:\wamp64\www\afyaplus\models\ExpensesAdd.php
 C:\wamp64\www\afyaplus\models\ExpensesDelete.php
 C:\wamp64\www\afyaplus\models\ExpensesEdit.php
 C:\wamp64\www\afyaplus\models\ExpensesList.php
+C:\wamp64\www\afyaplus\models\ExpensesReport.php
+C:\wamp64\www\afyaplus\models\ExpensesReport2.php
+C:\wamp64\www\afyaplus\models\ExpensesReport2List.php
+C:\wamp64\www\afyaplus\models\ExpensesReportSummary.php
 C:\wamp64\www\afyaplus\models\ExpensesView.php
 C:\wamp64\www\afyaplus\models\Exportlog.php
 C:\wamp64\www\afyaplus\models\ExportlogAdd.php
@@ -520,6 +526,7 @@ C:\wamp64\www\afyaplus\src\Entity\Disease.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorCharge.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
 C:\wamp64\www\afyaplus\src\Entity\Expense.php
+C:\wamp64\www\afyaplus\src\Entity\ExpensesReport.php
 C:\wamp64\www\afyaplus\src\Entity\Exportlog.php
 C:\wamp64\www\afyaplus\src\Entity\Income.php
 C:\wamp64\www\afyaplus\src\Entity\IncomeReport.php
@@ -713,6 +720,8 @@ C:\wamp64\www\afyaplus\views\ExpensesAdd.php
 C:\wamp64\www\afyaplus\views\ExpensesDelete.php
 C:\wamp64\www\afyaplus\views\ExpensesEdit.php
 C:\wamp64\www\afyaplus\views\ExpensesList.php
+C:\wamp64\www\afyaplus\views\ExpensesReport2List.php
+C:\wamp64\www\afyaplus\views\ExpensesReportSummary.php
 C:\wamp64\www\afyaplus\views\ExpensesView.php
 C:\wamp64\www\afyaplus\views\ExportlogAdd.php
 C:\wamp64\www\afyaplus\views\ExportlogDelete.php
