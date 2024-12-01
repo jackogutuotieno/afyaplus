@@ -177,6 +177,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->section->Visible) { // section ?>
         <th data-name="section" class="<?= $Page->section->headerCellClass() ?>"><div id="elh_patient_queue_section" class="patient_queue_section"><?= $Page->renderFieldHeader($Page->section) ?></div></th>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_patient_queue_status" class="patient_queue_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_queue_date_created" class="patient_queue_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -221,6 +224,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_queue_section" class="el_patient_queue_section">
 <span<?= $Page->section->viewAttributes() ?>>
 <?= $Page->section->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->status->Visible) { // status ?>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_queue_status" class="el_patient_queue_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -57,6 +57,9 @@ class VaccinationsReport extends AbstractEntity
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
 
+    #[Column(name: "vaccination_month", type: "string", nullable: true)]
+    private ?string $vaccinationMonth;
+
     public function getId(): int
     {
         return $this->id;
@@ -155,25 +158,19 @@ class VaccinationsReport extends AbstractEntity
         $this->dateUpdated = $value;
         return $this;
     }
+
+    public function getVaccinationMonth(): ?string
+    {
+        return HtmlDecode($this->vaccinationMonth);
+    }
+
+    public function setVaccinationMonth(?string $value): static
+    {
+        $this->vaccinationMonth = RemoveXss($value);
+        return $this;
+    }
 }
-= $value;
-        return $this;
-    }
-
-    public function getCategoryName(): ?string
-    {
-        return HtmlDecode($this->categoryName);
-    }
-
-    public function setCategoryName(?string $value): static
-    {
-        $this->categoryName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getSubcategory(): ?string
-    {
-        return HtmlDecode($this->subcategory);
+tegory);
     }
 
     public function setSubcategory(?string $value): static

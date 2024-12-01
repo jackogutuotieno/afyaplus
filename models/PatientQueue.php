@@ -50,6 +50,7 @@ class PatientQueue extends DbTable
     public $patient_id;
     public $visit_id;
     public $section;
+    public $status;
     public $date_created;
     public $date_updated;
 
@@ -114,7 +115,7 @@ class PatientQueue extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
@@ -212,16 +213,45 @@ class PatientQueue extends DbTable
         $this->section->SearchOperators = ["=", "<>"];
         $this->Fields['section'] = &$this->section;
 
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '`status`', // Expression
+            '`status`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`status`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->status->InputTextType = "text";
+        $this->status->Nullable = false; // NOT NULL field
+        $this->status->Required = true; // Required field
+        $this->status->setSelectMultiple(false); // Select one
+        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status->Lookup = new Lookup($this->status, 'patient_queue', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->status->OptionCount = 5;
+        $this->status->SearchOperators = ["=", "<>"];
+        $this->Fields['status'] = &$this->status;
+
         // date_created
         $this->date_created = new DbField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            3, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -234,7 +264,7 @@ class PatientQueue extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -244,10 +274,10 @@ class PatientQueue extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -261,7 +291,7 @@ class PatientQueue extends DbTable
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
         $this->date_updated->Sortable = false; // Allow sort
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -888,6 +918,7 @@ class PatientQueue extends DbTable
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
         $this->section->DbValue = $row['section'];
+        $this->status->DbValue = $row['status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1251,6 +1282,7 @@ class PatientQueue extends DbTable
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1290,6 +1322,8 @@ class PatientQueue extends DbTable
         // visit_id
 
         // section
+
+        // status
 
         // date_created
 
@@ -1333,6 +1367,13 @@ class PatientQueue extends DbTable
             $this->section->ViewValue = null;
         }
 
+        // status
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1356,6 +1397,10 @@ class PatientQueue extends DbTable
         // section
         $this->section->HrefValue = "";
         $this->section->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1432,6 +1477,11 @@ class PatientQueue extends DbTable
         $this->section->EditValue = $this->section->options(true);
         $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+        // status
+        $this->status->setupEditAttributes();
+        $this->status->EditValue = $this->status->options(true);
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1474,11 +1524,13 @@ class PatientQueue extends DbTable
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->section);
+                    $doc->exportCaption($this->status);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->section);
+                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                 }
                 $doc->endExportRow();
@@ -1510,11 +1562,13 @@ class PatientQueue extends DbTable
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->section);
+                        $doc->exportField($this->status);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->section);
+                        $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                     }
                     $doc->endExportRow($rowCnt);
@@ -1551,6 +1605,13 @@ class PatientQueue extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
+        if (IsLoggedIn() && CurrentUserLevel() == 2) {
+            $consultation = "Consultation";
+            AddFilter($filter, "section= '" . $consultation . "'");
+        } else if (IsLoggedIn() && CurrentUserLevel() == 3) {
+            $triage = "Triage";
+            AddFilter($filter, "section= '" . $triage . "'");
+        } 
     }
 
     // Recordset Selected event
@@ -1685,8 +1746,15 @@ class PatientQueue extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        if ($this->status->CurrentValue == "Checked In") {
+            $this->status->CellAttrs["style"] = "background-color: green; color: white";
+        } else if ($this->status->CurrentValue == "Vitals Taken") {
+            $this->status->CellAttrs["style"] = "background-color: purple; color: white";
+        } else if ($this->status->CurrentValue == "Doctor Consulted") {
+            $this->status->CellAttrs["style"] = "background-color: magenta; color: white";
+        } else if ($this->status->CurrentValue == "Medicines Issued") {
+            $this->status->CellAttrs["style"] = "background-color: cyan; color: grey";
+        } 
     }
 
     // User ID Filtering event

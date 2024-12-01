@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="321">
+      <phrase id="menutext" value="income report 2" />
+    </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
     </menu>
@@ -205,6 +208,9 @@
     </menu>
     <menu id="318">
       <phrase id="menutext" value="Vaccinations Report" />
+    </menu>
+    <menu id="322">
+      <phrase id="menutext" value="Income Report" />
     </menu>
     <menu id="317">
       <phrase id="menutext" value="vaccinations report 3" />
@@ -942,7 +948,7 @@
         <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="visit_id">
-        <phrase id="fldcaption" value="Check-In Title" />
+        <phrase id="fldcaption" value="Visit ID" />
       </field>
       <field id="service_id">
         <phrase id="fldcaption" value="Vaccination" />
@@ -1695,11 +1701,24 @@
         <phrase id="fldtagvalue5" value="Pharmacy" />
         <phrase id="fldtagcaption5" value="Pharmacy" />
       </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Checked In" />
+        <phrase id="fldtagcaption1" value="Checked In" />
+        <phrase id="fldtagvalue2" value="Vitals Taken" />
+        <phrase id="fldtagcaption2" value="Vitals Taken" />
+        <phrase id="fldtagvalue3" value="Doctor Consulted" />
+        <phrase id="fldtagcaption3" value="Doctor Consulted" />
+        <phrase id="fldtagvalue4" value="Tests Performed" />
+        <phrase id="fldtagcaption4" value="Tests Performed" />
+        <phrase id="fldtagvalue5" value="Medicines Issued" />
+        <phrase id="fldtagcaption5" value="Medicines Issued" />
+      </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Time" />
+        <phrase id="fldcaption" value="Queue Date/Time" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="Date Updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="laboratory_minor_report">
@@ -2218,9 +2237,17 @@
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
       </field>
+      <field id="vaccination_month">
+        <phrase id="fldcaption" value="vaccination month" />
+      </field>
     </table>
     <table id="vaccinations_report">
       <phrase id="tblcaption" value="Vaccinations Report" />
+      <chart id="vaccinationsbymonth">
+        <phrase id="chartcaption" value="Vaccinations by Month" />
+        <phrase id="chartxaxisname" value="vaccination month" />
+        <phrase id="chartyaxisname" value="vaccination month" />
+      </chart>
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
@@ -2247,6 +2274,9 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="vaccination_month">
+        <phrase id="fldcaption" value="vaccination month" />
       </field>
     </table>
     <table id="visits_report">
@@ -2318,6 +2348,59 @@
       </field>
       <field id="visit_month">
         <phrase id="fldcaption" value="visit month" />
+      </field>
+    </table>
+    <table id="income_report2">
+      <phrase id="tblcaption" value="income report 2" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="income_title">
+        <phrase id="fldcaption" value="income title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="cost" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="income_month">
+        <phrase id="fldcaption" value="income month" />
+      </field>
+    </table>
+    <table id="income_report">
+      <phrase id="tblcaption" value="Income Report" />
+      <chart id="incomebymonth">
+        <phrase id="chartcaption" value="Income by Month" />
+        <phrase id="chartxaxisname" value="income month" />
+        <phrase id="chartyaxisname" value="cost" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="income_title">
+        <phrase id="fldcaption" value="income title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="cost">
+        <phrase id="fldcaption" value="cost" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="income_month">
+        <phrase id="fldcaption" value="income month" />
       </field>
     </table>
   </project>

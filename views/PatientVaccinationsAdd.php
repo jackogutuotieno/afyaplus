@@ -74,11 +74,21 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_patient_vaccinations_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_patient_vaccinations_patient_id">
     <select
         id="x_patient_id"
@@ -118,6 +128,7 @@ loadjs.ready("fpatient_vaccinationsadd", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -125,11 +136,17 @@ loadjs.ready("fpatient_vaccinationsadd", function() {
     <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
         <label id="elh_patient_vaccinations_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
+<?php if ($Page->visit_id->getSessionValue() != "") { ?>
+<span<?= $Page->visit_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visit_id->getDisplayValue($Page->visit_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_patient_vaccinations_visit_id">
 <input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
 <?= $Page->visit_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

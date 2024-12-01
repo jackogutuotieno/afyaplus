@@ -28,10 +28,10 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null, ew.Validators.integer], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
-            ["section", [fields.section.visible && fields.section.required ? ew.Validators.required(fields.section.caption) : null], fields.section.isInvalid]
+            ["section", [fields.section.visible && fields.section.required ? ew.Validators.required(fields.section.caption) : null], fields.section.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -49,6 +49,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
             "section": <?= $Page->section->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -80,7 +81,7 @@ loadjs.ready("head", function () {
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
-        <label id="elh_patient_queue_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_patient_queue_id" for="x_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->id->cellAttributes() ?>>
 <span id="el_patient_queue_id">
 <span<?= $Page->id->viewAttributes() ?>>
@@ -142,24 +143,6 @@ loadjs.ready("fpatient_queueedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <div id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <label id="elh_patient_queue_visit_id" for="x_visit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->visit_id->caption() ?><?= $Page->visit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->visit_id->cellAttributes() ?>>
-<?php if ($Page->visit_id->getSessionValue() != "") { ?>
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visit_id->getDisplayValue($Page->visit_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x_visit_id" name="x_visit_id" value="<?= HtmlEncode($Page->visit_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el_patient_queue_visit_id">
-<input type="<?= $Page->visit_id->getInputTextType() ?>" name="x_visit_id" id="x_visit_id" data-table="patient_queue" data-field="x_visit_id" value="<?= $Page->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->visit_id->formatPattern()) ?>"<?= $Page->visit_id->editAttributes() ?> aria-describedby="x_visit_id_help">
-<?= $Page->visit_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->section->Visible) { // section ?>
     <div id="r_section"<?= $Page->section->rowAttributes() ?>>
         <label id="elh_patient_queue_section" for="x_section" class="<?= $Page->LeftColumnClass ?>"><?= $Page->section->caption() ?><?= $Page->section->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -197,6 +180,51 @@ loadjs.ready("fpatient_queueedit", function() {
     }
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_queue.fields.section.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_patient_queue_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_patient_queue_status">
+    <select
+        id="x_status"
+        name="x_status"
+        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
+        <?php if (!$Page->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_queueedit_x_status"
+        <?php } ?>
+        data-table="patient_queue"
+        data-field="x_status"
+        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+        <?= $Page->status->editAttributes() ?>>
+        <?= $Page->status->selectOptionListHtml("x_status") ?>
+    </select>
+    <?= $Page->status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if (!$Page->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_queueedit", function() {
+    var options = { name: "x_status", selectId: "fpatient_queueedit_x_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_queueedit.lists.status?.lookupOptions.length) {
+        options.data = { id: "x_status", form: "fpatient_queueedit" };
+    } else {
+        options.ajax = { id: "x_status", form: "fpatient_queueedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_queue.fields.status.selectOptions);
     ew.createSelect(options);
 });
 </script>

@@ -25,6 +25,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["section", [fields.section.visible && fields.section.required ? ew.Validators.required(fields.section.caption) : null], fields.section.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
@@ -32,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["section",false],["date_created",false]];
+                    fields = [["patient_id",false],["section",false],["status",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -54,6 +55,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
             "section": <?= $Grid->section->toClientList($Grid) ?>,
+            "status": <?= $Grid->status->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -93,6 +95,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->section->Visible) { // section ?>
         <th data-name="section" class="<?= $Grid->section->headerCellClass() ?>"><div id="elh_patient_queue_section" class="patient_queue_section"><?= $Grid->renderFieldHeader($Grid->section) ?></div></th>
+<?php } ?>
+<?php if ($Grid->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Grid->status->headerCellClass() ?>"><div id="elh_patient_queue_status" class="patient_queue_status"><?= $Grid->renderFieldHeader($Grid->status) ?></div></th>
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patient_queue_date_created" class="patient_queue_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
@@ -333,6 +338,99 @@ loadjs.ready("fpatient_queuegrid", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->status->Visible) { // status ?>
+        <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_queue_status" class="el_patient_queue_status">
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_queuegrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_queue"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_queuegrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_queuegrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_queuegrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_queuegrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_queuegrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_queue.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="patient_queue" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_queue_status" class="el_patient_queue_status">
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_queuegrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_queue"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_queuegrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_queuegrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_queuegrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_queuegrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_queuegrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_queue.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_queue_status" class="el_patient_queue_status">
+<span<?= $Grid->status->viewAttributes() ?>>
+<?= $Grid->status->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patient_queue" data-field="x_status" data-hidden="1" name="fpatient_queuegrid$x<?= $Grid->RowIndex ?>_status" id="fpatient_queuegrid$x<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->FormValue) ?>">
+<input type="hidden" data-table="patient_queue" data-field="x_status" data-hidden="1" data-old name="fpatient_queuegrid$o<?= $Grid->RowIndex ?>_status" id="fpatient_queuegrid$o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Grid->date_created->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -342,7 +440,7 @@ loadjs.ready("fpatient_queuegrid", function() {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_queuegrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -378,7 +476,7 @@ loadjs.ready(["fpatient_queuegrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_queuegrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

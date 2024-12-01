@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class VaccinationsReport3List extends VaccinationsReport3
+class IncomeReport2List extends IncomeReport2
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class VaccinationsReport3List extends VaccinationsReport3
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "VaccinationsReport3List";
+    public $PageObjName = "IncomeReport2List";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class VaccinationsReport3List extends VaccinationsReport3
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fvaccinations_report3list";
+    public $FormName = "fincome_report2list";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "vaccinationsreport3list";
+    public $CurrentPageName = "incomereport2list";
 
     // Page URLs
     public $AddUrl;
@@ -146,15 +146,12 @@ class VaccinationsReport3List extends VaccinationsReport3
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->gender->setVisibility();
-        $this->service_name->setVisibility();
-        $this->status->setVisibility();
+        $this->income_title->setVisibility();
+        $this->description->setVisibility();
+        $this->cost->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->vaccination_month->setVisibility();
+        $this->income_month->setVisibility();
     }
 
     // Constructor
@@ -165,8 +162,8 @@ class VaccinationsReport3List extends VaccinationsReport3
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'vaccinations_report3';
-        $this->TableName = 'vaccinations_report';
+        $this->TableVar = 'income_report2';
+        $this->TableName = 'income_report';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -186,26 +183,26 @@ class VaccinationsReport3List extends VaccinationsReport3
         // Language object
         $Language = Container("app.language");
 
-        // Table object (vaccinations_report3)
-        if (!isset($GLOBALS["vaccinations_report3"]) || $GLOBALS["vaccinations_report3"]::class == PROJECT_NAMESPACE . "vaccinations_report3") {
-            $GLOBALS["vaccinations_report3"] = &$this;
+        // Table object (income_report2)
+        if (!isset($GLOBALS["income_report2"]) || $GLOBALS["income_report2"]::class == PROJECT_NAMESPACE . "income_report2") {
+            $GLOBALS["income_report2"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "vaccinationsreport3add";
+        $this->AddUrl = "incomereport2add";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "vaccinationsreport3delete";
-        $this->MultiUpdateUrl = "vaccinationsreport3update";
+        $this->MultiDeleteUrl = "incomereport2delete";
+        $this->MultiUpdateUrl = "incomereport2update";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'vaccinations_report');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'income_report');
         }
 
         // Start timer
@@ -356,7 +353,7 @@ class VaccinationsReport3List extends VaccinationsReport3
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "vaccinationsreport3view"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "incomereport2view"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -712,7 +709,7 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fvaccinations_report3grid";
+            $this->FormName = "fincome_report2grid";
         }
 
         // Set up page action
@@ -1049,18 +1046,15 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fvaccinations_report3srch");
+            $savedFilterList = Profile()->getSearchFilters("fincome_report2srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
-        $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
-        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
-        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
-        $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
+        $filterList = Concat($filterList, $this->income_title->AdvancedSearch->toJson(), ","); // Field income_title
+        $filterList = Concat($filterList, $this->description->AdvancedSearch->toJson(), ","); // Field description
+        $filterList = Concat($filterList, $this->cost->AdvancedSearch->toJson(), ","); // Field cost
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->vaccination_month->AdvancedSearch->toJson(), ","); // Field vaccination_month
+        $filterList = Concat($filterList, $this->income_month->AdvancedSearch->toJson(), ","); // Field income_month
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1081,7 +1075,7 @@ class VaccinationsReport3List extends VaccinationsReport3
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fvaccinations_report3srch", $filters);
+            Profile()->setSearchFilters("fincome_report2srch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1108,53 +1102,29 @@ class VaccinationsReport3List extends VaccinationsReport3
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field first_name
-        $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator = @$filter["z_first_name"];
-        $this->first_name->AdvancedSearch->SearchCondition = @$filter["v_first_name"];
-        $this->first_name->AdvancedSearch->SearchValue2 = @$filter["y_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator2 = @$filter["w_first_name"];
-        $this->first_name->AdvancedSearch->save();
+        // Field income_title
+        $this->income_title->AdvancedSearch->SearchValue = @$filter["x_income_title"];
+        $this->income_title->AdvancedSearch->SearchOperator = @$filter["z_income_title"];
+        $this->income_title->AdvancedSearch->SearchCondition = @$filter["v_income_title"];
+        $this->income_title->AdvancedSearch->SearchValue2 = @$filter["y_income_title"];
+        $this->income_title->AdvancedSearch->SearchOperator2 = @$filter["w_income_title"];
+        $this->income_title->AdvancedSearch->save();
 
-        // Field last_name
-        $this->last_name->AdvancedSearch->SearchValue = @$filter["x_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator = @$filter["z_last_name"];
-        $this->last_name->AdvancedSearch->SearchCondition = @$filter["v_last_name"];
-        $this->last_name->AdvancedSearch->SearchValue2 = @$filter["y_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator2 = @$filter["w_last_name"];
-        $this->last_name->AdvancedSearch->save();
+        // Field description
+        $this->description->AdvancedSearch->SearchValue = @$filter["x_description"];
+        $this->description->AdvancedSearch->SearchOperator = @$filter["z_description"];
+        $this->description->AdvancedSearch->SearchCondition = @$filter["v_description"];
+        $this->description->AdvancedSearch->SearchValue2 = @$filter["y_description"];
+        $this->description->AdvancedSearch->SearchOperator2 = @$filter["w_description"];
+        $this->description->AdvancedSearch->save();
 
-        // Field date_of_birth
-        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->save();
-
-        // Field gender
-        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
-        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
-        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
-        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
-        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
-        $this->gender->AdvancedSearch->save();
-
-        // Field service_name
-        $this->service_name->AdvancedSearch->SearchValue = @$filter["x_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator = @$filter["z_service_name"];
-        $this->service_name->AdvancedSearch->SearchCondition = @$filter["v_service_name"];
-        $this->service_name->AdvancedSearch->SearchValue2 = @$filter["y_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator2 = @$filter["w_service_name"];
-        $this->service_name->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
+        // Field cost
+        $this->cost->AdvancedSearch->SearchValue = @$filter["x_cost"];
+        $this->cost->AdvancedSearch->SearchOperator = @$filter["z_cost"];
+        $this->cost->AdvancedSearch->SearchCondition = @$filter["v_cost"];
+        $this->cost->AdvancedSearch->SearchValue2 = @$filter["y_cost"];
+        $this->cost->AdvancedSearch->SearchOperator2 = @$filter["w_cost"];
+        $this->cost->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1172,13 +1142,13 @@ class VaccinationsReport3List extends VaccinationsReport3
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
 
-        // Field vaccination_month
-        $this->vaccination_month->AdvancedSearch->SearchValue = @$filter["x_vaccination_month"];
-        $this->vaccination_month->AdvancedSearch->SearchOperator = @$filter["z_vaccination_month"];
-        $this->vaccination_month->AdvancedSearch->SearchCondition = @$filter["v_vaccination_month"];
-        $this->vaccination_month->AdvancedSearch->SearchValue2 = @$filter["y_vaccination_month"];
-        $this->vaccination_month->AdvancedSearch->SearchOperator2 = @$filter["w_vaccination_month"];
-        $this->vaccination_month->AdvancedSearch->save();
+        // Field income_month
+        $this->income_month->AdvancedSearch->SearchValue = @$filter["x_income_month"];
+        $this->income_month->AdvancedSearch->SearchOperator = @$filter["z_income_month"];
+        $this->income_month->AdvancedSearch->SearchCondition = @$filter["v_income_month"];
+        $this->income_month->AdvancedSearch->SearchValue2 = @$filter["y_income_month"];
+        $this->income_month->AdvancedSearch->SearchOperator2 = @$filter["w_income_month"];
+        $this->income_month->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1218,12 +1188,9 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->first_name;
-        $searchFlds[] = &$this->last_name;
-        $searchFlds[] = &$this->gender;
-        $searchFlds[] = &$this->service_name;
-        $searchFlds[] = &$this->status;
-        $searchFlds[] = &$this->vaccination_month;
+        $searchFlds[] = &$this->income_title;
+        $searchFlds[] = &$this->description;
+        $searchFlds[] = &$this->income_month;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1303,15 +1270,12 @@ class VaccinationsReport3List extends VaccinationsReport3
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->gender); // gender
-            $this->updateSort($this->service_name); // service_name
-            $this->updateSort($this->status); // status
+            $this->updateSort($this->income_title); // income_title
+            $this->updateSort($this->description); // description
+            $this->updateSort($this->cost); // cost
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->vaccination_month); // vaccination_month
+            $this->updateSort($this->income_month); // income_month
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1337,15 +1301,12 @@ class VaccinationsReport3List extends VaccinationsReport3
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->first_name->setSort("");
-                $this->last_name->setSort("");
-                $this->date_of_birth->setSort("");
-                $this->gender->setSort("");
-                $this->service_name->setSort("");
-                $this->status->setSort("");
+                $this->income_title->setSort("");
+                $this->description->setSort("");
+                $this->cost->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
-                $this->vaccination_month->setSort("");
+                $this->income_month->setSort("");
             }
 
             // Reset start position
@@ -1441,12 +1402,12 @@ class VaccinationsReport3List extends VaccinationsReport3
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fvaccinations_report3list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fincome_report2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fvaccinations_report3list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fincome_report2list\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1492,15 +1453,12 @@ class VaccinationsReport3List extends VaccinationsReport3
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "first_name");
-            $this->createColumnOption($option, "last_name");
-            $this->createColumnOption($option, "date_of_birth");
-            $this->createColumnOption($option, "gender");
-            $this->createColumnOption($option, "service_name");
-            $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "income_title");
+            $this->createColumnOption($option, "description");
+            $this->createColumnOption($option, "cost");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
-            $this->createColumnOption($option, "vaccination_month");
+            $this->createColumnOption($option, "income_month");
         }
 
         // Set up custom actions
@@ -1525,10 +1483,10 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fvaccinations_report3srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fincome_report2srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fvaccinations_report3srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fincome_report2srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1588,7 +1546,7 @@ class VaccinationsReport3List extends VaccinationsReport3
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fvaccinations_report3list"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fincome_report2list"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1759,7 +1717,7 @@ class VaccinationsReport3List extends VaccinationsReport3
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_vaccinations_report3", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_income_report2", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1820,7 +1778,7 @@ class VaccinationsReport3List extends VaccinationsReport3
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_vaccinations_report3",
+            "id" => "r" . $this->RowCount . "_income_report2",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1940,15 +1898,12 @@ class VaccinationsReport3List extends VaccinationsReport3
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->gender->setDbValue($row['gender']);
-        $this->service_name->setDbValue($row['service_name']);
-        $this->status->setDbValue($row['status']);
+        $this->income_title->setDbValue($row['income_title']);
+        $this->description->setDbValue($row['description']);
+        $this->cost->setDbValue($row['cost']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->vaccination_month->setDbValue($row['vaccination_month']);
+        $this->income_month->setDbValue($row['income_month']);
     }
 
     // Return a row with default values
@@ -1956,15 +1911,12 @@ class VaccinationsReport3List extends VaccinationsReport3
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
-        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
-        $row['gender'] = $this->gender->DefaultValue;
-        $row['service_name'] = $this->service_name->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
+        $row['income_title'] = $this->income_title->DefaultValue;
+        $row['description'] = $this->description->DefaultValue;
+        $row['cost'] = $this->cost->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['vaccination_month'] = $this->vaccination_month->DefaultValue;
+        $row['income_month'] = $this->income_month->DefaultValue;
         return $row;
     }
 
@@ -2007,47 +1959,32 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // id
 
-        // first_name
+        // income_title
 
-        // last_name
+        // description
 
-        // date_of_birth
-
-        // gender
-
-        // service_name
-
-        // status
+        // cost
 
         // date_created
 
         // date_updated
 
-        // vaccination_month
+        // income_month
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
+            // income_title
+            $this->income_title->ViewValue = $this->income_title->CurrentValue;
 
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // description
+            $this->description->ViewValue = $this->description->CurrentValue;
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
-
-            // service_name
-            $this->service_name->ViewValue = $this->service_name->CurrentValue;
-
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
+            // cost
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2057,36 +1994,24 @@ class VaccinationsReport3List extends VaccinationsReport3
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // vaccination_month
-            $this->vaccination_month->ViewValue = $this->vaccination_month->CurrentValue;
+            // income_month
+            $this->income_month->ViewValue = $this->income_month->CurrentValue;
 
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
+            $this->income_title->TooltipValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // description
+            $this->description->HrefValue = "";
+            $this->description->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-            $this->service_name->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // cost
+            $this->cost->HrefValue = "";
+            $this->cost->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2096,9 +2021,9 @@ class VaccinationsReport3List extends VaccinationsReport3
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
 
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
-            $this->vaccination_month->TooltipValue = "";
+            // income_month
+            $this->income_month->HrefValue = "";
+            $this->income_month->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2119,19 +2044,19 @@ class VaccinationsReport3List extends VaccinationsReport3
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fvaccinations_report3list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fincome_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fvaccinations_report3list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fincome_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fvaccinations_report3list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fincome_report2list\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2143,7 +2068,7 @@ class VaccinationsReport3List extends VaccinationsReport3
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fvaccinations_report3list" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fincome_report2list" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2221,7 +2146,7 @@ class VaccinationsReport3List extends VaccinationsReport3
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fvaccinations_report3srch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fincome_report2srch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button

@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for patients_data_view
+ * Table class for income_report
  */
-class PatientsDataView extends DbTable
+class IncomeReport2 extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,10 +47,12 @@ class PatientsDataView extends DbTable
 
     // Fields
     public $id;
-    public $last_name;
-    public $first_name;
-    public $date_of_birth;
-    public $gender;
+    public $income_title;
+    public $description;
+    public $cost;
+    public $date_created;
+    public $date_updated;
+    public $income_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -63,14 +65,14 @@ class PatientsDataView extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "patients_data_view";
-        $this->TableName = 'patients_data_view';
+        $this->TableVar = "income_report2";
+        $this->TableName = 'income_report';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "patients_data_view";
+        $this->UpdateTable = "income_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -124,103 +126,153 @@ class PatientsDataView extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // last_name
-        $this->last_name = new DbField(
+        // income_title
+        $this->income_title = new DbField(
             $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
+            'x_income_title', // Variable name
+            'income_title', // Name
+            '`income_title`', // Expression
+            '`income_title`', // Basic search expression
             200, // Type
-            50, // Size
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`last_name`', // Virtual expression
+            '`income_title`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['last_name'] = &$this->last_name;
+        $this->income_title->InputTextType = "text";
+        $this->income_title->Nullable = false; // NOT NULL field
+        $this->income_title->Required = true; // Required field
+        $this->income_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['income_title'] = &$this->income_title;
 
-        // first_name
-        $this->first_name = new DbField(
+        // description
+        $this->description = new DbField(
             $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
+            'x_description', // Variable name
+            'description', // Name
+            '`description`', // Expression
+            '`description`', // Basic search expression
             200, // Type
-            50, // Size
+            65535, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`first_name`', // Virtual expression
+            '`description`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['first_name'] = &$this->first_name;
+        $this->description->InputTextType = "text";
+        $this->description->Nullable = false; // NOT NULL field
+        $this->description->Required = true; // Required field
+        $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['description'] = &$this->description;
 
-        // date_of_birth
-        $this->date_of_birth = new DbField(
+        // cost
+        $this->cost = new DbField(
             $this, // Table
-            'x_date_of_birth', // Variable name
-            'date_of_birth', // Name
-            '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
+            'x_cost', // Variable name
+            'cost', // Name
+            '`cost`', // Expression
+            '`cost`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`cost`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->cost->InputTextType = "text";
+        $this->cost->Raw = true;
+        $this->cost->Nullable = false; // NOT NULL field
+        $this->cost->Required = true; // Required field
+        $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['cost'] = &$this->cost;
+
+        // date_created
+        $this->date_created = new DbField(
+            $this, // Table
+            'x_date_created', // Variable name
+            'date_created', // Name
+            '`date_created`', // Expression
+            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            135, // Type
+            76, // Size
             0, // Date/Time format
             false, // Is upload field
-            '`date_of_birth`', // Virtual expression
+            '`date_created`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_of_birth->InputTextType = "text";
-        $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_of_birth'] = &$this->date_of_birth;
+        $this->date_created->InputTextType = "text";
+        $this->date_created->Raw = true;
+        $this->date_created->Nullable = false; // NOT NULL field
+        $this->date_created->Required = true; // Required field
+        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_created'] = &$this->date_created;
 
-        // gender
-        $this->gender = new DbField(
+        // date_updated
+        $this->date_updated = new DbField(
             $this, // Table
-            'x_gender', // Variable name
-            'gender', // Name
-            '`gender`', // Expression
-            '`gender`', // Basic search expression
+            'x_date_updated', // Variable name
+            'date_updated', // Name
+            '`date_updated`', // Expression
+            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            135, // Type
+            76, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '`date_updated`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->date_updated->InputTextType = "text";
+        $this->date_updated->Raw = true;
+        $this->date_updated->Nullable = false; // NOT NULL field
+        $this->date_updated->Required = true; // Required field
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_updated'] = &$this->date_updated;
+
+        // income_month
+        $this->income_month = new DbField(
+            $this, // Table
+            'x_income_month', // Variable name
+            'income_month', // Name
+            '`income_month`', // Expression
+            '`income_month`', // Basic search expression
             200, // Type
-            15, // Size
+            9, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`gender`', // Virtual expression
+            '`income_month`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->gender->InputTextType = "text";
-        $this->gender->Nullable = false; // NOT NULL field
-        $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['gender'] = &$this->gender;
+        $this->income_month->InputTextType = "text";
+        $this->income_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['income_month'] = &$this->income_month;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -289,7 +341,7 @@ class PatientsDataView extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "patients_data_view";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "income_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -741,10 +793,12 @@ class PatientsDataView extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->last_name->DbValue = $row['last_name'];
-        $this->first_name->DbValue = $row['first_name'];
-        $this->date_of_birth->DbValue = $row['date_of_birth'];
-        $this->gender->DbValue = $row['gender'];
+        $this->income_title->DbValue = $row['income_title'];
+        $this->description->DbValue = $row['description'];
+        $this->cost->DbValue = $row['cost'];
+        $this->date_created->DbValue = $row['date_created'];
+        $this->date_updated->DbValue = $row['date_updated'];
+        $this->income_month->DbValue = $row['income_month'];
     }
 
     // Delete uploaded files
@@ -818,7 +872,7 @@ class PatientsDataView extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("patientsdataviewlist");
+        return $_SESSION[$name] ?? GetUrl("incomereport2list");
     }
 
     // Set return page URL
@@ -832,9 +886,9 @@ class PatientsDataView extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "patientsdataviewview" => $Language->phrase("View"),
-            "patientsdataviewedit" => $Language->phrase("Edit"),
-            "patientsdataviewadd" => $Language->phrase("Add"),
+            "incomereport2view" => $Language->phrase("View"),
+            "incomereport2edit" => $Language->phrase("Edit"),
+            "incomereport2add" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -842,18 +896,18 @@ class PatientsDataView extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "patientsdataviewlist";
+        return "incomereport2list";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "PatientsDataViewView",
-            Config("API_ADD_ACTION") => "PatientsDataViewAdd",
-            Config("API_EDIT_ACTION") => "PatientsDataViewEdit",
-            Config("API_DELETE_ACTION") => "PatientsDataViewDelete",
-            Config("API_LIST_ACTION") => "PatientsDataViewList",
+            Config("API_VIEW_ACTION") => "IncomeReport2View",
+            Config("API_ADD_ACTION") => "IncomeReport2Add",
+            Config("API_EDIT_ACTION") => "IncomeReport2Edit",
+            Config("API_DELETE_ACTION") => "IncomeReport2Delete",
+            Config("API_LIST_ACTION") => "IncomeReport2List",
             default => ""
         };
     }
@@ -873,16 +927,16 @@ class PatientsDataView extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "patientsdataviewlist";
+        return "incomereport2list";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("patientsdataviewview", $parm);
+            $url = $this->keyUrl("incomereport2view", $parm);
         } else {
-            $url = $this->keyUrl("patientsdataviewview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("incomereport2view", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -891,9 +945,9 @@ class PatientsDataView extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "patientsdataviewadd?" . $parm;
+            $url = "incomereport2add?" . $parm;
         } else {
-            $url = "patientsdataviewadd";
+            $url = "incomereport2add";
         }
         return $this->addMasterUrl($url);
     }
@@ -901,28 +955,28 @@ class PatientsDataView extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("patientsdataviewedit", $parm);
+        $url = $this->keyUrl("incomereport2edit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("patientsdataviewlist", "action=edit");
+        $url = $this->keyUrl("incomereport2list", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("patientsdataviewadd", $parm);
+        $url = $this->keyUrl("incomereport2add", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("patientsdataviewlist", "action=copy");
+        $url = $this->keyUrl("incomereport2list", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -932,7 +986,7 @@ class PatientsDataView extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("patientsdataviewdelete", $parm);
+            return $this->keyUrl("incomereport2delete", $parm);
         }
     }
 
@@ -1098,17 +1152,19 @@ class PatientsDataView extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->gender->setDbValue($row['gender']);
+        $this->income_title->setDbValue($row['income_title']);
+        $this->description->setDbValue($row['description']);
+        $this->cost->setDbValue($row['cost']);
+        $this->date_created->setDbValue($row['date_created']);
+        $this->date_updated->setDbValue($row['date_updated']);
+        $this->income_month->setDbValue($row['income_month']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "PatientsDataViewList";
+        $listPage = "IncomeReport2List";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1134,49 +1190,69 @@ class PatientsDataView extends DbTable
 
         // id
 
-        // last_name
+        // income_title
 
-        // first_name
+        // description
 
-        // date_of_birth
+        // cost
 
-        // gender
+        // date_created
+
+        // date_updated
+
+        // income_month
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // last_name
-        $this->last_name->ViewValue = $this->last_name->CurrentValue;
+        // income_title
+        $this->income_title->ViewValue = $this->income_title->CurrentValue;
 
-        // first_name
-        $this->first_name->ViewValue = $this->first_name->CurrentValue;
+        // description
+        $this->description->ViewValue = $this->description->CurrentValue;
 
-        // date_of_birth
-        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+        // cost
+        $this->cost->ViewValue = $this->cost->CurrentValue;
+        $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-        // gender
-        $this->gender->ViewValue = $this->gender->CurrentValue;
+        // date_created
+        $this->date_created->ViewValue = $this->date_created->CurrentValue;
+        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+
+        // date_updated
+        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+        // income_month
+        $this->income_month->ViewValue = $this->income_month->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // last_name
-        $this->last_name->HrefValue = "";
-        $this->last_name->TooltipValue = "";
+        // income_title
+        $this->income_title->HrefValue = "";
+        $this->income_title->TooltipValue = "";
 
-        // first_name
-        $this->first_name->HrefValue = "";
-        $this->first_name->TooltipValue = "";
+        // description
+        $this->description->HrefValue = "";
+        $this->description->TooltipValue = "";
 
-        // date_of_birth
-        $this->date_of_birth->HrefValue = "";
-        $this->date_of_birth->TooltipValue = "";
+        // cost
+        $this->cost->HrefValue = "";
+        $this->cost->TooltipValue = "";
 
-        // gender
-        $this->gender->HrefValue = "";
-        $this->gender->TooltipValue = "";
+        // date_created
+        $this->date_created->HrefValue = "";
+        $this->date_created->TooltipValue = "";
+
+        // date_updated
+        $this->date_updated->HrefValue = "";
+        $this->date_updated->TooltipValue = "";
+
+        // income_month
+        $this->income_month->HrefValue = "";
+        $this->income_month->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1197,34 +1273,47 @@ class PatientsDataView extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // last_name
-        $this->last_name->setupEditAttributes();
-        if (!$this->last_name->Raw) {
-            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
+        // income_title
+        $this->income_title->setupEditAttributes();
+        if (!$this->income_title->Raw) {
+            $this->income_title->CurrentValue = HtmlDecode($this->income_title->CurrentValue);
         }
-        $this->last_name->EditValue = $this->last_name->CurrentValue;
-        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
+        $this->income_title->EditValue = $this->income_title->CurrentValue;
+        $this->income_title->PlaceHolder = RemoveHtml($this->income_title->caption());
 
-        // first_name
-        $this->first_name->setupEditAttributes();
-        if (!$this->first_name->Raw) {
-            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
+        // description
+        $this->description->setupEditAttributes();
+        if (!$this->description->Raw) {
+            $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
         }
-        $this->first_name->EditValue = $this->first_name->CurrentValue;
-        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
+        $this->description->EditValue = $this->description->CurrentValue;
+        $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
-        // date_of_birth
-        $this->date_of_birth->setupEditAttributes();
-        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
-        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
-
-        // gender
-        $this->gender->setupEditAttributes();
-        if (!$this->gender->Raw) {
-            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
+        // cost
+        $this->cost->setupEditAttributes();
+        $this->cost->EditValue = $this->cost->CurrentValue;
+        $this->cost->PlaceHolder = RemoveHtml($this->cost->caption());
+        if (strval($this->cost->EditValue) != "" && is_numeric($this->cost->EditValue)) {
+            $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
         }
-        $this->gender->EditValue = $this->gender->CurrentValue;
-        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
+
+        // date_created
+        $this->date_created->setupEditAttributes();
+        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+        // date_updated
+        $this->date_updated->setupEditAttributes();
+        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+        // income_month
+        $this->income_month->setupEditAttributes();
+        if (!$this->income_month->Raw) {
+            $this->income_month->CurrentValue = HtmlDecode($this->income_month->CurrentValue);
+        }
+        $this->income_month->EditValue = $this->income_month->CurrentValue;
+        $this->income_month->PlaceHolder = RemoveHtml($this->income_month->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1255,16 +1344,20 @@ class PatientsDataView extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->last_name);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->income_title);
+                    $doc->exportCaption($this->description);
+                    $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->date_created);
+                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->income_month);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->last_name);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->income_title);
+                    $doc->exportCaption($this->description);
+                    $doc->exportCaption($this->cost);
+                    $doc->exportCaption($this->date_created);
+                    $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->income_month);
                 }
                 $doc->endExportRow();
             }
@@ -1292,16 +1385,20 @@ class PatientsDataView extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->last_name);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->gender);
+                        $doc->exportField($this->income_title);
+                        $doc->exportField($this->description);
+                        $doc->exportField($this->cost);
+                        $doc->exportField($this->date_created);
+                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->income_month);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->last_name);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->gender);
+                        $doc->exportField($this->income_title);
+                        $doc->exportField($this->description);
+                        $doc->exportField($this->cost);
+                        $doc->exportField($this->date_created);
+                        $doc->exportField($this->date_updated);
+                        $doc->exportField($this->income_month);
                     }
                     $doc->endExportRow($rowCnt);
                 }

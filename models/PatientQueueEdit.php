@@ -123,8 +123,9 @@ class PatientQueueEdit extends PatientQueue
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->section->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -529,6 +530,7 @@ class PatientQueueEdit extends PatientQueue
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->section);
+        $this->setupLookupOptions($this->status);
 
         // Check modal
         if ($this->IsModal) {
@@ -717,7 +719,7 @@ class PatientQueueEdit extends PatientQueue
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
+            $this->id->setFormValue($val, true, $validate);
         }
 
         // Check field name 'patient_id' first before field var 'x_patient_id'
@@ -730,16 +732,6 @@ class PatientQueueEdit extends PatientQueue
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'section' first before field var 'x_section'
         $val = $CurrentForm->hasValue("section") ? $CurrentForm->getValue("section") : $CurrentForm->getValue("x_section");
         if (!$this->section->IsDetailKey) {
@@ -747,6 +739,16 @@ class PatientQueueEdit extends PatientQueue
                 $this->section->Visible = false; // Disable update for API request
             } else {
                 $this->section->setFormValue($val);
+            }
+        }
+
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
             }
         }
     }
@@ -757,8 +759,8 @@ class PatientQueueEdit extends PatientQueue
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->section->CurrentValue = $this->section->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -803,6 +805,7 @@ class PatientQueueEdit extends PatientQueue
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -815,6 +818,7 @@ class PatientQueueEdit extends PatientQueue
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -863,6 +867,9 @@ class PatientQueueEdit extends PatientQueue
         // section
         $this->section->RowCssClass = "row";
 
+        // status
+        $this->status->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -908,6 +915,13 @@ class PatientQueueEdit extends PatientQueue
                 $this->section->ViewValue = null;
             }
 
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -918,11 +932,11 @@ class PatientQueueEdit extends PatientQueue
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -980,24 +994,15 @@ class PatientQueueEdit extends PatientQueue
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-            } else {
-                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-                $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
-                }
-            }
-
             // section
             $this->section->setupEditAttributes();
             $this->section->EditValue = $this->section->options(true);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // Edit refer script
 
@@ -1007,11 +1012,11 @@ class PatientQueueEdit extends PatientQueue
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1038,22 +1043,22 @@ class PatientQueueEdit extends PatientQueue
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
+            if (!CheckInteger($this->id->FormValue)) {
+                $this->id->addErrorMessage($this->id->getErrorMessage(false));
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
-            }
             if ($this->section->Visible && $this->section->Required) {
                 if (!$this->section->IsDetailKey && EmptyValue($this->section->FormValue)) {
                     $this->section->addErrorMessage(str_replace("%s", $this->section->caption(), $this->section->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1151,14 +1156,11 @@ class PatientQueueEdit extends PatientQueue
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // visit_id
-        if ($this->visit_id->getSessionValue() != "") {
-            $this->visit_id->ReadOnly = true;
-        }
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
-
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, $this->section->ReadOnly);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
         return $rsnew;
     }
 
@@ -1171,11 +1173,11 @@ class PatientQueueEdit extends PatientQueue
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->CurrentValue = $row['visit_id'];
-        }
         if (isset($row['section'])) { // section
             $this->section->CurrentValue = $row['section'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
     }
 
@@ -1304,6 +1306,8 @@ class PatientQueueEdit extends PatientQueue
                 case "x_patient_id":
                     break;
                 case "x_section":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

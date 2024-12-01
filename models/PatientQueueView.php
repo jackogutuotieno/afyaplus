@@ -143,6 +143,7 @@ class PatientQueueView extends PatientQueue
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->section->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -562,6 +563,7 @@ class PatientQueueView extends PatientQueue
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->section);
+        $this->setupLookupOptions($this->status);
 
         // Check modal
         if ($this->IsModal) {
@@ -816,6 +818,7 @@ class PatientQueueView extends PatientQueue
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -828,6 +831,7 @@ class PatientQueueView extends PatientQueue
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -858,6 +862,8 @@ class PatientQueueView extends PatientQueue
         // visit_id
 
         // section
+
+        // status
 
         // date_created
 
@@ -902,6 +908,13 @@ class PatientQueueView extends PatientQueue
                 $this->section->ViewValue = null;
             }
 
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -921,6 +934,10 @@ class PatientQueueView extends PatientQueue
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1214,6 +1231,8 @@ class PatientQueueView extends PatientQueue
                 case "x_patient_id":
                     break;
                 case "x_section":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

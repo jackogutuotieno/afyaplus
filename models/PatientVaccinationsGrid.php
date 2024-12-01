@@ -483,12 +483,12 @@ class PatientVaccinationsGrid extends PatientVaccinations
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
     public $ShowOtherOptions = false;
-    public $DisplayRecords = 20;
+    public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -628,7 +628,6 @@ class PatientVaccinationsGrid extends PatientVaccinations
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->visit_id);
         $this->setupLookupOptions($this->service_id);
         $this->setupLookupOptions($this->status);
         $this->setupLookupOptions($this->created_by_user_id);
@@ -699,7 +698,7 @@ class PatientVaccinationsGrid extends PatientVaccinations
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 20; // Load default
+            $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -850,7 +849,7 @@ class PatientVaccinationsGrid extends PatientVaccinations
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 20; // Non-numeric, load default
+                    $this->DisplayRecords = 5; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1271,6 +1270,7 @@ class PatientVaccinationsGrid extends PatientVaccinations
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
                         $this->visit_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1708,7 +1708,7 @@ class PatientVaccinationsGrid extends PatientVaccinations
             if (IsApi() && $val === null) {
                 $this->visit_id->Visible = false; // Disable update for API request
             } else {
-                $this->visit_id->setFormValue($val);
+                $this->visit_id->setFormValue($val, true, $validate);
             }
         }
         if ($CurrentForm->hasValue("o_visit_id")) {
@@ -1984,27 +1984,8 @@ class PatientVaccinationsGrid extends PatientVaccinations
             }
 
             // visit_id
-            $curVal = strval($this->visit_id->CurrentValue);
-            if ($curVal != "") {
-                $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-                if ($this->visit_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
-                    } else {
-                        $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->visit_id->ViewValue = null;
-            }
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
@@ -2096,82 +2077,70 @@ class PatientVaccinationsGrid extends PatientVaccinations
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $curVal = trim(strval($this->patient_id->CurrentValue));
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            } else {
-                $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->patient_id->ViewValue !== null) { // Load from cache
-                $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->patient_id->EditValue = $arwrk;
-            }
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->OldValue = $this->visit_id->CurrentValue;
-                $curVal = strval($this->visit_id->CurrentValue);
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
                 if ($curVal != "") {
-                    $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-                    if ($this->visit_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $conn = Conn();
                         $config = $conn->getConfiguration();
                         $config->setResultCache($this->Cache);
                         $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
                         } else {
-                            $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                         }
                     }
                 } else {
-                    $this->visit_id->ViewValue = null;
+                    $this->patient_id->ViewValue = null;
                 }
             } else {
-                $curVal = trim(strval($this->visit_id->CurrentValue));
+                $curVal = trim(strval($this->patient_id->CurrentValue));
                 if ($curVal != "") {
-                    $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
                 } else {
-                    $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
                 }
-                if ($this->visit_id->ViewValue !== null) { // Load from cache
-                    $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
                 } else { // Lookup from database
                     if ($curVal == "") {
                         $filterWrk = "0=1";
                     } else {
-                        $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
                     }
-                    $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
-                    $this->visit_id->EditValue = $arwrk;
+                    $this->patient_id->EditValue = $arwrk;
                 }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            }
+
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            if ($this->visit_id->getSessionValue() != "") {
+                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+                $this->visit_id->OldValue = $this->visit_id->CurrentValue;
+                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+            } else {
+                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
                 $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+                }
             }
 
             // service_id
@@ -2243,82 +2212,70 @@ class PatientVaccinationsGrid extends PatientVaccinations
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $curVal = trim(strval($this->patient_id->CurrentValue));
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            } else {
-                $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->patient_id->ViewValue !== null) { // Load from cache
-                $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->patient_id->EditValue = $arwrk;
-            }
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->OldValue = $this->visit_id->CurrentValue;
-                $curVal = strval($this->visit_id->CurrentValue);
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
                 if ($curVal != "") {
-                    $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
-                    if ($this->visit_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->visit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $conn = Conn();
                         $config = $conn->getConfiguration();
                         $config->setResultCache($this->Cache);
                         $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->visit_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->visit_id->ViewValue = $this->visit_id->displayValue($arwrk);
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
                         } else {
-                            $this->visit_id->ViewValue = FormatNumber($this->visit_id->CurrentValue, $this->visit_id->formatPattern());
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                         }
                     }
                 } else {
-                    $this->visit_id->ViewValue = null;
+                    $this->patient_id->ViewValue = null;
                 }
             } else {
-                $curVal = trim(strval($this->visit_id->CurrentValue));
+                $curVal = trim(strval($this->patient_id->CurrentValue));
                 if ($curVal != "") {
-                    $this->visit_id->ViewValue = $this->visit_id->lookupCacheOption($curVal);
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
                 } else {
-                    $this->visit_id->ViewValue = $this->visit_id->Lookup !== null && is_array($this->visit_id->lookupOptions()) && count($this->visit_id->lookupOptions()) > 0 ? $curVal : null;
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
                 }
-                if ($this->visit_id->ViewValue !== null) { // Load from cache
-                    $this->visit_id->EditValue = array_values($this->visit_id->lookupOptions());
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
                 } else { // Lookup from database
                     if ($curVal == "") {
                         $filterWrk = "0=1";
                     } else {
-                        $filterWrk = SearchFilter($this->visit_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->visit_id->CurrentValue, $this->visit_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
                     }
-                    $sqlWrk = $this->visit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
-                    $this->visit_id->EditValue = $arwrk;
+                    $this->patient_id->EditValue = $arwrk;
                 }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            }
+
+            // visit_id
+            $this->visit_id->setupEditAttributes();
+            if ($this->visit_id->getSessionValue() != "") {
+                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+                $this->visit_id->OldValue = $this->visit_id->CurrentValue;
+                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+            } else {
+                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
                 $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+                }
             }
 
             // service_id
@@ -2418,6 +2375,9 @@ class PatientVaccinationsGrid extends PatientVaccinations
                 if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
                     $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
                 }
+            }
+            if (!CheckInteger($this->visit_id->FormValue)) {
+                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->service_id->Visible && $this->service_id->Required) {
                 if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
@@ -2549,24 +2509,6 @@ class PatientVaccinationsGrid extends PatientVaccinations
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check referential integrity for master table 'patient_visits'
-        $detailKeys = [];
-        $keyValue = $rsnew['visit_id'] ?? $rsold['visit_id'];
-        $detailKeys['visit_id'] = $keyValue;
-        $masterTable = Container("patient_visits");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
-
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -2611,6 +2553,9 @@ class PatientVaccinationsGrid extends PatientVaccinations
         $rsnew = [];
 
         // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->ReadOnly = true;
+        }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
         // visit_id
@@ -2669,6 +2614,8 @@ class PatientVaccinationsGrid extends PatientVaccinations
         if ($this->getCurrentMasterTable() == "patient_visits") {
             $this->visit_id->Visible = true; // Need to insert foreign key
             $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
         }
 
         // Get new row
@@ -2676,24 +2623,6 @@ class PatientVaccinationsGrid extends PatientVaccinations
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check referential integrity for master table 'patient_vaccinations'
-        $validMasterRecord = true;
-        $detailKeys = [];
-        $detailKeys["visit_id"] = $this->visit_id->CurrentValue;
-        $masterTable = Container("patient_visits");
-        $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-        if (!EmptyValue($masterFilter)) {
-            $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        } else { // Allow null value if not required field
-            $validMasterRecord = $masterFilter === null;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "patient_visits", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2803,6 +2732,10 @@ class PatientVaccinationsGrid extends PatientVaccinations
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
+            $this->patient_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
         }
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
@@ -2822,8 +2755,6 @@ class PatientVaccinationsGrid extends PatientVaccinations
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
-                    break;
-                case "x_visit_id":
                     break;
                 case "x_service_id":
                     $lookupFilter = $fld->getSelectFilter(); // PHP

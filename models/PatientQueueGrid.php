@@ -139,6 +139,7 @@ class PatientQueueGrid extends PatientQueue
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->section->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -624,6 +625,7 @@ class PatientQueueGrid extends PatientQueue
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->section);
+        $this->setupLookupOptions($this->status);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -1108,6 +1110,14 @@ class PatientQueueGrid extends PatientQueue
             $CurrentForm->hasValue("o_section") &&
             $this->section->CurrentValue != $this->section->DefaultValue &&
             !($this->section->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->section->CurrentValue == $this->section->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_status") &&
+            $CurrentForm->hasValue("o_status") &&
+            $this->status->CurrentValue != $this->status->DefaultValue &&
+            !($this->status->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->status->CurrentValue == $this->status->getSessionValue())
         ) {
             return false;
         }
@@ -1696,6 +1706,19 @@ class PatientQueueGrid extends PatientQueue
             $this->section->setOldValue($CurrentForm->getValue("o_section"));
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_status")) {
+            $this->status->setOldValue($CurrentForm->getValue("o_status"));
+        }
+
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -1726,6 +1749,7 @@ class PatientQueueGrid extends PatientQueue
         }
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->section->CurrentValue = $this->section->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
     }
@@ -1827,6 +1851,7 @@ class PatientQueueGrid extends PatientQueue
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1839,6 +1864,7 @@ class PatientQueueGrid extends PatientQueue
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1887,6 +1913,8 @@ class PatientQueueGrid extends PatientQueue
 
         // section
 
+        // status
+
         // date_created
 
         // date_updated
@@ -1931,6 +1959,13 @@ class PatientQueueGrid extends PatientQueue
                 $this->section->ViewValue = null;
             }
 
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1942,6 +1977,10 @@ class PatientQueueGrid extends PatientQueue
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2005,6 +2044,11 @@ class PatientQueueGrid extends PatientQueue
             $this->section->EditValue = $this->section->options(true);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2017,6 +2061,9 @@ class PatientQueueGrid extends PatientQueue
 
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2079,6 +2126,11 @@ class PatientQueueGrid extends PatientQueue
             $this->section->EditValue = $this->section->options(true);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // date_created
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
@@ -2091,6 +2143,9 @@ class PatientQueueGrid extends PatientQueue
 
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2123,6 +2178,11 @@ class PatientQueueGrid extends PatientQueue
             if ($this->section->Visible && $this->section->Required) {
                 if (!$this->section->IsDetailKey && EmptyValue($this->section->FormValue)) {
                     $this->section->addErrorMessage(str_replace("%s", $this->section->caption(), $this->section->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
@@ -2292,6 +2352,9 @@ class PatientQueueGrid extends PatientQueue
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, $this->section->ReadOnly);
 
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
         return $rsnew;
@@ -2308,6 +2371,9 @@ class PatientQueueGrid extends PatientQueue
         }
         if (isset($row['section'])) { // section
             $this->section->CurrentValue = $row['section'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -2379,6 +2445,9 @@ class PatientQueueGrid extends PatientQueue
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, false);
 
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
+
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
@@ -2400,6 +2469,9 @@ class PatientQueueGrid extends PatientQueue
         }
         if (isset($row['section'])) { // section
             $this->section->setFormValue($row['section']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
@@ -2445,6 +2517,8 @@ class PatientQueueGrid extends PatientQueue
                 case "x_patient_id":
                     break;
                 case "x_section":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

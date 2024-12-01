@@ -206,10 +206,10 @@ class RegisteredPatients extends ReportTable
             'x_date_of_birth', // Variable name
             'date_of_birth', // Name
             '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
             133, // Type
             40, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
             false, // Is virtual
@@ -222,7 +222,7 @@ class RegisteredPatients extends ReportTable
         $this->date_of_birth->Raw = true;
         $this->date_of_birth->Nullable = false; // NOT NULL field
         $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_of_birth->SourceTableVar = 'registered_patients_report';
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
@@ -411,10 +411,10 @@ class RegisteredPatients extends ReportTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -427,7 +427,7 @@ class RegisteredPatients extends ReportTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_created->SourceTableVar = 'registered_patients_report';
         $this->Fields['date_created'] = &$this->date_created;
@@ -438,10 +438,10 @@ class RegisteredPatients extends ReportTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -454,7 +454,7 @@ class RegisteredPatients extends ReportTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_updated->SourceTableVar = 'registered_patients_report';
         $this->Fields['date_updated'] = &$this->date_updated;

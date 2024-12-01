@@ -152,6 +152,9 @@ return [
     "visits_report" => \DI\create(VisitsReport::class),
     "Visits_Report1" => \DI\create(VisitsReport1::class),
     "visits_report1" => \DI\create(VisitsReport1::class),
+    "income_report2" => \DI\create(IncomeReport2::class),
+    "Income_Report" => \DI\create(IncomeReport::class),
+    "income_report" => \DI\create(IncomeReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

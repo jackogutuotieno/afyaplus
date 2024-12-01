@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for Vaccinations Report
+ * Table class for Income Report
  */
-class VaccinationsReport extends ReportTable
+class IncomeReport extends ReportTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -46,19 +46,16 @@ class VaccinationsReport extends ReportTable
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
-    public $VaccinationsbyMonth;
+    public $IncomebyMonth;
 
     // Fields
     public $id;
-    public $first_name;
-    public $last_name;
-    public $date_of_birth;
-    public $gender;
-    public $service_name;
-    public $status;
+    public $income_title;
+    public $description;
+    public $cost;
     public $date_created;
     public $date_updated;
-    public $vaccination_month;
+    public $income_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -71,11 +68,11 @@ class VaccinationsReport extends ReportTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "Vaccinations_Report";
-        $this->TableName = 'Vaccinations Report';
+        $this->TableVar = "Income_Report";
+        $this->TableName = 'Income Report';
         $this->TableType = "REPORT";
         $this->TableReportType = "summary"; // Report Type
-        $this->ReportSourceTable = 'vaccinations_report3'; // Report source table
+        $this->ReportSourceTable = 'income_report2'; // Report source table
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (report only)
@@ -119,163 +116,85 @@ class VaccinationsReport extends ReportTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->id->SourceTableVar = 'vaccinations_report3';
+        $this->id->SourceTableVar = 'income_report2';
         $this->Fields['id'] = &$this->id;
 
-        // first_name
-        $this->first_name = new ReportField(
+        // income_title
+        $this->income_title = new ReportField(
             $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`first_name`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->first_name->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['first_name'] = &$this->first_name;
-
-        // last_name
-        $this->last_name = new ReportField(
-            $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`last_name`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->last_name->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['last_name'] = &$this->last_name;
-
-        // date_of_birth
-        $this->date_of_birth = new ReportField(
-            $this, // Table
-            'x_date_of_birth', // Variable name
-            'date_of_birth', // Name
-            '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            7, // Date/Time format
-            false, // Is upload field
-            '`date_of_birth`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_of_birth->InputTextType = "text";
-        $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_of_birth->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['date_of_birth'] = &$this->date_of_birth;
-
-        // gender
-        $this->gender = new ReportField(
-            $this, // Table
-            'x_gender', // Variable name
-            'gender', // Name
-            '`gender`', // Expression
-            '`gender`', // Basic search expression
-            200, // Type
-            15, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`gender`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->gender->InputTextType = "text";
-        $this->gender->Nullable = false; // NOT NULL field
-        $this->gender->Required = true; // Required field
-        $this->gender->UseFilter = true; // Table header filter
-        $this->gender->Lookup = new Lookup($this->gender, 'Vaccinations_Report', true, 'gender', ["gender","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->gender->SourceTableVar = 'vaccinations_report3';
-        $this->gender->SearchType = "dropdown";
-        $this->Fields['gender'] = &$this->gender;
-
-        // service_name
-        $this->service_name = new ReportField(
-            $this, // Table
-            'x_service_name', // Variable name
-            'service_name', // Name
-            '`service_name`', // Expression
-            '`service_name`', // Basic search expression
+            'x_income_title', // Variable name
+            'income_title', // Name
+            '`income_title`', // Expression
+            '`income_title`', // Basic search expression
             200, // Type
             100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`service_name`', // Virtual expression
+            '`income_title`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->service_name->InputTextType = "text";
-        $this->service_name->Nullable = false; // NOT NULL field
-        $this->service_name->Required = true; // Required field
-        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->service_name->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['service_name'] = &$this->service_name;
+        $this->income_title->InputTextType = "text";
+        $this->income_title->Nullable = false; // NOT NULL field
+        $this->income_title->Required = true; // Required field
+        $this->income_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->income_title->SourceTableVar = 'income_report2';
+        $this->Fields['income_title'] = &$this->income_title;
 
-        // status
-        $this->status = new ReportField(
+        // description
+        $this->description = new ReportField(
             $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '`status`', // Expression
-            '`status`', // Basic search expression
+            'x_description', // Variable name
+            'description', // Name
+            '`description`', // Expression
+            '`description`', // Basic search expression
             200, // Type
-            20, // Size
+            65535, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`status`', // Virtual expression
+            '`description`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->status->InputTextType = "text";
-        $this->status->Nullable = false; // NOT NULL field
-        $this->status->Required = true; // Required field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->status->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['status'] = &$this->status;
+        $this->description->InputTextType = "text";
+        $this->description->Nullable = false; // NOT NULL field
+        $this->description->Required = true; // Required field
+        $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->description->SourceTableVar = 'income_report2';
+        $this->Fields['description'] = &$this->description;
+
+        // cost
+        $this->cost = new ReportField(
+            $this, // Table
+            'x_cost', // Variable name
+            'cost', // Name
+            '`cost`', // Expression
+            '`cost`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`cost`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->cost->InputTextType = "text";
+        $this->cost->Raw = true;
+        $this->cost->Nullable = false; // NOT NULL field
+        $this->cost->Required = true; // Required field
+        $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->cost->SourceTableVar = 'income_report2';
+        $this->Fields['cost'] = &$this->cost;
 
         // date_created
         $this->date_created = new ReportField(
@@ -301,7 +220,7 @@ class VaccinationsReport extends ReportTable
         $this->date_created->Required = true; // Required field
         $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_created->SourceTableVar = 'vaccinations_report3';
+        $this->date_created->SourceTableVar = 'income_report2';
         $this->Fields['date_created'] = &$this->date_created;
 
         // date_updated
@@ -328,62 +247,62 @@ class VaccinationsReport extends ReportTable
         $this->date_updated->Required = true; // Required field
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_updated->SourceTableVar = 'vaccinations_report3';
+        $this->date_updated->SourceTableVar = 'income_report2';
         $this->Fields['date_updated'] = &$this->date_updated;
 
-        // vaccination_month
-        $this->vaccination_month = new ReportField(
+        // income_month
+        $this->income_month = new ReportField(
             $this, // Table
-            'x_vaccination_month', // Variable name
-            'vaccination_month', // Name
-            '`vaccination_month`', // Expression
-            '`vaccination_month`', // Basic search expression
+            'x_income_month', // Variable name
+            'income_month', // Name
+            '`income_month`', // Expression
+            '`income_month`', // Basic search expression
             200, // Type
             9, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`vaccination_month`', // Virtual expression
+            '`income_month`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->vaccination_month->InputTextType = "text";
-        $this->vaccination_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->vaccination_month->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['vaccination_month'] = &$this->vaccination_month;
+        $this->income_month->InputTextType = "text";
+        $this->income_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->income_month->SourceTableVar = 'income_report2';
+        $this->Fields['income_month'] = &$this->income_month;
 
-        // Vaccinations by Month
-        $this->VaccinationsbyMonth = new DbChart($this, 'VaccinationsbyMonth', 'Vaccinations by Month', 'vaccination_month', 'vaccination_month', 1001, '', 0, 'COUNT', 600, 500);
-        $this->VaccinationsbyMonth->Position = 4;
-        $this->VaccinationsbyMonth->PageBreakType = "before";
-        $this->VaccinationsbyMonth->YAxisFormat = [""];
-        $this->VaccinationsbyMonth->YFieldFormat = [""];
-        $this->VaccinationsbyMonth->SortType = 0;
-        $this->VaccinationsbyMonth->SortSequence = "";
-        $this->VaccinationsbyMonth->SqlSelect = $this->getQueryBuilder()->select("`vaccination_month`", "''", "COUNT(`vaccination_month`)");
-        $this->VaccinationsbyMonth->SqlGroupBy = "`vaccination_month`";
-        $this->VaccinationsbyMonth->SqlOrderBy = "";
-        $this->VaccinationsbyMonth->SeriesDateType = "";
-        $this->VaccinationsbyMonth->ID = "Vaccinations_Report_VaccinationsbyMonth"; // Chart ID
-        $this->VaccinationsbyMonth->setParameters([
+        // Income by Month
+        $this->IncomebyMonth = new DbChart($this, 'IncomebyMonth', 'Income by Month', 'income_month', 'cost', 1001, '', 0, 'SUM', 600, 500);
+        $this->IncomebyMonth->Position = 4;
+        $this->IncomebyMonth->PageBreakType = "before";
+        $this->IncomebyMonth->YAxisFormat = ["Number"];
+        $this->IncomebyMonth->YFieldFormat = ["Number"];
+        $this->IncomebyMonth->SortType = 0;
+        $this->IncomebyMonth->SortSequence = "";
+        $this->IncomebyMonth->SqlSelect = $this->getQueryBuilder()->select("`income_month`", "''", "SUM(`cost`)");
+        $this->IncomebyMonth->SqlGroupBy = "`income_month`";
+        $this->IncomebyMonth->SqlOrderBy = "";
+        $this->IncomebyMonth->SeriesDateType = "";
+        $this->IncomebyMonth->ID = "Income_Report_IncomebyMonth"; // Chart ID
+        $this->IncomebyMonth->setParameters([
             ["type", "1001"],
             ["seriestype", "0"]
         ]); // Chart type / Chart series type
-        $this->VaccinationsbyMonth->setParameters([
-            ["caption", $this->VaccinationsbyMonth->caption()],
-            ["xaxisname", $this->VaccinationsbyMonth->xAxisName()]
+        $this->IncomebyMonth->setParameters([
+            ["caption", $this->IncomebyMonth->caption()],
+            ["xaxisname", $this->IncomebyMonth->xAxisName()]
         ]); // Chart caption / X axis name
-        $this->VaccinationsbyMonth->setParameter("yaxisname", $this->VaccinationsbyMonth->yAxisName()); // Y axis name
-        $this->VaccinationsbyMonth->setParameters([
+        $this->IncomebyMonth->setParameter("yaxisname", $this->IncomebyMonth->yAxisName()); // Y axis name
+        $this->IncomebyMonth->setParameters([
             ["shownames", "1"],
             ["showvalues", "1"],
             ["showhovercap", "1"]
         ]); // Show names / Show values / Show hover
-        $this->VaccinationsbyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
-        $this->VaccinationsbyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
-        $this->Charts[$this->VaccinationsbyMonth->ID] = &$this->VaccinationsbyMonth;
+        $this->IncomebyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->IncomebyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->IncomebyMonth->ID] = &$this->IncomebyMonth;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -515,7 +434,7 @@ class VaccinationsReport extends ReportTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "vaccinations_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "income_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -813,13 +732,13 @@ class VaccinationsReport extends ReportTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "vaccinationsreport";
+        return "incomereport";
     }
 
     // API page name
     public function getApiPageName($action)
     {
-        return "VaccinationsReportSummary";
+        return "IncomeReportSummary";
     }
 
     // Current URL

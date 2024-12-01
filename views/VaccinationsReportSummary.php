@@ -21,6 +21,9 @@ loadjs.ready("head", function () {
 <a id="top"></a>
 <!-- Content Container -->
 <div id="ew-report" class="ew-report container-fluid">
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <div class="btn-toolbar ew-toolbar">
 <?php
 if (!$Page->DrillDownInPanel) {
@@ -31,11 +34,145 @@ if (!$Page->DrillDownInPanel) {
 ?>
 </div>
 <?php if (!$Page->isExport() && !$Page->DrillDown && !$DashboardReport) { ?>
+<form name="fVaccinations_Reportsrch" id="fVaccinations_Reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fVaccinations_Reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<script>
+var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
+ew.deepAssign(ew.vars, { tables: { Vaccinations_Report: currentTable } });
+var currentPageID = ew.PAGE_ID = "summary";
+var currentForm;
+var fVaccinations_Reportsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("fVaccinations_Reportsrch")
+        .setPageId("summary")
+<?php if ($Page->UseAjaxActions) { ?>
+        .setSubmitWithFetch(true)
+<?php } ?>
+
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+            "gender": <?= $Page->gender->toClientList($Page) ?>,
+        })
+
+        // Filters
+        .setFilterList(<?= $Page->getFilterList() ?>)
+        .build();
+    window[form.id] = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->gender->Visible) { // gender ?>
+<?php
+if (!$Page->gender->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_gender" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->gender->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_gender"
+            name="x_gender[]"
+            class="form-control ew-select<?= $Page->gender->isInvalidClass() ?>"
+            data-select2-id="fVaccinations_Reportsrch_x_gender"
+            data-table="Vaccinations_Report"
+            data-field="x_gender"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->gender->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->gender->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->gender->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->gender->editAttributes() ?>>
+            <?= $Page->gender->selectOptionListHtml("x_gender", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->gender->getErrorMessage() ?></div>
+        <script>
+        loadjs.ready("fVaccinations_Reportsrch", function() {
+            var options = {
+                name: "x_gender",
+                selectId: "fVaccinations_Reportsrch_x_gender",
+                ajax: { id: "x_gender", form: "fVaccinations_Reportsrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.Vaccinations_Report.fields.gender.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->SearchColumnCount > 0) { ?>
+   <div class="col-sm-auto mb-3">
+       <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+   </div>
+<?php } ?>
+</div><!-- /.row -->
+</div><!-- /.ew-extended-search -->
+<?php } ?>
+<?php } ?>
+</div><!-- /.ew-search-panel -->
+</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
 ?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+<!-- Middle Container -->
+<div id="ew-middle" class="<?= $Page->MiddleContentClass ?>">
+<?php } ?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+<!-- Content Container -->
+<div id="ew-content" class="<?= $Page->ContainerClass ?>">
+<?php } ?>
 <?php if ($Page->ShowReport) { ?>
 <!-- Summary report (begin) -->
 <main class="report-summary<?= ($Page->TotalGroups == 0) ? " ew-no-record" : "" ?>">
@@ -85,6 +222,9 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { ?>
     <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div class="Vaccinations_Report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+<?php } ?>
+<?php if ($Page->vaccination_month->Visible) { ?>
+    <th data-name="vaccination_month" class="<?= $Page->vaccination_month->headerCellClass() ?>"><div class="Vaccinations_Report_vaccination_month"><?= $Page->renderFieldHeader($Page->vaccination_month) ?></div></th>
 <?php } ?>
     </tr>
 </thead>
@@ -162,6 +302,12 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?= $Page->date_updated->getViewValue() ?></span>
 </td>
 <?php } ?>
+<?php if ($Page->vaccination_month->Visible) { ?>
+        <td data-field="vaccination_month"<?= $Page->vaccination_month->cellAttributes() ?>>
+<span<?= $Page->vaccination_month->viewAttributes() ?>>
+<?= $Page->vaccination_month->getViewValue() ?></span>
+</td>
+<?php } ?>
     </tr>
 <?php
 } // End while
@@ -201,6 +347,32 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 </main>
 <!-- /.report-summary -->
 <!-- Summary report (end) -->
+<?php } ?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+</div>
+<!-- /#ew-content -->
+<?php } ?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+</div>
+<!-- /#ew-middle -->
+<?php } ?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+<!-- Bottom Container -->
+<div id="ew-bottom" class="<?= $Page->BottomContentClass ?>">
+<?php } ?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->VaccinationsbyMonth->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->VaccinationsbyMonth->render("ew-chart-bottom");
+}
+?>
+<?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
+</div>
+<!-- /#ew-bottom -->
+<?php } ?>
+<?php if (!$DashboardReport && !$Page->isExport() && !$Page->DrillDown) { ?>
+<div class="mb-3"><a class="ew-top-link" data-ew-action="scroll-top"><?= $Language->phrase("Top") ?></a></div>
 <?php } ?>
 </div>
 <!-- /.ew-report -->

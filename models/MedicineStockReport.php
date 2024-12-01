@@ -372,10 +372,10 @@ class MedicineStockReport extends ReportTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            11, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -388,7 +388,7 @@ class MedicineStockReport extends ReportTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_created->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['date_created'] = &$this->date_created;
@@ -399,10 +399,10 @@ class MedicineStockReport extends ReportTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            11, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -415,7 +415,7 @@ class MedicineStockReport extends ReportTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_updated->SourceTableVar = 'medicine_stock_report2';
         $this->Fields['date_updated'] = &$this->date_updated;

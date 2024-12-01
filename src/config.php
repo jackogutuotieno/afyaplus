@@ -804,7 +804,7 @@ $CONFIG = [
 
     // Fixed header table
     "FIXED_HEADER_TABLE_CLASS" => "table-head-fixed",
-    "USE_FIXED_HEADER_TABLE" => true,
+    "USE_FIXED_HEADER_TABLE" => false,
     "FIXED_HEADER_TABLE_HEIGHT" => "mh-400px", // CSS class for fixed header table height
 
     // Multi column list options position

@@ -55,6 +55,7 @@ class VaccinationsReport3 extends DbTable
     public $status;
     public $date_created;
     public $date_updated;
+    public $vaccination_month;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -325,6 +326,28 @@ class VaccinationsReport3 extends DbTable
         $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
+
+        // vaccination_month
+        $this->vaccination_month = new DbField(
+            $this, // Table
+            'x_vaccination_month', // Variable name
+            'vaccination_month', // Name
+            '`vaccination_month`', // Expression
+            '`vaccination_month`', // Basic search expression
+            200, // Type
+            9, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`vaccination_month`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->vaccination_month->InputTextType = "text";
+        $this->vaccination_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['vaccination_month'] = &$this->vaccination_month;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -853,6 +876,7 @@ class VaccinationsReport3 extends DbTable
         $this->status->DbValue = $row['status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
+        $this->vaccination_month->DbValue = $row['vaccination_month'];
     }
 
     // Delete uploaded files
@@ -1214,6 +1238,7 @@ class VaccinationsReport3 extends DbTable
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->vaccination_month->setDbValue($row['vaccination_month']);
     }
 
     // Render list content
@@ -1262,6 +1287,8 @@ class VaccinationsReport3 extends DbTable
 
         // date_updated
 
+        // vaccination_month
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
@@ -1291,6 +1318,9 @@ class VaccinationsReport3 extends DbTable
         // date_updated
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+        // vaccination_month
+        $this->vaccination_month->ViewValue = $this->vaccination_month->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
@@ -1327,6 +1357,10 @@ class VaccinationsReport3 extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
+
+        // vaccination_month
+        $this->vaccination_month->HrefValue = "";
+        $this->vaccination_month->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1402,6 +1436,14 @@ class VaccinationsReport3 extends DbTable
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
+        // vaccination_month
+        $this->vaccination_month->setupEditAttributes();
+        if (!$this->vaccination_month->Raw) {
+            $this->vaccination_month->CurrentValue = HtmlDecode($this->vaccination_month->CurrentValue);
+        }
+        $this->vaccination_month->EditValue = $this->vaccination_month->CurrentValue;
+        $this->vaccination_month->PlaceHolder = RemoveHtml($this->vaccination_month->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1439,6 +1481,7 @@ class VaccinationsReport3 extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->vaccination_month);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->first_name);
@@ -1449,6 +1492,7 @@ class VaccinationsReport3 extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->vaccination_month);
                 }
                 $doc->endExportRow();
             }
@@ -1484,6 +1528,7 @@ class VaccinationsReport3 extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->vaccination_month);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->first_name);
@@ -1494,6 +1539,7 @@ class VaccinationsReport3 extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->vaccination_month);
                     }
                     $doc->endExportRow($rowCnt);
                 }

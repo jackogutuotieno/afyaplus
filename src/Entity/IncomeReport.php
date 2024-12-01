@@ -22,34 +22,34 @@ use function PHPMaker2024\afyaplus\HtmlDecode;
 use function PHPMaker2024\afyaplus\EncryptPassword;
 
 /**
- * Entity class for "patient_queue" table
+ * Entity class for "income_report" table
  */
 #[Entity]
-#[Table(name: "patient_queue")]
-class PatientQueue extends AbstractEntity
+#[Table(name: "income_report")]
+class IncomeReport extends AbstractEntity
 {
     #[Id]
-    #[Column(type: "integer", unique: true)]
+    #[Column(type: "integer")]
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "patient_id", type: "integer")]
-    private int $patientId;
+    #[Column(name: "income_title", type: "string")]
+    private string $incomeTitle;
 
-    #[Column(name: "visit_id", type: "integer")]
-    private int $visitId;
+    #[Column(type: "text")]
+    private string $description;
 
-    #[Column(type: "string")]
-    private string $section;
-
-    #[Column(type: "string")]
-    private string $status;
+    #[Column(type: "float")]
+    private float $cost;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    #[Column(name: "income_month", type: "string", nullable: true)]
+    private ?string $incomeMonth;
 
     public function getId(): int
     {
@@ -62,47 +62,36 @@ class PatientQueue extends AbstractEntity
         return $this;
     }
 
-    public function getPatientId(): int
+    public function getIncomeTitle(): string
     {
-        return $this->patientId;
+        return HtmlDecode($this->incomeTitle);
     }
 
-    public function setPatientId(int $value): static
+    public function setIncomeTitle(string $value): static
     {
-        $this->patientId = $value;
+        $this->incomeTitle = RemoveXss($value);
         return $this;
     }
 
-    public function getVisitId(): int
+    public function getDescription(): string
     {
-        return $this->visitId;
+        return HtmlDecode($this->description);
     }
 
-    public function setVisitId(int $value): static
+    public function setDescription(string $value): static
     {
-        $this->visitId = $value;
+        $this->description = RemoveXss($value);
         return $this;
     }
 
-    public function getSection(): string
+    public function getCost(): float
     {
-        return HtmlDecode($this->section);
+        return $this->cost;
     }
 
-    public function setSection(string $value): static
+    public function setCost(float $value): static
     {
-        $this->section = RemoveXss($value);
-        return $this;
-    }
-
-    public function getStatus(): string
-    {
-        return HtmlDecode($this->status);
-    }
-
-    public function setStatus(string $value): static
-    {
-        $this->status = RemoveXss($value);
+        $this->cost = $value;
         return $this;
     }
 
@@ -125,6 +114,17 @@ class PatientQueue extends AbstractEntity
     public function setDateUpdated(DateTime $value): static
     {
         $this->dateUpdated = $value;
+        return $this;
+    }
+
+    public function getIncomeMonth(): ?string
+    {
+        return HtmlDecode($this->incomeMonth);
+    }
+
+    public function setIncomeMonth(?string $value): static
+    {
+        $this->incomeMonth = RemoveXss($value);
         return $this;
     }
 }

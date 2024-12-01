@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$VaccinationsReport3List = &$Page;
+$IncomeReport2List = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { vaccinations_report3: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income_report2: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -51,20 +51,20 @@ loadjs.ready("head", function () {
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fvaccinations_report3srch" id="fvaccinations_report3srch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fvaccinations_report3srch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fincome_report2srch" id="fincome_report2srch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fincome_report2srch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { vaccinations_report3: currentTable } });
+ew.deepAssign(ew.vars, { tables: { income_report2: currentTable } });
 var currentForm;
-var fvaccinations_report3srch, currentSearchForm, currentAdvancedSearchForm;
+var fincome_report2srch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fvaccinations_report3srch")
+        .setId("fincome_report2srch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -95,10 +95,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fvaccinations_report3srch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fvaccinations_report3srch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fvaccinations_report3srch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fvaccinations_report3srch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fincome_report2srch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fincome_report2srch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fincome_report2srch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fincome_report2srch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -138,13 +138,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="vaccinations_report3">
+<input type="hidden" name="t" value="income_report2">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_vaccinations_report3" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_income_report2" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_vaccinations_report3list" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_income_report2list" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -158,34 +158,25 @@ $Page->renderListOptions();
 $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_vaccinations_report3_id" class="vaccinations_report3_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_income_report2_id" class="income_report2_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_first_name" class="vaccinations_report3_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
+<?php if ($Page->income_title->Visible) { // income_title ?>
+        <th data-name="income_title" class="<?= $Page->income_title->headerCellClass() ?>"><div id="elh_income_report2_income_title" class="income_report2_income_title"><?= $Page->renderFieldHeader($Page->income_title) ?></div></th>
 <?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_last_name" class="vaccinations_report3_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+<?php if ($Page->description->Visible) { // description ?>
+        <th data-name="description" class="<?= $Page->description->headerCellClass() ?>"><div id="elh_income_report2_description" class="income_report2_description"><?= $Page->renderFieldHeader($Page->description) ?></div></th>
 <?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_vaccinations_report3_date_of_birth" class="vaccinations_report3_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
-<?php } ?>
-<?php if ($Page->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_vaccinations_report3_gender" class="vaccinations_report3_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
-<?php } ?>
-<?php if ($Page->service_name->Visible) { // service_name ?>
-        <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_service_name" class="vaccinations_report3_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_vaccinations_report3_status" class="vaccinations_report3_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
+<?php if ($Page->cost->Visible) { // cost ?>
+        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_income_report2_cost" class="income_report2_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_vaccinations_report3_date_created" class="vaccinations_report3_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_income_report2_date_created" class="income_report2_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_vaccinations_report3_date_updated" class="vaccinations_report3_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_income_report2_date_updated" class="income_report2_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
-<?php if ($Page->vaccination_month->Visible) { // vaccination_month ?>
-        <th data-name="vaccination_month" class="<?= $Page->vaccination_month->headerCellClass() ?>"><div id="elh_vaccinations_report3_vaccination_month" class="vaccinations_report3_vaccination_month"><?= $Page->renderFieldHeader($Page->vaccination_month) ?></div></th>
+<?php if ($Page->income_month->Visible) { // income_month ?>
+        <th data-name="income_month" class="<?= $Page->income_month->headerCellClass() ?>"><div id="elh_income_report2_income_month" class="income_report2_income_month"><?= $Page->renderFieldHeader($Page->income_month) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -217,63 +208,39 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
     <?php if ($Page->id->Visible) { // id ?>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_id" class="el_vaccinations_report3_id">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_id" class="el_income_report2_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_first_name" class="el_vaccinations_report3_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
+    <?php if ($Page->income_title->Visible) { // income_title ?>
+        <td data-name="income_title"<?= $Page->income_title->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_income_title" class="el_income_report2_income_title">
+<span<?= $Page->income_title->viewAttributes() ?>>
+<?= $Page->income_title->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->last_name->Visible) { // last_name ?>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_last_name" class="el_vaccinations_report3_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+    <?php if ($Page->description->Visible) { // description ?>
+        <td data-name="description"<?= $Page->description->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_description" class="el_income_report2_description">
+<span<?= $Page->description->viewAttributes() ?>>
+<?= $Page->description->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_date_of_birth" class="el_vaccinations_report3_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_gender" class="el_vaccinations_report3_gender">
-<span<?= $Page->gender->viewAttributes() ?>>
-<?= $Page->gender->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->service_name->Visible) { // service_name ?>
-        <td data-name="service_name"<?= $Page->service_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_service_name" class="el_vaccinations_report3_service_name">
-<span<?= $Page->service_name->viewAttributes() ?>>
-<?= $Page->service_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->status->Visible) { // status ?>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_status" class="el_vaccinations_report3_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
+    <?php if ($Page->cost->Visible) { // cost ?>
+        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_cost" class="el_income_report2_cost">
+<span<?= $Page->cost->viewAttributes() ?>>
+<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_date_created" class="el_vaccinations_report3_date_created">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_date_created" class="el_income_report2_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
 </span>
@@ -281,17 +248,17 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php } ?>
     <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_date_updated" class="el_vaccinations_report3_date_updated">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_date_updated" class="el_income_report2_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->vaccination_month->Visible) { // vaccination_month ?>
-        <td data-name="vaccination_month"<?= $Page->vaccination_month->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_vaccination_month" class="el_vaccinations_report3_vaccination_month">
-<span<?= $Page->vaccination_month->viewAttributes() ?>>
-<?= $Page->vaccination_month->getViewValue() ?></span>
+    <?php if ($Page->income_month->Visible) { // income_month ?>
+        <td data-name="income_month"<?= $Page->income_month->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_income_report2_income_month" class="el_income_report2_income_month">
+<span<?= $Page->income_month->viewAttributes() ?>>
+<?= $Page->income_month->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -354,7 +321,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("vaccinations_report3");
+    ew.addEventHandlers("income_report2");
 });
 </script>
 <script>

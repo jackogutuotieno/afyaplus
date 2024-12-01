@@ -125,6 +125,7 @@ class PatientQueueAdd extends PatientQueue
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->section->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -523,6 +524,7 @@ class PatientQueueAdd extends PatientQueue
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->section);
+        $this->setupLookupOptions($this->status);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -717,6 +719,16 @@ class PatientQueueAdd extends PatientQueue
             }
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -728,6 +740,7 @@ class PatientQueueAdd extends PatientQueue
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->section->CurrentValue = $this->section->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -772,6 +785,7 @@ class PatientQueueAdd extends PatientQueue
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -784,6 +798,7 @@ class PatientQueueAdd extends PatientQueue
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -832,6 +847,9 @@ class PatientQueueAdd extends PatientQueue
         // section
         $this->section->RowCssClass = "row";
 
+        // status
+        $this->status->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -877,6 +895,13 @@ class PatientQueueAdd extends PatientQueue
                 $this->section->ViewValue = null;
             }
 
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -889,6 +914,9 @@ class PatientQueueAdd extends PatientQueue
 
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -961,6 +989,11 @@ class PatientQueueAdd extends PatientQueue
             $this->section->EditValue = $this->section->options(true);
             $this->section->PlaceHolder = RemoveHtml($this->section->caption());
 
+            // status
+            $this->status->setupEditAttributes();
+            $this->status->EditValue = $this->status->options(true);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Add refer script
 
             // patient_id
@@ -971,6 +1004,9 @@ class PatientQueueAdd extends PatientQueue
 
             // section
             $this->section->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1008,6 +1044,11 @@ class PatientQueueAdd extends PatientQueue
             if ($this->section->Visible && $this->section->Required) {
                 if (!$this->section->IsDetailKey && EmptyValue($this->section->FormValue)) {
                     $this->section->addErrorMessage(str_replace("%s", $this->section->caption(), $this->section->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1089,6 +1130,9 @@ class PatientQueueAdd extends PatientQueue
 
         // section
         $this->section->setDbValueDef($rsnew, $this->section->CurrentValue, false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1106,6 +1150,9 @@ class PatientQueueAdd extends PatientQueue
         }
         if (isset($row['section'])) { // section
             $this->section->setFormValue($row['section']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
     }
 
@@ -1233,6 +1280,8 @@ class PatientQueueAdd extends PatientQueue
                 case "x_patient_id":
                     break;
                 case "x_section":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

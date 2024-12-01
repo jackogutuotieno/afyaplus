@@ -140,8 +140,12 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -970,9 +974,29 @@
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
@@ -1637,6 +1661,9 @@
                 '/incomeview[/{id}]',
                 '/incomeedit[/{id}]',
                 '/incomedelete[/{id}]',
+                '/incomereport2list[/{id}]',
+                '/incomereport',
+                '/incomereport/IncomebyMonth',
                 '/invoicedetailslist[/{id}]',
                 '/invoicedetailsadd[/{id}]',
                 '/invoicedetailsview[/{id}]',
@@ -1839,6 +1866,7 @@
                 '/vaccinationsreport2list',
                 '/vaccinationsreport3list[/{id}]',
                 '/vaccinationsreport',
+                '/vaccinationsreport/VaccinationsbyMonth',
                 '/visitsmonth',
                 '/visitsreport1',
                 '/visitsreport1/VisitsbyMonth',
@@ -1903,6 +1931,9 @@
                 'PHPMaker2024\\afyaplus\\IncomeController:view',
                 'PHPMaker2024\\afyaplus\\IncomeController:edit',
                 'PHPMaker2024\\afyaplus\\IncomeController:delete',
+                'PHPMaker2024\\afyaplus\\IncomeReport2Controller:list',
+                'PHPMaker2024\\afyaplus\\IncomeReportController:summary',
+                'PHPMaker2024\\afyaplus\\IncomeReportController:IncomebyMonth',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:list',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:add',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:view',
@@ -2105,6 +2136,7 @@
                 'PHPMaker2024\\afyaplus\\Vaccinationsreport2Controller:list',
                 'PHPMaker2024\\afyaplus\\VaccinationsReport3Controller:list',
                 'PHPMaker2024\\afyaplus\\VaccinationsReportController:summary',
+                'PHPMaker2024\\afyaplus\\VaccinationsReportController:VaccinationsbyMonth',
                 'PHPMaker2024\\afyaplus\\VisitsMonthController:summary',
                 'PHPMaker2024\\afyaplus\\VisitsReport1Controller:summary',
                 'PHPMaker2024\\afyaplus\\VisitsReport1Controller:VisitsbyMonth',
@@ -2118,6 +2150,15 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -2908,6 +2949,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -2961,6 +3005,9 @@
                 'view.income',
                 'edit.income',
                 'delete.income',
+                'list.income_report2',
+                'summary.Income_Report',
+                'summary.Income_Report.IncomebyMonth',
                 'list.invoice_details',
                 'add.invoice_details',
                 'view.invoice_details',
@@ -3163,6 +3210,7 @@
                 'list.vaccinationsreport2',
                 'list.vaccinations_report3',
                 'summary.Vaccinations_Report',
+                'summary.Vaccinations_Report.VaccinationsbyMonth',
                 'summary.Visits_Month',
                 'summary.Visits_Report1',
                 'summary.Visits_Report1.VisitsbyMonth',
@@ -3176,6 +3224,10 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3708,6 +3760,10 @@
         $o[261],
         $o[262],
         $o[263],
+        $o[264],
+        $o[265],
+        $o[266],
+        $o[267],
     ],
     []
 );

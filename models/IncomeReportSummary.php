@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class VaccinationsReportSummary extends VaccinationsReport
+class IncomeReportSummary extends IncomeReport
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class VaccinationsReportSummary extends VaccinationsReport
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "VaccinationsReportSummary";
+    public $PageObjName = "IncomeReportSummary";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class VaccinationsReportSummary extends VaccinationsReport
 
     // CSS class/style
     public $ReportContainerClass = "ew-grid";
-    public $CurrentPageName = "vaccinationsreport";
+    public $CurrentPageName = "incomereport";
 
     // Page headings
     public $Heading = "";
@@ -121,8 +121,8 @@ class VaccinationsReportSummary extends VaccinationsReport
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'Vaccinations_Report';
-        $this->TableName = 'Vaccinations Report';
+        $this->TableVar = 'Income_Report';
+        $this->TableName = 'Income Report';
 
         // CSS class name as context
         $this->ContextClass = CheckClassName($this->TableVar);
@@ -139,9 +139,9 @@ class VaccinationsReportSummary extends VaccinationsReport
         // Language object
         $Language = Container("app.language");
 
-        // Table object (Vaccinations_Report)
-        if (!isset($GLOBALS["Vaccinations_Report"]) || $GLOBALS["Vaccinations_Report"]::class == PROJECT_NAMESPACE . "Vaccinations_Report") {
-            $GLOBALS["Vaccinations_Report"] = &$this;
+        // Table object (Income_Report)
+        if (!isset($GLOBALS["Income_Report"]) || $GLOBALS["Income_Report"]::class == PROJECT_NAMESPACE . "Income_Report") {
+            $GLOBALS["Income_Report"] = &$this;
         }
 
         // Page URL
@@ -151,7 +151,7 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'Vaccinations Report');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'Income Report');
         }
 
         // Start timer
@@ -455,15 +455,11 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // Set field visibility for detail fields
         $this->id->setVisibility();
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->gender->setVisibility();
-        $this->service_name->setVisibility();
-        $this->status->setVisibility();
+        $this->income_title->setVisibility();
+        $this->description->setVisibility();
+        $this->cost->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
-        $this->vaccination_month->setVisibility();
+        $this->income_month->setVisibility();
 
         // Set up groups per page dynamically
         $this->setupDisplayGroups();
@@ -473,27 +469,15 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->setupBreadcrumb();
         }
 
-        // Check if search command
-        $this->SearchCommand = (Get("cmd", "") == "search");
-
         // Load custom filters
         $this->pageFilterLoad();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
 
         // Extended filter
         $extendedFilter = "";
 
-        // Restore filter list
-        $this->restoreFilterList();
-
-        // Build extended filter
-        $extendedFilter = $this->getExtendedFilter();
-        AddFilter($this->SearchWhere, $extendedFilter);
+        // No filter
+        $this->FilterOptions["savecurrentfilter"]->Visible = false;
+        $this->FilterOptions["deletefilter"]->Visible = false;
 
         // Call Page Selecting event
         $this->pageSelecting($this->SearchWhere);
@@ -612,26 +596,20 @@ class VaccinationsReportSummary extends VaccinationsReport
     {
         $data = [];
         $data["id"] = $record['id'];
-        $data["first_name"] = $record['first_name'];
-        $data["last_name"] = $record['last_name'];
-        $data["date_of_birth"] = $record['date_of_birth'];
-        $data["gender"] = $record['gender'];
-        $data["service_name"] = $record['service_name'];
-        $data["status"] = $record['status'];
+        $data["income_title"] = $record['income_title'];
+        $data["description"] = $record['description'];
+        $data["cost"] = $record['cost'];
         $data["date_created"] = $record['date_created'];
         $data["date_updated"] = $record['date_updated'];
-        $data["vaccination_month"] = $record['vaccination_month'];
+        $data["income_month"] = $record['income_month'];
         $this->Rows[] = $data;
         $this->id->setDbValue($record['id']);
-        $this->first_name->setDbValue($record['first_name']);
-        $this->last_name->setDbValue($record['last_name']);
-        $this->date_of_birth->setDbValue($record['date_of_birth']);
-        $this->gender->setDbValue($record['gender']);
-        $this->service_name->setDbValue($record['service_name']);
-        $this->status->setDbValue($record['status']);
+        $this->income_title->setDbValue($record['income_title']);
+        $this->description->setDbValue($record['description']);
+        $this->cost->setDbValue($record['cost']);
         $this->date_created->setDbValue($record['date_created']);
         $this->date_updated->setDbValue($record['date_updated']);
-        $this->vaccination_month->setDbValue($record['vaccination_month']);
+        $this->income_month->setDbValue($record['income_month']);
     }
 
     // Render row
@@ -670,63 +648,36 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // id
 
-        // first_name
+        // income_title
 
-        // last_name
+        // description
 
-        // date_of_birth
-
-        // gender
-
-        // service_name
-
-        // status
+        // cost
 
         // date_created
 
-        // date_updated
-
-        // vaccination_month
-        if ($this->RowType == RowType::SEARCH) {
-            // gender
-            if ($this->gender->UseFilter && !EmptyValue($this->gender->AdvancedSearch->SearchValue)) {
-                if (is_array($this->gender->AdvancedSearch->SearchValue)) {
-                    $this->gender->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
-                }
-                $this->gender->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
-            }
+        // income_month
+        if ($this->RowType == RowType::SEARCH) { // Search row
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
 
             // id
             $this->id->HrefValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
+            // description
+            $this->description->HrefValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-
-            // status
-            $this->status->HrefValue = "";
+            // cost
+            $this->cost->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
 
-            // date_updated
-            $this->date_updated->HrefValue = "";
-
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
+            // income_month
+            $this->income_month->HrefValue = "";
         } else {
             if ($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER) {
             } else {
@@ -741,84 +692,51 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-            $this->first_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // income_title
+            $this->income_title->ViewValue = $this->income_title->CurrentValue;
+            $this->income_title->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
-            $this->last_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // description
+            $this->description->ViewValue = $this->description->CurrentValue;
+            $this->description->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-            $this->date_of_birth->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
-            $this->gender->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // service_name
-            $this->service_name->ViewValue = $this->service_name->CurrentValue;
-            $this->service_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-            $this->status->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // cost
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
+            $this->cost->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
             $this->date_created->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-            $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // vaccination_month
-            $this->vaccination_month->ViewValue = $this->vaccination_month->CurrentValue;
-            $this->vaccination_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // income_month
+            $this->income_month->ViewValue = $this->income_month->CurrentValue;
+            $this->income_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
+            // income_title
+            $this->income_title->HrefValue = "";
+            $this->income_title->TooltipValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // description
+            $this->description->HrefValue = "";
+            $this->description->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-            $this->service_name->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // cost
+            $this->cost->HrefValue = "";
+            $this->cost->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
 
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
-
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
-            $this->vaccination_month->TooltipValue = "";
+            // income_month
+            $this->income_month->HrefValue = "";
+            $this->income_month->TooltipValue = "";
         }
 
         // Call Cell_Rendered event
@@ -833,59 +751,32 @@ class VaccinationsReportSummary extends VaccinationsReport
             $linkAttrs = &$this->id->LinkAttrs;
             $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // first_name
-            $currentValue = $this->first_name->CurrentValue;
-            $viewValue = &$this->first_name->ViewValue;
-            $viewAttrs = &$this->first_name->ViewAttrs;
-            $cellAttrs = &$this->first_name->CellAttrs;
-            $hrefValue = &$this->first_name->HrefValue;
-            $linkAttrs = &$this->first_name->LinkAttrs;
-            $this->cellRendered($this->first_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // income_title
+            $currentValue = $this->income_title->CurrentValue;
+            $viewValue = &$this->income_title->ViewValue;
+            $viewAttrs = &$this->income_title->ViewAttrs;
+            $cellAttrs = &$this->income_title->CellAttrs;
+            $hrefValue = &$this->income_title->HrefValue;
+            $linkAttrs = &$this->income_title->LinkAttrs;
+            $this->cellRendered($this->income_title, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // last_name
-            $currentValue = $this->last_name->CurrentValue;
-            $viewValue = &$this->last_name->ViewValue;
-            $viewAttrs = &$this->last_name->ViewAttrs;
-            $cellAttrs = &$this->last_name->CellAttrs;
-            $hrefValue = &$this->last_name->HrefValue;
-            $linkAttrs = &$this->last_name->LinkAttrs;
-            $this->cellRendered($this->last_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // description
+            $currentValue = $this->description->CurrentValue;
+            $viewValue = &$this->description->ViewValue;
+            $viewAttrs = &$this->description->ViewAttrs;
+            $cellAttrs = &$this->description->CellAttrs;
+            $hrefValue = &$this->description->HrefValue;
+            $linkAttrs = &$this->description->LinkAttrs;
+            $this->cellRendered($this->description, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // date_of_birth
-            $currentValue = $this->date_of_birth->CurrentValue;
-            $viewValue = &$this->date_of_birth->ViewValue;
-            $viewAttrs = &$this->date_of_birth->ViewAttrs;
-            $cellAttrs = &$this->date_of_birth->CellAttrs;
-            $hrefValue = &$this->date_of_birth->HrefValue;
-            $linkAttrs = &$this->date_of_birth->LinkAttrs;
-            $this->cellRendered($this->date_of_birth, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // gender
-            $currentValue = $this->gender->CurrentValue;
-            $viewValue = &$this->gender->ViewValue;
-            $viewAttrs = &$this->gender->ViewAttrs;
-            $cellAttrs = &$this->gender->CellAttrs;
-            $hrefValue = &$this->gender->HrefValue;
-            $linkAttrs = &$this->gender->LinkAttrs;
-            $this->cellRendered($this->gender, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // service_name
-            $currentValue = $this->service_name->CurrentValue;
-            $viewValue = &$this->service_name->ViewValue;
-            $viewAttrs = &$this->service_name->ViewAttrs;
-            $cellAttrs = &$this->service_name->CellAttrs;
-            $hrefValue = &$this->service_name->HrefValue;
-            $linkAttrs = &$this->service_name->LinkAttrs;
-            $this->cellRendered($this->service_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // status
-            $currentValue = $this->status->CurrentValue;
-            $viewValue = &$this->status->ViewValue;
-            $viewAttrs = &$this->status->ViewAttrs;
-            $cellAttrs = &$this->status->CellAttrs;
-            $hrefValue = &$this->status->HrefValue;
-            $linkAttrs = &$this->status->LinkAttrs;
-            $this->cellRendered($this->status, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // cost
+            $currentValue = $this->cost->CurrentValue;
+            $viewValue = &$this->cost->ViewValue;
+            $viewAttrs = &$this->cost->ViewAttrs;
+            $cellAttrs = &$this->cost->CellAttrs;
+            $hrefValue = &$this->cost->HrefValue;
+            $linkAttrs = &$this->cost->LinkAttrs;
+            $this->cellRendered($this->cost, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // date_created
             $currentValue = $this->date_created->CurrentValue;
@@ -896,23 +787,14 @@ class VaccinationsReportSummary extends VaccinationsReport
             $linkAttrs = &$this->date_created->LinkAttrs;
             $this->cellRendered($this->date_created, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // date_updated
-            $currentValue = $this->date_updated->CurrentValue;
-            $viewValue = &$this->date_updated->ViewValue;
-            $viewAttrs = &$this->date_updated->ViewAttrs;
-            $cellAttrs = &$this->date_updated->CellAttrs;
-            $hrefValue = &$this->date_updated->HrefValue;
-            $linkAttrs = &$this->date_updated->LinkAttrs;
-            $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // vaccination_month
-            $currentValue = $this->vaccination_month->CurrentValue;
-            $viewValue = &$this->vaccination_month->ViewValue;
-            $viewAttrs = &$this->vaccination_month->ViewAttrs;
-            $cellAttrs = &$this->vaccination_month->CellAttrs;
-            $hrefValue = &$this->vaccination_month->HrefValue;
-            $linkAttrs = &$this->vaccination_month->LinkAttrs;
-            $this->cellRendered($this->vaccination_month, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // income_month
+            $currentValue = $this->income_month->CurrentValue;
+            $viewValue = &$this->income_month->ViewValue;
+            $viewAttrs = &$this->income_month->ViewAttrs;
+            $cellAttrs = &$this->income_month->CellAttrs;
+            $hrefValue = &$this->income_month->HrefValue;
+            $linkAttrs = &$this->income_month->LinkAttrs;
+            $this->cellRendered($this->income_month, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
         }
 
         // Call Row_Rendered event
@@ -956,31 +838,19 @@ class VaccinationsReportSummary extends VaccinationsReport
         if ($this->id->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->first_name->Visible) {
+        if ($this->income_title->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->last_name->Visible) {
+        if ($this->description->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->date_of_birth->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->gender->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->service_name->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->status->Visible) {
+        if ($this->cost->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->date_created->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->date_updated->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->vaccination_month->Visible) {
+        if ($this->income_month->Visible) {
             $this->DetailColumnCount += 1;
         }
     }
@@ -1074,15 +944,6 @@ class VaccinationsReportSummary extends VaccinationsReport
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -1106,7 +967,7 @@ class VaccinationsReportSummary extends VaccinationsReport
     // Check if any search fields
     public function hasSearchFields()
     {
-        return $this->gender->Visible;
+        return false;
     }
 
     // Render search options
@@ -1176,11 +1037,11 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fVaccinations_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fIncome_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fVaccinations_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fIncome_Reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1286,296 +1147,27 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->setOrderBy("");
             $this->setStartGroup(1);
             $this->id->setSort("");
-            $this->first_name->setSort("");
-            $this->last_name->setSort("");
-            $this->date_of_birth->setSort("");
-            $this->gender->setSort("");
-            $this->service_name->setSort("");
-            $this->status->setSort("");
+            $this->income_title->setSort("");
+            $this->description->setSort("");
+            $this->cost->setSort("");
             $this->date_created->setSort("");
-            $this->date_updated->setSort("");
-            $this->vaccination_month->setSort("");
+            $this->income_month->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->gender); // gender
-            $this->updateSort($this->service_name); // service_name
-            $this->updateSort($this->status); // status
+            $this->updateSort($this->income_title); // income_title
+            $this->updateSort($this->description); // description
+            $this->updateSort($this->cost); // cost
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->vaccination_month); // vaccination_month
+            $this->updateSort($this->income_month); // income_month
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);
         }
         return $this->getOrderBy();
-    }
-
-    // Return extended filter
-    protected function getExtendedFilter()
-    {
-        $filter = "";
-        if ($this->DrillDown) {
-            return "";
-        }
-        $restoreSession = false;
-        $restoreDefault = false;
-        // Reset search command
-        if (Get("cmd") == "reset") {
-            // Set default values
-            $this->gender->AdvancedSearch->unsetSession();
-            $restoreDefault = true;
-        } else {
-            $restoreSession = !$this->SearchCommand;
-
-            // Field gender
-            $this->getDropDownValue($this->gender);
-            if (!$this->validateForm()) {
-                return $filter;
-            }
-        }
-
-        // Restore session
-        if ($restoreSession) {
-            $restoreDefault = true;
-            if ($this->gender->AdvancedSearch->issetSession()) { // Field gender
-                $this->gender->AdvancedSearch->load();
-                $restoreDefault = false;
-            }
-        }
-
-        // Restore default
-        if ($restoreDefault) {
-            $this->loadDefaultFilters();
-        }
-
-        // Call page filter validated event
-        $this->pageFilterValidated();
-
-        // Build SQL and save to session
-        $this->buildDropDownFilter($this->gender, $filter, false, true); // Field gender
-        $this->gender->AdvancedSearch->save();
-        return $filter;
-    }
-
-    // Build dropdown filter
-    protected function buildDropDownFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
-    {
-        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
-        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
-        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
-        if (!EmptyValue($fld->DateFilter)) {
-            $fldVal2 = "";
-        } elseif ($fld->UseFilter) {
-            $fldOpr = "";
-            $fldVal2 = "";
-        }
-        $sql = "";
-        if (is_array($fldVal)) {
-            foreach ($fldVal as $val) {
-                $wrk = DropDownFilter($fld, $val, $fldOpr, $this->Dbid);
-
-                // Call Page Filtering event
-                if (StartsString("@@", $val)) {
-                    $this->pageFiltering($fld, $wrk, "custom", substr($val, 2));
-                } else {
-                    $this->pageFiltering($fld, $wrk, "dropdown", $fldOpr, $val);
-                }
-                AddFilter($sql, $wrk, "OR");
-            }
-        } else {
-            $sql = DropDownFilter($fld, $fldVal, $fldOpr, $this->Dbid, $fldVal2);
-
-            // Call Page Filtering event
-            if (StartsString("@@", $fldVal)) {
-                $this->pageFiltering($fld, $sql, "custom", substr($fldVal, 2));
-            } else {
-                $this->pageFiltering($fld, $sql, "dropdown", $fldOpr, $fldVal, "", "", $fldVal2);
-            }
-        }
-        if ($sql != "") {
-            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
-            AddFilter($filterClause, $sql, $cond);
-            if ($saveFilter) {
-                $fld->CurrentFilter = $sql;
-            }
-        }
-    }
-
-    // Build extended filter
-    protected function buildExtendedFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
-    {
-        $wrk = GetReportFilter($fld, $default, $this->Dbid);
-        if (!$default) {
-            $this->pageFiltering($fld, $wrk, "extended", $fld->AdvancedSearch->SearchOperator, $fld->AdvancedSearch->SearchValue, $fld->AdvancedSearch->SearchCondition, $fld->AdvancedSearch->SearchOperator2, $fld->AdvancedSearch->SearchValue2);
-        }
-        if ($wrk != "") {
-            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
-            AddFilter($filterClause, $wrk, $cond);
-            if ($saveFilter) {
-                $fld->CurrentFilter = $wrk;
-            }
-        }
-    }
-
-    // Get drop down value from querystring
-    protected function getDropDownValue(&$fld)
-    {
-        if (IsPost()) {
-            return false; // Skip post back
-        }
-        $res = false;
-        $parm = $fld->Param;
-        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
-        $opr = Get("z_$parm");
-        if ($opr !== null) {
-            $fld->AdvancedSearch->SearchOperator = $opr;
-        }
-        $val = Get("x_$parm");
-        if ($val !== null) {
-            if (is_array($val)) {
-                $val = implode($sep, $val);
-            }
-            $fld->AdvancedSearch->setSearchValue($val);
-            $res = true;
-        }
-        $val2 = Get("y_$parm");
-        if ($val2 !== null) {
-            if (is_array($val2)) {
-                $val2 = implode($sep, $val2);
-            }
-            $fld->AdvancedSearch->setSearchValue2($val2);
-            $res = true;
-        }
-        return $res;
-    }
-
-    // Dropdown filter exist
-    protected function dropDownFilterExist(&$fld)
-    {
-        $wrk = "";
-        $this->buildDropDownFilter($fld, $wrk);
-        return ($wrk != "");
-    }
-
-    // Extended filter exist
-    protected function extendedFilterExist(&$fld)
-    {
-        $extWrk = "";
-        $this->buildExtendedFilter($fld, $extWrk);
-        return ($extWrk != "");
-    }
-
-    // Validate form
-    protected function validateForm()
-    {
-        global $Language;
-
-        // Check if validation required
-        if (!Config("SERVER_VALIDATE")) {
-            return true;
-        }
-
-        // Return validate result
-        $validateForm = !$this->hasInvalidFields();
-
-        // Call Form_CustomValidate event
-        $formCustomError = "";
-        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
-        if ($formCustomError != "") {
-            $this->setFailureMessage($formCustomError);
-        }
-        return $validateForm;
-    }
-
-    // Load default value for filters
-    protected function loadDefaultFilters()
-    {
-        // Field gender
-        $this->gender->AdvancedSearch->loadDefault();
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fVaccinations_Reportsrch");
-        }
-
-        // Return filter list in json
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("fVaccinations_Reportsrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd", "") != "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter", ""), true);
-        return $this->setupFilterList($filter);
-    }
-
-    // Setup list of filters
-    protected function setupFilterList($filter)
-    {
-        if (!is_array($filter)) {
-            return false;
-        }
-        return true;
     }
 
     // Page Load event

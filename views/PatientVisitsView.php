@@ -194,6 +194,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vaccinations", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_vaccinations")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientVaccinationsGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

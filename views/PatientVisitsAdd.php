@@ -339,6 +339,14 @@ loadjs.ready("fpatient_visitsadd", function() {
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_vaccinations", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientVaccinationsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatient_visitsadd"><?= $Language->phrase("AddBtn") ?></button>

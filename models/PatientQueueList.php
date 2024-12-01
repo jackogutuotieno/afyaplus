@@ -149,6 +149,7 @@ class PatientQueueList extends PatientQueue
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->section->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -712,6 +713,7 @@ class PatientQueueList extends PatientQueue
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->section);
+        $this->setupLookupOptions($this->status);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1078,6 +1080,7 @@ class PatientQueueList extends PatientQueue
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->section->AdvancedSearch->toJson(), ","); // Field section
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1151,6 +1154,14 @@ class PatientQueueList extends PatientQueue
         $this->section->AdvancedSearch->SearchOperator2 = @$filter["w_section"];
         $this->section->AdvancedSearch->save();
 
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1206,6 +1217,7 @@ class PatientQueueList extends PatientQueue
         // Fields to search
         $searchFlds = [];
         $searchFlds[] = &$this->section;
+        $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1286,6 +1298,7 @@ class PatientQueueList extends PatientQueue
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->section); // section
+            $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1324,6 +1337,7 @@ class PatientQueueList extends PatientQueue
                 $this->patient_id->setSort("");
                 $this->visit_id->setSort("");
                 $this->section->setSort("");
+                $this->status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1555,6 +1569,7 @@ class PatientQueueList extends PatientQueue
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "section");
+            $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -1998,6 +2013,7 @@ class PatientQueueList extends PatientQueue
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->section->setDbValue($row['section']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2010,6 +2026,7 @@ class PatientQueueList extends PatientQueue
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['section'] = $this->section->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2060,6 +2077,8 @@ class PatientQueueList extends PatientQueue
 
         // section
 
+        // status
+
         // date_created
 
         // date_updated
@@ -2104,6 +2123,13 @@ class PatientQueueList extends PatientQueue
                 $this->section->ViewValue = null;
             }
 
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2115,6 +2141,10 @@ class PatientQueueList extends PatientQueue
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2499,6 +2529,8 @@ class PatientQueueList extends PatientQueue
                 case "x_patient_id":
                     break;
                 case "x_section":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

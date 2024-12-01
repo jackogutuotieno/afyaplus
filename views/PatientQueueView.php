@@ -95,6 +95,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_queue_status"><?= $Page->status->caption() ?></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el_patient_queue_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

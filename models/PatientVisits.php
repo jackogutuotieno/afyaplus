@@ -539,6 +539,11 @@ class PatientVisits extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "patient_vaccinations") {
+            $detailUrl = Container("patient_vaccinations")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
         if ($detailUrl == "") {
             $detailUrl = "patientvisitslist";
         }
