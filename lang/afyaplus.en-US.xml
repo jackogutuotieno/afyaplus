@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="334">
+      <phrase id="menutext" value="Radiology Overview" />
+    </menu>
     <menu id="327">
       <phrase id="menutext" value="Triage Overview" />
     </menu>
@@ -22,12 +25,6 @@
     </menu>
     <menu id="325">
       <phrase id="menutext" value="Facility Overview" />
-    </menu>
-    <menu id="323">
-      <phrase id="menutext" value="expenses report 2" />
-    </menu>
-    <menu id="321">
-      <phrase id="menutext" value="income report 2" />
     </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
@@ -227,6 +224,9 @@
     <menu id="316">
       <phrase id="menutext" value="Laboratory" />
     </menu>
+    <menu id="333">
+      <phrase id="menutext" value="Radiology Report" />
+    </menu>
     <menu id="313">
       <phrase id="menutext" value="Medicine Stock" />
     </menu>
@@ -235,6 +235,15 @@
     </menu>
     <menu id="324">
       <phrase id="menutext" value="Expenses" />
+    </menu>
+    <menu id="427">
+      <phrase id="menutext" value="External Reports" />
+    </menu>
+    <menu id="335">
+      <phrase id="menutext" value="MOH 204A" />
+    </menu>
+    <menu id="428">
+      <phrase id="menutext" value="MOH 204B" />
     </menu>
     <menu id="317">
       <phrase id="menutext" value="vaccinations report 3" />
@@ -268,6 +277,15 @@
     </menu>
     <menu id="319">
       <phrase id="menutext" value="Visits Report" />
+    </menu>
+    <menu id="321">
+      <phrase id="menutext" value="income report 2" />
+    </menu>
+    <menu id="323">
+      <phrase id="menutext" value="expenses report 2" />
+    </menu>
+    <menu id="332">
+      <phrase id="menutext" value="Radiology Report" />
     </menu>
     <table id="appointments_report2">
       <phrase id="tblcaption" value="Appointments Report" />
@@ -2503,6 +2521,170 @@
     </table>
     <table id="financials_overview">
       <phrase id="tblcaption" value="Financials Overview" />
+    </table>
+    <table id="radiology_report2">
+      <phrase id="tblcaption" value="Radiology Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="s/no" />
+      </field>
+      <field id="patient_name_radiology">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="first name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="last name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="subcategory">
+        <phrase id="fldcaption" value="subcategory" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="service name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="radiology_month">
+        <phrase id="fldcaption" value="radiology month" />
+      </field>
+    </table>
+    <table id="radiology_report">
+      <phrase id="tblcaption" value="Radiology Report" />
+      <chart id="submissionsbymonth">
+        <phrase id="chartcaption" value="Submissions by Month" />
+        <phrase id="chartxaxisname" value="radiology month" />
+        <phrase id="chartyaxisname" value="radiology month" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="s/no" />
+      </field>
+      <field id="patient_name_radiology">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="first_name">
+        <phrase id="fldcaption" value="first name" />
+      </field>
+      <field id="last_name">
+        <phrase id="fldcaption" value="last name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="subcategory">
+        <phrase id="fldcaption" value="subcategory" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="service name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="radiology_month">
+        <phrase id="fldcaption" value="radiology month" />
+      </field>
+    </table>
+    <table id="radiology_overview">
+      <phrase id="tblcaption" value="Radiology Overview" />
+    </table>
+    <table id="moh204a_report">
+      <phrase id="tblcaption" value="MOH 204A Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="patient_name_moh204a">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="patient age" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="email address" />
+      </field>
+      <field id="marital_status">
+        <phrase id="fldcaption" value="marital status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="registration date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="next_of_kin">
+        <phrase id="fldcaption" value="next of kin" />
+      </field>
+      <field id="next_of_kin_phone">
+        <phrase id="fldcaption" value="next of kin phone" />
+      </field>
+      <field id="registration_month">
+        <phrase id="fldcaption" value="registration month" />
+      </field>
+    </table>
+    <table id="moh204b_report">
+      <phrase id="tblcaption" value="MOH 204B Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="patient_name_moh204a">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="patient age" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="email address" />
+      </field>
+      <field id="marital_status">
+        <phrase id="fldcaption" value="marital status" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="next_of_kin">
+        <phrase id="fldcaption" value="next of kin" />
+      </field>
+      <field id="next_of_kin_phone">
+        <phrase id="fldcaption" value="next of kin phone" />
+      </field>
+      <field id="registration_month">
+        <phrase id="fldcaption" value="registration month" />
+      </field>
     </table>
   </project>
 </ew-language>

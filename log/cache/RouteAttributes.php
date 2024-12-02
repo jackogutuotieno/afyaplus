@@ -152,8 +152,14 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -1045,9 +1051,39 @@
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
@@ -1823,6 +1859,8 @@
                 '/medicinesuppliersview[/{id}]',
                 '/medicinesuppliersedit[/{id}]',
                 '/medicinesuppliersdelete[/{id}]',
+                '/moh204areportlist[/{id}]',
+                '/moh204breportlist[/{id}]',
                 '/personaldata',
                 '/login[/{provider}]',
                 '/resetpassword',
@@ -1885,6 +1923,10 @@
                 '/prescriptionsdelete[/{id}]',
                 '/radiologybillingreportlist[/{id}]',
                 '/radiologybillingreportdetailslist[/{id}]',
+                '/radiologyoverview',
+                '/radiologyreport2list[/{id}]',
+                '/radiologyreport',
+                '/radiologyreport/SubmissionsbyMonth',
                 '/radiologyreportslist[/{id}]',
                 '/radiologyreportsadd[/{id}]',
                 '/radiologyreportsview[/{id}]',
@@ -2104,6 +2146,8 @@
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:view',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:edit',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:delete',
+                'PHPMaker2024\\afyaplus\\Moh204aReportController:list',
+                'PHPMaker2024\\afyaplus\\Moh204bReportController:list',
                 'PHPMaker2024\\afyaplus\\OthersController:personaldata',
                 'PHPMaker2024\\afyaplus\\OthersController:login',
                 'PHPMaker2024\\afyaplus\\OthersController:resetpassword',
@@ -2166,6 +2210,10 @@
                 'PHPMaker2024\\afyaplus\\PrescriptionsController:delete',
                 'PHPMaker2024\\afyaplus\\RadiologyBillingReportController:list',
                 'PHPMaker2024\\afyaplus\\RadiologyBillingReportDetailsController:list',
+                'PHPMaker2024\\afyaplus\\RadiologyOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\RadiologyReport2Controller:list',
+                'PHPMaker2024\\afyaplus\\RadiologyReportController:summary',
+                'PHPMaker2024\\afyaplus\\RadiologyReportController:SubmissionsbyMonth',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:list',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:add',
                 'PHPMaker2024\\afyaplus\\RadiologyReportsController:view',
@@ -2238,6 +2286,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3073,6 +3127,18 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3222,6 +3288,8 @@
                 'view.medicine_suppliers',
                 'edit.medicine_suppliers',
                 'delete.medicine_suppliers',
+                'list.moh204a_report',
+                'list.moh204b_report',
                 'personaldata',
                 'login',
                 'resetpassword',
@@ -3284,6 +3352,10 @@
                 'delete.prescriptions',
                 'list.radiology_billing_report',
                 'list.radiology_billing_report_details',
+                'dashboard.Radiology_Overview',
+                'list.radiology_report2',
+                'summary.Radiology_Report',
+                'summary.Radiology_Report.SubmissionsbyMonth',
                 'list.radiology_reports',
                 'add.radiology_reports',
                 'view.radiology_reports',
@@ -3356,6 +3428,12 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3918,6 +3996,12 @@
         $o[276],
         $o[277],
         $o[278],
+        $o[279],
+        $o[280],
+        $o[281],
+        $o[282],
+        $o[283],
+        $o[284],
     ],
     []
 );

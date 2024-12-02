@@ -172,6 +172,13 @@ return [
     "pharmacy_overview" => \DI\create(PharmacyOverview::class),
     "Financials_Overview" => \DI\create(FinancialsOverview::class),
     "financials_overview" => \DI\create(FinancialsOverview::class),
+    "radiology_report2" => \DI\create(RadiologyReport2::class),
+    "Radiology_Report" => \DI\create(RadiologyReport::class),
+    "radiology_report" => \DI\create(RadiologyReport::class),
+    "Radiology_Overview" => \DI\create(RadiologyOverview::class),
+    "radiology_overview" => \DI\create(RadiologyOverview::class),
+    "moh204a_report" => \DI\create(Moh204aReport::class),
+    "moh204b_report" => \DI\create(Moh204bReport::class),
 
     // User table
     "usertable" => \DI\get("users"),
