@@ -52,7 +52,7 @@ $Page->showMessage();
                     Appointments
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-calendar"></i></p>
                     <p class="record-count">
                         <?php
                             $user_id = CurrentUserID();
@@ -70,7 +70,7 @@ $Page->showMessage();
                     Today's Appointments
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-calendar"></i></p>
                     <p class="record-count">
                         <?php
                             $user_id = CurrentUserID();

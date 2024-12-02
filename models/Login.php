@@ -595,6 +595,8 @@ class Login extends Users
                 $url= "laboratoryoverview";
             } else if (CurrentUserlevel() == 5) {
                 $url= "pharmacyoverview";
+            } else if (CurrentUserlevel() == 7) {
+                $url= "financialsoverview";
             }
         }
     }

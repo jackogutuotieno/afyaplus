@@ -185,23 +185,6 @@ $Page->showMessage();
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card counters">
                 <div class="card-header">
-                    Accountants
-                </div>
-                <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
-                    <p class="record-count">
-                        <?php
-                            $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=7";
-                            $accountants = ExecuteScalar($sql);
-                            echo $accountants;
-                        ?>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card counters">
-                <div class="card-header">
                     HR Officers
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">

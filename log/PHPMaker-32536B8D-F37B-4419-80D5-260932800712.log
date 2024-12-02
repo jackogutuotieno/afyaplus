@@ -20,6 +20,7 @@ C:\wamp64\www\afyaplus\controllers\ExpensesReportController.php
 C:\wamp64\www\afyaplus\controllers\ExportlogController.php
 C:\wamp64\www\afyaplus\controllers\FaciityOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FacilityOverviewController.php
+C:\wamp64\www\afyaplus\controllers\FinancialsOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FrontOfficeOverviewController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
@@ -173,6 +174,7 @@ C:\wamp64\www\afyaplus\models\ExportlogList.php
 C:\wamp64\www\afyaplus\models\ExportlogView.php
 C:\wamp64\www\afyaplus\models\FaciityOverview.php
 C:\wamp64\www\afyaplus\models\FacilityOverview.php
+C:\wamp64\www\afyaplus\models\FinancialsOverview.php
 C:\wamp64\www\afyaplus\models\FrontOfficeOverview.php
 C:\wamp64\www\afyaplus\models\Income.php
 C:\wamp64\www\afyaplus\models\IncomeAdd.php
@@ -745,6 +747,7 @@ C:\wamp64\www\afyaplus\views\ExportlogList.php
 C:\wamp64\www\afyaplus\views\ExportlogView.php
 C:\wamp64\www\afyaplus\views\FaciityOverview.php
 C:\wamp64\www\afyaplus\views\FacilityOverview.php
+C:\wamp64\www\afyaplus\views\FinancialsOverview.php
 C:\wamp64\www\afyaplus\views\FrontOfficeOverview.php
 C:\wamp64\www\afyaplus\views\IncomeAdd.php
 C:\wamp64\www\afyaplus\views\IncomeDelete.php

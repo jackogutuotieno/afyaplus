@@ -151,6 +151,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -295,6 +296,11 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1722,6 +1728,7 @@
                 '/exportlogdelete[/{FileId:.*}]',
                 '/faciityoverview',
                 '/facilityoverview',
+                '/financialsoverview',
                 '/frontofficeoverview',
                 '/incomelist[/{id}]',
                 '/incomeadd[/{id}]',
@@ -2002,6 +2009,7 @@
                 'PHPMaker2024\\afyaplus\\ExportlogController:delete',
                 'PHPMaker2024\\afyaplus\\FaciityOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\FacilityOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\FinancialsOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\FrontOfficeOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\IncomeController:list',
                 'PHPMaker2024\\afyaplus\\IncomeController:add',
@@ -2230,6 +2238,9 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3116,6 +3127,7 @@
                 'delete.exportlog',
                 'dashboard.Faciity_Overview',
                 'dashboard.Facility_Overview',
+                'dashboard.Financials_Overview',
                 'dashboard.Front_Office_Overview',
                 'list.income',
                 'add.income',
@@ -3344,6 +3356,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -3904,6 +3917,7 @@
         $o[275],
         $o[276],
         $o[277],
+        $o[278],
     ],
     []
 );

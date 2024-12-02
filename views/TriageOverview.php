@@ -52,7 +52,7 @@ $Page->showMessage();
                     All Time Visits
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-list"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patient_visits";
@@ -69,7 +69,7 @@ $Page->showMessage();
                     Today's Visits
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-list"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patient_visits WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()";
@@ -86,7 +86,7 @@ $Page->showMessage();
                     Vitals
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-thermometer-half"></i>"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patient_vitals";
@@ -120,7 +120,7 @@ $Page->showMessage();
                     Vaccinations
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-syringe"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patient_vaccinations";

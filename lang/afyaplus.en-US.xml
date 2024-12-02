@@ -14,6 +14,9 @@
     <menu id="330">
       <phrase id="menutext" value="Pharmacy Overview" />
     </menu>
+    <menu id="331">
+      <phrase id="menutext" value="Financials Overview" />
+    </menu>
     <menu id="326">
       <phrase id="menutext" value="Front Office Overview" />
     </menu>
@@ -2497,6 +2500,9 @@
     </table>
     <table id="pharmacy_overview">
       <phrase id="tblcaption" value="Pharmacy Overview" />
+    </table>
+    <table id="financials_overview">
+      <phrase id="tblcaption" value="Financials Overview" />
     </table>
   </project>
 </ew-language>
