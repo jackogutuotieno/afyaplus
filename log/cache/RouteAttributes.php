@@ -149,8 +149,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -1025,9 +1028,24 @@
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
                 ],
                 [
                     'GET',
@@ -1683,6 +1701,7 @@
                 '/doctornotesview[/{id}]',
                 '/doctornotesedit[/{id}]',
                 '/doctornotesdelete[/{id}]',
+                '/doctoroverview',
                 '/expenseslist[/{id}]',
                 '/expensesadd[/{id}]',
                 '/expensesview[/{id}]',
@@ -1722,6 +1741,7 @@
                 '/laboratorybillingreportsearch',
                 '/laboratorybillingreportdetailslist[/{id}]',
                 '/laboratoryminorreportlist[/{id}]',
+                '/laboratoryoverview',
                 '/laboratoryreports2list[/{id}]',
                 '/laboratoryreports',
                 '/laboratoryreports/ReportbySubmissionMonth',
@@ -1900,6 +1920,7 @@
                 '/subscriptionsview[/{Id}]',
                 '/subscriptionsedit[/{Id}]',
                 '/subscriptionsdelete[/{Id}]',
+                '/triageoverview',
                 '/userslist[/{id}]',
                 '/usersadd[/{id}]',
                 '/usersview[/{id}]',
@@ -1959,6 +1980,7 @@
                 'PHPMaker2024\\afyaplus\\DoctorNotesController:view',
                 'PHPMaker2024\\afyaplus\\DoctorNotesController:edit',
                 'PHPMaker2024\\afyaplus\\DoctorNotesController:delete',
+                'PHPMaker2024\\afyaplus\\DoctorOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\ExpensesController:list',
                 'PHPMaker2024\\afyaplus\\ExpensesController:add',
                 'PHPMaker2024\\afyaplus\\ExpensesController:view',
@@ -1998,6 +2020,7 @@
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportController:search',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportDetailsController:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryMinorReportController:list',
+                'PHPMaker2024\\afyaplus\\LaboratoryOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\LaboratoryReports2Controller:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryReportsController:summary',
                 'PHPMaker2024\\afyaplus\\LaboratoryReportsController:ReportbySubmissionMonth',
@@ -2176,6 +2199,7 @@
                 'PHPMaker2024\\afyaplus\\SubscriptionsController:view',
                 'PHPMaker2024\\afyaplus\\SubscriptionsController:edit',
                 'PHPMaker2024\\afyaplus\\SubscriptionsController:delete',
+                'PHPMaker2024\\afyaplus\\TriageOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\UsersController:list',
                 'PHPMaker2024\\afyaplus\\UsersController:add',
                 'PHPMaker2024\\afyaplus\\UsersController:view',
@@ -2198,6 +2222,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3018,6 +3048,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3057,6 +3090,7 @@
                 'view.doctor_notes',
                 'edit.doctor_notes',
                 'delete.doctor_notes',
+                'dashboard.Doctor_Overview',
                 'list.expenses',
                 'add.expenses',
                 'view.expenses',
@@ -3096,6 +3130,7 @@
                 'search.laboratory_billing_report',
                 'list.laboratory_billing_report_details',
                 'list.laboratory_minor_report',
+                'dashboard.Laboratory_Overview',
                 'list.laboratory_reports2',
                 'summary.Laboratory_Reports',
                 'summary.Laboratory_Reports.ReportbySubmissionMonth',
@@ -3274,6 +3309,7 @@
                 'view.subscriptions',
                 'edit.subscriptions',
                 'delete.subscriptions',
+                'dashboard.Triage_Overview',
                 'list.users',
                 'add.users',
                 'view.users',
@@ -3296,6 +3332,9 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3848,6 +3887,9 @@
         $o[271],
         $o[272],
         $o[273],
+        $o[274],
+        $o[275],
+        $o[276],
     ],
     []
 );

@@ -1,0 +1,12 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-12-02 06:49:42",/afyaplus/login,1,login,::1,,,,
+"2024-12-02 07:26:50",/afyaplus/logout,1,logout,::1,,,,
+"2024-12-02 07:26:59",/afyaplus/login,3,login,::1,,,,
+"2024-12-02 07:30:25",/afyaplus/logout,3,logout,::1,,,,
+"2024-12-02 07:49:26",/afyaplus/login,4,login,::1,,,,
+"2024-12-02 08:00:13",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-02 08:00:23",/afyaplus/login,5,login,::1,,,,
+"2024-12-02 08:14:08",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-02 08:14:48",/afyaplus/login,5,login,::1,,,,
+"2024-12-02 08:23:05",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-02 08:23:14",/afyaplus/login,5,login,::1,,,,

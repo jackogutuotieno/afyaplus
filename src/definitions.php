@@ -162,6 +162,12 @@ return [
     "facility_overview" => \DI\create(FacilityOverview::class),
     "Front_Office_Overview" => \DI\create(FrontOfficeOverview::class),
     "front_office_overview" => \DI\create(FrontOfficeOverview::class),
+    "Triage_Overview" => \DI\create(TriageOverview::class),
+    "triage_overview" => \DI\create(TriageOverview::class),
+    "Doctor_Overview" => \DI\create(DoctorOverview::class),
+    "doctor_overview" => \DI\create(DoctorOverview::class),
+    "Laboratory_Overview" => \DI\create(LaboratoryOverview::class),
+    "laboratory_overview" => \DI\create(LaboratoryOverview::class),
 
     // User table
     "usertable" => \DI\get("users"),

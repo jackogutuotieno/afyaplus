@@ -13,6 +13,7 @@ C:\wamp64\www\afyaplus\controllers\DiagnosisController.php
 C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
+C:\wamp64\www\afyaplus\controllers\DoctorOverviewController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReportController.php
@@ -35,6 +36,7 @@ C:\wamp64\www\afyaplus\controllers\LaboratoryBillingController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingReportController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryMinorReportController.php
+C:\wamp64\www\afyaplus\controllers\LaboratoryOverviewController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryReports2Controller.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryReportsController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryreportsController.php
@@ -77,6 +79,7 @@ C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceSubcategoriesController.php
 C:\wamp64\www\afyaplus\controllers\SubscriptionsController.php
+C:\wamp64\www\afyaplus\controllers\TriageOverviewController.php
 C:\wamp64\www\afyaplus\controllers\UsersController.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReport3Controller.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReportController.php
@@ -150,6 +153,7 @@ C:\wamp64\www\afyaplus\models\DoctorNotesEdit.php
 C:\wamp64\www\afyaplus\models\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\models\DoctorNotesList.php
 C:\wamp64\www\afyaplus\models\DoctorNotesView.php
+C:\wamp64\www\afyaplus\models\DoctorOverview.php
 C:\wamp64\www\afyaplus\models\Expenses.php
 C:\wamp64\www\afyaplus\models\ExpensesAdd.php
 C:\wamp64\www\afyaplus\models\ExpensesDelete.php
@@ -240,6 +244,7 @@ C:\wamp64\www\afyaplus\models\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportSearch.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReportList.php
+C:\wamp64\www\afyaplus\models\LaboratoryOverview.php
 C:\wamp64\www\afyaplus\models\LaboratoryReports.php
 C:\wamp64\www\afyaplus\models\LaboratoryReports2.php
 C:\wamp64\www\afyaplus\models\LaboratoryReports2List.php
@@ -444,6 +449,7 @@ C:\wamp64\www\afyaplus\models\SubscriptionsDelete.php
 C:\wamp64\www\afyaplus\models\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\models\SubscriptionsList.php
 C:\wamp64\www\afyaplus\models\SubscriptionsView.php
+C:\wamp64\www\afyaplus\models\TriageOverview.php
 C:\wamp64\www\afyaplus\models\Users.php
 C:\wamp64\www\afyaplus\models\UsersAdd.php
 C:\wamp64\www\afyaplus\models\UsersDelete.php
@@ -721,6 +727,7 @@ C:\wamp64\www\afyaplus\views\DoctorNotesEdit.php
 C:\wamp64\www\afyaplus\views\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\views\DoctorNotesList.php
 C:\wamp64\www\afyaplus\views\DoctorNotesView.php
+C:\wamp64\www\afyaplus\views\DoctorOverview.php
 C:\wamp64\www\afyaplus\views\Error.php
 C:\wamp64\www\afyaplus\views\ExpensesAdd.php
 C:\wamp64\www\afyaplus\views\ExpensesDelete.php
@@ -799,6 +806,7 @@ C:\wamp64\www\afyaplus\views\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportSearch.php
 C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
+C:\wamp64\www\afyaplus\views\LaboratoryOverview.php
 C:\wamp64\www\afyaplus\views\LaboratoryReports2List.php
 C:\wamp64\www\afyaplus\views\LaboratoryReportsList.php
 C:\wamp64\www\afyaplus\views\LaboratoryReportsSummary.php
@@ -969,6 +977,7 @@ C:\wamp64\www\afyaplus\views\SubscriptionsDelete.php
 C:\wamp64\www\afyaplus\views\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\views\SubscriptionsList.php
 C:\wamp64\www\afyaplus\views\SubscriptionsView.php
+C:\wamp64\www\afyaplus\views\TriageOverview.php
 C:\wamp64\www\afyaplus\views\UsersAdd.php
 C:\wamp64\www\afyaplus\views\UsersDelete.php
 C:\wamp64\www\afyaplus\views\UsersEdit.php

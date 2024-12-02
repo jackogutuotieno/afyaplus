@@ -8,6 +8,9 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(329, "mi_Laboratory_Overview", $Language->menuPhrase("329", "MenuText"), "laboratoryoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "", "", false, true);

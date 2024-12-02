@@ -2,6 +2,15 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="327">
+      <phrase id="menutext" value="Triage Overview" />
+    </menu>
+    <menu id="328">
+      <phrase id="menutext" value="Doctor Overview" />
+    </menu>
+    <menu id="329">
+      <phrase id="menutext" value="Laboratory Overview" />
+    </menu>
     <menu id="326">
       <phrase id="menutext" value="Front Office Overview" />
     </menu>
@@ -2473,6 +2482,15 @@
     </table>
     <table id="front_office_overview">
       <phrase id="tblcaption" value="Front Office Overview" />
+    </table>
+    <table id="triage_overview">
+      <phrase id="tblcaption" value="Triage Overview" />
+    </table>
+    <table id="doctor_overview">
+      <phrase id="tblcaption" value="Doctor Overview" />
+    </table>
+    <table id="laboratory_overview">
+      <phrase id="tblcaption" value="Laboratory Overview" />
     </table>
   </project>
 </ew-language>

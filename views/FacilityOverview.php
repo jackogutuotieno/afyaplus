@@ -243,8 +243,8 @@ $Page->showMessage();
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patients";
-                            $income = ExecuteScalar($sql);
-                            echo $income;
+                            $patients = ExecuteScalar($sql);
+                            echo $patients;
                         ?>
                     </p>
                 </div>

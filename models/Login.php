@@ -585,9 +585,15 @@ class Login extends Users
         if (IsLoggedIn()) {
             if (CurrentUserlevel() == -1) {
                 $url= "facilityoverview";
-            } if (CurrentUserlevel() == 1) {
+            } else if (CurrentUserlevel() == 1) {
                 $url= "frontofficeoverview";
-            } 
+            } else if (CurrentUserlevel() == 3) {
+                $url= "triageoverview";
+            } else if (CurrentUserlevel() == 2) {
+                $url= "doctoroverview";
+            } else if (CurrentUserlevel() == 4) {
+                $url= "laboratoryoverview";
+            }
         }
     }
 
