@@ -855,7 +855,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","5","1096"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview","9","0"]];
 
 /**
  * Tables
@@ -942,4 +953,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Front Office Overview","Front_Office_Overview","Front Office Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","frontofficeoverview"],
     ["Triage Overview","Triage_Overview","Triage Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","triageoverview"],
     ["Doctor Overview","Doctor_Overview","Doctor Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctoroverview"],
-    ["Laboratory Overview","Laboratory_Overview","Laboratory Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryoverview"]];
+    ["Laboratory Overview","Laboratory_Overview","Laboratory Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryoverview"],
+    ["Pharmacy Overview","Pharmacy_Overview","Pharmacy Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacyoverview"]];

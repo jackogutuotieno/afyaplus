@@ -11,6 +11,9 @@
     <menu id="329">
       <phrase id="menutext" value="Laboratory Overview" />
     </menu>
+    <menu id="330">
+      <phrase id="menutext" value="Pharmacy Overview" />
+    </menu>
     <menu id="326">
       <phrase id="menutext" value="Front Office Overview" />
     </menu>
@@ -2491,6 +2494,9 @@
     </table>
     <table id="laboratory_overview">
       <phrase id="tblcaption" value="Laboratory Overview" />
+    </table>
+    <table id="pharmacy_overview">
+      <phrase id="tblcaption" value="Pharmacy Overview" />
     </table>
   </project>
 </ew-language>

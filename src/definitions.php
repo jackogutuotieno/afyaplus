@@ -168,6 +168,8 @@ return [
     "doctor_overview" => \DI\create(DoctorOverview::class),
     "Laboratory_Overview" => \DI\create(LaboratoryOverview::class),
     "laboratory_overview" => \DI\create(LaboratoryOverview::class),
+    "Pharmacy_Overview" => \DI\create(PharmacyOverview::class),
+    "pharmacy_overview" => \DI\create(PharmacyOverview::class),
 
     // User table
     "usertable" => \DI\get("users"),
