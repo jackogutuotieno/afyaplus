@@ -50,15 +50,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_requests_queue") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/LabTestRequestsQueueMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="flab_test_reportssrch" id="flab_test_reportssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="flab_test_reportssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -150,10 +141,6 @@ $Page->showMessage();
 <input type="hidden" name="t" value="lab_test_reports">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
-<?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "lab_test_requests_queue" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_requests_queue">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_requests_queue_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_lab_test_reports" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>

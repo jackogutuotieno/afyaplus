@@ -138,14 +138,6 @@ loadjs.ready("fradiology_requests_detailsadd", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
-<?php
-    if (in_array("radiology_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $radiology_requests_queue->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_requests_queue", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "RadiologyRequestsQueueGrid.php" ?>
-<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fradiology_requests_detailsadd"><?= $Language->phrase("AddBtn") ?></button>

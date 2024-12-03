@@ -101,9 +101,6 @@
     <menu id="14">
       <phrase id="menutext" value="Test Details" />
     </menu>
-    <menu id="15">
-      <phrase id="menutext" value="Lab Queue" />
-    </menu>
     <menu id="12">
       <phrase id="menutext" value="Test Reports" />
     </menu>
@@ -115,9 +112,6 @@
     </menu>
     <menu id="31">
       <phrase id="menutext" value="Radiology Test Details" />
-    </menu>
-    <menu id="32">
-      <phrase id="menutext" value="Radiology Queue" />
     </menu>
     <menu id="29">
       <phrase id="menutext" value="Radiology Reports" />
@@ -268,9 +262,6 @@
     </menu>
     <menu id="243">
       <phrase id="menutext" value="registered patients report" />
-    </menu>
-    <menu id="314">
-      <phrase id="menutext" value="Laboratory Reports" />
     </menu>
     <menu id="319">
       <phrase id="menutext" value="Visits Report" />
@@ -654,49 +645,6 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />
-      </field>
-    </table>
-    <table id="lab_test_requests_queue">
-      <phrase id="tblcaption" value="Test Queue" />
-      <field id="id">
-        <phrase id="fldcaption" value="S/No" />
-      </field>
-      <field id="lab_test_requests_details_id">
-        <phrase id="fldcaption" value="Request Details ID" />
-      </field>
-      <field id="time">
-        <phrase id="fldcaption" value="Time" />
-      </field>
-      <field id="waiting_time">
-        <phrase id="fldcaption" value="Waiting Time" />
-        <phrase id="custommsg" value="Enter an integer (e.g 45)" />
-      </field>
-      <field id="waiting_interval">
-        <phrase id="fldcaption" value="Waiting Interval" />
-        <phrase id="fldtagvalue1" value="Minutes" />
-        <phrase id="fldtagcaption1" value="Minutes" />
-        <phrase id="fldtagvalue2" value="Hours" />
-        <phrase id="fldtagcaption2" value="Hours" />
-        <phrase id="fldtagvalue3" value="Days" />
-        <phrase id="fldtagcaption3" value="Days" />
-      </field>
-      <field id="status">
-        <phrase id="fldcaption" value="Status" />
-        <phrase id="fldtagvalue1" value="Done" />
-        <phrase id="fldtagcaption1" value="Done" />
-        <phrase id="fldtagvalue2" value="In Progress" />
-        <phrase id="fldtagcaption2" value="In Progress" />
-        <phrase id="fldtagvalue3" value="Cancelled" />
-        <phrase id="fldtagcaption3" value="Cancelled" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="Submitted by" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="medical_schemes">
@@ -1317,46 +1265,6 @@
       </field>
       <field id="service_id">
         <phrase id="fldcaption" value="Radiology Test" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="Date Added" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="Last Updated" />
-      </field>
-    </table>
-    <table id="radiology_requests_queue">
-      <phrase id="tblcaption" value="Radiology Queue" />
-      <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
-      </field>
-      <field id="radiology_requests_details_id">
-        <phrase id="fldcaption" value="Request Details ID" />
-      </field>
-      <field id="test_time">
-        <phrase id="fldcaption" value="Waiting Time" />
-      </field>
-      <field id="waiting_time">
-        <phrase id="fldcaption" value="Waiting Time" />
-      </field>
-      <field id="waiting_interval">
-        <phrase id="fldcaption" value="Interval" />
-        <phrase id="fldtagvalue1" value="Hours" />
-        <phrase id="fldtagcaption1" value="Hours" />
-        <phrase id="fldtagvalue2" value="Minutes" />
-        <phrase id="fldtagcaption2" value="Minutes" />
-        <phrase id="fldtagvalue3" value="Days" />
-        <phrase id="fldtagcaption3" value="Days" />
-      </field>
-      <field id="status">
-        <phrase id="fldcaption" value="Status" />
-        <phrase id="fldtagvalue1" value="Done" />
-        <phrase id="fldtagcaption1" value="Done" />
-        <phrase id="fldtagvalue2" value="Cancelled" />
-        <phrase id="fldtagcaption2" value="Cancelled" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="Submitted By" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Date Added" />
@@ -2107,45 +2015,6 @@
         <phrase id="fldcaption" value="stockadd month" />
       </field>
     </table>
-    <table id="laboratory_reports2">
-      <phrase id="tblcaption" value="Laboratory Reports" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
-      </field>
-      <field id="first_name">
-        <phrase id="fldcaption" value="First Name" />
-      </field>
-      <field id="last_name">
-        <phrase id="fldcaption" value="Last Name" />
-      </field>
-      <field id="gender">
-        <phrase id="fldcaption" value="Gender" />
-      </field>
-      <field id="date_of_birth">
-        <phrase id="fldcaption" value="DoB" />
-      </field>
-      <field id="p_age">
-        <phrase id="fldcaption" value="Age" />
-      </field>
-      <field id="specimen">
-        <phrase id="fldcaption" value="Specimen" />
-      </field>
-      <field id="service_name">
-        <phrase id="fldcaption" value="Test Name" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="Last Updated" />
-      </field>
-      <field id="report_month">
-        <phrase id="fldcaption" value="report month" />
-      </field>
-    </table>
     <table id="patients_data_view">
       <phrase id="tblcaption" value="patients data view" />
       <field id="id">
@@ -2171,9 +2040,6 @@
         <phrase id="chartxaxisname" value="report month" />
         <phrase id="chartyaxisname" value="report month" />
       </chart>
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="patient id" />
       </field>
@@ -2198,17 +2064,8 @@
       <field id="service_name">
         <phrase id="fldcaption" value="Test Name" />
       </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="Submission Date" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="Last Updated" />
-      </field>
       <field id="p_age">
         <phrase id="fldcaption" value="Age" />
-      </field>
-      <field id="report_month">
-        <phrase id="fldcaption" value="report month" />
       </field>
     </table>
     <table id="vaccinations_report3">

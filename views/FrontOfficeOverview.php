@@ -52,7 +52,7 @@ $Page->showMessage();
                     Patients
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-hospital-user"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM patients";

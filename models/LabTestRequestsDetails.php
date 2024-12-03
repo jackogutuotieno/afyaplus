@@ -120,7 +120,6 @@ class LabTestRequestsDetails extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -405,32 +404,6 @@ class LabTestRequestsDetails extends DbTable
                 return GetKeyFilter($this->lab_test_request_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
-    }
-
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "lab_test_requests_queue") {
-            $detailUrl = Container("lab_test_requests_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "labtestrequestsdetailslist";
-        }
-        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -1062,11 +1035,7 @@ class LabTestRequestsDetails extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("labtestrequestsdetailsedit", $parm);
-        } else {
-            $url = $this->keyUrl("labtestrequestsdetailsedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("labtestrequestsdetailsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
@@ -1080,11 +1049,7 @@ class LabTestRequestsDetails extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("labtestrequestsdetailsadd", $parm);
-        } else {
-            $url = $this->keyUrl("labtestrequestsdetailsadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("labtestrequestsdetailsadd", $parm);
         return $this->addMasterUrl($url);
     }
 

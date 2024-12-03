@@ -96,14 +96,6 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
-<?php
-    if (in_array("lab_test_requests_queue", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests_queue->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests_queue", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsQueueGrid.php" ?>
-<?php } ?>
 </form>
 </main>
 <?php
