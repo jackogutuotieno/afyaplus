@@ -286,6 +286,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1716,6 +1717,11 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -1996,6 +2002,7 @@
                 '/visitsmonth',
                 '/visitsreport1',
                 '/visitsreport1/VisitsbyMonth',
+                '/visitsreport1/VisitsbyMedicalScheme',
                 '/visitsreportlist[/{id}]',
                 '/visittypeslist[/{id}]',
                 '/visittypesadd[/{id}]',
@@ -2284,6 +2291,7 @@
                 'PHPMaker2024\\afyaplus\\VisitsMonthController:summary',
                 'PHPMaker2024\\afyaplus\\VisitsReport1Controller:summary',
                 'PHPMaker2024\\afyaplus\\VisitsReport1Controller:VisitsbyMonth',
+                'PHPMaker2024\\afyaplus\\VisitsReport1Controller:VisitsbyMedicalScheme',
                 'PHPMaker2024\\afyaplus\\VisitsReportController:list',
                 'PHPMaker2024\\afyaplus\\VisitTypesController:list',
                 'PHPMaker2024\\afyaplus\\VisitTypesController:add',
@@ -3150,6 +3158,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3430,6 +3441,7 @@
                 'summary.Visits_Month',
                 'summary.Visits_Report1',
                 'summary.Visits_Report1.VisitsbyMonth',
+                'summary.Visits_Report1.VisitsbyMedicalScheme',
                 'list.visits_report',
                 'list.visit_types',
                 'add.visit_types',
@@ -3440,6 +3452,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -4016,6 +4029,7 @@
         $o[283],
         $o[284],
         $o[285],
+        $o[286],
     ],
     []
 );

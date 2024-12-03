@@ -153,7 +153,7 @@ $Page->showMessage();
 <div class="chart-content container">
     <div class="row">
         <div class="card-group">
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Registration Graph</h4>
@@ -163,13 +163,33 @@ $Page->showMessage();
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Visits Graph</h4>
                     </div>
                     <div class="card-body">
                         <?= $FrontOfficeOverview->renderItem($this, 2) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-header content-header">
+                        <h4>Appointments Graph</h4>
+                    </div>
+                    <div class="card-body">
+                        <?= $FrontOfficeOverview->renderItem($this, 3) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-header content-header">
+                        <h4>Insurance Graph</h4>
+                    </div>
+                    <div class="card-body">
+                        <?= $FrontOfficeOverview->renderItem($this, 4) ?>
                     </div>
                 </div>
             </div>

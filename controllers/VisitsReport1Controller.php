@@ -30,4 +30,11 @@ class VisitsReport1Controller extends ControllerBase
     {
         return $this->runChart($request, $response, $args, "VisitsReport1Summary", "VisitsbyMonth");
     }
+
+    // VisitsbyMedicalScheme (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/visitsreport1/VisitsbyMedicalScheme", [PermissionMiddleware::class], "summary.Visits_Report1.VisitsbyMedicalScheme")]
+    public function VisitsbyMedicalScheme(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "VisitsReport1Summary", "VisitsbyMedicalScheme");
+    }
 }

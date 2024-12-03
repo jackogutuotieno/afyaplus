@@ -351,7 +351,7 @@ class FrontOfficeOverview extends ReportTable
     public $DashboardType = "custom";
 
     // Item CSS class names
-    public $ItemClassNames = ["",""];
+    public $ItemClassNames = ["","","",""];
 
     // Export options
     public $ExportOptions;
@@ -500,6 +500,22 @@ class FrontOfficeOverview extends ReportTable
                 $Page->VisitsbyMonth->DrillDownUrl = ""; // No drill down for dashboard
                 $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
                     $Page->VisitsbyMonth->render("ew-dashboard-chart", null, null) .
+                    GetDebugMessage(); // Return chart content
+            }
+            if ($id == 3) {
+                $Page = Container("AppointmentsReportSummary");
+                $Page->run();
+                $Page->AppointmentsSubmittedbyMonth->DrillDownUrl = ""; // No drill down for dashboard
+                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
+                    $Page->AppointmentsSubmittedbyMonth->render("ew-dashboard-chart", null, null) .
+                    GetDebugMessage(); // Return chart content
+            }
+            if ($id == 4) {
+                $Page = Container("VisitsReport1Summary");
+                $Page->run();
+                $Page->VisitsbyMedicalScheme->DrillDownUrl = ""; // No drill down for dashboard
+                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
+                    $Page->VisitsbyMedicalScheme->render("ew-dashboard-chart", null, null) .
                     GetDebugMessage(); // Return chart content
             }
         } catch (\Exception $e) {

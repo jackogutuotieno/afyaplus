@@ -159,8 +159,6 @@ return [
     "triage_overview" => \DI\create(TriageOverview::class),
     "Doctor_Overview" => \DI\create(DoctorOverview::class),
     "doctor_overview" => \DI\create(DoctorOverview::class),
-    "Laboratory_Overview" => \DI\create(LaboratoryOverview::class),
-    "laboratory_overview" => \DI\create(LaboratoryOverview::class),
     "Pharmacy_Overview" => \DI\create(PharmacyOverview::class),
     "pharmacy_overview" => \DI\create(PharmacyOverview::class),
     "Financials_Overview" => \DI\create(FinancialsOverview::class),

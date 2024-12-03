@@ -211,6 +211,13 @@ if (!$DashboardReport) {
     echo $Page->VisitsbyMonth->render("ew-chart-bottom");
 }
 ?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->VisitsbyMedicalScheme->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->VisitsbyMedicalScheme->render("ew-chart-bottom");
+}
+?>
 <?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
 </div>
 <!-- /#ew-bottom -->

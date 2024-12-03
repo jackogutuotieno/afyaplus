@@ -47,6 +47,7 @@ class VisitsReport1 extends ReportTable
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
     public $VisitsbyMonth;
+    public $VisitsbyMedicalScheme;
 
     // Fields
     public $id;
@@ -377,6 +378,37 @@ class VisitsReport1 extends ReportTable
         $this->VisitsbyMonth->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
         $this->VisitsbyMonth->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
         $this->Charts[$this->VisitsbyMonth->ID] = &$this->VisitsbyMonth;
+
+        // Visits by Medical Scheme
+        $this->VisitsbyMedicalScheme = new DbChart($this, 'VisitsbyMedicalScheme', 'Visits by Medical Scheme', 'company', 'company', 1001, '', 0, 'COUNT', 600, 500);
+        $this->VisitsbyMedicalScheme->Position = 4;
+        $this->VisitsbyMedicalScheme->PageBreakType = "before";
+        $this->VisitsbyMedicalScheme->YAxisFormat = [""];
+        $this->VisitsbyMedicalScheme->YFieldFormat = [""];
+        $this->VisitsbyMedicalScheme->SortType = 0;
+        $this->VisitsbyMedicalScheme->SortSequence = "";
+        $this->VisitsbyMedicalScheme->SqlSelect = $this->getQueryBuilder()->select("`company`", "''", "COUNT(`company`)");
+        $this->VisitsbyMedicalScheme->SqlGroupBy = "`company`";
+        $this->VisitsbyMedicalScheme->SqlOrderBy = "";
+        $this->VisitsbyMedicalScheme->SeriesDateType = "";
+        $this->VisitsbyMedicalScheme->ID = "Visits_Report1_VisitsbyMedicalScheme"; // Chart ID
+        $this->VisitsbyMedicalScheme->setParameters([
+            ["type", "1001"],
+            ["seriestype", "0"]
+        ]); // Chart type / Chart series type
+        $this->VisitsbyMedicalScheme->setParameters([
+            ["caption", $this->VisitsbyMedicalScheme->caption()],
+            ["xaxisname", $this->VisitsbyMedicalScheme->xAxisName()]
+        ]); // Chart caption / X axis name
+        $this->VisitsbyMedicalScheme->setParameter("yaxisname", $this->VisitsbyMedicalScheme->yAxisName()); // Y axis name
+        $this->VisitsbyMedicalScheme->setParameters([
+            ["shownames", "1"],
+            ["showvalues", "1"],
+            ["showhovercap", "1"]
+        ]); // Show names / Show values / Show hover
+        $this->VisitsbyMedicalScheme->setParameter("alpha", DbChart::getDefaultAlpha()); // Chart alpha (datasets background color)
+        $this->VisitsbyMedicalScheme->setParameters([["options.plugins.legend.display",false],["options.plugins.legend.fullWidth",false],["options.plugins.legend.reverse",false],["options.plugins.legend.rtl",false],["options.plugins.legend.labels.usePointStyle",false],["options.plugins.title.display",false],["options.plugins.tooltip.enabled",false],["options.plugins.tooltip.intersect",false],["options.plugins.tooltip.displayColors",false],["options.plugins.tooltip.rtl",false],["options.plugins.filler.propagate",false],["options.animation.animateRotate",false],["options.animation.animateScale",false],["options.scales.r.angleLines.display",false],["options.plugins.stacked100.enable",false],["dataset.showLine",false],["dataset.spanGaps",false],["dataset.steppedLine",false],["dataset.circular",false],["scale.offset",false],["scale.gridLines.offsetGridLines",false],["options.plugins.datalabels.clamp",false],["options.plugins.datalabels.clip",false],["options.plugins.datalabels.display",false],["annotation1.show",false],["annotation1.secondaryYAxis",false],["annotation2.show",false],["annotation2.secondaryYAxis",false],["annotation3.show",false],["annotation3.secondaryYAxis",false],["annotation4.show",false],["annotation4.secondaryYAxis",false]]);
+        $this->Charts[$this->VisitsbyMedicalScheme->ID] = &$this->VisitsbyMedicalScheme;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();

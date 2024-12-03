@@ -348,10 +348,10 @@ class LaboratoryOverview extends ReportTable
     }
 
     // Dashboard type
-    public $DashboardType = "custom";
+    public $DashboardType = "vertical";
 
     // Item CSS class names
-    public $ItemClassNames = [""];
+    public $ItemClassNames = [];
 
     // Export options
     public $ExportOptions;
@@ -486,14 +486,6 @@ class LaboratoryOverview extends ReportTable
             return $content; // To be rendered by JavaScript
         }
         try {
-            if ($id == 1) {
-                $Page = Container("LaboratoryReportsSummary");
-                $Page->run();
-                $Page->ReportbySubmissionMonth->DrillDownUrl = ""; // No drill down for dashboard
-                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
-                    $Page->ReportbySubmissionMonth->render("ew-dashboard-chart", null, null) .
-                    GetDebugMessage(); // Return chart content
-            }
         } catch (\Exception $e) {
             $GLOBALS["Page"] = $this;
         } finally {
