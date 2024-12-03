@@ -121,7 +121,7 @@ class UsersDelete extends Users
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->photo->setVisibility();
         $this->full_name->setVisibility();
         $this->first_name->Visible = false;
@@ -843,10 +843,6 @@ class UsersDelete extends Users
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // photo
             if (!empty($this->photo->Upload->DbValue)) {

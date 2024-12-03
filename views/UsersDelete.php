@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_users_id" class="users_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->photo->Visible) { // photo ?>
         <th class="<?= $Page->photo->headerCellClass() ?>"><span id="elh_users_photo" class="users_photo"><?= $Page->photo->caption() ?></span></th>
 <?php } ?>
@@ -113,14 +110,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->photo->Visible) { // photo ?>
         <td<?= $Page->photo->cellAttributes() ?>>
 <span id="">

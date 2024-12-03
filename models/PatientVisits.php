@@ -1914,10 +1914,10 @@ class PatientVisits extends DbTable
         $current_date = CurrentDate();
         if ($this->date_created->CurrentValue > $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New"; 
+            $this->status->ViewValue = "New Visit"; 
         } else if ($this->date_created->CurrentValue < $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #e5064b; color: white";
-            $this->status->ViewValue = "Lapsed"; 
+            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
+            $this->status->ViewValue = "Past Visit"; 
         } 
     }
 
