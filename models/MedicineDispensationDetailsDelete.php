@@ -121,8 +121,8 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->medicine_dispensation_id->setVisibility();
+        $this->id->Visible = false;
+        $this->medicine_dispensation_id->Visible = false;
         $this->medicine_stock_id->setVisibility();
         $this->quantity->setVisibility();
         $this->date_created->Visible = false;
@@ -645,10 +645,8 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
         // quantity
 
         // date_created
-        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -686,13 +684,13 @@ class MedicineDispensationDetailsDelete extends MedicineDispensationDetails
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // date_created
+            $this->date_created->ViewValue = $this->date_created->CurrentValue;
+            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
-            $this->medicine_dispensation_id->TooltipValue = "";
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";

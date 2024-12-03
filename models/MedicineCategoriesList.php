@@ -2489,7 +2489,10 @@ class MedicineCategoriesList extends MedicineCategories
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add category");
     }
 
     // Page Unload event

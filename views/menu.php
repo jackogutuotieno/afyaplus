@@ -8,6 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(430, "mi_medicine_stock_data", $Language->menuPhrase("430", "MenuText"), "medicinestockdatalist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}medicine_stock_data'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334", "MenuText"), "radiologyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "fa-tachometer", "", false, true);

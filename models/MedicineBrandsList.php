@@ -2497,7 +2497,10 @@ class MedicineBrandsList extends MedicineBrands
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add medidine brand");
     }
 
     // Page Unload event

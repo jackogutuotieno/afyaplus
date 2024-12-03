@@ -2552,7 +2552,10 @@ class MedicineSuppliersList extends MedicineSuppliers
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add supplier");
     }
 
     // Page Unload event

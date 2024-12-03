@@ -104,12 +104,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_dispensation_details_id" class="medicine_dispensation_details_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
-<?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <th data-name="medicine_dispensation_id" class="<?= $Page->medicine_dispensation_id->headerCellClass() ?>"><div id="elh_medicine_dispensation_details_medicine_dispensation_id" class="medicine_dispensation_details_medicine_dispensation_id"><?= $Page->renderFieldHeader($Page->medicine_dispensation_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th data-name="medicine_stock_id" class="<?= $Page->medicine_stock_id->headerCellClass() ?>"><div id="elh_medicine_dispensation_details_medicine_stock_id" class="medicine_dispensation_details_medicine_stock_id"><?= $Page->renderFieldHeader($Page->medicine_stock_id) ?></div></th>
 <?php } ?>
@@ -144,22 +138,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_dispensation_details_id" class="el_medicine_dispensation_details_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td data-name="medicine_dispensation_id"<?= $Page->medicine_dispensation_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_dispensation_details_medicine_dispensation_id" class="el_medicine_dispensation_details_medicine_dispensation_id">
-<span<?= $Page->medicine_dispensation_id->viewAttributes() ?>>
-<?= $Page->medicine_dispensation_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <td data-name="medicine_stock_id"<?= $Page->medicine_stock_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_dispensation_details_medicine_stock_id" class="el_medicine_dispensation_details_medicine_stock_id">

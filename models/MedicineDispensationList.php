@@ -2727,7 +2727,10 @@ class MedicineDispensationList extends MedicineDispensation
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "dispense medicine");
     }
 
     // Page Unload event

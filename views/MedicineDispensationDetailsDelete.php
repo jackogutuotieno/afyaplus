@@ -50,12 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_medicine_dispensation_details_id" class="medicine_dispensation_details_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <th class="<?= $Page->medicine_dispensation_id->headerCellClass() ?>"><span id="elh_medicine_dispensation_details_medicine_dispensation_id" class="medicine_dispensation_details_medicine_dispensation_id"><?= $Page->medicine_dispensation_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th class="<?= $Page->medicine_stock_id->headerCellClass() ?>"><span id="elh_medicine_dispensation_details_medicine_stock_id" class="medicine_dispensation_details_medicine_stock_id"><?= $Page->medicine_stock_id->caption() ?></span></th>
 <?php } ?>
@@ -83,22 +77,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td<?= $Page->medicine_dispensation_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->medicine_dispensation_id->viewAttributes() ?>>
-<?= $Page->medicine_dispensation_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <td<?= $Page->medicine_stock_id->cellAttributes() ?>>
 <span id="">

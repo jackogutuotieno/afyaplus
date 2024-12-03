@@ -47,6 +47,7 @@ C:\wamp64\www\afyaplus\controllers\MedicineCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\MedicineDispensationController.php
 C:\wamp64\www\afyaplus\controllers\MedicineDispensationDetailsController.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockController.php
+C:\wamp64\www\afyaplus\controllers\MedicineStockDataController.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockReportController.php
 C:\wamp64\www\afyaplus\controllers\MedicineSuppliersController.php
@@ -296,6 +297,8 @@ C:\wamp64\www\afyaplus\models\MedicineDispensationList.php
 C:\wamp64\www\afyaplus\models\MedicineDispensationView.php
 C:\wamp64\www\afyaplus\models\MedicineStock.php
 C:\wamp64\www\afyaplus\models\MedicineStockAdd.php
+C:\wamp64\www\afyaplus\models\MedicineStockData.php
+C:\wamp64\www\afyaplus\models\MedicineStockDataList.php
 C:\wamp64\www\afyaplus\models\MedicineStockDelete.php
 C:\wamp64\www\afyaplus\models\MedicineStockEdit.php
 C:\wamp64\www\afyaplus\models\MedicineStockList.php
@@ -580,6 +583,7 @@ C:\wamp64\www\afyaplus\src\Entity\MedicineCategory.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineDispensation.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineDispensationDetail.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineStock.php
+C:\wamp64\www\afyaplus\src\Entity\MedicineStockDatum.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineStockReport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineSupplier.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204AReport.php
@@ -863,6 +867,7 @@ C:\wamp64\www\afyaplus\views\MedicineDispensationList.php
 C:\wamp64\www\afyaplus\views\MedicineDispensationMaster.php
 C:\wamp64\www\afyaplus\views\MedicineDispensationView.php
 C:\wamp64\www\afyaplus\views\MedicineStockAdd.php
+C:\wamp64\www\afyaplus\views\MedicineStockDataList.php
 C:\wamp64\www\afyaplus\views\MedicineStockDelete.php
 C:\wamp64\www\afyaplus\views\MedicineStockEdit.php
 C:\wamp64\www\afyaplus\views\MedicineStockList.php

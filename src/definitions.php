@@ -99,7 +99,6 @@ return [
     "medicine_brands" => \DI\create(MedicineBrands::class),
     "medicine_categories" => \DI\create(MedicineCategories::class),
     "medicine_dispensation" => \DI\create(MedicineDispensation::class),
-    "medicine_dispensation_details" => \DI\create(MedicineDispensationDetails::class),
     "medicine_stock" => \DI\create(MedicineStock::class),
     "medicine_stock_report2" => \DI\create(MedicineStockReport2::class),
     "medicine_suppliers" => \DI\create(MedicineSuppliers::class),
@@ -133,7 +132,6 @@ return [
     "radiology_billing_report" => \DI\create(RadiologyBillingReport::class),
     "radiology_billing_report_details" => \DI\create(RadiologyBillingReportDetails::class),
     "pharmacy_billing_report" => \DI\create(PharmacyBillingReport::class),
-    "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
     "income" => \DI\create(Income::class),
     "Appointments_Report" => \DI\create(AppointmentsReport::class),
     "appointments_report" => \DI\create(AppointmentsReport::class),
@@ -179,6 +177,9 @@ return [
     "radiology_overview" => \DI\create(RadiologyOverview::class),
     "moh204a_report" => \DI\create(Moh204aReport::class),
     "moh204b_report" => \DI\create(Moh204bReport::class),
+    "medicine_dispensation_details" => \DI\create(MedicineDispensationDetails::class),
+    "medicine_stock_data" => \DI\create(MedicineStockData::class),
+    "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
 
     // User table
     "usertable" => \DI\get("users"),

@@ -52,7 +52,7 @@ $Page->showMessage();
                     Administrators
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-cog"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=-1";
@@ -69,7 +69,7 @@ $Page->showMessage();
                     Receptionists
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-phone"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=1";
@@ -86,7 +86,7 @@ $Page->showMessage();
                     Nurses
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-user-nurse"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=3";
@@ -103,7 +103,7 @@ $Page->showMessage();
                     Doctors
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-user-doctor"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=2";
@@ -120,7 +120,7 @@ $Page->showMessage();
                     Laboratorists
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-microscoe"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=4";
@@ -137,7 +137,7 @@ $Page->showMessage();
                     Radiologists
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-x-ray"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=6";
@@ -154,7 +154,7 @@ $Page->showMessage();
                     Pharmacists
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-users"></i></p>
+                    <p class="card-text"><i class="fas fa-briefcase-medical"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=5";

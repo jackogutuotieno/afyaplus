@@ -145,8 +145,8 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->medicine_dispensation_id->setVisibility();
+        $this->id->Visible = false;
+        $this->medicine_dispensation_id->Visible = false;
         $this->medicine_stock_id->setVisibility();
         $this->quantity->setVisibility();
         $this->date_created->Visible = false;
@@ -1030,8 +1030,6 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->medicine_dispensation_id); // medicine_dispensation_id
             $this->updateSort($this->medicine_stock_id); // medicine_stock_id
             $this->updateSort($this->quantity); // quantity
             $this->setStartRecordNumber(1); // Reset start position
@@ -1129,6 +1127,14 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1166,6 +1172,10 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1301,8 +1311,6 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "medicine_dispensation_id");
             $this->createColumnOption($option, "medicine_stock_id");
             $this->createColumnOption($option, "quantity");
         }
@@ -1800,10 +1808,8 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
         // quantity
 
         // date_created
-        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1841,13 +1847,13 @@ class MedicineDispensationDetailsList extends MedicineDispensationDetails
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // date_created
+            $this->date_created->ViewValue = $this->date_created->CurrentValue;
+            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
-            $this->medicine_dispensation_id->TooltipValue = "";
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";

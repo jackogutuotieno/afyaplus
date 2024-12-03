@@ -177,7 +177,7 @@ class MedicineDispensationDetails extends DbTable
         $this->medicine_stock_id->setSelectMultiple(false); // Select one
         $this->medicine_stock_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->medicine_stock_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->medicine_stock_id->Lookup = new Lookup($this->medicine_stock_id, 'medicine_stock_report2', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
+        $this->medicine_stock_id->Lookup = new Lookup($this->medicine_stock_id, 'medicine_stock_data', false, 'id', ["brand_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`brand_name`");
         $this->medicine_stock_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->medicine_stock_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['medicine_stock_id'] = &$this->medicine_stock_id;
@@ -230,7 +230,6 @@ class MedicineDispensationDetails extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->Sortable = false; // Allow sort
         $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
@@ -257,7 +256,6 @@ class MedicineDispensationDetails extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -1276,10 +1274,8 @@ class MedicineDispensationDetails extends DbTable
         // quantity
 
         // date_created
-        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1439,6 +1435,8 @@ class MedicineDispensationDetails extends DbTable
                     $doc->exportCaption($this->medicine_dispensation_id);
                     $doc->exportCaption($this->medicine_stock_id);
                     $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->date_created);
+                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1474,6 +1472,8 @@ class MedicineDispensationDetails extends DbTable
                         $doc->exportField($this->medicine_dispensation_id);
                         $doc->exportField($this->medicine_stock_id);
                         $doc->exportField($this->quantity);
+                        $doc->exportField($this->date_created);
+                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }

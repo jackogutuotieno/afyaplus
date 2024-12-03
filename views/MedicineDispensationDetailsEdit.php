@@ -142,7 +142,7 @@ loadjs.ready("fmedicine_dispensation_detailsedit", function() {
     } else {
         options.ajax = { id: "x_medicine_stock_id", form: "fmedicine_dispensation_detailsedit", limit: ew.LOOKUP_PAGE_SIZE };
     }
-    options.minimumResultsForSearch = Infinity;
+    options.minimumInputLength = ew.selectMinimumInputLength;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation_details.fields.medicine_stock_id.selectOptions);
     ew.createSelect(options);
 });

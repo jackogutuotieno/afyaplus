@@ -1,7 +1,13 @@
-<ew-language date="2024/12/2" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/3" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="430">
+      <phrase id="menutext" value="medicine stock data" />
+    </menu>
+    <menu id="431">
+      <phrase id="menutext" value="Pharmacy Bill" />
+    </menu>
     <menu id="334">
       <phrase id="menutext" value="Radiology Overview" />
     </menu>
@@ -140,8 +146,8 @@
     <menu id="19">
       <phrase id="menutext" value="Dispense Medicine" />
     </menu>
-    <menu id="20">
-      <phrase id="menutext" value="medicine dispensation details" />
+    <menu id="429">
+      <phrase id="menutext" value="Dispense Details" />
     </menu>
     <menu id="236">
       <phrase id="menutext" value="Billing" />
@@ -160,9 +166,6 @@
     </menu>
     <menu id="239">
       <phrase id="menutext" value="Pharmacy" />
-    </menu>
-    <menu id="240">
-      <phrase id="menutext" value="Pharmacy Bill" />
     </menu>
     <menu id="53">
       <phrase id="menutext" value="Financials" />
@@ -721,21 +724,21 @@
       </field>
     </table>
     <table id="medicine_brands">
-      <phrase id="tblcaption" value="medicine brands" />
+      <phrase id="tblcaption" value="Medicine Brands" />
       <field id="id">
         <phrase id="fldcaption" value="Brand ID" />
       </field>
       <field id="category_id">
-        <phrase id="fldcaption" value="Categry" />
+        <phrase id="fldcaption" value="Category" />
       </field>
       <field id="brand_name">
         <phrase id="fldcaption" value="Brand Name" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date Created" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="LAst Updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="medicine_categories">
@@ -750,14 +753,14 @@
         <phrase id="fldcaption" value="Description" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date Added" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="medicine_dispensation">
-      <phrase id="tblcaption" value="medicine dispensation" />
+      <phrase id="tblcaption" value="Medicine Dispensation" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
@@ -791,27 +794,6 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
-      </field>
-    </table>
-    <table id="medicine_dispensation_details">
-      <phrase id="tblcaption" value="medicine dispensation details" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="medicine_dispensation_id">
-        <phrase id="fldcaption" value="medicine dispensation id" />
-      </field>
-      <field id="medicine_stock_id">
-        <phrase id="fldcaption" value="Medicine Brand" />
-      </field>
-      <field id="quantity">
-        <phrase id="fldcaption" value="Quantity Issued" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
       </field>
     </table>
     <table id="medicine_stock">
@@ -921,7 +903,7 @@
       </field>
     </table>
     <table id="medicine_suppliers">
-      <phrase id="tblcaption" value="medicine suppliers" />
+      <phrase id="tblcaption" value="Suppliers" />
       <field id="id">
         <phrase id="fldcaption" value="Suier ID" />
       </field>
@@ -1886,27 +1868,6 @@
         <phrase id="fldcaption" value="Date Updated" />
       </field>
     </table>
-    <table id="pharmacy_billing_report_details">
-      <phrase id="tblcaption" value="Pharmacy Bill" />
-      <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
-      </field>
-      <field id="medicine_dispensation_id">
-        <phrase id="fldcaption" value="medicine dispensation id" />
-      </field>
-      <field id="brand_name">
-        <phrase id="fldcaption" value="Medicine Name" />
-      </field>
-      <field id="selling_price_per_unit">
-        <phrase id="fldcaption" value="SP (Kshs)" />
-      </field>
-      <field id="quantity">
-        <phrase id="fldcaption" value="Qty" />
-      </field>
-      <field id="line_total">
-        <phrase id="fldcaption" value="Line Total (Kshs)" />
-      </field>
-    </table>
     <table id="income">
       <phrase id="tblcaption" value="Income" />
       <field id="id">
@@ -2684,6 +2645,99 @@
       </field>
       <field id="registration_month">
         <phrase id="fldcaption" value="registration month" />
+      </field>
+    </table>
+    <table id="medicine_dispensation_details">
+      <phrase id="tblcaption" value="Medicine Details" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="medicine_dispensation_id">
+        <phrase id="fldcaption" value="Dispense ID" />
+      </field>
+      <field id="medicine_stock_id">
+        <phrase id="fldcaption" value="Medicine Name" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Qty Issues" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+    </table>
+    <table id="medicine_stock_data">
+      <phrase id="tblcaption" value="medicine stock data" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="quantity" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="measuring unit" />
+      </field>
+      <field id="buying_price_per_unit">
+        <phrase id="fldcaption" value="buying price per unit" />
+      </field>
+      <field id="selling_price_per_unit">
+        <phrase id="fldcaption" value="selling price per unit" />
+      </field>
+      <field id="expiry_date">
+        <phrase id="fldcaption" value="expiry date" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="supplier_name">
+        <phrase id="fldcaption" value="supplier name" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="email address" />
+      </field>
+      <field id="physical_address">
+        <phrase id="fldcaption" value="physical address" />
+      </field>
+      <field id="brand_name">
+        <phrase id="fldcaption" value="brand name" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="batch number" />
+      </field>
+      <field id="stockadd_month">
+        <phrase id="fldcaption" value="stockadd month" />
+      </field>
+      <field id="expiry_status">
+        <phrase id="fldcaption" value="Expiry Status" />
+      </field>
+    </table>
+    <table id="pharmacy_billing_report_details">
+      <phrase id="tblcaption" value="Pharmacy Bill" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="medicine_dispensation_id">
+        <phrase id="fldcaption" value="medicine dispensation id" />
+      </field>
+      <field id="brand_name">
+        <phrase id="fldcaption" value="brand name" />
+      </field>
+      <field id="selling_price_per_unit">
+        <phrase id="fldcaption" value="selling price per unit" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="quantity" />
+      </field>
+      <field id="line_total">
+        <phrase id="fldcaption" value="Total (Kshs)" />
       </field>
     </table>
   </project>
