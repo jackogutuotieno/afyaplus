@@ -127,6 +127,7 @@ class PrescriptionsAdd extends Prescriptions
         $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -720,6 +721,16 @@ class PrescriptionsAdd extends Prescriptions
             }
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -730,6 +741,7 @@ class PrescriptionsAdd extends Prescriptions
         global $CurrentForm;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -785,6 +797,7 @@ class PrescriptionsAdd extends Prescriptions
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -797,6 +810,7 @@ class PrescriptionsAdd extends Prescriptions
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -848,6 +862,9 @@ class PrescriptionsAdd extends Prescriptions
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -908,11 +925,17 @@ class PrescriptionsAdd extends Prescriptions
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -967,56 +990,14 @@ class PrescriptionsAdd extends Prescriptions
             }
 
             // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->created_by_user_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                    if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                        } else {
-                            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->created_by_user_id->EditValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->created_by_user_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                } else {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->Lookup !== null && is_array($this->created_by_user_id->lookupOptions()) && count($this->created_by_user_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->created_by_user_id->ViewValue !== null) { // Load from cache
-                    $this->created_by_user_id->EditValue = array_values($this->created_by_user_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->created_by_user_id->CurrentValue, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->created_by_user_id->EditValue = $arwrk;
-                }
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
             }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // Add refer script
 
@@ -1025,6 +1006,9 @@ class PrescriptionsAdd extends Prescriptions
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1054,6 +1038,11 @@ class PrescriptionsAdd extends Prescriptions
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1087,18 +1076,6 @@ class PrescriptionsAdd extends Prescriptions
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid User ID
-        if (
-            !EmptyValue($Security->currentUserID()) &&
-            !$Security->isAdmin() && // Non system admin
-            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
-        ) {
-            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
-            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
-            $this->setFailureMessage($userIdMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Begin transaction
@@ -1188,7 +1165,11 @@ class PrescriptionsAdd extends Prescriptions
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
         // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
 
         // visit_id
         if ($this->visit_id->getSessionValue() != "") {
@@ -1208,6 +1189,9 @@ class PrescriptionsAdd extends Prescriptions
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->setFormValue($row['visit_id']);

@@ -121,12 +121,13 @@ class PrescriptionsDelete extends Prescriptions
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -629,6 +630,7 @@ class PrescriptionsDelete extends Prescriptions
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -641,6 +643,7 @@ class PrescriptionsDelete extends Prescriptions
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -668,6 +671,8 @@ class PrescriptionsDelete extends Prescriptions
         // date_created
 
         // date_updated
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -728,9 +733,8 @@ class PrescriptionsDelete extends Prescriptions
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -747,6 +751,10 @@ class PrescriptionsDelete extends Prescriptions
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event

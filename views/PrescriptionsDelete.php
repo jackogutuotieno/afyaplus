@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_prescriptions_id" class="prescriptions_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_prescriptions_patient_id" class="prescriptions_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
@@ -64,6 +61,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_prescriptions_date_updated" class="prescriptions_date_updated"><?= $Page->date_updated->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_prescriptions_status" class="prescriptions_status"><?= $Page->status->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -86,14 +86,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td<?= $Page->patient_id->cellAttributes() ?>>
 <span id="">
@@ -123,6 +115,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <td<?= $Page->status->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

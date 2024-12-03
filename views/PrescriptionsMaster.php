@@ -10,17 +10,6 @@ $prescriptions->TableClass = "table table-bordered table-hover table-sm ew-table
 <div class="ew-master-div">
 <table id="tbl_prescriptionsmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($prescriptions->id->Visible) { // id ?>
-        <tr id="r_id"<?= $prescriptions->id->rowAttributes() ?>>
-            <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->id->caption() ?></td>
-            <td<?= $prescriptions->id->cellAttributes() ?>>
-<span id="el_prescriptions_id">
-<span<?= $prescriptions->id->viewAttributes() ?>>
-<?= $prescriptions->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($prescriptions->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $prescriptions->patient_id->rowAttributes() ?>>
             <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->patient_id->caption() ?></td>
@@ -61,6 +50,17 @@ $prescriptions->TableClass = "table table-bordered table-hover table-sm ew-table
 <span id="el_prescriptions_date_updated">
 <span<?= $prescriptions->date_updated->viewAttributes() ?>>
 <?= $prescriptions->date_updated->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($prescriptions->status->Visible) { // status ?>
+        <tr id="r_status"<?= $prescriptions->status->rowAttributes() ?>>
+            <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->status->caption() ?></td>
+            <td<?= $prescriptions->status->cellAttributes() ?>>
+<span id="el_prescriptions_status">
+<span<?= $prescriptions->status->viewAttributes() ?>>
+<?= $prescriptions->status->getViewValue() ?></span>
 </span>
 </td>
         </tr>

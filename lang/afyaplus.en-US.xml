@@ -1206,6 +1206,9 @@
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
       </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
     </table>
     <table id="radiology_reports">
       <phrase id="tblcaption" value="Radiology Reports" />

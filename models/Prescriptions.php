@@ -52,6 +52,7 @@ class Prescriptions extends DbTable
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
+    public $status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -203,10 +204,10 @@ class Prescriptions extends DbTable
             'FORMATTED TEXT', // View Tag
             'SELECT' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
         $this->created_by_user_id->setSelectMultiple(false); // Select one
         $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -266,6 +267,29 @@ class Prescriptions extends DbTable
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
+
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->status->InputTextType = "text";
+        $this->status->IsCustom = true; // Custom field
+        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['status'] = &$this->status;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -485,20 +509,7 @@ class Prescriptions extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, '' AS `status`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -923,6 +934,7 @@ class Prescriptions extends DbTable
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
+        $this->status->DbValue = $row['status'];
     }
 
     // Delete uploaded files
@@ -1294,6 +1306,7 @@ class Prescriptions extends DbTable
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Render list content
@@ -1336,6 +1349,8 @@ class Prescriptions extends DbTable
         // date_created
 
         // date_updated
+
+        // status
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1398,6 +1413,9 @@ class Prescriptions extends DbTable
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+        // status
+        $this->status->ViewValue = $this->status->CurrentValue;
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
@@ -1421,6 +1439,10 @@ class Prescriptions extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1485,33 +1507,6 @@ class Prescriptions extends DbTable
         }
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->EditValue = null;
-            }
-        } else {
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1522,6 +1517,14 @@ class Prescriptions extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+        // status
+        $this->status->setupEditAttributes();
+        if (!$this->status->Raw) {
+            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        }
+        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1556,12 +1559,14 @@ class Prescriptions extends DbTable
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->status);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->status);
                 }
                 $doc->endExportRow();
             }
@@ -1593,12 +1598,14 @@ class Prescriptions extends DbTable
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->status);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->status);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1815,8 +1822,14 @@ class Prescriptions extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $current_date = CurrentDate();
+        if ($this->date_created->CurrentValue > $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->status->ViewValue = "New"; 
+        } else if ($this->date_created->CurrentValue < $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
+            $this->status->ViewValue = "Past"; 
+        } 
     }
 
     // User ID Filtering event

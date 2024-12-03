@@ -23,18 +23,18 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["created_by_user_id",false],["date_created",false],["date_updated",false]];
+                    fields = [["patient_id",false],["date_created",false],["date_updated",false],["status",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -90,9 +90,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_prescriptions_id" class="prescriptions_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_prescriptions_patient_id" class="prescriptions_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
@@ -104,6 +101,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Grid->date_updated->headerCellClass() ?>"><div id="elh_prescriptions_date_updated" class="prescriptions_date_updated"><?= $Grid->renderFieldHeader($Grid->date_updated) ?></div></th>
+<?php } ?>
+<?php if ($Grid->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Grid->status->headerCellClass() ?>"><div id="elh_prescriptions_status" class="prescriptions_status"><?= $Grid->renderFieldHeader($Grid->status) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -141,33 +141,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_id" class="el_prescriptions_id"></span>
-<input type="hidden" data-table="prescriptions" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_id" class="el_prescriptions_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="prescriptions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_id" class="el_prescriptions_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="prescriptions" data-field="x_id" data-hidden="1" name="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_id" id="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="prescriptions" data-field="x_id" data-hidden="1" data-old name="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_id" id="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="prescriptions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -278,97 +251,9 @@ loadjs.ready("fprescriptionsgrid", function() {
     <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
         <td data-name="created_by_user_id"<?= $Grid->created_by_user_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
-<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue) ?></span></span>
-<input type="hidden" data-table="prescriptions" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_created_by_user_id" class="el_prescriptions_created_by_user_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_created_by_user_id"
-        name="x<?= $Grid->RowIndex ?>_created_by_user_id"
-        class="form-select ew-select<?= $Grid->created_by_user_id->isInvalidClass() ?>"
-        <?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
-        data-select2-id="fprescriptionsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id"
-        <?php } ?>
-        data-table="prescriptions"
-        data-field="x_created_by_user_id"
-        data-value-separator="<?= $Grid->created_by_user_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>"
-        <?= $Grid->created_by_user_id->editAttributes() ?>>
-        <?= $Grid->created_by_user_id->selectOptionListHtml("x{$Grid->RowIndex}_created_by_user_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
-<?= $Grid->created_by_user_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_created_by_user_id") ?>
-<?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescriptionsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_created_by_user_id", selectId: "fprescriptionsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescriptionsgrid.lists.created_by_user_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "fprescriptionsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "fprescriptionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.created_by_user_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
 <input type="hidden" data-table="prescriptions" data-field="x_created_by_user_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_created_by_user_id" id="o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
-<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->created_by_user_id->getDisplayValue($Grid->created_by_user_id->EditValue) ?></span></span>
-<input type="hidden" data-table="prescriptions" data-field="x_created_by_user_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_created_by_user_id" id="x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_created_by_user_id" class="el_prescriptions_created_by_user_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_created_by_user_id"
-        name="x<?= $Grid->RowIndex ?>_created_by_user_id"
-        class="form-select ew-select<?= $Grid->created_by_user_id->isInvalidClass() ?>"
-        <?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
-        data-select2-id="fprescriptionsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id"
-        <?php } ?>
-        data-table="prescriptions"
-        data-field="x_created_by_user_id"
-        data-value-separator="<?= $Grid->created_by_user_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->created_by_user_id->getPlaceHolder()) ?>"
-        <?= $Grid->created_by_user_id->editAttributes() ?>>
-        <?= $Grid->created_by_user_id->selectOptionListHtml("x{$Grid->RowIndex}_created_by_user_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->created_by_user_id->getErrorMessage() ?></div>
-<?= $Grid->created_by_user_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_created_by_user_id") ?>
-<?php if (!$Grid->created_by_user_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescriptionsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_created_by_user_id", selectId: "fprescriptionsgrid_x<?= $Grid->RowIndex ?>_created_by_user_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescriptionsgrid.lists.created_by_user_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "fprescriptionsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_created_by_user_id", form: "fprescriptionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.created_by_user_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_created_by_user_id" class="el_prescriptions_created_by_user_id">
@@ -548,6 +433,33 @@ loadjs.ready(["fprescriptionsgrid", "datetimepicker"], function () {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="prescriptions" data-field="x_date_updated" data-hidden="1" name="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_date_updated" id="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->FormValue) ?>">
 <input type="hidden" data-table="prescriptions" data-field="x_date_updated" data-hidden="1" data-old name="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_date_updated" id="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->status->Visible) { // status ?>
+        <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_status" class="el_prescriptions_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="prescriptions" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="prescriptions" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_status" class="el_prescriptions_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="prescriptions" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescriptions_status" class="el_prescriptions_status">
+<span<?= $Grid->status->viewAttributes() ?>>
+<?= $Grid->status->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="prescriptions" data-field="x_status" data-hidden="1" name="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_status" id="fprescriptionsgrid$x<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->FormValue) ?>">
+<input type="hidden" data-table="prescriptions" data-field="x_status" data-hidden="1" data-old name="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_status" id="fprescriptionsgrid$o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

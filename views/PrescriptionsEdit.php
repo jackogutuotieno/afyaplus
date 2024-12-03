@@ -30,7 +30,8 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -141,55 +142,15 @@ loadjs.ready("fprescriptionsedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_prescriptions_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
-<input type="hidden" data-table="prescriptions" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_prescriptions_created_by_user_id">
-    <select
-        id="x_created_by_user_id"
-        name="x_created_by_user_id"
-        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
-        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-        data-select2-id="fprescriptionsedit_x_created_by_user_id"
-        <?php } ?>
-        data-table="prescriptions"
-        data-field="x_created_by_user_id"
-        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
-        <?= $Page->created_by_user_id->editAttributes() ?>>
-        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
-    </select>
-    <?= $Page->created_by_user_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
-<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescriptionsedit", function() {
-    var options = { name: "x_created_by_user_id", selectId: "fprescriptionsedit_x_created_by_user_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescriptionsedit.lists.created_by_user_id?.lookupOptions.length) {
-        options.data = { id: "x_created_by_user_id", form: "fprescriptionsedit" };
-    } else {
-        options.ajax = { id: "x_created_by_user_id", form: "fprescriptionsedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.created_by_user_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_prescriptions_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_prescriptions_status">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="prescriptions" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
+<?= $Page->status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
