@@ -36,9 +36,6 @@ class PaymentMethod extends AbstractEntity
     #[Column(name: "payment_method", type: "string")]
     private string $paymentMethod;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -64,17 +61,6 @@ class PaymentMethod extends AbstractEntity
     public function setPaymentMethod(string $value): static
     {
         $this->paymentMethod = RemoveXss($value);
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

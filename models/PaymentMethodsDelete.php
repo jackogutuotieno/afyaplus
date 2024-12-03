@@ -121,9 +121,8 @@ class PaymentMethodsDelete extends PaymentMethods
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->payment_method->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -428,25 +427,6 @@ class PaymentMethodsDelete extends PaymentMethods
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
 
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("paymentmethodslist"); // Return to list
-            return;
-        }
-
         // Get action
         if (IsApi()) {
             $this->CurrentAction = "delete"; // Delete record directly
@@ -617,7 +597,6 @@ class PaymentMethodsDelete extends PaymentMethods
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->payment_method->setDbValue($row['payment_method']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -628,7 +607,6 @@ class PaymentMethodsDelete extends PaymentMethods
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['payment_method'] = $this->payment_method->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -650,8 +628,6 @@ class PaymentMethodsDelete extends PaymentMethods
 
         // payment_method
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -664,10 +640,6 @@ class PaymentMethodsDelete extends PaymentMethods
             // payment_method
             $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -676,17 +648,9 @@ class PaymentMethodsDelete extends PaymentMethods
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // payment_method
             $this->payment_method->HrefValue = "";
             $this->payment_method->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -800,16 +764,6 @@ class PaymentMethodsDelete extends PaymentMethods
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb
