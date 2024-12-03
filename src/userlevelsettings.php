@@ -1024,7 +1024,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Income Report","Income_Report","Income Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","incomereport"],
     ["expenses_report","expenses_report2","expenses report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport2list"],
     ["Expenses Report","Expenses_Report","Expenses Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","expensesreport"],
-    ["Facility Overview","Facility_Overview","Faciity Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","facilityoverview"],
+    ["Facility Overview","Facility_Overview","Facility Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","facilityoverview"],
     ["Front Office Overview","Front_Office_Overview","Front Office Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","frontofficeoverview"],
     ["Triage Overview","Triage_Overview","Triage Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","triageoverview"],
     ["Doctor Overview","Doctor_Overview","Doctor Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctoroverview"],

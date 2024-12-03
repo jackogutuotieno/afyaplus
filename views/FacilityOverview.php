@@ -233,12 +233,29 @@ $Page->showMessage();
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    Total Income (Kshs)
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-money-bill"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT SUM(cost) FROM income_report";
+                            $income_report = ExecuteScalar($sql);
+                            echo $income_report;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="chart-content container">
     <div class="row">
         <div class="card-group">
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Income by Month (Kshs)</h4>
@@ -248,7 +265,7 @@ $Page->showMessage();
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Expense by Month (Kshs)</h4>
