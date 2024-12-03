@@ -86,7 +86,7 @@ $Page->showMessage();
                     Total Invoices
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-invoice"></i></p>
+                    <p class="card-text"><i class="fas  fa-file-invoice"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM invoices";
@@ -103,7 +103,7 @@ $Page->showMessage();
                     Today's Invoices
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-invoice"></i></p>
+                    <p class="card-text"><i class="fas  fa-file-invoice"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM invoices WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()";
@@ -120,7 +120,7 @@ $Page->showMessage();
                     Paid Invoices
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-invoice"></i></p>
+                    <p class="card-text"><i class="fas fa-file-invoice"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM invoices WHERE payment_status='Paid'";
@@ -137,7 +137,7 @@ $Page->showMessage();
                     Voided Invoices
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-invoice"></i></p>
+                    <p class="card-text"><i class="fas fa-file-invoice"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM invoices WHERE payment_status='Voided'";
@@ -153,7 +153,7 @@ $Page->showMessage();
 <div class="chart-content container">
     <div class="row">
         <div class="card-group">
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Income Graph</h4>
@@ -163,7 +163,7 @@ $Page->showMessage();
                     </div>
                 </div>
             </div>
-                        <div class="col-lg-12 col-md-12">
+                        <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Expenses Graph</h4>
