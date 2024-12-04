@@ -99,7 +99,7 @@
       <phrase id="menutext" value="Test Details" />
     </menu>
     <menu id="12">
-      <phrase id="menutext" value="Test Reports" />
+      <phrase id="menutext" value="Lab Reports" />
     </menu>
     <menu id="102">
       <phrase id="menutext" value="Radiology" />
