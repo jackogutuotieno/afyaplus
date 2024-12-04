@@ -1933,6 +1933,11 @@
         <phrase id="chartxaxisname" value="Expiry Status" />
         <phrase id="chartyaxisname" value="Expiry Status" />
       </chart>
+      <chart id="stockbymedicinebrand">
+        <phrase id="chartcaption" value="Stock by Medicine Brand" />
+        <phrase id="chartxaxisname" value="Medicine Name" />
+        <phrase id="chartyaxisname" value="Medicine Name" />
+      </chart>
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>

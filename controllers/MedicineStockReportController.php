@@ -44,4 +44,11 @@ class MedicineStockReportController extends ControllerBase
     {
         return $this->runChart($request, $response, $args, "MedicineStockReportSummary", "StockbyExpiryStatus");
     }
+
+    // StockbyMedicineBrand (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/medicinestockreport/StockbyMedicineBrand", [PermissionMiddleware::class], "summary.Medicine_Stock_Report.StockbyMedicineBrand")]
+    public function StockbyMedicineBrand(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "MedicineStockReportSummary", "StockbyMedicineBrand");
+    }
 }

@@ -1825,10 +1825,10 @@ class Prescriptions extends DbTable
         $current_date = CurrentDate();
         if ($this->date_created->CurrentValue > $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New"; 
+            $this->status->ViewValue = "New Prescription"; 
         } else if ($this->date_created->CurrentValue < $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
-            $this->status->ViewValue = "Past"; 
+            $this->status->ViewValue = "Past Prescription"; 
         } 
     }
 

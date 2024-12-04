@@ -1218,6 +1218,8 @@ class PrescriptionsList extends Prescriptions
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->patient_id;
+        $searchFlds[] = &$this->visit_id;
         $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;

@@ -261,6 +261,13 @@ if (!$DashboardReport) {
     echo $Page->StockbyExpiryStatus->render("ew-chart-bottom");
 }
 ?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->StockbyMedicineBrand->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->StockbyMedicineBrand->render("ew-chart-bottom");
+}
+?>
 <?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
 </div>
 <!-- /#ew-bottom -->
