@@ -376,7 +376,7 @@ loadjs.ready("fpatient_visitssearch", function() {
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_visitssearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

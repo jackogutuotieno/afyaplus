@@ -944,7 +944,7 @@
         <phrase id="fldcaption" value="User Role" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Check-In Time" />
+        <phrase id="fldcaption" value="Visit Date/Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

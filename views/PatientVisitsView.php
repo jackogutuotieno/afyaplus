@@ -121,19 +121,24 @@ loadjs.ready("head", function () {
 <div id="tpd_patient_visitsview" class="ew-custom-template"></div>
 <template id="tpm_patient_visitsview">
 <div id="ct_PatientVisitsView"><div class="row check-in-view">
-    <div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_patient_id"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_visit_type_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_visit_type_id"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-4 col-md-6 col-sm-12">
+    <div class="col-lg-6 col-md-6 col-sm-12">
         <div class="card">
-            <p><slot class="ew-slot" name="tpc_patient_visits_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_date_created"></slot></p>
+            <p><slot class="ew-slot" name="tpc_patient_visits_payment_method_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_payment_method_id"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_medical_scheme_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_medical_scheme_id"></slot></p>
         </div>
     </div> <!-- ./col -->  
 </div> <!-- ./row --></div>
