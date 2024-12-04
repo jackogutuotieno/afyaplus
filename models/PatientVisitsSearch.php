@@ -121,15 +121,15 @@ class PatientVisitsSearch extends PatientVisits
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_type_id->setVisibility();
         $this->payment_method_id->setVisibility();
         $this->medical_scheme_id->setVisibility();
-        $this->user_role->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
-        $this->status->setVisibility();
+        $this->user_role->Visible = false;
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
+        $this->status->Visible = false;
     }
 
     // Constructor
@@ -578,15 +578,10 @@ class PatientVisitsSearch extends PatientVisits
     protected function buildAdvancedSearch()
     {
         $srchUrl = "";
-        $this->buildSearchUrl($srchUrl, $this->id); // id
         $this->buildSearchUrl($srchUrl, $this->patient_id); // patient_id
         $this->buildSearchUrl($srchUrl, $this->visit_type_id); // visit_type_id
         $this->buildSearchUrl($srchUrl, $this->payment_method_id); // payment_method_id
         $this->buildSearchUrl($srchUrl, $this->medical_scheme_id); // medical_scheme_id
-        $this->buildSearchUrl($srchUrl, $this->user_role); // user_role
-        $this->buildSearchUrl($srchUrl, $this->date_created); // date_created
-        $this->buildSearchUrl($srchUrl, $this->date_updated); // date_updated
-        $this->buildSearchUrl($srchUrl, $this->status); // status
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -657,11 +652,6 @@ class PatientVisitsSearch extends PatientVisits
         // Load search values
         $hasValue = false;
 
-        // id
-        if ($this->id->AdvancedSearch->get()) {
-            $hasValue = true;
-        }
-
         // patient_id
         if ($this->patient_id->AdvancedSearch->get()) {
             $hasValue = true;
@@ -679,26 +669,6 @@ class PatientVisitsSearch extends PatientVisits
 
         // medical_scheme_id
         if ($this->medical_scheme_id->AdvancedSearch->get()) {
-            $hasValue = true;
-        }
-
-        // user_role
-        if ($this->user_role->AdvancedSearch->get()) {
-            $hasValue = true;
-        }
-
-        // date_created
-        if ($this->date_created->AdvancedSearch->get()) {
-            $hasValue = true;
-        }
-
-        // date_updated
-        if ($this->date_updated->AdvancedSearch->get()) {
-            $hasValue = true;
-        }
-
-        // status
-        if ($this->status->AdvancedSearch->get()) {
             $hasValue = true;
         }
         return $hasValue;
@@ -840,9 +810,6 @@ class PatientVisitsSearch extends PatientVisits
                 $this->medical_scheme_id->ViewValue = null;
             }
 
-            // user_role
-            $this->user_role->ViewValue = $this->user_role->CurrentValue;
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -853,10 +820,6 @@ class PatientVisitsSearch extends PatientVisits
 
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -873,28 +836,7 @@ class PatientVisitsSearch extends PatientVisits
             // medical_scheme_id
             $this->medical_scheme_id->HrefValue = "";
             $this->medical_scheme_id->TooltipValue = "";
-
-            // user_role
-            $this->user_role->HrefValue = "";
-            $this->user_role->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
         } elseif ($this->RowType == RowType::SEARCH) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->AdvancedSearch->SearchValue;
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-
             // patient_id
             $this->patient_id->setupEditAttributes();
             $curVal = trim(strval($this->patient_id->AdvancedSearch->SearchValue));
@@ -1002,32 +944,6 @@ class PatientVisitsSearch extends PatientVisits
                 $this->medical_scheme_id->EditValue = $arwrk;
             }
             $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
-
-            // user_role
-            $this->user_role->setupEditAttributes();
-            if (!$this->user_role->Raw) {
-                $this->user_role->AdvancedSearch->SearchValue = HtmlDecode($this->user_role->AdvancedSearch->SearchValue);
-            }
-            $this->user_role->EditValue = HtmlEncode($this->user_role->AdvancedSearch->SearchValue);
-            $this->user_role->PlaceHolder = RemoveHtml($this->user_role->caption());
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern()), $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-            // status
-            $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1046,15 +962,6 @@ class PatientVisitsSearch extends PatientVisits
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
-        if (!CheckInteger($this->id->AdvancedSearch->SearchValue)) {
-            $this->id->addErrorMessage($this->id->getErrorMessage(false));
-        }
-        if (!CheckDate($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern())) {
-            $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-        }
-        if (!CheckDate($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern())) {
-            $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
-        }
 
         // Return validate result
         $validateSearch = !$this->hasInvalidFields();
@@ -1071,15 +978,10 @@ class PatientVisitsSearch extends PatientVisits
     // Load advanced search
     public function loadAdvancedSearch()
     {
-        $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
         $this->visit_type_id->AdvancedSearch->load();
         $this->payment_method_id->AdvancedSearch->load();
         $this->medical_scheme_id->AdvancedSearch->load();
-        $this->user_role->AdvancedSearch->load();
-        $this->date_created->AdvancedSearch->load();
-        $this->date_updated->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb

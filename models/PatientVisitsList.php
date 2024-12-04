@@ -1109,15 +1109,10 @@ class PatientVisitsList extends PatientVisits
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
             $savedFilterList = Profile()->getSearchFilters("fpatient_visitssrch");
         }
-        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->visit_type_id->AdvancedSearch->toJson(), ","); // Field visit_type_id
         $filterList = Concat($filterList, $this->payment_method_id->AdvancedSearch->toJson(), ","); // Field payment_method_id
         $filterList = Concat($filterList, $this->medical_scheme_id->AdvancedSearch->toJson(), ","); // Field medical_scheme_id
-        $filterList = Concat($filterList, $this->user_role->AdvancedSearch->toJson(), ","); // Field user_role
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1157,14 +1152,6 @@ class PatientVisitsList extends PatientVisits
         $filter = json_decode(Post("filter"), true);
         $this->Command = "search";
 
-        // Field id
-        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-        $this->id->AdvancedSearch->save();
-
         // Field patient_id
         $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
         $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
@@ -1196,38 +1183,6 @@ class PatientVisitsList extends PatientVisits
         $this->medical_scheme_id->AdvancedSearch->SearchValue2 = @$filter["y_medical_scheme_id"];
         $this->medical_scheme_id->AdvancedSearch->SearchOperator2 = @$filter["w_medical_scheme_id"];
         $this->medical_scheme_id->AdvancedSearch->save();
-
-        // Field user_role
-        $this->user_role->AdvancedSearch->SearchValue = @$filter["x_user_role"];
-        $this->user_role->AdvancedSearch->SearchOperator = @$filter["z_user_role"];
-        $this->user_role->AdvancedSearch->SearchCondition = @$filter["v_user_role"];
-        $this->user_role->AdvancedSearch->SearchValue2 = @$filter["y_user_role"];
-        $this->user_role->AdvancedSearch->SearchOperator2 = @$filter["w_user_role"];
-        $this->user_role->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1240,30 +1195,20 @@ class PatientVisitsList extends PatientVisits
         if (!$Security->canSearch()) {
             return "";
         }
-        $this->buildSearchSql($where, $this->id, $default, false); // id
         $this->buildSearchSql($where, $this->patient_id, $default, false); // patient_id
         $this->buildSearchSql($where, $this->visit_type_id, $default, false); // visit_type_id
         $this->buildSearchSql($where, $this->payment_method_id, $default, false); // payment_method_id
         $this->buildSearchSql($where, $this->medical_scheme_id, $default, false); // medical_scheme_id
-        $this->buildSearchSql($where, $this->user_role, $default, false); // user_role
-        $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
-        $this->buildSearchSql($where, $this->date_updated, $default, false); // date_updated
-        $this->buildSearchSql($where, $this->status, $default, false); // status
 
         // Set up search command
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
             $this->Command = "search";
         }
         if (!$default && $this->Command == "search") {
-            $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
             $this->visit_type_id->AdvancedSearch->save(); // visit_type_id
             $this->payment_method_id->AdvancedSearch->save(); // payment_method_id
             $this->medical_scheme_id->AdvancedSearch->save(); // medical_scheme_id
-            $this->user_role->AdvancedSearch->save(); // user_role
-            $this->date_created->AdvancedSearch->save(); // date_created
-            $this->date_updated->AdvancedSearch->save(); // date_updated
-            $this->status->AdvancedSearch->save(); // status
 
             // Clear rules for QueryBuilder
             $this->setSessionRules("");
@@ -1294,15 +1239,10 @@ class PatientVisitsList extends PatientVisits
         // Clear other search and save rules to session
         if ($where && $fieldName == "") { // Skip if get query for specific field
             $this->resetSearchParms();
-            $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
             $this->visit_type_id->AdvancedSearch->save(); // visit_type_id
             $this->payment_method_id->AdvancedSearch->save(); // payment_method_id
             $this->medical_scheme_id->AdvancedSearch->save(); // medical_scheme_id
-            $this->user_role->AdvancedSearch->save(); // user_role
-            $this->date_created->AdvancedSearch->save(); // date_created
-            $this->date_updated->AdvancedSearch->save(); // date_updated
-            $this->status->AdvancedSearch->save(); // status
             $this->setSessionRules($rules);
         }
 
@@ -1394,24 +1334,6 @@ class PatientVisitsList extends PatientVisits
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->medical_scheme_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
-
-        // Field date_created
-        $filter = $this->queryBuilderWhere("date_created");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->date_created, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field status
-        $filter = $this->queryBuilderWhere("status");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->status, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1468,9 +1390,6 @@ class PatientVisitsList extends PatientVisits
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
-        if ($this->id->AdvancedSearch->issetSession()) {
-            return true;
-        }
         if ($this->patient_id->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1481,18 +1400,6 @@ class PatientVisitsList extends PatientVisits
             return true;
         }
         if ($this->medical_scheme_id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->user_role->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->date_created->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->date_updated->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->status->AdvancedSearch->issetSession()) {
             return true;
         }
         return false;
@@ -1530,15 +1437,10 @@ class PatientVisitsList extends PatientVisits
     // Clear all advanced search parameters
     protected function resetAdvancedSearchParms()
     {
-        $this->id->AdvancedSearch->unsetSession();
         $this->patient_id->AdvancedSearch->unsetSession();
         $this->visit_type_id->AdvancedSearch->unsetSession();
         $this->payment_method_id->AdvancedSearch->unsetSession();
         $this->medical_scheme_id->AdvancedSearch->unsetSession();
-        $this->user_role->AdvancedSearch->unsetSession();
-        $this->date_created->AdvancedSearch->unsetSession();
-        $this->date_updated->AdvancedSearch->unsetSession();
-        $this->status->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1550,15 +1452,10 @@ class PatientVisitsList extends PatientVisits
         $this->BasicSearch->load();
 
         // Restore advanced search values
-        $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
         $this->visit_type_id->AdvancedSearch->load();
         $this->payment_method_id->AdvancedSearch->load();
         $this->medical_scheme_id->AdvancedSearch->load();
-        $this->user_role->AdvancedSearch->load();
-        $this->date_created->AdvancedSearch->load();
-        $this->date_updated->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -2799,14 +2696,6 @@ class PatientVisitsList extends PatientVisits
             $this->Command = "search";
         }
 
-        // id
-        if ($this->id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
         // patient_id
         if ($this->patient_id->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2835,38 +2724,6 @@ class PatientVisitsList extends PatientVisits
         if ($this->medical_scheme_id->AdvancedSearch->get()) {
             $hasValue = true;
             if (($this->medical_scheme_id->AdvancedSearch->SearchValue != "" || $this->medical_scheme_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // user_role
-        if ($this->user_role->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->user_role->AdvancedSearch->SearchValue != "" || $this->user_role->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // date_created
-        if ($this->date_created->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->date_created->AdvancedSearch->SearchValue != "" || $this->date_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // date_updated
-        if ($this->date_updated->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->date_updated->AdvancedSearch->SearchValue != "" || $this->date_updated->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // status
-        if ($this->status->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
                 $this->Command = "search";
             }
         }
@@ -3210,15 +3067,10 @@ class PatientVisitsList extends PatientVisits
     // Load advanced search
     public function loadAdvancedSearch()
     {
-        $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
         $this->visit_type_id->AdvancedSearch->load();
         $this->payment_method_id->AdvancedSearch->load();
         $this->medical_scheme_id->AdvancedSearch->load();
-        $this->user_role->AdvancedSearch->load();
-        $this->date_created->AdvancedSearch->load();
-        $this->date_updated->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
     }
 
     // Get export HTML tag

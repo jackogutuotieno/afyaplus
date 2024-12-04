@@ -25,15 +25,10 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .addFields([
-            ["id", [ew.Validators.integer], fields.id.isInvalid],
             ["patient_id", [], fields.patient_id.isInvalid],
             ["visit_type_id", [], fields.visit_type_id.isInvalid],
             ["payment_method_id", [], fields.payment_method_id.isInvalid],
-            ["medical_scheme_id", [], fields.medical_scheme_id.isInvalid],
-            ["user_role", [], fields.user_role.isInvalid],
-            ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid],
-            ["status", [], fields.status.isInvalid]
+            ["medical_scheme_id", [], fields.medical_scheme_id.isInvalid]
         ])
         // Validate form
         .setValidate(
@@ -103,26 +98,6 @@ $Page->showMessage();
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <div class="ew-search-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="row"<?= $Page->id->rowAttributes() ?>>
-        <label for="x_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_id"><?= $Page->id->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_id" id="z_id" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>">
-            <div<?= $Page->id->cellAttributes() ?>>
-                <div class="d-flex align-items-start">
-                <span id="el_patient_visits_id" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->id->getInputTextType() ?>" name="x_id" id="x_id" data-table="patient_visits" data-field="x_id" value="<?= $Page->id->EditValue ?>" placeholder="<?= HtmlEncode($Page->id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->id->formatPattern()) ?>"<?= $Page->id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->id->getErrorMessage(false) ?></div>
-</span>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <div id="r_patient_id" class="row"<?= $Page->patient_id->rowAttributes() ?>>
         <label for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_patient_id"><?= $Page->patient_id->caption() ?></span>
@@ -333,144 +308,6 @@ loadjs.ready("fpatient_visitssearch", function() {
 });
 </script>
 <?php } ?>
-</span>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php } ?>
-<?php if ($Page->user_role->Visible) { // user_role ?>
-    <div id="r_user_role" class="row"<?= $Page->user_role->rowAttributes() ?>>
-        <label class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_user_role"><?= $Page->user_role->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("LIKE") ?>
-<input type="hidden" name="z_user_role" id="z_user_role" value="LIKE">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>">
-            <div<?= $Page->user_role->cellAttributes() ?>>
-                <div class="d-flex align-items-start">
-                <span id="el_patient_visits_user_role" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->user_role->getInputTextType() ?>" name="x_user_role" id="x_user_role" data-table="patient_visits" data-field="x_user_role" value="<?= $Page->user_role->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->user_role->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->user_role->formatPattern()) ?>"<?= $Page->user_role->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->user_role->getErrorMessage(false) ?></div>
-</span>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <div id="r_date_created" class="row"<?= $Page->date_created->rowAttributes() ?>>
-        <label for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_date_created"><?= $Page->date_created->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_date_created" id="z_date_created" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>">
-            <div<?= $Page->date_created->cellAttributes() ?>>
-                <div class="d-flex align-items-start">
-                <span id="el_patient_visits_date_created" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="patient_visits" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage(false) ?></div>
-<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatient_visitssearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatient_visitssearch", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <div id="r_date_updated" class="row"<?= $Page->date_updated->rowAttributes() ?>>
-        <label for="x_date_updated" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_date_updated"><?= $Page->date_updated->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_date_updated" id="z_date_updated" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>">
-            <div<?= $Page->date_updated->cellAttributes() ?>>
-                <div class="d-flex align-items-start">
-                <span id="el_patient_visits_date_updated" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->date_updated->getInputTextType() ?>" name="x_date_updated" id="x_date_updated" data-table="patient_visits" data-field="x_date_updated" value="<?= $Page->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_updated->formatPattern()) ?>"<?= $Page->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->date_updated->getErrorMessage(false) ?></div>
-<?php if (!$Page->date_updated->ReadOnly && !$Page->date_updated->Disabled && !isset($Page->date_updated->EditAttrs["readonly"]) && !isset($Page->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatient_visitssearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatient_visitssearch", "x_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <div id="r_status" class="row"<?= $Page->status->rowAttributes() ?>>
-        <label for="x_status" class="<?= $Page->LeftColumnClass ?>"><span id="elh_patient_visits_status"><?= $Page->status->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("LIKE") ?>
-<input type="hidden" name="z_status" id="z_status" value="LIKE">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>">
-            <div<?= $Page->status->cellAttributes() ?>>
-                <div class="d-flex align-items-start">
-                <span id="el_patient_visits_status" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="patient_visits" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage(false) ?></div>
 </span>
                 </div>
             </div>
