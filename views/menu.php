@@ -36,7 +36,6 @@ $sideMenu->addMenuItem(5, "mi_diseases", $Language->menuPhrase("5", "MenuText"),
 $sideMenu->addMenuItem(6, "mi_doctor_charges", $Language->menuPhrase("6", "MenuText"), "doctorchargeslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_charges'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(173, "mci_Investigations", $Language->menuPhrase("173", "MenuText"), "", -1, "", true, false, true, "fa-microscope", "", false, true);
 $sideMenu->addMenuItem(52, "mci_Laboratory", $Language->menuPhrase("52", "MenuText"), "", 173, "", true, false, true, "fa-microscope", "", false, true);
-$sideMenu->addMenuItem(11, "mi_lab_specimens", $Language->menuPhrase("11", "MenuText"), "labspecimenslist", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}lab_specimens'), false, false, "fa-droplet", "", false, true);
 $sideMenu->addMenuItem(13, "mi_lab_test_requests", $Language->menuPhrase("13", "MenuText"), "labtestrequestslist?cmd=resetall", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests'), false, false, "fa-microscope", "", false, true);
 $sideMenu->addMenuItem(12, "mi_lab_test_reports", $Language->menuPhrase("12", "MenuText"), "labtestreportslist", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(102, "mci_Radiology", $Language->menuPhrase("102", "MenuText"), "", 173, "", true, false, true, "fa-x-ray", "", false, true);

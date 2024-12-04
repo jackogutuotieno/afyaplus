@@ -47,7 +47,6 @@ class LaboratoryMinorReport extends DbTable
 
     // Fields
     public $id;
-    public $specimen;
     public $service_name;
     public $category_name;
     public $subcategory;
@@ -125,30 +124,6 @@ class LaboratoryMinorReport extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // specimen
-        $this->specimen = new DbField(
-            $this, // Table
-            'x_specimen', // Variable name
-            'specimen', // Name
-            '`specimen`', // Expression
-            '`specimen`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`specimen`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->specimen->InputTextType = "text";
-        $this->specimen->Nullable = false; // NOT NULL field
-        $this->specimen->Required = true; // Required field
-        $this->specimen->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['specimen'] = &$this->specimen;
 
         // service_name
         $this->service_name = new DbField(
@@ -791,7 +766,6 @@ class LaboratoryMinorReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->specimen->DbValue = $row['specimen'];
         $this->service_name->DbValue = $row['service_name'];
         $this->category_name->DbValue = $row['category_name'];
         $this->subcategory->DbValue = $row['subcategory'];
@@ -1150,7 +1124,6 @@ class LaboratoryMinorReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->specimen->setDbValue($row['specimen']);
         $this->service_name->setDbValue($row['service_name']);
         $this->category_name->setDbValue($row['category_name']);
         $this->subcategory->setDbValue($row['subcategory']);
@@ -1188,8 +1161,6 @@ class LaboratoryMinorReport extends DbTable
 
         // id
 
-        // specimen
-
         // service_name
 
         // category_name
@@ -1202,9 +1173,6 @@ class LaboratoryMinorReport extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // specimen
-        $this->specimen->ViewValue = $this->specimen->CurrentValue;
 
         // service_name
         $this->service_name->ViewValue = $this->service_name->CurrentValue;
@@ -1225,10 +1193,6 @@ class LaboratoryMinorReport extends DbTable
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // specimen
-        $this->specimen->HrefValue = "";
-        $this->specimen->TooltipValue = "";
 
         // service_name
         $this->service_name->HrefValue = "";
@@ -1268,14 +1232,6 @@ class LaboratoryMinorReport extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // specimen
-        $this->specimen->setupEditAttributes();
-        if (!$this->specimen->Raw) {
-            $this->specimen->CurrentValue = HtmlDecode($this->specimen->CurrentValue);
-        }
-        $this->specimen->EditValue = $this->specimen->CurrentValue;
-        $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
 
         // service_name
         $this->service_name->setupEditAttributes();
@@ -1343,7 +1299,6 @@ class LaboratoryMinorReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->specimen);
                     $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->category_name);
                     $doc->exportCaption($this->subcategory);
@@ -1351,7 +1306,6 @@ class LaboratoryMinorReport extends DbTable
                     $doc->exportCaption($this->date_created);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->specimen);
                     $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->category_name);
                     $doc->exportCaption($this->subcategory);
@@ -1384,7 +1338,6 @@ class LaboratoryMinorReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->specimen);
                         $doc->exportField($this->service_name);
                         $doc->exportField($this->category_name);
                         $doc->exportField($this->subcategory);
@@ -1392,7 +1345,6 @@ class LaboratoryMinorReport extends DbTable
                         $doc->exportField($this->date_created);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->specimen);
                         $doc->exportField($this->service_name);
                         $doc->exportField($this->category_name);
                         $doc->exportField($this->subcategory);

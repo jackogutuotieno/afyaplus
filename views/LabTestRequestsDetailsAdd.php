@@ -23,7 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["lab_test_request_id", [fields.lab_test_request_id.visible && fields.lab_test_request_id.required ? ew.Validators.required(fields.lab_test_request_id.caption) : null, ew.Validators.integer], fields.lab_test_request_id.isInvalid],
-            ["specimen_id", [fields.specimen_id.visible && fields.specimen_id.required ? ew.Validators.required(fields.specimen_id.caption) : null], fields.specimen_id.isInvalid],
             ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
         ])
 
@@ -40,7 +39,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "specimen_id": <?= $Page->specimen_id->toClientList($Page) ?>,
             "service_id": <?= $Page->service_id->toClientList($Page) ?>,
         })
         .build();
@@ -90,52 +88,6 @@ $Page->showMessage();
 <div class="invalid-feedback"><?= $Page->lab_test_request_id->getErrorMessage() ?></div>
 </span>
 <?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-    <div id="r_specimen_id"<?= $Page->specimen_id->rowAttributes() ?>>
-        <label id="elh_lab_test_requests_details_specimen_id" for="x_specimen_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->specimen_id->caption() ?><?= $Page->specimen_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->specimen_id->cellAttributes() ?>>
-<span id="el_lab_test_requests_details_specimen_id">
-    <select
-        id="x_specimen_id"
-        name="x_specimen_id"
-        class="form-select ew-select<?= $Page->specimen_id->isInvalidClass() ?>"
-        <?php if (!$Page->specimen_id->IsNativeSelect) { ?>
-        data-select2-id="flab_test_requests_detailsadd_x_specimen_id"
-        <?php } ?>
-        data-table="lab_test_requests_details"
-        data-field="x_specimen_id"
-        data-value-separator="<?= $Page->specimen_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->specimen_id->getPlaceHolder()) ?>"
-        <?= $Page->specimen_id->editAttributes() ?>>
-        <?= $Page->specimen_id->selectOptionListHtml("x_specimen_id") ?>
-    </select>
-    <?= $Page->specimen_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->specimen_id->getErrorMessage() ?></div>
-<?= $Page->specimen_id->Lookup->getParamTag($Page, "p_x_specimen_id") ?>
-<?php if (!$Page->specimen_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("flab_test_requests_detailsadd", function() {
-    var options = { name: "x_specimen_id", selectId: "flab_test_requests_detailsadd_x_specimen_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (flab_test_requests_detailsadd.lists.specimen_id?.lookupOptions.length) {
-        options.data = { id: "x_specimen_id", form: "flab_test_requests_detailsadd" };
-    } else {
-        options.ajax = { id: "x_specimen_id", form: "flab_test_requests_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests_details.fields.specimen_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
 </div></div>
     </div>
 <?php } ?>

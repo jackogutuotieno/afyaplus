@@ -23,8 +23,9 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
@@ -32,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["date_created",false]];
+                    fields = [["patient_id",false],["status",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -52,6 +53,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
             "created_by_user_id": <?= $Grid->created_by_user_id->toClientList($Grid) ?>,
         })
         .build();
@@ -87,11 +89,14 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_lab_test_requests_id" class="lab_test_requests_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
+<?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_lab_test_requests_patient_id" class="lab_test_requests_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Grid->created_by_user_id->headerCellClass() ?>"><div id="elh_lab_test_requests_created_by_user_id" class="lab_test_requests_created_by_user_id"><?= $Grid->renderFieldHeader($Grid->created_by_user_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Grid->status->headerCellClass() ?>"><div id="elh_lab_test_requests_status" class="lab_test_requests_status"><?= $Grid->renderFieldHeader($Grid->status) ?></div></th>
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_lab_test_requests_date_created" class="lab_test_requests_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
@@ -132,32 +137,112 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
+    <?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_id" class="el_lab_test_requests_id"></span>
-<input type="hidden" data-table="lab_test_requests" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_patient_id" class="el_lab_test_requests_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_requestsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="lab_test_requests"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flab_test_requestsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "flab_test_requestsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_requestsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flab_test_requestsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flab_test_requestsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<input type="hidden" data-table="lab_test_requests" data-field="x_patient_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_id" id="o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_id" class="el_lab_test_requests_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="lab_test_requests" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_patient_id" class="el_lab_test_requests_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_requestsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="lab_test_requests"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flab_test_requestsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "flab_test_requestsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_requestsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flab_test_requestsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flab_test_requestsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
+<?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_id" class="el_lab_test_requests_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_patient_id" class="el_lab_test_requests_patient_id">
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<?= $Grid->patient_id->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_requests" data-field="x_id" data-hidden="1" name="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_id" id="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="lab_test_requests" data-field="x_id" data-hidden="1" data-old name="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_id" id="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
+<input type="hidden" data-table="lab_test_requests" data-field="x_patient_id" data-hidden="1" name="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_patient_id" id="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->FormValue) ?>">
+<input type="hidden" data-table="lab_test_requests" data-field="x_patient_id" data-hidden="1" data-old name="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_patient_id" id="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
-    <?php } else { ?>
-            <input type="hidden" data-table="lab_test_requests" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
         <td data-name="created_by_user_id"<?= $Grid->created_by_user_id->cellAttributes() ?>>
@@ -178,6 +263,33 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->status->Visible) { // status ?>
+        <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_status" class="el_lab_test_requests_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="lab_test_requests" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="lab_test_requests" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_status" class="el_lab_test_requests_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="lab_test_requests" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_status" class="el_lab_test_requests_status">
+<span<?= $Grid->status->viewAttributes() ?>>
+<?= $Grid->status->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="lab_test_requests" data-field="x_status" data-hidden="1" name="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_status" id="flab_test_requestsgrid$x<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->FormValue) ?>">
+<input type="hidden" data-table="lab_test_requests" data-field="x_status" data-hidden="1" data-old name="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_status" id="flab_test_requestsgrid$o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Grid->date_created->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -187,7 +299,7 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -223,7 +335,7 @@ loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

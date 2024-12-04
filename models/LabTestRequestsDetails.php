@@ -48,7 +48,6 @@ class LabTestRequestsDetails extends DbTable
     // Fields
     public $id;
     public $lab_test_request_id;
-    public $specimen_id;
     public $service_id;
     public $date_created;
     public $date_updated;
@@ -151,36 +150,6 @@ class LabTestRequestsDetails extends DbTable
         $this->lab_test_request_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->lab_test_request_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['lab_test_request_id'] = &$this->lab_test_request_id;
-
-        // specimen_id
-        $this->specimen_id = new DbField(
-            $this, // Table
-            'x_specimen_id', // Variable name
-            'specimen_id', // Name
-            '`specimen_id`', // Expression
-            '`specimen_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`specimen_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->specimen_id->InputTextType = "text";
-        $this->specimen_id->Raw = true;
-        $this->specimen_id->Nullable = false; // NOT NULL field
-        $this->specimen_id->Required = true; // Required field
-        $this->specimen_id->setSelectMultiple(false); // Select one
-        $this->specimen_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->specimen_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->specimen_id->Lookup = new Lookup($this->specimen_id, 'lab_specimens', false, 'id', ["specimen","","",""], '', '', [], [], [], [], [], [], false, '', '', "`specimen`");
-        $this->specimen_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->specimen_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['specimen_id'] = &$this->specimen_id;
 
         // service_id
         $this->service_id = new DbField(
@@ -875,7 +844,6 @@ class LabTestRequestsDetails extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->lab_test_request_id->DbValue = $row['lab_test_request_id'];
-        $this->specimen_id->DbValue = $row['specimen_id'];
         $this->service_id->DbValue = $row['service_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1237,7 +1205,6 @@ class LabTestRequestsDetails extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->specimen_id->setDbValue($row['specimen_id']);
         $this->service_id->setDbValue($row['service_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1275,8 +1242,6 @@ class LabTestRequestsDetails extends DbTable
 
         // lab_test_request_id
 
-        // specimen_id
-
         // service_id
 
         // date_created
@@ -1289,29 +1254,6 @@ class LabTestRequestsDetails extends DbTable
         // lab_test_request_id
         $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
         $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-
-        // specimen_id
-        $curVal = strval($this->specimen_id->CurrentValue);
-        if ($curVal != "") {
-            $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
-            if ($this->specimen_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->specimen_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->specimen_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->specimen_id->ViewValue = $this->specimen_id->displayValue($arwrk);
-                } else {
-                    $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->CurrentValue, $this->specimen_id->formatPattern());
-                }
-            }
-        } else {
-            $this->specimen_id->ViewValue = null;
-        }
 
         // service_id
         $curVal = strval($this->service_id->CurrentValue);
@@ -1351,10 +1293,6 @@ class LabTestRequestsDetails extends DbTable
         // lab_test_request_id
         $this->lab_test_request_id->HrefValue = "";
         $this->lab_test_request_id->TooltipValue = "";
-
-        // specimen_id
-        $this->specimen_id->HrefValue = "";
-        $this->specimen_id->TooltipValue = "";
 
         // service_id
         $this->service_id->HrefValue = "";
@@ -1401,10 +1339,6 @@ class LabTestRequestsDetails extends DbTable
             }
         }
 
-        // specimen_id
-        $this->specimen_id->setupEditAttributes();
-        $this->specimen_id->PlaceHolder = RemoveHtml($this->specimen_id->caption());
-
         // service_id
         $this->service_id->setupEditAttributes();
         $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
@@ -1449,12 +1383,10 @@ class LabTestRequestsDetails extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_request_id);
-                    $doc->exportCaption($this->specimen_id);
                     $doc->exportCaption($this->service_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_request_id);
-                    $doc->exportCaption($this->specimen_id);
                     $doc->exportCaption($this->service_id);
                 }
                 $doc->endExportRow();
@@ -1484,12 +1416,10 @@ class LabTestRequestsDetails extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_request_id);
-                        $doc->exportField($this->specimen_id);
                         $doc->exportField($this->service_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_request_id);
-                        $doc->exportField($this->specimen_id);
                         $doc->exportField($this->service_id);
                     }
                     $doc->endExportRow($rowCnt);

@@ -50,12 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_id" class="lab_test_requests_details_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-        <th class="<?= $Page->specimen_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_specimen_id" class="lab_test_requests_details_specimen_id"><?= $Page->specimen_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th class="<?= $Page->service_id->headerCellClass() ?>"><span id="elh_lab_test_requests_details_service_id" class="lab_test_requests_details_service_id"><?= $Page->service_id->caption() ?></span></th>
 <?php } ?>
@@ -80,22 +74,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-        <td<?= $Page->specimen_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->specimen_id->viewAttributes() ?>>
-<?= $Page->specimen_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <td<?= $Page->service_id->cellAttributes() ?>>
 <span id="">

@@ -36,9 +36,6 @@ class LabTestRequestsDetail extends AbstractEntity
     #[Column(name: "lab_test_request_id", type: "integer")]
     private int $labTestRequestId;
 
-    #[Column(name: "specimen_id", type: "integer")]
-    private int $specimenId;
-
     #[Column(name: "service_id", type: "integer")]
     private int $serviceId;
 
@@ -67,17 +64,6 @@ class LabTestRequestsDetail extends AbstractEntity
     public function setLabTestRequestId(int $value): static
     {
         $this->labTestRequestId = $value;
-        return $this;
-    }
-
-    public function getSpecimenId(): int
-    {
-        return $this->specimenId;
-    }
-
-    public function setSpecimenId(int $value): static
-    {
-        $this->specimenId = $value;
         return $this;
     }
 

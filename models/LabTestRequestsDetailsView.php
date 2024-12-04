@@ -141,7 +141,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
     {
         $this->id->setVisibility();
         $this->lab_test_request_id->setVisibility();
-        $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -560,7 +559,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->specimen_id);
         $this->setupLookupOptions($this->service_id);
 
         // Check modal
@@ -814,7 +812,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->specimen_id->setDbValue($row['specimen_id']);
         $this->service_id->setDbValue($row['service_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -826,7 +823,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
-        $row['specimen_id'] = $this->specimen_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -855,8 +851,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
 
         // lab_test_request_id
 
-        // specimen_id
-
         // service_id
 
         // date_created
@@ -871,29 +865,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
             // lab_test_request_id
             $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
             $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-
-            // specimen_id
-            $curVal = strval($this->specimen_id->CurrentValue);
-            if ($curVal != "") {
-                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
-                if ($this->specimen_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->specimen_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->specimen_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->specimen_id->ViewValue = $this->specimen_id->displayValue($arwrk);
-                    } else {
-                        $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->CurrentValue, $this->specimen_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->specimen_id->ViewValue = null;
-            }
 
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
@@ -925,10 +896,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
             // lab_test_request_id
             $this->lab_test_request_id->HrefValue = "";
             $this->lab_test_request_id->TooltipValue = "";
-
-            // specimen_id
-            $this->specimen_id->HrefValue = "";
-            $this->specimen_id->TooltipValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";
@@ -1198,8 +1165,6 @@ class LabTestRequestsDetailsView extends LabTestRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_specimen_id":
-                    break;
                 case "x_service_id":
                     break;
                 default:

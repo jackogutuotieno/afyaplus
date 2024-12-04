@@ -160,9 +160,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_laboratory_minor_report_id" class="laboratory_minor_report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->specimen->Visible) { // specimen ?>
-        <th data-name="specimen" class="<?= $Page->specimen->headerCellClass() ?>"><div id="elh_laboratory_minor_report_specimen" class="laboratory_minor_report_specimen"><?= $Page->renderFieldHeader($Page->specimen) ?></div></th>
-<?php } ?>
 <?php if ($Page->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_laboratory_minor_report_service_name" class="laboratory_minor_report_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
 <?php } ?>
@@ -211,14 +208,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_minor_report_id" class="el_laboratory_minor_report_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->specimen->Visible) { // specimen ?>
-        <td data-name="specimen"<?= $Page->specimen->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_minor_report_specimen" class="el_laboratory_minor_report_specimen">
-<span<?= $Page->specimen->viewAttributes() ?>>
-<?= $Page->specimen->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -33,9 +33,6 @@ class LaboratoryMinorReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(type: "string")]
-    private string $specimen;
-
     #[Column(name: "service_name", type: "string")]
     private string $serviceName;
 
@@ -59,17 +56,6 @@ class LaboratoryMinorReport extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getSpecimen(): string
-    {
-        return HtmlDecode($this->specimen);
-    }
-
-    public function setSpecimen(string $value): static
-    {
-        $this->specimen = RemoveXss($value);
         return $this;
     }
 

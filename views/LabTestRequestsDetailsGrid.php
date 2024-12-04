@@ -23,8 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["specimen_id", [fields.specimen_id.visible && fields.specimen_id.required ? ew.Validators.required(fields.specimen_id.caption) : null], fields.specimen_id.isInvalid],
             ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
         ])
 
@@ -32,7 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["specimen_id",false],["service_id",false]];
+                    fields = [["service_id",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -52,7 +50,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "specimen_id": <?= $Grid->specimen_id->toClientList($Grid) ?>,
             "service_id": <?= $Grid->service_id->toClientList($Grid) ?>,
         })
         .build();
@@ -88,12 +85,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_id" class="lab_test_requests_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->specimen_id->Visible) { // specimen_id ?>
-        <th data-name="specimen_id" class="<?= $Grid->specimen_id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_specimen_id" class="lab_test_requests_details_specimen_id"><?= $Grid->renderFieldHeader($Grid->specimen_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Grid->service_id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_service_id" class="lab_test_requests_details_service_id"><?= $Grid->renderFieldHeader($Grid->service_id) ?></div></th>
 <?php } ?>
@@ -133,128 +124,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_id" class="el_lab_test_requests_details_id"></span>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_id" class="el_lab_test_requests_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_id" class="el_lab_test_requests_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" name="flab_test_requests_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="flab_test_requests_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" data-old name="flab_test_requests_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="flab_test_requests_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
-    <?php if ($Grid->specimen_id->Visible) { // specimen_id ?>
-        <td data-name="specimen_id"<?= $Grid->specimen_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_specimen_id" class="el_lab_test_requests_details_specimen_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_specimen_id"
-        name="x<?= $Grid->RowIndex ?>_specimen_id"
-        class="form-select ew-select<?= $Grid->specimen_id->isInvalidClass() ?>"
-        <?php if (!$Grid->specimen_id->IsNativeSelect) { ?>
-        data-select2-id="flab_test_requests_detailsgrid_x<?= $Grid->RowIndex ?>_specimen_id"
-        <?php } ?>
-        data-table="lab_test_requests_details"
-        data-field="x_specimen_id"
-        data-value-separator="<?= $Grid->specimen_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->specimen_id->getPlaceHolder()) ?>"
-        <?= $Grid->specimen_id->editAttributes() ?>>
-        <?= $Grid->specimen_id->selectOptionListHtml("x{$Grid->RowIndex}_specimen_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->specimen_id->getErrorMessage() ?></div>
-<?= $Grid->specimen_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_specimen_id") ?>
-<?php if (!$Grid->specimen_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("flab_test_requests_detailsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_specimen_id", selectId: "flab_test_requests_detailsgrid_x<?= $Grid->RowIndex ?>_specimen_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (flab_test_requests_detailsgrid.lists.specimen_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_specimen_id", form: "flab_test_requests_detailsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_specimen_id", form: "flab_test_requests_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests_details.fields.specimen_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_specimen_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_specimen_id" id="o<?= $Grid->RowIndex ?>_specimen_id" value="<?= HtmlEncode($Grid->specimen_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_specimen_id" class="el_lab_test_requests_details_specimen_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_specimen_id"
-        name="x<?= $Grid->RowIndex ?>_specimen_id"
-        class="form-select ew-select<?= $Grid->specimen_id->isInvalidClass() ?>"
-        <?php if (!$Grid->specimen_id->IsNativeSelect) { ?>
-        data-select2-id="flab_test_requests_detailsgrid_x<?= $Grid->RowIndex ?>_specimen_id"
-        <?php } ?>
-        data-table="lab_test_requests_details"
-        data-field="x_specimen_id"
-        data-value-separator="<?= $Grid->specimen_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->specimen_id->getPlaceHolder()) ?>"
-        <?= $Grid->specimen_id->editAttributes() ?>>
-        <?= $Grid->specimen_id->selectOptionListHtml("x{$Grid->RowIndex}_specimen_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->specimen_id->getErrorMessage() ?></div>
-<?= $Grid->specimen_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_specimen_id") ?>
-<?php if (!$Grid->specimen_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("flab_test_requests_detailsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_specimen_id", selectId: "flab_test_requests_detailsgrid_x<?= $Grid->RowIndex ?>_specimen_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (flab_test_requests_detailsgrid.lists.specimen_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_specimen_id", form: "flab_test_requests_detailsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_specimen_id", form: "flab_test_requests_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests_details.fields.specimen_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_lab_test_requests_details_specimen_id" class="el_lab_test_requests_details_specimen_id">
-<span<?= $Grid->specimen_id->viewAttributes() ?>>
-<?= $Grid->specimen_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_specimen_id" data-hidden="1" name="flab_test_requests_detailsgrid$x<?= $Grid->RowIndex ?>_specimen_id" id="flab_test_requests_detailsgrid$x<?= $Grid->RowIndex ?>_specimen_id" value="<?= HtmlEncode($Grid->specimen_id->FormValue) ?>">
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_specimen_id" data-hidden="1" data-old name="flab_test_requests_detailsgrid$o<?= $Grid->RowIndex ?>_specimen_id" id="flab_test_requests_detailsgrid$o<?= $Grid->RowIndex ?>_specimen_id" value="<?= HtmlEncode($Grid->specimen_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->service_id->Visible) { // service_id ?>
         <td data-name="service_id"<?= $Grid->service_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>

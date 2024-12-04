@@ -73,17 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-    <tr id="r_specimen_id"<?= $Page->specimen_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_details_specimen_id"><?= $Page->specimen_id->caption() ?></span></td>
-        <td data-name="specimen_id"<?= $Page->specimen_id->cellAttributes() ?>>
-<span id="el_lab_test_requests_details_specimen_id">
-<span<?= $Page->specimen_id->viewAttributes() ?>>
-<?= $Page->specimen_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
     <tr id="r_service_id"<?= $Page->service_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_details_service_id"><?= $Page->service_id->caption() ?></span></td>

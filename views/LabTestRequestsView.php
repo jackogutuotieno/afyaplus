@@ -73,13 +73,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el_lab_test_requests_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_requests_status"><?= $Page->status->caption() ?></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el_lab_test_requests_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     </tr>

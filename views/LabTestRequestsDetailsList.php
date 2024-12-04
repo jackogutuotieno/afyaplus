@@ -25,8 +25,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["specimen_id", [fields.specimen_id.visible && fields.specimen_id.required ? ew.Validators.required(fields.specimen_id.caption) : null], fields.specimen_id.isInvalid],
             ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
         ])
 
@@ -34,7 +32,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["specimen_id",false],["service_id",false]];
+                    fields = [["service_id",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -54,7 +52,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "specimen_id": <?= $Page->specimen_id->toClientList($Page) ?>,
             "service_id": <?= $Page->service_id->toClientList($Page) ?>,
         })
         .build();
@@ -139,12 +136,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_id" class="lab_test_requests_details_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
-<?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-        <th data-name="specimen_id" class="<?= $Page->specimen_id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_specimen_id" class="lab_test_requests_details_specimen_id"><?= $Page->renderFieldHeader($Page->specimen_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Page->service_id->headerCellClass() ?>"><div id="elh_lab_test_requests_details_service_id" class="lab_test_requests_details_service_id"><?= $Page->renderFieldHeader($Page->service_id) ?></div></th>
 <?php } ?>
@@ -184,71 +175,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<?php if ($Page->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_details_id" class="el_lab_test_requests_details_id"></span>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Page->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_details_id" class="el_lab_test_requests_details_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Page->specimen_id->Visible) { // specimen_id ?>
-        <td data-name="specimen_id"<?= $Page->specimen_id->cellAttributes() ?>>
-<?php if ($Page->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_details_specimen_id" class="el_lab_test_requests_details_specimen_id">
-    <select
-        id="x<?= $Page->RowIndex ?>_specimen_id"
-        name="x<?= $Page->RowIndex ?>_specimen_id"
-        class="form-select ew-select<?= $Page->specimen_id->isInvalidClass() ?>"
-        <?php if (!$Page->specimen_id->IsNativeSelect) { ?>
-        data-select2-id="<?= $Page->FormName ?>_x<?= $Page->RowIndex ?>_specimen_id"
-        <?php } ?>
-        data-table="lab_test_requests_details"
-        data-field="x_specimen_id"
-        data-value-separator="<?= $Page->specimen_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->specimen_id->getPlaceHolder()) ?>"
-        <?= $Page->specimen_id->editAttributes() ?>>
-        <?= $Page->specimen_id->selectOptionListHtml("x{$Page->RowIndex}_specimen_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Page->specimen_id->getErrorMessage() ?></div>
-<?= $Page->specimen_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_specimen_id") ?>
-<?php if (!$Page->specimen_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("<?= $Page->FormName ?>", function() {
-    var options = { name: "x<?= $Page->RowIndex ?>_specimen_id", selectId: "<?= $Page->FormName ?>_x<?= $Page->RowIndex ?>_specimen_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (<?= $Page->FormName ?>.lists.specimen_id?.lookupOptions.length) {
-        options.data = { id: "x<?= $Page->RowIndex ?>_specimen_id", form: "<?= $Page->FormName ?>" };
-    } else {
-        options.ajax = { id: "x<?= $Page->RowIndex ?>_specimen_id", form: "<?= $Page->FormName ?>", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_requests_details.fields.specimen_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="lab_test_requests_details" data-field="x_specimen_id" data-hidden="1" data-old name="o<?= $Page->RowIndex ?>_specimen_id" id="o<?= $Page->RowIndex ?>_specimen_id" value="<?= HtmlEncode($Page->specimen_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Page->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_requests_details_specimen_id" class="el_lab_test_requests_details_specimen_id">
-<span<?= $Page->specimen_id->viewAttributes() ?>>
-<?= $Page->specimen_id->getViewValue() ?></span>
-</span>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Page->service_id->Visible) { // service_id ?>
         <td data-name="service_id"<?= $Page->service_id->cellAttributes() ?>>
 <?php if ($Page->RowType == RowType::ADD) { // Add record ?>

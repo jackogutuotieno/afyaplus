@@ -90,7 +90,6 @@ return [
     "invoice_details" => \DI\create(InvoiceDetails::class),
     "invoice_reports" => \DI\create(InvoiceReports::class),
     "invoices" => \DI\create(Invoices::class),
-    "lab_specimens" => \DI\create(LabSpecimens::class),
     "lab_test_reports" => \DI\create(LabTestReports::class),
     "lab_test_requests" => \DI\create(LabTestRequests::class),
     "lab_test_requests_details" => \DI\create(LabTestRequestsDetails::class),

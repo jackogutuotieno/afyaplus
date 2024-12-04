@@ -145,9 +145,8 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->lab_test_request_id->Visible = false;
-        $this->specimen_id->setVisibility();
         $this->service_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -713,7 +712,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->specimen_id);
         $this->setupLookupOptions($this->service_id);
 
         // Load default values for add
@@ -1201,14 +1199,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_specimen_id") &&
-            $CurrentForm->hasValue("o_specimen_id") &&
-            $this->specimen_id->CurrentValue != $this->specimen_id->DefaultValue &&
-            !($this->specimen_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->specimen_id->CurrentValue == $this->specimen_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_service_id") &&
             $CurrentForm->hasValue("o_service_id") &&
             $this->service_id->CurrentValue != $this->service_id->DefaultValue &&
@@ -1323,8 +1313,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->specimen_id); // specimen_id
             $this->updateSort($this->service_id); // service_id
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1355,7 +1343,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->lab_test_request_id->setSort("");
-                $this->specimen_id->setSort("");
                 $this->service_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
@@ -1420,6 +1407,14 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1492,6 +1487,10 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1621,8 +1620,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "specimen_id");
             $this->createColumnOption($option, "service_id");
         }
 
@@ -2025,25 +2022,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'specimen_id' first before field var 'x_specimen_id'
-        $val = $CurrentForm->hasValue("specimen_id") ? $CurrentForm->getValue("specimen_id") : $CurrentForm->getValue("x_specimen_id");
-        if (!$this->specimen_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->specimen_id->Visible = false; // Disable update for API request
-            } else {
-                $this->specimen_id->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_specimen_id")) {
-            $this->specimen_id->setOldValue($CurrentForm->getValue("o_specimen_id"));
-        }
-
         // Check field name 'service_id' first before field var 'x_service_id'
         $val = $CurrentForm->hasValue("service_id") ? $CurrentForm->getValue("service_id") : $CurrentForm->getValue("x_service_id");
         if (!$this->service_id->IsDetailKey) {
@@ -2056,6 +2034,12 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if ($CurrentForm->hasValue("o_service_id")) {
             $this->service_id->setOldValue($CurrentForm->getValue("o_service_id"));
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
     }
 
     // Restore form values
@@ -2065,7 +2049,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->specimen_id->CurrentValue = $this->specimen_id->FormValue;
         $this->service_id->CurrentValue = $this->service_id->FormValue;
     }
 
@@ -2164,7 +2147,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->specimen_id->setDbValue($row['specimen_id']);
         $this->service_id->setDbValue($row['service_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -2176,7 +2158,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
-        $row['specimen_id'] = $this->specimen_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2224,8 +2205,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
         // lab_test_request_id
 
-        // specimen_id
-
         // service_id
 
         // date_created
@@ -2240,29 +2219,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             // lab_test_request_id
             $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
             $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
-
-            // specimen_id
-            $curVal = strval($this->specimen_id->CurrentValue);
-            if ($curVal != "") {
-                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
-                if ($this->specimen_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->specimen_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->specimen_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->specimen_id->ViewValue = $this->specimen_id->displayValue($arwrk);
-                    } else {
-                        $this->specimen_id->ViewValue = FormatNumber($this->specimen_id->CurrentValue, $this->specimen_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->specimen_id->ViewValue = null;
-            }
 
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
@@ -2287,47 +2243,10 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // specimen_id
-            $this->specimen_id->HrefValue = "";
-            $this->specimen_id->TooltipValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
-            // specimen_id
-            $this->specimen_id->setupEditAttributes();
-            $curVal = trim(strval($this->specimen_id->CurrentValue));
-            if ($curVal != "") {
-                $this->specimen_id->ViewValue = $this->specimen_id->lookupCacheOption($curVal);
-            } else {
-                $this->specimen_id->ViewValue = $this->specimen_id->Lookup !== null && is_array($this->specimen_id->lookupOptions()) && count($this->specimen_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->specimen_id->ViewValue !== null) { // Load from cache
-                $this->specimen_id->EditValue = array_values($this->specimen_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->specimen_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->specimen_id->CurrentValue, $this->specimen_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->specimen_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->specimen_id->EditValue = $arwrk;
-            }
-            $this->specimen_id->PlaceHolder = RemoveHtml($this->specimen_id->caption());
-
             // service_id
             $this->service_id->setupEditAttributes();
             $curVal = trim(strval($this->service_id->CurrentValue));
@@ -2357,12 +2276,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // specimen_id
-            $this->specimen_id->HrefValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
         }
@@ -2386,16 +2299,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->specimen_id->Visible && $this->specimen_id->Required) {
-                if (!$this->specimen_id->IsDetailKey && EmptyValue($this->specimen_id->FormValue)) {
-                    $this->specimen_id->addErrorMessage(str_replace("%s", $this->specimen_id->caption(), $this->specimen_id->RequiredErrorMessage));
-                }
-            }
             if ($this->service_id->Visible && $this->service_id->Required) {
                 if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
                     $this->service_id->addErrorMessage(str_replace("%s", $this->service_id->caption(), $this->service_id->RequiredErrorMessage));
@@ -2555,9 +2458,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         global $Security;
         $rsnew = [];
 
-        // specimen_id
-        $this->specimen_id->setDbValueDef($rsnew, $this->specimen_id->CurrentValue, false);
-
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, false);
 
@@ -2574,9 +2474,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['specimen_id'])) { // specimen_id
-            $this->specimen_id->setFormValue($row['specimen_id']);
-        }
         if (isset($row['service_id'])) { // service_id
             $this->service_id->setFormValue($row['service_id']);
         }
@@ -2914,8 +2811,6 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_specimen_id":
-                    break;
                 case "x_service_id":
                     break;
                 default:

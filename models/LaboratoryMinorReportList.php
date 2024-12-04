@@ -146,7 +146,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->specimen->setVisibility();
         $this->service_name->setVisibility();
         $this->category_name->setVisibility();
         $this->subcategory->setVisibility();
@@ -1049,7 +1048,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
             $savedFilterList = Profile()->getSearchFilters("flaboratory_minor_reportsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->specimen->AdvancedSearch->toJson(), ","); // Field specimen
         $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
         $filterList = Concat($filterList, $this->category_name->AdvancedSearch->toJson(), ","); // Field category_name
         $filterList = Concat($filterList, $this->subcategory->AdvancedSearch->toJson(), ","); // Field subcategory
@@ -1101,14 +1099,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field specimen
-        $this->specimen->AdvancedSearch->SearchValue = @$filter["x_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator = @$filter["z_specimen"];
-        $this->specimen->AdvancedSearch->SearchCondition = @$filter["v_specimen"];
-        $this->specimen->AdvancedSearch->SearchValue2 = @$filter["y_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator2 = @$filter["w_specimen"];
-        $this->specimen->AdvancedSearch->save();
 
         // Field service_name
         $this->service_name->AdvancedSearch->SearchValue = @$filter["x_service_name"];
@@ -1188,7 +1178,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->specimen;
         $searchFlds[] = &$this->service_name;
         $searchFlds[] = &$this->category_name;
         $searchFlds[] = &$this->subcategory;
@@ -1272,7 +1261,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->specimen); // specimen
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->category_name); // category_name
             $this->updateSort($this->subcategory); // subcategory
@@ -1303,7 +1291,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->specimen->setSort("");
                 $this->service_name->setSort("");
                 $this->category_name->setSort("");
                 $this->subcategory->setSort("");
@@ -1455,7 +1442,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "specimen");
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "category_name");
             $this->createColumnOption($option, "subcategory");
@@ -1900,7 +1886,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->specimen->setDbValue($row['specimen']);
         $this->service_name->setDbValue($row['service_name']);
         $this->category_name->setDbValue($row['category_name']);
         $this->subcategory->setDbValue($row['subcategory']);
@@ -1913,7 +1898,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['specimen'] = $this->specimen->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['category_name'] = $this->category_name->DefaultValue;
         $row['subcategory'] = $this->subcategory->DefaultValue;
@@ -1961,8 +1945,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
 
         // id
 
-        // specimen
-
         // service_name
 
         // category_name
@@ -1977,9 +1959,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // specimen
-            $this->specimen->ViewValue = $this->specimen->CurrentValue;
 
             // service_name
             $this->service_name->ViewValue = $this->service_name->CurrentValue;
@@ -2000,10 +1979,6 @@ class LaboratoryMinorReportList extends LaboratoryMinorReport
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // specimen
-            $this->specimen->HrefValue = "";
-            $this->specimen->TooltipValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
