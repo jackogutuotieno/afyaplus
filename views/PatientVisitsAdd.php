@@ -334,6 +334,14 @@ loadjs.ready("fpatient_visitsadd", function() {
 <?php } ?>
 <?php include_once "PatientVaccinationsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("cash_payments", explode(",", $Page->getCurrentDetailTable())) && $cash_payments->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("cash_payments", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "CashPaymentsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatient_visitsadd"><?= $Language->phrase("AddBtn") ?></button>

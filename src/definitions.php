@@ -172,6 +172,7 @@ return [
     "medicine_dispensation_details" => \DI\create(MedicineDispensationDetails::class),
     "medicine_stock_data" => \DI\create(MedicineStockData::class),
     "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
+    "cash_payments" => \DI\create(CashPayments::class),
 
     // User table
     "usertable" => \DI\get("users"),

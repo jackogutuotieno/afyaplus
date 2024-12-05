@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "pharmacybillingreportdetailsgrid";
+    public $CurrentPageName = "cashpaymentsdelete";
 
     // Page headings
     public $Heading = "";
@@ -330,7 +330,7 @@ class PersonalData
         global $Language, $UserTable;
         $pwd = Post($this->Password->FieldVar, "");
         $userName = CurrentUserName();
-        if ($UserTable->UpdateTable != $UserTable->TableName) { // Note: The username and password field name must be the same
+        if ($UserTable->UpdateTable != $UserTable->TableName && $this->UpdateTable != $this->getSqlFrom()) { // Note: The username and password field name must be the same
             $entityClass = GetEntityClass($UserTable->UpdateTable);
             if ($entityClass) {
                 $user = GetUserEntityManager()->getRepository($entityClass)->findOneBy(["email" => $userName]);

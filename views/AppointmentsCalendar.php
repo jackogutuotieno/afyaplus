@@ -36,10 +36,10 @@ var currentCalendar; // FullCalendar.Calendar
 var calendarLoaded = loadjs.isDefined("fullcalendar");
 if (!calendarLoaded) {
     ew.loadjs([
-        ew.PATH_BASE + "fullcalendar/index.global.min.js?v=24.16.5",
-        ew.PATH_BASE + "fullcalendar/bootstrap5/index.global.min.js?v=24.16.5"
+        ew.PATH_BASE + "fullcalendar/index.global.min.js?v=24.16.6",
+        ew.PATH_BASE + "fullcalendar/bootstrap5/index.global.min.js?v=24.16.6"
     ], "fullcalendar");
-    ew.ready(["fullcalendar", "luxon"], ew.PATH_BASE + "fullcalendar/luxon3/index.global.min.js?v=24.16.5");
+    ew.ready(["fullcalendar", "luxon"], ew.PATH_BASE + "fullcalendar/luxon3/index.global.min.js?v=24.16.6");
 }
 loadjs.ready(
     ["luxon", "fullcalendar", "makerjs"],

@@ -207,6 +207,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "PatientVaccinationsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("cash_payments", explode(",", $Page->getCurrentDetailTable())) && $cash_payments->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("cash_payments", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("cash_payments")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "CashPaymentsGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

@@ -20633,4 +20633,10 @@ td button, .btn-primary {
   font-weight: 600;
 }
 
+.el_patient_visits_patient_id a {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #540000;
+}
+
 /*END_USER_STYLES*/

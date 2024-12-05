@@ -338,7 +338,7 @@ class ChangePassword extends Users
             }
 
             // Find user
-            if ($this->UpdateTable != $this->TableName) { // Note: The username field name must be the same
+            if ($this->UpdateTable != $this->TableName && $this->UpdateTable != $this->getSqlFrom()) { // Note: The username field name must be the same
                 $entityClass = GetEntityClass($this->UpdateTable);
                 if ($entityClass) {
                     $user = GetUserEntityManager()->getRepository($entityClass)->findOneBy(["email" => $userName]);

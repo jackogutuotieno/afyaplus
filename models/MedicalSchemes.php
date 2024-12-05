@@ -216,7 +216,7 @@ class MedicalSchemes extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->physical_address->InputTextType = "text";
         $this->physical_address->Nullable = false; // NOT NULL field
@@ -1316,9 +1316,6 @@ class MedicalSchemes extends DbTable
 
         // physical_address
         $this->physical_address->setupEditAttributes();
-        if (!$this->physical_address->Raw) {
-            $this->physical_address->CurrentValue = HtmlDecode($this->physical_address->CurrentValue);
-        }
         $this->physical_address->EditValue = $this->physical_address->CurrentValue;
         $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
 

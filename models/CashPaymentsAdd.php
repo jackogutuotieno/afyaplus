@@ -15,18 +15,18 @@ use Closure;
 /**
  * Page class
  */
-class MedicalSchemesEdit extends MedicalSchemes
+class CashPaymentsAdd extends CashPayments
 {
     use MessagesTrait;
 
     // Page ID
-    public $PageID = "edit";
+    public $PageID = "add";
 
     // Project ID
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "MedicalSchemesEdit";
+    public $PageObjName = "CashPaymentsAdd";
 
     // View file path
     public $View = null;
@@ -38,7 +38,7 @@ class MedicalSchemesEdit extends MedicalSchemes
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "medicalschemesedit";
+    public $CurrentPageName = "cashpaymentsadd";
 
     // Page headings
     public $Heading = "";
@@ -121,11 +121,12 @@ class MedicalSchemesEdit extends MedicalSchemes
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->company->setVisibility();
-        $this->phone->setVisibility();
-        $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
+        $this->id->Visible = false;
+        $this->patient_id->setVisibility();
+        $this->visit_id->Visible = false;
+        $this->amount->setVisibility();
+        $this->details->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -135,11 +136,11 @@ class MedicalSchemesEdit extends MedicalSchemes
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'medical_schemes';
-        $this->TableName = 'medical_schemes';
+        $this->TableVar = 'cash_payments';
+        $this->TableName = 'cash_payments';
 
         // Table CSS class
-        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-edit-table";
+        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-add-table";
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -147,14 +148,14 @@ class MedicalSchemesEdit extends MedicalSchemes
         // Language object
         $Language = Container("app.language");
 
-        // Table object (medical_schemes)
-        if (!isset($GLOBALS["medical_schemes"]) || $GLOBALS["medical_schemes"]::class == PROJECT_NAMESPACE . "medical_schemes") {
-            $GLOBALS["medical_schemes"] = &$this;
+        // Table object (cash_payments)
+        if (!isset($GLOBALS["cash_payments"]) || $GLOBALS["cash_payments"]::class == PROJECT_NAMESPACE . "cash_payments") {
+            $GLOBALS["cash_payments"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'medical_schemes');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'cash_payments');
         }
 
         // Start timer
@@ -268,7 +269,7 @@ class MedicalSchemesEdit extends MedicalSchemes
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "medicalschemesview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "cashpaymentsview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -449,20 +450,14 @@ class MedicalSchemesEdit extends MedicalSchemes
         }
         return $lookup->toJson($this, $response); // Use settings from current page
     }
-
-    // Properties
-    public $FormClassName = "ew-form ew-edit-form overlay-wrapper";
+    public $FormClassName = "ew-form ew-add-form";
     public $IsModal = false;
     public $IsMobileOrModal = false;
-    public $DbMasterFilter;
-    public $DbDetailFilter;
-    public $HashValue; // Hash Value
-    public $DisplayRecords = 1;
+    public $DbMasterFilter = "";
+    public $DbDetailFilter = "";
     public $StartRecord;
-    public $StopRecord;
-    public $TotalRecords = 0;
-    public $RecordRange = 10;
-    public $RecordCount;
+    public $Priv = 0;
+    public $CopyRecord;
 
     /**
      * Page run
@@ -527,124 +522,106 @@ class MedicalSchemesEdit extends MedicalSchemes
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->created_by_user_id);
+
+        // Load default values for add
+        $this->loadDefaultValues();
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
         }
         $this->IsMobileOrModal = IsMobile() || $this->IsModal;
-        $loaded = false;
         $postBack = false;
 
-        // Set up current action and primary key
+        // Set up current action
         if (IsApi()) {
-            // Load key values
-            $loaded = true;
-            if (($keyValue = Get("id") ?? Key(0) ?? Route(2)) !== null) {
-                $this->id->setQueryStringValue($keyValue);
-                $this->id->setOldValue($this->id->QueryStringValue);
-            } elseif (Post("id") !== null) {
-                $this->id->setFormValue(Post("id"));
-                $this->id->setOldValue($this->id->FormValue);
-            } else {
-                $loaded = false; // Unable to load key
-            }
-
-            // Load record
-            if ($loaded) {
-                $loaded = $this->loadRow();
-            }
-            if (!$loaded) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
-                $this->terminate();
-                return;
-            }
-            $this->CurrentAction = "update"; // Update record directly
-            $this->OldKey = $this->getKey(true); // Get from CurrentValue
+            $this->CurrentAction = "insert"; // Add record directly
+            $postBack = true;
+        } elseif (Post("action", "") !== "") {
+            $this->CurrentAction = Post("action"); // Get form action
+            $this->setKey(Post($this->OldKeyName));
             $postBack = true;
         } else {
-            if (Post("action", "") !== "") {
-                $this->CurrentAction = Post("action"); // Get action code
-                if (!$this->isShow()) { // Not reload record, handle as postback
-                    $postBack = true;
-                }
-
-                // Get key from Form
-                $this->setKey(Post($this->OldKeyName), $this->isShow());
-            } else {
-                $this->CurrentAction = "show"; // Default action is display
-
-                // Load key from QueryString
-                $loadByQuery = false;
-                if (($keyValue = Get("id") ?? Route("id")) !== null) {
-                    $this->id->setQueryStringValue($keyValue);
-                    $loadByQuery = true;
-                } else {
-                    $this->id->CurrentValue = null;
-                }
+            // Load key values from QueryString
+            if (($keyValue = Get("id") ?? Route("id")) !== null) {
+                $this->id->setQueryStringValue($keyValue);
             }
-
-            // Load result set
-            if ($this->isShow()) {
-                    // Load current record
-                    $loaded = $this->loadRow();
-                $this->OldKey = $loaded ? $this->getKey(true) : ""; // Get from CurrentValue
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
+            $this->CopyRecord = !EmptyValue($this->OldKey);
+            if ($this->CopyRecord) {
+                $this->CurrentAction = "copy"; // Copy record
+                $this->setKey($this->OldKey); // Set up record key
+            } else {
+                $this->CurrentAction = "show"; // Display blank record
             }
         }
 
-        // Process form if post back
+        // Load old record or default values
+        $rsold = $this->loadOldRecord();
+
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
+        // Load form values
         if ($postBack) {
-            $this->loadFormValues(); // Get form values
+            $this->loadFormValues(); // Load form values
         }
 
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
                 $this->EventCancelled = true; // Event cancelled
-                $this->restoreFormValues();
+                $this->restoreFormValues(); // Restore form values
                 if (IsApi()) {
                     $this->terminate();
                     return;
                 } else {
-                    $this->CurrentAction = ""; // Form error, reset action
+                    $this->CurrentAction = "show"; // Form error, reset action
                 }
             }
         }
 
         // Perform current action
         switch ($this->CurrentAction) {
-            case "show": // Get a record to display
-                    if (!$loaded) { // Load record based on key
-                        if ($this->getFailureMessage() == "") {
-                            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
-                        }
-                        $this->terminate("medicalschemeslist"); // No matching record, return to list
-                        return;
+            case "copy": // Copy an existing record
+                if (!$rsold) { // Record not loaded
+                    if ($this->getFailureMessage() == "") {
+                        $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                break;
-            case "update": // Update
-                $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "medicalschemeslist") {
-                    $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
+                    $this->terminate("cashpaymentslist"); // No matching record, return to list
+                    return;
                 }
-                $this->SendEmail = true; // Send email on update success
-                if ($this->editRow()) { // Update record based on key
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Update success
+                break;
+            case "insert": // Add new record
+                $this->SendEmail = true; // Send email on add success
+                if ($this->addRow($rsold)) { // Add successful
+                    if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
+                        $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
+                    }
+                    $returnUrl = $this->getReturnUrl();
+                    if (GetPageName($returnUrl) == "cashpaymentslist") {
+                        $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
+                    } elseif (GetPageName($returnUrl) == "cashpaymentsview") {
+                        $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "medicalschemeslist") {
+                        if (GetPageName($returnUrl) != "cashpaymentslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "medicalschemeslist"; // Return list page content
+                            $returnUrl = "cashpaymentslist"; // Return list page content
                         }
                     }
-                    if (IsJsonResponse()) {
+                    if (IsJsonResponse()) { // Return to caller
                         $this->terminate(true);
                         return;
                     } else {
-                        $this->terminate($returnUrl); // Return to caller
+                        $this->terminate($returnUrl);
                         return;
                     }
                 } elseif (IsApi()) { // API request, return
@@ -655,20 +632,19 @@ class MedicalSchemesEdit extends MedicalSchemes
                     $this->clearFailureMessage();
                     $this->terminate();
                     return;
-                } elseif ($this->getFailureMessage() == $Language->phrase("NoRecord")) {
-                    $this->terminate($returnUrl); // Return to caller
-                    return;
                 } else {
                     $this->EventCancelled = true; // Event cancelled
-                    $this->restoreFormValues(); // Restore form values if update failed
+                    $this->restoreFormValues(); // Add failed, restore form values
                 }
         }
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
-        // Render the record
-        $this->RowType = RowType::EDIT; // Render as Edit
+        // Render row based on row type
+        $this->RowType = RowType::ADD; // Render add type
+
+        // Render row
         $this->resetAttributes();
         $this->renderRow();
 
@@ -701,6 +677,11 @@ class MedicalSchemesEdit extends MedicalSchemes
         global $CurrentForm, $Language;
     }
 
+    // Load default values
+    protected function loadDefaultValues()
+    {
+    }
+
     // Load form values
     protected function loadFormValues()
     {
@@ -708,62 +689,58 @@ class MedicalSchemesEdit extends MedicalSchemes
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'patient_id' first before field var 'x_patient_id'
+        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
+        if (!$this->patient_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->patient_id->Visible = false; // Disable update for API request
+            } else {
+                $this->patient_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'amount' first before field var 'x_amount'
+        $val = $CurrentForm->hasValue("amount") ? $CurrentForm->getValue("amount") : $CurrentForm->getValue("x_amount");
+        if (!$this->amount->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->amount->Visible = false; // Disable update for API request
+            } else {
+                $this->amount->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'details' first before field var 'x_details'
+        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
+        if (!$this->details->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->details->Visible = false; // Disable update for API request
+            } else {
+                $this->details->setFormValue($val);
+            }
+        }
+
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'company' first before field var 'x_company'
-        $val = $CurrentForm->hasValue("company") ? $CurrentForm->getValue("company") : $CurrentForm->getValue("x_company");
-        if (!$this->company->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->company->Visible = false; // Disable update for API request
-            } else {
-                $this->company->setFormValue($val);
-            }
-        }
-
-        // Check field name 'phone' first before field var 'x_phone'
-        $val = $CurrentForm->hasValue("phone") ? $CurrentForm->getValue("phone") : $CurrentForm->getValue("x_phone");
-        if (!$this->phone->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->phone->Visible = false; // Disable update for API request
-            } else {
-                $this->phone->setFormValue($val);
-            }
-        }
-
-        // Check field name 'email_address' first before field var 'x_email_address'
-        $val = $CurrentForm->hasValue("email_address") ? $CurrentForm->getValue("email_address") : $CurrentForm->getValue("x_email_address");
-        if (!$this->email_address->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->email_address->Visible = false; // Disable update for API request
-            } else {
-                $this->email_address->setFormValue($val);
-            }
-        }
-
-        // Check field name 'physical_address' first before field var 'x_physical_address'
-        $val = $CurrentForm->hasValue("physical_address") ? $CurrentForm->getValue("physical_address") : $CurrentForm->getValue("x_physical_address");
-        if (!$this->physical_address->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->physical_address->Visible = false; // Disable update for API request
-            } else {
-                $this->physical_address->setFormValue($val);
-            }
-        }
     }
 
     // Restore form values
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->id->CurrentValue = $this->id->FormValue;
-        $this->company->CurrentValue = $this->company->FormValue;
-        $this->phone->CurrentValue = $this->phone->FormValue;
-        $this->email_address->CurrentValue = $this->email_address->FormValue;
-        $this->physical_address->CurrentValue = $this->physical_address->FormValue;
+        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->amount->CurrentValue = $this->amount->FormValue;
+        $this->details->CurrentValue = $this->details->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
     /**
@@ -805,10 +782,11 @@ class MedicalSchemesEdit extends MedicalSchemes
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->company->setDbValue($row['company']);
-        $this->phone->setDbValue($row['phone']);
-        $this->email_address->setDbValue($row['email_address']);
-        $this->physical_address->setDbValue($row['physical_address']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->visit_id->setDbValue($row['visit_id']);
+        $this->amount->setDbValue($row['amount']);
+        $this->details->setDbValue($row['details']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -818,10 +796,11 @@ class MedicalSchemesEdit extends MedicalSchemes
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['company'] = $this->company->DefaultValue;
-        $row['phone'] = $this->phone->DefaultValue;
-        $row['email_address'] = $this->email_address->DefaultValue;
-        $row['physical_address'] = $this->physical_address->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['visit_id'] = $this->visit_id->DefaultValue;
+        $row['amount'] = $this->amount->DefaultValue;
+        $row['details'] = $this->details->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -861,17 +840,20 @@ class MedicalSchemesEdit extends MedicalSchemes
         // id
         $this->id->RowCssClass = "row";
 
-        // company
-        $this->company->RowCssClass = "row";
+        // patient_id
+        $this->patient_id->RowCssClass = "row";
 
-        // phone
-        $this->phone->RowCssClass = "row";
+        // visit_id
+        $this->visit_id->RowCssClass = "row";
 
-        // email_address
-        $this->email_address->RowCssClass = "row";
+        // amount
+        $this->amount->RowCssClass = "row";
 
-        // physical_address
-        $this->physical_address->RowCssClass = "row";
+        // details
+        $this->details->RowCssClass = "row";
+
+        // created_by_user_id
+        $this->created_by_user_id->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -884,17 +866,62 @@ class MedicalSchemesEdit extends MedicalSchemes
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // company
-            $this->company->ViewValue = $this->company->CurrentValue;
+            // patient_id
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
-            // phone
-            $this->phone->ViewValue = $this->phone->CurrentValue;
+            // visit_id
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-            // email_address
-            $this->email_address->ViewValue = $this->email_address->CurrentValue;
+            // amount
+            $this->amount->ViewValue = $this->amount->CurrentValue;
+            $this->amount->ViewValue = FormatNumber($this->amount->ViewValue, $this->amount->formatPattern());
 
-            // physical_address
-            $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
+            // details
+            $this->details->ViewValue = $this->details->CurrentValue;
+
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -904,102 +931,98 @@ class MedicalSchemesEdit extends MedicalSchemes
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
 
-            // company
-            $this->company->HrefValue = "";
+            // amount
+            $this->amount->HrefValue = "";
 
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+            // details
+            $this->details->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
                 }
             } else {
-                $this->phone->HrefValue = "";
-            }
-
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
                 }
-            } else {
-                $this->email_address->HrefValue = "";
-            }
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-        } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
-            // company
-            $this->company->setupEditAttributes();
-            if (!$this->company->Raw) {
-                $this->company->CurrentValue = HtmlDecode($this->company->CurrentValue);
-            }
-            $this->company->EditValue = HtmlEncode($this->company->CurrentValue);
-            $this->company->PlaceHolder = RemoveHtml($this->company->caption());
-
-            // phone
-            $this->phone->setupEditAttributes();
-            if (!$this->phone->Raw) {
-                $this->phone->CurrentValue = HtmlDecode($this->phone->CurrentValue);
-            }
-            $this->phone->EditValue = HtmlEncode($this->phone->CurrentValue);
-            $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
-
-            // email_address
-            $this->email_address->setupEditAttributes();
-            if (!$this->email_address->Raw) {
-                $this->email_address->CurrentValue = HtmlDecode($this->email_address->CurrentValue);
-            }
-            $this->email_address->EditValue = HtmlEncode($this->email_address->CurrentValue);
-            $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
-
-            // physical_address
-            $this->physical_address->setupEditAttributes();
-            $this->physical_address->EditValue = HtmlEncode($this->physical_address->CurrentValue);
-            $this->physical_address->PlaceHolder = RemoveHtml($this->physical_address->caption());
-
-            // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
-
-            // company
-            $this->company->HrefValue = "";
-
-            // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->EditValue) && !is_array($this->phone->EditValue) ? RemoveHtml($this->phone->EditValue) : $this->phone->CurrentValue); // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
                 }
-            } else {
-                $this->phone->HrefValue = "";
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->EditValue) && !is_array($this->email_address->EditValue) ? RemoveHtml($this->email_address->EditValue) : $this->email_address->CurrentValue); // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-                }
-            } else {
-                $this->email_address->HrefValue = "";
+            // amount
+            $this->amount->setupEditAttributes();
+            $this->amount->EditValue = $this->amount->CurrentValue;
+            $this->amount->PlaceHolder = RemoveHtml($this->amount->caption());
+            if (strval($this->amount->EditValue) != "" && is_numeric($this->amount->EditValue)) {
+                $this->amount->EditValue = FormatNumber($this->amount->EditValue, null);
             }
 
-            // physical_address
-            $this->physical_address->HrefValue = "";
+            // details
+            $this->details->setupEditAttributes();
+            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
+            // created_by_user_id
+
+            // Add refer script
+
+            // patient_id
+            $this->patient_id->HrefValue = "";
+
+            // amount
+            $this->amount->HrefValue = "";
+
+            // details
+            $this->details->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1021,29 +1044,27 @@ class MedicalSchemesEdit extends MedicalSchemes
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+            if ($this->patient_id->Visible && $this->patient_id->Required) {
+                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
+                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->company->Visible && $this->company->Required) {
-                if (!$this->company->IsDetailKey && EmptyValue($this->company->FormValue)) {
-                    $this->company->addErrorMessage(str_replace("%s", $this->company->caption(), $this->company->RequiredErrorMessage));
+            if ($this->amount->Visible && $this->amount->Required) {
+                if (!$this->amount->IsDetailKey && EmptyValue($this->amount->FormValue)) {
+                    $this->amount->addErrorMessage(str_replace("%s", $this->amount->caption(), $this->amount->RequiredErrorMessage));
                 }
             }
-            if ($this->phone->Visible && $this->phone->Required) {
-                if (!$this->phone->IsDetailKey && EmptyValue($this->phone->FormValue)) {
-                    $this->phone->addErrorMessage(str_replace("%s", $this->phone->caption(), $this->phone->RequiredErrorMessage));
+            if (!CheckNumber($this->amount->FormValue)) {
+                $this->amount->addErrorMessage($this->amount->getErrorMessage(false));
+            }
+            if ($this->details->Visible && $this->details->Required) {
+                if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
+                    $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
                 }
             }
-            if ($this->email_address->Visible && $this->email_address->Required) {
-                if (!$this->email_address->IsDetailKey && EmptyValue($this->email_address->FormValue)) {
-                    $this->email_address->addErrorMessage(str_replace("%s", $this->email_address->caption(), $this->email_address->RequiredErrorMessage));
-                }
-            }
-            if ($this->physical_address->Visible && $this->physical_address->Required) {
-                if (!$this->physical_address->IsDetailKey && EmptyValue($this->physical_address->FormValue)) {
-                    $this->physical_address->addErrorMessage(str_replace("%s", $this->physical_address->caption(), $this->physical_address->RequiredErrorMessage));
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
 
@@ -1059,45 +1080,28 @@ class MedicalSchemesEdit extends MedicalSchemes
         return $validateForm;
     }
 
-    // Update record based on key values
-    protected function editRow()
+    // Add record
+    protected function addRow($rsold = null)
     {
-        global $Security, $Language;
-        $oldKeyFilter = $this->getRecordFilter();
-        $filter = $this->applyUserIDFilters($oldKeyFilter);
-        $conn = $this->getConnection();
-
-        // Load old row
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $rsold = $conn->fetchAssociative($sql);
-        if (!$rsold) {
-            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
-            return false; // Update Failed
-        } else {
-            // Load old values
-            $this->loadDbValues($rsold);
-        }
+        global $Language, $Security;
 
         // Get new row
-        $rsnew = $this->getEditRow($rsold);
+        $rsnew = $this->getAddRow();
 
         // Update current values
         $this->setCurrentValues($rsnew);
+        $conn = $this->getConnection();
 
-        // Call Row Updating event
-        $updateRow = $this->rowUpdating($rsold, $rsnew);
-        if ($updateRow) {
-            if (count($rsnew) > 0) {
-                $this->CurrentFilter = $filter; // Set up current filter
-                $editRow = $this->update($rsnew, "", $rsold);
-                if (!$editRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
-                    $this->setFailureMessage($this->DbErrorMessage);
-                }
-            } else {
-                $editRow = true; // No field to update
-            }
-            if ($editRow) {
+        // Load db values from old row
+        $this->loadDbValues($rsold);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
+                $this->setFailureMessage($this->DbErrorMessage);
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1106,67 +1110,172 @@ class MedicalSchemesEdit extends MedicalSchemes
                 $this->setFailureMessage($this->CancelMessage);
                 $this->CancelMessage = "";
             } else {
-                $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
-            $editRow = false;
+            $addRow = false;
         }
-
-        // Call Row_Updated event
-        if ($editRow) {
-            $this->rowUpdated($rsold, $rsnew);
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
         }
 
         // Write JSON response
-        if (IsJsonResponse() && $editRow) {
+        if (IsJsonResponse() && $addRow) {
             $row = $this->getRecordsFromRecordset([$rsnew], true);
             $table = $this->TableVar;
-            WriteJson(["success" => true, "action" => Config("API_EDIT_ACTION"), $table => $row]);
+            WriteJson(["success" => true, "action" => Config("API_ADD_ACTION"), $table => $row]);
         }
-        return $editRow;
+        return $addRow;
     }
 
     /**
-     * Get edit row
+     * Get add row
      *
      * @return array
      */
-    protected function getEditRow($rsold)
+    protected function getAddRow()
     {
         global $Security;
         $rsnew = [];
 
-        // company
-        $this->company->setDbValueDef($rsnew, $this->company->CurrentValue, $this->company->ReadOnly);
+        // patient_id
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // phone
-        $this->phone->setDbValueDef($rsnew, $this->phone->CurrentValue, $this->phone->ReadOnly);
+        // amount
+        $this->amount->setDbValueDef($rsnew, $this->amount->CurrentValue, false);
 
-        // email_address
-        $this->email_address->setDbValueDef($rsnew, $this->email_address->CurrentValue, $this->email_address->ReadOnly);
+        // details
+        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, false);
 
-        // physical_address
-        $this->physical_address->setDbValueDef($rsnew, $this->physical_address->CurrentValue, $this->physical_address->ReadOnly);
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
+        }
         return $rsnew;
     }
 
     /**
-     * Restore edit form from row
+     * Restore add form from row
      * @param array $row Row
      */
-    protected function restoreEditFormFromRow($row)
+    protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['company'])) { // company
-            $this->company->CurrentValue = $row['company'];
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
         }
-        if (isset($row['phone'])) { // phone
-            $this->phone->CurrentValue = $row['phone'];
+        if (isset($row['amount'])) { // amount
+            $this->amount->setFormValue($row['amount']);
         }
-        if (isset($row['email_address'])) { // email_address
-            $this->email_address->CurrentValue = $row['email_address'];
+        if (isset($row['details'])) { // details
+            $this->details->setFormValue($row['details']);
         }
-        if (isset($row['physical_address'])) { // physical_address
-            $this->physical_address->CurrentValue = $row['physical_address'];
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_visits") {
+                $validMaster = true;
+                $masterTbl = Container("patient_visits");
+                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
+                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
+                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_visits") {
+                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
+                    $this->visit_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -1175,9 +1284,9 @@ class MedicalSchemesEdit extends MedicalSchemes
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("medicalschemeslist"), "", $this->TableVar, true);
-        $pageId = "edit";
-        $Breadcrumb->add("edit", $pageId, $url);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("cashpaymentslist"), "", $this->TableVar, true);
+        $pageId = ($this->isCopy()) ? "Copy" : "Add";
+        $Breadcrumb->add("add", $pageId, $url);
     }
 
     // Setup lookup options
@@ -1193,6 +1302,10 @@ class MedicalSchemesEdit extends MedicalSchemes
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
+                case "x_created_by_user_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -1220,40 +1333,6 @@ class MedicalSchemesEdit extends MedicalSchemes
                 $fld->Lookup->Options = $ar;
             }
         }
-    }
-
-    // Set up starting record parameters
-    public function setupStartRecord()
-    {
-        if ($this->DisplayRecords == 0) {
-            return;
-        }
-        $pageNo = Get(Config("TABLE_PAGE_NUMBER"));
-        $startRec = Get(Config("TABLE_START_REC"));
-        $infiniteScroll = false;
-        $recordNo = $pageNo ?? $startRec; // Record number = page number or start record
-        if ($recordNo !== null && is_numeric($recordNo)) {
-            $this->StartRecord = $recordNo;
-        } else {
-            $this->StartRecord = $this->getStartRecordNumber();
-        }
-
-        // Check if correct start record counter
-        if (!is_numeric($this->StartRecord) || intval($this->StartRecord) <= 0) { // Avoid invalid start record counter
-            $this->StartRecord = 1; // Reset start record counter
-        } elseif ($this->StartRecord > $this->TotalRecords) { // Avoid starting record > total records
-            $this->StartRecord = (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to last page first record
-        } elseif (($this->StartRecord - 1) % $this->DisplayRecords != 0) {
-            $this->StartRecord = (int)(($this->StartRecord - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to page boundary
-        }
-        if (!$infiniteScroll) {
-            $this->setStartRecordNumber($this->StartRecord);
-        }
-    }
-
-    // Get page count
-    public function pageCount() {
-        return ceil($this->TotalRecords / $this->DisplayRecords);
     }
 
     // Page Load event

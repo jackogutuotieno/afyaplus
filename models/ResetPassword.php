@@ -340,7 +340,7 @@ class ResetPassword extends Users
             $filter = [Config("LOGIN_USERNAME_PROPERTY_NAME") => $userName];
         }
         if ($action != "") {
-            if ($this->UpdateTable != $this->TableName) { // Note: The username field name must be the same
+            if ($this->UpdateTable != $this->TableName && $this->UpdateTable != $this->getSqlFrom()) { // Note: The username field name must be the same
                 $entityClass = GetEntityClass($this->UpdateTable);
                 if ($entityClass) {
                     $userRepository = GetUserEntityManager()->getRepository($entityClass);

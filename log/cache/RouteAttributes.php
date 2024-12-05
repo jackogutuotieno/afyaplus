@@ -156,6 +156,10 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -305,6 +309,26 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1738,6 +1762,10 @@
                 '/appointmentsreport2list[/{id}]',
                 '/appointmentsreport',
                 '/appointmentsreport/AppointmentsSubmittedbyMonth',
+                '/cashpaymentslist[/{id}]',
+                '/cashpaymentsview[/{id}]',
+                '/cashpaymentsedit[/{id}]',
+                '/cashpaymentsdelete[/{id}]',
                 '/departmentslist[/{id}]',
                 '/departmentsadd[/{id}]',
                 '/departmentsview[/{id}]',
@@ -2028,6 +2056,10 @@
                 'PHPMaker2024\\afyaplus\\AppointmentsReport2Controller:list',
                 'PHPMaker2024\\afyaplus\\AppointmentsReportController:summary',
                 'PHPMaker2024\\afyaplus\\AppointmentsReportController:AppointmentsSubmittedbyMonth',
+                'PHPMaker2024\\afyaplus\\CashPaymentsController:list',
+                'PHPMaker2024\\afyaplus\\CashPaymentsController:view',
+                'PHPMaker2024\\afyaplus\\CashPaymentsController:edit',
+                'PHPMaker2024\\afyaplus\\CashPaymentsController:delete',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:list',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:add',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:view',
@@ -2310,6 +2342,18 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3182,6 +3226,10 @@
                 'list.appointments_report2',
                 'summary.Appointments_Report',
                 'summary.Appointments_Report.AppointmentsSubmittedbyMonth',
+                'list.cash_payments',
+                'view.cash_payments',
+                'edit.cash_payments',
+                'delete.cash_payments',
                 'list.departments',
                 'add.departments',
                 'view.departments',
@@ -3464,6 +3512,10 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4044,6 +4096,10 @@
         $o[285],
         $o[286],
         $o[287],
+        $o[288],
+        $o[289],
+        $o[290],
+        $o[291],
     ],
     []
 );

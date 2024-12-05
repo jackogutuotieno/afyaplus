@@ -888,7 +888,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report_details","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","1","1903"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments","9","0"]];
 
 /**
  * Tables
@@ -978,4 +989,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["moh204b_report","moh204b_report","MOH 204B Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","moh204breportlist"],
     ["medicine_dispensation_details","medicine_dispensation_details","Medicine Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinedispensationdetailslist"],
     ["medicine_stock_data","medicine_stock_data","medicine stock data",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockdatalist"],
-    ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"]];
+    ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"],
+    ["cash_payments","cash_payments","Cash Payments",true,"{32536B8D-F37B-4419-80D5-260932800712}","cashpaymentslist"]];
