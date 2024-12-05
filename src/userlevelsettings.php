@@ -276,7 +276,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","1","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","2","840"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","3","877"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations","5","0"],

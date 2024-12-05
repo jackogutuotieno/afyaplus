@@ -18,3 +18,8 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-04 19:09:38",/afyaplus/login,4,login,::1,,,,
 "2024-12-04 19:10:20",/afyaplus/logout,4,logout,::1,,,,
 "2024-12-04 19:10:38",/afyaplus/login,4,login,::1,,,,
+"2024-12-04 21:03:53",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-04 21:04:26",/afyaplus/login,4,login,::1,,,,
+"2024-12-04 21:08:41",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-04 21:39:33",/afyaplus/login,4,login,::1,,,,
+"2024-12-04 21:39:49",/afyaplus/logout,4,logout,::1,,,,
