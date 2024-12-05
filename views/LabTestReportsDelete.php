@@ -53,6 +53,9 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_lab_test_reports_lab_test_request_id" class="lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
         <th class="<?= $Page->details->headerCellClass() ?>"><span id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->details->caption() ?></span></th>
 <?php } ?>
@@ -88,6 +91,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
+<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

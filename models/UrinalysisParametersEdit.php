@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class LabTestReportsEdit extends LabTestReports
+class UrinalysisParametersEdit extends UrinalysisParameters
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class LabTestReportsEdit extends LabTestReports
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LabTestReportsEdit";
+    public $PageObjName = "UrinalysisParametersEdit";
 
     // View file path
     public $View = null;
@@ -38,7 +38,7 @@ class LabTestReportsEdit extends LabTestReports
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "labtestreportsedit";
+    public $CurrentPageName = "urinalysisparametersedit";
 
     // Page headings
     public $Heading = "";
@@ -122,9 +122,10 @@ class LabTestReportsEdit extends LabTestReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
-        $this->details->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->lab_test_reports_id->setVisibility();
+        $this->parameter->setVisibility();
+        $this->result->setVisibility();
+        $this->comments->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -134,8 +135,8 @@ class LabTestReportsEdit extends LabTestReports
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'lab_test_reports';
-        $this->TableName = 'lab_test_reports';
+        $this->TableVar = 'urinalysis_parameters';
+        $this->TableName = 'urinalysis_parameters';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-edit-table";
@@ -146,14 +147,14 @@ class LabTestReportsEdit extends LabTestReports
         // Language object
         $Language = Container("app.language");
 
-        // Table object (lab_test_reports)
-        if (!isset($GLOBALS["lab_test_reports"]) || $GLOBALS["lab_test_reports"]::class == PROJECT_NAMESPACE . "lab_test_reports") {
-            $GLOBALS["lab_test_reports"] = &$this;
+        // Table object (urinalysis_parameters)
+        if (!isset($GLOBALS["urinalysis_parameters"]) || $GLOBALS["urinalysis_parameters"]::class == PROJECT_NAMESPACE . "urinalysis_parameters") {
+            $GLOBALS["urinalysis_parameters"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'lab_test_reports');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'urinalysis_parameters');
         }
 
         // Start timer
@@ -267,7 +268,7 @@ class LabTestReportsEdit extends LabTestReports
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "labtestreportsview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "urinalysisparametersview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -527,8 +528,7 @@ class LabTestReportsEdit extends LabTestReports
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->lab_test_request_id);
-        $this->setupLookupOptions($this->created_by_user_id);
+        $this->setupLookupOptions($this->parameter);
 
         // Check modal
         if ($this->IsModal) {
@@ -586,6 +586,9 @@ class LabTestReportsEdit extends LabTestReports
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -597,9 +600,6 @@ class LabTestReportsEdit extends LabTestReports
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
-
-            // Set up detail parameters
-            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -623,20 +623,13 @@ class LabTestReportsEdit extends LabTestReports
                         if ($this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                         }
-                        $this->terminate("labtestreportslist"); // No matching record, return to list
+                        $this->terminate("urinalysisparameterslist"); // No matching record, return to list
                         return;
                     }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "update": // Update
-                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
-                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
-                } else {
-                    $returnUrl = $this->getReturnUrl();
-                }
-                if (GetPageName($returnUrl) == "labtestreportslist") {
+                $returnUrl = $this->getReturnUrl();
+                if (GetPageName($returnUrl) == "urinalysisparameterslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -646,11 +639,11 @@ class LabTestReportsEdit extends LabTestReports
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "labtestreportslist") {
+                        if (GetPageName($returnUrl) != "urinalysisparameterslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "labtestreportslist"; // Return list page content
+                            $returnUrl = "urinalysisparameterslist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) {
@@ -674,9 +667,6 @@ class LabTestReportsEdit extends LabTestReports
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -730,33 +720,43 @@ class LabTestReportsEdit extends LabTestReports
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'lab_test_request_id' first before field var 'x_lab_test_request_id'
-        $val = $CurrentForm->hasValue("lab_test_request_id") ? $CurrentForm->getValue("lab_test_request_id") : $CurrentForm->getValue("x_lab_test_request_id");
-        if (!$this->lab_test_request_id->IsDetailKey) {
+        // Check field name 'lab_test_reports_id' first before field var 'x_lab_test_reports_id'
+        $val = $CurrentForm->hasValue("lab_test_reports_id") ? $CurrentForm->getValue("lab_test_reports_id") : $CurrentForm->getValue("x_lab_test_reports_id");
+        if (!$this->lab_test_reports_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->lab_test_request_id->Visible = false; // Disable update for API request
+                $this->lab_test_reports_id->Visible = false; // Disable update for API request
             } else {
-                $this->lab_test_request_id->setFormValue($val);
+                $this->lab_test_reports_id->setFormValue($val, true, $validate);
             }
         }
 
-        // Check field name 'details' first before field var 'x_details'
-        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
-        if (!$this->details->IsDetailKey) {
+        // Check field name 'parameter' first before field var 'x_parameter'
+        $val = $CurrentForm->hasValue("parameter") ? $CurrentForm->getValue("parameter") : $CurrentForm->getValue("x_parameter");
+        if (!$this->parameter->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->details->Visible = false; // Disable update for API request
+                $this->parameter->Visible = false; // Disable update for API request
             } else {
-                $this->details->setFormValue($val);
+                $this->parameter->setFormValue($val);
             }
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
+        // Check field name 'result' first before field var 'x_result'
+        $val = $CurrentForm->hasValue("result") ? $CurrentForm->getValue("result") : $CurrentForm->getValue("x_result");
+        if (!$this->result->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
+                $this->result->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val);
+                $this->result->setFormValue($val);
+            }
+        }
+
+        // Check field name 'comments' first before field var 'x_comments'
+        $val = $CurrentForm->hasValue("comments") ? $CurrentForm->getValue("comments") : $CurrentForm->getValue("x_comments");
+        if (!$this->comments->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->comments->Visible = false; // Disable update for API request
+            } else {
+                $this->comments->setFormValue($val);
             }
         }
     }
@@ -766,9 +766,10 @@ class LabTestReportsEdit extends LabTestReports
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
-        $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->FormValue;
-        $this->details->CurrentValue = $this->details->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->lab_test_reports_id->CurrentValue = $this->lab_test_reports_id->FormValue;
+        $this->parameter->CurrentValue = $this->parameter->FormValue;
+        $this->result->CurrentValue = $this->result->FormValue;
+        $this->comments->CurrentValue = $this->comments->FormValue;
     }
 
     /**
@@ -794,15 +795,6 @@ class LabTestReportsEdit extends LabTestReports
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -819,9 +811,10 @@ class LabTestReportsEdit extends LabTestReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
-        $this->details->setDbValue($row['details']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->lab_test_reports_id->setDbValue($row['lab_test_reports_id']);
+        $this->parameter->setDbValue($row['parameter']);
+        $this->result->setDbValue($row['result']);
+        $this->comments->setDbValue($row['comments']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -831,9 +824,10 @@ class LabTestReportsEdit extends LabTestReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
-        $row['details'] = $this->details->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['lab_test_reports_id'] = $this->lab_test_reports_id->DefaultValue;
+        $row['parameter'] = $this->parameter->DefaultValue;
+        $row['result'] = $this->result->DefaultValue;
+        $row['comments'] = $this->comments->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -873,14 +867,17 @@ class LabTestReportsEdit extends LabTestReports
         // id
         $this->id->RowCssClass = "row";
 
-        // lab_test_request_id
-        $this->lab_test_request_id->RowCssClass = "row";
+        // lab_test_reports_id
+        $this->lab_test_reports_id->RowCssClass = "row";
 
-        // details
-        $this->details->RowCssClass = "row";
+        // parameter
+        $this->parameter->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
+        // result
+        $this->result->RowCssClass = "row";
+
+        // comments
+        $this->comments->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -893,172 +890,93 @@ class LabTestReportsEdit extends LabTestReports
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_request_id
-            $curVal = strval($this->lab_test_request_id->CurrentValue);
-            if ($curVal != "") {
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->lookupCacheOption($curVal);
-                if ($this->lab_test_request_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->lab_test_request_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->lab_test_request_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->lab_test_request_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->lab_test_request_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->displayValue($arwrk);
-                    } else {
-                        $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->CurrentValue, $this->lab_test_request_id->formatPattern());
-                    }
-                }
+            // lab_test_reports_id
+            $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
+            $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
+
+            // parameter
+            if (strval($this->parameter->CurrentValue) != "") {
+                $this->parameter->ViewValue = $this->parameter->optionCaption($this->parameter->CurrentValue);
             } else {
-                $this->lab_test_request_id->ViewValue = null;
+                $this->parameter->ViewValue = null;
             }
 
-            // details
-            $this->details->ViewValue = $this->details->CurrentValue;
+            // result
+            $this->result->ViewValue = $this->result->CurrentValue;
 
-            // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->ViewValue = null;
-            }
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+            // comments
+            $this->comments->ViewValue = $this->comments->CurrentValue;
 
             // id
             $this->id->HrefValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
+            // lab_test_reports_id
+            $this->lab_test_reports_id->HrefValue = "";
 
-            // details
-            $this->details->HrefValue = "";
+            // parameter
+            $this->parameter->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // result
+            $this->result->HrefValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
 
-            // lab_test_request_id
-            $this->lab_test_request_id->setupEditAttributes();
-            $curVal = trim(strval($this->lab_test_request_id->CurrentValue));
-            if ($curVal != "") {
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->lookupCacheOption($curVal);
+            // lab_test_reports_id
+            $this->lab_test_reports_id->setupEditAttributes();
+            if ($this->lab_test_reports_id->getSessionValue() != "") {
+                $this->lab_test_reports_id->CurrentValue = GetForeignKeyValue($this->lab_test_reports_id->getSessionValue());
+                $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
+                $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
             } else {
-                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->Lookup !== null && is_array($this->lab_test_request_id->lookupOptions()) && count($this->lab_test_request_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->lab_test_request_id->ViewValue !== null) { // Load from cache
-                $this->lab_test_request_id->EditValue = array_values($this->lab_test_request_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->lab_test_request_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->lab_test_request_id->CurrentValue, $this->lab_test_request_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $this->lab_test_reports_id->EditValue = $this->lab_test_reports_id->CurrentValue;
+                $this->lab_test_reports_id->PlaceHolder = RemoveHtml($this->lab_test_reports_id->caption());
+                if (strval($this->lab_test_reports_id->EditValue) != "" && is_numeric($this->lab_test_reports_id->EditValue)) {
+                    $this->lab_test_reports_id->EditValue = FormatNumber($this->lab_test_reports_id->EditValue, null);
                 }
-                $sqlWrk = $this->lab_test_request_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->lab_test_request_id->EditValue = $arwrk;
             }
-            $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
 
-            // details
-            $this->details->setupEditAttributes();
-            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
-            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+            // parameter
+            $this->parameter->setupEditAttributes();
+            $this->parameter->EditValue = $this->parameter->options(true);
+            $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
 
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->created_by_user_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                    if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                        } else {
-                            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->created_by_user_id->EditValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->created_by_user_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                } else {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->Lookup !== null && is_array($this->created_by_user_id->lookupOptions()) && count($this->created_by_user_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->created_by_user_id->ViewValue !== null) { // Load from cache
-                    $this->created_by_user_id->EditValue = array_values($this->created_by_user_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->created_by_user_id->CurrentValue, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->created_by_user_id->EditValue = $arwrk;
-                }
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+            // result
+            $this->result->setupEditAttributes();
+            if (!$this->result->Raw) {
+                $this->result->CurrentValue = HtmlDecode($this->result->CurrentValue);
             }
+            $this->result->EditValue = HtmlEncode($this->result->CurrentValue);
+            $this->result->PlaceHolder = RemoveHtml($this->result->caption());
+
+            // comments
+            $this->comments->setupEditAttributes();
+            if (!$this->comments->Raw) {
+                $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+            }
+            $this->comments->EditValue = HtmlEncode($this->comments->CurrentValue);
+            $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
 
             // Edit refer script
 
             // id
             $this->id->HrefValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
+            // lab_test_reports_id
+            $this->lab_test_reports_id->HrefValue = "";
 
-            // details
-            $this->details->HrefValue = "";
+            // parameter
+            $this->parameter->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // result
+            $this->result->HrefValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1085,29 +1003,29 @@ class LabTestReportsEdit extends LabTestReports
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->lab_test_request_id->Visible && $this->lab_test_request_id->Required) {
-                if (!$this->lab_test_request_id->IsDetailKey && EmptyValue($this->lab_test_request_id->FormValue)) {
-                    $this->lab_test_request_id->addErrorMessage(str_replace("%s", $this->lab_test_request_id->caption(), $this->lab_test_request_id->RequiredErrorMessage));
+            if ($this->lab_test_reports_id->Visible && $this->lab_test_reports_id->Required) {
+                if (!$this->lab_test_reports_id->IsDetailKey && EmptyValue($this->lab_test_reports_id->FormValue)) {
+                    $this->lab_test_reports_id->addErrorMessage(str_replace("%s", $this->lab_test_reports_id->caption(), $this->lab_test_reports_id->RequiredErrorMessage));
                 }
             }
-            if ($this->details->Visible && $this->details->Required) {
-                if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
-                    $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
+            if (!CheckInteger($this->lab_test_reports_id->FormValue)) {
+                $this->lab_test_reports_id->addErrorMessage($this->lab_test_reports_id->getErrorMessage(false));
+            }
+            if ($this->parameter->Visible && $this->parameter->Required) {
+                if (!$this->parameter->IsDetailKey && EmptyValue($this->parameter->FormValue)) {
+                    $this->parameter->addErrorMessage(str_replace("%s", $this->parameter->caption(), $this->parameter->RequiredErrorMessage));
                 }
             }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+            if ($this->result->Visible && $this->result->Required) {
+                if (!$this->result->IsDetailKey && EmptyValue($this->result->FormValue)) {
+                    $this->result->addErrorMessage(str_replace("%s", $this->result->caption(), $this->result->RequiredErrorMessage));
                 }
             }
-
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("UrinalysisParametersGrid");
-        if (in_array("urinalysis_parameters", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
+            if ($this->comments->Visible && $this->comments->Required) {
+                if (!$this->comments->IsDetailKey && EmptyValue($this->comments->FormValue)) {
+                    $this->comments->addErrorMessage(str_replace("%s", $this->comments->caption(), $this->comments->RequiredErrorMessage));
+                }
+            }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1147,11 +1065,6 @@ class LabTestReportsEdit extends LabTestReports
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
-            $conn->beginTransaction();
-        }
-
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
         if ($updateRow) {
@@ -1165,32 +1078,6 @@ class LabTestReportsEdit extends LabTestReports
                 $editRow = true; // No field to update
             }
             if ($editRow) {
-            }
-
-            // Update detail records
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("UrinalysisParametersGrid");
-            if (in_array("urinalysis_parameters", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "urinalysis_parameters"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
-
-            // Commit/Rollback transaction
-            if ($this->getCurrentDetailTable() != "") {
-                if ($editRow) {
-                    if ($this->UseTransaction) { // Commit transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->commit();
-                        }
-                    }
-                } else {
-                    if ($this->UseTransaction) { // Rollback transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->rollback();
-                        }
-                    }
-                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1228,14 +1115,20 @@ class LabTestReportsEdit extends LabTestReports
         global $Security;
         $rsnew = [];
 
-        // lab_test_request_id
-        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, $this->lab_test_request_id->ReadOnly);
+        // lab_test_reports_id
+        if ($this->lab_test_reports_id->getSessionValue() != "") {
+            $this->lab_test_reports_id->ReadOnly = true;
+        }
+        $this->lab_test_reports_id->setDbValueDef($rsnew, $this->lab_test_reports_id->CurrentValue, $this->lab_test_reports_id->ReadOnly);
 
-        // details
-        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, $this->details->ReadOnly);
+        // parameter
+        $this->parameter->setDbValueDef($rsnew, $this->parameter->CurrentValue, $this->parameter->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
+        // result
+        $this->result->setDbValueDef($rsnew, $this->result->CurrentValue, $this->result->ReadOnly);
+
+        // comments
+        $this->comments->setDbValueDef($rsnew, $this->comments->CurrentValue, $this->comments->ReadOnly);
         return $rsnew;
     }
 
@@ -1245,55 +1138,91 @@ class LabTestReportsEdit extends LabTestReports
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
-            $this->lab_test_request_id->CurrentValue = $row['lab_test_request_id'];
+        if (isset($row['lab_test_reports_id'])) { // lab_test_reports_id
+            $this->lab_test_reports_id->CurrentValue = $row['lab_test_reports_id'];
         }
-        if (isset($row['details'])) { // details
-            $this->details->CurrentValue = $row['details'];
+        if (isset($row['parameter'])) { // parameter
+            $this->parameter->CurrentValue = $row['parameter'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
+        if (isset($row['result'])) { // result
+            $this->result->CurrentValue = $row['result'];
+        }
+        if (isset($row['comments'])) { // comments
+            $this->comments->CurrentValue = $row['comments'];
         }
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
     {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
+        $validMaster = false;
+        $foreignKeys = [];
         // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("urinalysis_parameters", $detailTblVar)) {
-                $detailPageObj = Container("UrinalysisParametersGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->lab_test_reports_id->IsDetailKey = true;
-                    $detailPageObj->lab_test_reports_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->lab_test_reports_id->setSessionValue($detailPageObj->lab_test_reports_id->CurrentValue);
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_reports") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_reports");
+                if (($parm = Get("fk_id", Get("lab_test_reports_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->lab_test_reports_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_reports_id->setSessionValue($this->lab_test_reports_id->QueryStringValue);
+                    $foreignKeys["lab_test_reports_id"] = $this->lab_test_reports_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "lab_test_reports") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_reports");
+                if (($parm = Post("fk_id", Post("lab_test_reports_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->lab_test_reports_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_reports_id->setSessionValue($this->lab_test_reports_id->FormValue);
+                    $foreignKeys["lab_test_reports_id"] = $this->lab_test_reports_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
                 }
             }
         }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "lab_test_reports") {
+                if (!array_key_exists("lab_test_reports_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_reports_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -1302,7 +1231,7 @@ class LabTestReportsEdit extends LabTestReports
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("labtestreportslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("urinalysisparameterslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }
@@ -1320,9 +1249,7 @@ class LabTestReportsEdit extends LabTestReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_lab_test_request_id":
-                    break;
-                case "x_created_by_user_id":
+                case "x_parameter":
                     break;
                 default:
                     $lookupFilter = "";

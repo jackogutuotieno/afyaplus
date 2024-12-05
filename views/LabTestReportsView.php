@@ -62,13 +62,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
-    <tr id="r_lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_requests_queue_id"><?= $Page->lab_test_requests_queue_id->caption() ?></span></td>
-        <td data-name="lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->cellAttributes() ?>>
-<span id="el_lab_test_reports_lab_test_requests_queue_id">
-<span<?= $Page->lab_test_requests_queue_id->viewAttributes() ?>>
-<?= $Page->lab_test_requests_queue_id->getViewValue() ?></span>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+    <tr id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></td>
+        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<span id="el_lab_test_reports_lab_test_request_id">
+<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
+<?= $Page->lab_test_request_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -107,6 +107,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("urinalysis_parameters", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_parameters->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("urinalysis_parameters", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "UrinalysisParametersGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

@@ -192,14 +192,6 @@ loadjs.ready("head", function () {
 <?php include_once "InvoicesGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
-<?php } ?>
-<?php include_once "LabTestRequestsGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("patient_vaccinations", explode(",", $Page->getCurrentDetailTable())) && $patient_vaccinations->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
@@ -214,6 +206,14 @@ loadjs.ready("head", function () {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("cash_payments", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("cash_payments")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "CashPaymentsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("lab_test_requests", explode(",", $Page->getCurrentDetailTable())) && $lab_test_requests->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

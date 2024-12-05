@@ -174,6 +174,7 @@ return [
     "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
     "cash_payments" => \DI\create(CashPayments::class),
     "cash_payments_report" => \DI\create(CashPaymentsReport::class),
+    "urinalysis_parameters" => \DI\create(UrinalysisParameters::class),
 
     // User table
     "usertable" => \DI\get("users"),

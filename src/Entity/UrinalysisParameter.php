@@ -22,25 +22,28 @@ use function PHPMaker2024\afyaplus\HtmlDecode;
 use function PHPMaker2024\afyaplus\EncryptPassword;
 
 /**
- * Entity class for "lab_test_reports" table
+ * Entity class for "urinalysis_parameters" table
  */
 #[Entity]
-#[Table(name: "lab_test_reports")]
-class LabTestReport extends AbstractEntity
+#[Table(name: "urinalysis_parameters")]
+class UrinalysisParameter extends AbstractEntity
 {
     #[Id]
     #[Column(type: "integer", unique: true)]
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "lab_test_request_id", type: "integer")]
-    private int $labTestRequestId;
+    #[Column(name: "lab_test_reports_id", type: "integer")]
+    private int $labTestReportsId;
 
-    #[Column(type: "text", nullable: true)]
-    private ?string $details;
+    #[Column(type: "string")]
+    private string $parameter;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
+    #[Column(type: "string")]
+    private string $result;
+
+    #[Column(type: "text")]
+    private string $comments;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -59,36 +62,47 @@ class LabTestReport extends AbstractEntity
         return $this;
     }
 
-    public function getLabTestRequestId(): int
+    public function getLabTestReportsId(): int
     {
-        return $this->labTestRequestId;
+        return $this->labTestReportsId;
     }
 
-    public function setLabTestRequestId(int $value): static
+    public function setLabTestReportsId(int $value): static
     {
-        $this->labTestRequestId = $value;
+        $this->labTestReportsId = $value;
         return $this;
     }
 
-    public function getDetails(): ?string
+    public function getParameter(): string
     {
-        return HtmlDecode($this->details);
+        return HtmlDecode($this->parameter);
     }
 
-    public function setDetails(?string $value): static
+    public function setParameter(string $value): static
     {
-        $this->details = RemoveXss($value);
+        $this->parameter = RemoveXss($value);
         return $this;
     }
 
-    public function getCreatedByUserId(): int
+    public function getResult(): string
     {
-        return $this->createdByUserId;
+        return HtmlDecode($this->result);
     }
 
-    public function setCreatedByUserId(int $value): static
+    public function setResult(string $value): static
     {
-        $this->createdByUserId = $value;
+        $this->result = RemoveXss($value);
+        return $this;
+    }
+
+    public function getComments(): string
+    {
+        return HtmlDecode($this->comments);
+    }
+
+    public function setComments(string $value): static
+    {
+        $this->comments = RemoveXss($value);
         return $this;
     }
 

@@ -90,6 +90,7 @@ C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceSubcategoriesController.php
 C:\wamp64\www\afyaplus\controllers\SubscriptionsController.php
 C:\wamp64\www\afyaplus\controllers\TriageOverviewController.php
+C:\wamp64\www\afyaplus\controllers\UrinalysisParametersController.php
 C:\wamp64\www\afyaplus\controllers\UsersController.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReport3Controller.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReportController.php
@@ -482,6 +483,13 @@ C:\wamp64\www\afyaplus\models\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\models\SubscriptionsList.php
 C:\wamp64\www\afyaplus\models\SubscriptionsView.php
 C:\wamp64\www\afyaplus\models\TriageOverview.php
+C:\wamp64\www\afyaplus\models\UrinalysisParameters.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersAdd.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersDelete.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersEdit.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersGrid.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersList.php
+C:\wamp64\www\afyaplus\models\UrinalysisParametersView.php
 C:\wamp64\www\afyaplus\models\Users.php
 C:\wamp64\www\afyaplus\models\UsersAdd.php
 C:\wamp64\www\afyaplus\models\UsersDelete.php
@@ -628,6 +636,7 @@ C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceSubcategory.php
 C:\wamp64\www\afyaplus\src\Entity\Subscription.php
+C:\wamp64\www\afyaplus\src\Entity\UrinalysisParameter.php
 C:\wamp64\www\afyaplus\src\Entity\User.php
 C:\wamp64\www\afyaplus\src\Entity\VaccinationsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Vaccinationsreport.php
@@ -1031,6 +1040,12 @@ C:\wamp64\www\afyaplus\views\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\views\SubscriptionsList.php
 C:\wamp64\www\afyaplus\views\SubscriptionsView.php
 C:\wamp64\www\afyaplus\views\TriageOverview.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersAdd.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersDelete.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersEdit.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersGrid.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersList.php
+C:\wamp64\www\afyaplus\views\UrinalysisParametersView.php
 C:\wamp64\www\afyaplus\views\UsersAdd.php
 C:\wamp64\www\afyaplus\views\UsersDelete.php
 C:\wamp64\www\afyaplus\views\UsersEdit.php

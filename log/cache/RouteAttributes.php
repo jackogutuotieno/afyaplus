@@ -293,6 +293,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1758,6 +1763,31 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -2032,6 +2062,11 @@
                 '/subscriptionsedit[/{Id}]',
                 '/subscriptionsdelete[/{Id}]',
                 '/triageoverview',
+                '/urinalysisparameterslist[/{id}]',
+                '/urinalysisparametersadd[/{id}]',
+                '/urinalysisparametersview[/{id}]',
+                '/urinalysisparametersedit[/{id}]',
+                '/urinalysisparametersdelete[/{id}]',
                 '/userslist[/{id}]',
                 '/usersadd[/{id}]',
                 '/usersview[/{id}]',
@@ -2327,6 +2362,11 @@
                 'PHPMaker2024\\afyaplus\\SubscriptionsController:edit',
                 'PHPMaker2024\\afyaplus\\SubscriptionsController:delete',
                 'PHPMaker2024\\afyaplus\\TriageOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\UrinalysisParametersController:list',
+                'PHPMaker2024\\afyaplus\\UrinalysisParametersController:add',
+                'PHPMaker2024\\afyaplus\\UrinalysisParametersController:view',
+                'PHPMaker2024\\afyaplus\\UrinalysisParametersController:edit',
+                'PHPMaker2024\\afyaplus\\UrinalysisParametersController:delete',
                 'PHPMaker2024\\afyaplus\\UsersController:list',
                 'PHPMaker2024\\afyaplus\\UsersController:add',
                 'PHPMaker2024\\afyaplus\\UsersController:view',
@@ -3227,6 +3267,21 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3501,6 +3556,11 @@
                 'edit.subscriptions',
                 'delete.subscriptions',
                 'dashboard.Triage_Overview',
+                'list.urinalysis_parameters',
+                'add.urinalysis_parameters',
+                'view.urinalysis_parameters',
+                'edit.urinalysis_parameters',
+                'delete.urinalysis_parameters',
                 'list.users',
                 'add.users',
                 'view.users',
@@ -3524,6 +3584,11 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4114,6 +4179,11 @@
         $o[290],
         $o[291],
         $o[292],
+        $o[293],
+        $o[294],
+        $o[295],
+        $o[296],
+        $o[297],
     ],
     []
 );

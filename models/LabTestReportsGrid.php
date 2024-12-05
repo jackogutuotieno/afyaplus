@@ -136,11 +136,11 @@ class LabTestReportsGrid extends LabTestReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_requests_queue_id->Visible = false;
         $this->details->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
+        $this->lab_test_request_id->setVisibility();
     }
 
     // Constructor
@@ -705,21 +705,21 @@ class LabTestReportsGrid extends LabTestReports
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_requests_queue") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests_queue"); // Add master User ID filter
+            if ($this->getCurrentMasterTable() == "lab_test_requests") {
+                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_requests"); // Add master User ID filter
             }
         }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests_queue") {
-            $masterTbl = Container("lab_test_requests_queue");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_requests") {
+            $masterTbl = Container("lab_test_requests");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestrequestsqueuelist"); // Return to master page
+                $this->terminate("labtestrequestslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1125,6 +1125,14 @@ class LabTestReportsGrid extends LabTestReports
         ) {
             return false;
         }
+        if (
+            $CurrentForm->hasValue("x_lab_test_request_id") &&
+            $CurrentForm->hasValue("o_lab_test_request_id") &&
+            $this->lab_test_request_id->CurrentValue != $this->lab_test_request_id->DefaultValue &&
+            !($this->lab_test_request_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->lab_test_request_id->CurrentValue == $this->lab_test_request_id->getSessionValue())
+        ) {
+            return false;
+        }
         return true;
     }
 
@@ -1252,7 +1260,7 @@ class LabTestReportsGrid extends LabTestReports
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->lab_test_requests_queue_id->setSessionValue("");
+                        $this->lab_test_request_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1710,6 +1718,19 @@ class LabTestReportsGrid extends LabTestReports
         if ($CurrentForm->hasValue("o_date_created")) {
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
+
+        // Check field name 'lab_test_request_id' first before field var 'x_lab_test_request_id'
+        $val = $CurrentForm->hasValue("lab_test_request_id") ? $CurrentForm->getValue("lab_test_request_id") : $CurrentForm->getValue("x_lab_test_request_id");
+        if (!$this->lab_test_request_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->lab_test_request_id->Visible = false; // Disable update for API request
+            } else {
+                $this->lab_test_request_id->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_lab_test_request_id")) {
+            $this->lab_test_request_id->setOldValue($CurrentForm->getValue("o_lab_test_request_id"));
+        }
     }
 
     // Restore form values
@@ -1723,6 +1744,7 @@ class LabTestReportsGrid extends LabTestReports
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->FormValue;
     }
 
     /**
@@ -1819,11 +1841,11 @@ class LabTestReportsGrid extends LabTestReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_requests_queue_id->setDbValue($row['lab_test_requests_queue_id']);
         $this->details->setDbValue($row['details']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
     }
 
     // Return a row with default values
@@ -1831,11 +1853,11 @@ class LabTestReportsGrid extends LabTestReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_requests_queue_id'] = $this->lab_test_requests_queue_id->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         return $row;
     }
 
@@ -1876,8 +1898,6 @@ class LabTestReportsGrid extends LabTestReports
 
         // id
 
-        // lab_test_requests_queue_id
-
         // details
 
         // created_by_user_id
@@ -1887,14 +1907,12 @@ class LabTestReportsGrid extends LabTestReports
         // date_updated
         $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
+        // lab_test_request_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // lab_test_requests_queue_id
-            $this->lab_test_requests_queue_id->ViewValue = $this->lab_test_requests_queue_id->CurrentValue;
-            $this->lab_test_requests_queue_id->ViewValue = FormatNumber($this->lab_test_requests_queue_id->ViewValue, $this->lab_test_requests_queue_id->formatPattern());
 
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
@@ -1926,6 +1944,10 @@ class LabTestReportsGrid extends LabTestReports
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
+            // lab_test_request_id
+            $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+            $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -1941,6 +1963,10 @@ class LabTestReportsGrid extends LabTestReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // lab_test_request_id
+            $this->lab_test_request_id->HrefValue = "";
+            $this->lab_test_request_id->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
@@ -2006,6 +2032,21 @@ class LabTestReportsGrid extends LabTestReports
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
+            // lab_test_request_id
+            $this->lab_test_request_id->setupEditAttributes();
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
+                $this->lab_test_request_id->OldValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+            } else {
+                $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
+                if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
+                    $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+                }
+            }
+
             // Add refer script
 
             // id
@@ -2019,6 +2060,9 @@ class LabTestReportsGrid extends LabTestReports
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // lab_test_request_id
+            $this->lab_test_request_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -2086,6 +2130,21 @@ class LabTestReportsGrid extends LabTestReports
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
+            // lab_test_request_id
+            $this->lab_test_request_id->setupEditAttributes();
+            if ($this->lab_test_request_id->getSessionValue() != "") {
+                $this->lab_test_request_id->CurrentValue = GetForeignKeyValue($this->lab_test_request_id->getSessionValue());
+                $this->lab_test_request_id->OldValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->ViewValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->ViewValue = FormatNumber($this->lab_test_request_id->ViewValue, $this->lab_test_request_id->formatPattern());
+            } else {
+                $this->lab_test_request_id->EditValue = $this->lab_test_request_id->CurrentValue;
+                $this->lab_test_request_id->PlaceHolder = RemoveHtml($this->lab_test_request_id->caption());
+                if (strval($this->lab_test_request_id->EditValue) != "" && is_numeric($this->lab_test_request_id->EditValue)) {
+                    $this->lab_test_request_id->EditValue = FormatNumber($this->lab_test_request_id->EditValue, null);
+                }
+            }
+
             // Edit refer script
 
             // id
@@ -2099,6 +2158,9 @@ class LabTestReportsGrid extends LabTestReports
 
             // date_created
             $this->date_created->HrefValue = "";
+
+            // lab_test_request_id
+            $this->lab_test_request_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2142,6 +2204,14 @@ class LabTestReportsGrid extends LabTestReports
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+            }
+            if ($this->lab_test_request_id->Visible && $this->lab_test_request_id->Required) {
+                if (!$this->lab_test_request_id->IsDetailKey && EmptyValue($this->lab_test_request_id->FormValue)) {
+                    $this->lab_test_request_id->addErrorMessage(str_replace("%s", $this->lab_test_request_id->caption(), $this->lab_test_request_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->lab_test_request_id->FormValue)) {
+                $this->lab_test_request_id->addErrorMessage($this->lab_test_request_id->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2301,6 +2371,12 @@ class LabTestReportsGrid extends LabTestReports
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
+
+        // lab_test_request_id
+        if ($this->lab_test_request_id->getSessionValue() != "") {
+            $this->lab_test_request_id->ReadOnly = true;
+        }
+        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, $this->lab_test_request_id->ReadOnly);
         return $rsnew;
     }
 
@@ -2319,6 +2395,9 @@ class LabTestReportsGrid extends LabTestReports
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
         }
+        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
+            $this->lab_test_request_id->CurrentValue = $row['lab_test_request_id'];
+        }
     }
 
     // Add record
@@ -2327,9 +2406,9 @@ class LabTestReportsGrid extends LabTestReports
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "lab_test_requests_queue") {
-            $this->lab_test_requests_queue_id->Visible = true; // Need to insert foreign key
-            $this->lab_test_requests_queue_id->CurrentValue = $this->lab_test_requests_queue_id->getSessionValue();
+        if ($this->getCurrentMasterTable() == "lab_test_requests") {
+            $this->lab_test_request_id->Visible = true; // Need to insert foreign key
+            $this->lab_test_request_id->CurrentValue = $this->lab_test_request_id->getSessionValue();
         }
 
         // Get new row
@@ -2353,14 +2432,14 @@ class LabTestReportsGrid extends LabTestReports
         // Check if valid key values for master user
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
             $detailKeys = [];
-            $detailKeys["lab_test_requests_queue_id"] = $this->lab_test_requests_queue_id->CurrentValue;
-            $masterTable = Container("lab_test_requests_queue");
+            $detailKeys["lab_test_request_id"] = $this->lab_test_request_id->CurrentValue;
+            $masterTable = Container("lab_test_requests");
             $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
             if (!EmptyValue($masterFilter)) {
                 $validMasterKey = true;
                 if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
                     $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_requests_queue") {
+                } elseif ($this->getCurrentMasterTable() == "lab_test_requests") {
                     $validMasterKey = false;
                 }
                 if (!$validMasterKey) {
@@ -2421,10 +2500,8 @@ class LabTestReportsGrid extends LabTestReports
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
-        // lab_test_requests_queue_id
-        if ($this->lab_test_requests_queue_id->getSessionValue() != "") {
-            $rsnew['lab_test_requests_queue_id'] = $this->lab_test_requests_queue_id->getSessionValue();
-        }
+        // lab_test_request_id
+        $this->lab_test_request_id->setDbValueDef($rsnew, $this->lab_test_request_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2443,8 +2520,8 @@ class LabTestReportsGrid extends LabTestReports
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
-        if (isset($row['lab_test_requests_queue_id'])) { // lab_test_requests_queue_id
-            $this->lab_test_requests_queue_id->setFormValue($row['lab_test_requests_queue_id']);
+        if (isset($row['lab_test_request_id'])) { // lab_test_request_id
+            $this->lab_test_request_id->setFormValue($row['lab_test_request_id']);
         }
     }
 
@@ -2463,9 +2540,9 @@ class LabTestReportsGrid extends LabTestReports
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "lab_test_requests_queue") {
-            $masterTbl = Container("lab_test_requests_queue");
-            $this->lab_test_requests_queue_id->Visible = false;
+        if ($masterTblVar == "lab_test_requests") {
+            $masterTbl = Container("lab_test_requests");
+            $this->lab_test_request_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }

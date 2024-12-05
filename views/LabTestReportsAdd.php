@@ -22,7 +22,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["lab_test_requests_queue_id", [fields.lab_test_requests_queue_id.visible && fields.lab_test_requests_queue_id.required ? ew.Validators.required(fields.lab_test_requests_queue_id.caption) : null, ew.Validators.integer], fields.lab_test_requests_queue_id.isInvalid],
+            ["lab_test_request_id", [fields.lab_test_request_id.visible && fields.lab_test_request_id.required ? ew.Validators.required(fields.lab_test_request_id.caption) : null], fields.lab_test_request_id.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
@@ -40,6 +40,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "lab_test_request_id": <?= $Page->lab_test_request_id->toClientList($Page) ?>,
             "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
@@ -70,14 +71,48 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-add-div"><!-- page* -->
-<?php if ($Page->lab_test_requests_queue_id->Visible) { // lab_test_requests_queue_id ?>
-    <div id="r_lab_test_requests_queue_id"<?= $Page->lab_test_requests_queue_id->rowAttributes() ?>>
-        <label id="elh_lab_test_reports_lab_test_requests_queue_id" for="x_lab_test_requests_queue_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->lab_test_requests_queue_id->caption() ?><?= $Page->lab_test_requests_queue_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->lab_test_requests_queue_id->cellAttributes() ?>>
-<span id="el_lab_test_reports_lab_test_requests_queue_id">
-<input type="<?= $Page->lab_test_requests_queue_id->getInputTextType() ?>" name="x_lab_test_requests_queue_id" id="x_lab_test_requests_queue_id" data-table="lab_test_reports" data-field="x_lab_test_requests_queue_id" value="<?= $Page->lab_test_requests_queue_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->lab_test_requests_queue_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->lab_test_requests_queue_id->formatPattern()) ?>"<?= $Page->lab_test_requests_queue_id->editAttributes() ?> aria-describedby="x_lab_test_requests_queue_id_help">
-<?= $Page->lab_test_requests_queue_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->lab_test_requests_queue_id->getErrorMessage() ?></div>
+<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
+    <div id="r_lab_test_request_id"<?= $Page->lab_test_request_id->rowAttributes() ?>>
+        <label id="elh_lab_test_reports_lab_test_request_id" for="x_lab_test_request_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->lab_test_request_id->caption() ?><?= $Page->lab_test_request_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->lab_test_request_id->cellAttributes() ?>>
+<span id="el_lab_test_reports_lab_test_request_id">
+    <select
+        id="x_lab_test_request_id"
+        name="x_lab_test_request_id"
+        class="form-select ew-select<?= $Page->lab_test_request_id->isInvalidClass() ?>"
+        <?php if (!$Page->lab_test_request_id->IsNativeSelect) { ?>
+        data-select2-id="flab_test_reportsadd_x_lab_test_request_id"
+        <?php } ?>
+        data-table="lab_test_reports"
+        data-field="x_lab_test_request_id"
+        data-value-separator="<?= $Page->lab_test_request_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->lab_test_request_id->getPlaceHolder()) ?>"
+        <?= $Page->lab_test_request_id->editAttributes() ?>>
+        <?= $Page->lab_test_request_id->selectOptionListHtml("x_lab_test_request_id") ?>
+    </select>
+    <?= $Page->lab_test_request_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->lab_test_request_id->getErrorMessage() ?></div>
+<?= $Page->lab_test_request_id->Lookup->getParamTag($Page, "p_x_lab_test_request_id") ?>
+<?php if (!$Page->lab_test_request_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flab_test_reportsadd", function() {
+    var options = { name: "x_lab_test_request_id", selectId: "flab_test_reportsadd_x_lab_test_request_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flab_test_reportsadd.lists.lab_test_request_id?.lookupOptions.length) {
+        options.data = { id: "x_lab_test_request_id", form: "flab_test_reportsadd" };
+    } else {
+        options.ajax = { id: "x_lab_test_request_id", form: "flab_test_reportsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.lab_test_reports.fields.lab_test_request_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -153,6 +188,14 @@ loadjs.ready("flab_test_reportsadd", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("urinalysis_parameters", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_parameters->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("urinalysis_parameters", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "UrinalysisParametersGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="flab_test_reportsadd"><?= $Language->phrase("AddBtn") ?></button>

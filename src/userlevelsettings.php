@@ -157,7 +157,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","1","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","2","872"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","3","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","4","1997"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","4","2029"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","7","0"],
@@ -910,7 +910,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","4","2031"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters","9","0"]];
 
 /**
  * Tables
@@ -1002,4 +1013,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["medicine_stock_data","medicine_stock_data","medicine stock data",true,"{32536B8D-F37B-4419-80D5-260932800712}","medicinestockdatalist"],
     ["pharmacy_billing_report_details","pharmacy_billing_report_details","Pharmacy Bill",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacybillingreportdetailslist"],
     ["cash_payments","cash_payments","Cash Payments",true,"{32536B8D-F37B-4419-80D5-260932800712}","cashpaymentslist"],
-    ["cash_payments_report","cash_payments_report","Cash Payments Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","cashpaymentsreportlist"]];
+    ["cash_payments_report","cash_payments_report","Cash Payments Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","cashpaymentsreportlist"],
+    ["urinalysis_parameters","urinalysis_parameters","Test Parameters",true,"{32536B8D-F37B-4419-80D5-260932800712}","urinalysisparameterslist"]];

@@ -21,6 +21,17 @@ $lab_test_reports->TableClass = "table table-bordered table-hover table-sm ew-ta
 </td>
         </tr>
 <?php } ?>
+<?php if ($lab_test_reports->lab_test_request_id->Visible) { // lab_test_request_id ?>
+        <tr id="r_lab_test_request_id"<?= $lab_test_reports->lab_test_request_id->rowAttributes() ?>>
+            <td class="<?= $lab_test_reports->TableLeftColumnClass ?>"><?= $lab_test_reports->lab_test_request_id->caption() ?></td>
+            <td<?= $lab_test_reports->lab_test_request_id->cellAttributes() ?>>
+<span id="el_lab_test_reports_lab_test_request_id">
+<span<?= $lab_test_reports->lab_test_request_id->viewAttributes() ?>>
+<?= $lab_test_reports->lab_test_request_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($lab_test_reports->details->Visible) { // details ?>
         <tr id="r_details"<?= $lab_test_reports->details->rowAttributes() ?>>
             <td class="<?= $lab_test_reports->TableLeftColumnClass ?>"><?= $lab_test_reports->details->caption() ?></td>

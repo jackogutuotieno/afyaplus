@@ -42,8 +42,8 @@ class LaboratoryMinorReport extends AbstractEntity
     #[Column(type: "string")]
     private string $subcategory;
 
-    #[Column(type: "text")]
-    private string $details;
+    #[Column(type: "text", nullable: true)]
+    private ?string $details;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -92,12 +92,12 @@ class LaboratoryMinorReport extends AbstractEntity
         return $this;
     }
 
-    public function getDetails(): string
+    public function getDetails(): ?string
     {
         return HtmlDecode($this->details);
     }
 
-    public function setDetails(string $value): static
+    public function setDetails(?string $value): static
     {
         $this->details = RemoveXss($value);
         return $this;
