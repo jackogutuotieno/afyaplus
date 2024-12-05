@@ -1628,8 +1628,14 @@ class PharmacyBillingReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $current_date = CurrentDate();
+        if ($this->date_created->CurrentValue > $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->status->ViewValue = "New Dispense"; 
+        } else if ($this->date_created->CurrentValue < $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
+            $this->status->ViewValue = "Past Dispense"; 
+        } 
     }
 
     // User ID Filtering event

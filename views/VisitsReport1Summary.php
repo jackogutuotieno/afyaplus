@@ -21,6 +21,9 @@ loadjs.ready("head", function () {
 <a id="top"></a>
 <!-- Content Container -->
 <div id="ew-report" class="ew-report container-fluid">
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <div class="btn-toolbar ew-toolbar">
 <?php
 if (!$Page->DrillDownInPanel) {
@@ -31,6 +34,171 @@ if (!$Page->DrillDownInPanel) {
 ?>
 </div>
 <?php if (!$Page->isExport() && !$Page->DrillDown && !$DashboardReport) { ?>
+<form name="fVisits_Report1srch" id="fVisits_Report1srch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fVisits_Report1srch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<script>
+var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
+ew.deepAssign(ew.vars, { tables: { Visits_Report1: currentTable } });
+var currentPageID = ew.PAGE_ID = "summary";
+var currentForm;
+var fVisits_Report1srch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("fVisits_Report1srch")
+        .setPageId("summary")
+<?php if ($Page->UseAjaxActions) { ?>
+        .setSubmitWithFetch(true)
+<?php } ?>
+
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
+        // Dynamic selection lists
+        .setLists({
+            "payment_method": <?= $Page->payment_method->toClientList($Page) ?>,
+            "company": <?= $Page->company->toClientList($Page) ?>,
+        })
+
+        // Filters
+        .setFilterList(<?= $Page->getFilterList() ?>)
+        .build();
+    window[form.id] = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->payment_method->Visible) { // payment_method ?>
+<?php
+if (!$Page->payment_method->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_payment_method" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->payment_method->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_payment_method"
+            name="x_payment_method[]"
+            class="form-control ew-select<?= $Page->payment_method->isInvalidClass() ?>"
+            data-select2-id="fVisits_Report1srch_x_payment_method"
+            data-table="Visits_Report1"
+            data-field="x_payment_method"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->payment_method->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->payment_method->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->payment_method->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->payment_method->editAttributes() ?>>
+            <?= $Page->payment_method->selectOptionListHtml("x_payment_method", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->payment_method->getErrorMessage() ?></div>
+        <script>
+        loadjs.ready("fVisits_Report1srch", function() {
+            var options = {
+                name: "x_payment_method",
+                selectId: "fVisits_Report1srch_x_payment_method",
+                ajax: { id: "x_payment_method", form: "fVisits_Report1srch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.Visits_Report1.fields.payment_method.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->company->Visible) { // company ?>
+<?php
+if (!$Page->company->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_company" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->company->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_company"
+            name="x_company[]"
+            class="form-control ew-select<?= $Page->company->isInvalidClass() ?>"
+            data-select2-id="fVisits_Report1srch_x_company"
+            data-table="Visits_Report1"
+            data-field="x_company"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->company->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->company->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->company->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->company->editAttributes() ?>>
+            <?= $Page->company->selectOptionListHtml("x_company", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->company->getErrorMessage() ?></div>
+        <script>
+        loadjs.ready("fVisits_Report1srch", function() {
+            var options = {
+                name: "x_company",
+                selectId: "fVisits_Report1srch_x_company",
+                ajax: { id: "x_company", form: "fVisits_Report1srch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.Visits_Report1.fields.company.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->SearchColumnCount > 0) { ?>
+   <div class="col-sm-auto mb-3">
+       <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+   </div>
+<?php } ?>
+</div><!-- /.row -->
+</div><!-- /.ew-extended-search -->
+<?php } ?>
+<?php } ?>
+</div><!-- /.ew-search-panel -->
+</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php

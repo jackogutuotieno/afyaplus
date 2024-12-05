@@ -242,8 +242,11 @@ class VisitsReport1 extends ReportTable
         $this->payment_method->InputTextType = "text";
         $this->payment_method->Nullable = false; // NOT NULL field
         $this->payment_method->Required = true; // Required field
+        $this->payment_method->UseFilter = true; // Table header filter
+        $this->payment_method->Lookup = new Lookup($this->payment_method, 'Visits_Report1', true, 'payment_method', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->payment_method->SourceTableVar = 'visits_report';
+        $this->payment_method->SearchType = "dropdown";
         $this->Fields['payment_method'] = &$this->payment_method;
 
         // company
@@ -267,8 +270,11 @@ class VisitsReport1 extends ReportTable
         $this->company->InputTextType = "text";
         $this->company->Nullable = false; // NOT NULL field
         $this->company->Required = true; // Required field
+        $this->company->UseFilter = true; // Table header filter
+        $this->company->Lookup = new Lookup($this->company, 'Visits_Report1', true, 'company', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->company->SourceTableVar = 'visits_report';
+        $this->company->SearchType = "dropdown";
         $this->Fields['company'] = &$this->company;
 
         // date_created
@@ -349,7 +355,7 @@ class VisitsReport1 extends ReportTable
         $this->Fields['visit_month'] = &$this->visit_month;
 
         // Visits by Month
-        $this->VisitsbyMonth = new DbChart($this, 'VisitsbyMonth', 'Visits by Month', 'visit_month', 'visit_month', 1001, '', 0, 'COUNT', 600, 500);
+        $this->VisitsbyMonth = new DbChart($this, 'VisitsbyMonth', 'Visits by Month', 'visit_month', 'visit_month', 1007, '', 0, 'COUNT', 600, 500);
         $this->VisitsbyMonth->Position = 4;
         $this->VisitsbyMonth->PageBreakType = "before";
         $this->VisitsbyMonth->YAxisFormat = [""];
@@ -362,7 +368,7 @@ class VisitsReport1 extends ReportTable
         $this->VisitsbyMonth->SeriesDateType = "";
         $this->VisitsbyMonth->ID = "Visits_Report1_VisitsbyMonth"; // Chart ID
         $this->VisitsbyMonth->setParameters([
-            ["type", "1001"],
+            ["type", "1007"],
             ["seriestype", "0"]
         ]); // Chart type / Chart series type
         $this->VisitsbyMonth->setParameters([
@@ -380,7 +386,7 @@ class VisitsReport1 extends ReportTable
         $this->Charts[$this->VisitsbyMonth->ID] = &$this->VisitsbyMonth;
 
         // Visits by Medical Scheme
-        $this->VisitsbyMedicalScheme = new DbChart($this, 'VisitsbyMedicalScheme', 'Visits by Medical Scheme', 'company', 'company', 1001, '', 0, 'COUNT', 600, 500);
+        $this->VisitsbyMedicalScheme = new DbChart($this, 'VisitsbyMedicalScheme', 'Visits by Medical Scheme', 'company', 'company', 1003, '', 0, 'COUNT', 600, 500);
         $this->VisitsbyMedicalScheme->Position = 4;
         $this->VisitsbyMedicalScheme->PageBreakType = "before";
         $this->VisitsbyMedicalScheme->YAxisFormat = [""];
@@ -393,7 +399,7 @@ class VisitsReport1 extends ReportTable
         $this->VisitsbyMedicalScheme->SeriesDateType = "";
         $this->VisitsbyMedicalScheme->ID = "Visits_Report1_VisitsbyMedicalScheme"; // Chart ID
         $this->VisitsbyMedicalScheme->setParameters([
-            ["type", "1001"],
+            ["type", "1003"],
             ["seriestype", "0"]
         ]); // Chart type / Chart series type
         $this->VisitsbyMedicalScheme->setParameters([

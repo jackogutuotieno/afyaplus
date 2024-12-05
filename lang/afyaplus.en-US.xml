@@ -2169,7 +2169,7 @@
         <phrase id="fldcaption" value="Payment Method" />
       </field>
       <field id="company">
-        <phrase id="fldcaption" value="Company" />
+        <phrase id="fldcaption" value="Medical Scheme" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Visit Date" />

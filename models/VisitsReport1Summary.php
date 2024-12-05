@@ -470,15 +470,27 @@ class VisitsReport1Summary extends VisitsReport1
             $this->setupBreadcrumb();
         }
 
+        // Check if search command
+        $this->SearchCommand = (Get("cmd", "") == "search");
+
         // Load custom filters
         $this->pageFilterLoad();
+
+        // Process filter list
+        if ($this->processFilterList()) {
+            $this->terminate();
+            return;
+        }
 
         // Extended filter
         $extendedFilter = "";
 
-        // No filter
-        $this->FilterOptions["savecurrentfilter"]->Visible = false;
-        $this->FilterOptions["deletefilter"]->Visible = false;
+        // Restore filter list
+        $this->restoreFilterList();
+
+        // Build extended filter
+        $extendedFilter = $this->getExtendedFilter();
+        AddFilter($this->SearchWhere, $extendedFilter);
 
         // Call Page Selecting event
         $this->pageSelecting($this->SearchWhere);
@@ -666,7 +678,22 @@ class VisitsReport1Summary extends VisitsReport1
         // date_created
 
         // date_updated
-        if ($this->RowType == RowType::SEARCH) { // Search row
+        if ($this->RowType == RowType::SEARCH) {
+            // payment_method
+            if ($this->payment_method->UseFilter && !EmptyValue($this->payment_method->AdvancedSearch->SearchValue)) {
+                if (is_array($this->payment_method->AdvancedSearch->SearchValue)) {
+                    $this->payment_method->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method->AdvancedSearch->SearchValue);
+                }
+                $this->payment_method->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method->AdvancedSearch->SearchValue);
+            }
+
+            // company
+            if ($this->company->UseFilter && !EmptyValue($this->company->AdvancedSearch->SearchValue)) {
+                if (is_array($this->company->AdvancedSearch->SearchValue)) {
+                    $this->company->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->company->AdvancedSearch->SearchValue);
+                }
+                $this->company->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->company->AdvancedSearch->SearchValue);
+            }
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
 
@@ -977,6 +1004,15 @@ class VisitsReport1Summary extends VisitsReport1
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        } else {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        }
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
+
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -1000,7 +1036,7 @@ class VisitsReport1Summary extends VisitsReport1
     // Check if any search fields
     public function hasSearchFields()
     {
-        return false;
+        return $this->payment_method->Visible || $this->company->Visible;
     }
 
     // Render search options
@@ -1071,10 +1107,10 @@ class VisitsReport1Summary extends VisitsReport1
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fVisits_Report1srch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fVisits_Report1srch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1203,6 +1239,280 @@ class VisitsReport1Summary extends VisitsReport1
             $this->setStartGroup(1);
         }
         return $this->getOrderBy();
+    }
+
+    // Return extended filter
+    protected function getExtendedFilter()
+    {
+        $filter = "";
+        if ($this->DrillDown) {
+            return "";
+        }
+        $restoreSession = false;
+        $restoreDefault = false;
+        // Reset search command
+        if (Get("cmd") == "reset") {
+            // Set default values
+            $this->payment_method->AdvancedSearch->unsetSession();
+            $this->company->AdvancedSearch->unsetSession();
+            $restoreDefault = true;
+        } else {
+            $restoreSession = !$this->SearchCommand;
+
+            // Field payment_method
+            $this->getDropDownValue($this->payment_method);
+
+            // Field company
+            $this->getDropDownValue($this->company);
+            if (!$this->validateForm()) {
+                return $filter;
+            }
+        }
+
+        // Restore session
+        if ($restoreSession) {
+            $restoreDefault = true;
+            if ($this->payment_method->AdvancedSearch->issetSession()) { // Field payment_method
+                $this->payment_method->AdvancedSearch->load();
+                $restoreDefault = false;
+            }
+            if ($this->company->AdvancedSearch->issetSession()) { // Field company
+                $this->company->AdvancedSearch->load();
+                $restoreDefault = false;
+            }
+        }
+
+        // Restore default
+        if ($restoreDefault) {
+            $this->loadDefaultFilters();
+        }
+
+        // Call page filter validated event
+        $this->pageFilterValidated();
+
+        // Build SQL and save to session
+        $this->buildDropDownFilter($this->payment_method, $filter, false, true); // Field payment_method
+        $this->payment_method->AdvancedSearch->save();
+        $this->buildDropDownFilter($this->company, $filter, false, true); // Field company
+        $this->company->AdvancedSearch->save();
+        return $filter;
+    }
+
+    // Build dropdown filter
+    protected function buildDropDownFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
+    {
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        if (!EmptyValue($fld->DateFilter)) {
+            $fldVal2 = "";
+        } elseif ($fld->UseFilter) {
+            $fldOpr = "";
+            $fldVal2 = "";
+        }
+        $sql = "";
+        if (is_array($fldVal)) {
+            foreach ($fldVal as $val) {
+                $wrk = DropDownFilter($fld, $val, $fldOpr, $this->Dbid);
+
+                // Call Page Filtering event
+                if (StartsString("@@", $val)) {
+                    $this->pageFiltering($fld, $wrk, "custom", substr($val, 2));
+                } else {
+                    $this->pageFiltering($fld, $wrk, "dropdown", $fldOpr, $val);
+                }
+                AddFilter($sql, $wrk, "OR");
+            }
+        } else {
+            $sql = DropDownFilter($fld, $fldVal, $fldOpr, $this->Dbid, $fldVal2);
+
+            // Call Page Filtering event
+            if (StartsString("@@", $fldVal)) {
+                $this->pageFiltering($fld, $sql, "custom", substr($fldVal, 2));
+            } else {
+                $this->pageFiltering($fld, $sql, "dropdown", $fldOpr, $fldVal, "", "", $fldVal2);
+            }
+        }
+        if ($sql != "") {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+            AddFilter($filterClause, $sql, $cond);
+            if ($saveFilter) {
+                $fld->CurrentFilter = $sql;
+            }
+        }
+    }
+
+    // Build extended filter
+    protected function buildExtendedFilter(&$fld, &$filterClause, $default = false, $saveFilter = false)
+    {
+        $wrk = GetReportFilter($fld, $default, $this->Dbid);
+        if (!$default) {
+            $this->pageFiltering($fld, $wrk, "extended", $fld->AdvancedSearch->SearchOperator, $fld->AdvancedSearch->SearchValue, $fld->AdvancedSearch->SearchCondition, $fld->AdvancedSearch->SearchOperator2, $fld->AdvancedSearch->SearchValue2);
+        }
+        if ($wrk != "") {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+            AddFilter($filterClause, $wrk, $cond);
+            if ($saveFilter) {
+                $fld->CurrentFilter = $wrk;
+            }
+        }
+    }
+
+    // Get drop down value from querystring
+    protected function getDropDownValue(&$fld)
+    {
+        if (IsPost()) {
+            return false; // Skip post back
+        }
+        $res = false;
+        $parm = $fld->Param;
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        $opr = Get("z_$parm");
+        if ($opr !== null) {
+            $fld->AdvancedSearch->SearchOperator = $opr;
+        }
+        $val = Get("x_$parm");
+        if ($val !== null) {
+            if (is_array($val)) {
+                $val = implode($sep, $val);
+            }
+            $fld->AdvancedSearch->setSearchValue($val);
+            $res = true;
+        }
+        $val2 = Get("y_$parm");
+        if ($val2 !== null) {
+            if (is_array($val2)) {
+                $val2 = implode($sep, $val2);
+            }
+            $fld->AdvancedSearch->setSearchValue2($val2);
+            $res = true;
+        }
+        return $res;
+    }
+
+    // Dropdown filter exist
+    protected function dropDownFilterExist(&$fld)
+    {
+        $wrk = "";
+        $this->buildDropDownFilter($fld, $wrk);
+        return ($wrk != "");
+    }
+
+    // Extended filter exist
+    protected function extendedFilterExist(&$fld)
+    {
+        $extWrk = "";
+        $this->buildExtendedFilter($fld, $extWrk);
+        return ($extWrk != "");
+    }
+
+    // Validate form
+    protected function validateForm()
+    {
+        global $Language;
+
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateForm = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateForm;
+    }
+
+    // Load default value for filters
+    protected function loadDefaultFilters()
+    {
+        // Field payment_method
+        $this->payment_method->AdvancedSearch->loadDefault();
+
+        // Field company
+        $this->company->AdvancedSearch->loadDefault();
+    }
+
+    // Show list of filters
+    public function showFilterList()
+    {
+        global $Language;
+
+        // Initialize
+        $filterList = "";
+        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
+        $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Show Filters
+        if ($filterList != "") {
+            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
+                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
+            $this->messageShowing($message, "");
+            Write($message);
+        } else { // Output empty tag
+            Write("<div id=\"ew-filter-list\"></div>");
+        }
+    }
+
+    // Get list of filters
+    public function getFilterList()
+    {
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fVisits_Report1srch");
+        }
+
+        // Return filter list in json
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            Profile()->setSearchFilters("fVisits_Report1srch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd", "") != "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter", ""), true);
+        return $this->setupFilterList($filter);
+    }
+
+    // Setup list of filters
+    protected function setupFilterList($filter)
+    {
+        if (!is_array($filter)) {
+            return false;
+        }
+        return true;
     }
 
     // Page Load event
