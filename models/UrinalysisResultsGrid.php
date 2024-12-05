@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class UrinalysisParametersGrid extends UrinalysisParameters
+class UrinalysisResultsGrid extends UrinalysisResults
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "UrinalysisParametersGrid";
+    public $PageObjName = "UrinalysisResultsGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "furinalysis_parametersgrid";
+    public $FormName = "furinalysis_resultsgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "urinalysisparametersgrid";
+    public $CurrentPageName = "urinalysisresultsgrid";
 
     // Page URLs
     public $AddUrl;
@@ -140,8 +140,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->parameter->setVisibility();
         $this->result->setVisibility();
         $this->comments->setVisibility();
-        $this->date_created->Visible = false;
-        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -152,8 +150,8 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'urinalysis_parameters';
-        $this->TableName = 'urinalysis_parameters';
+        $this->TableVar = 'urinalysis_results';
+        $this->TableName = 'urinalysis_results';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -177,15 +175,15 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Language object
         $Language = Container("app.language");
 
-        // Table object (urinalysis_parameters)
-        if (!isset($GLOBALS["urinalysis_parameters"]) || $GLOBALS["urinalysis_parameters"]::class == PROJECT_NAMESPACE . "urinalysis_parameters") {
-            $GLOBALS["urinalysis_parameters"] = &$this;
+        // Table object (urinalysis_results)
+        if (!isset($GLOBALS["urinalysis_results"]) || $GLOBALS["urinalysis_results"]::class == PROJECT_NAMESPACE . "urinalysis_results") {
+            $GLOBALS["urinalysis_results"] = &$this;
         }
-        $this->AddUrl = "urinalysisparametersadd";
+        $this->AddUrl = "urinalysisresultsadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'urinalysis_parameters');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'urinalysis_results');
         }
 
         // Start timer
@@ -622,15 +620,12 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->parameter);
-
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "furinalysis_parametersgrid";
+            $this->FormName = "furinalysis_resultsgrid";
         }
 
         // Set up page action
@@ -679,7 +674,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
             if ($this->isGridAdd() || $this->isGridEdit()) {
                 $item = $this->ListOptions["griddelete"];
                 if ($item) {
-                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                    $item->Visible = false;
                 }
             }
         }
@@ -703,24 +698,17 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_reports") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_reports"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
-            $masterTbl = Container("lab_test_reports");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTbl = Container("patients_lab_report");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestreportslist"); // Return to master page
+                $this->terminate("patientslabreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1287,24 +1275,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
-
         // "sequence"
         $item = &$this->ListOptions->add("sequence");
         $item->CssClass = "text-nowrap";
@@ -1374,7 +1344,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                 $options = &$this->ListOptions;
                 $options->UseButtonGroup = true; // Use button group for grid delete button
                 $opt = $options["griddelete"];
-                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
                     $opt->Body = "&nbsp;";
                 } else {
                     $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
@@ -1385,48 +1355,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // "sequence"
         $opt = $this->ListOptions["sequence"];
         $opt->Body = FormatSequenceNumber($this->RecordCount);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
         $this->renderListOptionsExt();
 
@@ -1449,19 +1378,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
-
-        // Add
-        if ($this->CurrentMode == "view") { // Check view mode
-            $item = &$option->add("add");
-            $addcaption = HtmlTitle($Language->phrase("AddLink"));
-            $this->AddUrl = $this->getAddUrl();
-            if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-            } else {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-            }
-            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        }
     }
 
     // Active user filter
@@ -1499,7 +1415,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                     $option->UseDropDownButton = false;
                     $item = &$option->add("addblankrow");
                     $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = $Security->canAdd();
+                    $item->Visible = false;
                     $this->ShowOtherOptions = $item->Visible;
                 }
             }
@@ -1553,7 +1469,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_urinalysis_parameters", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_urinalysis_results", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1641,7 +1557,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_urinalysis_parameters",
+            "id" => "r" . $this->RowCount . "_urinalysis_results",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1832,8 +1748,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->parameter->setDbValue($row['parameter']);
         $this->result->setDbValue($row['result']);
         $this->comments->setDbValue($row['comments']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -1845,8 +1759,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $row['parameter'] = $this->parameter->DefaultValue;
         $row['result'] = $this->result->DefaultValue;
         $row['comments'] = $this->comments->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -1895,10 +1807,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
         // comments
 
-        // date_created
-
-        // date_updated
-
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -1909,11 +1817,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
             $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
 
             // parameter
-            if (strval($this->parameter->CurrentValue) != "") {
-                $this->parameter->ViewValue = $this->parameter->optionCaption($this->parameter->CurrentValue);
-            } else {
-                $this->parameter->ViewValue = null;
-            }
+            $this->parameter->ViewValue = $this->parameter->CurrentValue;
 
             // result
             $this->result->ViewValue = $this->result->CurrentValue;
@@ -1935,7 +1839,10 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         } elseif ($this->RowType == RowType::ADD) {
             // parameter
             $this->parameter->setupEditAttributes();
-            $this->parameter->EditValue = $this->parameter->options(true);
+            if (!$this->parameter->Raw) {
+                $this->parameter->CurrentValue = HtmlDecode($this->parameter->CurrentValue);
+            }
+            $this->parameter->EditValue = HtmlEncode($this->parameter->CurrentValue);
             $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
 
             // result
@@ -1967,7 +1874,10 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         } elseif ($this->RowType == RowType::EDIT) {
             // parameter
             $this->parameter->setupEditAttributes();
-            $this->parameter->EditValue = $this->parameter->options(true);
+            if (!$this->parameter->Raw) {
+                $this->parameter->CurrentValue = HtmlDecode($this->parameter->CurrentValue);
+            }
+            $this->parameter->EditValue = HtmlEncode($this->parameter->CurrentValue);
             $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
 
             // result
@@ -2216,7 +2126,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "lab_test_reports") {
+        if ($this->getCurrentMasterTable() == "patients_lab_report") {
             $this->lab_test_reports_id->Visible = true; // Need to insert foreign key
             $this->lab_test_reports_id->CurrentValue = $this->lab_test_reports_id->getSessionValue();
         }
@@ -2226,28 +2136,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["lab_test_reports_id"] = $this->lab_test_reports_id->CurrentValue;
-            $masterTable = Container("lab_test_reports");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_reports") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2330,8 +2218,8 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "lab_test_reports") {
-            $masterTbl = Container("lab_test_reports");
+        if ($masterTblVar == "patients_lab_report") {
+            $masterTbl = Container("patients_lab_report");
             $this->lab_test_reports_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
@@ -2354,8 +2242,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_parameter":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2388,10 +2274,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add parameter");
+        //Log("Page Load");
     }
 
     // Page Unload event

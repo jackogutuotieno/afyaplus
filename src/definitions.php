@@ -175,6 +175,9 @@ return [
     "cash_payments" => \DI\create(CashPayments::class),
     "cash_payments_report" => \DI\create(CashPaymentsReport::class),
     "urinalysis_parameters" => \DI\create(UrinalysisParameters::class),
+    "patients_lab_report" => \DI\create(PatientsLabReport::class),
+    "urinalysis_results" => \DI\create(UrinalysisResults::class),
+    "full_haemogram_parameters" => \DI\create(FullHaemogramParameters::class),
 
     // User table
     "usertable" => \DI\get("users"),

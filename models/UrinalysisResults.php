@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for patient_visits
+ * Table class for urinalysis_results
  */
-class PatientVisits extends DbTable
+class UrinalysisResults extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,14 +47,10 @@ class PatientVisits extends DbTable
 
     // Fields
     public $id;
-    public $patient_id;
-    public $visit_type_id;
-    public $payment_method_id;
-    public $medical_scheme_id;
-    public $user_role;
-    public $date_created;
-    public $date_updated;
-    public $status;
+    public $lab_test_reports_id;
+    public $parameter;
+    public $result;
+    public $comments;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -67,14 +63,14 @@ class PatientVisits extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "patient_visits";
-        $this->TableName = 'patient_visits';
-        $this->TableType = "TABLE";
+        $this->TableVar = "urinalysis_results";
+        $this->TableName = 'urinalysis_results';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "patient_visits";
+        $this->UpdateTable = "urinalysis_results";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -93,7 +89,7 @@ class PatientVisits extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -123,230 +119,109 @@ class PatientVisits extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_id
-        $this->patient_id = new DbField(
+        // lab_test_reports_id
+        $this->lab_test_reports_id = new DbField(
             $this, // Table
-            'x_patient_id', // Variable name
-            'patient_id', // Name
-            '`patient_id`', // Expression
-            '`patient_id`', // Basic search expression
+            'x_lab_test_reports_id', // Variable name
+            'lab_test_reports_id', // Name
+            '`lab_test_reports_id`', // Expression
+            '`lab_test_reports_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`patient_id`', // Virtual expression
+            '`lab_test_reports_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->patient_id->InputTextType = "text";
-        $this->patient_id->Raw = true;
-        $this->patient_id->IsForeignKey = true; // Foreign key field
-        $this->patient_id->Nullable = false; // NOT NULL field
-        $this->patient_id->Required = true; // Required field
-        $this->patient_id->setSelectMultiple(false); // Select one
-        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_id'] = &$this->patient_id;
+        $this->lab_test_reports_id->InputTextType = "text";
+        $this->lab_test_reports_id->Raw = true;
+        $this->lab_test_reports_id->IsForeignKey = true; // Foreign key field
+        $this->lab_test_reports_id->Nullable = false; // NOT NULL field
+        $this->lab_test_reports_id->Required = true; // Required field
+        $this->lab_test_reports_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lab_test_reports_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['lab_test_reports_id'] = &$this->lab_test_reports_id;
 
-        // visit_type_id
-        $this->visit_type_id = new DbField(
+        // parameter
+        $this->parameter = new DbField(
             $this, // Table
-            'x_visit_type_id', // Variable name
-            'visit_type_id', // Name
-            '`visit_type_id`', // Expression
-            '`visit_type_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`visit_type_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->visit_type_id->InputTextType = "text";
-        $this->visit_type_id->Raw = true;
-        $this->visit_type_id->Nullable = false; // NOT NULL field
-        $this->visit_type_id->Required = true; // Required field
-        $this->visit_type_id->setSelectMultiple(false); // Select one
-        $this->visit_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->visit_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->visit_type_id->Lookup = new Lookup($this->visit_type_id, 'visit_types', false, 'id', ["visit_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "`visit_type`");
-        $this->visit_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_type_id'] = &$this->visit_type_id;
-
-        // payment_method_id
-        $this->payment_method_id = new DbField(
-            $this, // Table
-            'x_payment_method_id', // Variable name
-            'payment_method_id', // Name
-            '`payment_method_id`', // Expression
-            '`payment_method_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`payment_method_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->payment_method_id->InputTextType = "text";
-        $this->payment_method_id->Raw = true;
-        $this->payment_method_id->Nullable = false; // NOT NULL field
-        $this->payment_method_id->Required = true; // Required field
-        $this->payment_method_id->setSelectMultiple(false); // Select one
-        $this->payment_method_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->payment_method_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', false, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
-        $this->payment_method_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->payment_method_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['payment_method_id'] = &$this->payment_method_id;
-
-        // medical_scheme_id
-        $this->medical_scheme_id = new DbField(
-            $this, // Table
-            'x_medical_scheme_id', // Variable name
-            'medical_scheme_id', // Name
-            '`medical_scheme_id`', // Expression
-            '`medical_scheme_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`medical_scheme_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->medical_scheme_id->InputTextType = "text";
-        $this->medical_scheme_id->Raw = true;
-        $this->medical_scheme_id->setSelectMultiple(false); // Select one
-        $this->medical_scheme_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->medical_scheme_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', false, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
-        $this->medical_scheme_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->medical_scheme_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['medical_scheme_id'] = &$this->medical_scheme_id;
-
-        // user_role
-        $this->user_role = new DbField(
-            $this, // Table
-            'x_user_role', // Variable name
-            'user_role', // Name
-            '`user_role`', // Expression
-            '`user_role`', // Basic search expression
+            'x_parameter', // Variable name
+            'parameter', // Name
+            '`parameter`', // Expression
+            '`parameter`', // Basic search expression
             200, // Type
             100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`user_role`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'HIDDEN' // Edit Tag
-        );
-        $this->user_role->addMethod("getAutoUpdateValue", fn() => CurrentUserLevel());
-        $this->user_role->InputTextType = "text";
-        $this->user_role->Nullable = false; // NOT NULL field
-        $this->user_role->Sortable = false; // Allow sort
-        $this->user_role->SearchOperators = ["=", "<>"];
-        $this->Fields['user_role'] = &$this->user_role;
-
-        // date_created
-        $this->date_created = new DbField(
-            $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_created`', // Virtual expression
+            '`parameter`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
+        $this->parameter->InputTextType = "text";
+        $this->parameter->Nullable = false; // NOT NULL field
+        $this->parameter->Required = true; // Required field
+        $this->parameter->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['parameter'] = &$this->parameter;
 
-        // date_updated
-        $this->date_updated = new DbField(
+        // result
+        $this->result = new DbField(
             $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
-
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '\'\'', // Expression
-            '\'\'', // Basic search expression
+            'x_result', // Variable name
+            'result', // Name
+            '`result`', // Expression
+            '`result`', // Basic search expression
             200, // Type
-            0, // Size
+            20, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '\'\'', // Virtual expression
+            '`result`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->status->InputTextType = "text";
-        $this->status->IsCustom = true; // Custom field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['status'] = &$this->status;
+        $this->result->InputTextType = "text";
+        $this->result->Nullable = false; // NOT NULL field
+        $this->result->Required = true; // Required field
+        $this->result->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['result'] = &$this->result;
+
+        // comments
+        $this->comments = new DbField(
+            $this, // Table
+            'x_comments', // Variable name
+            'comments', // Name
+            '`comments`', // Expression
+            '`comments`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`comments`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->comments->InputTextType = "text";
+        $this->comments->Nullable = false; // NOT NULL field
+        $this->comments->Required = true; // Required field
+        $this->comments->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['comments'] = &$this->comments;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -422,10 +297,10 @@ class PatientVisits extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "patients") {
-            $masterTable = Container("patients");
-            if ($this->patient_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->patient_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+        if ($this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTable = Container("patients_lab_report");
+            if ($this->lab_test_reports_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_reports_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
             } else {
                 return "";
             }
@@ -438,10 +313,10 @@ class PatientVisits extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "patients") {
-            $masterTable = Container("patients");
-            if ($this->patient_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+        if ($this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTable = Container("patients_lab_report");
+            if ($this->lab_test_reports_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_reports_id, $this->lab_test_reports_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
                 return "";
             }
@@ -460,8 +335,8 @@ class PatientVisits extends DbTable
     {
         $validKeys = true;
         switch ($masterTable->TableVar) {
-            case "patients":
-                $key = $keys["patient_id"] ?? "";
+            case "patients_lab_report":
+                $key = $keys["lab_test_reports_id"] ?? "";
                 if (EmptyValue($key)) {
                     if ($masterTable->id->Required) { // Required field and empty value
                         return ""; // Return empty filter
@@ -471,7 +346,7 @@ class PatientVisits extends DbTable
                     return ""; // Return empty filter
                 }
                 if ($validKeys) {
-                    return GetKeyFilter($masterTable->id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_reports_id"], $this->lab_test_reports_id->DataType, $this->Dbid);
                 }
                 break;
         }
@@ -482,82 +357,10 @@ class PatientVisits extends DbTable
     public function getDetailFilter($masterTable)
     {
         switch ($masterTable->TableVar) {
-            case "patients":
-                return GetKeyFilter($this->patient_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+            case "patients_lab_report":
+                return GetKeyFilter($this->lab_test_reports_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
-    }
-
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "patient_queue") {
-            $detailUrl = Container("patient_queue")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "patient_vitals") {
-            $detailUrl = Container("patient_vitals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "doctor_notes") {
-            $detailUrl = Container("doctor_notes")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "prescriptions") {
-            $detailUrl = Container("prescriptions")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "radiology_requests") {
-            $detailUrl = Container("radiology_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "invoices") {
-            $detailUrl = Container("invoices")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "patient_vaccinations") {
-            $detailUrl = Container("patient_vaccinations")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "cash_payments") {
-            $detailUrl = Container("cash_payments")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "lab_test_requests") {
-            $detailUrl = Container("lab_test_requests")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "patients_lab_report") {
-            $detailUrl = Container("patients_lab_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "patientvisitslist";
-        }
-        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -569,7 +372,7 @@ class PatientVisits extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "patient_visits";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "urinalysis_results";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -593,7 +396,20 @@ class PatientVisits extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, '' AS `status`";
+        $useFieldNames = false;
+        $fieldNames = [];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($this->Fields as $field) {
+            $expr = $field->Expression;
+            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
+            if ($customExpr != $expr) {
+                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
+                $useFieldNames = true;
+            } else {
+                $fieldNames[] = $expr;
+            }
+        }
+        return $useFieldNames ? implode(", ", $fieldNames) : "*";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -1008,14 +824,10 @@ class PatientVisits extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_id->DbValue = $row['patient_id'];
-        $this->visit_type_id->DbValue = $row['visit_type_id'];
-        $this->payment_method_id->DbValue = $row['payment_method_id'];
-        $this->medical_scheme_id->DbValue = $row['medical_scheme_id'];
-        $this->user_role->DbValue = $row['user_role'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
-        $this->status->DbValue = $row['status'];
+        $this->lab_test_reports_id->DbValue = $row['lab_test_reports_id'];
+        $this->parameter->DbValue = $row['parameter'];
+        $this->result->DbValue = $row['result'];
+        $this->comments->DbValue = $row['comments'];
     }
 
     // Delete uploaded files
@@ -1089,7 +901,7 @@ class PatientVisits extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("patientvisitslist");
+        return $_SESSION[$name] ?? GetUrl("urinalysisresultslist");
     }
 
     // Set return page URL
@@ -1103,9 +915,9 @@ class PatientVisits extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "patientvisitsview" => $Language->phrase("View"),
-            "patientvisitsedit" => $Language->phrase("Edit"),
-            "patientvisitsadd" => $Language->phrase("Add"),
+            "urinalysisresultsview" => $Language->phrase("View"),
+            "urinalysisresultsedit" => $Language->phrase("Edit"),
+            "urinalysisresultsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1113,18 +925,18 @@ class PatientVisits extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "patientvisitslist";
+        return "urinalysisresultslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "PatientVisitsView",
-            Config("API_ADD_ACTION") => "PatientVisitsAdd",
-            Config("API_EDIT_ACTION") => "PatientVisitsEdit",
-            Config("API_DELETE_ACTION") => "PatientVisitsDelete",
-            Config("API_LIST_ACTION") => "PatientVisitsList",
+            Config("API_VIEW_ACTION") => "UrinalysisResultsView",
+            Config("API_ADD_ACTION") => "UrinalysisResultsAdd",
+            Config("API_EDIT_ACTION") => "UrinalysisResultsEdit",
+            Config("API_DELETE_ACTION") => "UrinalysisResultsDelete",
+            Config("API_LIST_ACTION") => "UrinalysisResultsList",
             default => ""
         };
     }
@@ -1144,16 +956,16 @@ class PatientVisits extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "patientvisitslist";
+        return "urinalysisresultslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("patientvisitsview", $parm);
+            $url = $this->keyUrl("urinalysisresultsview", $parm);
         } else {
-            $url = $this->keyUrl("patientvisitsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("urinalysisresultsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1162,9 +974,9 @@ class PatientVisits extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "patientvisitsadd?" . $parm;
+            $url = "urinalysisresultsadd?" . $parm;
         } else {
-            $url = "patientvisitsadd";
+            $url = "urinalysisresultsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1172,36 +984,28 @@ class PatientVisits extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("patientvisitsedit", $parm);
-        } else {
-            $url = $this->keyUrl("patientvisitsedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("urinalysisresultsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("patientvisitslist", "action=edit");
+        $url = $this->keyUrl("urinalysisresultslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("patientvisitsadd", $parm);
-        } else {
-            $url = $this->keyUrl("patientvisitsadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("urinalysisresultsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("patientvisitslist", "action=copy");
+        $url = $this->keyUrl("urinalysisresultslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1211,16 +1015,16 @@ class PatientVisits extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("patientvisitsdelete", $parm);
+            return $this->keyUrl("urinalysisresultsdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "patients" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+        if ($this->getCurrentMasterTable() == "patients_lab_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->patient_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_reports_id->getSessionValue()); // Use Session Value
         }
         return $url;
     }
@@ -1381,21 +1185,17 @@ class PatientVisits extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_type_id->setDbValue($row['visit_type_id']);
-        $this->payment_method_id->setDbValue($row['payment_method_id']);
-        $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
-        $this->user_role->setDbValue($row['user_role']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
-        $this->status->setDbValue($row['status']);
+        $this->lab_test_reports_id->setDbValue($row['lab_test_reports_id']);
+        $this->parameter->setDbValue($row['parameter']);
+        $this->result->setDbValue($row['result']);
+        $this->comments->setDbValue($row['comments']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "PatientVisitsList";
+        $listPage = "UrinalysisResultsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1421,166 +1221,49 @@ class PatientVisits extends DbTable
 
         // id
 
-        // patient_id
+        // lab_test_reports_id
 
-        // visit_type_id
+        // parameter
 
-        // payment_method_id
+        // result
 
-        // medical_scheme_id
-
-        // user_role
-
-        // date_created
-
-        // date_updated
-
-        // status
+        // comments
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // patient_id
-        $curVal = strval($this->patient_id->CurrentValue);
-        if ($curVal != "") {
-            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            if ($this->patient_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                } else {
-                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                }
-            }
-        } else {
-            $this->patient_id->ViewValue = null;
-        }
+        // lab_test_reports_id
+        $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
+        $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
 
-        // visit_type_id
-        $curVal = strval($this->visit_type_id->CurrentValue);
-        if ($curVal != "") {
-            $this->visit_type_id->ViewValue = $this->visit_type_id->lookupCacheOption($curVal);
-            if ($this->visit_type_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->visit_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->visit_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->visit_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->visit_type_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->visit_type_id->ViewValue = $this->visit_type_id->displayValue($arwrk);
-                } else {
-                    $this->visit_type_id->ViewValue = FormatNumber($this->visit_type_id->CurrentValue, $this->visit_type_id->formatPattern());
-                }
-            }
-        } else {
-            $this->visit_type_id->ViewValue = null;
-        }
+        // parameter
+        $this->parameter->ViewValue = $this->parameter->CurrentValue;
 
-        // payment_method_id
-        $curVal = strval($this->payment_method_id->CurrentValue);
-        if ($curVal != "") {
-            $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
-            if ($this->payment_method_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
-                } else {
-                    $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
-                }
-            }
-        } else {
-            $this->payment_method_id->ViewValue = null;
-        }
+        // result
+        $this->result->ViewValue = $this->result->CurrentValue;
 
-        // medical_scheme_id
-        $curVal = strval($this->medical_scheme_id->CurrentValue);
-        if ($curVal != "") {
-            $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
-            if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
-                } else {
-                    $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
-                }
-            }
-        } else {
-            $this->medical_scheme_id->ViewValue = null;
-        }
-
-        // user_role
-        $this->user_role->ViewValue = $this->user_role->CurrentValue;
-
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-        // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        // comments
+        $this->comments->ViewValue = $this->comments->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_id
-        $this->patient_id->HrefValue = "";
-        $this->patient_id->TooltipValue = "";
+        // lab_test_reports_id
+        $this->lab_test_reports_id->HrefValue = "";
+        $this->lab_test_reports_id->TooltipValue = "";
 
-        // visit_type_id
-        $this->visit_type_id->HrefValue = "";
-        $this->visit_type_id->TooltipValue = "";
+        // parameter
+        $this->parameter->HrefValue = "";
+        $this->parameter->TooltipValue = "";
 
-        // payment_method_id
-        $this->payment_method_id->HrefValue = "";
-        $this->payment_method_id->TooltipValue = "";
+        // result
+        $this->result->HrefValue = "";
+        $this->result->TooltipValue = "";
 
-        // medical_scheme_id
-        $this->medical_scheme_id->HrefValue = "";
-        $this->medical_scheme_id->TooltipValue = "";
-
-        // user_role
-        $this->user_role->HrefValue = "";
-        $this->user_role->TooltipValue = "";
-
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
-
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
+        // comments
+        $this->comments->HrefValue = "";
+        $this->comments->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1601,66 +1284,43 @@ class PatientVisits extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // patient_id
-        $this->patient_id->setupEditAttributes();
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-            $curVal = strval($this->patient_id->CurrentValue);
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                    } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->patient_id->ViewValue = null;
-            }
+        // lab_test_reports_id
+        $this->lab_test_reports_id->setupEditAttributes();
+        if ($this->lab_test_reports_id->getSessionValue() != "") {
+            $this->lab_test_reports_id->CurrentValue = GetForeignKeyValue($this->lab_test_reports_id->getSessionValue());
+            $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
+            $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
         } else {
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+            $this->lab_test_reports_id->EditValue = $this->lab_test_reports_id->CurrentValue;
+            $this->lab_test_reports_id->PlaceHolder = RemoveHtml($this->lab_test_reports_id->caption());
+            if (strval($this->lab_test_reports_id->EditValue) != "" && is_numeric($this->lab_test_reports_id->EditValue)) {
+                $this->lab_test_reports_id->EditValue = FormatNumber($this->lab_test_reports_id->EditValue, null);
+            }
         }
 
-        // visit_type_id
-        $this->visit_type_id->setupEditAttributes();
-        $this->visit_type_id->PlaceHolder = RemoveHtml($this->visit_type_id->caption());
-
-        // payment_method_id
-        $this->payment_method_id->setupEditAttributes();
-        $this->payment_method_id->PlaceHolder = RemoveHtml($this->payment_method_id->caption());
-
-        // medical_scheme_id
-        $this->medical_scheme_id->setupEditAttributes();
-        $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
-
-        // user_role
-
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // status
-        $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        // parameter
+        $this->parameter->setupEditAttributes();
+        if (!$this->parameter->Raw) {
+            $this->parameter->CurrentValue = HtmlDecode($this->parameter->CurrentValue);
         }
-        $this->status->EditValue = $this->status->CurrentValue;
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+        $this->parameter->EditValue = $this->parameter->CurrentValue;
+        $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
+
+        // result
+        $this->result->setupEditAttributes();
+        if (!$this->result->Raw) {
+            $this->result->CurrentValue = HtmlDecode($this->result->CurrentValue);
+        }
+        $this->result->EditValue = $this->result->CurrentValue;
+        $this->result->PlaceHolder = RemoveHtml($this->result->caption());
+
+        // comments
+        $this->comments->setupEditAttributes();
+        if (!$this->comments->Raw) {
+            $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+        }
+        $this->comments->EditValue = $this->comments->CurrentValue;
+        $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1691,20 +1351,16 @@ class PatientVisits extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_type_id);
-                    $doc->exportCaption($this->payment_method_id);
-                    $doc->exportCaption($this->medical_scheme_id);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->lab_test_reports_id);
+                    $doc->exportCaption($this->parameter);
+                    $doc->exportCaption($this->result);
+                    $doc->exportCaption($this->comments);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_type_id);
-                    $doc->exportCaption($this->payment_method_id);
-                    $doc->exportCaption($this->medical_scheme_id);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->lab_test_reports_id);
+                    $doc->exportCaption($this->parameter);
+                    $doc->exportCaption($this->result);
+                    $doc->exportCaption($this->comments);
                 }
                 $doc->endExportRow();
             }
@@ -1732,20 +1388,16 @@ class PatientVisits extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_type_id);
-                        $doc->exportField($this->payment_method_id);
-                        $doc->exportField($this->medical_scheme_id);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->lab_test_reports_id);
+                        $doc->exportField($this->parameter);
+                        $doc->exportField($this->result);
+                        $doc->exportField($this->comments);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_type_id);
-                        $doc->exportField($this->payment_method_id);
-                        $doc->exportField($this->medical_scheme_id);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->lab_test_reports_id);
+                        $doc->exportField($this->parameter);
+                        $doc->exportField($this->result);
+                        $doc->exportField($this->comments);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1781,6 +1433,7 @@ class PatientVisits extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
+        // Enter your code here
     }
 
     // Recordset Selected event
@@ -1817,14 +1470,8 @@ class PatientVisits extends DbTable
     // Row Inserting event
     public function rowInserting($rsold, &$rsnew)
     {
-        // Check if both job id and user id exists
-        $sql = ExecuteScalar("SELECT count(*) FROM patient_visits where patient_id = '".$rsnew["patient_id"]."' AND STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()");
-    	if($sql > 0) { // Check for double applications
-    		$this->CancelMessage = "The patient's visit for today has already been created.";
-    		return false;
-    	} else if ($sql < 0) { 
-            return true; 
-        }
+        // Enter your code here
+        // To cancel, set return value to false
         return true;
     }
 
@@ -1921,15 +1568,8 @@ class PatientVisits extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        $current_date = CurrentDate();
-        if ($this->date_created->CurrentValue > $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New Visit"; 
-        } else if ($this->date_created->CurrentValue < $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
-            $this->status->ViewValue = "Past Visit"; 
-        } 
-        $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+        // To view properties of field class, use:
+        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

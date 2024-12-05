@@ -2,8 +2,11 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="434">
-      <phrase id="menutext" value="Test Parameters" />
+    <menu id="437">
+      <phrase id="menutext" value="Full Haemogram" />
+    </menu>
+    <menu id="436">
+      <phrase id="menutext" value="Urinalysis Results" />
     </menu>
     <menu id="334">
       <phrase id="menutext" value="Radiology Overview" />
@@ -105,6 +108,12 @@
       <phrase id="menutext" value="Test Details" />
     </menu>
     <menu id="12">
+      <phrase id="menutext" value="Generate Report" />
+    </menu>
+    <menu id="434">
+      <phrase id="menutext" value="Urinalysis Parameters" />
+    </menu>
+    <menu id="435">
       <phrase id="menutext" value="Lab Reports" />
     </menu>
     <menu id="102">
@@ -2612,7 +2621,7 @@
       </field>
     </table>
     <table id="urinalysis_parameters">
-      <phrase id="tblcaption" value="Test Parameters" />
+      <phrase id="tblcaption" value="Urinalysis Details" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
@@ -2651,6 +2660,133 @@
       </field>
       <field id="comments">
         <phrase id="fldcaption" value="Comments" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="date created" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
+      </field>
+    </table>
+    <table id="patients_lab_report">
+      <phrase id="tblcaption" value="Lab Reports" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="visit_id">
+        <phrase id="fldcaption" value="Visit ID" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient ID" />
+      </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="details">
+        <phrase id="fldcaption" value="Findings" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="laboratorist">
+        <phrase id="fldcaption" value="Laboratorist" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Report Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="urinalysis_results">
+      <phrase id="tblcaption" value="Urinalysis Results" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="lab_test_reports_id">
+        <phrase id="fldcaption" value="Report ID" />
+      </field>
+      <field id="parameter">
+        <phrase id="fldcaption" value="Parameter" />
+      </field>
+      <field id="result">
+        <phrase id="fldcaption" value="Result" />
+      </field>
+      <field id="comments">
+        <phrase id="fldcaption" value="Comments" />
+      </field>
+    </table>
+    <table id="full_haemogram_parameters">
+      <phrase id="tblcaption" value="Full Haemogram" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="lab_test_report_id">
+        <phrase id="fldcaption" value="Report ID" />
+      </field>
+      <field id="test">
+        <phrase id="fldcaption" value="Test" />
+        <phrase id="fldtagvalue1" value="WHITE BLOOD CELL COUNT" />
+        <phrase id="fldtagcaption1" value="WHITE BLOOD CELL COUNT" />
+        <phrase id="fldtagvalue2" value="LYM ABSOLUTE#" />
+        <phrase id="fldtagcaption2" value="LYM ABSOLUTE#" />
+        <phrase id="fldtagvalue3" value="MID ABSOLUTE#" />
+        <phrase id="fldtagcaption3" value="MID ABSOLUTE#" />
+        <phrase id="fldtagvalue4" value="GRA ABSOLUTE#" />
+        <phrase id="fldtagcaption4" value="GRA ABSOLUTE#" />
+        <phrase id="fldtagvalue5" value="LYM %" />
+        <phrase id="fldtagcaption5" value="LYM %" />
+        <phrase id="fldtagvalue6" value="MID %" />
+        <phrase id="fldtagcaption6" value="MID %" />
+        <phrase id="fldtagvalue7" value="GRA %" />
+        <phrase id="fldtagcaption7" value="GRA %" />
+        <phrase id="fldtagvalue8" value="RED BLOOD CELL COUNT" />
+        <phrase id="fldtagcaption8" value="RED BLOOD CELL COUNT" />
+        <phrase id="fldtagvalue9" value="HAEMOGLOBIN(HB)" />
+        <phrase id="fldtagcaption9" value="HAEMOGLOBIN(HB)" />
+        <phrase id="fldtagvalue10" value="HCT" />
+        <phrase id="fldtagcaption10" value="HCT" />
+        <phrase id="fldtagvalue11" value="MCV" />
+        <phrase id="fldtagcaption11" value="MCV" />
+        <phrase id="fldtagvalue12" value="MCH" />
+        <phrase id="fldtagcaption12" value="MCH" />
+        <phrase id="fldtagvalue13" value="MCHC" />
+        <phrase id="fldtagcaption13" value="MCHC" />
+        <phrase id="fldtagvalue14" value="RDW-CV" />
+        <phrase id="fldtagcaption14" value="RDW-CV" />
+        <phrase id="fldtagvalue15" value="RDW-SD" />
+        <phrase id="fldtagcaption15" value="RDW-SD" />
+        <phrase id="fldtagvalue16" value="PLATELET COUNT (PLT)" />
+        <phrase id="fldtagcaption16" value="PLATELET COUNT (PLT)" />
+        <phrase id="fldtagvalue17" value="PCT" />
+        <phrase id="fldtagcaption17" value="PCT" />
+        <phrase id="fldtagvalue18" value="MPV" />
+        <phrase id="fldtagcaption18" value="MPV" />
+        <phrase id="fldtagvalue19" value="PDW" />
+        <phrase id="fldtagcaption19" value="PDW" />
+        <phrase id="fldtagvalue20" value="P LCR" />
+        <phrase id="fldtagcaption20" value="P LCR" />
+      </field>
+      <field id="results">
+        <phrase id="fldcaption" value="Results" />
+      </field>
+      <field id="unit">
+        <phrase id="fldcaption" value="Unit" />
+      </field>
+      <field id="unit_references">
+        <phrase id="fldcaption" value="Reference" />
+      </field>
+      <field id="comment">
+        <phrase id="fldcaption" value="Comment" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="date created" />

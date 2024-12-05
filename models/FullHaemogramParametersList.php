@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class UrinalysisParametersList extends UrinalysisParameters
+class FullHaemogramParametersList extends FullHaemogramParameters
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class UrinalysisParametersList extends UrinalysisParameters
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "UrinalysisParametersList";
+    public $PageObjName = "FullHaemogramParametersList";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class UrinalysisParametersList extends UrinalysisParameters
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "furinalysis_parameterslist";
+    public $FormName = "ffull_haemogram_parameterslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "urinalysisparameterslist";
+    public $CurrentPageName = "fullhaemogramparameterslist";
 
     // Page URLs
     public $AddUrl;
@@ -145,11 +145,13 @@ class UrinalysisParametersList extends UrinalysisParameters
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
-        $this->lab_test_reports_id->Visible = false;
-        $this->parameter->setVisibility();
-        $this->result->setVisibility();
-        $this->comments->setVisibility();
+        $this->id->setVisibility();
+        $this->lab_test_report_id->setVisibility();
+        $this->test->setVisibility();
+        $this->results->setVisibility();
+        $this->unit->setVisibility();
+        $this->unit_references->setVisibility();
+        $this->comment->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -162,8 +164,8 @@ class UrinalysisParametersList extends UrinalysisParameters
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'urinalysis_parameters';
-        $this->TableName = 'urinalysis_parameters';
+        $this->TableVar = 'full_haemogram_parameters';
+        $this->TableName = 'full_haemogram_parameters';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -183,26 +185,26 @@ class UrinalysisParametersList extends UrinalysisParameters
         // Language object
         $Language = Container("app.language");
 
-        // Table object (urinalysis_parameters)
-        if (!isset($GLOBALS["urinalysis_parameters"]) || $GLOBALS["urinalysis_parameters"]::class == PROJECT_NAMESPACE . "urinalysis_parameters") {
-            $GLOBALS["urinalysis_parameters"] = &$this;
+        // Table object (full_haemogram_parameters)
+        if (!isset($GLOBALS["full_haemogram_parameters"]) || $GLOBALS["full_haemogram_parameters"]::class == PROJECT_NAMESPACE . "full_haemogram_parameters") {
+            $GLOBALS["full_haemogram_parameters"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "urinalysisparametersadd";
+        $this->AddUrl = "fullhaemogramparametersadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "urinalysisparametersdelete";
-        $this->MultiUpdateUrl = "urinalysisparametersupdate";
+        $this->MultiDeleteUrl = "fullhaemogramparametersdelete";
+        $this->MultiUpdateUrl = "fullhaemogramparametersupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'urinalysis_parameters');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'full_haemogram_parameters');
         }
 
         // Start timer
@@ -353,7 +355,7 @@ class UrinalysisParametersList extends UrinalysisParameters
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "urinalysisparametersview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "fullhaemogramparametersview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -711,11 +713,11 @@ class UrinalysisParametersList extends UrinalysisParameters
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->parameter);
+        $this->setupLookupOptions($this->test);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "furinalysis_parametersgrid";
+            $this->FormName = "ffull_haemogram_parametersgrid";
         }
 
         // Set up page action
@@ -850,24 +852,17 @@ class UrinalysisParametersList extends UrinalysisParameters
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_reports") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_reports"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
-            $masterTbl = Container("lab_test_reports");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTbl = Container("patients_lab_report");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestreportslist"); // Return to master page
+                $this->terminate("patientslabreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1079,13 +1074,15 @@ class UrinalysisParametersList extends UrinalysisParameters
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("furinalysis_parameterssrch");
+            $savedFilterList = Profile()->getSearchFilters("ffull_haemogram_parameterssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->lab_test_reports_id->AdvancedSearch->toJson(), ","); // Field lab_test_reports_id
-        $filterList = Concat($filterList, $this->parameter->AdvancedSearch->toJson(), ","); // Field parameter
-        $filterList = Concat($filterList, $this->result->AdvancedSearch->toJson(), ","); // Field result
-        $filterList = Concat($filterList, $this->comments->AdvancedSearch->toJson(), ","); // Field comments
+        $filterList = Concat($filterList, $this->lab_test_report_id->AdvancedSearch->toJson(), ","); // Field lab_test_report_id
+        $filterList = Concat($filterList, $this->test->AdvancedSearch->toJson(), ","); // Field test
+        $filterList = Concat($filterList, $this->results->AdvancedSearch->toJson(), ","); // Field results
+        $filterList = Concat($filterList, $this->unit->AdvancedSearch->toJson(), ","); // Field unit
+        $filterList = Concat($filterList, $this->unit_references->AdvancedSearch->toJson(), ","); // Field unit_references
+        $filterList = Concat($filterList, $this->comment->AdvancedSearch->toJson(), ","); // Field comment
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1108,7 +1105,7 @@ class UrinalysisParametersList extends UrinalysisParameters
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("furinalysis_parameterssrch", $filters);
+            Profile()->setSearchFilters("ffull_haemogram_parameterssrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1135,37 +1132,53 @@ class UrinalysisParametersList extends UrinalysisParameters
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field lab_test_reports_id
-        $this->lab_test_reports_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_reports_id"];
-        $this->lab_test_reports_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_reports_id"];
-        $this->lab_test_reports_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_reports_id"];
-        $this->lab_test_reports_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_reports_id"];
-        $this->lab_test_reports_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_reports_id"];
-        $this->lab_test_reports_id->AdvancedSearch->save();
+        // Field lab_test_report_id
+        $this->lab_test_report_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->save();
 
-        // Field parameter
-        $this->parameter->AdvancedSearch->SearchValue = @$filter["x_parameter"];
-        $this->parameter->AdvancedSearch->SearchOperator = @$filter["z_parameter"];
-        $this->parameter->AdvancedSearch->SearchCondition = @$filter["v_parameter"];
-        $this->parameter->AdvancedSearch->SearchValue2 = @$filter["y_parameter"];
-        $this->parameter->AdvancedSearch->SearchOperator2 = @$filter["w_parameter"];
-        $this->parameter->AdvancedSearch->save();
+        // Field test
+        $this->test->AdvancedSearch->SearchValue = @$filter["x_test"];
+        $this->test->AdvancedSearch->SearchOperator = @$filter["z_test"];
+        $this->test->AdvancedSearch->SearchCondition = @$filter["v_test"];
+        $this->test->AdvancedSearch->SearchValue2 = @$filter["y_test"];
+        $this->test->AdvancedSearch->SearchOperator2 = @$filter["w_test"];
+        $this->test->AdvancedSearch->save();
 
-        // Field result
-        $this->result->AdvancedSearch->SearchValue = @$filter["x_result"];
-        $this->result->AdvancedSearch->SearchOperator = @$filter["z_result"];
-        $this->result->AdvancedSearch->SearchCondition = @$filter["v_result"];
-        $this->result->AdvancedSearch->SearchValue2 = @$filter["y_result"];
-        $this->result->AdvancedSearch->SearchOperator2 = @$filter["w_result"];
-        $this->result->AdvancedSearch->save();
+        // Field results
+        $this->results->AdvancedSearch->SearchValue = @$filter["x_results"];
+        $this->results->AdvancedSearch->SearchOperator = @$filter["z_results"];
+        $this->results->AdvancedSearch->SearchCondition = @$filter["v_results"];
+        $this->results->AdvancedSearch->SearchValue2 = @$filter["y_results"];
+        $this->results->AdvancedSearch->SearchOperator2 = @$filter["w_results"];
+        $this->results->AdvancedSearch->save();
 
-        // Field comments
-        $this->comments->AdvancedSearch->SearchValue = @$filter["x_comments"];
-        $this->comments->AdvancedSearch->SearchOperator = @$filter["z_comments"];
-        $this->comments->AdvancedSearch->SearchCondition = @$filter["v_comments"];
-        $this->comments->AdvancedSearch->SearchValue2 = @$filter["y_comments"];
-        $this->comments->AdvancedSearch->SearchOperator2 = @$filter["w_comments"];
-        $this->comments->AdvancedSearch->save();
+        // Field unit
+        $this->unit->AdvancedSearch->SearchValue = @$filter["x_unit"];
+        $this->unit->AdvancedSearch->SearchOperator = @$filter["z_unit"];
+        $this->unit->AdvancedSearch->SearchCondition = @$filter["v_unit"];
+        $this->unit->AdvancedSearch->SearchValue2 = @$filter["y_unit"];
+        $this->unit->AdvancedSearch->SearchOperator2 = @$filter["w_unit"];
+        $this->unit->AdvancedSearch->save();
+
+        // Field unit_references
+        $this->unit_references->AdvancedSearch->SearchValue = @$filter["x_unit_references"];
+        $this->unit_references->AdvancedSearch->SearchOperator = @$filter["z_unit_references"];
+        $this->unit_references->AdvancedSearch->SearchCondition = @$filter["v_unit_references"];
+        $this->unit_references->AdvancedSearch->SearchValue2 = @$filter["y_unit_references"];
+        $this->unit_references->AdvancedSearch->SearchOperator2 = @$filter["w_unit_references"];
+        $this->unit_references->AdvancedSearch->save();
+
+        // Field comment
+        $this->comment->AdvancedSearch->SearchValue = @$filter["x_comment"];
+        $this->comment->AdvancedSearch->SearchOperator = @$filter["z_comment"];
+        $this->comment->AdvancedSearch->SearchCondition = @$filter["v_comment"];
+        $this->comment->AdvancedSearch->SearchValue2 = @$filter["y_comment"];
+        $this->comment->AdvancedSearch->SearchOperator2 = @$filter["w_comment"];
+        $this->comment->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1221,9 +1234,10 @@ class UrinalysisParametersList extends UrinalysisParameters
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->parameter;
-        $searchFlds[] = &$this->result;
-        $searchFlds[] = &$this->comments;
+        $searchFlds[] = &$this->test;
+        $searchFlds[] = &$this->unit;
+        $searchFlds[] = &$this->unit_references;
+        $searchFlds[] = &$this->comment;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1302,9 +1316,13 @@ class UrinalysisParametersList extends UrinalysisParameters
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->parameter); // parameter
-            $this->updateSort($this->result); // result
-            $this->updateSort($this->comments); // comments
+            $this->updateSort($this->id); // id
+            $this->updateSort($this->lab_test_report_id); // lab_test_report_id
+            $this->updateSort($this->test); // test
+            $this->updateSort($this->results); // results
+            $this->updateSort($this->unit); // unit
+            $this->updateSort($this->unit_references); // unit_references
+            $this->updateSort($this->comment); // comment
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1330,7 +1348,7 @@ class UrinalysisParametersList extends UrinalysisParameters
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->lab_test_reports_id->setSessionValue("");
+                        $this->lab_test_report_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1338,10 +1356,12 @@ class UrinalysisParametersList extends UrinalysisParameters
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->lab_test_reports_id->setSort("");
-                $this->parameter->setSort("");
-                $this->result->setSort("");
-                $this->comments->setSort("");
+                $this->lab_test_report_id->setSort("");
+                $this->test->setSort("");
+                $this->results->setSort("");
+                $this->unit->setSort("");
+                $this->unit_references->setSort("");
+                $this->comment->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1373,6 +1393,12 @@ class UrinalysisParametersList extends UrinalysisParameters
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1456,7 +1482,7 @@ class UrinalysisParametersList extends UrinalysisParameters
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"full_haemogram_parameters\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1469,9 +1495,22 @@ class UrinalysisParametersList extends UrinalysisParameters
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"full_haemogram_parameters\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd()) {
+                if ($this->ModalAdd && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"full_haemogram_parameters\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1510,12 +1549,12 @@ class UrinalysisParametersList extends UrinalysisParameters
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"furinalysis_parameterslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"ffull_haemogram_parameterslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"furinalysis_parameterslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"ffull_haemogram_parameterslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1558,7 +1597,7 @@ class UrinalysisParametersList extends UrinalysisParameters
         $item = &$option->add("add");
         $addcaption = HtmlTitle($Language->phrase("AddLink"));
         if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"full_haemogram_parameters\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
@@ -1571,9 +1610,13 @@ class UrinalysisParametersList extends UrinalysisParameters
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "parameter");
-            $this->createColumnOption($option, "result");
-            $this->createColumnOption($option, "comments");
+            $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "lab_test_report_id");
+            $this->createColumnOption($option, "test");
+            $this->createColumnOption($option, "results");
+            $this->createColumnOption($option, "unit");
+            $this->createColumnOption($option, "unit_references");
+            $this->createColumnOption($option, "comment");
         }
 
         // Set up custom actions
@@ -1598,10 +1641,10 @@ class UrinalysisParametersList extends UrinalysisParameters
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"furinalysis_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"ffull_haemogram_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"furinalysis_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"ffull_haemogram_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1661,7 +1704,7 @@ class UrinalysisParametersList extends UrinalysisParameters
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="furinalysis_parameterslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="ffull_haemogram_parameterslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1832,7 +1875,7 @@ class UrinalysisParametersList extends UrinalysisParameters
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_urinalysis_parameters", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_full_haemogram_parameters", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1893,7 +1936,7 @@ class UrinalysisParametersList extends UrinalysisParameters
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_urinalysis_parameters",
+            "id" => "r" . $this->RowCount . "_full_haemogram_parameters",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2013,10 +2056,12 @@ class UrinalysisParametersList extends UrinalysisParameters
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_reports_id->setDbValue($row['lab_test_reports_id']);
-        $this->parameter->setDbValue($row['parameter']);
-        $this->result->setDbValue($row['result']);
-        $this->comments->setDbValue($row['comments']);
+        $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
+        $this->test->setDbValue($row['test']);
+        $this->results->setDbValue($row['results']);
+        $this->unit->setDbValue($row['unit']);
+        $this->unit_references->setDbValue($row['unit_references']);
+        $this->comment->setDbValue($row['comment']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2026,10 +2071,12 @@ class UrinalysisParametersList extends UrinalysisParameters
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_reports_id'] = $this->lab_test_reports_id->DefaultValue;
-        $row['parameter'] = $this->parameter->DefaultValue;
-        $row['result'] = $this->result->DefaultValue;
-        $row['comments'] = $this->comments->DefaultValue;
+        $row['lab_test_report_id'] = $this->lab_test_report_id->DefaultValue;
+        $row['test'] = $this->test->DefaultValue;
+        $row['results'] = $this->results->DefaultValue;
+        $row['unit'] = $this->unit->DefaultValue;
+        $row['unit_references'] = $this->unit_references->DefaultValue;
+        $row['comment'] = $this->comment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2074,13 +2121,17 @@ class UrinalysisParametersList extends UrinalysisParameters
 
         // id
 
-        // lab_test_reports_id
+        // lab_test_report_id
 
-        // parameter
+        // test
 
-        // result
+        // results
 
-        // comments
+        // unit
+
+        // unit_references
+
+        // comment
 
         // date_created
 
@@ -2091,34 +2142,57 @@ class UrinalysisParametersList extends UrinalysisParameters
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_reports_id
-            $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
-            $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
+            // lab_test_report_id
+            $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
+            $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
 
-            // parameter
-            if (strval($this->parameter->CurrentValue) != "") {
-                $this->parameter->ViewValue = $this->parameter->optionCaption($this->parameter->CurrentValue);
+            // test
+            if (strval($this->test->CurrentValue) != "") {
+                $this->test->ViewValue = $this->test->optionCaption($this->test->CurrentValue);
             } else {
-                $this->parameter->ViewValue = null;
+                $this->test->ViewValue = null;
             }
 
-            // result
-            $this->result->ViewValue = $this->result->CurrentValue;
+            // results
+            $this->results->ViewValue = $this->results->CurrentValue;
+            $this->results->ViewValue = FormatNumber($this->results->ViewValue, $this->results->formatPattern());
 
-            // comments
-            $this->comments->ViewValue = $this->comments->CurrentValue;
+            // unit
+            $this->unit->ViewValue = $this->unit->CurrentValue;
 
-            // parameter
-            $this->parameter->HrefValue = "";
-            $this->parameter->TooltipValue = "";
+            // unit_references
+            $this->unit_references->ViewValue = $this->unit_references->CurrentValue;
 
-            // result
-            $this->result->HrefValue = "";
-            $this->result->TooltipValue = "";
+            // comment
+            $this->comment->ViewValue = $this->comment->CurrentValue;
 
-            // comments
-            $this->comments->HrefValue = "";
-            $this->comments->TooltipValue = "";
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
+            // lab_test_report_id
+            $this->lab_test_report_id->HrefValue = "";
+            $this->lab_test_report_id->TooltipValue = "";
+
+            // test
+            $this->test->HrefValue = "";
+            $this->test->TooltipValue = "";
+
+            // results
+            $this->results->HrefValue = "";
+            $this->results->TooltipValue = "";
+
+            // unit
+            $this->unit->HrefValue = "";
+            $this->unit->TooltipValue = "";
+
+            // unit_references
+            $this->unit_references->HrefValue = "";
+            $this->unit_references->TooltipValue = "";
+
+            // comment
+            $this->comment->HrefValue = "";
+            $this->comment->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2139,19 +2213,19 @@ class UrinalysisParametersList extends UrinalysisParameters
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"furinalysis_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"ffull_haemogram_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"furinalysis_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"ffull_haemogram_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"furinalysis_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"ffull_haemogram_parameterslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2163,7 +2237,7 @@ class UrinalysisParametersList extends UrinalysisParameters
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="furinalysis_parameterslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="ffull_haemogram_parameterslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2241,7 +2315,7 @@ class UrinalysisParametersList extends UrinalysisParameters
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"furinalysis_parameterssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"ffull_haemogram_parameterssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2329,15 +2403,15 @@ class UrinalysisParametersList extends UrinalysisParameters
         $doc->ExportCustom = !$this->pageExporting($doc);
 
         // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
-            $lab_test_reports = new LabTestReportsList();
-            $rsmaster = $lab_test_reports->loadRs($this->DbMasterFilter); // Load master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
+            $patients_lab_report = new PatientsLabReportList();
+            $rsmaster = $patients_lab_report->loadRs($this->DbMasterFilter); // Load master record
             if ($rsmaster) {
                 $exportStyle = $doc->Style;
                 $doc->setStyle("v"); // Change to vertical
                 if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($lab_test_reports);
-                    $lab_test_reports->exportDocument($doc, $rsmaster);
+                    $doc->setTable($patients_lab_report);
+                    $patients_lab_report->exportDocument($doc, $rsmaster);
                     $doc->exportEmptyRow();
                     $doc->setTable($this);
                 }
@@ -2377,14 +2451,14 @@ class UrinalysisParametersList extends UrinalysisParameters
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "lab_test_reports") {
+            if ($masterTblVar == "patients_lab_report") {
                 $validMaster = true;
-                $masterTbl = Container("lab_test_reports");
-                if (($parm = Get("fk_id", Get("lab_test_reports_id"))) !== null) {
+                $masterTbl = Container("patients_lab_report");
+                if (($parm = Get("fk_id", Get("lab_test_report_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_reports_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_reports_id->setSessionValue($this->lab_test_reports_id->QueryStringValue);
-                    $foreignKeys["lab_test_reports_id"] = $this->lab_test_reports_id->QueryStringValue;
+                    $this->lab_test_report_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->QueryStringValue);
+                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->QueryStringValue;
                     if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
@@ -2399,14 +2473,14 @@ class UrinalysisParametersList extends UrinalysisParameters
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "lab_test_reports") {
+            if ($masterTblVar == "patients_lab_report") {
                 $validMaster = true;
-                $masterTbl = Container("lab_test_reports");
-                if (($parm = Post("fk_id", Post("lab_test_reports_id"))) !== null) {
+                $masterTbl = Container("patients_lab_report");
+                if (($parm = Post("fk_id", Post("lab_test_report_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_reports_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_reports_id->setSessionValue($this->lab_test_reports_id->FormValue);
-                    $foreignKeys["lab_test_reports_id"] = $this->lab_test_reports_id->FormValue;
+                    $this->lab_test_report_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->FormValue);
+                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->FormValue;
                     if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
@@ -2438,9 +2512,9 @@ class UrinalysisParametersList extends UrinalysisParameters
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "lab_test_reports") {
-                if (!array_key_exists("lab_test_reports_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_reports_id->setSessionValue("");
+            if ($masterTblVar != "patients_lab_report") {
+                if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_report_id->setSessionValue("");
                 }
             }
         }
@@ -2471,7 +2545,7 @@ class UrinalysisParametersList extends UrinalysisParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_parameter":
+                case "x_test":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2645,10 +2719,7 @@ class UrinalysisParametersList extends UrinalysisParameters
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add parameter");
+        //Log("Page Load");
     }
 
     // Page Unload event

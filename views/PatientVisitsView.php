@@ -120,7 +120,7 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_patient_visitsview" class="ew-custom-template"></div>
 <template id="tpm_patient_visitsview">
-<div id="ct_PatientVisitsView"><div class="row check-in-view">
+<div id="ct_PatientVisitsView"><div class="row gridder-view">
     <div class="col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_patient_id"></slot></p>
@@ -214,6 +214,14 @@ loadjs.ready("head", function () {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("lab_test_requests", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("lab_test_requests")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "LabTestRequestsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patients_lab_report", explode(",", $Page->getCurrentDetailTable())) && $patients_lab_report->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_lab_report", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patients_lab_report")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientsLabReportGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

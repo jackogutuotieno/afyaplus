@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class UrinalysisParametersGrid extends UrinalysisParameters
+class PatientsLabReportGrid extends PatientsLabReport
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "UrinalysisParametersGrid";
+    public $PageObjName = "PatientsLabReportGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "furinalysis_parametersgrid";
+    public $FormName = "fpatients_lab_reportgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "urinalysisparametersgrid";
+    public $CurrentPageName = "patientslabreportgrid";
 
     // Page URLs
     public $AddUrl;
@@ -135,13 +135,18 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
-        $this->lab_test_reports_id->Visible = false;
-        $this->parameter->setVisibility();
-        $this->result->setVisibility();
-        $this->comments->setVisibility();
-        $this->date_created->Visible = false;
-        $this->date_updated->Visible = false;
+        $this->id->setVisibility();
+        $this->visit_id->Visible = false;
+        $this->patient_id->Visible = false;
+        $this->patient_name->setVisibility();
+        $this->date_of_birth->Visible = false;
+        $this->gender->Visible = false;
+        $this->patient_age->setVisibility();
+        $this->details->setVisibility();
+        $this->status->setVisibility();
+        $this->laboratorist->setVisibility();
+        $this->date_created->setVisibility();
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -152,8 +157,8 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'urinalysis_parameters';
-        $this->TableName = 'urinalysis_parameters';
+        $this->TableVar = 'patients_lab_report';
+        $this->TableName = 'patients_lab_report';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -177,15 +182,15 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Language object
         $Language = Container("app.language");
 
-        // Table object (urinalysis_parameters)
-        if (!isset($GLOBALS["urinalysis_parameters"]) || $GLOBALS["urinalysis_parameters"]::class == PROJECT_NAMESPACE . "urinalysis_parameters") {
-            $GLOBALS["urinalysis_parameters"] = &$this;
+        // Table object (patients_lab_report)
+        if (!isset($GLOBALS["patients_lab_report"]) || $GLOBALS["patients_lab_report"]::class == PROJECT_NAMESPACE . "patients_lab_report") {
+            $GLOBALS["patients_lab_report"] = &$this;
         }
-        $this->AddUrl = "urinalysisparametersadd";
+        $this->AddUrl = "patientslabreportadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'urinalysis_parameters');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patients_lab_report');
         }
 
         // Start timer
@@ -376,7 +381,8 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'];
+            $key .= @$ar['id'] . Config("COMPOSITE_KEY_SEPARATOR");
+            $key .= @$ar['visit_id'];
         }
         return $key;
     }
@@ -390,6 +396,9 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
+        }
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->visit_id->Visible = false;
         }
     }
 
@@ -622,15 +631,12 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->parameter);
-
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "furinalysis_parametersgrid";
+            $this->FormName = "fpatients_lab_reportgrid";
         }
 
         // Set up page action
@@ -679,7 +685,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
             if ($this->isGridAdd() || $this->isGridEdit()) {
                 $item = $this->ListOptions["griddelete"];
                 if ($item) {
-                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                    $item->Visible = false;
                 }
             }
         }
@@ -703,24 +709,17 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "lab_test_reports") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_reports"); // Add master User ID filter
-            }
-        }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
-            $masterTbl = Container("lab_test_reports");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
+            $masterTbl = Container("patient_visits");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("labtestreportslist"); // Return to master page
+                $this->terminate("patientvisitslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1067,6 +1066,10 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                         $key .= Config("COMPOSITE_KEY_SEPARATOR");
                     }
                     $key .= $this->id->CurrentValue;
+                    if ($key != "") {
+                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
+                    }
+                    $key .= $this->visit_id->CurrentValue;
 
                     // Add filter for this record
                     AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
@@ -1103,26 +1106,58 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_parameter") &&
-            $CurrentForm->hasValue("o_parameter") &&
-            $this->parameter->CurrentValue != $this->parameter->DefaultValue &&
-            !($this->parameter->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->parameter->CurrentValue == $this->parameter->getSessionValue())
+            $CurrentForm->hasValue("x_patient_name") &&
+            $CurrentForm->hasValue("o_patient_name") &&
+            $this->patient_name->CurrentValue != $this->patient_name->DefaultValue &&
+            !($this->patient_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_name->CurrentValue == $this->patient_name->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_result") &&
-            $CurrentForm->hasValue("o_result") &&
-            $this->result->CurrentValue != $this->result->DefaultValue &&
-            !($this->result->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->result->CurrentValue == $this->result->getSessionValue())
+            $CurrentForm->hasValue("x_patient_age") &&
+            $CurrentForm->hasValue("o_patient_age") &&
+            $this->patient_age->CurrentValue != $this->patient_age->DefaultValue &&
+            !($this->patient_age->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_age->CurrentValue == $this->patient_age->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_comments") &&
-            $CurrentForm->hasValue("o_comments") &&
-            $this->comments->CurrentValue != $this->comments->DefaultValue &&
-            !($this->comments->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->comments->CurrentValue == $this->comments->getSessionValue())
+            $CurrentForm->hasValue("x_details") &&
+            $CurrentForm->hasValue("o_details") &&
+            $this->details->CurrentValue != $this->details->DefaultValue &&
+            !($this->details->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->details->CurrentValue == $this->details->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_status") &&
+            $CurrentForm->hasValue("o_status") &&
+            $this->status->CurrentValue != $this->status->DefaultValue &&
+            !($this->status->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->status->CurrentValue == $this->status->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_laboratorist") &&
+            $CurrentForm->hasValue("o_laboratorist") &&
+            $this->laboratorist->CurrentValue != $this->laboratorist->DefaultValue &&
+            !($this->laboratorist->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->laboratorist->CurrentValue == $this->laboratorist->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_date_created") &&
+            $CurrentForm->hasValue("o_date_created") &&
+            $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
+            !($this->date_created->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_created->CurrentValue == $this->date_created->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_date_updated") &&
+            $CurrentForm->hasValue("o_date_updated") &&
+            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
+            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
         ) {
             return false;
         }
@@ -1253,7 +1288,8 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->lab_test_reports_id->setSessionValue("");
+                        $this->visit_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1292,26 +1328,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
-
-        // "sequence"
-        $item = &$this->ListOptions->add("sequence");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = true; // Always on left
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
@@ -1374,55 +1390,22 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                 $options = &$this->ListOptions;
                 $options->UseButtonGroup = true; // Use button group for grid delete button
                 $opt = $options["griddelete"];
-                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
                     $opt->Body = "&nbsp;";
                 } else {
                     $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
                 }
             }
         }
-
-        // "sequence"
-        $opt = $this->ListOptions["sequence"];
-        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_lab_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1449,19 +1432,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
-
-        // Add
-        if ($this->CurrentMode == "view") { // Check view mode
-            $item = &$option->add("add");
-            $addcaption = HtmlTitle($Language->phrase("AddLink"));
-            $this->AddUrl = $this->getAddUrl();
-            if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"urinalysis_parameters\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-            } else {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-            }
-            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        }
     }
 
     // Active user filter
@@ -1499,7 +1469,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                     $option->UseDropDownButton = false;
                     $item = &$option->add("addblankrow");
                     $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = $Security->canAdd();
+                    $item->Visible = false;
                     $this->ShowOtherOptions = $item->Visible;
                 }
             }
@@ -1553,7 +1523,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_urinalysis_parameters", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_patients_lab_report", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1641,7 +1611,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_urinalysis_parameters",
+            "id" => "r" . $this->RowCount . "_patients_lab_report",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1676,49 +1646,109 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'parameter' first before field var 'x_parameter'
-        $val = $CurrentForm->hasValue("parameter") ? $CurrentForm->getValue("parameter") : $CurrentForm->getValue("x_parameter");
-        if (!$this->parameter->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->parameter->Visible = false; // Disable update for API request
-            } else {
-                $this->parameter->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_parameter")) {
-            $this->parameter->setOldValue($CurrentForm->getValue("o_parameter"));
-        }
-
-        // Check field name 'result' first before field var 'x_result'
-        $val = $CurrentForm->hasValue("result") ? $CurrentForm->getValue("result") : $CurrentForm->getValue("x_result");
-        if (!$this->result->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->result->Visible = false; // Disable update for API request
-            } else {
-                $this->result->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_result")) {
-            $this->result->setOldValue($CurrentForm->getValue("o_result"));
-        }
-
-        // Check field name 'comments' first before field var 'x_comments'
-        $val = $CurrentForm->hasValue("comments") ? $CurrentForm->getValue("comments") : $CurrentForm->getValue("x_comments");
-        if (!$this->comments->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->comments->Visible = false; // Disable update for API request
-            } else {
-                $this->comments->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_comments")) {
-            $this->comments->setOldValue($CurrentForm->getValue("o_comments"));
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
             $this->id->setFormValue($val);
+        }
+
+        // Check field name 'patient_name' first before field var 'x_patient_name'
+        $val = $CurrentForm->hasValue("patient_name") ? $CurrentForm->getValue("patient_name") : $CurrentForm->getValue("x_patient_name");
+        if (!$this->patient_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->patient_name->Visible = false; // Disable update for API request
+            } else {
+                $this->patient_name->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_patient_name")) {
+            $this->patient_name->setOldValue($CurrentForm->getValue("o_patient_name"));
+        }
+
+        // Check field name 'patient_age' first before field var 'x_patient_age'
+        $val = $CurrentForm->hasValue("patient_age") ? $CurrentForm->getValue("patient_age") : $CurrentForm->getValue("x_patient_age");
+        if (!$this->patient_age->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->patient_age->Visible = false; // Disable update for API request
+            } else {
+                $this->patient_age->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_patient_age")) {
+            $this->patient_age->setOldValue($CurrentForm->getValue("o_patient_age"));
+        }
+
+        // Check field name 'details' first before field var 'x_details'
+        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
+        if (!$this->details->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->details->Visible = false; // Disable update for API request
+            } else {
+                $this->details->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_details")) {
+            $this->details->setOldValue($CurrentForm->getValue("o_details"));
+        }
+
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_status")) {
+            $this->status->setOldValue($CurrentForm->getValue("o_status"));
+        }
+
+        // Check field name 'laboratorist' first before field var 'x_laboratorist'
+        $val = $CurrentForm->hasValue("laboratorist") ? $CurrentForm->getValue("laboratorist") : $CurrentForm->getValue("x_laboratorist");
+        if (!$this->laboratorist->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->laboratorist->Visible = false; // Disable update for API request
+            } else {
+                $this->laboratorist->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_laboratorist")) {
+            $this->laboratorist->setOldValue($CurrentForm->getValue("o_laboratorist"));
+        }
+
+        // Check field name 'date_created' first before field var 'x_date_created'
+        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
+        if (!$this->date_created->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->date_created->Visible = false; // Disable update for API request
+            } else {
+                $this->date_created->setFormValue($val, true, $validate);
+            }
+            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_date_created")) {
+            $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
+        }
+
+        // Check field name 'date_updated' first before field var 'x_date_updated'
+        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
+        if (!$this->date_updated->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->date_updated->Visible = false; // Disable update for API request
+            } else {
+                $this->date_updated->setFormValue($val, true, $validate);
+            }
+            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_date_updated")) {
+            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
+        }
+
+        // Check field name 'visit_id' first before field var 'x_visit_id'
+        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
+        if (!$this->visit_id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->visit_id->setFormValue($val);
         }
     }
 
@@ -1727,11 +1757,20 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         global $CurrentForm;
         if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->visit_id->CurrentValue = $this->visit_id->FormValue;
+        }
+        if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->parameter->CurrentValue = $this->parameter->FormValue;
-        $this->result->CurrentValue = $this->result->FormValue;
-        $this->comments->CurrentValue = $this->comments->FormValue;
+        $this->patient_name->CurrentValue = $this->patient_name->FormValue;
+        $this->patient_age->CurrentValue = $this->patient_age->FormValue;
+        $this->details->CurrentValue = $this->details->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
+        $this->laboratorist->CurrentValue = $this->laboratorist->FormValue;
+        $this->date_created->CurrentValue = $this->date_created->FormValue;
+        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
+        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
+        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1828,10 +1867,15 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->lab_test_reports_id->setDbValue($row['lab_test_reports_id']);
-        $this->parameter->setDbValue($row['parameter']);
-        $this->result->setDbValue($row['result']);
-        $this->comments->setDbValue($row['comments']);
+        $this->visit_id->setDbValue($row['visit_id']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
+        $this->patient_age->setDbValue($row['patient_age']);
+        $this->details->setDbValue($row['details']);
+        $this->status->setDbValue($row['status']);
+        $this->laboratorist->setDbValue($row['laboratorist']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1841,10 +1885,15 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['lab_test_reports_id'] = $this->lab_test_reports_id->DefaultValue;
-        $row['parameter'] = $this->parameter->DefaultValue;
-        $row['result'] = $this->result->DefaultValue;
-        $row['comments'] = $this->comments->DefaultValue;
+        $row['visit_id'] = $this->visit_id->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['gender'] = $this->gender->DefaultValue;
+        $row['patient_age'] = $this->patient_age->DefaultValue;
+        $row['details'] = $this->details->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
+        $row['laboratorist'] = $this->laboratorist->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1887,13 +1936,23 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
         // id
 
-        // lab_test_reports_id
+        // visit_id
 
-        // parameter
+        // patient_id
 
-        // result
+        // patient_name
 
-        // comments
+        // date_of_birth
+
+        // gender
+
+        // patient_age
+
+        // details
+
+        // status
+
+        // laboratorist
 
         // date_created
 
@@ -1904,98 +1963,233 @@ class UrinalysisParametersGrid extends UrinalysisParameters
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // lab_test_reports_id
-            $this->lab_test_reports_id->ViewValue = $this->lab_test_reports_id->CurrentValue;
-            $this->lab_test_reports_id->ViewValue = FormatNumber($this->lab_test_reports_id->ViewValue, $this->lab_test_reports_id->formatPattern());
+            // visit_id
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
 
-            // parameter
-            if (strval($this->parameter->CurrentValue) != "") {
-                $this->parameter->ViewValue = $this->parameter->optionCaption($this->parameter->CurrentValue);
-            } else {
-                $this->parameter->ViewValue = null;
-            }
+            // patient_id
+            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
 
-            // result
-            $this->result->ViewValue = $this->result->CurrentValue;
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
-            // comments
-            $this->comments->ViewValue = $this->comments->CurrentValue;
+            // date_of_birth
+            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
-            // parameter
-            $this->parameter->HrefValue = "";
-            $this->parameter->TooltipValue = "";
+            // gender
+            $this->gender->ViewValue = $this->gender->CurrentValue;
 
-            // result
-            $this->result->HrefValue = "";
-            $this->result->TooltipValue = "";
+            // patient_age
+            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
-            // comments
-            $this->comments->HrefValue = "";
-            $this->comments->TooltipValue = "";
+            // details
+            $this->details->ViewValue = $this->details->CurrentValue;
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
+            // laboratorist
+            $this->laboratorist->ViewValue = $this->laboratorist->CurrentValue;
+
+            // date_created
+            $this->date_created->ViewValue = $this->date_created->CurrentValue;
+            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
+
+            // patient_age
+            $this->patient_age->HrefValue = "";
+            $this->patient_age->TooltipValue = "";
+
+            // details
+            $this->details->HrefValue = "";
+            $this->details->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
+
+            // laboratorist
+            $this->laboratorist->HrefValue = "";
+            $this->laboratorist->TooltipValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+            $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // parameter
-            $this->parameter->setupEditAttributes();
-            $this->parameter->EditValue = $this->parameter->options(true);
-            $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
+            // id
 
-            // result
-            $this->result->setupEditAttributes();
-            if (!$this->result->Raw) {
-                $this->result->CurrentValue = HtmlDecode($this->result->CurrentValue);
+            // patient_name
+            $this->patient_name->setupEditAttributes();
+            if (!$this->patient_name->Raw) {
+                $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
             }
-            $this->result->EditValue = HtmlEncode($this->result->CurrentValue);
-            $this->result->PlaceHolder = RemoveHtml($this->result->caption());
+            $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
+            $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
-            // comments
-            $this->comments->setupEditAttributes();
-            if (!$this->comments->Raw) {
-                $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+            // patient_age
+            $this->patient_age->setupEditAttributes();
+            $this->patient_age->EditValue = $this->patient_age->CurrentValue;
+            $this->patient_age->PlaceHolder = RemoveHtml($this->patient_age->caption());
+            if (strval($this->patient_age->EditValue) != "" && is_numeric($this->patient_age->EditValue)) {
+                $this->patient_age->EditValue = FormatNumber($this->patient_age->EditValue, null);
             }
-            $this->comments->EditValue = HtmlEncode($this->comments->CurrentValue);
-            $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
+
+            // details
+            $this->details->setupEditAttributes();
+            if (!$this->details->Raw) {
+                $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
+            }
+            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // laboratorist
+            $this->laboratorist->setupEditAttributes();
+            if (!$this->laboratorist->Raw) {
+                $this->laboratorist->CurrentValue = HtmlDecode($this->laboratorist->CurrentValue);
+            }
+            $this->laboratorist->EditValue = HtmlEncode($this->laboratorist->CurrentValue);
+            $this->laboratorist->PlaceHolder = RemoveHtml($this->laboratorist->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
-            // parameter
-            $this->parameter->HrefValue = "";
+            // id
+            $this->id->HrefValue = "";
 
-            // result
-            $this->result->HrefValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
 
-            // comments
-            $this->comments->HrefValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+
+            // details
+            $this->details->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+
+            // laboratorist
+            $this->laboratorist->HrefValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // parameter
-            $this->parameter->setupEditAttributes();
-            $this->parameter->EditValue = $this->parameter->options(true);
-            $this->parameter->PlaceHolder = RemoveHtml($this->parameter->caption());
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
 
-            // result
-            $this->result->setupEditAttributes();
-            if (!$this->result->Raw) {
-                $this->result->CurrentValue = HtmlDecode($this->result->CurrentValue);
+            // patient_name
+            $this->patient_name->setupEditAttributes();
+            if (!$this->patient_name->Raw) {
+                $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
             }
-            $this->result->EditValue = HtmlEncode($this->result->CurrentValue);
-            $this->result->PlaceHolder = RemoveHtml($this->result->caption());
+            $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
+            $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
-            // comments
-            $this->comments->setupEditAttributes();
-            if (!$this->comments->Raw) {
-                $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+            // patient_age
+            $this->patient_age->setupEditAttributes();
+            $this->patient_age->EditValue = $this->patient_age->CurrentValue;
+            $this->patient_age->PlaceHolder = RemoveHtml($this->patient_age->caption());
+            if (strval($this->patient_age->EditValue) != "" && is_numeric($this->patient_age->EditValue)) {
+                $this->patient_age->EditValue = FormatNumber($this->patient_age->EditValue, null);
             }
-            $this->comments->EditValue = HtmlEncode($this->comments->CurrentValue);
-            $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
+
+            // details
+            $this->details->setupEditAttributes();
+            if (!$this->details->Raw) {
+                $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
+            }
+            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // laboratorist
+            $this->laboratorist->setupEditAttributes();
+            if (!$this->laboratorist->Raw) {
+                $this->laboratorist->CurrentValue = HtmlDecode($this->laboratorist->CurrentValue);
+            }
+            $this->laboratorist->EditValue = HtmlEncode($this->laboratorist->CurrentValue);
+            $this->laboratorist->PlaceHolder = RemoveHtml($this->laboratorist->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
 
-            // parameter
-            $this->parameter->HrefValue = "";
+            // id
+            $this->id->HrefValue = "";
 
-            // result
-            $this->result->HrefValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
 
-            // comments
-            $this->comments->HrefValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+
+            // details
+            $this->details->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+
+            // laboratorist
+            $this->laboratorist->HrefValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2017,20 +2211,54 @@ class UrinalysisParametersGrid extends UrinalysisParameters
             return true;
         }
         $validateForm = true;
-            if ($this->parameter->Visible && $this->parameter->Required) {
-                if (!$this->parameter->IsDetailKey && EmptyValue($this->parameter->FormValue)) {
-                    $this->parameter->addErrorMessage(str_replace("%s", $this->parameter->caption(), $this->parameter->RequiredErrorMessage));
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->result->Visible && $this->result->Required) {
-                if (!$this->result->IsDetailKey && EmptyValue($this->result->FormValue)) {
-                    $this->result->addErrorMessage(str_replace("%s", $this->result->caption(), $this->result->RequiredErrorMessage));
+            if ($this->patient_name->Visible && $this->patient_name->Required) {
+                if (!$this->patient_name->IsDetailKey && EmptyValue($this->patient_name->FormValue)) {
+                    $this->patient_name->addErrorMessage(str_replace("%s", $this->patient_name->caption(), $this->patient_name->RequiredErrorMessage));
                 }
             }
-            if ($this->comments->Visible && $this->comments->Required) {
-                if (!$this->comments->IsDetailKey && EmptyValue($this->comments->FormValue)) {
-                    $this->comments->addErrorMessage(str_replace("%s", $this->comments->caption(), $this->comments->RequiredErrorMessage));
+            if ($this->patient_age->Visible && $this->patient_age->Required) {
+                if (!$this->patient_age->IsDetailKey && EmptyValue($this->patient_age->FormValue)) {
+                    $this->patient_age->addErrorMessage(str_replace("%s", $this->patient_age->caption(), $this->patient_age->RequiredErrorMessage));
                 }
+            }
+            if (!CheckInteger($this->patient_age->FormValue)) {
+                $this->patient_age->addErrorMessage($this->patient_age->getErrorMessage(false));
+            }
+            if ($this->details->Visible && $this->details->Required) {
+                if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
+                    $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+                }
+            }
+            if ($this->laboratorist->Visible && $this->laboratorist->Required) {
+                if (!$this->laboratorist->IsDetailKey && EmptyValue($this->laboratorist->FormValue)) {
+                    $this->laboratorist->addErrorMessage(str_replace("%s", $this->laboratorist->caption(), $this->laboratorist->RequiredErrorMessage));
+                }
+            }
+            if ($this->date_created->Visible && $this->date_created->Required) {
+                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
+                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
+                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+            }
+            if ($this->date_updated->Visible && $this->date_updated->Required) {
+                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
+                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
+                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2071,6 +2299,10 @@ class UrinalysisParametersGrid extends UrinalysisParameters
                 $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
             }
             $thisKey .= $row['id'];
+            if ($thisKey != "") {
+                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+            }
+            $thisKey .= $row['visit_id'];
 
             // Call row deleting event
             $deleteRow = $this->rowDeleting($row);
@@ -2182,14 +2414,26 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         global $Security;
         $rsnew = [];
 
-        // parameter
-        $this->parameter->setDbValueDef($rsnew, $this->parameter->CurrentValue, $this->parameter->ReadOnly);
+        // patient_name
+        $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, $this->patient_name->ReadOnly);
 
-        // result
-        $this->result->setDbValueDef($rsnew, $this->result->CurrentValue, $this->result->ReadOnly);
+        // patient_age
+        $this->patient_age->setDbValueDef($rsnew, $this->patient_age->CurrentValue, $this->patient_age->ReadOnly);
 
-        // comments
-        $this->comments->setDbValueDef($rsnew, $this->comments->CurrentValue, $this->comments->ReadOnly);
+        // details
+        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, $this->details->ReadOnly);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
+
+        // laboratorist
+        $this->laboratorist->setDbValueDef($rsnew, $this->laboratorist->CurrentValue, $this->laboratorist->ReadOnly);
+
+        // date_created
+        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
+
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -2199,14 +2443,26 @@ class UrinalysisParametersGrid extends UrinalysisParameters
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['parameter'])) { // parameter
-            $this->parameter->CurrentValue = $row['parameter'];
+        if (isset($row['patient_name'])) { // patient_name
+            $this->patient_name->CurrentValue = $row['patient_name'];
         }
-        if (isset($row['result'])) { // result
-            $this->result->CurrentValue = $row['result'];
+        if (isset($row['patient_age'])) { // patient_age
+            $this->patient_age->CurrentValue = $row['patient_age'];
         }
-        if (isset($row['comments'])) { // comments
-            $this->comments->CurrentValue = $row['comments'];
+        if (isset($row['details'])) { // details
+            $this->details->CurrentValue = $row['details'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
+        }
+        if (isset($row['laboratorist'])) { // laboratorist
+            $this->laboratorist->CurrentValue = $row['laboratorist'];
+        }
+        if (isset($row['date_created'])) { // date_created
+            $this->date_created->CurrentValue = $row['date_created'];
+        }
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->CurrentValue = $row['date_updated'];
         }
     }
 
@@ -2216,9 +2472,11 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "lab_test_reports") {
-            $this->lab_test_reports_id->Visible = true; // Need to insert foreign key
-            $this->lab_test_reports_id->CurrentValue = $this->lab_test_reports_id->getSessionValue();
+        if ($this->getCurrentMasterTable() == "patient_visits") {
+            $this->visit_id->Visible = true; // Need to insert foreign key
+            $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
         }
 
         // Get new row
@@ -2226,28 +2484,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid key values for master user
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $detailKeys = [];
-            $detailKeys["lab_test_reports_id"] = $this->lab_test_reports_id->CurrentValue;
-            $masterTable = Container("lab_test_reports");
-            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
-            if (!EmptyValue($masterFilter)) {
-                $validMasterKey = true;
-                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
-                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
-                } elseif ($this->getCurrentMasterTable() == "lab_test_reports") {
-                    $validMasterKey = false;
-                }
-                if (!$validMasterKey) {
-                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
-                    $this->setFailureMessage($masterUserIdMsg);
-                    return false;
-                }
-            }
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -2289,18 +2525,35 @@ class UrinalysisParametersGrid extends UrinalysisParameters
         global $Security;
         $rsnew = [];
 
-        // parameter
-        $this->parameter->setDbValueDef($rsnew, $this->parameter->CurrentValue, false);
+        // patient_name
+        $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, false);
 
-        // result
-        $this->result->setDbValueDef($rsnew, $this->result->CurrentValue, false);
+        // patient_age
+        $this->patient_age->setDbValueDef($rsnew, $this->patient_age->CurrentValue, false);
 
-        // comments
-        $this->comments->setDbValueDef($rsnew, $this->comments->CurrentValue, false);
+        // details
+        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, false);
 
-        // lab_test_reports_id
-        if ($this->lab_test_reports_id->getSessionValue() != "") {
-            $rsnew['lab_test_reports_id'] = $this->lab_test_reports_id->getSessionValue();
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
+
+        // laboratorist
+        $this->laboratorist->setDbValueDef($rsnew, $this->laboratorist->CurrentValue, false);
+
+        // date_created
+        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
+
+        // date_updated
+        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
+        }
+
+        // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $rsnew['patient_id'] = $this->patient_id->getSessionValue();
         }
         return $rsnew;
     }
@@ -2311,17 +2564,32 @@ class UrinalysisParametersGrid extends UrinalysisParameters
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['parameter'])) { // parameter
-            $this->parameter->setFormValue($row['parameter']);
+        if (isset($row['patient_name'])) { // patient_name
+            $this->patient_name->setFormValue($row['patient_name']);
         }
-        if (isset($row['result'])) { // result
-            $this->result->setFormValue($row['result']);
+        if (isset($row['patient_age'])) { // patient_age
+            $this->patient_age->setFormValue($row['patient_age']);
         }
-        if (isset($row['comments'])) { // comments
-            $this->comments->setFormValue($row['comments']);
+        if (isset($row['details'])) { // details
+            $this->details->setFormValue($row['details']);
         }
-        if (isset($row['lab_test_reports_id'])) { // lab_test_reports_id
-            $this->lab_test_reports_id->setFormValue($row['lab_test_reports_id']);
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
+        }
+        if (isset($row['laboratorist'])) { // laboratorist
+            $this->laboratorist->setFormValue($row['laboratorist']);
+        }
+        if (isset($row['date_created'])) { // date_created
+            $this->date_created->setFormValue($row['date_created']);
+        }
+        if (isset($row['date_updated'])) { // date_updated
+            $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
+        }
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
         }
     }
 
@@ -2330,9 +2598,13 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "lab_test_reports") {
-            $masterTbl = Container("lab_test_reports");
-            $this->lab_test_reports_id->Visible = false;
+        if ($masterTblVar == "patient_visits") {
+            $masterTbl = Container("patient_visits");
+            $this->visit_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+            $this->patient_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
@@ -2354,8 +2626,6 @@ class UrinalysisParametersGrid extends UrinalysisParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_parameter":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2388,10 +2658,7 @@ class UrinalysisParametersGrid extends UrinalysisParameters
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add parameter");
+        //Log("Page Load");
     }
 
     // Page Unload event

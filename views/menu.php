@@ -8,7 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(434, "mi_urinalysis_parameters", $Language->menuPhrase("434", "MenuText"), "urinalysisparameterslist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}urinalysis_parameters'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(437, "mi_full_haemogram_parameters", $Language->menuPhrase("437", "MenuText"), "fullhaemogramparameterslist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334", "MenuText"), "radiologyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "fa-tachometer", "", false, true);
@@ -39,6 +39,7 @@ $sideMenu->addMenuItem(173, "mci_Investigations", $Language->menuPhrase("173", "
 $sideMenu->addMenuItem(52, "mci_Laboratory", $Language->menuPhrase("52", "MenuText"), "", 173, "", true, false, true, "fa-microscope", "", false, true);
 $sideMenu->addMenuItem(13, "mi_lab_test_requests", $Language->menuPhrase("13", "MenuText"), "labtestrequestslist?cmd=resetall", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}lab_test_requests'), false, false, "fa-microscope", "", false, true);
 $sideMenu->addMenuItem(12, "mi_lab_test_reports", $Language->menuPhrase("12", "MenuText"), "labtestreportslist", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports'), false, false, "fa-file-medical", "", false, true);
+$sideMenu->addMenuItem(435, "mi_patients_lab_report", $Language->menuPhrase("435", "MenuText"), "patientslabreportlist?cmd=resetall", 52, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients_lab_report'), false, false, "fa-file-medical", "", false, true);
 $sideMenu->addMenuItem(102, "mci_Radiology", $Language->menuPhrase("102", "MenuText"), "", 173, "", true, false, true, "fa-x-ray", "", false, true);
 $sideMenu->addMenuItem(30, "mi_radiology_requests", $Language->menuPhrase("30", "MenuText"), "radiologyrequestslist?cmd=resetall", 102, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}radiology_requests'), false, false, "fa-x-ray", "", false, true);
 $sideMenu->addMenuItem(29, "mi_radiology_reports", $Language->menuPhrase("29", "MenuText"), "radiologyreportslist", 102, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}radiology_reports'), false, false, "fa-list", "", false, true);
