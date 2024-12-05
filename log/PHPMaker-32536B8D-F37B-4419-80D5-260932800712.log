@@ -7,6 +7,7 @@ C:\wamp64\www\afyaplus\controllers\AppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReportController.php
 C:\wamp64\www\afyaplus\controllers\CashPaymentsController.php
+C:\wamp64\www\afyaplus\controllers\CashPaymentsReportController.php
 C:\wamp64\www\afyaplus\controllers\ControllerBase.php
 C:\wamp64\www\afyaplus\controllers\DepartmentsController.php
 C:\wamp64\www\afyaplus\controllers\DesignationsController.php
@@ -129,6 +130,8 @@ C:\wamp64\www\afyaplus\models\CashPaymentsDelete.php
 C:\wamp64\www\afyaplus\models\CashPaymentsEdit.php
 C:\wamp64\www\afyaplus\models\CashPaymentsGrid.php
 C:\wamp64\www\afyaplus\models\CashPaymentsList.php
+C:\wamp64\www\afyaplus\models\CashPaymentsReport.php
+C:\wamp64\www\afyaplus\models\CashPaymentsReportList.php
 C:\wamp64\www\afyaplus\models\CashPaymentsView.php
 C:\wamp64\www\afyaplus\models\ChangePassword.php
 C:\wamp64\www\afyaplus\models\Departments.php
@@ -561,6 +564,7 @@ C:\wamp64\www\afyaplus\src\EmailTwoFactorAuthentication.php
 C:\wamp64\www\afyaplus\src\EntityDescriptor.php
 C:\wamp64\www\afyaplus\src\Entity\AppointmentsReport.php
 C:\wamp64\www\afyaplus\src\Entity\CashPayment.php
+C:\wamp64\www\afyaplus\src\Entity\CashPaymentsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Department.php
 C:\wamp64\www\afyaplus\src\Entity\Designation.php
 C:\wamp64\www\afyaplus\src\Entity\Diagnosis.php
@@ -732,6 +736,7 @@ C:\wamp64\www\afyaplus\views\CashPaymentsDelete.php
 C:\wamp64\www\afyaplus\views\CashPaymentsEdit.php
 C:\wamp64\www\afyaplus\views\CashPaymentsGrid.php
 C:\wamp64\www\afyaplus\views\CashPaymentsList.php
+C:\wamp64\www\afyaplus\views\CashPaymentsReportList.php
 C:\wamp64\www\afyaplus\views\CashPaymentsView.php
 C:\wamp64\www\afyaplus\views\ChangePassword.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php

@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "cashpaymentsdelete";
+    public $CurrentPageName = "cashpaymentsreportlist";
 
     // Page headings
     public $Heading = "";

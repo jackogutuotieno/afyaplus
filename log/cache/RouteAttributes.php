@@ -160,6 +160,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -309,6 +310,11 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1766,6 +1772,7 @@
                 '/cashpaymentsview[/{id}]',
                 '/cashpaymentsedit[/{id}]',
                 '/cashpaymentsdelete[/{id}]',
+                '/cashpaymentsreportlist[/{id}]',
                 '/departmentslist[/{id}]',
                 '/departmentsadd[/{id}]',
                 '/departmentsview[/{id}]',
@@ -2060,6 +2067,7 @@
                 'PHPMaker2024\\afyaplus\\CashPaymentsController:view',
                 'PHPMaker2024\\afyaplus\\CashPaymentsController:edit',
                 'PHPMaker2024\\afyaplus\\CashPaymentsController:delete',
+                'PHPMaker2024\\afyaplus\\CashPaymentsReportController:list',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:list',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:add',
                 'PHPMaker2024\\afyaplus\\DepartmentsController:view',
@@ -2342,6 +2350,9 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3230,6 +3241,7 @@
                 'view.cash_payments',
                 'edit.cash_payments',
                 'delete.cash_payments',
+                'list.cash_payments_report',
                 'list.departments',
                 'add.departments',
                 'view.departments',
@@ -3512,6 +3524,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -4100,6 +4113,7 @@
         $o[289],
         $o[290],
         $o[291],
+        $o[292],
     ],
     []
 );

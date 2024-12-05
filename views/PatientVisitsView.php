@@ -140,7 +140,7 @@ loadjs.ready("head", function () {
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_medical_scheme_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_medical_scheme_id"></slot></p>
         </div>
-    </div> <!-- ./col -->  
+    </div> <!-- ./col --> 
 </div> <!-- ./row --></div>
 </template>
 <?php

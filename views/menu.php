@@ -71,9 +71,10 @@ $sideMenu->addMenuItem(242, "mi_Appointments_Report", $Language->menuPhrase("242
 $sideMenu->addMenuItem(318, "mi_Vaccinations_Report", $Language->menuPhrase("318", "MenuText"), "vaccinationsreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Vaccinations Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(333, "mi_Radiology_Report", $Language->menuPhrase("333", "MenuText"), "radiologyreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(313, "mi_Medicine_Stock_Report", $Language->menuPhrase("313", "MenuText"), "medicinestockreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report'), false, false, "fa-file", "", false, true);
+$sideMenu->addMenuItem(433, "mi_cash_payments_report", $Language->menuPhrase("433", "MenuText"), "cashpaymentsreportlist", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(322, "mi_Income_Report", $Language->menuPhrase("322", "MenuText"), "incomereport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Income Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(324, "mi_Expenses_Report", $Language->menuPhrase("324", "MenuText"), "expensesreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Expenses Report'), false, false, "fa-file", "", false, true);
-$sideMenu->addMenuItem(427, "mci_External_Reports", $Language->menuPhrase("427", "MenuText"), "", 104, "", true, false, true, "fa-file", "", false, true);
+$sideMenu->addMenuItem(427, "mci_External_Reports", $Language->menuPhrase("427", "MenuText"), "fa-file", 104, "", true, false, true, "fa-file", "", false, true);
 $sideMenu->addMenuItem(335, "mi_moh204a_report", $Language->menuPhrase("335", "MenuText"), "moh204areportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh204a_report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(428, "mi_moh204b_report", $Language->menuPhrase("428", "MenuText"), "moh204breportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh204b_report'), false, false, "fa-file", "", false, true);
 echo $sideMenu->toScript();

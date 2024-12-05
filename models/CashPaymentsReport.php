@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for laboratory_billing_report
+ * Table class for cash_payments_report
  */
-class LaboratoryBillingReport extends DbTable
+class CashPaymentsReport extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,9 +47,11 @@ class LaboratoryBillingReport extends DbTable
 
     // Fields
     public $id;
-    public $patient_id;
-    public $visit_id;
-    public $status;
+    public $patient_name;
+    public $date_of_birth;
+    public $gender;
+    public $amount;
+    public $details;
     public $date_created;
     public $date_updated;
 
@@ -64,14 +66,14 @@ class LaboratoryBillingReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "laboratory_billing_report";
-        $this->TableName = 'laboratory_billing_report';
+        $this->TableVar = "cash_payments_report";
+        $this->TableName = 'cash_payments_report';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "laboratory_billing_report";
+        $this->UpdateTable = "cash_payments_report";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -90,7 +92,7 @@ class LaboratoryBillingReport extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
+        $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -120,90 +122,130 @@ class LaboratoryBillingReport extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_id
-        $this->patient_id = new DbField(
+        // patient_name
+        $this->patient_name = new DbField(
             $this, // Table
-            'x_patient_id', // Variable name
-            'patient_id', // Name
-            '`patient_id`', // Expression
-            '`patient_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`patient_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->patient_id->InputTextType = "text";
-        $this->patient_id->Raw = true;
-        $this->patient_id->Nullable = false; // NOT NULL field
-        $this->patient_id->Required = true; // Required field
-        $this->patient_id->setSelectMultiple(false); // Select one
-        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_id'] = &$this->patient_id;
-
-        // visit_id
-        $this->visit_id = new DbField(
-            $this, // Table
-            'x_visit_id', // Variable name
-            'visit_id', // Name
-            '`visit_id`', // Expression
-            '`visit_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`visit_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->visit_id->InputTextType = "text";
-        $this->visit_id->Raw = true;
-        $this->visit_id->Nullable = false; // NOT NULL field
-        $this->visit_id->Required = true; // Required field
-        $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['visit_id'] = &$this->visit_id;
-
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '\'\'', // Expression
-            '\'\'', // Basic search expression
+            'x_patient_name', // Variable name
+            'patient_name', // Name
+            '`patient_name`', // Expression
+            '`patient_name`', // Basic search expression
             200, // Type
-            0, // Size
+            101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '\'\'', // Virtual expression
+            '`patient_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->status->InputTextType = "text";
-        $this->status->IsCustom = true; // Custom field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['status'] = &$this->status;
+        $this->patient_name->InputTextType = "text";
+        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_name'] = &$this->patient_name;
+
+        // date_of_birth
+        $this->date_of_birth = new DbField(
+            $this, // Table
+            'x_date_of_birth', // Variable name
+            'date_of_birth', // Name
+            '`date_of_birth`', // Expression
+            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
+            133, // Type
+            40, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '`date_of_birth`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->date_of_birth->InputTextType = "text";
+        $this->date_of_birth->Raw = true;
+        $this->date_of_birth->Nullable = false; // NOT NULL field
+        $this->date_of_birth->Required = true; // Required field
+        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['date_of_birth'] = &$this->date_of_birth;
+
+        // gender
+        $this->gender = new DbField(
+            $this, // Table
+            'x_gender', // Variable name
+            'gender', // Name
+            '`gender`', // Expression
+            '`gender`', // Basic search expression
+            200, // Type
+            15, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`gender`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->gender->InputTextType = "text";
+        $this->gender->Nullable = false; // NOT NULL field
+        $this->gender->Required = true; // Required field
+        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['gender'] = &$this->gender;
+
+        // amount
+        $this->amount = new DbField(
+            $this, // Table
+            'x_amount', // Variable name
+            'amount', // Name
+            '`amount`', // Expression
+            '`amount`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`amount`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->amount->InputTextType = "text";
+        $this->amount->Raw = true;
+        $this->amount->Nullable = false; // NOT NULL field
+        $this->amount->Required = true; // Required field
+        $this->amount->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->amount->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['amount'] = &$this->amount;
+
+        // details
+        $this->details = new DbField(
+            $this, // Table
+            'x_details', // Variable name
+            'details', // Name
+            '`details`', // Expression
+            '`details`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`details`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->details->InputTextType = "text";
+        $this->details->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['details'] = &$this->details;
 
         // date_created
         $this->date_created = new DbField(
@@ -315,32 +357,6 @@ class LaboratoryBillingReport extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "laboratory_billing_report_details") {
-            $detailUrl = Container("laboratory_billing_report_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "laboratorybillingreportlist";
-        }
-        return $detailUrl;
-    }
-
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -350,7 +366,7 @@ class LaboratoryBillingReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "laboratory_billing_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "cash_payments_report";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -374,7 +390,20 @@ class LaboratoryBillingReport extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, '' AS `status`";
+        $useFieldNames = false;
+        $fieldNames = [];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($this->Fields as $field) {
+            $expr = $field->Expression;
+            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
+            if ($customExpr != $expr) {
+                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
+                $useFieldNames = true;
+            } else {
+                $fieldNames[] = $expr;
+            }
+        }
+        return $useFieldNames ? implode(", ", $fieldNames) : "*";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -789,9 +818,11 @@ class LaboratoryBillingReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_id->DbValue = $row['patient_id'];
-        $this->visit_id->DbValue = $row['visit_id'];
-        $this->status->DbValue = $row['status'];
+        $this->patient_name->DbValue = $row['patient_name'];
+        $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->gender->DbValue = $row['gender'];
+        $this->amount->DbValue = $row['amount'];
+        $this->details->DbValue = $row['details'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -867,7 +898,7 @@ class LaboratoryBillingReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("laboratorybillingreportlist");
+        return $_SESSION[$name] ?? GetUrl("cashpaymentsreportlist");
     }
 
     // Set return page URL
@@ -881,9 +912,9 @@ class LaboratoryBillingReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "laboratorybillingreportview" => $Language->phrase("View"),
-            "laboratorybillingreportedit" => $Language->phrase("Edit"),
-            "laboratorybillingreportadd" => $Language->phrase("Add"),
+            "cashpaymentsreportview" => $Language->phrase("View"),
+            "cashpaymentsreportedit" => $Language->phrase("Edit"),
+            "cashpaymentsreportadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -891,18 +922,18 @@ class LaboratoryBillingReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "laboratorybillingreportlist";
+        return "cashpaymentsreportlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "LaboratoryBillingReportView",
-            Config("API_ADD_ACTION") => "LaboratoryBillingReportAdd",
-            Config("API_EDIT_ACTION") => "LaboratoryBillingReportEdit",
-            Config("API_DELETE_ACTION") => "LaboratoryBillingReportDelete",
-            Config("API_LIST_ACTION") => "LaboratoryBillingReportList",
+            Config("API_VIEW_ACTION") => "CashPaymentsReportView",
+            Config("API_ADD_ACTION") => "CashPaymentsReportAdd",
+            Config("API_EDIT_ACTION") => "CashPaymentsReportEdit",
+            Config("API_DELETE_ACTION") => "CashPaymentsReportDelete",
+            Config("API_LIST_ACTION") => "CashPaymentsReportList",
             default => ""
         };
     }
@@ -922,16 +953,16 @@ class LaboratoryBillingReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "laboratorybillingreportlist";
+        return "cashpaymentsreportlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportview", $parm);
+            $url = $this->keyUrl("cashpaymentsreportview", $parm);
         } else {
-            $url = $this->keyUrl("laboratorybillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("cashpaymentsreportview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -940,9 +971,9 @@ class LaboratoryBillingReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "laboratorybillingreportadd?" . $parm;
+            $url = "cashpaymentsreportadd?" . $parm;
         } else {
-            $url = "laboratorybillingreportadd";
+            $url = "cashpaymentsreportadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -950,36 +981,28 @@ class LaboratoryBillingReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportedit", $parm);
-        } else {
-            $url = $this->keyUrl("laboratorybillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("cashpaymentsreportedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("laboratorybillingreportlist", "action=edit");
+        $url = $this->keyUrl("cashpaymentsreportlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("laboratorybillingreportadd", $parm);
-        } else {
-            $url = $this->keyUrl("laboratorybillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("cashpaymentsreportadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("laboratorybillingreportlist", "action=copy");
+        $url = $this->keyUrl("cashpaymentsreportlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -989,7 +1012,7 @@ class LaboratoryBillingReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("laboratorybillingreportdelete", $parm);
+            return $this->keyUrl("cashpaymentsreportdelete", $parm);
         }
     }
 
@@ -1155,9 +1178,11 @@ class LaboratoryBillingReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->status->setDbValue($row['status']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
+        $this->amount->setDbValue($row['amount']);
+        $this->details->setDbValue($row['details']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1166,7 +1191,7 @@ class LaboratoryBillingReport extends DbTable
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "LaboratoryBillingReportList";
+        $listPage = "CashPaymentsReportList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1192,11 +1217,15 @@ class LaboratoryBillingReport extends DbTable
 
         // id
 
-        // patient_id
+        // patient_name
 
-        // visit_id
+        // date_of_birth
 
-        // status
+        // gender
+
+        // amount
+
+        // details
 
         // date_created
 
@@ -1205,35 +1234,22 @@ class LaboratoryBillingReport extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // patient_id
-        $curVal = strval($this->patient_id->CurrentValue);
-        if ($curVal != "") {
-            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-            if ($this->patient_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                } else {
-                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                }
-            }
-        } else {
-            $this->patient_id->ViewValue = null;
-        }
+        // patient_name
+        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
-        // visit_id
-        $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-        $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+        // date_of_birth
+        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
-        // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        // gender
+        $this->gender->ViewValue = $this->gender->CurrentValue;
+
+        // amount
+        $this->amount->ViewValue = $this->amount->CurrentValue;
+        $this->amount->ViewValue = FormatNumber($this->amount->ViewValue, $this->amount->formatPattern());
+
+        // details
+        $this->details->ViewValue = $this->details->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1247,17 +1263,25 @@ class LaboratoryBillingReport extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_id
-        $this->patient_id->HrefValue = "";
-        $this->patient_id->TooltipValue = "";
+        // patient_name
+        $this->patient_name->HrefValue = "";
+        $this->patient_name->TooltipValue = "";
 
-        // visit_id
-        $this->visit_id->HrefValue = "";
-        $this->visit_id->TooltipValue = "";
+        // date_of_birth
+        $this->date_of_birth->HrefValue = "";
+        $this->date_of_birth->TooltipValue = "";
 
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
+        // gender
+        $this->gender->HrefValue = "";
+        $this->gender->TooltipValue = "";
+
+        // amount
+        $this->amount->HrefValue = "";
+        $this->amount->TooltipValue = "";
+
+        // details
+        $this->details->HrefValue = "";
+        $this->details->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1286,25 +1310,42 @@ class LaboratoryBillingReport extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // patient_id
-        $this->patient_id->setupEditAttributes();
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+        // patient_name
+        $this->patient_name->setupEditAttributes();
+        if (!$this->patient_name->Raw) {
+            $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
+        }
+        $this->patient_name->EditValue = $this->patient_name->CurrentValue;
+        $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
-        // visit_id
-        $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-        if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-            $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
+        // date_of_birth
+        $this->date_of_birth->setupEditAttributes();
+        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
+        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
+
+        // gender
+        $this->gender->setupEditAttributes();
+        if (!$this->gender->Raw) {
+            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
+        }
+        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
+
+        // amount
+        $this->amount->setupEditAttributes();
+        $this->amount->EditValue = $this->amount->CurrentValue;
+        $this->amount->PlaceHolder = RemoveHtml($this->amount->caption());
+        if (strval($this->amount->EditValue) != "" && is_numeric($this->amount->EditValue)) {
+            $this->amount->EditValue = FormatNumber($this->amount->EditValue, null);
         }
 
-        // status
-        $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        // details
+        $this->details->setupEditAttributes();
+        if (!$this->details->Raw) {
+            $this->details->CurrentValue = HtmlDecode($this->details->CurrentValue);
         }
-        $this->status->EditValue = $this->status->CurrentValue;
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+        $this->details->EditValue = $this->details->CurrentValue;
+        $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1323,11 +1364,19 @@ class LaboratoryBillingReport extends DbTable
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->amount->CurrentValue)) {
+                $this->amount->Total += $this->amount->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->amount->CurrentValue = $this->amount->Total;
+            $this->amount->ViewValue = $this->amount->CurrentValue;
+            $this->amount->ViewValue = FormatNumber($this->amount->ViewValue, $this->amount->formatPattern());
+            $this->amount->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1345,16 +1394,20 @@ class LaboratoryBillingReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->amount);
+                    $doc->exportCaption($this->details);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->amount);
+                    $doc->exportCaption($this->details);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1375,6 +1428,7 @@ class LaboratoryBillingReport extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1384,16 +1438,20 @@ class LaboratoryBillingReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->amount);
+                        $doc->exportField($this->details);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->amount);
+                        $doc->exportField($this->details);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1404,6 +1462,25 @@ class LaboratoryBillingReport extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
+            }
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = RowType::AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->id, '');
+                $doc->exportAggregate($this->patient_name, '');
+                $doc->exportAggregate($this->date_of_birth, '');
+                $doc->exportAggregate($this->gender, '');
+                $doc->exportAggregate($this->amount, 'TOTAL');
+                $doc->exportAggregate($this->details, '');
+                $doc->exportAggregate($this->date_created, '');
+                $doc->exportAggregate($this->date_updated, '');
+                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {
@@ -1566,14 +1643,8 @@ class LaboratoryBillingReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        $current_date = CurrentDate();
-        if ($this->date_created->CurrentValue >= $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New"; 
-        } else if ($this->date_created->CurrentValue < $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: orange; color: white";
-            $this->status->ViewValue = "Overdue"; 
-        } 
+        // To view properties of field class, use:
+        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

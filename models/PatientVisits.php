@@ -1924,7 +1924,7 @@ class PatientVisits extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Visit"; 
         } 
-        $this->patient_id->ViewValue = "<a href='patientvisitsview/" . $this->id->ViewValue . "?showdetail=patient_vitals,lab_test_requests'> " . $this->patient_id->ViewValue . " </a>";
+        $this->patient_id->ViewValue = "<a href='patientvisitsview/" . $this->id->ViewValue . "?showdetail=patient_queue,patient_vitals,doctor_notes,lab_test_requests,prescriptions'> " . $this->patient_id->ViewValue . " </a>";
     }
 
     // User ID Filtering event
