@@ -33,8 +33,8 @@ class RadiologyReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "radiology_requests_details_id", type: "integer")]
-    private int $radiologyRequestsDetailsId;
+    #[Column(name: "radiology_requests_id", type: "integer")]
+    private int $radiologyRequestsId;
 
     #[Column(type: "text")]
     private string $findings;
@@ -62,14 +62,14 @@ class RadiologyReport extends AbstractEntity
         return $this;
     }
 
-    public function getRadiologyRequestsDetailsId(): int
+    public function getRadiologyRequestsId(): int
     {
-        return $this->radiologyRequestsDetailsId;
+        return $this->radiologyRequestsId;
     }
 
-    public function setRadiologyRequestsDetailsId(int $value): static
+    public function setRadiologyRequestsId(int $value): static
     {
-        $this->radiologyRequestsDetailsId = $value;
+        $this->radiologyRequestsId = $value;
         return $this;
     }
 

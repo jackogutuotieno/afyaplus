@@ -949,7 +949,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","1","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","2","1896"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","3","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","4","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","4","2031"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","7","0"],

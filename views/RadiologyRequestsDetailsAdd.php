@@ -23,7 +23,8 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["radiology_request_id", [fields.radiology_request_id.visible && fields.radiology_request_id.required ? ew.Validators.required(fields.radiology_request_id.caption) : null, ew.Validators.integer], fields.radiology_request_id.isInvalid],
-            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
+            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid],
+            ["comments", [fields.comments.visible && fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -133,6 +134,18 @@ loadjs.ready("fradiology_requests_detailsadd", function() {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->comments->Visible) { // comments ?>
+    <div id="r_comments"<?= $Page->comments->rowAttributes() ?>>
+        <label id="elh_radiology_requests_details_comments" for="x_comments" class="<?= $Page->LeftColumnClass ?>"><?= $Page->comments->caption() ?><?= $Page->comments->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->comments->cellAttributes() ?>>
+<span id="el_radiology_requests_details_comments">
+<input type="<?= $Page->comments->getInputTextType() ?>" name="x_comments" id="x_comments" data-table="radiology_requests_details" data-field="x_comments" value="<?= $Page->comments->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->comments->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->comments->formatPattern()) ?>"<?= $Page->comments->editAttributes() ?> aria-describedby="x_comments_help">
+<?= $Page->comments->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->comments->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

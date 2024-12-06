@@ -47,7 +47,7 @@ class RadiologyReports extends DbTable
 
     // Fields
     public $id;
-    public $radiology_requests_details_id;
+    public $radiology_requests_id;
     public $findings;
     public $attachment;
     public $created_by_user_id;
@@ -126,36 +126,32 @@ class RadiologyReports extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // radiology_requests_details_id
-        $this->radiology_requests_details_id = new DbField(
+        // radiology_requests_id
+        $this->radiology_requests_id = new DbField(
             $this, // Table
-            'x_radiology_requests_details_id', // Variable name
-            'radiology_requests_details_id', // Name
-            '`radiology_requests_details_id`', // Expression
-            '`radiology_requests_details_id`', // Basic search expression
+            'x_radiology_requests_id', // Variable name
+            'radiology_requests_id', // Name
+            '`radiology_requests_id`', // Expression
+            '`radiology_requests_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`radiology_requests_details_id`', // Virtual expression
+            '`radiology_requests_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->radiology_requests_details_id->InputTextType = "text";
-        $this->radiology_requests_details_id->Raw = true;
-        $this->radiology_requests_details_id->Nullable = false; // NOT NULL field
-        $this->radiology_requests_details_id->Required = true; // Required field
-        $this->radiology_requests_details_id->setSelectMultiple(false); // Select one
-        $this->radiology_requests_details_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->radiology_requests_details_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->radiology_requests_details_id->Lookup = new Lookup($this->radiology_requests_details_id, 'radiology_requests', false, 'id', ["id","","",""], '', '', [], [], [], [], [], [], false, '', '', "`id`");
-        $this->radiology_requests_details_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->radiology_requests_details_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->radiology_requests_details_id->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->radiology_requests_details_id->Param, "CustomMsg");
-        $this->Fields['radiology_requests_details_id'] = &$this->radiology_requests_details_id;
+        $this->radiology_requests_id->InputTextType = "text";
+        $this->radiology_requests_id->Raw = true;
+        $this->radiology_requests_id->Nullable = false; // NOT NULL field
+        $this->radiology_requests_id->Required = true; // Required field
+        $this->radiology_requests_id->Lookup = new Lookup($this->radiology_requests_id, 'radiology_requests', false, 'id', ["id","","",""], '', '', [], [], [], [], [], [], false, '', '', "`id`");
+        $this->radiology_requests_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->radiology_requests_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['radiology_requests_id'] = &$this->radiology_requests_id;
 
         // findings
         $this->findings = new DbField(
@@ -813,7 +809,7 @@ class RadiologyReports extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->radiology_requests_details_id->DbValue = $row['radiology_requests_details_id'];
+        $this->radiology_requests_id->DbValue = $row['radiology_requests_id'];
         $this->findings->DbValue = $row['findings'];
         $this->attachment->Upload->DbValue = $row['attachment'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
@@ -1172,7 +1168,7 @@ class RadiologyReports extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->findings->setDbValue($row['findings']);
         $this->attachment->Upload->DbValue = $row['attachment'];
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
@@ -1210,7 +1206,7 @@ class RadiologyReports extends DbTable
 
         // id
 
-        // radiology_requests_details_id
+        // radiology_requests_id
 
         // findings
 
@@ -1225,27 +1221,28 @@ class RadiologyReports extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // radiology_requests_details_id
-        $curVal = strval($this->radiology_requests_details_id->CurrentValue);
+        // radiology_requests_id
+        $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
+        $curVal = strval($this->radiology_requests_id->CurrentValue);
         if ($curVal != "") {
-            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->lookupCacheOption($curVal);
-            if ($this->radiology_requests_details_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->radiology_requests_details_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
+            if ($this->radiology_requests_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->radiology_requests_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $conn = Conn();
                 $config = $conn->getConfiguration();
                 $config->setResultCache($this->Cache);
                 $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->radiology_requests_details_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->displayValue($arwrk);
+                    $arwrk = $this->radiology_requests_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->displayValue($arwrk);
                 } else {
-                    $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->CurrentValue, $this->radiology_requests_details_id->formatPattern());
+                    $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->formatPattern());
                 }
             }
         } else {
-            $this->radiology_requests_details_id->ViewValue = null;
+            $this->radiology_requests_id->ViewValue = null;
         }
 
         // findings
@@ -1294,9 +1291,9 @@ class RadiologyReports extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // radiology_requests_details_id
-        $this->radiology_requests_details_id->HrefValue = "";
-        $this->radiology_requests_details_id->TooltipValue = "";
+        // radiology_requests_id
+        $this->radiology_requests_id->HrefValue = "";
+        $this->radiology_requests_id->TooltipValue = "";
 
         // findings
         $this->findings->HrefValue = "";
@@ -1349,9 +1346,10 @@ class RadiologyReports extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // radiology_requests_details_id
-        $this->radiology_requests_details_id->setupEditAttributes();
-        $this->radiology_requests_details_id->PlaceHolder = RemoveHtml($this->radiology_requests_details_id->caption());
+        // radiology_requests_id
+        $this->radiology_requests_id->setupEditAttributes();
+        $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
+        $this->radiology_requests_id->PlaceHolder = RemoveHtml($this->radiology_requests_id->caption());
 
         // findings
         $this->findings->setupEditAttributes();
@@ -1408,7 +1406,7 @@ class RadiologyReports extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->radiology_requests_details_id);
+                    $doc->exportCaption($this->radiology_requests_id);
                     $doc->exportCaption($this->findings);
                     $doc->exportCaption($this->attachment);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1416,7 +1414,7 @@ class RadiologyReports extends DbTable
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->radiology_requests_details_id);
+                    $doc->exportCaption($this->radiology_requests_id);
                     $doc->exportCaption($this->findings);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
@@ -1448,7 +1446,7 @@ class RadiologyReports extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->radiology_requests_details_id);
+                        $doc->exportField($this->radiology_requests_id);
                         $doc->exportField($this->findings);
                         $doc->exportField($this->attachment);
                         $doc->exportField($this->created_by_user_id);
@@ -1456,7 +1454,7 @@ class RadiologyReports extends DbTable
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->radiology_requests_details_id);
+                        $doc->exportField($this->radiology_requests_id);
                         $doc->exportField($this->findings);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
@@ -1693,8 +1691,14 @@ class RadiologyReports extends DbTable
     // Row Inserting event
     public function rowInserting($rsold, &$rsnew)
     {
-        // Enter your code here
-        // To cancel, set return value to false
+         // Check if both visit id and patient id exists
+        $if_exists = ExecuteScalar("SELECT count(*) FROM radiology_reports where radiology_requests_id = '".$rsnew["radiology_requests_id"]."'");
+    	if($if_exists > 0) { // Check for double applications
+    		$this->CancelMessage = "Report has already been submitted for this request";
+    		return false;
+    	} else if ($if_exists < 0) { 
+            return true; 
+        }
         return true;
     }
 

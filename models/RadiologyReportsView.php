@@ -140,7 +140,7 @@ class RadiologyReportsView extends RadiologyReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->radiology_requests_details_id->setVisibility();
+        $this->radiology_requests_id->setVisibility();
         $this->findings->setVisibility();
         $this->attachment->setVisibility();
         $this->created_by_user_id->setVisibility();
@@ -561,7 +561,7 @@ class RadiologyReportsView extends RadiologyReports
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->radiology_requests_details_id);
+        $this->setupLookupOptions($this->radiology_requests_id);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
@@ -811,7 +811,7 @@ class RadiologyReportsView extends RadiologyReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->findings->setDbValue($row['findings']);
         $this->attachment->Upload->DbValue = $row['attachment'];
         if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
@@ -827,7 +827,7 @@ class RadiologyReportsView extends RadiologyReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['radiology_requests_details_id'] = $this->radiology_requests_details_id->DefaultValue;
+        $row['radiology_requests_id'] = $this->radiology_requests_id->DefaultValue;
         $row['findings'] = $this->findings->DefaultValue;
         $row['attachment'] = $this->attachment->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
@@ -856,7 +856,7 @@ class RadiologyReportsView extends RadiologyReports
 
         // id
 
-        // radiology_requests_details_id
+        // radiology_requests_id
 
         // findings
 
@@ -873,27 +873,28 @@ class RadiologyReportsView extends RadiologyReports
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // radiology_requests_details_id
-            $curVal = strval($this->radiology_requests_details_id->CurrentValue);
+            // radiology_requests_id
+            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
+            $curVal = strval($this->radiology_requests_id->CurrentValue);
             if ($curVal != "") {
-                $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->lookupCacheOption($curVal);
-                if ($this->radiology_requests_details_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->radiology_requests_details_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
+                if ($this->radiology_requests_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->radiology_requests_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->radiology_requests_details_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->displayValue($arwrk);
+                        $arwrk = $this->radiology_requests_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->displayValue($arwrk);
                     } else {
-                        $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->CurrentValue, $this->radiology_requests_details_id->formatPattern());
+                        $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->formatPattern());
                     }
                 }
             } else {
-                $this->radiology_requests_details_id->ViewValue = null;
+                $this->radiology_requests_id->ViewValue = null;
             }
 
             // findings
@@ -942,9 +943,9 @@ class RadiologyReportsView extends RadiologyReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // radiology_requests_details_id
-            $this->radiology_requests_details_id->HrefValue = "";
-            $this->radiology_requests_details_id->TooltipValue = "";
+            // radiology_requests_id
+            $this->radiology_requests_id->HrefValue = "";
+            $this->radiology_requests_id->TooltipValue = "";
 
             // findings
             $this->findings->HrefValue = "";
@@ -1179,7 +1180,7 @@ class RadiologyReportsView extends RadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_radiology_requests_details_id":
+                case "x_radiology_requests_id":
                     break;
                 case "x_created_by_user_id":
                     break;

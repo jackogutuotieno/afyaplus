@@ -124,6 +124,7 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         $this->id->Visible = false;
         $this->radiology_request_id->Visible = false;
         $this->service_id->setVisibility();
+        $this->comments->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -605,6 +606,7 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
+        $this->comments->setDbValue($row['comments']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -616,6 +618,7 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
+        $row['comments'] = $this->comments->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -638,6 +641,8 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
         // radiology_request_id
 
         // service_id
+
+        // comments
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -677,9 +682,16 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
+            // comments
+            $this->comments->ViewValue = $this->comments->CurrentValue;
+
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
+            $this->comments->TooltipValue = "";
         }
 
         // Call Row Rendered event

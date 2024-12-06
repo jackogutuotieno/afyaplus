@@ -124,6 +124,7 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         $this->id->setVisibility();
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
+        $this->comments->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -737,6 +738,16 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
                 $this->service_id->setFormValue($val);
             }
         }
+
+        // Check field name 'comments' first before field var 'x_comments'
+        $val = $CurrentForm->hasValue("comments") ? $CurrentForm->getValue("comments") : $CurrentForm->getValue("x_comments");
+        if (!$this->comments->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->comments->Visible = false; // Disable update for API request
+            } else {
+                $this->comments->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -746,6 +757,7 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         $this->id->CurrentValue = $this->id->FormValue;
         $this->radiology_request_id->CurrentValue = $this->radiology_request_id->FormValue;
         $this->service_id->CurrentValue = $this->service_id->FormValue;
+        $this->comments->CurrentValue = $this->comments->FormValue;
     }
 
     /**
@@ -789,6 +801,7 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
+        $this->comments->setDbValue($row['comments']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -800,6 +813,7 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
+        $row['comments'] = $this->comments->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -845,6 +859,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         // service_id
         $this->service_id->RowCssClass = "row";
 
+        // comments
+        $this->comments->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -883,6 +900,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
+            // comments
+            $this->comments->ViewValue = $this->comments->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
 
@@ -891,6 +911,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
 
             // service_id
             $this->service_id->HrefValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -937,6 +960,14 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
             }
             $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
 
+            // comments
+            $this->comments->setupEditAttributes();
+            if (!$this->comments->Raw) {
+                $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+            }
+            $this->comments->EditValue = HtmlEncode($this->comments->CurrentValue);
+            $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
+
             // Edit refer script
 
             // id
@@ -947,6 +978,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
 
             // service_id
             $this->service_id->HrefValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -984,6 +1018,11 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
             if ($this->service_id->Visible && $this->service_id->Required) {
                 if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
                     $this->service_id->addErrorMessage(str_replace("%s", $this->service_id->caption(), $this->service_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->comments->Visible && $this->comments->Required) {
+                if (!$this->comments->IsDetailKey && EmptyValue($this->comments->FormValue)) {
+                    $this->comments->addErrorMessage(str_replace("%s", $this->comments->caption(), $this->comments->RequiredErrorMessage));
                 }
             }
 
@@ -1083,6 +1122,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
 
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, $this->service_id->ReadOnly);
+
+        // comments
+        $this->comments->setDbValueDef($rsnew, $this->comments->CurrentValue, $this->comments->ReadOnly);
         return $rsnew;
     }
 
@@ -1097,6 +1139,9 @@ class RadiologyRequestsDetailsEdit extends RadiologyRequestsDetails
         }
         if (isset($row['service_id'])) { // service_id
             $this->service_id->CurrentValue = $row['service_id'];
+        }
+        if (isset($row['comments'])) { // comments
+            $this->comments->CurrentValue = $row['comments'];
         }
     }
 

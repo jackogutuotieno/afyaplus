@@ -142,6 +142,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $this->id->setVisibility();
         $this->radiology_request_id->setVisibility();
         $this->service_id->setVisibility();
+        $this->comments->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -813,6 +814,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
+        $this->comments->setDbValue($row['comments']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -824,6 +826,7 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         $row['id'] = $this->id->DefaultValue;
         $row['radiology_request_id'] = $this->radiology_request_id->DefaultValue;
         $row['service_id'] = $this->service_id->DefaultValue;
+        $row['comments'] = $this->comments->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -852,6 +855,8 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
         // radiology_request_id
 
         // service_id
+
+        // comments
 
         // date_created
 
@@ -889,6 +894,9 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
+            // comments
+            $this->comments->ViewValue = $this->comments->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -900,6 +908,10 @@ class RadiologyRequestsDetailsView extends RadiologyRequestsDetails
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
+
+            // comments
+            $this->comments->HrefValue = "";
+            $this->comments->TooltipValue = "";
         }
 
         // Call Row Rendered event

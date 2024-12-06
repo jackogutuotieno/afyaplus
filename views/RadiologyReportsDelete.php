@@ -53,8 +53,8 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-        <th class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><span id="elh_radiology_reports_radiology_requests_details_id" class="radiology_reports_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></th>
+<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
+        <th class="<?= $Page->radiology_requests_id->headerCellClass() ?>"><span id="elh_radiology_reports_radiology_requests_id" class="radiology_reports_radiology_requests_id"><?= $Page->radiology_requests_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->findings->Visible) { // findings ?>
         <th class="<?= $Page->findings->headerCellClass() ?>"><span id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->findings->caption() ?></span></th>
@@ -97,11 +97,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-        <td<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
+<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
+        <td<?= $Page->radiology_requests_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
+<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

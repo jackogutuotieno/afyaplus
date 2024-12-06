@@ -39,6 +39,9 @@ class RadiologyRequestsDetail extends AbstractEntity
     #[Column(name: "service_id", type: "integer")]
     private int $serviceId;
 
+    #[Column(type: "text", nullable: true)]
+    private ?string $comments;
+
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -75,6 +78,17 @@ class RadiologyRequestsDetail extends AbstractEntity
     public function setServiceId(int $value): static
     {
         $this->serviceId = $value;
+        return $this;
+    }
+
+    public function getComments(): ?string
+    {
+        return HtmlDecode($this->comments);
+    }
+
+    public function setComments(?string $value): static
+    {
+        $this->comments = RemoveXss($value);
         return $this;
     }
 

@@ -62,13 +62,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-    <tr id="r_radiology_requests_details_id"<?= $Page->radiology_requests_details_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_radiology_requests_details_id"><?= $Page->radiology_requests_details_id->caption() ?></span></td>
-        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
-<span id="el_radiology_reports_radiology_requests_details_id">
-<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
+<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
+    <tr id="r_radiology_requests_id"<?= $Page->radiology_requests_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_reports_radiology_requests_id"><?= $Page->radiology_requests_id->caption() ?></span></td>
+        <td data-name="radiology_requests_id"<?= $Page->radiology_requests_id->cellAttributes() ?>>
+<span id="el_radiology_reports_radiology_requests_id">
+<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

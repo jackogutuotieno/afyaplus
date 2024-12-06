@@ -53,6 +53,9 @@ $Page->showMessage();
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th class="<?= $Page->service_id->headerCellClass() ?>"><span id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Page->service_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->comments->Visible) { // comments ?>
+        <th class="<?= $Page->comments->headerCellClass() ?>"><span id="elh_radiology_requests_details_comments" class="radiology_requests_details_comments"><?= $Page->comments->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -79,6 +82,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->service_id->viewAttributes() ?>>
 <?= $Page->service_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->comments->Visible) { // comments ?>
+        <td<?= $Page->comments->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->comments->viewAttributes() ?>>
+<?= $Page->comments->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -49,6 +49,7 @@ class RadiologyRequestsDetails extends DbTable
     public $id;
     public $radiology_request_id;
     public $service_id;
+    public $comments;
     public $date_created;
     public $date_updated;
 
@@ -180,6 +181,28 @@ class RadiologyRequestsDetails extends DbTable
         $this->service_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->service_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_id'] = &$this->service_id;
+
+        // comments
+        $this->comments = new DbField(
+            $this, // Table
+            'x_comments', // Variable name
+            'comments', // Name
+            '`comments`', // Expression
+            '`comments`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`comments`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->comments->InputTextType = "text";
+        $this->comments->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['comments'] = &$this->comments;
 
         // date_created
         $this->date_created = new DbField(
@@ -845,6 +868,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->id->DbValue = $row['id'];
         $this->radiology_request_id->DbValue = $row['radiology_request_id'];
         $this->service_id->DbValue = $row['service_id'];
+        $this->comments->DbValue = $row['comments'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1206,6 +1230,7 @@ class RadiologyRequestsDetails extends DbTable
         $this->id->setDbValue($row['id']);
         $this->radiology_request_id->setDbValue($row['radiology_request_id']);
         $this->service_id->setDbValue($row['service_id']);
+        $this->comments->setDbValue($row['comments']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1244,6 +1269,8 @@ class RadiologyRequestsDetails extends DbTable
 
         // service_id
 
+        // comments
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
@@ -1280,6 +1307,9 @@ class RadiologyRequestsDetails extends DbTable
             $this->service_id->ViewValue = null;
         }
 
+        // comments
+        $this->comments->ViewValue = $this->comments->CurrentValue;
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1299,6 +1329,10 @@ class RadiologyRequestsDetails extends DbTable
         // service_id
         $this->service_id->HrefValue = "";
         $this->service_id->TooltipValue = "";
+
+        // comments
+        $this->comments->HrefValue = "";
+        $this->comments->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1345,6 +1379,14 @@ class RadiologyRequestsDetails extends DbTable
         $this->service_id->setupEditAttributes();
         $this->service_id->PlaceHolder = RemoveHtml($this->service_id->caption());
 
+        // comments
+        $this->comments->setupEditAttributes();
+        if (!$this->comments->Raw) {
+            $this->comments->CurrentValue = HtmlDecode($this->comments->CurrentValue);
+        }
+        $this->comments->EditValue = $this->comments->CurrentValue;
+        $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1386,10 +1428,12 @@ class RadiologyRequestsDetails extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
+                    $doc->exportCaption($this->comments);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_request_id);
                     $doc->exportCaption($this->service_id);
+                    $doc->exportCaption($this->comments);
                 }
                 $doc->endExportRow();
             }
@@ -1419,10 +1463,12 @@ class RadiologyRequestsDetails extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
+                        $doc->exportField($this->comments);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_request_id);
                         $doc->exportField($this->service_id);
+                        $doc->exportField($this->comments);
                     }
                     $doc->endExportRow($rowCnt);
                 }

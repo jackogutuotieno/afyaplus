@@ -146,7 +146,7 @@ class RadiologyReportsList extends RadiologyReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->radiology_requests_details_id->setVisibility();
+        $this->radiology_requests_id->setVisibility();
         $this->findings->setVisibility();
         $this->attachment->Visible = false;
         $this->created_by_user_id->setVisibility();
@@ -711,7 +711,7 @@ class RadiologyReportsList extends RadiologyReports
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->radiology_requests_details_id);
+        $this->setupLookupOptions($this->radiology_requests_id);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
@@ -1056,7 +1056,7 @@ class RadiologyReportsList extends RadiologyReports
             $savedFilterList = Profile()->getSearchFilters("fradiology_reportssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->radiology_requests_details_id->AdvancedSearch->toJson(), ","); // Field radiology_requests_details_id
+        $filterList = Concat($filterList, $this->radiology_requests_id->AdvancedSearch->toJson(), ","); // Field radiology_requests_id
         $filterList = Concat($filterList, $this->findings->AdvancedSearch->toJson(), ","); // Field findings
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
@@ -1108,13 +1108,13 @@ class RadiologyReportsList extends RadiologyReports
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field radiology_requests_details_id
-        $this->radiology_requests_details_id->AdvancedSearch->SearchValue = @$filter["x_radiology_requests_details_id"];
-        $this->radiology_requests_details_id->AdvancedSearch->SearchOperator = @$filter["z_radiology_requests_details_id"];
-        $this->radiology_requests_details_id->AdvancedSearch->SearchCondition = @$filter["v_radiology_requests_details_id"];
-        $this->radiology_requests_details_id->AdvancedSearch->SearchValue2 = @$filter["y_radiology_requests_details_id"];
-        $this->radiology_requests_details_id->AdvancedSearch->SearchOperator2 = @$filter["w_radiology_requests_details_id"];
-        $this->radiology_requests_details_id->AdvancedSearch->save();
+        // Field radiology_requests_id
+        $this->radiology_requests_id->AdvancedSearch->SearchValue = @$filter["x_radiology_requests_id"];
+        $this->radiology_requests_id->AdvancedSearch->SearchOperator = @$filter["z_radiology_requests_id"];
+        $this->radiology_requests_id->AdvancedSearch->SearchCondition = @$filter["v_radiology_requests_id"];
+        $this->radiology_requests_id->AdvancedSearch->SearchValue2 = @$filter["y_radiology_requests_id"];
+        $this->radiology_requests_id->AdvancedSearch->SearchOperator2 = @$filter["w_radiology_requests_id"];
+        $this->radiology_requests_id->AdvancedSearch->save();
 
         // Field findings
         $this->findings->AdvancedSearch->SearchValue = @$filter["x_findings"];
@@ -1266,7 +1266,7 @@ class RadiologyReportsList extends RadiologyReports
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->radiology_requests_details_id); // radiology_requests_details_id
+            $this->updateSort($this->radiology_requests_id); // radiology_requests_id
             $this->updateSort($this->findings); // findings
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
@@ -1296,7 +1296,7 @@ class RadiologyReportsList extends RadiologyReports
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->radiology_requests_details_id->setSort("");
+                $this->radiology_requests_id->setSort("");
                 $this->findings->setSort("");
                 $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
@@ -1517,7 +1517,7 @@ class RadiologyReportsList extends RadiologyReports
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "radiology_requests_details_id");
+            $this->createColumnOption($option, "radiology_requests_id");
             $this->createColumnOption($option, "findings");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
@@ -1961,7 +1961,7 @@ class RadiologyReportsList extends RadiologyReports
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->radiology_requests_details_id->setDbValue($row['radiology_requests_details_id']);
+        $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->findings->setDbValue($row['findings']);
         $this->attachment->Upload->DbValue = $row['attachment'];
         if (is_resource($this->attachment->Upload->DbValue) && get_resource_type($this->attachment->Upload->DbValue) == "stream") { // Byte array
@@ -1977,7 +1977,7 @@ class RadiologyReportsList extends RadiologyReports
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['radiology_requests_details_id'] = $this->radiology_requests_details_id->DefaultValue;
+        $row['radiology_requests_id'] = $this->radiology_requests_id->DefaultValue;
         $row['findings'] = $this->findings->DefaultValue;
         $row['attachment'] = $this->attachment->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
@@ -2025,7 +2025,7 @@ class RadiologyReportsList extends RadiologyReports
 
         // id
 
-        // radiology_requests_details_id
+        // radiology_requests_id
 
         // findings
 
@@ -2042,27 +2042,28 @@ class RadiologyReportsList extends RadiologyReports
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // radiology_requests_details_id
-            $curVal = strval($this->radiology_requests_details_id->CurrentValue);
+            // radiology_requests_id
+            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
+            $curVal = strval($this->radiology_requests_id->CurrentValue);
             if ($curVal != "") {
-                $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->lookupCacheOption($curVal);
-                if ($this->radiology_requests_details_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->radiology_requests_details_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
+                if ($this->radiology_requests_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->radiology_requests_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->radiology_requests_details_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->displayValue($arwrk);
+                        $arwrk = $this->radiology_requests_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->displayValue($arwrk);
                     } else {
-                        $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->CurrentValue, $this->radiology_requests_details_id->formatPattern());
+                        $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->formatPattern());
                     }
                 }
             } else {
-                $this->radiology_requests_details_id->ViewValue = null;
+                $this->radiology_requests_id->ViewValue = null;
             }
 
             // findings
@@ -2103,9 +2104,9 @@ class RadiologyReportsList extends RadiologyReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // radiology_requests_details_id
-            $this->radiology_requests_details_id->HrefValue = "";
-            $this->radiology_requests_details_id->TooltipValue = "";
+            // radiology_requests_id
+            $this->radiology_requests_id->HrefValue = "";
+            $this->radiology_requests_id->TooltipValue = "";
 
             // findings
             $this->findings->HrefValue = "";
@@ -2383,7 +2384,7 @@ class RadiologyReportsList extends RadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_radiology_requests_details_id":
+                case "x_radiology_requests_id":
                     break;
                 case "x_created_by_user_id":
                     break;

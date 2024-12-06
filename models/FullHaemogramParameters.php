@@ -416,6 +416,14 @@ class FullHaemogramParameters extends DbTable
                 return "";
             }
         }
+        if ($this->getCurrentMasterTable() == "lab_test_reports") {
+            $masterTable = Container("lab_test_reports");
+            if ($this->lab_test_report_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_report_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
         return $masterFilter;
     }
 
@@ -426,6 +434,14 @@ class FullHaemogramParameters extends DbTable
         $detailFilter = "";
         if ($this->getCurrentMasterTable() == "patients_lab_report") {
             $masterTable = Container("patients_lab_report");
+            if ($this->lab_test_report_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_report_id, $this->lab_test_report_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        if ($this->getCurrentMasterTable() == "lab_test_reports") {
+            $masterTable = Container("lab_test_reports");
             if ($this->lab_test_report_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetKeyFilter($this->lab_test_report_id, $this->lab_test_report_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
@@ -460,6 +476,20 @@ class FullHaemogramParameters extends DbTable
                     return GetKeyFilter($masterTable->id, $keys["lab_test_report_id"], $this->lab_test_report_id->DataType, $this->Dbid);
                 }
                 break;
+            case "lab_test_reports":
+                $key = $keys["lab_test_report_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_report_id"], $this->lab_test_report_id->DataType, $this->Dbid);
+                }
+                break;
         }
         return null; // All null values and no required fields
     }
@@ -469,6 +499,8 @@ class FullHaemogramParameters extends DbTable
     {
         switch ($masterTable->TableVar) {
             case "patients_lab_report":
+                return GetKeyFilter($this->lab_test_report_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+            case "lab_test_reports":
                 return GetKeyFilter($this->lab_test_report_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
@@ -613,6 +645,16 @@ class FullHaemogramParameters extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            if ($this->getCurrentMasterTable() == "patients_lab_report" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "patients_lab_report"); // Add detail User ID filter
+            }
+            if ($this->getCurrentMasterTable() == "lab_test_reports" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "lab_test_reports"); // Add detail User ID filter
+            }
+        }
         return $filter;
     }
 
@@ -1141,6 +1183,10 @@ class FullHaemogramParameters extends DbTable
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_report_id->getSessionValue()); // Use Session Value
         }
+        if ($this->getCurrentMasterTable() == "lab_test_reports" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_report_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1604,6 +1650,30 @@ class FullHaemogramParameters extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_reports") {
+            $filterWrk = Container("lab_test_reports")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "lab_test_reports") {
+            $mastertable = Container("lab_test_reports");
+            if (!$mastertable->userIDAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->lab_test_report_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

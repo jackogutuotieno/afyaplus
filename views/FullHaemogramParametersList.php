@@ -58,6 +58,13 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patients_l
     }
 }
 ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_reports") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/LabTestReportsMaster.php";
+    }
+}
+?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="ffull_haemogram_parameterssrch" id="ffull_haemogram_parameterssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
@@ -153,6 +160,10 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "patients_lab_report" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patients_lab_report">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "lab_test_reports" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_full_haemogram_parameters" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">

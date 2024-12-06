@@ -1340,6 +1340,13 @@ class LabTestReportsList extends LabTestReports
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
+        // "detail_full_haemogram_parameters"
+        $item = &$this->ListOptions->add("detail_full_haemogram_parameters");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'full_haemogram_parameters');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $item = &$this->ListOptions->add("details");
@@ -1353,6 +1360,7 @@ class LabTestReportsList extends LabTestReports
         // Set up detail pages
         $pages = new SubPages();
         $pages->add("urinalysis_parameters");
+        $pages->add("full_haemogram_parameters");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1533,6 +1541,44 @@ class LabTestReportsList extends LabTestReports
                 $opt->Visible = false;
             }
         }
+
+        // "detail_full_haemogram_parameters"
+        $opt = $this->ListOptions["detail_full_haemogram_parameters"];
+        if ($Security->allowList(CurrentProjectID() . 'full_haemogram_parameters') && $this->showOptionLink()) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("full_haemogram_parameters", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("fullhaemogramparameterslist?" . Config("TABLE_SHOW_MASTER") . "=lab_test_reports&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("FullHaemogramParametersGrid");
+            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'lab_test_reports')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemogram_parameters");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "full_haemogram_parameters";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'lab_test_reports')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemogram_parameters");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "full_haemogram_parameters";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
             $links = "";
@@ -1600,6 +1646,18 @@ class LabTestReportsList extends LabTestReports
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "urinalysis_parameters";
+        }
+        $item = &$option->add("detailadd_full_haemogram_parameters");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemogram_parameters");
+        $detailPage = Container("FullHaemogramParametersGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'lab_test_reports') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "full_haemogram_parameters";
         }
 
         // Add multiple details

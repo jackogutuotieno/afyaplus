@@ -23,14 +23,15 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
+            ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid],
+            ["comments", [fields.comments.visible && fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["service_id",false]];
+                    fields = [["service_id",false],["comments",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -87,6 +88,9 @@ $Grid->ListOptions->render("header", "left");
 ?>
 <?php if ($Grid->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Grid->service_id->headerCellClass() ?>"><div id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Grid->renderFieldHeader($Grid->service_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->comments->Visible) { // comments ?>
+        <th data-name="comments" class="<?= $Grid->comments->headerCellClass() ?>"><div id="elh_radiology_requests_details_comments" class="radiology_requests_details_comments"><?= $Grid->renderFieldHeader($Grid->comments) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -215,6 +219,33 @@ loadjs.ready("fradiology_requests_detailsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="radiology_requests_details" data-field="x_service_id" data-hidden="1" name="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_service_id" id="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_service_id" value="<?= HtmlEncode($Grid->service_id->FormValue) ?>">
 <input type="hidden" data-table="radiology_requests_details" data-field="x_service_id" data-hidden="1" data-old name="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_service_id" id="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_service_id" value="<?= HtmlEncode($Grid->service_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->comments->Visible) { // comments ?>
+        <td data-name="comments"<?= $Grid->comments->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_comments" class="el_radiology_requests_details_comments">
+<input type="<?= $Grid->comments->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_comments" id="x<?= $Grid->RowIndex ?>_comments" data-table="radiology_requests_details" data-field="x_comments" value="<?= $Grid->comments->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->comments->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->comments->formatPattern()) ?>"<?= $Grid->comments->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->comments->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="radiology_requests_details" data-field="x_comments" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_comments" id="o<?= $Grid->RowIndex ?>_comments" value="<?= HtmlEncode($Grid->comments->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_comments" class="el_radiology_requests_details_comments">
+<input type="<?= $Grid->comments->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_comments" id="x<?= $Grid->RowIndex ?>_comments" data-table="radiology_requests_details" data-field="x_comments" value="<?= $Grid->comments->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->comments->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->comments->formatPattern()) ?>"<?= $Grid->comments->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->comments->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_comments" class="el_radiology_requests_details_comments">
+<span<?= $Grid->comments->viewAttributes() ?>>
+<?= $Grid->comments->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="radiology_requests_details" data-field="x_comments" data-hidden="1" name="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_comments" id="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_comments" value="<?= HtmlEncode($Grid->comments->FormValue) ?>">
+<input type="hidden" data-table="radiology_requests_details" data-field="x_comments" data-hidden="1" data-old name="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_comments" id="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_comments" value="<?= HtmlEncode($Grid->comments->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

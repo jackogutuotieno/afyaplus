@@ -78,6 +78,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patients_lab_report">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "lab_test_reports") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>

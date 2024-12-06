@@ -84,6 +84,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->comments->Visible) { // comments ?>
+    <tr id="r_comments"<?= $Page->comments->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_details_comments"><?= $Page->comments->caption() ?></span></td>
+        <td data-name="comments"<?= $Page->comments->cellAttributes() ?>>
+<span id="el_radiology_requests_details_comments">
+<span<?= $Page->comments->viewAttributes() ?>>
+<?= $Page->comments->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

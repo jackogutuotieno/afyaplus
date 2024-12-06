@@ -160,8 +160,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-        <th data-name="radiology_requests_details_id" class="<?= $Page->radiology_requests_details_id->headerCellClass() ?>"><div id="elh_radiology_reports_radiology_requests_details_id" class="radiology_reports_radiology_requests_details_id"><?= $Page->renderFieldHeader($Page->radiology_requests_details_id) ?></div></th>
+<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
+        <th data-name="radiology_requests_id" class="<?= $Page->radiology_requests_id->headerCellClass() ?>"><div id="elh_radiology_reports_radiology_requests_id" class="radiology_reports_radiology_requests_id"><?= $Page->renderFieldHeader($Page->radiology_requests_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->findings->Visible) { // findings ?>
         <th data-name="findings" class="<?= $Page->findings->headerCellClass() ?>"><div id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->renderFieldHeader($Page->findings) ?></div></th>
@@ -211,11 +211,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->radiology_requests_details_id->Visible) { // radiology_requests_details_id ?>
-        <td data-name="radiology_requests_details_id"<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_radiology_requests_details_id" class="el_radiology_reports_radiology_requests_details_id">
-<span<?= $Page->radiology_requests_details_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_details_id->getViewValue() ?></span>
+    <?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
+        <td data-name="radiology_requests_id"<?= $Page->radiology_requests_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_radiology_requests_id" class="el_radiology_reports_radiology_requests_id">
+<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
+<?= $Page->radiology_requests_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

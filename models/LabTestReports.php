@@ -342,6 +342,10 @@ class LabTestReports extends DbTable
             $detailUrl = Container("urinalysis_parameters")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "full_haemogram_parameters") {
+            $detailUrl = Container("full_haemogram_parameters")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
         if ($detailUrl == "") {
             $detailUrl = "labtestreportslist";
         }

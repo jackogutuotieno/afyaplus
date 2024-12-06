@@ -1085,6 +1085,28 @@ class FullHaemogramParametersAdd extends FullHaemogramParameters
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $detailKeys = [];
+            $detailKeys["lab_test_report_id"] = $this->lab_test_report_id->CurrentValue;
+            $masterTable = Container("lab_test_reports");
+            $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
+            if (!EmptyValue($masterFilter)) {
+                $validMasterKey = true;
+                if ($rsmaster = $masterTable->loadRs($masterFilter)->fetchAssociative()) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['created_by_user_id']);
+                } elseif ($this->getCurrentMasterTable() == "lab_test_reports") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1207,6 +1229,21 @@ class FullHaemogramParametersAdd extends FullHaemogramParameters
                     $validMaster = false;
                 }
             }
+            if ($masterTblVar == "lab_test_reports") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_reports");
+                if (($parm = Get("fk_id", Get("lab_test_report_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->lab_test_report_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->QueryStringValue);
+                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
             $masterTblVar = $master;
             if ($masterTblVar == "") {
@@ -1217,6 +1254,21 @@ class FullHaemogramParametersAdd extends FullHaemogramParameters
             if ($masterTblVar == "patients_lab_report") {
                 $validMaster = true;
                 $masterTbl = Container("patients_lab_report");
+                if (($parm = Post("fk_id", Post("lab_test_report_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->lab_test_report_id->FormValue = $masterTbl->id->FormValue;
+                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->FormValue);
+                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "lab_test_reports") {
+                $validMaster = true;
+                $masterTbl = Container("lab_test_reports");
                 if (($parm = Post("fk_id", Post("lab_test_report_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->lab_test_report_id->FormValue = $masterTbl->id->FormValue;
@@ -1242,6 +1294,11 @@ class FullHaemogramParametersAdd extends FullHaemogramParameters
 
             // Clear previous master key from Session
             if ($masterTblVar != "patients_lab_report") {
+                if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
+                    $this->lab_test_report_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "lab_test_reports") {
                 if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
                     $this->lab_test_report_id->setSessionValue("");
                 }

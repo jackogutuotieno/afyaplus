@@ -1061,6 +1061,11 @@ class LabTestReportsAdd extends LabTestReports
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
+        $detailPage = Container("FullHaemogramParametersGrid");
+        if (in_array("full_haemogram_parameters", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1137,6 +1142,16 @@ class LabTestReportsAdd extends LabTestReports
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
                 $detailPage->lab_test_reports_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("FullHaemogramParametersGrid");
+            if (in_array("full_haemogram_parameters", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->lab_test_report_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "full_haemogram_parameters"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->lab_test_report_id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
         }
@@ -1248,6 +1263,25 @@ class LabTestReportsAdd extends LabTestReports
                     $detailPageObj->lab_test_reports_id->IsDetailKey = true;
                     $detailPageObj->lab_test_reports_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->lab_test_reports_id->setSessionValue($detailPageObj->lab_test_reports_id->CurrentValue);
+                }
+            }
+            if (in_array("full_haemogram_parameters", $detailTblVar)) {
+                $detailPageObj = Container("FullHaemogramParametersGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->lab_test_report_id->IsDetailKey = true;
+                    $detailPageObj->lab_test_report_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->lab_test_report_id->setSessionValue($detailPageObj->lab_test_report_id->CurrentValue);
                 }
             }
         }
