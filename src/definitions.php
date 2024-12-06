@@ -178,6 +178,8 @@ return [
     "patients_lab_report" => \DI\create(PatientsLabReport::class),
     "urinalysis_results" => \DI\create(UrinalysisResults::class),
     "full_haemogram_parameters" => \DI\create(FullHaemogramParameters::class),
+    "patients_radiology_reports" => \DI\create(PatientsRadiologyReports::class),
+    "patients_radiology_reports_details" => \DI\create(PatientsRadiologyReportsDetails::class),
 
     // User table
     "usertable" => \DI\get("users"),

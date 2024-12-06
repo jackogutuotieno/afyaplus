@@ -306,6 +306,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1836,6 +1838,16 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -2024,6 +2036,8 @@
                 '/patientsdataviewlist[/{id}]',
                 '/patientslabreportlist[/{keys:.*}]',
                 '/patientslabreportview[/{keys:.*}]',
+                '/patientsradiologyreportslist[/{visit_id}]',
+                '/patientsradiologyreportsdetailslist[/{id}]',
                 '/patientsreport2list[/{id}]',
                 '/patientsreport',
                 '/patientsvisitsreportlist[/{id}]',
@@ -2332,6 +2346,8 @@
                 'PHPMaker2024\\afyaplus\\PatientsDataViewController:list',
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:list',
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:view',
+                'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsController:list',
+                'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsDetailsController:list',
                 'PHPMaker2024\\afyaplus\\PatientsReport2Controller:list',
                 'PHPMaker2024\\afyaplus\\PatientsReportController:summary',
                 'PHPMaker2024\\afyaplus\\PatientsvisitsreportController:list',
@@ -3370,6 +3386,12 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3558,6 +3580,8 @@
                 'list.patients_data_view',
                 'list.patients_lab_report',
                 'view.patients_lab_report',
+                'list.patients_radiology_reports',
+                'list.patients_radiology_reports_details',
                 'list.patients_report2',
                 'summary.Patients_Report',
                 'list.patientsvisitsreport',
@@ -3680,6 +3704,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4296,6 +4322,8 @@
         $o[303],
         $o[304],
         $o[305],
+        $o[306],
+        $o[307],
     ],
     []
 );

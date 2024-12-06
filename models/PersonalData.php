@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "fullhaemogramparametersdelete";
+    public $CurrentPageName = "patientsradiologyreportsdetailsgrid";
 
     // Page headings
     public $Heading = "";

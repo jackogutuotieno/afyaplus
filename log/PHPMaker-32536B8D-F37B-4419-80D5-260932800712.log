@@ -65,6 +65,8 @@ C:\wamp64\www\afyaplus\controllers\PatientVitalsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsDataViewController.php
 C:\wamp64\www\afyaplus\controllers\PatientsLabReportController.php
+C:\wamp64\www\afyaplus\controllers\PatientsRadiologyReportsController.php
+C:\wamp64\www\afyaplus\controllers\PatientsRadiologyReportsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PatientsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\PatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\PatientsvisitsreportController.php
@@ -387,6 +389,11 @@ C:\wamp64\www\afyaplus\models\PatientsLabReportGrid.php
 C:\wamp64\www\afyaplus\models\PatientsLabReportList.php
 C:\wamp64\www\afyaplus\models\PatientsLabReportView.php
 C:\wamp64\www\afyaplus\models\PatientsList.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReports.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetails.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsGrid.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsList.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsList.php
 C:\wamp64\www\afyaplus\models\PatientsReport.php
 C:\wamp64\www\afyaplus\models\PatientsReport2.php
 C:\wamp64\www\afyaplus\models\PatientsReport2List.php
@@ -635,6 +642,8 @@ C:\wamp64\www\afyaplus\src\Entity\PatientVisit.php
 C:\wamp64\www\afyaplus\src\Entity\PatientVital.php
 C:\wamp64\www\afyaplus\src\Entity\PatientsDataView.php
 C:\wamp64\www\afyaplus\src\Entity\PatientsLabReport.php
+C:\wamp64\www\afyaplus\src\Entity\PatientsRadiologyReport.php
+C:\wamp64\www\afyaplus\src\Entity\PatientsRadiologyReportsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\PatientsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Patientsvisitsreport.php
 C:\wamp64\www\afyaplus\src\Entity\PaymentMethod.php
@@ -979,6 +988,10 @@ C:\wamp64\www\afyaplus\views\PatientsLabReportMaster.php
 C:\wamp64\www\afyaplus\views\PatientsLabReportView.php
 C:\wamp64\www\afyaplus\views\PatientsList.php
 C:\wamp64\www\afyaplus\views\PatientsMaster.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsDetailsGrid.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsDetailsList.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsList.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsMaster.php
 C:\wamp64\www\afyaplus\views\PatientsReport2List.php
 C:\wamp64\www\afyaplus\views\PatientsReportList.php
 C:\wamp64\www\afyaplus\views\PatientsReportSummary.php

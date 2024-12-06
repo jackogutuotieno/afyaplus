@@ -954,7 +954,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}full_haemogram_parameters","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","2","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","6","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","2","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","6","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","9","0"]];
 
 /**
  * Tables
@@ -1050,4 +1072,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["urinalysis_parameters","urinalysis_parameters","Urinalysis Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","urinalysisparameterslist"],
     ["patients_lab_report","patients_lab_report","Lab Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientslabreportlist"],
     ["urinalysis_results","urinalysis_results","Urinalysis Results",true,"{32536B8D-F37B-4419-80D5-260932800712}","urinalysisresultslist"],
-    ["full_haemogram_parameters","full_haemogram_parameters","Full Haemogram",true,"{32536B8D-F37B-4419-80D5-260932800712}","fullhaemogramparameterslist"]];
+    ["full_haemogram_parameters","full_haemogram_parameters","Full Haemogram",true,"{32536B8D-F37B-4419-80D5-260932800712}","fullhaemogramparameterslist"],
+    ["patients_radiology_reports","patients_radiology_reports","Radiology Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsradiologyreportslist"],
+    ["patients_radiology_reports_details","patients_radiology_reports_details","Radiology Results",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsradiologyreportsdetailslist"]];
