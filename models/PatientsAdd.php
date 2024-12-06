@@ -40,6 +40,14 @@ class PatientsAdd extends Patients
     // CSS class/style
     public $CurrentPageName = "patientsadd";
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -1607,6 +1615,9 @@ class PatientsAdd extends Patients
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
+            if ($this->SendEmail) {
+                $this->sendEmailOnAdd($rsnew);
+            }
         }
 
         // Write JSON response

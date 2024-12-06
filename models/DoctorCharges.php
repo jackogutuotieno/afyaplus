@@ -33,6 +33,14 @@ class DoctorCharges extends DbTable
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
 
+    // Audit trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Ajax / Modal
     public $UseAjaxActions = false;
     public $ModalSearch = false;
@@ -702,6 +710,9 @@ class DoctorCharges extends DbTable
         if ($result) {
             $this->id->setDbValue($conn->lastInsertId());
             $rs['id'] = $this->id->DbValue;
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailOnAdd($rs);
+            }
         }
         return $result;
     }
@@ -758,6 +769,14 @@ class DoctorCharges extends DbTable
                 $rs['id'] = $this->id->CurrentValue;
             }
         }
+        if ($success && $this->AuditTrailOnEdit && $rsold) {
+            $rsaudit = $rs;
+            $fldname = 'id';
+            if (!array_key_exists($fldname, $rsaudit)) {
+                $rsaudit[$fldname] = $rsold[$fldname];
+            }
+            $this->writeAuditTrailOnEdit($rsold, $rsaudit);
+        }
         return $success;
     }
 
@@ -798,6 +817,9 @@ class DoctorCharges extends DbTable
                 $success = false;
                 $this->DbErrorMessage = $e->getMessage();
             }
+        }
+        if ($success && $this->AuditTrailOnDelete) {
+            $this->writeAuditTrailOnDelete($rs);
         }
         return $success;
     }
@@ -1503,6 +1525,192 @@ class DoctorCharges extends DbTable
 
         // No binary fields
         return false;
+    }
+
+    // Write audit trail start/end for grid update
+    public function writeAuditTrailDummy($typ)
+    {
+        WriteAuditLog(CurrentUserIdentifier(), $typ, 'doctor_charges');
+    }
+
+    // Write audit trail (add page)
+    public function writeAuditTrailOnAdd(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnAdd) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                    $newvalue = $Language->phrase("PasswordMask");
+                } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo Field
+                    $newvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rs[$fldname] : "[MEMO]";
+                } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML Field
+                    $newvalue = "[XML]";
+                } else {
+                    $newvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "A", 'doctor_charges', $fldname, $key, "", $newvalue);
+            }
+        }
+    }
+
+    // Write audit trail (edit page)
+    public function writeAuditTrailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnEdit) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rsnew) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && array_key_exists($fldname, $rsold) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->DataType == DataType::DATE) { // DateTime field
+                    $modified = (FormatDateTime($rsold[$fldname], 0) != FormatDateTime($rsnew[$fldname], 0));
+                } else {
+                    $modified = !CompareValue($rsold[$fldname], $rsnew[$fldname]);
+                }
+                if ($modified) {
+                    if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                        $oldvalue = $Language->phrase("PasswordMask");
+                        $newvalue = $Language->phrase("PasswordMask");
+                    } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo field
+                        $oldvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rsold[$fldname] : "[MEMO]";
+                        $newvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rsnew[$fldname] : "[MEMO]";
+                    } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML field
+                        $oldvalue = "[XML]";
+                        $newvalue = "[XML]";
+                    } else {
+                        $oldvalue = $rsold[$fldname];
+                        $newvalue = $rsnew[$fldname];
+                    }
+                    WriteAuditLog($usr, "U", 'doctor_charges', $fldname, $key, $oldvalue, $newvalue);
+                }
+            }
+        }
+    }
+
+    // Write audit trail (delete page)
+    public function writeAuditTrailOnDelete(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnDelete) {
+            return;
+        }
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write audit trail
+        $usr = CurrentUserIdentifier();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DataType::BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                    $oldvalue = $Language->phrase("PasswordMask");
+                } elseif ($this->Fields[$fldname]->DataType == DataType::MEMO) { // Memo field
+                    $oldvalue = Config("AUDIT_TRAIL_TO_DATABASE") ? $rs[$fldname] : "[MEMO]";
+                } elseif ($this->Fields[$fldname]->DataType == DataType::XML) { // XML field
+                    $oldvalue = "[XML]";
+                } else {
+                    $oldvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "D", 'doctor_charges', $fldname, $key, $oldvalue);
+            }
+        }
+    }
+
+    // Send email after add success
+    public function sendEmailOnAdd(&$rs)
+    {
+        global $Language;
+        $table = 'doctor_charges';
+        $subject = $table . " " . $Language->phrase("RecordInserted");
+        $action = $Language->phrase("ActionInserted");
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+        $email = new Email();
+        $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+            "From" => Config("SENDER_EMAIL"), // Replace Sender
+            "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+            "Subject" => $subject,  // Replace Subject
+            "Table" => $table,
+            "Key" => $key,
+            "Action" => $action
+        ]);
+        $args = ["rsnew" => $rs];
+        $emailSent = false;
+        if ($this->emailSending($email, $args)) {
+            $emailSent = $email->send();
+        }
+
+        // Send email failed
+        if (!$emailSent) {
+            $this->setFailureMessage($email->SendErrDescription);
+        }
+    }
+
+    // Send email after update success
+    public function sendEmailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        $table = 'doctor_charges';
+        $subject = $table . " ". $Language->phrase("RecordUpdated");
+        $action = $Language->phrase("ActionUpdated");
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+        $email = new Email();
+        $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+            "From" => Config("SENDER_EMAIL"), // Replace Sender
+            "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+            "Subject" => $subject,  // Replace Subject
+            "Table" => $table,
+            "Key" => $key,
+            "Action" => $action
+        ]);
+        $args = ["rsold" => $rsold, "rsnew" => $rsnew];
+        $emailSent = false;
+        if ($this->emailSending($email, $args)) {
+            $emailSent = $email->send();
+        }
+
+        // Send email failed
+        if (!$emailSent) {
+            $this->setFailureMessage($email->SendErrDescription);
+        }
     }
 
     // Table level events

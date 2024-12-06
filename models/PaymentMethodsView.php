@@ -58,6 +58,14 @@ class PaymentMethodsView extends PaymentMethods
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -803,6 +811,9 @@ class PaymentMethodsView extends PaymentMethods
 
         // Call Row Selected event
         $this->rowSelected($row);
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->payment_method->setDbValue($row['payment_method']);
         $this->date_created->setDbValue($row['date_created']);

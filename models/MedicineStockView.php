@@ -58,6 +58,14 @@ class MedicineStockView extends MedicineStock
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -817,6 +825,9 @@ class MedicineStockView extends MedicineStock
 
         // Call Row Selected event
         $this->rowSelected($row);
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->supplier_id->setDbValue($row['supplier_id']);
         $this->brand_id->setDbValue($row['brand_id']);

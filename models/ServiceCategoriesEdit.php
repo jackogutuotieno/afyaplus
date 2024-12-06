@@ -40,6 +40,14 @@ class ServiceCategoriesEdit extends ServiceCategories
     // CSS class/style
     public $CurrentPageName = "servicecategoriesedit";
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -1129,6 +1137,11 @@ class ServiceCategoriesEdit extends ServiceCategories
         // Call Row_Updated event
         if ($editRow) {
             $this->rowUpdated($rsold, $rsnew);
+        }
+        if ($editRow) {
+            if ($this->SendEmail) {
+                $this->sendEmailOnEdit($rsold, $rsnew);
+            }
         }
 
         // Write JSON response

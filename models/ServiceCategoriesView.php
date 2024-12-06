@@ -58,6 +58,14 @@ class ServiceCategoriesView extends ServiceCategories
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -815,6 +823,9 @@ class ServiceCategoriesView extends ServiceCategories
 
         // Call Row Selected event
         $this->rowSelected($row);
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->category_name->setDbValue($row['category_name']);
         $this->description->setDbValue($row['description']);

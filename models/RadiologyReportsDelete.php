@@ -40,6 +40,14 @@ class RadiologyReportsDelete extends RadiologyReports
     // CSS class/style
     public $CurrentPageName = "radiologyreportsdelete";
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -785,6 +793,9 @@ class RadiologyReportsDelete extends RadiologyReports
         if ($this->UseTransaction) {
             $conn->beginTransaction();
         }
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
+        }
 
         // Clone old rows
         $rsold = $rows;
@@ -846,11 +857,37 @@ class RadiologyReportsDelete extends RadiologyReports
             if (count($failKeys) > 0) {
                 $this->setWarningMessage(str_replace("%k", explode(", ", $failKeys), $Language->phrase("DeleteRecordsFailed")));
             }
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteSuccess")); // Batch delete success
+            }
+            $table = 'radiology_reports';
+            $subject = $table . " " . $Language->phrase("RecordDeleted");
+            $action = $Language->phrase("ActionDeleted");
+            $email = new Email();
+            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+                "From" => Config("SENDER_EMAIL"), // Replace Sender
+                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+                "Subject" => $subject,  // Replace Subject
+                "Table" => $table,
+                "Key" => implode(", ", $successKeys),
+                "Action" => $action
+            ]);
+            $args = ["rs" => $rsold];
+            $emailSent = false;
+            if ($this->emailSending($email, $args)) {
+                $emailSent = $email->send();
+            }
+            if (!$emailSent) {
+                $this->setFailureMessage($email->SendErrDescription);
+            }
         } else {
             if ($this->UseTransaction) { // Rollback transaction
                 if ($conn->isTransactionActive()) {
                     $conn->rollback();
                 }
+            }
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteRollback")); // Batch delete rollback
             }
         }
 

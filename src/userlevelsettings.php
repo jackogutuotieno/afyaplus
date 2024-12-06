@@ -353,7 +353,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","1","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","2","1864"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","3","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","4","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}radiology_reports","5","0"],

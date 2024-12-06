@@ -58,6 +58,14 @@ class FullHaemogramParametersView extends FullHaemogramParameters
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -824,6 +832,9 @@ class FullHaemogramParametersView extends FullHaemogramParameters
 
         // Call Row Selected event
         $this->rowSelected($row);
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
         $this->test->setDbValue($row['test']);

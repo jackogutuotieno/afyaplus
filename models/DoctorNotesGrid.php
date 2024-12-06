@@ -54,6 +54,14 @@ class DoctorNotesGrid extends DoctorNotes
     public $CopyUrl;
     public $ListUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -910,6 +918,9 @@ class DoctorNotesGrid extends DoctorNotes
             return false;
         }
         $this->loadDefaultValues();
+        if ($this->AuditTrailOnEdit) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchUpdateBegin")); // Batch update begin
+        }
         $wrkfilter = "";
         $key = "";
 
@@ -975,8 +986,38 @@ class DoctorNotesGrid extends DoctorNotes
 
             // Call Grid_Updated event
             $this->gridUpdated($rsold, $rsnew);
+            if ($this->AuditTrailOnEdit) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchUpdateSuccess")); // Batch update success
+            }
             $this->clearInlineMode(); // Clear inline edit mode
+
+            // Send notify email
+            $table = 'doctor_notes';
+            $subject = $table . " " . $Language->phrase("RecordUpdated");
+            $action = $Language->phrase("ActionUpdatedGridEdit");
+            $email = new Email();
+            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+                "From" => Config("SENDER_EMAIL"), // Replace Sender
+                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+                "Subject" => $subject,  // Replace Subject
+                "Table" => $table,
+                "Key" => $key,
+                "Action" => $action
+            ]);
+            $args = ["rsold" => $rsold, "rsnew" => $rsnew];
+            $emailSent = false;
+            if ($this->emailSending($email, $args)) {
+                $emailSent = $email->send();
+            }
+
+            // Set up error message
+            if (!$emailSent) {
+                $this->setFailureMessage($email->SendErrDescription);
+            }
         } else {
+            if ($this->AuditTrailOnEdit) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchUpdateRollback")); // Batch update rollback
+            }
             if ($this->getFailureMessage() == "") {
                 $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
             }
@@ -1036,6 +1077,9 @@ class DoctorNotesGrid extends DoctorNotes
         // Init key filter
         $wrkfilter = "";
         $addcnt = 0;
+        if ($this->AuditTrailOnAdd) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchInsertBegin")); // Batch insert begin
+        }
         $key = "";
 
         // Get row count
@@ -1090,8 +1134,36 @@ class DoctorNotesGrid extends DoctorNotes
 
             // Call Grid_Inserted event
             $this->gridInserted($rsnew);
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertSuccess")); // Batch insert success
+            }
             $this->clearInlineMode(); // Clear grid add mode
+
+            // Send notify email
+            $table = 'doctor_notes';
+            $subject = $table . " " . $Language->phrase("RecordInserted");
+            $action = $Language->phrase("ActionInsertedGridAdd");
+            $email = new Email();
+            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+                "From" => Config("SENDER_EMAIL"), // Replace Sender
+                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+                "Subject" => $subject,  // Replace Subject
+                "Table" => $table,
+                "Key" => $key,
+                "Action" => $action
+            ]);
+            $args = ["rsnew" => $rsnew];
+            $emailSent = false;
+            if ($this->emailSending($email, $args)) {
+                $emailSent = $email->send();
+            }
+            if (!$emailSent) {
+                $this->setFailureMessage($email->SendErrDescription);
+            }
         } else {
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertRollback")); // Batch insert rollback
+            }
             if ($this->getFailureMessage() == "") {
                 $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
             }
@@ -2448,6 +2520,9 @@ class DoctorNotesGrid extends DoctorNotes
         if (count($rows) == 0) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
             return false;
+        }
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
         }
 
         // Clone old rows

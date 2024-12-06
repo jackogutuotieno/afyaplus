@@ -58,6 +58,14 @@ class UsersView extends Users
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -824,6 +832,9 @@ class UsersView extends Users
 
         // Call Row Selected event
         $this->rowSelected($row);
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->photo->Upload->DbValue = $row['photo'];
         if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array

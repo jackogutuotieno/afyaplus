@@ -64,6 +64,14 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -1117,6 +1125,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         // Init key filter
         $wrkfilter = "";
         $addcnt = 0;
+        if ($this->AuditTrailOnAdd) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchInsertBegin")); // Batch insert begin
+        }
         $key = "";
 
         // Get row count
@@ -1177,15 +1188,43 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
 
             // Call Grid_Inserted event
             $this->gridInserted($rsnew);
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertSuccess")); // Batch insert success
+            }
             if ($this->getSuccessMessage() == "") {
                 $this->setSuccessMessage($Language->phrase("InsertSuccess")); // Set up insert success message
             }
             $this->clearInlineMode(); // Clear grid add mode
+
+            // Send notify email
+            $table = 'lab_test_requests_details';
+            $subject = $table . " " . $Language->phrase("RecordInserted");
+            $action = $Language->phrase("ActionInsertedGridAdd");
+            $email = new Email();
+            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
+                "From" => Config("SENDER_EMAIL"), // Replace Sender
+                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
+                "Subject" => $subject,  // Replace Subject
+                "Table" => $table,
+                "Key" => $key,
+                "Action" => $action
+            ]);
+            $args = ["rsnew" => $rsnew];
+            $emailSent = false;
+            if ($this->emailSending($email, $args)) {
+                $emailSent = $email->send();
+            }
+            if (!$emailSent) {
+                $this->setFailureMessage($email->SendErrDescription);
+            }
         } else {
             if ($this->UseTransaction) { // Rollback transaction
                 if ($conn->isTransactionActive()) {
                     $conn->rollback();
                 }
+            }
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertRollback")); // Batch insert rollback
             }
             if ($this->getFailureMessage() == "") {
                 $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
@@ -2332,6 +2371,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
             return false;
         }
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
+        }
 
         // Clone old rows
         $rsold = $rows;
@@ -2444,6 +2486,9 @@ class LabTestRequestsDetailsList extends LabTestRequestsDetails
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
+            if ($this->SendEmail) {
+                $this->sendEmailOnAdd($rsnew);
+            }
         }
         return $addRow;
     }
