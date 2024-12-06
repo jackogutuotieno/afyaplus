@@ -47,14 +47,11 @@ class LaboratoryReports2 extends DbTable
 
     // Fields
     public $id;
-    public $patient_id;
-    public $first_name;
-    public $last_name;
+    public $patient_name;
     public $gender;
-    public $date_of_birth;
-    public $p_age;
-    public $specimen;
-    public $service_name;
+    public $patient_age;
+    public $tests;
+    public $disease_name;
     public $date_created;
     public $date_updated;
     public $report_month;
@@ -120,90 +117,38 @@ class LaboratoryReports2 extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
+        $this->id->addMethod("getDefault", fn() => 0);
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
-        $this->id->IsAutoIncrement = true; // Autoincrement field
-        $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Nullable = false; // NOT NULL field
+        $this->id->Required = true; // Required field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_id
-        $this->patient_id = new DbField(
+        // patient_name
+        $this->patient_name = new DbField(
             $this, // Table
-            'x_patient_id', // Variable name
-            'patient_id', // Name
-            '`patient_id`', // Expression
-            '`patient_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`patient_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->patient_id->InputTextType = "text";
-        $this->patient_id->Raw = true;
-        $this->patient_id->Nullable = false; // NOT NULL field
-        $this->patient_id->Required = true; // Required field
-        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_id'] = &$this->patient_id;
-
-        // first_name
-        $this->first_name = new DbField(
-            $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
+            'x_patient_name', // Variable name
+            'patient_name', // Name
+            '`patient_name`', // Expression
+            '`patient_name`', // Basic search expression
             200, // Type
-            50, // Size
+            101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`first_name`', // Virtual expression
+            '`patient_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['first_name'] = &$this->first_name;
-
-        // last_name
-        $this->last_name = new DbField(
-            $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`last_name`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['last_name'] = &$this->last_name;
+        $this->patient_name->InputTextType = "text";
+        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_name'] = &$this->patient_name;
 
         // gender
         $this->gender = new DbField(
@@ -229,104 +174,73 @@ class LaboratoryReports2 extends DbTable
         $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['gender'] = &$this->gender;
 
-        // date_of_birth
-        $this->date_of_birth = new DbField(
+        // patient_age
+        $this->patient_age = new DbField(
             $this, // Table
-            'x_date_of_birth', // Variable name
-            'date_of_birth', // Name
-            '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            7, // Date/Time format
-            false, // Is upload field
-            '`date_of_birth`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_of_birth->InputTextType = "text";
-        $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_of_birth'] = &$this->date_of_birth;
-
-        // p_age
-        $this->p_age = new DbField(
-            $this, // Table
-            'x_p_age', // Variable name
-            'p_age', // Name
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Expression
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Basic search expression
+            'x_patient_age', // Variable name
+            'patient_age', // Name
+            '`patient_age`', // Expression
+            '`patient_age`', // Basic search expression
             20, // Type
             21, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Virtual expression
+            '`patient_age`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->p_age->InputTextType = "text";
-        $this->p_age->Raw = true;
-        $this->p_age->IsCustom = true; // Custom field
-        $this->p_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->p_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['p_age'] = &$this->p_age;
+        $this->patient_age->InputTextType = "text";
+        $this->patient_age->Raw = true;
+        $this->patient_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->patient_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_age'] = &$this->patient_age;
 
-        // specimen
-        $this->specimen = new DbField(
+        // tests
+        $this->tests = new DbField(
             $this, // Table
-            'x_specimen', // Variable name
-            'specimen', // Name
-            '`specimen`', // Expression
-            '`specimen`', // Basic search expression
+            'x_tests', // Variable name
+            'tests', // Name
+            '`tests`', // Expression
+            '`tests`', // Basic search expression
             200, // Type
-            50, // Size
+            4096, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`specimen`', // Virtual expression
+            '`tests`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->specimen->InputTextType = "text";
-        $this->specimen->Nullable = false; // NOT NULL field
-        $this->specimen->Required = true; // Required field
-        $this->specimen->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['specimen'] = &$this->specimen;
+        $this->tests->InputTextType = "text";
+        $this->tests->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['tests'] = &$this->tests;
 
-        // service_name
-        $this->service_name = new DbField(
+        // disease_name
+        $this->disease_name = new DbField(
             $this, // Table
-            'x_service_name', // Variable name
-            'service_name', // Name
-            '`service_name`', // Expression
-            '`service_name`', // Basic search expression
+            'x_disease_name', // Variable name
+            'disease_name', // Name
+            '`disease_name`', // Expression
+            '`disease_name`', // Basic search expression
             200, // Type
-            100, // Size
+            200, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`service_name`', // Virtual expression
+            '`disease_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->service_name->InputTextType = "text";
-        $this->service_name->Nullable = false; // NOT NULL field
-        $this->service_name->Required = true; // Required field
-        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['service_name'] = &$this->service_name;
+        $this->disease_name->InputTextType = "text";
+        $this->disease_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['disease_name'] = &$this->disease_name;
 
         // date_created
         $this->date_created = new DbField(
@@ -334,10 +248,10 @@ class LaboratoryReports2 extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
-            7, // Date/Time format
+            19, // Size
+            0, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -350,7 +264,7 @@ class LaboratoryReports2 extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -360,10 +274,10 @@ class LaboratoryReports2 extends DbTable
             'x_date_updated', // Variable name
             'date_updated', // Name
             '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 7, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
             135, // Type
-            76, // Size
-            7, // Date/Time format
+            19, // Size
+            0, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
             false, // Is virtual
@@ -376,7 +290,7 @@ class LaboratoryReports2 extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
 
@@ -493,7 +407,20 @@ class LaboratoryReports2 extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS `p_age`";
+        $useFieldNames = false;
+        $fieldNames = [];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($this->Fields as $field) {
+            $expr = $field->Expression;
+            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
+            if ($customExpr != $expr) {
+                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
+                $useFieldNames = true;
+            } else {
+                $fieldNames[] = $expr;
+            }
+        }
+        return $useFieldNames ? implode(", ", $fieldNames) : "*";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -799,8 +726,6 @@ class LaboratoryReports2 extends DbTable
             $this->DbErrorMessage = $e->getMessage();
         }
         if ($result) {
-            $this->id->setDbValue($conn->lastInsertId());
-            $rs['id'] = $this->id->DbValue;
         }
         return $result;
     }
@@ -850,13 +775,6 @@ class LaboratoryReports2 extends DbTable
             $success = false;
             $this->DbErrorMessage = $e->getMessage();
         }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
-                $rs['id'] = $this->id->CurrentValue;
-            }
-        }
         return $success;
     }
 
@@ -876,9 +794,6 @@ class LaboratoryReports2 extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
-            if (array_key_exists('id', $rs)) {
-                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
-            }
         }
         $filter = $curfilter ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -908,14 +823,11 @@ class LaboratoryReports2 extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_id->DbValue = $row['patient_id'];
-        $this->first_name->DbValue = $row['first_name'];
-        $this->last_name->DbValue = $row['last_name'];
+        $this->patient_name->DbValue = $row['patient_name'];
         $this->gender->DbValue = $row['gender'];
-        $this->date_of_birth->DbValue = $row['date_of_birth'];
-        $this->p_age->DbValue = $row['p_age'];
-        $this->specimen->DbValue = $row['specimen'];
-        $this->service_name->DbValue = $row['service_name'];
+        $this->patient_age->DbValue = $row['patient_age'];
+        $this->tests->DbValue = $row['tests'];
+        $this->disease_name->DbValue = $row['disease_name'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
         $this->report_month->DbValue = $row['report_month'];
@@ -930,19 +842,13 @@ class LaboratoryReports2 extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`id` = @id@";
+        return "";
     }
 
     // Get Key
     public function getKey($current = false, $keySeparator = null)
     {
         $keys = [];
-        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
-        if (EmptyValue($val)) {
-            return "";
-        } else {
-            $keys[] = $val;
-        }
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         return implode($keySeparator, $keys);
     }
@@ -953,12 +859,7 @@ class LaboratoryReports2 extends DbTable
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         $this->OldKey = strval($key);
         $keys = explode($keySeparator, $this->OldKey);
-        if (count($keys) == 1) {
-            if ($current) {
-                $this->id->CurrentValue = $keys[0];
-            } else {
-                $this->id->OldValue = $keys[0];
-            }
+        if (count($keys) == 0) {
         }
     }
 
@@ -966,19 +867,6 @@ class LaboratoryReports2 extends DbTable
     public function getRecordFilter($row = null, $current = false)
     {
         $keyFilter = $this->sqlKeyFilter();
-        if (is_array($row)) {
-            $val = array_key_exists('id', $row) ? $row['id'] : null;
-        } else {
-            $val = !EmptyValue($this->id->OldValue) && !$current ? $this->id->OldValue : $this->id->CurrentValue;
-        }
-        if (!is_numeric($val)) {
-            return "0=1"; // Invalid key
-        }
-        if ($val === null) {
-            return "0=1"; // Invalid key
-        } else {
-            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
-        }
         return $keyFilter;
     }
 
@@ -1119,7 +1007,6 @@ class LaboratoryReports2 extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
-        $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -1130,11 +1017,6 @@ class LaboratoryReports2 extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
-        if ($this->id->CurrentValue !== null) {
-            $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
-        } else {
-            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
-        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -1204,24 +1086,14 @@ class LaboratoryReports2 extends DbTable
             $isApi = IsApi();
             $keyValues = $isApi
                 ? (Route(0) == "export"
-                    ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
-                    : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
+                    ? array_map(fn ($i) => Route($i + 3), range(0, -1))  // Export API
+                    : array_map(fn ($i) => Route($i + 2), range(0, -1))) // Other API
                 : []; // Non-API
-            if (($keyValue = Param("id") ?? Route("id")) !== null) {
-                $arKeys[] = $keyValue;
-            } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
-                $arKeys[] = $keyValue;
-            } else {
-                $arKeys = null; // Do not setup
-            }
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
-                if (!is_numeric($key)) {
-                    continue;
-                }
                 $ar[] = $key;
             }
         }
@@ -1242,11 +1114,6 @@ class LaboratoryReports2 extends DbTable
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
-            }
-            if ($setCurrent) {
-                $this->id->CurrentValue = $key;
-            } else {
-                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1272,14 +1139,11 @@ class LaboratoryReports2 extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
+        $this->patient_name->setDbValue($row['patient_name']);
         $this->gender->setDbValue($row['gender']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->p_age->setDbValue($row['p_age']);
-        $this->specimen->setDbValue($row['specimen']);
-        $this->service_name->setDbValue($row['service_name']);
+        $this->patient_age->setDbValue($row['patient_age']);
+        $this->tests->setDbValue($row['tests']);
+        $this->disease_name->setDbValue($row['disease_name']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
         $this->report_month->setDbValue($row['report_month']);
@@ -1315,21 +1179,15 @@ class LaboratoryReports2 extends DbTable
 
         // id
 
-        // patient_id
-
-        // first_name
-
-        // last_name
+        // patient_name
 
         // gender
 
-        // date_of_birth
+        // patient_age
 
-        // p_age
+        // tests
 
-        // specimen
-
-        // service_name
+        // disease_name
 
         // date_created
 
@@ -1339,33 +1197,23 @@ class LaboratoryReports2 extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+        $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
-        // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-
-        // first_name
-        $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-        // last_name
-        $this->last_name->ViewValue = $this->last_name->CurrentValue;
+        // patient_name
+        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
 
-        // date_of_birth
-        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+        // patient_age
+        $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+        $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
-        // p_age
-        $this->p_age->ViewValue = $this->p_age->CurrentValue;
-        $this->p_age->ViewValue = FormatNumber($this->p_age->ViewValue, $this->p_age->formatPattern());
+        // tests
+        $this->tests->ViewValue = $this->tests->CurrentValue;
 
-        // specimen
-        $this->specimen->ViewValue = $this->specimen->CurrentValue;
-
-        // service_name
-        $this->service_name->ViewValue = $this->service_name->CurrentValue;
+        // disease_name
+        $this->disease_name->ViewValue = $this->disease_name->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1382,37 +1230,25 @@ class LaboratoryReports2 extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_id
-        $this->patient_id->HrefValue = "";
-        $this->patient_id->TooltipValue = "";
-
-        // first_name
-        $this->first_name->HrefValue = "";
-        $this->first_name->TooltipValue = "";
-
-        // last_name
-        $this->last_name->HrefValue = "";
-        $this->last_name->TooltipValue = "";
+        // patient_name
+        $this->patient_name->HrefValue = "";
+        $this->patient_name->TooltipValue = "";
 
         // gender
         $this->gender->HrefValue = "";
         $this->gender->TooltipValue = "";
 
-        // date_of_birth
-        $this->date_of_birth->HrefValue = "";
-        $this->date_of_birth->TooltipValue = "";
+        // patient_age
+        $this->patient_age->HrefValue = "";
+        $this->patient_age->TooltipValue = "";
 
-        // p_age
-        $this->p_age->HrefValue = "";
-        $this->p_age->TooltipValue = "";
+        // tests
+        $this->tests->HrefValue = "";
+        $this->tests->TooltipValue = "";
 
-        // specimen
-        $this->specimen->HrefValue = "";
-        $this->specimen->TooltipValue = "";
-
-        // service_name
-        $this->service_name->HrefValue = "";
-        $this->service_name->TooltipValue = "";
+        // disease_name
+        $this->disease_name->HrefValue = "";
+        $this->disease_name->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1444,30 +1280,18 @@ class LaboratoryReports2 extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // patient_id
-        $this->patient_id->setupEditAttributes();
-        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
         }
 
-        // first_name
-        $this->first_name->setupEditAttributes();
-        if (!$this->first_name->Raw) {
-            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
+        // patient_name
+        $this->patient_name->setupEditAttributes();
+        if (!$this->patient_name->Raw) {
+            $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
         }
-        $this->first_name->EditValue = $this->first_name->CurrentValue;
-        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
-
-        // last_name
-        $this->last_name->setupEditAttributes();
-        if (!$this->last_name->Raw) {
-            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
-        }
-        $this->last_name->EditValue = $this->last_name->CurrentValue;
-        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
+        $this->patient_name->EditValue = $this->patient_name->CurrentValue;
+        $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
         // gender
         $this->gender->setupEditAttributes();
@@ -1477,34 +1301,29 @@ class LaboratoryReports2 extends DbTable
         $this->gender->EditValue = $this->gender->CurrentValue;
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
-        // date_of_birth
-        $this->date_of_birth->setupEditAttributes();
-        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
-        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
-
-        // p_age
-        $this->p_age->setupEditAttributes();
-        $this->p_age->EditValue = $this->p_age->CurrentValue;
-        $this->p_age->PlaceHolder = RemoveHtml($this->p_age->caption());
-        if (strval($this->p_age->EditValue) != "" && is_numeric($this->p_age->EditValue)) {
-            $this->p_age->EditValue = FormatNumber($this->p_age->EditValue, null);
+        // patient_age
+        $this->patient_age->setupEditAttributes();
+        $this->patient_age->EditValue = $this->patient_age->CurrentValue;
+        $this->patient_age->PlaceHolder = RemoveHtml($this->patient_age->caption());
+        if (strval($this->patient_age->EditValue) != "" && is_numeric($this->patient_age->EditValue)) {
+            $this->patient_age->EditValue = FormatNumber($this->patient_age->EditValue, null);
         }
 
-        // specimen
-        $this->specimen->setupEditAttributes();
-        if (!$this->specimen->Raw) {
-            $this->specimen->CurrentValue = HtmlDecode($this->specimen->CurrentValue);
+        // tests
+        $this->tests->setupEditAttributes();
+        if (!$this->tests->Raw) {
+            $this->tests->CurrentValue = HtmlDecode($this->tests->CurrentValue);
         }
-        $this->specimen->EditValue = $this->specimen->CurrentValue;
-        $this->specimen->PlaceHolder = RemoveHtml($this->specimen->caption());
+        $this->tests->EditValue = $this->tests->CurrentValue;
+        $this->tests->PlaceHolder = RemoveHtml($this->tests->caption());
 
-        // service_name
-        $this->service_name->setupEditAttributes();
-        if (!$this->service_name->Raw) {
-            $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
+        // disease_name
+        $this->disease_name->setupEditAttributes();
+        if (!$this->disease_name->Raw) {
+            $this->disease_name->CurrentValue = HtmlDecode($this->disease_name->CurrentValue);
         }
-        $this->service_name->EditValue = $this->service_name->CurrentValue;
-        $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
+        $this->disease_name->EditValue = $this->disease_name->CurrentValue;
+        $this->disease_name->PlaceHolder = RemoveHtml($this->disease_name->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1553,27 +1372,21 @@ class LaboratoryReports2 extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->p_age);
-                    $doc->exportCaption($this->specimen);
-                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->patient_age);
+                    $doc->exportCaption($this->tests);
+                    $doc->exportCaption($this->disease_name);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                     $doc->exportCaption($this->report_month);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->p_age);
-                    $doc->exportCaption($this->specimen);
-                    $doc->exportCaption($this->service_name);
+                    $doc->exportCaption($this->patient_age);
+                    $doc->exportCaption($this->tests);
+                    $doc->exportCaption($this->disease_name);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                     $doc->exportCaption($this->report_month);
@@ -1604,27 +1417,21 @@ class LaboratoryReports2 extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->patient_name);
                         $doc->exportField($this->gender);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->p_age);
-                        $doc->exportField($this->specimen);
-                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->patient_age);
+                        $doc->exportField($this->tests);
+                        $doc->exportField($this->disease_name);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                         $doc->exportField($this->report_month);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_id);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->patient_name);
                         $doc->exportField($this->gender);
-                        $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->p_age);
-                        $doc->exportField($this->specimen);
-                        $doc->exportField($this->service_name);
+                        $doc->exportField($this->patient_age);
+                        $doc->exportField($this->tests);
+                        $doc->exportField($this->disease_name);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                         $doc->exportField($this->report_month);

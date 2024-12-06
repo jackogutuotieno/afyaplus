@@ -146,14 +146,11 @@ class LaboratoryReports2List extends LaboratoryReports2
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->Visible = false;
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
+        $this->patient_name->setVisibility();
         $this->gender->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->p_age->setVisibility();
-        $this->specimen->setVisibility();
-        $this->service_name->setVisibility();
+        $this->patient_age->setVisibility();
+        $this->tests->setVisibility();
+        $this->disease_name->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
         $this->report_month->setVisibility();
@@ -449,7 +446,6 @@ class LaboratoryReports2List extends LaboratoryReports2
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -461,9 +457,6 @@ class LaboratoryReports2List extends LaboratoryReports2
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -1054,14 +1047,11 @@ class LaboratoryReports2List extends LaboratoryReports2
             $savedFilterList = Profile()->getSearchFilters("flaboratory_reports2srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
-        $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
-        $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
+        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
-        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
-        $filterList = Concat($filterList, $this->p_age->AdvancedSearch->toJson(), ","); // Field p_age
-        $filterList = Concat($filterList, $this->specimen->AdvancedSearch->toJson(), ","); // Field specimen
-        $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
+        $filterList = Concat($filterList, $this->patient_age->AdvancedSearch->toJson(), ","); // Field patient_age
+        $filterList = Concat($filterList, $this->tests->AdvancedSearch->toJson(), ","); // Field tests
+        $filterList = Concat($filterList, $this->disease_name->AdvancedSearch->toJson(), ","); // Field disease_name
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         $filterList = Concat($filterList, $this->report_month->AdvancedSearch->toJson(), ","); // Field report_month
@@ -1112,29 +1102,13 @@ class LaboratoryReports2List extends LaboratoryReports2
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field patient_id
-        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
-        $this->patient_id->AdvancedSearch->save();
-
-        // Field first_name
-        $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator = @$filter["z_first_name"];
-        $this->first_name->AdvancedSearch->SearchCondition = @$filter["v_first_name"];
-        $this->first_name->AdvancedSearch->SearchValue2 = @$filter["y_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator2 = @$filter["w_first_name"];
-        $this->first_name->AdvancedSearch->save();
-
-        // Field last_name
-        $this->last_name->AdvancedSearch->SearchValue = @$filter["x_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator = @$filter["z_last_name"];
-        $this->last_name->AdvancedSearch->SearchCondition = @$filter["v_last_name"];
-        $this->last_name->AdvancedSearch->SearchValue2 = @$filter["y_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator2 = @$filter["w_last_name"];
-        $this->last_name->AdvancedSearch->save();
+        // Field patient_name
+        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
+        $this->patient_name->AdvancedSearch->save();
 
         // Field gender
         $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
@@ -1144,37 +1118,29 @@ class LaboratoryReports2List extends LaboratoryReports2
         $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
         $this->gender->AdvancedSearch->save();
 
-        // Field date_of_birth
-        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->save();
+        // Field patient_age
+        $this->patient_age->AdvancedSearch->SearchValue = @$filter["x_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchOperator = @$filter["z_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchCondition = @$filter["v_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchValue2 = @$filter["y_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchOperator2 = @$filter["w_patient_age"];
+        $this->patient_age->AdvancedSearch->save();
 
-        // Field p_age
-        $this->p_age->AdvancedSearch->SearchValue = @$filter["x_p_age"];
-        $this->p_age->AdvancedSearch->SearchOperator = @$filter["z_p_age"];
-        $this->p_age->AdvancedSearch->SearchCondition = @$filter["v_p_age"];
-        $this->p_age->AdvancedSearch->SearchValue2 = @$filter["y_p_age"];
-        $this->p_age->AdvancedSearch->SearchOperator2 = @$filter["w_p_age"];
-        $this->p_age->AdvancedSearch->save();
+        // Field tests
+        $this->tests->AdvancedSearch->SearchValue = @$filter["x_tests"];
+        $this->tests->AdvancedSearch->SearchOperator = @$filter["z_tests"];
+        $this->tests->AdvancedSearch->SearchCondition = @$filter["v_tests"];
+        $this->tests->AdvancedSearch->SearchValue2 = @$filter["y_tests"];
+        $this->tests->AdvancedSearch->SearchOperator2 = @$filter["w_tests"];
+        $this->tests->AdvancedSearch->save();
 
-        // Field specimen
-        $this->specimen->AdvancedSearch->SearchValue = @$filter["x_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator = @$filter["z_specimen"];
-        $this->specimen->AdvancedSearch->SearchCondition = @$filter["v_specimen"];
-        $this->specimen->AdvancedSearch->SearchValue2 = @$filter["y_specimen"];
-        $this->specimen->AdvancedSearch->SearchOperator2 = @$filter["w_specimen"];
-        $this->specimen->AdvancedSearch->save();
-
-        // Field service_name
-        $this->service_name->AdvancedSearch->SearchValue = @$filter["x_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator = @$filter["z_service_name"];
-        $this->service_name->AdvancedSearch->SearchCondition = @$filter["v_service_name"];
-        $this->service_name->AdvancedSearch->SearchValue2 = @$filter["y_service_name"];
-        $this->service_name->AdvancedSearch->SearchOperator2 = @$filter["w_service_name"];
-        $this->service_name->AdvancedSearch->save();
+        // Field disease_name
+        $this->disease_name->AdvancedSearch->SearchValue = @$filter["x_disease_name"];
+        $this->disease_name->AdvancedSearch->SearchOperator = @$filter["z_disease_name"];
+        $this->disease_name->AdvancedSearch->SearchCondition = @$filter["v_disease_name"];
+        $this->disease_name->AdvancedSearch->SearchValue2 = @$filter["y_disease_name"];
+        $this->disease_name->AdvancedSearch->SearchOperator2 = @$filter["w_disease_name"];
+        $this->disease_name->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1238,11 +1204,10 @@ class LaboratoryReports2List extends LaboratoryReports2
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->first_name;
-        $searchFlds[] = &$this->last_name;
+        $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
-        $searchFlds[] = &$this->specimen;
-        $searchFlds[] = &$this->service_name;
+        $searchFlds[] = &$this->tests;
+        $searchFlds[] = &$this->disease_name;
         $searchFlds[] = &$this->report_month;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
@@ -1323,13 +1288,11 @@ class LaboratoryReports2List extends LaboratoryReports2
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
+            $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->gender); // gender
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->p_age); // p_age
-            $this->updateSort($this->specimen); // specimen
-            $this->updateSort($this->service_name); // service_name
+            $this->updateSort($this->patient_age); // patient_age
+            $this->updateSort($this->tests); // tests
+            $this->updateSort($this->disease_name); // disease_name
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->updateSort($this->report_month); // report_month
@@ -1358,14 +1321,11 @@ class LaboratoryReports2List extends LaboratoryReports2
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->patient_id->setSort("");
-                $this->first_name->setSort("");
-                $this->last_name->setSort("");
+                $this->patient_name->setSort("");
                 $this->gender->setSort("");
-                $this->date_of_birth->setSort("");
-                $this->p_age->setSort("");
-                $this->specimen->setSort("");
-                $this->service_name->setSort("");
+                $this->patient_age->setSort("");
+                $this->tests->setSort("");
+                $this->disease_name->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
                 $this->report_month->setSort("");
@@ -1487,7 +1447,6 @@ class LaboratoryReports2List extends LaboratoryReports2
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1515,13 +1474,11 @@ class LaboratoryReports2List extends LaboratoryReports2
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "first_name");
-            $this->createColumnOption($option, "last_name");
+            $this->createColumnOption($option, "patient_name");
             $this->createColumnOption($option, "gender");
-            $this->createColumnOption($option, "date_of_birth");
-            $this->createColumnOption($option, "p_age");
-            $this->createColumnOption($option, "specimen");
-            $this->createColumnOption($option, "service_name");
+            $this->createColumnOption($option, "patient_age");
+            $this->createColumnOption($option, "tests");
+            $this->createColumnOption($option, "disease_name");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
             $this->createColumnOption($option, "report_month");
@@ -1964,14 +1921,11 @@ class LaboratoryReports2List extends LaboratoryReports2
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
+        $this->patient_name->setDbValue($row['patient_name']);
         $this->gender->setDbValue($row['gender']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->p_age->setDbValue($row['p_age']);
-        $this->specimen->setDbValue($row['specimen']);
-        $this->service_name->setDbValue($row['service_name']);
+        $this->patient_age->setDbValue($row['patient_age']);
+        $this->tests->setDbValue($row['tests']);
+        $this->disease_name->setDbValue($row['disease_name']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
         $this->report_month->setDbValue($row['report_month']);
@@ -1982,14 +1936,11 @@ class LaboratoryReports2List extends LaboratoryReports2
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
-        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
-        $row['p_age'] = $this->p_age->DefaultValue;
-        $row['specimen'] = $this->specimen->DefaultValue;
-        $row['service_name'] = $this->service_name->DefaultValue;
+        $row['patient_age'] = $this->patient_age->DefaultValue;
+        $row['tests'] = $this->tests->DefaultValue;
+        $row['disease_name'] = $this->disease_name->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         $row['report_month'] = $this->report_month->DefaultValue;
@@ -1999,18 +1950,6 @@ class LaboratoryReports2List extends LaboratoryReports2
     // Load old record
     protected function loadOldRecord()
     {
-        // Load old record
-        if ($this->OldKey != "") {
-            $this->setKey($this->OldKey);
-            $this->CurrentFilter = $this->getRecordFilter();
-            $sql = $this->getCurrentSql();
-            $conn = $this->getConnection();
-            $rs = ExecuteQuery($sql, $conn);
-            if ($row = $rs->fetch()) {
-                $this->loadRowValues($row); // Load row values
-                return $row;
-            }
-        }
         $this->loadRowValues(); // Load default row values
         return null;
     }
@@ -2035,21 +1974,15 @@ class LaboratoryReports2List extends LaboratoryReports2
 
         // id
 
-        // patient_id
-
-        // first_name
-
-        // last_name
+        // patient_name
 
         // gender
 
-        // date_of_birth
+        // patient_age
 
-        // p_age
+        // tests
 
-        // specimen
-
-        // service_name
+        // disease_name
 
         // date_created
 
@@ -2061,33 +1994,23 @@ class LaboratoryReports2List extends LaboratoryReports2
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
-            // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+            // patient_age
+            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
-            // p_age
-            $this->p_age->ViewValue = $this->p_age->CurrentValue;
-            $this->p_age->ViewValue = FormatNumber($this->p_age->ViewValue, $this->p_age->formatPattern());
+            // tests
+            $this->tests->ViewValue = $this->tests->CurrentValue;
 
-            // specimen
-            $this->specimen->ViewValue = $this->specimen->CurrentValue;
-
-            // service_name
-            $this->service_name->ViewValue = $this->service_name->CurrentValue;
+            // disease_name
+            $this->disease_name->ViewValue = $this->disease_name->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2104,33 +2027,25 @@ class LaboratoryReports2List extends LaboratoryReports2
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+            $this->patient_age->TooltipValue = "";
 
-            // p_age
-            $this->p_age->HrefValue = "";
-            $this->p_age->TooltipValue = "";
+            // tests
+            $this->tests->HrefValue = "";
+            $this->tests->TooltipValue = "";
 
-            // specimen
-            $this->specimen->HrefValue = "";
-            $this->specimen->TooltipValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-            $this->service_name->TooltipValue = "";
+            // disease_name
+            $this->disease_name->HrefValue = "";
+            $this->disease_name->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

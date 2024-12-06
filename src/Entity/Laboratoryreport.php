@@ -28,31 +28,23 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 #[Table(name: "laboratory_reports")]
 class LaboratoryReport extends AbstractEntity
 {
-    #[Id]
     #[Column(type: "integer")]
-    #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "patient_id", type: "integer")]
-    private int $patientId;
-
-    #[Column(name: "first_name", type: "string")]
-    private string $firstName;
-
-    #[Column(name: "last_name", type: "string")]
-    private string $lastName;
+    #[Column(name: "patient_name", type: "string", nullable: true)]
+    private ?string $patientName;
 
     #[Column(type: "string")]
     private string $gender;
 
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
+    #[Column(name: "patient_age", type: "bigint", nullable: true)]
+    private ?string $patientAge;
 
-    #[Column(type: "string")]
-    private string $specimen;
+    #[Column(type: "text", nullable: true)]
+    private ?string $tests;
 
-    #[Column(name: "service_name", type: "string")]
-    private string $serviceName;
+    #[Column(name: "disease_name", type: "string", nullable: true)]
+    private ?string $diseaseName;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -62,6 +54,11 @@ class LaboratoryReport extends AbstractEntity
 
     #[Column(name: "report_month", type: "string", nullable: true)]
     private ?string $reportMonth;
+
+    public function __construct()
+    {
+        $this->id = 0;
+    }
 
     public function getId(): int
     {
@@ -74,36 +71,14 @@ class LaboratoryReport extends AbstractEntity
         return $this;
     }
 
-    public function getPatientId(): int
+    public function getPatientName(): ?string
     {
-        return $this->patientId;
+        return HtmlDecode($this->patientName);
     }
 
-    public function setPatientId(int $value): static
+    public function setPatientName(?string $value): static
     {
-        $this->patientId = $value;
-        return $this;
-    }
-
-    public function getFirstName(): string
-    {
-        return HtmlDecode($this->firstName);
-    }
-
-    public function setFirstName(string $value): static
-    {
-        $this->firstName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getLastName(): string
-    {
-        return HtmlDecode($this->lastName);
-    }
-
-    public function setLastName(string $value): static
-    {
-        $this->lastName = RemoveXss($value);
+        $this->patientName = RemoveXss($value);
         return $this;
     }
 
@@ -118,36 +93,36 @@ class LaboratoryReport extends AbstractEntity
         return $this;
     }
 
-    public function getDateOfBirth(): DateTime
+    public function getPatientAge(): ?string
     {
-        return $this->dateOfBirth;
+        return $this->patientAge;
     }
 
-    public function setDateOfBirth(DateTime $value): static
+    public function setPatientAge(?string $value): static
     {
-        $this->dateOfBirth = $value;
+        $this->patientAge = $value;
         return $this;
     }
 
-    public function getSpecimen(): string
+    public function getTests(): ?string
     {
-        return HtmlDecode($this->specimen);
+        return HtmlDecode($this->tests);
     }
 
-    public function setSpecimen(string $value): static
+    public function setTests(?string $value): static
     {
-        $this->specimen = RemoveXss($value);
+        $this->tests = RemoveXss($value);
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getDiseaseName(): ?string
     {
-        return HtmlDecode($this->serviceName);
+        return HtmlDecode($this->diseaseName);
     }
 
-    public function setServiceName(string $value): static
+    public function setDiseaseName(?string $value): static
     {
-        $this->serviceName = RemoveXss($value);
+        $this->diseaseName = RemoveXss($value);
         return $this;
     }
 

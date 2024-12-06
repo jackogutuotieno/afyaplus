@@ -166,6 +166,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -325,6 +327,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1939,9 +1951,11 @@
                 '/laboratorybillingreportdetailslist[/{id}]',
                 '/laboratoryminorreportlist[/{id}]',
                 '/laboratoryoverview',
-                '/laboratoryreports2list[/{id}]',
+                '/laboratoryreports2list',
                 '/laboratoryreports',
-                '/laboratoryreports/ReportbySubmissionMonth',
+                '/laboratoryreports/GraphbySubmission',
+                '/laboratoryreports/GraphbyTestsPerformed',
+                '/laboratoryreports/GraphbyDisease',
                 '/labspecimenslist[/{id}]',
                 '/labspecimensadd[/{id}]',
                 '/labspecimensview[/{id}]',
@@ -2251,7 +2265,9 @@
                 'PHPMaker2024\\afyaplus\\LaboratoryOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\LaboratoryReports2Controller:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryReportsController:summary',
-                'PHPMaker2024\\afyaplus\\LaboratoryReportsController:ReportbySubmissionMonth',
+                'PHPMaker2024\\afyaplus\\LaboratoryReportsController:GraphbySubmission',
+                'PHPMaker2024\\afyaplus\\LaboratoryReportsController:GraphbyTestsPerformed',
+                'PHPMaker2024\\afyaplus\\LaboratoryReportsController:GraphbyDisease',
                 'PHPMaker2024\\afyaplus\\LabSpecimensController:list',
                 'PHPMaker2024\\afyaplus\\LabSpecimensController:add',
                 'PHPMaker2024\\afyaplus\\LabSpecimensController:view',
@@ -2470,6 +2486,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3485,7 +3507,9 @@
                 'dashboard.Laboratory_Overview',
                 'list.laboratory_reports2',
                 'summary.Laboratory_Reports',
-                'summary.Laboratory_Reports.ReportbySubmissionMonth',
+                'summary.Laboratory_Reports.GraphbySubmission',
+                'summary.Laboratory_Reports.GraphbyTestsPerformed',
+                'summary.Laboratory_Reports.GraphbyDisease',
                 'list.lab_specimens',
                 'add.lab_specimens',
                 'view.lab_specimens',
@@ -3704,6 +3728,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4324,6 +4350,8 @@
         $o[305],
         $o[306],
         $o[307],
+        $o[308],
+        $o[309],
     ],
     []
 );

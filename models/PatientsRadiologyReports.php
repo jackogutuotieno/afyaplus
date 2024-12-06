@@ -172,13 +172,13 @@ class PatientsRadiologyReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
-        $this->visit_id->IsAutoIncrement = true; // Autoincrement field
         $this->visit_id->IsPrimaryKey = true; // Primary key field
         $this->visit_id->Nullable = false; // NOT NULL field
+        $this->visit_id->Required = true; // Required field
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
@@ -261,7 +261,7 @@ class PatientsRadiologyReports extends DbTable
             '`service_name`', // Expression
             '`service_name`', // Basic search expression
             200, // Type
-            100, // Size
+            4096, // Size
             -1, // Date/Time format
             false, // Is upload field
             '`service_name`', // Virtual expression
@@ -272,9 +272,7 @@ class PatientsRadiologyReports extends DbTable
             'TEXT' // Edit Tag
         );
         $this->service_name->InputTextType = "text";
-        $this->service_name->Nullable = false; // NOT NULL field
-        $this->service_name->Required = true; // Required field
-        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['service_name'] = &$this->service_name;
 
         // status
@@ -330,7 +328,7 @@ class PatientsRadiologyReports extends DbTable
             '`date_created`', // Expression
             CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
@@ -356,7 +354,7 @@ class PatientsRadiologyReports extends DbTable
             '`date_updated`', // Expression
             CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
@@ -797,8 +795,6 @@ class PatientsRadiologyReports extends DbTable
             $this->DbErrorMessage = $e->getMessage();
         }
         if ($result) {
-            $this->visit_id->setDbValue($conn->lastInsertId());
-            $rs['visit_id'] = $this->visit_id->DbValue;
         }
         return $result;
     }
@@ -847,13 +843,6 @@ class PatientsRadiologyReports extends DbTable
         } catch (\Exception $e) {
             $success = false;
             $this->DbErrorMessage = $e->getMessage();
-        }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['visit_id']) && !EmptyValue($this->visit_id->CurrentValue)) {
-                $rs['visit_id'] = $this->visit_id->CurrentValue;
-            }
         }
         return $success;
     }
@@ -1455,6 +1444,7 @@ class PatientsRadiologyReports extends DbTable
         // visit_id
         $this->visit_id->setupEditAttributes();
         $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
         // patient_name
         $this->patient_name->setupEditAttributes();

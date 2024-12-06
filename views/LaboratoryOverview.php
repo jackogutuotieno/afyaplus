@@ -44,6 +44,97 @@ $Page->showMessage();
 ?>
 <!-- Dashboard Container -->
 <div id="ew-dashboard" class="ew-dashboard">
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    Total Requests
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-vial"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT COUNT(*) FROM lab_test_requests";
+                            $requests = ExecuteScalar($sql);
+                            echo $requests;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    Today's Requests
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-vial"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT COUNT(*) FROM lab_test_requests WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()";
+                            $requests_today = ExecuteScalar($sql);
+                            echo $requests_today;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    Reports
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-file"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT COUNT(*) FROM lab_test_reports";
+                            $reports = ExecuteScalar($sql);
+                            echo $reports;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="chart-content container">
+    <div class="row">
+        <div class="card-group">
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-header content-header">
+                        <h4>Reports Submissions Graph</h4>
+                    </div>
+                    <div class="card-body">
+                        <?= $LaboratoryOverview->renderItem($this, 1) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-header content-header">
+                        <h4>Tests Performed Graph</h4>
+                    </div>
+                    <div class="card-body">
+                        <?= $LaboratoryOverview->renderItem($this, 2) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-header content-header">
+                        <h4>Diseases Graph</h4>
+                    </div>
+                    <div class="card-body">
+                        <?= $LaboratoryOverview->renderItem($this, 3) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 <!-- /.ew-dashboard -->
 </div>

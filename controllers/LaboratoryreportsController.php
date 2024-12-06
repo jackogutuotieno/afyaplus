@@ -24,10 +24,24 @@ class LaboratoryReportsController extends ControllerBase
         return $this->runPage($request, $response, $args, "LaboratoryReportsSummary");
     }
 
-    // ReportbySubmissionMonth (chart)
-    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports/ReportbySubmissionMonth", [PermissionMiddleware::class], "summary.Laboratory_Reports.ReportbySubmissionMonth")]
-    public function ReportbySubmissionMonth(Request $request, Response $response, array $args): Response
+    // GraphbySubmission (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports/GraphbySubmission", [PermissionMiddleware::class], "summary.Laboratory_Reports.GraphbySubmission")]
+    public function GraphbySubmission(Request $request, Response $response, array $args): Response
     {
-        return $this->runChart($request, $response, $args, "LaboratoryReportsSummary", "ReportbySubmissionMonth");
+        return $this->runChart($request, $response, $args, "LaboratoryReportsSummary", "GraphbySubmission");
+    }
+
+    // GraphbyTestsPerformed (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports/GraphbyTestsPerformed", [PermissionMiddleware::class], "summary.Laboratory_Reports.GraphbyTestsPerformed")]
+    public function GraphbyTestsPerformed(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "LaboratoryReportsSummary", "GraphbyTestsPerformed");
+    }
+
+    // GraphbyDisease (chart)
+    #[Map(["GET", "POST", "OPTIONS"], "/laboratoryreports/GraphbyDisease", [PermissionMiddleware::class], "summary.Laboratory_Reports.GraphbyDisease")]
+    public function GraphbyDisease(Request $request, Response $response, array $args): Response
+    {
+        return $this->runChart($request, $response, $args, "LaboratoryReportsSummary", "GraphbyDisease");
     }
 }

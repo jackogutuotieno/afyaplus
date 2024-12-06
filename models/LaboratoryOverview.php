@@ -348,10 +348,10 @@ class LaboratoryOverview extends ReportTable
     }
 
     // Dashboard type
-    public $DashboardType = "vertical";
+    public $DashboardType = "custom";
 
     // Item CSS class names
-    public $ItemClassNames = [];
+    public $ItemClassNames = ["","",""];
 
     // Export options
     public $ExportOptions;
@@ -486,6 +486,30 @@ class LaboratoryOverview extends ReportTable
             return $content; // To be rendered by JavaScript
         }
         try {
+            if ($id == 1) {
+                $Page = Container("LaboratoryReportsSummary");
+                $Page->run();
+                $Page->GraphbySubmission->DrillDownUrl = ""; // No drill down for dashboard
+                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
+                    $Page->GraphbySubmission->render("ew-dashboard-chart", null, null) .
+                    GetDebugMessage(); // Return chart content
+            }
+            if ($id == 2) {
+                $Page = Container("LaboratoryReportsSummary");
+                $Page->run();
+                $Page->GraphbyTestsPerformed->DrillDownUrl = ""; // No drill down for dashboard
+                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
+                    $Page->GraphbyTestsPerformed->render("ew-dashboard-chart", null, null) .
+                    GetDebugMessage(); // Return chart content
+            }
+            if ($id == 3) {
+                $Page = Container("LaboratoryReportsSummary");
+                $Page->run();
+                $Page->GraphbyDisease->DrillDownUrl = ""; // No drill down for dashboard
+                $content = IsApi() && !EmptyValue($this->Export) ? "" : // Disable chart content for API export
+                    $Page->GraphbyDisease->render("ew-dashboard-chart", null, null) .
+                    GetDebugMessage(); // Return chart content
+            }
         } catch (\Exception $e) {
             $GLOBALS["Page"] = $this;
         } finally {

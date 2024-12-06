@@ -460,9 +460,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->visit_id->Visible = false;
-        }
     }
 
     // Lookup data

@@ -455,16 +455,13 @@ class LaboratoryReportsSummary extends LaboratoryReports
 
         // Set field visibility for detail fields
         $this->id->setVisibility();
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
+        $this->patient_name->setVisibility();
         $this->gender->setVisibility();
-        $this->date_of_birth->setVisibility();
-        $this->patient_age_1->setVisibility();
-        $this->specimen->setVisibility();
-        $this->service_name->setVisibility();
+        $this->patient_age->setVisibility();
+        $this->tests->setVisibility();
+        $this->disease_name->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->p_age->setVisibility();
         $this->report_month->setVisibility();
 
         // Set up groups per page dynamically
@@ -602,31 +599,23 @@ class LaboratoryReportsSummary extends LaboratoryReports
     {
         $data = [];
         $data["id"] = $record['id'];
-        $data["patient_id"] = $record['patient_id'];
-        $data["first_name"] = $record['first_name'];
-        $data["last_name"] = $record['last_name'];
+        $data["patient_name"] = $record['patient_name'];
         $data["gender"] = $record['gender'];
-        $data["date_of_birth"] = $record['date_of_birth'];
-        $data["patient_age_1"] = $record['patient_age_1'];
-        $data["specimen"] = $record['specimen'];
-        $data["service_name"] = $record['service_name'];
+        $data["patient_age"] = $record['patient_age'];
+        $data["tests"] = $record['tests'];
+        $data["disease_name"] = $record['disease_name'];
         $data["date_created"] = $record['date_created'];
         $data["date_updated"] = $record['date_updated'];
-        $data["p_age"] = $record['p_age'];
         $data["report_month"] = $record['report_month'];
         $this->Rows[] = $data;
         $this->id->setDbValue($record['id']);
-        $this->patient_id->setDbValue($record['patient_id']);
-        $this->first_name->setDbValue($record['first_name']);
-        $this->last_name->setDbValue($record['last_name']);
+        $this->patient_name->setDbValue($record['patient_name']);
         $this->gender->setDbValue($record['gender']);
-        $this->date_of_birth->setDbValue($record['date_of_birth']);
-        $this->patient_age_1->setDbValue($record['patient_age_1']);
-        $this->specimen->setDbValue($record['specimen']);
-        $this->service_name->setDbValue($record['service_name']);
+        $this->patient_age->setDbValue($record['patient_age']);
+        $this->tests->setDbValue($record['tests']);
+        $this->disease_name->setDbValue($record['disease_name']);
         $this->date_created->setDbValue($record['date_created']);
         $this->date_updated->setDbValue($record['date_updated']);
-        $this->p_age->setDbValue($record['p_age']);
         $this->report_month->setDbValue($record['report_month']);
     }
 
@@ -666,25 +655,19 @@ class LaboratoryReportsSummary extends LaboratoryReports
 
         // id
 
-        // first_name
-
-        // last_name
+        // patient_name
 
         // gender
 
-        // date_of_birth
+        // patient_age
 
-        // patient_age_1
+        // tests
 
-        // specimen
-
-        // service_name
+        // disease_name
 
         // date_created
 
         // date_updated
-
-        // p_age
 
         // report_month
         if ($this->RowType == RowType::SEARCH) { // Search row
@@ -694,35 +677,26 @@ class LaboratoryReportsSummary extends LaboratoryReports
             // id
             $this->id->HrefValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
 
             // gender
             $this->gender->HrefValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
 
-            // patient_age_1
-            $this->patient_age_1->HrefValue = "";
+            // tests
+            $this->tests->HrefValue = "";
 
-            // specimen
-            $this->specimen->HrefValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
+            // disease_name
+            $this->disease_name->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
 
             // date_updated
             $this->date_updated->HrefValue = "";
-
-            // p_age
-            $this->p_age->HrefValue = "";
 
             // report_month
             $this->report_month->HrefValue = "";
@@ -738,37 +712,29 @@ class LaboratoryReportsSummary extends LaboratoryReports
 
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
             $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-            $this->first_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
-            $this->last_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+            $this->patient_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
             $this->gender->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-            $this->date_of_birth->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // patient_age
+            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
+            $this->patient_age->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // patient_age_1
-            $this->patient_age_1->ViewValue = $this->patient_age_1->CurrentValue;
-            $this->patient_age_1->ViewValue = FormatNumber($this->patient_age_1->ViewValue, $this->patient_age_1->formatPattern());
-            $this->patient_age_1->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // tests
+            $this->tests->ViewValue = $this->tests->CurrentValue;
+            $this->tests->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // specimen
-            $this->specimen->ViewValue = $this->specimen->CurrentValue;
-            $this->specimen->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // service_name
-            $this->service_name->ViewValue = $this->service_name->CurrentValue;
-            $this->service_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // disease_name
+            $this->disease_name->ViewValue = $this->disease_name->CurrentValue;
+            $this->disease_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -780,11 +746,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
             $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // p_age
-            $this->p_age->ViewValue = $this->p_age->CurrentValue;
-            $this->p_age->ViewValue = FormatNumber($this->p_age->ViewValue, $this->p_age->formatPattern());
-            $this->p_age->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
             // report_month
             $this->report_month->ViewValue = $this->report_month->CurrentValue;
             $this->report_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
@@ -793,33 +754,25 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
-
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
 
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+            $this->patient_age->TooltipValue = "";
 
-            // patient_age_1
-            $this->patient_age_1->HrefValue = "";
-            $this->patient_age_1->TooltipValue = "";
+            // tests
+            $this->tests->HrefValue = "";
+            $this->tests->TooltipValue = "";
 
-            // specimen
-            $this->specimen->HrefValue = "";
-            $this->specimen->TooltipValue = "";
-
-            // service_name
-            $this->service_name->HrefValue = "";
-            $this->service_name->TooltipValue = "";
+            // disease_name
+            $this->disease_name->HrefValue = "";
+            $this->disease_name->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -828,10 +781,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // p_age
-            $this->p_age->HrefValue = "";
-            $this->p_age->TooltipValue = "";
 
             // report_month
             $this->report_month->HrefValue = "";
@@ -850,23 +799,14 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $linkAttrs = &$this->id->LinkAttrs;
             $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // first_name
-            $currentValue = $this->first_name->CurrentValue;
-            $viewValue = &$this->first_name->ViewValue;
-            $viewAttrs = &$this->first_name->ViewAttrs;
-            $cellAttrs = &$this->first_name->CellAttrs;
-            $hrefValue = &$this->first_name->HrefValue;
-            $linkAttrs = &$this->first_name->LinkAttrs;
-            $this->cellRendered($this->first_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // last_name
-            $currentValue = $this->last_name->CurrentValue;
-            $viewValue = &$this->last_name->ViewValue;
-            $viewAttrs = &$this->last_name->ViewAttrs;
-            $cellAttrs = &$this->last_name->CellAttrs;
-            $hrefValue = &$this->last_name->HrefValue;
-            $linkAttrs = &$this->last_name->LinkAttrs;
-            $this->cellRendered($this->last_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // patient_name
+            $currentValue = $this->patient_name->CurrentValue;
+            $viewValue = &$this->patient_name->ViewValue;
+            $viewAttrs = &$this->patient_name->ViewAttrs;
+            $cellAttrs = &$this->patient_name->CellAttrs;
+            $hrefValue = &$this->patient_name->HrefValue;
+            $linkAttrs = &$this->patient_name->LinkAttrs;
+            $this->cellRendered($this->patient_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // gender
             $currentValue = $this->gender->CurrentValue;
@@ -877,41 +817,32 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $linkAttrs = &$this->gender->LinkAttrs;
             $this->cellRendered($this->gender, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // date_of_birth
-            $currentValue = $this->date_of_birth->CurrentValue;
-            $viewValue = &$this->date_of_birth->ViewValue;
-            $viewAttrs = &$this->date_of_birth->ViewAttrs;
-            $cellAttrs = &$this->date_of_birth->CellAttrs;
-            $hrefValue = &$this->date_of_birth->HrefValue;
-            $linkAttrs = &$this->date_of_birth->LinkAttrs;
-            $this->cellRendered($this->date_of_birth, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // patient_age
+            $currentValue = $this->patient_age->CurrentValue;
+            $viewValue = &$this->patient_age->ViewValue;
+            $viewAttrs = &$this->patient_age->ViewAttrs;
+            $cellAttrs = &$this->patient_age->CellAttrs;
+            $hrefValue = &$this->patient_age->HrefValue;
+            $linkAttrs = &$this->patient_age->LinkAttrs;
+            $this->cellRendered($this->patient_age, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // patient_age_1
-            $currentValue = $this->patient_age_1->CurrentValue;
-            $viewValue = &$this->patient_age_1->ViewValue;
-            $viewAttrs = &$this->patient_age_1->ViewAttrs;
-            $cellAttrs = &$this->patient_age_1->CellAttrs;
-            $hrefValue = &$this->patient_age_1->HrefValue;
-            $linkAttrs = &$this->patient_age_1->LinkAttrs;
-            $this->cellRendered($this->patient_age_1, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // tests
+            $currentValue = $this->tests->CurrentValue;
+            $viewValue = &$this->tests->ViewValue;
+            $viewAttrs = &$this->tests->ViewAttrs;
+            $cellAttrs = &$this->tests->CellAttrs;
+            $hrefValue = &$this->tests->HrefValue;
+            $linkAttrs = &$this->tests->LinkAttrs;
+            $this->cellRendered($this->tests, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // specimen
-            $currentValue = $this->specimen->CurrentValue;
-            $viewValue = &$this->specimen->ViewValue;
-            $viewAttrs = &$this->specimen->ViewAttrs;
-            $cellAttrs = &$this->specimen->CellAttrs;
-            $hrefValue = &$this->specimen->HrefValue;
-            $linkAttrs = &$this->specimen->LinkAttrs;
-            $this->cellRendered($this->specimen, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // service_name
-            $currentValue = $this->service_name->CurrentValue;
-            $viewValue = &$this->service_name->ViewValue;
-            $viewAttrs = &$this->service_name->ViewAttrs;
-            $cellAttrs = &$this->service_name->CellAttrs;
-            $hrefValue = &$this->service_name->HrefValue;
-            $linkAttrs = &$this->service_name->LinkAttrs;
-            $this->cellRendered($this->service_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // disease_name
+            $currentValue = $this->disease_name->CurrentValue;
+            $viewValue = &$this->disease_name->ViewValue;
+            $viewAttrs = &$this->disease_name->ViewAttrs;
+            $cellAttrs = &$this->disease_name->CellAttrs;
+            $hrefValue = &$this->disease_name->HrefValue;
+            $linkAttrs = &$this->disease_name->LinkAttrs;
+            $this->cellRendered($this->disease_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // date_created
             $currentValue = $this->date_created->CurrentValue;
@@ -930,15 +861,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $hrefValue = &$this->date_updated->HrefValue;
             $linkAttrs = &$this->date_updated->LinkAttrs;
             $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // p_age
-            $currentValue = $this->p_age->CurrentValue;
-            $viewValue = &$this->p_age->ViewValue;
-            $viewAttrs = &$this->p_age->ViewAttrs;
-            $cellAttrs = &$this->p_age->CellAttrs;
-            $hrefValue = &$this->p_age->HrefValue;
-            $linkAttrs = &$this->p_age->LinkAttrs;
-            $this->cellRendered($this->p_age, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // report_month
             $currentValue = $this->report_month->CurrentValue;
@@ -991,34 +913,25 @@ class LaboratoryReportsSummary extends LaboratoryReports
         if ($this->id->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->first_name->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->last_name->Visible) {
+        if ($this->patient_name->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->gender->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->date_of_birth->Visible) {
+        if ($this->patient_age->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->patient_age_1->Visible) {
+        if ($this->tests->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->specimen->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->service_name->Visible) {
+        if ($this->disease_name->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->date_created->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->date_updated->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->p_age->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->report_month->Visible) {
@@ -1318,16 +1231,13 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->setOrderBy("");
             $this->setStartGroup(1);
             $this->id->setSort("");
-            $this->first_name->setSort("");
-            $this->last_name->setSort("");
+            $this->patient_name->setSort("");
             $this->gender->setSort("");
-            $this->date_of_birth->setSort("");
-            $this->patient_age_1->setSort("");
-            $this->specimen->setSort("");
-            $this->service_name->setSort("");
+            $this->patient_age->setSort("");
+            $this->tests->setSort("");
+            $this->disease_name->setSort("");
             $this->date_created->setSort("");
             $this->date_updated->setSort("");
-            $this->p_age->setSort("");
             $this->report_month->setSort("");
 
         // Check for an Order parameter
@@ -1335,16 +1245,13 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
+            $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->gender); // gender
-            $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->patient_age_1); // patient_age_1
-            $this->updateSort($this->specimen); // specimen
-            $this->updateSort($this->service_name); // service_name
+            $this->updateSort($this->patient_age); // patient_age
+            $this->updateSort($this->tests); // tests
+            $this->updateSort($this->disease_name); // disease_name
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->p_age); // p_age
             $this->updateSort($this->report_month); // report_month
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);

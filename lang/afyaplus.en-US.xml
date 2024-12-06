@@ -1,7 +1,10 @@
-<ew-language date="2024/12/6" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/7" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="441">
+      <phrase id="menutext" value="Laboratory Reports" />
+    </menu>
     <menu id="439">
       <phrase id="menutext" value="Radiology Results" />
     </menu>
@@ -229,6 +232,9 @@
     </menu>
     <menu id="318">
       <phrase id="menutext" value="Vaccinations" />
+    </menu>
+    <menu id="440">
+      <phrase id="menutext" value="Laboratory Reports" />
     </menu>
     <menu id="333">
       <phrase id="menutext" value="Radiology Report" />
@@ -2829,7 +2835,7 @@
         <phrase id="fldcaption" value="Gender" />
       </field>
       <field id="service_name">
-        <phrase id="fldcaption" value="Test Name" />
+        <phrase id="fldcaption" value="Test(s)" />
       </field>
       <field id="status">
         <phrase id="fldcaption" value="Status" />
@@ -2860,6 +2866,81 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />
+      </field>
+    </table>
+    <table id="laboratory_reports2">
+      <phrase id="tblcaption" value="Laboratory Reports" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="tests">
+        <phrase id="fldcaption" value="Tests" />
+      </field>
+      <field id="disease_name">
+        <phrase id="fldcaption" value="Disease" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Report Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="report_month">
+        <phrase id="fldcaption" value="report month" />
+      </field>
+    </table>
+    <table id="laboratory_reports">
+      <phrase id="tblcaption" value="Laboratory Reports" />
+      <chart id="graphbysubmission">
+        <phrase id="chartcaption" value="Graph by Submission" />
+        <phrase id="chartxaxisname" value="report month" />
+        <phrase id="chartyaxisname" value="report month" />
+      </chart>
+      <chart id="graphbytestsperformed">
+        <phrase id="chartcaption" value="Graph by Tests Performed" />
+        <phrase id="chartxaxisname" value="Tests" />
+        <phrase id="chartyaxisname" value="Tests" />
+      </chart>
+      <chart id="graphbydisease">
+        <phrase id="chartcaption" value="Graph by Disease" />
+        <phrase id="chartxaxisname" value="Disease" />
+        <phrase id="chartyaxisname" value="Disease" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="patient_age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="tests">
+        <phrase id="fldcaption" value="Tests" />
+      </field>
+      <field id="disease_name">
+        <phrase id="fldcaption" value="Disease" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Report Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="report_month">
+        <phrase id="fldcaption" value="report month" />
       </field>
     </table>
   </project>

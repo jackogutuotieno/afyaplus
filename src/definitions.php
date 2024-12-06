@@ -158,6 +158,8 @@ return [
     "triage_overview" => \DI\create(TriageOverview::class),
     "Doctor_Overview" => \DI\create(DoctorOverview::class),
     "doctor_overview" => \DI\create(DoctorOverview::class),
+    "Laboratory_Overview" => \DI\create(LaboratoryOverview::class),
+    "laboratory_overview" => \DI\create(LaboratoryOverview::class),
     "Pharmacy_Overview" => \DI\create(PharmacyOverview::class),
     "pharmacy_overview" => \DI\create(PharmacyOverview::class),
     "Financials_Overview" => \DI\create(FinancialsOverview::class),
@@ -180,6 +182,9 @@ return [
     "full_haemogram_parameters" => \DI\create(FullHaemogramParameters::class),
     "patients_radiology_reports" => \DI\create(PatientsRadiologyReports::class),
     "patients_radiology_reports_details" => \DI\create(PatientsRadiologyReportsDetails::class),
+    "laboratory_reports2" => \DI\create(LaboratoryReports2::class),
+    "Laboratory_Reports" => \DI\create(LaboratoryReports::class),
+    "laboratory_reports" => \DI\create(LaboratoryReports::class),
 
     // User table
     "usertable" => \DI\get("users"),

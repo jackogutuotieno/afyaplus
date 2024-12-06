@@ -155,7 +155,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","-2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","0","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","1","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","2","872"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","3","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","4","2029"],
     ["{32536B8D-F37B-4419-80D5-260932800712}lab_test_reports","5","0"],
@@ -976,7 +976,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","6","1896"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_radiology_reports_details","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports","9","0"]];
 
 /**
  * Tables
@@ -1056,7 +1078,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Front Office Overview","Front_Office_Overview","Front Office Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","frontofficeoverview"],
     ["Triage Overview","Triage_Overview","Triage Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","triageoverview"],
     ["Doctor Overview","Doctor_Overview","Doctor Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctoroverview"],
-    ["Laboratory Overview","Laboratory_Overview","Laboratory Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}",""],
+    ["Laboratory Overview","Laboratory_Overview","Laboratory Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryoverview"],
     ["Pharmacy Overview","Pharmacy_Overview","Pharmacy Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","pharmacyoverview"],
     ["Financials Overview","Financials_Overview","Financials Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","financialsoverview"],
     ["radiology_report","radiology_report2","Radiology Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","radiologyreport2list"],
@@ -1074,4 +1096,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["urinalysis_results","urinalysis_results","Urinalysis Results",true,"{32536B8D-F37B-4419-80D5-260932800712}","urinalysisresultslist"],
     ["full_haemogram_parameters","full_haemogram_parameters","Full Haemogram",true,"{32536B8D-F37B-4419-80D5-260932800712}","fullhaemogramparameterslist"],
     ["patients_radiology_reports","patients_radiology_reports","Radiology Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsradiologyreportslist"],
-    ["patients_radiology_reports_details","patients_radiology_reports_details","Radiology Results",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsradiologyreportsdetailslist"]];
+    ["patients_radiology_reports_details","patients_radiology_reports_details","Radiology Results",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsradiologyreportsdetailslist"],
+    ["laboratory_reports","laboratory_reports2","Laboratory Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryreports2list"],
+    ["Laboratory Reports","Laboratory_Reports","Laboratory Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryreports"]];

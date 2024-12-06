@@ -160,26 +160,20 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_laboratory_reports2_id" class="laboratory_reports2_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_laboratory_reports2_first_name" class="laboratory_reports2_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_laboratory_reports2_last_name" class="laboratory_reports2_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_laboratory_reports2_patient_name" class="laboratory_reports2_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_laboratory_reports2_gender" class="laboratory_reports2_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_laboratory_reports2_date_of_birth" class="laboratory_reports2_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php if ($Page->patient_age->Visible) { // patient_age ?>
+        <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div id="elh_laboratory_reports2_patient_age" class="laboratory_reports2_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
 <?php } ?>
-<?php if ($Page->p_age->Visible) { // p_age ?>
-        <th data-name="p_age" class="<?= $Page->p_age->headerCellClass() ?>"><div id="elh_laboratory_reports2_p_age" class="laboratory_reports2_p_age"><?= $Page->renderFieldHeader($Page->p_age) ?></div></th>
+<?php if ($Page->tests->Visible) { // tests ?>
+        <th data-name="tests" class="<?= $Page->tests->headerCellClass() ?>"><div id="elh_laboratory_reports2_tests" class="laboratory_reports2_tests"><?= $Page->renderFieldHeader($Page->tests) ?></div></th>
 <?php } ?>
-<?php if ($Page->specimen->Visible) { // specimen ?>
-        <th data-name="specimen" class="<?= $Page->specimen->headerCellClass() ?>"><div id="elh_laboratory_reports2_specimen" class="laboratory_reports2_specimen"><?= $Page->renderFieldHeader($Page->specimen) ?></div></th>
-<?php } ?>
-<?php if ($Page->service_name->Visible) { // service_name ?>
-        <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_laboratory_reports2_service_name" class="laboratory_reports2_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
+<?php if ($Page->disease_name->Visible) { // disease_name ?>
+        <th data-name="disease_name" class="<?= $Page->disease_name->headerCellClass() ?>"><div id="elh_laboratory_reports2_disease_name" class="laboratory_reports2_disease_name"><?= $Page->renderFieldHeader($Page->disease_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_laboratory_reports2_date_created" class="laboratory_reports2_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -226,19 +220,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_first_name" class="el_laboratory_reports2_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->last_name->Visible) { // last_name ?>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_last_name" class="el_laboratory_reports2_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+    <?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_patient_name" class="el_laboratory_reports2_patient_name">
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -250,35 +236,27 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_date_of_birth" class="el_laboratory_reports2_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
+    <?php if ($Page->patient_age->Visible) { // patient_age ?>
+        <td data-name="patient_age"<?= $Page->patient_age->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_patient_age" class="el_laboratory_reports2_patient_age">
+<span<?= $Page->patient_age->viewAttributes() ?>>
+<?= $Page->patient_age->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->p_age->Visible) { // p_age ?>
-        <td data-name="p_age"<?= $Page->p_age->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_p_age" class="el_laboratory_reports2_p_age">
-<span<?= $Page->p_age->viewAttributes() ?>>
-<?= $Page->p_age->getViewValue() ?></span>
+    <?php if ($Page->tests->Visible) { // tests ?>
+        <td data-name="tests"<?= $Page->tests->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_tests" class="el_laboratory_reports2_tests">
+<span<?= $Page->tests->viewAttributes() ?>>
+<?= $Page->tests->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->specimen->Visible) { // specimen ?>
-        <td data-name="specimen"<?= $Page->specimen->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_specimen" class="el_laboratory_reports2_specimen">
-<span<?= $Page->specimen->viewAttributes() ?>>
-<?= $Page->specimen->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->service_name->Visible) { // service_name ?>
-        <td data-name="service_name"<?= $Page->service_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_service_name" class="el_laboratory_reports2_service_name">
-<span<?= $Page->service_name->viewAttributes() ?>>
-<?= $Page->service_name->getViewValue() ?></span>
+    <?php if ($Page->disease_name->Visible) { // disease_name ?>
+        <td data-name="disease_name"<?= $Page->disease_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_laboratory_reports2_disease_name" class="el_laboratory_reports2_disease_name">
+<span<?= $Page->disease_name->viewAttributes() ?>>
+<?= $Page->disease_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

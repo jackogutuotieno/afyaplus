@@ -36,7 +36,6 @@ class PatientsRadiologyReport extends AbstractEntity
 
     #[Id]
     #[Column(name: "visit_id", type: "integer")]
-    #[GeneratedValue]
     private int $visitId;
 
     #[Column(name: "patient_name", type: "string", nullable: true)]
@@ -48,8 +47,8 @@ class PatientsRadiologyReport extends AbstractEntity
     #[Column(type: "string")]
     private string $gender;
 
-    #[Column(name: "service_name", type: "string")]
-    private string $serviceName;
+    #[Column(name: "service_name", type: "text", nullable: true)]
+    private ?string $serviceName;
 
     #[Column(type: "string", nullable: true)]
     private ?string $radiologist;
@@ -126,12 +125,12 @@ class PatientsRadiologyReport extends AbstractEntity
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getServiceName(): ?string
     {
         return HtmlDecode($this->serviceName);
     }
 
-    public function setServiceName(string $value): static
+    public function setServiceName(?string $value): static
     {
         $this->serviceName = RemoveXss($value);
         return $this;

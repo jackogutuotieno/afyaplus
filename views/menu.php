@@ -8,9 +8,11 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(441, "mi_Laboratory_Reports", $Language->menuPhrase("441", "MenuText"), "laboratoryreports", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Laboratory Reports'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334", "MenuText"), "radiologyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "fa-tachometer", "", false, true);
+$sideMenu->addMenuItem(329, "mi_Laboratory_Overview", $Language->menuPhrase("329", "MenuText"), "laboratoryoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Laboratory Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(330, "mi_Pharmacy_Overview", $Language->menuPhrase("330", "MenuText"), "pharmacyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(331, "mi_Financials_Overview", $Language->menuPhrase("331", "MenuText"), "financialsoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Financials Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
@@ -71,6 +73,7 @@ $sideMenu->addMenuItem(244, "mi_Registered_Patients", $Language->menuPhrase("244
 $sideMenu->addMenuItem(320, "mi_Visits_Report1", $Language->menuPhrase("320", "MenuText"), "visitsreport1", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Visits Report1'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(242, "mi_Appointments_Report", $Language->menuPhrase("242", "MenuText"), "appointmentsreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Appointments Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(318, "mi_Vaccinations_Report", $Language->menuPhrase("318", "MenuText"), "vaccinationsreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Vaccinations Report'), false, false, "fa-file", "", false, true);
+$sideMenu->addMenuItem(440, "mi_laboratory_reports2", $Language->menuPhrase("440", "MenuText"), "laboratoryreports2list", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}laboratory_reports'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(333, "mi_Radiology_Report", $Language->menuPhrase("333", "MenuText"), "radiologyreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(313, "mi_Medicine_Stock_Report", $Language->menuPhrase("313", "MenuText"), "medicinestockreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Medicine Stock Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(433, "mi_cash_payments_report", $Language->menuPhrase("433", "MenuText"), "cashpaymentsreportlist", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}cash_payments_report'), false, false, "fa-file", "", false, true);

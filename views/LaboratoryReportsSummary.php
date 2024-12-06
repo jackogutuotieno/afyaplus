@@ -70,35 +70,26 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php if ($Page->id->Visible) { ?>
     <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div class="Laboratory_Reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { ?>
-    <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div class="Laboratory_Reports_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { ?>
-    <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div class="Laboratory_Reports_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
+<?php if ($Page->patient_name->Visible) { ?>
+    <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div class="Laboratory_Reports_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { ?>
     <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div class="Laboratory_Reports_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
-<?php if ($Page->date_of_birth->Visible) { ?>
-    <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div class="Laboratory_Reports_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php if ($Page->patient_age->Visible) { ?>
+    <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div class="Laboratory_Reports_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
 <?php } ?>
-<?php if ($Page->patient_age_1->Visible) { ?>
-    <th data-name="patient_age_1" class="<?= $Page->patient_age_1->headerCellClass() ?>"><div class="Laboratory_Reports_patient_age_1"><?= $Page->renderFieldHeader($Page->patient_age_1) ?></div></th>
+<?php if ($Page->tests->Visible) { ?>
+    <th data-name="tests" class="<?= $Page->tests->headerCellClass() ?>"><div class="Laboratory_Reports_tests"><?= $Page->renderFieldHeader($Page->tests) ?></div></th>
 <?php } ?>
-<?php if ($Page->specimen->Visible) { ?>
-    <th data-name="specimen" class="<?= $Page->specimen->headerCellClass() ?>"><div class="Laboratory_Reports_specimen"><?= $Page->renderFieldHeader($Page->specimen) ?></div></th>
-<?php } ?>
-<?php if ($Page->service_name->Visible) { ?>
-    <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div class="Laboratory_Reports_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
+<?php if ($Page->disease_name->Visible) { ?>
+    <th data-name="disease_name" class="<?= $Page->disease_name->headerCellClass() ?>"><div class="Laboratory_Reports_disease_name"><?= $Page->renderFieldHeader($Page->disease_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { ?>
     <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div class="Laboratory_Reports_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { ?>
     <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div class="Laboratory_Reports_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->p_age->Visible) { ?>
-    <th data-name="p_age" class="<?= $Page->p_age->headerCellClass() ?>"><div class="Laboratory_Reports_p_age"><?= $Page->renderFieldHeader($Page->p_age) ?></div></th>
 <?php } ?>
 <?php if ($Page->report_month->Visible) { ?>
     <th data-name="report_month" class="<?= $Page->report_month->headerCellClass() ?>"><div class="Laboratory_Reports_report_month"><?= $Page->renderFieldHeader($Page->report_month) ?></div></th>
@@ -131,16 +122,10 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?= $Page->id->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { ?>
-        <td data-field="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->last_name->Visible) { ?>
-        <td data-field="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
+<?php if ($Page->patient_name->Visible) { ?>
+        <td data-field="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php if ($Page->gender->Visible) { ?>
@@ -149,28 +134,22 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?= $Page->gender->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->date_of_birth->Visible) { ?>
-        <td data-field="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
+<?php if ($Page->patient_age->Visible) { ?>
+        <td data-field="patient_age"<?= $Page->patient_age->cellAttributes() ?>>
+<span<?= $Page->patient_age->viewAttributes() ?>>
+<?= $Page->patient_age->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->patient_age_1->Visible) { ?>
-        <td data-field="patient_age_1"<?= $Page->patient_age_1->cellAttributes() ?>>
-<span<?= $Page->patient_age_1->viewAttributes() ?>>
-<?= $Page->patient_age_1->getViewValue() ?></span>
+<?php if ($Page->tests->Visible) { ?>
+        <td data-field="tests"<?= $Page->tests->cellAttributes() ?>>
+<span<?= $Page->tests->viewAttributes() ?>>
+<?= $Page->tests->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->specimen->Visible) { ?>
-        <td data-field="specimen"<?= $Page->specimen->cellAttributes() ?>>
-<span<?= $Page->specimen->viewAttributes() ?>>
-<?= $Page->specimen->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->service_name->Visible) { ?>
-        <td data-field="service_name"<?= $Page->service_name->cellAttributes() ?>>
-<span<?= $Page->service_name->viewAttributes() ?>>
-<?= $Page->service_name->getViewValue() ?></span>
+<?php if ($Page->disease_name->Visible) { ?>
+        <td data-field="disease_name"<?= $Page->disease_name->cellAttributes() ?>>
+<span<?= $Page->disease_name->viewAttributes() ?>>
+<?= $Page->disease_name->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { ?>
@@ -183,12 +162,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         <td data-field="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->p_age->Visible) { ?>
-        <td data-field="p_age"<?= $Page->p_age->cellAttributes() ?>>
-<span<?= $Page->p_age->viewAttributes() ?>>
-<?= $Page->p_age->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php if ($Page->report_month->Visible) { ?>
@@ -252,8 +225,22 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php
 if (!$DashboardReport) {
     // Set up chart drilldown
-    $Page->ReportbySubmissionMonth->DrillDownInPanel = $Page->DrillDownInPanel;
-    echo $Page->ReportbySubmissionMonth->render("ew-chart-bottom");
+    $Page->GraphbySubmission->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->GraphbySubmission->render("ew-chart-bottom");
+}
+?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->GraphbyTestsPerformed->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->GraphbyTestsPerformed->render("ew-chart-bottom");
+}
+?>
+<?php
+if (!$DashboardReport) {
+    // Set up chart drilldown
+    $Page->GraphbyDisease->DrillDownInPanel = $Page->DrillDownInPanel;
+    echo $Page->GraphbyDisease->render("ew-chart-bottom");
 }
 ?>
 <?php if ((!$Page->isExport() || $Page->isExport("print")) && !$DashboardReport) { ?>
