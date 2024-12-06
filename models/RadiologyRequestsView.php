@@ -143,6 +143,7 @@ class RadiologyRequestsView extends RadiologyRequests
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->created_by_user_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -897,6 +898,7 @@ class RadiologyRequestsView extends RadiologyRequests
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -909,6 +911,7 @@ class RadiologyRequestsView extends RadiologyRequests
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -939,6 +942,8 @@ class RadiologyRequestsView extends RadiologyRequests
         // visit_id
 
         // created_by_user_id
+
+        // status
 
         // date_created
 
@@ -995,6 +1000,9 @@ class RadiologyRequestsView extends RadiologyRequests
                 $this->created_by_user_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1010,6 +1018,10 @@ class RadiologyRequestsView extends RadiologyRequests
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

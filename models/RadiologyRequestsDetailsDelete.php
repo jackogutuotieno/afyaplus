@@ -122,7 +122,7 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->radiology_request_id->setVisibility();
+        $this->radiology_request_id->Visible = false;
         $this->service_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -676,10 +676,6 @@ class RadiologyRequestsDetailsDelete extends RadiologyRequestsDetails
             } else {
                 $this->service_id->ViewValue = null;
             }
-
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-            $this->radiology_request_id->TooltipValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";

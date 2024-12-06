@@ -24,7 +24,8 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
-            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -143,6 +144,18 @@ loadjs.ready("fradiology_requestsadd", function() {
 <div class="invalid-feedback"><?= $Page->visit_id->getErrorMessage() ?></div>
 </span>
 <?php } ?>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_radiology_requests_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_radiology_requests_status">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="radiology_requests" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
+<?= $Page->status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+</span>
 </div></div>
     </div>
 <?php } ?>

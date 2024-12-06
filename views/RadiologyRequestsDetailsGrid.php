@@ -23,7 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["radiology_request_id", [fields.radiology_request_id.visible && fields.radiology_request_id.required ? ew.Validators.required(fields.radiology_request_id.caption) : null, ew.Validators.integer], fields.radiology_request_id.isInvalid],
             ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid]
         ])
 
@@ -31,7 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["radiology_request_id",false],["service_id",false]];
+                    fields = [["service_id",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -86,9 +85,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->radiology_request_id->Visible) { // radiology_request_id ?>
-        <th data-name="radiology_request_id" class="<?= $Grid->radiology_request_id->headerCellClass() ?>"><div id="elh_radiology_requests_details_radiology_request_id" class="radiology_requests_details_radiology_request_id"><?= $Grid->renderFieldHeader($Grid->radiology_request_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Grid->service_id->headerCellClass() ?>"><div id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Grid->renderFieldHeader($Grid->service_id) ?></div></th>
 <?php } ?>
@@ -128,45 +124,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td data-name="radiology_request_id"<?= $Grid->radiology_request_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_radiology_request_id" class="el_radiology_requests_details_radiology_request_id">
-<input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_requests_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_request_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="radiology_requests_details" data-field="x_radiology_request_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_radiology_request_id" id="o<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_radiology_request_id" class="el_radiology_requests_details_radiology_request_id">
-<input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_requests_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_request_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_details_radiology_request_id" class="el_radiology_requests_details_radiology_request_id">
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<?= $Grid->radiology_request_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="radiology_requests_details" data-field="x_radiology_request_id" data-hidden="1" name="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_radiology_request_id" id="fradiology_requests_detailsgrid$x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->FormValue) ?>">
-<input type="hidden" data-table="radiology_requests_details" data-field="x_radiology_request_id" data-hidden="1" data-old name="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_radiology_request_id" id="fradiology_requests_detailsgrid$o<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->service_id->Visible) { // service_id ?>
         <td data-name="service_id"<?= $Grid->service_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>

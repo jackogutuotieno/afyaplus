@@ -136,7 +136,7 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->radiology_request_id->setVisibility();
+        $this->radiology_request_id->Visible = false;
         $this->service_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -1101,14 +1101,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_radiology_request_id") &&
-            $CurrentForm->hasValue("o_radiology_request_id") &&
-            $this->radiology_request_id->CurrentValue != $this->radiology_request_id->DefaultValue &&
-            !($this->radiology_request_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->radiology_request_id->CurrentValue == $this->radiology_request_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_service_id") &&
             $CurrentForm->hasValue("o_service_id") &&
             $this->service_id->CurrentValue != $this->service_id->DefaultValue &&
@@ -1666,19 +1658,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'radiology_request_id' first before field var 'x_radiology_request_id'
-        $val = $CurrentForm->hasValue("radiology_request_id") ? $CurrentForm->getValue("radiology_request_id") : $CurrentForm->getValue("x_radiology_request_id");
-        if (!$this->radiology_request_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->radiology_request_id->Visible = false; // Disable update for API request
-            } else {
-                $this->radiology_request_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_radiology_request_id")) {
-            $this->radiology_request_id->setOldValue($CurrentForm->getValue("o_radiology_request_id"));
-        }
-
         // Check field name 'service_id' first before field var 'x_service_id'
         $val = $CurrentForm->hasValue("service_id") ? $CurrentForm->getValue("service_id") : $CurrentForm->getValue("x_service_id");
         if (!$this->service_id->IsDetailKey) {
@@ -1706,7 +1685,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->radiology_request_id->CurrentValue = $this->radiology_request_id->FormValue;
         $this->service_id->CurrentValue = $this->service_id->FormValue;
     }
 
@@ -1901,29 +1879,10 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
                 $this->service_id->ViewValue = null;
             }
 
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-            $this->radiology_request_id->TooltipValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
             $this->service_id->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // radiology_request_id
-            $this->radiology_request_id->setupEditAttributes();
-            if ($this->radiology_request_id->getSessionValue() != "") {
-                $this->radiology_request_id->CurrentValue = GetForeignKeyValue($this->radiology_request_id->getSessionValue());
-                $this->radiology_request_id->OldValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->ViewValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
-            } else {
-                $this->radiology_request_id->EditValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->PlaceHolder = RemoveHtml($this->radiology_request_id->caption());
-                if (strval($this->radiology_request_id->EditValue) != "" && is_numeric($this->radiology_request_id->EditValue)) {
-                    $this->radiology_request_id->EditValue = FormatNumber($this->radiology_request_id->EditValue, null);
-                }
-            }
-
             // service_id
             $this->service_id->setupEditAttributes();
             $curVal = trim(strval($this->service_id->CurrentValue));
@@ -1953,27 +1912,9 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
 
             // Add refer script
 
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // radiology_request_id
-            $this->radiology_request_id->setupEditAttributes();
-            if ($this->radiology_request_id->getSessionValue() != "") {
-                $this->radiology_request_id->CurrentValue = GetForeignKeyValue($this->radiology_request_id->getSessionValue());
-                $this->radiology_request_id->OldValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->ViewValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->ViewValue = FormatNumber($this->radiology_request_id->ViewValue, $this->radiology_request_id->formatPattern());
-            } else {
-                $this->radiology_request_id->EditValue = $this->radiology_request_id->CurrentValue;
-                $this->radiology_request_id->PlaceHolder = RemoveHtml($this->radiology_request_id->caption());
-                if (strval($this->radiology_request_id->EditValue) != "" && is_numeric($this->radiology_request_id->EditValue)) {
-                    $this->radiology_request_id->EditValue = FormatNumber($this->radiology_request_id->EditValue, null);
-                }
-            }
-
             // service_id
             $this->service_id->setupEditAttributes();
             $curVal = trim(strval($this->service_id->CurrentValue));
@@ -2003,9 +1944,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
 
             // Edit refer script
 
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
         }
@@ -2029,14 +1967,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
             return true;
         }
         $validateForm = true;
-            if ($this->radiology_request_id->Visible && $this->radiology_request_id->Required) {
-                if (!$this->radiology_request_id->IsDetailKey && EmptyValue($this->radiology_request_id->FormValue)) {
-                    $this->radiology_request_id->addErrorMessage(str_replace("%s", $this->radiology_request_id->caption(), $this->radiology_request_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->radiology_request_id->FormValue)) {
-                $this->radiology_request_id->addErrorMessage($this->radiology_request_id->getErrorMessage(false));
-            }
             if ($this->service_id->Visible && $this->service_id->Required) {
                 if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
                     $this->service_id->addErrorMessage(str_replace("%s", $this->service_id->caption(), $this->service_id->RequiredErrorMessage));
@@ -2192,12 +2122,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
         global $Security;
         $rsnew = [];
 
-        // radiology_request_id
-        if ($this->radiology_request_id->getSessionValue() != "") {
-            $this->radiology_request_id->ReadOnly = true;
-        }
-        $this->radiology_request_id->setDbValueDef($rsnew, $this->radiology_request_id->CurrentValue, $this->radiology_request_id->ReadOnly);
-
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, $this->service_id->ReadOnly);
         return $rsnew;
@@ -2209,9 +2133,6 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['radiology_request_id'])) { // radiology_request_id
-            $this->radiology_request_id->CurrentValue = $row['radiology_request_id'];
-        }
         if (isset($row['service_id'])) { // service_id
             $this->service_id->CurrentValue = $row['service_id'];
         }
@@ -2296,11 +2217,13 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
         global $Security;
         $rsnew = [];
 
-        // radiology_request_id
-        $this->radiology_request_id->setDbValueDef($rsnew, $this->radiology_request_id->CurrentValue, false);
-
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, false);
+
+        // radiology_request_id
+        if ($this->radiology_request_id->getSessionValue() != "") {
+            $rsnew['radiology_request_id'] = $this->radiology_request_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2310,11 +2233,11 @@ class RadiologyRequestsDetailsGrid extends RadiologyRequestsDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['radiology_request_id'])) { // radiology_request_id
-            $this->radiology_request_id->setFormValue($row['radiology_request_id']);
-        }
         if (isset($row['service_id'])) { // service_id
             $this->service_id->setFormValue($row['service_id']);
+        }
+        if (isset($row['radiology_request_id'])) { // radiology_request_id
+            $this->radiology_request_id->setFormValue($row['radiology_request_id']);
         }
     }
 

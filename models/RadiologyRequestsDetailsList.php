@@ -146,7 +146,7 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->radiology_request_id->setVisibility();
+        $this->radiology_request_id->Visible = false;
         $this->service_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -1029,7 +1029,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->radiology_request_id); // radiology_request_id
             $this->updateSort($this->service_id); // service_id
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1290,7 +1289,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "radiology_request_id");
             $this->createColumnOption($option, "service_id");
         }
 
@@ -1819,10 +1817,6 @@ class RadiologyRequestsDetailsList extends RadiologyRequestsDetails
             } else {
                 $this->service_id->ViewValue = null;
             }
-
-            // radiology_request_id
-            $this->radiology_request_id->HrefValue = "";
-            $this->radiology_request_id->TooltipValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";

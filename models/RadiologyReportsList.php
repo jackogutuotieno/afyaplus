@@ -459,6 +459,9 @@ class RadiologyReportsList extends RadiologyReports
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -708,6 +711,7 @@ class RadiologyReportsList extends RadiologyReports
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->radiology_requests_details_id);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
@@ -2039,8 +2043,27 @@ class RadiologyReportsList extends RadiologyReports
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // radiology_requests_details_id
-            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
-            $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
+            $curVal = strval($this->radiology_requests_details_id->CurrentValue);
+            if ($curVal != "") {
+                $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->lookupCacheOption($curVal);
+                if ($this->radiology_requests_details_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->radiology_requests_details_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->radiology_requests_details_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->displayValue($arwrk);
+                    } else {
+                        $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->CurrentValue, $this->radiology_requests_details_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->radiology_requests_details_id->ViewValue = null;
+            }
 
             // findings
             $this->findings->ViewValue = $this->findings->CurrentValue;
@@ -2360,6 +2383,8 @@ class RadiologyReportsList extends RadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_radiology_requests_details_id":
+                    break;
                 case "x_created_by_user_id":
                     break;
                 default:

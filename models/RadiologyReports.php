@@ -142,14 +142,19 @@ class RadiologyReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->radiology_requests_details_id->InputTextType = "text";
         $this->radiology_requests_details_id->Raw = true;
         $this->radiology_requests_details_id->Nullable = false; // NOT NULL field
         $this->radiology_requests_details_id->Required = true; // Required field
+        $this->radiology_requests_details_id->setSelectMultiple(false); // Select one
+        $this->radiology_requests_details_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->radiology_requests_details_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->radiology_requests_details_id->Lookup = new Lookup($this->radiology_requests_details_id, 'radiology_requests', false, 'id', ["id","","",""], '', '', [], [], [], [], [], [], false, '', '', "`id`");
         $this->radiology_requests_details_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->radiology_requests_details_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->radiology_requests_details_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->radiology_requests_details_id->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->radiology_requests_details_id->Param, "CustomMsg");
         $this->Fields['radiology_requests_details_id'] = &$this->radiology_requests_details_id;
 
         // findings
@@ -197,7 +202,9 @@ class RadiologyReports extends DbTable
         $this->attachment->InputTextType = "text";
         $this->attachment->Raw = true;
         $this->attachment->Sortable = false; // Allow sort
+        $this->attachment->UploadAllowedFileExt = "jpg,jpeg";
         $this->attachment->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->attachment->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->attachment->Param, "CustomMsg");
         $this->Fields['attachment'] = &$this->attachment;
 
         // created_by_user_id
@@ -218,10 +225,10 @@ class RadiologyReports extends DbTable
             'FORMATTED TEXT', // View Tag
             'SELECT' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
         $this->created_by_user_id->setSelectMultiple(false); // Select one
         $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -1219,8 +1226,27 @@ class RadiologyReports extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // radiology_requests_details_id
-        $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->CurrentValue;
-        $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->ViewValue, $this->radiology_requests_details_id->formatPattern());
+        $curVal = strval($this->radiology_requests_details_id->CurrentValue);
+        if ($curVal != "") {
+            $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->lookupCacheOption($curVal);
+            if ($this->radiology_requests_details_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_details_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->radiology_requests_details_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->radiology_requests_details_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->radiology_requests_details_id->ViewValue = $this->radiology_requests_details_id->displayValue($arwrk);
+                } else {
+                    $this->radiology_requests_details_id->ViewValue = FormatNumber($this->radiology_requests_details_id->CurrentValue, $this->radiology_requests_details_id->formatPattern());
+                }
+            }
+        } else {
+            $this->radiology_requests_details_id->ViewValue = null;
+        }
 
         // findings
         $this->findings->ViewValue = $this->findings->CurrentValue;
@@ -1325,11 +1351,7 @@ class RadiologyReports extends DbTable
 
         // radiology_requests_details_id
         $this->radiology_requests_details_id->setupEditAttributes();
-        $this->radiology_requests_details_id->EditValue = $this->radiology_requests_details_id->CurrentValue;
         $this->radiology_requests_details_id->PlaceHolder = RemoveHtml($this->radiology_requests_details_id->caption());
-        if (strval($this->radiology_requests_details_id->EditValue) != "" && is_numeric($this->radiology_requests_details_id->EditValue)) {
-            $this->radiology_requests_details_id->EditValue = FormatNumber($this->radiology_requests_details_id->EditValue, null);
-        }
 
         // findings
         $this->findings->setupEditAttributes();
@@ -1346,33 +1368,6 @@ class RadiologyReports extends DbTable
         }
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->EditValue = null;
-            }
-        } else {
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();

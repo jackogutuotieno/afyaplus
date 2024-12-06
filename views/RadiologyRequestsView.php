@@ -84,6 +84,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_status"><?= $Page->status->caption() ?></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el_radiology_requests_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_requests_date_created"><?= $Page->date_created->caption() ?></span></td>

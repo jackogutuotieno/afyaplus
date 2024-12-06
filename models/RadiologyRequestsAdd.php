@@ -125,6 +125,7 @@ class RadiologyRequestsAdd extends RadiologyRequests
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->created_by_user_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -730,6 +731,16 @@ class RadiologyRequestsAdd extends RadiologyRequests
             }
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -741,6 +752,7 @@ class RadiologyRequestsAdd extends RadiologyRequests
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -794,6 +806,7 @@ class RadiologyRequestsAdd extends RadiologyRequests
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -806,6 +819,7 @@ class RadiologyRequestsAdd extends RadiologyRequests
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -853,6 +867,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -915,6 +932,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
                 $this->created_by_user_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -927,6 +947,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -996,6 +1019,14 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
             // created_by_user_id
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Add refer script
 
             // patient_id
@@ -1006,6 +1037,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1043,6 +1077,11 @@ class RadiologyRequestsAdd extends RadiologyRequests
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
                     $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
                 }
             }
 
@@ -1170,6 +1209,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
         // created_by_user_id
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1187,6 +1229,9 @@ class RadiologyRequestsAdd extends RadiologyRequests
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
     }
 

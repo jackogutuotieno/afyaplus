@@ -83,23 +83,6 @@ $Page->showMessage();
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card counters">
                 <div class="card-header">
-                    Requests Queue
-                </div>
-                <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-list"></i></p>
-                    <p class="record-count">
-                        <?php
-                            $sql = "SELECT COUNT(*) FROM radiology_requests_queue WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()";
-                            $requests_queue = ExecuteScalar($sql);
-                            echo $requests_queue;
-                        ?>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card counters">
-                <div class="card-header">
                     Reports
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">

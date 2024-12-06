@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <th class="<?= $Page->radiology_request_id->headerCellClass() ?>"><span id="elh_radiology_requests_details_radiology_request_id" class="radiology_requests_details_radiology_request_id"><?= $Page->radiology_request_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th class="<?= $Page->service_id->headerCellClass() ?>"><span id="elh_radiology_requests_details_service_id" class="radiology_requests_details_service_id"><?= $Page->service_id->caption() ?></span></th>
 <?php } ?>
@@ -77,14 +74,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td<?= $Page->radiology_request_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->radiology_request_id->viewAttributes() ?>>
-<?= $Page->radiology_request_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <td<?= $Page->service_id->cellAttributes() ?>>
 <span id="">

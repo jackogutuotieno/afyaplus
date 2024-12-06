@@ -22,7 +22,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["radiology_requests_details_id", [fields.radiology_requests_details_id.visible && fields.radiology_requests_details_id.required ? ew.Validators.required(fields.radiology_requests_details_id.caption) : null, ew.Validators.integer], fields.radiology_requests_details_id.isInvalid],
+            ["radiology_requests_details_id", [fields.radiology_requests_details_id.visible && fields.radiology_requests_details_id.required ? ew.Validators.required(fields.radiology_requests_details_id.caption) : null], fields.radiology_requests_details_id.isInvalid],
             ["findings", [fields.findings.visible && fields.findings.required ? ew.Validators.required(fields.findings.caption) : null], fields.findings.isInvalid],
             ["attachment", [fields.attachment.visible && fields.attachment.required ? ew.Validators.fileRequired(fields.attachment.caption) : null], fields.attachment.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
@@ -41,6 +41,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "radiology_requests_details_id": <?= $Page->radiology_requests_details_id->toClientList($Page) ?>,
             "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
@@ -76,9 +77,43 @@ $Page->showMessage();
         <label id="elh_radiology_reports_radiology_requests_details_id" for="x_radiology_requests_details_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->radiology_requests_details_id->caption() ?><?= $Page->radiology_requests_details_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->radiology_requests_details_id->cellAttributes() ?>>
 <span id="el_radiology_reports_radiology_requests_details_id">
-<input type="<?= $Page->radiology_requests_details_id->getInputTextType() ?>" name="x_radiology_requests_details_id" id="x_radiology_requests_details_id" data-table="radiology_reports" data-field="x_radiology_requests_details_id" value="<?= $Page->radiology_requests_details_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->radiology_requests_details_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->radiology_requests_details_id->formatPattern()) ?>"<?= $Page->radiology_requests_details_id->editAttributes() ?> aria-describedby="x_radiology_requests_details_id_help">
-<?= $Page->radiology_requests_details_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->radiology_requests_details_id->getErrorMessage() ?></div>
+    <select
+        id="x_radiology_requests_details_id"
+        name="x_radiology_requests_details_id"
+        class="form-select ew-select<?= $Page->radiology_requests_details_id->isInvalidClass() ?>"
+        <?php if (!$Page->radiology_requests_details_id->IsNativeSelect) { ?>
+        data-select2-id="fradiology_reportsadd_x_radiology_requests_details_id"
+        <?php } ?>
+        data-table="radiology_reports"
+        data-field="x_radiology_requests_details_id"
+        data-value-separator="<?= $Page->radiology_requests_details_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->radiology_requests_details_id->getPlaceHolder()) ?>"
+        <?= $Page->radiology_requests_details_id->editAttributes() ?>>
+        <?= $Page->radiology_requests_details_id->selectOptionListHtml("x_radiology_requests_details_id") ?>
+    </select>
+    <?= $Page->radiology_requests_details_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->radiology_requests_details_id->getErrorMessage() ?></div>
+<?= $Page->radiology_requests_details_id->Lookup->getParamTag($Page, "p_x_radiology_requests_details_id") ?>
+<?php if (!$Page->radiology_requests_details_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fradiology_reportsadd", function() {
+    var options = { name: "x_radiology_requests_details_id", selectId: "fradiology_reportsadd_x_radiology_requests_details_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fradiology_reportsadd.lists.radiology_requests_details_id?.lookupOptions.length) {
+        options.data = { id: "x_radiology_requests_details_id", form: "fradiology_reportsadd" };
+    } else {
+        options.ajax = { id: "x_radiology_requests_details_id", form: "fradiology_reportsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_reports.fields.radiology_requests_details_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -133,58 +168,6 @@ loadjs.ready(["fradiology_reportsadd", "editor"], function() {
 <input type="hidden" name="fa_x_attachment" id= "fa_x_attachment" value="0">
 <table id="ft_x_attachment" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_radiology_reports_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
-<input type="hidden" data-table="radiology_reports" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_radiology_reports_created_by_user_id">
-    <select
-        id="x_created_by_user_id"
-        name="x_created_by_user_id"
-        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
-        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-        data-select2-id="fradiology_reportsadd_x_created_by_user_id"
-        <?php } ?>
-        data-table="radiology_reports"
-        data-field="x_created_by_user_id"
-        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
-        <?= $Page->created_by_user_id->editAttributes() ?>>
-        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
-    </select>
-    <?= $Page->created_by_user_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
-<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fradiology_reportsadd", function() {
-    var options = { name: "x_created_by_user_id", selectId: "fradiology_reportsadd_x_created_by_user_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fradiology_reportsadd.lists.created_by_user_id?.lookupOptions.length) {
-        options.data = { id: "x_created_by_user_id", form: "fradiology_reportsadd" };
-    } else {
-        options.ajax = { id: "x_created_by_user_id", form: "fradiology_reportsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.radiology_reports.fields.created_by_user_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
