@@ -32,6 +32,17 @@ $patients_lab_report->TableClass = "table table-bordered table-hover table-sm ew
 </td>
         </tr>
 <?php } ?>
+<?php if ($patients_lab_report->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+        <tr id="r_Group_Concat_service_name"<?= $patients_lab_report->Group_Concat_service_name->rowAttributes() ?>>
+            <td class="<?= $patients_lab_report->TableLeftColumnClass ?>"><?= $patients_lab_report->Group_Concat_service_name->caption() ?></td>
+            <td<?= $patients_lab_report->Group_Concat_service_name->cellAttributes() ?>>
+<span id="el_patients_lab_report_Group_Concat_service_name">
+<span<?= $patients_lab_report->Group_Concat_service_name->viewAttributes() ?>>
+<?= $patients_lab_report->Group_Concat_service_name->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patients_lab_report->patient_age->Visible) { // patient_age ?>
         <tr id="r_patient_age"<?= $patients_lab_report->patient_age->rowAttributes() ?>>
             <td class="<?= $patients_lab_report->TableLeftColumnClass ?>"><?= $patients_lab_report->patient_age->caption() ?></td>

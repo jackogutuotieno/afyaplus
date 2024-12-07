@@ -24,16 +24,17 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["lab_test_request_id", [fields.lab_test_request_id.visible && fields.lab_test_request_id.required ? ew.Validators.required(fields.lab_test_request_id.caption) : null, ew.Validators.integer], fields.lab_test_request_id.isInvalid],
-            ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
-            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
+            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
+            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["lab_test_request_id",false],["service_name",false],["cost",false]];
+                    fields = [["patient_id",false],["status",false],["date_created",false],["date_updated",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -53,6 +54,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -90,14 +92,17 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_id" class="laboratory_billing_report_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
 <?php } ?>
-<?php if ($Grid->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th data-name="lab_test_request_id" class="<?= $Grid->lab_test_request_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_lab_test_request_id" class="laboratory_billing_report_lab_test_request_id"><?= $Grid->renderFieldHeader($Grid->lab_test_request_id) ?></div></th>
+<?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_patient_id" class="laboratory_billing_report_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Grid->service_name->Visible) { // service_name ?>
-        <th data-name="service_name" class="<?= $Grid->service_name->headerCellClass() ?>"><div id="elh_laboratory_billing_report_service_name" class="laboratory_billing_report_service_name"><?= $Grid->renderFieldHeader($Grid->service_name) ?></div></th>
+<?php if ($Grid->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Grid->status->headerCellClass() ?>"><div id="elh_laboratory_billing_report_status" class="laboratory_billing_report_status"><?= $Grid->renderFieldHeader($Grid->status) ?></div></th>
 <?php } ?>
-<?php if ($Grid->cost->Visible) { // cost ?>
-        <th data-name="cost" class="<?= $Grid->cost->headerCellClass() ?>"><div id="elh_laboratory_billing_report_cost" class="laboratory_billing_report_cost"><?= $Grid->renderFieldHeader($Grid->cost) ?></div></th>
+<?php if ($Grid->date_created->Visible) { // date_created ?>
+        <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_laboratory_billing_report_date_created" class="laboratory_billing_report_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
+<?php } ?>
+<?php if ($Grid->date_updated->Visible) { // date_updated ?>
+        <th data-name="date_updated" class="<?= $Grid->date_updated->headerCellClass() ?>"><div id="elh_laboratory_billing_report_date_updated" class="laboratory_billing_report_date_updated"><?= $Grid->renderFieldHeader($Grid->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -162,95 +167,306 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php } else { ?>
             <input type="hidden" data-table="laboratory_billing_report" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
-    <?php if ($Grid->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td data-name="lab_test_request_id"<?= $Grid->lab_test_request_id->cellAttributes() ?>>
+    <?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->lab_test_request_id->getSessionValue() != "") { ?>
-<span<?= $Grid->lab_test_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_request_id->getDisplayValue($Grid->lab_test_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_request_id" name="x<?= $Grid->RowIndex ?>_lab_test_request_id" value="<?= HtmlEncode($Grid->lab_test_request_id->CurrentValue) ?>" data-hidden="1">
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
 <?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_lab_test_request_id" class="el_laboratory_billing_report_lab_test_request_id">
-<input type="<?= $Grid->lab_test_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_request_id" id="x<?= $Grid->RowIndex ?>_lab_test_request_id" data-table="laboratory_billing_report" data-field="x_lab_test_request_id" value="<?= $Grid->lab_test_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_request_id->formatPattern()) ?>"<?= $Grid->lab_test_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->lab_test_request_id->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_patient_id" class="el_laboratory_billing_report_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="flaboratory_billing_reportgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="laboratory_billing_report"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flaboratory_billing_reportgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "flaboratory_billing_reportgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flaboratory_billing_reportgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flaboratory_billing_reportgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flaboratory_billing_reportgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.laboratory_billing_report.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_lab_test_request_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_lab_test_request_id" id="o<?= $Grid->RowIndex ?>_lab_test_request_id" value="<?= HtmlEncode($Grid->lab_test_request_id->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_patient_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_id" id="o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->lab_test_request_id->getSessionValue() != "") { ?>
-<span<?= $Grid->lab_test_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->lab_test_request_id->getDisplayValue($Grid->lab_test_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_lab_test_request_id" name="x<?= $Grid->RowIndex ?>_lab_test_request_id" value="<?= HtmlEncode($Grid->lab_test_request_id->CurrentValue) ?>" data-hidden="1">
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
 <?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_lab_test_request_id" class="el_laboratory_billing_report_lab_test_request_id">
-<input type="<?= $Grid->lab_test_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_lab_test_request_id" id="x<?= $Grid->RowIndex ?>_lab_test_request_id" data-table="laboratory_billing_report" data-field="x_lab_test_request_id" value="<?= $Grid->lab_test_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->lab_test_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->lab_test_request_id->formatPattern()) ?>"<?= $Grid->lab_test_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->lab_test_request_id->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_patient_id" class="el_laboratory_billing_report_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="flaboratory_billing_reportgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="laboratory_billing_report"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flaboratory_billing_reportgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "flaboratory_billing_reportgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flaboratory_billing_reportgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flaboratory_billing_reportgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "flaboratory_billing_reportgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.laboratory_billing_report.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_lab_test_request_id" class="el_laboratory_billing_report_lab_test_request_id">
-<span<?= $Grid->lab_test_request_id->viewAttributes() ?>>
-<?= $Grid->lab_test_request_id->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_patient_id" class="el_laboratory_billing_report_patient_id">
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<?= $Grid->patient_id->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_lab_test_request_id" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_lab_test_request_id" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_lab_test_request_id" value="<?= HtmlEncode($Grid->lab_test_request_id->FormValue) ?>">
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_lab_test_request_id" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_lab_test_request_id" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_lab_test_request_id" value="<?= HtmlEncode($Grid->lab_test_request_id->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_patient_id" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_patient_id" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->FormValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_patient_id" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_patient_id" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->service_name->Visible) { // service_name ?>
-        <td data-name="service_name"<?= $Grid->service_name->cellAttributes() ?>>
+    <?php if ($Grid->status->Visible) { // status ?>
+        <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_service_name" class="el_laboratory_billing_report_service_name">
-<input type="<?= $Grid->service_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_service_name" id="x<?= $Grid->RowIndex ?>_service_name" data-table="laboratory_billing_report" data-field="x_service_name" value="<?= $Grid->service_name->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->service_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->service_name->formatPattern()) ?>"<?= $Grid->service_name->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->service_name->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_status" class="el_laboratory_billing_report_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="laboratory_billing_report" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
 </span>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_service_name" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_service_name" id="o<?= $Grid->RowIndex ?>_service_name" value="<?= HtmlEncode($Grid->service_name->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_service_name" class="el_laboratory_billing_report_service_name">
-<input type="<?= $Grid->service_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_service_name" id="x<?= $Grid->RowIndex ?>_service_name" data-table="laboratory_billing_report" data-field="x_service_name" value="<?= $Grid->service_name->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->service_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->service_name->formatPattern()) ?>"<?= $Grid->service_name->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->service_name->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_status" class="el_laboratory_billing_report_status">
+<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="laboratory_billing_report" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_service_name" class="el_laboratory_billing_report_service_name">
-<span<?= $Grid->service_name->viewAttributes() ?>>
-<?= $Grid->service_name->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_status" class="el_laboratory_billing_report_status">
+<span<?= $Grid->status->viewAttributes() ?>>
+<?= $Grid->status->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_service_name" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_service_name" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_service_name" value="<?= HtmlEncode($Grid->service_name->FormValue) ?>">
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_service_name" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_service_name" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_service_name" value="<?= HtmlEncode($Grid->service_name->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_status" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_status" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->FormValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_status" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_status" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->cost->Visible) { // cost ?>
-        <td data-name="cost"<?= $Grid->cost->cellAttributes() ?>>
+    <?php if ($Grid->date_created->Visible) { // date_created ?>
+        <td data-name="date_created"<?= $Grid->date_created->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_cost" class="el_laboratory_billing_report_cost">
-<input type="<?= $Grid->cost->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_cost" id="x<?= $Grid->RowIndex ?>_cost" data-table="laboratory_billing_report" data-field="x_cost" value="<?= $Grid->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->cost->formatPattern()) ?>"<?= $Grid->cost->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->cost->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_created" class="el_laboratory_billing_report_date_created">
+<input type="<?= $Grid->date_created->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_created" id="x<?= $Grid->RowIndex ?>_date_created" data-table="laboratory_billing_report" data-field="x_date_created" value="<?= $Grid->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_created->formatPattern()) ?>"<?= $Grid->date_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->date_created->getErrorMessage() ?></div>
+<?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flaboratory_billing_reportgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flaboratory_billing_reportgrid", "x<?= $Grid->RowIndex ?>_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
 </span>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_cost" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_cost" id="o<?= $Grid->RowIndex ?>_cost" value="<?= HtmlEncode($Grid->cost->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_created" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_date_created" id="o<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_cost" class="el_laboratory_billing_report_cost">
-<input type="<?= $Grid->cost->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_cost" id="x<?= $Grid->RowIndex ?>_cost" data-table="laboratory_billing_report" data-field="x_cost" value="<?= $Grid->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->cost->formatPattern()) ?>"<?= $Grid->cost->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->cost->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_created" class="el_laboratory_billing_report_date_created">
+<input type="<?= $Grid->date_created->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_created" id="x<?= $Grid->RowIndex ?>_date_created" data-table="laboratory_billing_report" data-field="x_date_created" value="<?= $Grid->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_created->formatPattern()) ?>"<?= $Grid->date_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->date_created->getErrorMessage() ?></div>
+<?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flaboratory_billing_reportgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flaboratory_billing_reportgrid", "x<?= $Grid->RowIndex ?>_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_cost" class="el_laboratory_billing_report_cost">
-<span<?= $Grid->cost->viewAttributes() ?>>
-<?= $Grid->cost->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_created" class="el_laboratory_billing_report_date_created">
+<span<?= $Grid->date_created->viewAttributes() ?>>
+<?= $Grid->date_created->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_cost" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_cost" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_cost" value="<?= HtmlEncode($Grid->cost->FormValue) ?>">
-<input type="hidden" data-table="laboratory_billing_report" data-field="x_cost" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_cost" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_cost" value="<?= HtmlEncode($Grid->cost->OldValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_created" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_date_created" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->FormValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_created" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_date_created" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->date_updated->Visible) { // date_updated ?>
+        <td data-name="date_updated"<?= $Grid->date_updated->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_updated" class="el_laboratory_billing_report_date_updated">
+<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="laboratory_billing_report" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
+<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flaboratory_billing_reportgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flaboratory_billing_reportgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_updated" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_date_updated" id="o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_updated" class="el_laboratory_billing_report_date_updated">
+<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="laboratory_billing_report" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
+<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flaboratory_billing_reportgrid", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flaboratory_billing_reportgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_date_updated" class="el_laboratory_billing_report_date_updated">
+<span<?= $Grid->date_updated->viewAttributes() ?>>
+<?= $Grid->date_updated->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_updated" data-hidden="1" name="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_date_updated" id="flaboratory_billing_reportgrid$x<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->FormValue) ?>">
+<input type="hidden" data-table="laboratory_billing_report" data-field="x_date_updated" data-hidden="1" data-old name="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_date_updated" id="flaboratory_billing_reportgrid$o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -280,47 +496,6 @@ loadjs.ready(["flaboratory_billing_reportgrid","load"], () => flaboratory_billin
 }
 ?>
 </tbody>
-<?php
-// Render aggregate row
-$Grid->RowType = RowType::AGGREGATE;
-$Grid->resetAttributes();
-$Grid->renderRow();
-?>
-<?php if ($Grid->TotalRecords > 0 && $Grid->CurrentMode == "view") { ?>
-<tfoot><!-- Table footer -->
-    <tr class="ew-table-footer">
-<?php
-// Render list options
-$Grid->renderListOptions();
-
-// Render list options (footer, left)
-$Grid->ListOptions->render("footer", "left");
-?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_laboratory_billing_report_id" class="laboratory_billing_report_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td data-name="lab_test_request_id" class="<?= $Grid->lab_test_request_id->footerCellClass() ?>"><span id="elf_laboratory_billing_report_lab_test_request_id" class="laboratory_billing_report_lab_test_request_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->service_name->Visible) { // service_name ?>
-        <td data-name="service_name" class="<?= $Grid->service_name->footerCellClass() ?>"><span id="elf_laboratory_billing_report_service_name" class="laboratory_billing_report_service_name">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->cost->Visible) { // cost ?>
-        <td data-name="cost" class="<?= $Grid->cost->footerCellClass() ?>"><span id="elf_laboratory_billing_report_cost" class="laboratory_billing_report_cost">
-        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
-        <?= $Grid->cost->ViewValue ?></span>
-        </span></td>
-    <?php } ?>
-<?php
-// Render list options (footer, right)
-$Grid->ListOptions->render("footer", "right");
-?>
-    </tr>
-</tfoot>
-<?php } ?>
 </table><!-- /.ew-table -->
 <?php if ($Grid->CurrentMode == "add" || $Grid->CurrentMode == "copy") { ?>
 <input type="hidden" name="<?= $Grid->FormKeyCountName ?>" id="<?= $Grid->FormKeyCountName ?>" value="<?= $Grid->KeyCount ?>">

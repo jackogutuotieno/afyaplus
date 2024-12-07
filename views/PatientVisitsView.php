@@ -216,6 +216,30 @@ loadjs.ready("head", function () {
 <?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 <?php
+    if (in_array("laboratory_billing_report", explode(",", $Page->getCurrentDetailTable())) && $laboratory_billing_report->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("laboratory_billing_report", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("laboratory_billing_report")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "LaboratoryBillingReportGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("radiology_billing_report", explode(",", $Page->getCurrentDetailTable())) && $radiology_billing_report->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_billing_report", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("radiology_billing_report")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "RadiologyBillingReportGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("pharmacy_billing_report", explode(",", $Page->getCurrentDetailTable())) && $pharmacy_billing_report->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("pharmacy_billing_report", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("pharmacy_billing_report")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PharmacyBillingReportGrid.php" ?>
+<?php } ?>
+<?php
     if (in_array("patients_lab_report", explode(",", $Page->getCurrentDetailTable())) && $patients_lab_report->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>

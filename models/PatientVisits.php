@@ -557,6 +557,20 @@ class PatientVisits extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "laboratory_billing_report") {
+            $detailUrl = Container("laboratory_billing_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "radiology_billing_report") {
+            $detailUrl = Container("radiology_billing_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "pharmacy_billing_report") {
+            $detailUrl = Container("pharmacy_billing_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
         if ($this->getCurrentDetailTable() == "patients_lab_report") {
             $detailUrl = Container("patients_lab_report")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
@@ -2136,8 +2150,14 @@ class PatientVisits extends DbTable
         } else if ($this->date_created->CurrentValue < $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Visit"; 
-        } 
-        $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+        }
+        if (CurrentUserlevel() == 1) {
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+        } else if (CurrentUserlevel() == 2) {
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+        } else {
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+        }
     }
 
     // User ID Filtering event

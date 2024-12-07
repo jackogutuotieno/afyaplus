@@ -863,31 +863,12 @@ class FullHaemogramParametersList extends FullHaemogramParameters
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patients_lab_report") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patients_lab_report"); // Add master User ID filter
-            }
             if ($this->getCurrentMasterTable() == "lab_test_reports") {
                 $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_reports"); // Add master User ID filter
             }
         }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
-            $masterTbl = Container("patients_lab_report");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientslabreportlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
@@ -1389,7 +1370,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->lab_test_report_id->setSessionValue("");
                         $this->lab_test_report_id->setSessionValue("");
             }
 
@@ -2445,23 +2425,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         $doc->ExportCustom = !$this->pageExporting($doc);
 
         // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
-            $patients_lab_report = new PatientsLabReportList();
-            $rsmaster = $patients_lab_report->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($patients_lab_report);
-                    $patients_lab_report->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
-        // Export master record
         if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
             $lab_test_reports = new LabTestReportsList();
             $rsmaster = $lab_test_reports->loadRs($this->DbMasterFilter); // Load master record
@@ -2510,21 +2473,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "patients_lab_report") {
-                $validMaster = true;
-                $masterTbl = Container("patients_lab_report");
-                if (($parm = Get("fk_id", Get("lab_test_report_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->lab_test_report_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->QueryStringValue);
-                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "lab_test_reports") {
                 $validMaster = true;
                 $masterTbl = Container("lab_test_reports");
@@ -2546,21 +2494,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patients_lab_report") {
-                $validMaster = true;
-                $masterTbl = Container("patients_lab_report");
-                if (($parm = Post("fk_id", Post("lab_test_report_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->lab_test_report_id->FormValue = $masterTbl->id->FormValue;
-                    $this->lab_test_report_id->setSessionValue($this->lab_test_report_id->FormValue);
-                    $foreignKeys["lab_test_report_id"] = $this->lab_test_report_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "lab_test_reports") {
                 $validMaster = true;
@@ -2601,11 +2534,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "patients_lab_report") {
-                if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
-                    $this->lab_test_report_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "lab_test_reports") {
                 if (!array_key_exists("lab_test_report_id", $foreignKeys)) { // Not current foreign key
                     $this->lab_test_report_id->setSessionValue("");

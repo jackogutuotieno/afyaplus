@@ -356,6 +356,30 @@ loadjs.ready("fpatient_visitsedit", function() {
 <?php include_once "LabTestRequestsGrid.php" ?>
 <?php } ?>
 <?php
+    if (in_array("laboratory_billing_report", explode(",", $Page->getCurrentDetailTable())) && $laboratory_billing_report->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("laboratory_billing_report", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "LaboratoryBillingReportGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("radiology_billing_report", explode(",", $Page->getCurrentDetailTable())) && $radiology_billing_report->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("radiology_billing_report", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "RadiologyBillingReportGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("pharmacy_billing_report", explode(",", $Page->getCurrentDetailTable())) && $pharmacy_billing_report->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("pharmacy_billing_report", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PharmacyBillingReportGrid.php" ?>
+<?php } ?>
+<?php
     if (in_array("patients_lab_report", explode(",", $Page->getCurrentDetailTable())) && $patients_lab_report->DetailEdit) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>

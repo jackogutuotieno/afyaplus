@@ -149,6 +149,7 @@ class PatientsLabReportList extends PatientsLabReport
         $this->visit_id->Visible = false;
         $this->patient_id->Visible = false;
         $this->patient_name->setVisibility();
+        $this->Group_Concat_service_name->setVisibility();
         $this->date_of_birth->Visible = false;
         $this->gender->Visible = false;
         $this->patient_age->setVisibility();
@@ -462,12 +463,6 @@ class PatientsLabReportList extends PatientsLabReport
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->visit_id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -1084,6 +1079,7 @@ class PatientsLabReportList extends PatientsLabReport
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
+        $filterList = Concat($filterList, $this->Group_Concat_service_name->AdvancedSearch->toJson(), ","); // Field Group_Concat_service_name
         $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->patient_age->AdvancedSearch->toJson(), ","); // Field patient_age
@@ -1162,6 +1158,14 @@ class PatientsLabReportList extends PatientsLabReport
         $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
         $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
         $this->patient_name->AdvancedSearch->save();
+
+        // Field Group_Concat_service_name
+        $this->Group_Concat_service_name->AdvancedSearch->SearchValue = @$filter["x_Group_Concat_service_name"];
+        $this->Group_Concat_service_name->AdvancedSearch->SearchOperator = @$filter["z_Group_Concat_service_name"];
+        $this->Group_Concat_service_name->AdvancedSearch->SearchCondition = @$filter["v_Group_Concat_service_name"];
+        $this->Group_Concat_service_name->AdvancedSearch->SearchValue2 = @$filter["y_Group_Concat_service_name"];
+        $this->Group_Concat_service_name->AdvancedSearch->SearchOperator2 = @$filter["w_Group_Concat_service_name"];
+        $this->Group_Concat_service_name->AdvancedSearch->save();
 
         // Field date_of_birth
         $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
@@ -1265,6 +1269,7 @@ class PatientsLabReportList extends PatientsLabReport
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->Group_Concat_service_name;
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->details;
         $searchFlds[] = &$this->status;
@@ -1349,6 +1354,7 @@ class PatientsLabReportList extends PatientsLabReport
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->patient_name); // patient_name
+            $this->updateSort($this->Group_Concat_service_name); // Group_Concat_service_name
             $this->updateSort($this->patient_age); // patient_age
             $this->updateSort($this->details); // details
             $this->updateSort($this->status); // status
@@ -1392,6 +1398,7 @@ class PatientsLabReportList extends PatientsLabReport
                 $this->visit_id->setSort("");
                 $this->patient_id->setSort("");
                 $this->patient_name->setSort("");
+                $this->Group_Concat_service_name->setSort("");
                 $this->date_of_birth->setSort("");
                 $this->gender->setSort("");
                 $this->patient_age->setSort("");
@@ -1419,23 +1426,10 @@ class PatientsLabReportList extends PatientsLabReport
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
         // "detail_urinalysis_results"
         $item = &$this->ListOptions->add("detail_urinalysis_results");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->allowList(CurrentProjectID() . 'urinalysis_results');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_full_haemogram_parameters"
-        $item = &$this->ListOptions->add("detail_full_haemogram_parameters");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'full_haemogram_parameters');
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
@@ -1452,7 +1446,6 @@ class PatientsLabReportList extends PatientsLabReport
         // Set up detail pages
         $pages = new SubPages();
         $pages->add("urinalysis_results");
-        $pages->add("full_haemogram_parameters");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1512,19 +1505,7 @@ class PatientsLabReportList extends PatientsLabReport
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_lab_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
 
         // Set up list action buttons
@@ -1574,44 +1555,6 @@ class PatientsLabReportList extends PatientsLabReport
             $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("urinalysisresultslist?" . Config("TABLE_SHOW_MASTER") . "=patients_lab_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("UrinalysisResultsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients_lab_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=urinalysis_results");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "urinalysis_results";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_full_haemogram_parameters"
-        $opt = $this->ListOptions["detail_full_haemogram_parameters"];
-        if ($Security->allowList(CurrentProjectID() . 'full_haemogram_parameters')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("full_haemogram_parameters", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("fullhaemogramparameterslist?" . Config("TABLE_SHOW_MASTER") . "=patients_lab_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("FullHaemogramParametersGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients_lab_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemogram_parameters");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "full_haemogram_parameters";
-            }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
                 $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
@@ -1677,6 +1620,7 @@ class PatientsLabReportList extends PatientsLabReport
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_name");
+            $this->createColumnOption($option, "Group_Concat_service_name");
             $this->createColumnOption($option, "patient_age");
             $this->createColumnOption($option, "details");
             $this->createColumnOption($option, "status");
@@ -2125,6 +2069,7 @@ class PatientsLabReportList extends PatientsLabReport
         $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
+        $this->Group_Concat_service_name->setDbValue($row['Group_Concat_service_name']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
@@ -2143,6 +2088,7 @@ class PatientsLabReportList extends PatientsLabReport
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['Group_Concat_service_name'] = $this->Group_Concat_service_name->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['patient_age'] = $this->patient_age->DefaultValue;
@@ -2199,6 +2145,8 @@ class PatientsLabReportList extends PatientsLabReport
 
         // patient_name
 
+        // Group_Concat_service_name
+
         // date_of_birth
 
         // gender
@@ -2229,6 +2177,9 @@ class PatientsLabReportList extends PatientsLabReport
 
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->ViewValue = $this->Group_Concat_service_name->CurrentValue;
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
@@ -2265,6 +2216,10 @@ class PatientsLabReportList extends PatientsLabReport
             // patient_name
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->HrefValue = "";
+            $this->Group_Concat_service_name->TooltipValue = "";
 
             // patient_age
             $this->patient_age->HrefValue = "";

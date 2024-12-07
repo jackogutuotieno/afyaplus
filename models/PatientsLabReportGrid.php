@@ -139,6 +139,7 @@ class PatientsLabReportGrid extends PatientsLabReport
         $this->visit_id->Visible = false;
         $this->patient_id->Visible = false;
         $this->patient_name->setVisibility();
+        $this->Group_Concat_service_name->setVisibility();
         $this->date_of_birth->Visible = false;
         $this->gender->Visible = false;
         $this->patient_age->setVisibility();
@@ -394,12 +395,6 @@ class PatientsLabReportGrid extends PatientsLabReport
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->visit_id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -1106,10 +1101,26 @@ class PatientsLabReportGrid extends PatientsLabReport
     {
         global $CurrentForm;
         if (
+            $CurrentForm->hasValue("x_id") &&
+            $CurrentForm->hasValue("o_id") &&
+            $this->id->CurrentValue != $this->id->DefaultValue &&
+            !($this->id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->id->CurrentValue == $this->id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
             $CurrentForm->hasValue("x_patient_name") &&
             $CurrentForm->hasValue("o_patient_name") &&
             $this->patient_name->CurrentValue != $this->patient_name->DefaultValue &&
             !($this->patient_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_name->CurrentValue == $this->patient_name->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_Group_Concat_service_name") &&
+            $CurrentForm->hasValue("o_Group_Concat_service_name") &&
+            $this->Group_Concat_service_name->CurrentValue != $this->Group_Concat_service_name->DefaultValue &&
+            !($this->Group_Concat_service_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->Group_Concat_service_name->CurrentValue == $this->Group_Concat_service_name->getSessionValue())
         ) {
             return false;
         }
@@ -1323,12 +1334,6 @@ class PatientsLabReportGrid extends PatientsLabReport
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1397,19 +1402,7 @@ class PatientsLabReportGrid extends PatientsLabReport
                 }
             }
         }
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_lab_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
         $this->renderListOptionsExt();
 
@@ -1648,8 +1641,15 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
+        if (!$this->id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->id->Visible = false; // Disable update for API request
+            } else {
+                $this->id->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_id")) {
+            $this->id->setOldValue($CurrentForm->getValue("o_id"));
         }
 
         // Check field name 'patient_name' first before field var 'x_patient_name'
@@ -1663,6 +1663,19 @@ class PatientsLabReportGrid extends PatientsLabReport
         }
         if ($CurrentForm->hasValue("o_patient_name")) {
             $this->patient_name->setOldValue($CurrentForm->getValue("o_patient_name"));
+        }
+
+        // Check field name 'Group_Concat_service_name' first before field var 'x_Group_Concat_service_name'
+        $val = $CurrentForm->hasValue("Group_Concat_service_name") ? $CurrentForm->getValue("Group_Concat_service_name") : $CurrentForm->getValue("x_Group_Concat_service_name");
+        if (!$this->Group_Concat_service_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->Group_Concat_service_name->Visible = false; // Disable update for API request
+            } else {
+                $this->Group_Concat_service_name->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_Group_Concat_service_name")) {
+            $this->Group_Concat_service_name->setOldValue($CurrentForm->getValue("o_Group_Concat_service_name"));
         }
 
         // Check field name 'patient_age' first before field var 'x_patient_age'
@@ -1747,7 +1760,7 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // Check field name 'visit_id' first before field var 'x_visit_id'
         $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+        if (!$this->visit_id->IsDetailKey) {
             $this->visit_id->setFormValue($val);
         }
     }
@@ -1756,13 +1769,10 @@ class PatientsLabReportGrid extends PatientsLabReport
     public function restoreFormValues()
     {
         global $CurrentForm;
-        if (!$this->isGridAdd() && !$this->isAdd()) {
-            $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        }
-        if (!$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->CurrentValue = $this->id->FormValue;
-        }
+                        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
+        $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_name->CurrentValue = $this->patient_name->FormValue;
+        $this->Group_Concat_service_name->CurrentValue = $this->Group_Concat_service_name->FormValue;
         $this->patient_age->CurrentValue = $this->patient_age->FormValue;
         $this->details->CurrentValue = $this->details->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
@@ -1870,6 +1880,7 @@ class PatientsLabReportGrid extends PatientsLabReport
         $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
+        $this->Group_Concat_service_name->setDbValue($row['Group_Concat_service_name']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
@@ -1888,6 +1899,7 @@ class PatientsLabReportGrid extends PatientsLabReport
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['Group_Concat_service_name'] = $this->Group_Concat_service_name->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['patient_age'] = $this->patient_age->DefaultValue;
@@ -1942,6 +1954,8 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // patient_name
 
+        // Group_Concat_service_name
+
         // date_of_birth
 
         // gender
@@ -1972,6 +1986,9 @@ class PatientsLabReportGrid extends PatientsLabReport
 
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->ViewValue = $this->Group_Concat_service_name->CurrentValue;
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
@@ -2009,6 +2026,10 @@ class PatientsLabReportGrid extends PatientsLabReport
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
 
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->HrefValue = "";
+            $this->Group_Concat_service_name->TooltipValue = "";
+
             // patient_age
             $this->patient_age->HrefValue = "";
             $this->patient_age->TooltipValue = "";
@@ -2034,6 +2055,12 @@ class PatientsLabReportGrid extends PatientsLabReport
             $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+                $this->id->EditValue = $this->id->EditValue;
+            }
 
             // patient_name
             $this->patient_name->setupEditAttributes();
@@ -2042,6 +2069,14 @@ class PatientsLabReportGrid extends PatientsLabReport
             }
             $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
             $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->setupEditAttributes();
+            if (!$this->Group_Concat_service_name->Raw) {
+                $this->Group_Concat_service_name->CurrentValue = HtmlDecode($this->Group_Concat_service_name->CurrentValue);
+            }
+            $this->Group_Concat_service_name->EditValue = HtmlEncode($this->Group_Concat_service_name->CurrentValue);
+            $this->Group_Concat_service_name->PlaceHolder = RemoveHtml($this->Group_Concat_service_name->caption());
 
             // patient_age
             $this->patient_age->setupEditAttributes();
@@ -2093,6 +2128,9 @@ class PatientsLabReportGrid extends PatientsLabReport
             // patient_name
             $this->patient_name->HrefValue = "";
 
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->HrefValue = "";
+
             // patient_age
             $this->patient_age->HrefValue = "";
 
@@ -2114,6 +2152,7 @@ class PatientsLabReportGrid extends PatientsLabReport
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
 
             // patient_name
             $this->patient_name->setupEditAttributes();
@@ -2122,6 +2161,14 @@ class PatientsLabReportGrid extends PatientsLabReport
             }
             $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
             $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->setupEditAttributes();
+            if (!$this->Group_Concat_service_name->Raw) {
+                $this->Group_Concat_service_name->CurrentValue = HtmlDecode($this->Group_Concat_service_name->CurrentValue);
+            }
+            $this->Group_Concat_service_name->EditValue = HtmlEncode($this->Group_Concat_service_name->CurrentValue);
+            $this->Group_Concat_service_name->PlaceHolder = RemoveHtml($this->Group_Concat_service_name->caption());
 
             // patient_age
             $this->patient_age->setupEditAttributes();
@@ -2173,6 +2220,9 @@ class PatientsLabReportGrid extends PatientsLabReport
             // patient_name
             $this->patient_name->HrefValue = "";
 
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->HrefValue = "";
+
             // patient_age
             $this->patient_age->HrefValue = "";
 
@@ -2216,9 +2266,17 @@ class PatientsLabReportGrid extends PatientsLabReport
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
+            if (!CheckInteger($this->id->FormValue)) {
+                $this->id->addErrorMessage($this->id->getErrorMessage(false));
+            }
             if ($this->patient_name->Visible && $this->patient_name->Required) {
                 if (!$this->patient_name->IsDetailKey && EmptyValue($this->patient_name->FormValue)) {
                     $this->patient_name->addErrorMessage(str_replace("%s", $this->patient_name->caption(), $this->patient_name->RequiredErrorMessage));
+                }
+            }
+            if ($this->Group_Concat_service_name->Visible && $this->Group_Concat_service_name->Required) {
+                if (!$this->Group_Concat_service_name->IsDetailKey && EmptyValue($this->Group_Concat_service_name->FormValue)) {
+                    $this->Group_Concat_service_name->addErrorMessage(str_replace("%s", $this->Group_Concat_service_name->caption(), $this->Group_Concat_service_name->RequiredErrorMessage));
                 }
             }
             if ($this->patient_age->Visible && $this->patient_age->Required) {
@@ -2373,6 +2431,19 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
+
+        // Check for duplicate key when key changed
+        if ($updateRow) {
+            $newKeyFilter = $this->getRecordFilter($rsnew);
+            if ($newKeyFilter != $oldKeyFilter) {
+                $rsChk = $this->loadRs($newKeyFilter)->fetch();
+                if ($rsChk !== false) {
+                    $keyErrMsg = str_replace("%f", $newKeyFilter, $Language->phrase("DupKey"));
+                    $this->setFailureMessage($keyErrMsg);
+                    $updateRow = false;
+                }
+            }
+        }
         if ($updateRow) {
             if (count($rsnew) > 0) {
                 $this->CurrentFilter = $filter; // Set up current filter
@@ -2414,8 +2485,14 @@ class PatientsLabReportGrid extends PatientsLabReport
         global $Security;
         $rsnew = [];
 
+        // id
+        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, $this->id->ReadOnly);
+
         // patient_name
         $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, $this->patient_name->ReadOnly);
+
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name->setDbValueDef($rsnew, $this->Group_Concat_service_name->CurrentValue, $this->Group_Concat_service_name->ReadOnly);
 
         // patient_age
         $this->patient_age->setDbValueDef($rsnew, $this->patient_age->CurrentValue, $this->patient_age->ReadOnly);
@@ -2443,8 +2520,14 @@ class PatientsLabReportGrid extends PatientsLabReport
      */
     protected function restoreEditFormFromRow($row)
     {
+        if (isset($row['id'])) { // id
+            $this->id->CurrentValue = $row['id'];
+        }
         if (isset($row['patient_name'])) { // patient_name
             $this->patient_name->CurrentValue = $row['patient_name'];
+        }
+        if (isset($row['Group_Concat_service_name'])) { // Group_Concat_service_name
+            $this->Group_Concat_service_name->CurrentValue = $row['Group_Concat_service_name'];
         }
         if (isset($row['patient_age'])) { // patient_age
             $this->patient_age->CurrentValue = $row['patient_age'];
@@ -2491,6 +2574,29 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+
+        // Check if key value entered
+        if ($insertRow && $this->ValidateKey && strval($rsnew['id']) == "") {
+            $this->setFailureMessage($Language->phrase("InvalidKeyValue"));
+            $insertRow = false;
+        }
+
+        // Check if key value entered
+        if ($insertRow && $this->ValidateKey && strval($rsnew['visit_id']) == "") {
+            $this->setFailureMessage($Language->phrase("InvalidKeyValue"));
+            $insertRow = false;
+        }
+
+        // Check for duplicate key
+        if ($insertRow && $this->ValidateKey) {
+            $filter = $this->getRecordFilter($rsnew);
+            $rsChk = $this->loadRs($filter)->fetch();
+            if ($rsChk !== false) {
+                $keyErrMsg = str_replace("%f", $filter, $Language->phrase("DupKey"));
+                $this->setFailureMessage($keyErrMsg);
+                $insertRow = false;
+            }
+        }
         if ($insertRow) {
             $addRow = $this->insert($rsnew);
             if ($addRow) {
@@ -2525,8 +2631,14 @@ class PatientsLabReportGrid extends PatientsLabReport
         global $Security;
         $rsnew = [];
 
+        // id
+        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, strval($this->id->CurrentValue) == "");
+
         // patient_name
         $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, false);
+
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name->setDbValueDef($rsnew, $this->Group_Concat_service_name->CurrentValue, false);
 
         // patient_age
         $this->patient_age->setDbValueDef($rsnew, $this->patient_age->CurrentValue, false);
@@ -2564,8 +2676,14 @@ class PatientsLabReportGrid extends PatientsLabReport
      */
     protected function restoreAddFormFromRow($row)
     {
+        if (isset($row['id'])) { // id
+            $this->id->setFormValue($row['id']);
+        }
         if (isset($row['patient_name'])) { // patient_name
             $this->patient_name->setFormValue($row['patient_name']);
+        }
+        if (isset($row['Group_Concat_service_name'])) { // Group_Concat_service_name
+            $this->Group_Concat_service_name->setFormValue($row['Group_Concat_service_name']);
         }
         if (isset($row['patient_age'])) { // patient_age
             $this->patient_age->setFormValue($row['patient_age']);

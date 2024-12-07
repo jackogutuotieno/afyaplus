@@ -22,13 +22,6 @@ class PatientsLabReportController extends ControllerBase
         return $this->runPage($request, $response, $this->getKeyParams($args), "PatientsLabReportList");
     }
 
-    // view
-    #[Map(["GET","POST","OPTIONS"], "/patientslabreportview[/{keys:.*}]", [PermissionMiddleware::class], "view.patients_lab_report")]
-    public function view(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $this->getKeyParams($args), "PatientsLabReportView");
-    }
-
     // Get keys as associative array
     protected function getKeyParams($args)
     {

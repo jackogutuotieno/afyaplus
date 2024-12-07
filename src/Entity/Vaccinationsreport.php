@@ -33,14 +33,11 @@ class VaccinationsReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
-    #[Column(name: "first_name", type: "string")]
-    private string $firstName;
+    #[Column(name: "patient_name", type: "string", nullable: true)]
+    private ?string $patientName;
 
-    #[Column(name: "last_name", type: "string")]
-    private string $lastName;
-
-    #[Column(name: "date_of_birth", type: "date")]
-    private DateTime $dateOfBirth;
+    #[Column(name: "patient_age", type: "bigint", nullable: true)]
+    private ?string $patientAge;
 
     #[Column(type: "string")]
     private string $gender;
@@ -71,36 +68,25 @@ class VaccinationsReport extends AbstractEntity
         return $this;
     }
 
-    public function getFirstName(): string
+    public function getPatientName(): ?string
     {
-        return HtmlDecode($this->firstName);
+        return HtmlDecode($this->patientName);
     }
 
-    public function setFirstName(string $value): static
+    public function setPatientName(?string $value): static
     {
-        $this->firstName = RemoveXss($value);
+        $this->patientName = RemoveXss($value);
         return $this;
     }
 
-    public function getLastName(): string
+    public function getPatientAge(): ?string
     {
-        return HtmlDecode($this->lastName);
+        return $this->patientAge;
     }
 
-    public function setLastName(string $value): static
+    public function setPatientAge(?string $value): static
     {
-        $this->lastName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getDateOfBirth(): DateTime
-    {
-        return $this->dateOfBirth;
-    }
-
-    public function setDateOfBirth(DateTime $value): static
-    {
-        $this->dateOfBirth = $value;
+        $this->patientAge = $value;
         return $this;
     }
 
@@ -170,7 +156,18 @@ class VaccinationsReport extends AbstractEntity
         return $this;
     }
 }
-tegory);
+ HtmlDecode($this->categoryName);
+    }
+
+    public function setCategoryName(?string $value): static
+    {
+        $this->categoryName = RemoveXss($value);
+        return $this;
+    }
+
+    public function getSubcategory(): ?string
+    {
+        return HtmlDecode($this->subcategory);
     }
 
     public function setSubcategory(?string $value): static

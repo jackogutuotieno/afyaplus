@@ -160,14 +160,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_vaccinations_report3_id" class="vaccinations_report3_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { // first_name ?>
-        <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_first_name" class="vaccinations_report3_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_patient_name" class="vaccinations_report3_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->last_name->Visible) { // last_name ?>
-        <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div id="elh_vaccinations_report3_last_name" class="vaccinations_report3_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_vaccinations_report3_date_of_birth" class="vaccinations_report3_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php if ($Page->patient_age->Visible) { // patient_age ?>
+        <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div id="elh_vaccinations_report3_patient_age" class="vaccinations_report3_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_vaccinations_report3_gender" class="vaccinations_report3_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
@@ -183,9 +180,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_vaccinations_report3_date_updated" class="vaccinations_report3_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->vaccination_month->Visible) { // vaccination_month ?>
-        <th data-name="vaccination_month" class="<?= $Page->vaccination_month->headerCellClass() ?>"><div id="elh_vaccinations_report3_vaccination_month" class="vaccinations_report3_vaccination_month"><?= $Page->renderFieldHeader($Page->vaccination_month) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -223,27 +217,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->first_name->Visible) { // first_name ?>
-        <td data-name="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_first_name" class="el_vaccinations_report3_first_name">
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
+    <?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_patient_name" class="el_vaccinations_report3_patient_name">
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->last_name->Visible) { // last_name ?>
-        <td data-name="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_last_name" class="el_vaccinations_report3_last_name">
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
-        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_date_of_birth" class="el_vaccinations_report3_date_of_birth">
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
+    <?php if ($Page->patient_age->Visible) { // patient_age ?>
+        <td data-name="patient_age"<?= $Page->patient_age->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_patient_age" class="el_vaccinations_report3_patient_age">
+<span<?= $Page->patient_age->viewAttributes() ?>>
+<?= $Page->patient_age->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -284,14 +270,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_date_updated" class="el_vaccinations_report3_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->vaccination_month->Visible) { // vaccination_month ?>
-        <td data-name="vaccination_month"<?= $Page->vaccination_month->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_vaccinations_report3_vaccination_month" class="el_vaccinations_report3_vaccination_month">
-<span<?= $Page->vaccination_month->viewAttributes() ?>>
-<?= $Page->vaccination_month->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

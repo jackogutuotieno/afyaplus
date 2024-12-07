@@ -455,15 +455,13 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // Set field visibility for detail fields
         $this->id->setVisibility();
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
-        $this->date_of_birth->setVisibility();
+        $this->patient_name->setVisibility();
+        $this->patient_age->setVisibility();
         $this->gender->setVisibility();
         $this->service_name->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->vaccination_month->setVisibility();
 
         // Set up groups per page dynamically
         $this->setupDisplayGroups();
@@ -612,9 +610,8 @@ class VaccinationsReportSummary extends VaccinationsReport
     {
         $data = [];
         $data["id"] = $record['id'];
-        $data["first_name"] = $record['first_name'];
-        $data["last_name"] = $record['last_name'];
-        $data["date_of_birth"] = $record['date_of_birth'];
+        $data["patient_name"] = $record['patient_name'];
+        $data["patient_age"] = $record['patient_age'];
         $data["gender"] = $record['gender'];
         $data["service_name"] = $record['service_name'];
         $data["status"] = $record['status'];
@@ -623,9 +620,8 @@ class VaccinationsReportSummary extends VaccinationsReport
         $data["vaccination_month"] = $record['vaccination_month'];
         $this->Rows[] = $data;
         $this->id->setDbValue($record['id']);
-        $this->first_name->setDbValue($record['first_name']);
-        $this->last_name->setDbValue($record['last_name']);
-        $this->date_of_birth->setDbValue($record['date_of_birth']);
+        $this->patient_name->setDbValue($record['patient_name']);
+        $this->patient_age->setDbValue($record['patient_age']);
         $this->gender->setDbValue($record['gender']);
         $this->service_name->setDbValue($record['service_name']);
         $this->status->setDbValue($record['status']);
@@ -670,11 +666,9 @@ class VaccinationsReportSummary extends VaccinationsReport
 
         // id
 
-        // first_name
+        // patient_name
 
-        // last_name
-
-        // date_of_birth
+        // patient_age
 
         // gender
 
@@ -685,8 +679,6 @@ class VaccinationsReportSummary extends VaccinationsReport
         // date_created
 
         // date_updated
-
-        // vaccination_month
         if ($this->RowType == RowType::SEARCH) {
             // gender
             if ($this->gender->UseFilter && !EmptyValue($this->gender->AdvancedSearch->SearchValue)) {
@@ -695,20 +687,25 @@ class VaccinationsReportSummary extends VaccinationsReport
                 }
                 $this->gender->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
             }
+
+            // service_name
+            if ($this->service_name->UseFilter && !EmptyValue($this->service_name->AdvancedSearch->SearchValue)) {
+                if (is_array($this->service_name->AdvancedSearch->SearchValue)) {
+                    $this->service_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->service_name->AdvancedSearch->SearchValue);
+                }
+                $this->service_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->service_name->AdvancedSearch->SearchValue);
+            }
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
 
             // id
             $this->id->HrefValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
 
             // gender
             $this->gender->HrefValue = "";
@@ -724,9 +721,6 @@ class VaccinationsReportSummary extends VaccinationsReport
 
             // date_updated
             $this->date_updated->HrefValue = "";
-
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
         } else {
             if ($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER) {
             } else {
@@ -741,18 +735,14 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
-            $this->first_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+            $this->patient_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
-            $this->last_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-            $this->date_of_birth->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
+            // patient_age
+            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
+            $this->patient_age->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -776,25 +766,17 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
             $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // vaccination_month
-            $this->vaccination_month->ViewValue = $this->vaccination_month->CurrentValue;
-            $this->vaccination_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
-
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+            $this->patient_age->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";
@@ -815,10 +797,6 @@ class VaccinationsReportSummary extends VaccinationsReport
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
-            $this->vaccination_month->TooltipValue = "";
         }
 
         // Call Cell_Rendered event
@@ -833,32 +811,23 @@ class VaccinationsReportSummary extends VaccinationsReport
             $linkAttrs = &$this->id->LinkAttrs;
             $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // first_name
-            $currentValue = $this->first_name->CurrentValue;
-            $viewValue = &$this->first_name->ViewValue;
-            $viewAttrs = &$this->first_name->ViewAttrs;
-            $cellAttrs = &$this->first_name->CellAttrs;
-            $hrefValue = &$this->first_name->HrefValue;
-            $linkAttrs = &$this->first_name->LinkAttrs;
-            $this->cellRendered($this->first_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // patient_name
+            $currentValue = $this->patient_name->CurrentValue;
+            $viewValue = &$this->patient_name->ViewValue;
+            $viewAttrs = &$this->patient_name->ViewAttrs;
+            $cellAttrs = &$this->patient_name->CellAttrs;
+            $hrefValue = &$this->patient_name->HrefValue;
+            $linkAttrs = &$this->patient_name->LinkAttrs;
+            $this->cellRendered($this->patient_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
-            // last_name
-            $currentValue = $this->last_name->CurrentValue;
-            $viewValue = &$this->last_name->ViewValue;
-            $viewAttrs = &$this->last_name->ViewAttrs;
-            $cellAttrs = &$this->last_name->CellAttrs;
-            $hrefValue = &$this->last_name->HrefValue;
-            $linkAttrs = &$this->last_name->LinkAttrs;
-            $this->cellRendered($this->last_name, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // date_of_birth
-            $currentValue = $this->date_of_birth->CurrentValue;
-            $viewValue = &$this->date_of_birth->ViewValue;
-            $viewAttrs = &$this->date_of_birth->ViewAttrs;
-            $cellAttrs = &$this->date_of_birth->CellAttrs;
-            $hrefValue = &$this->date_of_birth->HrefValue;
-            $linkAttrs = &$this->date_of_birth->LinkAttrs;
-            $this->cellRendered($this->date_of_birth, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
+            // patient_age
+            $currentValue = $this->patient_age->CurrentValue;
+            $viewValue = &$this->patient_age->ViewValue;
+            $viewAttrs = &$this->patient_age->ViewAttrs;
+            $cellAttrs = &$this->patient_age->CellAttrs;
+            $hrefValue = &$this->patient_age->HrefValue;
+            $linkAttrs = &$this->patient_age->LinkAttrs;
+            $this->cellRendered($this->patient_age, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
 
             // gender
             $currentValue = $this->gender->CurrentValue;
@@ -904,15 +873,6 @@ class VaccinationsReportSummary extends VaccinationsReport
             $hrefValue = &$this->date_updated->HrefValue;
             $linkAttrs = &$this->date_updated->LinkAttrs;
             $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // vaccination_month
-            $currentValue = $this->vaccination_month->CurrentValue;
-            $viewValue = &$this->vaccination_month->ViewValue;
-            $viewAttrs = &$this->vaccination_month->ViewAttrs;
-            $cellAttrs = &$this->vaccination_month->CellAttrs;
-            $hrefValue = &$this->vaccination_month->HrefValue;
-            $linkAttrs = &$this->vaccination_month->LinkAttrs;
-            $this->cellRendered($this->vaccination_month, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
         }
 
         // Call Row_Rendered event
@@ -956,13 +916,10 @@ class VaccinationsReportSummary extends VaccinationsReport
         if ($this->id->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->first_name->Visible) {
+        if ($this->patient_name->Visible) {
             $this->DetailColumnCount += 1;
         }
-        if ($this->last_name->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->date_of_birth->Visible) {
+        if ($this->patient_age->Visible) {
             $this->DetailColumnCount += 1;
         }
         if ($this->gender->Visible) {
@@ -978,9 +935,6 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->DetailColumnCount += 1;
         }
         if ($this->date_updated->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->vaccination_month->Visible) {
             $this->DetailColumnCount += 1;
         }
     }
@@ -1106,7 +1060,7 @@ class VaccinationsReportSummary extends VaccinationsReport
     // Check if any search fields
     public function hasSearchFields()
     {
-        return $this->gender->Visible;
+        return $this->gender->Visible || $this->service_name->Visible;
     }
 
     // Render search options
@@ -1286,30 +1240,26 @@ class VaccinationsReportSummary extends VaccinationsReport
             $this->setOrderBy("");
             $this->setStartGroup(1);
             $this->id->setSort("");
-            $this->first_name->setSort("");
-            $this->last_name->setSort("");
-            $this->date_of_birth->setSort("");
+            $this->patient_name->setSort("");
+            $this->patient_age->setSort("");
             $this->gender->setSort("");
             $this->service_name->setSort("");
             $this->status->setSort("");
             $this->date_created->setSort("");
             $this->date_updated->setSort("");
-            $this->vaccination_month->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
+            $this->updateSort($this->patient_name); // patient_name
+            $this->updateSort($this->patient_age); // patient_age
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->vaccination_month); // vaccination_month
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);
@@ -1330,12 +1280,16 @@ class VaccinationsReportSummary extends VaccinationsReport
         if (Get("cmd") == "reset") {
             // Set default values
             $this->gender->AdvancedSearch->unsetSession();
+            $this->service_name->AdvancedSearch->unsetSession();
             $restoreDefault = true;
         } else {
             $restoreSession = !$this->SearchCommand;
 
             // Field gender
             $this->getDropDownValue($this->gender);
+
+            // Field service_name
+            $this->getDropDownValue($this->service_name);
             if (!$this->validateForm()) {
                 return $filter;
             }
@@ -1346,6 +1300,10 @@ class VaccinationsReportSummary extends VaccinationsReport
             $restoreDefault = true;
             if ($this->gender->AdvancedSearch->issetSession()) { // Field gender
                 $this->gender->AdvancedSearch->load();
+                $restoreDefault = false;
+            }
+            if ($this->service_name->AdvancedSearch->issetSession()) { // Field service_name
+                $this->service_name->AdvancedSearch->load();
                 $restoreDefault = false;
             }
         }
@@ -1361,6 +1319,8 @@ class VaccinationsReportSummary extends VaccinationsReport
         // Build SQL and save to session
         $this->buildDropDownFilter($this->gender, $filter, false, true); // Field gender
         $this->gender->AdvancedSearch->save();
+        $this->buildDropDownFilter($this->service_name, $filter, false, true); // Field service_name
+        $this->service_name->AdvancedSearch->save();
         return $filter;
     }
 
@@ -1499,6 +1459,9 @@ class VaccinationsReportSummary extends VaccinationsReport
     {
         // Field gender
         $this->gender->AdvancedSearch->loadDefault();
+
+        // Field service_name
+        $this->service_name->AdvancedSearch->loadDefault();
     }
 
     // Show list of filters

@@ -50,6 +50,7 @@ class PatientsLabReport extends DbTable
     public $visit_id;
     public $patient_id;
     public $patient_name;
+    public $Group_Concat_service_name;
     public $date_of_birth;
     public $gender;
     public $patient_age;
@@ -96,7 +97,7 @@ class PatientsLabReport extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -120,14 +121,14 @@ class PatientsLabReport extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
-        $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
+        $this->id->Required = true; // Required field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
@@ -148,14 +149,14 @@ class PatientsLabReport extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
-        $this->visit_id->IsAutoIncrement = true; // Autoincrement field
         $this->visit_id->IsPrimaryKey = true; // Primary key field
         $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
+        $this->visit_id->Required = true; // Required field
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
@@ -209,6 +210,28 @@ class PatientsLabReport extends DbTable
         $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['patient_name'] = &$this->patient_name;
 
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name = new DbField(
+            $this, // Table
+            'x_Group_Concat_service_name', // Variable name
+            'Group_Concat_service_name', // Name
+            '`Group_Concat_service_name`', // Expression
+            '`Group_Concat_service_name`', // Basic search expression
+            200, // Type
+            4096, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`Group_Concat_service_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->Group_Concat_service_name->InputTextType = "text";
+        $this->Group_Concat_service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['Group_Concat_service_name'] = &$this->Group_Concat_service_name;
+
         // date_of_birth
         $this->date_of_birth = new DbField(
             $this, // Table
@@ -217,7 +240,7 @@ class PatientsLabReport extends DbTable
             '`date_of_birth`', // Expression
             CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
             133, // Type
-            40, // Size
+            10, // Size
             0, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
@@ -358,7 +381,7 @@ class PatientsLabReport extends DbTable
             '`date_created`', // Expression
             CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
@@ -384,7 +407,7 @@ class PatientsLabReport extends DbTable
             '`date_updated`', // Expression
             CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
-            76, // Size
+            19, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
@@ -579,10 +602,6 @@ class PatientsLabReport extends DbTable
         $detailUrl = "";
         if ($this->getCurrentDetailTable() == "urinalysis_results") {
             $detailUrl = Container("urinalysis_results")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "full_haemogram_parameters") {
-            $detailUrl = Container("full_haemogram_parameters")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
@@ -930,10 +949,6 @@ class PatientsLabReport extends DbTable
             $this->DbErrorMessage = $e->getMessage();
         }
         if ($result) {
-            $this->id->setDbValue($conn->lastInsertId());
-            $rs['id'] = $this->id->DbValue;
-            $this->visit_id->setDbValue($conn->lastInsertId());
-            $rs['visit_id'] = $this->visit_id->DbValue;
         }
         return $result;
     }
@@ -982,20 +997,6 @@ class PatientsLabReport extends DbTable
         } catch (\Exception $e) {
             $success = false;
             $this->DbErrorMessage = $e->getMessage();
-        }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['id']) && !EmptyValue($this->id->CurrentValue)) {
-                $rs['id'] = $this->id->CurrentValue;
-            }
-        }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['visit_id']) && !EmptyValue($this->visit_id->CurrentValue)) {
-                $rs['visit_id'] = $this->visit_id->CurrentValue;
-            }
         }
         return $success;
     }
@@ -1054,6 +1055,7 @@ class PatientsLabReport extends DbTable
         $this->visit_id->DbValue = $row['visit_id'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->patient_name->DbValue = $row['patient_name'];
+        $this->Group_Concat_service_name->DbValue = $row['Group_Concat_service_name'];
         $this->date_of_birth->DbValue = $row['date_of_birth'];
         $this->gender->DbValue = $row['gender'];
         $this->patient_age->DbValue = $row['patient_age'];
@@ -1483,6 +1485,7 @@ class PatientsLabReport extends DbTable
         $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
+        $this->Group_Concat_service_name->setDbValue($row['Group_Concat_service_name']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
@@ -1529,6 +1532,8 @@ class PatientsLabReport extends DbTable
 
         // patient_name
 
+        // Group_Concat_service_name
+
         // date_of_birth
 
         // gender
@@ -1557,6 +1562,9 @@ class PatientsLabReport extends DbTable
 
         // patient_name
         $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name->ViewValue = $this->Group_Concat_service_name->CurrentValue;
 
         // date_of_birth
         $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
@@ -1601,6 +1609,10 @@ class PatientsLabReport extends DbTable
         // patient_name
         $this->patient_name->HrefValue = "";
         $this->patient_name->TooltipValue = "";
+
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name->HrefValue = "";
+        $this->Group_Concat_service_name->TooltipValue = "";
 
         // date_of_birth
         $this->date_of_birth->HrefValue = "";
@@ -1652,10 +1664,12 @@ class PatientsLabReport extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
 
         // visit_id
         $this->visit_id->setupEditAttributes();
         $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
 
         // patient_id
         $this->patient_id->setupEditAttributes();
@@ -1678,6 +1692,14 @@ class PatientsLabReport extends DbTable
         }
         $this->patient_name->EditValue = $this->patient_name->CurrentValue;
         $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
+
+        // Group_Concat_service_name
+        $this->Group_Concat_service_name->setupEditAttributes();
+        if (!$this->Group_Concat_service_name->Raw) {
+            $this->Group_Concat_service_name->CurrentValue = HtmlDecode($this->Group_Concat_service_name->CurrentValue);
+        }
+        $this->Group_Concat_service_name->EditValue = $this->Group_Concat_service_name->CurrentValue;
+        $this->Group_Concat_service_name->PlaceHolder = RemoveHtml($this->Group_Concat_service_name->caption());
 
         // date_of_birth
         $this->date_of_birth->setupEditAttributes();
@@ -1764,6 +1786,7 @@ class PatientsLabReport extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->Group_Concat_service_name);
                     $doc->exportCaption($this->date_of_birth);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->patient_age);
@@ -1777,6 +1800,7 @@ class PatientsLabReport extends DbTable
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->Group_Concat_service_name);
                     $doc->exportCaption($this->date_of_birth);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->patient_age);
@@ -1813,6 +1837,7 @@ class PatientsLabReport extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_name);
+                        $doc->exportField($this->Group_Concat_service_name);
                         $doc->exportField($this->date_of_birth);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->patient_age);
@@ -1826,6 +1851,7 @@ class PatientsLabReport extends DbTable
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->patient_name);
+                        $doc->exportField($this->Group_Concat_service_name);
                         $doc->exportField($this->date_of_birth);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->patient_age);

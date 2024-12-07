@@ -24,6 +24,7 @@ C:\wamp64\www\afyaplus\controllers\FaciityOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FacilityOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FinancialsOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FrontOfficeOverviewController.php
+C:\wamp64\www\afyaplus\controllers\FullHaemoResultsController.php
 C:\wamp64\www\afyaplus\controllers\FullHaemogramParametersController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
@@ -199,6 +200,9 @@ C:\wamp64\www\afyaplus\models\FaciityOverview.php
 C:\wamp64\www\afyaplus\models\FacilityOverview.php
 C:\wamp64\www\afyaplus\models\FinancialsOverview.php
 C:\wamp64\www\afyaplus\models\FrontOfficeOverview.php
+C:\wamp64\www\afyaplus\models\FullHaemoResults.php
+C:\wamp64\www\afyaplus\models\FullHaemoResultsGrid.php
+C:\wamp64\www\afyaplus\models\FullHaemoResultsList.php
 C:\wamp64\www\afyaplus\models\FullHaemogramParameters.php
 C:\wamp64\www\afyaplus\models\FullHaemogramParametersAdd.php
 C:\wamp64\www\afyaplus\models\FullHaemogramParametersDelete.php
@@ -275,6 +279,7 @@ C:\wamp64\www\afyaplus\models\LaboratoryBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\models\LaboratoryBillingReportSearch.php
+C:\wamp64\www\afyaplus\models\LaboratoryBillingReportView.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\models\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\models\LaboratoryOverview.php
@@ -413,7 +418,9 @@ C:\wamp64\www\afyaplus\models\PharmacyBillingReport.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetails.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportList.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportView.php
 C:\wamp64\www\afyaplus\models\PharmacyOverview.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetails.php
 C:\wamp64\www\afyaplus\models\PrescriptionDetailsAdd.php
@@ -433,7 +440,9 @@ C:\wamp64\www\afyaplus\models\RadiologyBillingReport.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetails.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportList.php
+C:\wamp64\www\afyaplus\models\RadiologyBillingReportView.php
 C:\wamp64\www\afyaplus\models\RadiologyOverview.php
 C:\wamp64\www\afyaplus\models\RadiologyReport.php
 C:\wamp64\www\afyaplus\models\RadiologyReport2.php
@@ -606,6 +615,7 @@ C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
 C:\wamp64\www\afyaplus\src\Entity\Expense.php
 C:\wamp64\www\afyaplus\src\Entity\ExpensesReport.php
 C:\wamp64\www\afyaplus\src\Entity\Exportlog.php
+C:\wamp64\www\afyaplus\src\Entity\FullHaemoResult.php
 C:\wamp64\www\afyaplus\src\Entity\FullHaemogramParameter.php
 C:\wamp64\www\afyaplus\src\Entity\Income.php
 C:\wamp64\www\afyaplus\src\Entity\IncomeReport.php
@@ -828,6 +838,8 @@ C:\wamp64\www\afyaplus\views\FaciityOverview.php
 C:\wamp64\www\afyaplus\views\FacilityOverview.php
 C:\wamp64\www\afyaplus\views\FinancialsOverview.php
 C:\wamp64\www\afyaplus\views\FrontOfficeOverview.php
+C:\wamp64\www\afyaplus\views\FullHaemoResultsGrid.php
+C:\wamp64\www\afyaplus\views\FullHaemoResultsList.php
 C:\wamp64\www\afyaplus\views\FullHaemogramParametersAdd.php
 C:\wamp64\www\afyaplus\views\FullHaemogramParametersDelete.php
 C:\wamp64\www\afyaplus\views\FullHaemogramParametersEdit.php
@@ -895,6 +907,7 @@ C:\wamp64\www\afyaplus\views\LaboratoryBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\LaboratoryBillingReportSearch.php
+C:\wamp64\www\afyaplus\views\LaboratoryBillingReportView.php
 C:\wamp64\www\afyaplus\views\LaboratoryMinorReportList.php
 C:\wamp64\www\afyaplus\views\LaboratoryOverview.php
 C:\wamp64\www\afyaplus\views\LaboratoryReports2List.php
@@ -1005,8 +1018,10 @@ C:\wamp64\www\afyaplus\views\PaymentMethodsView.php
 C:\wamp64\www\afyaplus\views\PersonalData.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportList.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportMaster.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportView.php
 C:\wamp64\www\afyaplus\views\PharmacyOverview.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsAdd.php
 C:\wamp64\www\afyaplus\views\PrescriptionDetailsDelete.php
@@ -1023,8 +1038,10 @@ C:\wamp64\www\afyaplus\views\PrescriptionsMaster.php
 C:\wamp64\www\afyaplus\views\PrescriptionsView.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportList.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportMaster.php
+C:\wamp64\www\afyaplus\views\RadiologyBillingReportView.php
 C:\wamp64\www\afyaplus\views\RadiologyOverview.php
 C:\wamp64\www\afyaplus\views\RadiologyReport2List.php
 C:\wamp64\www\afyaplus\views\RadiologyReportSummary.php

@@ -153,7 +153,7 @@ $Page->showMessage();
 <div class="chart-content container">
     <div class="row">
         <div class="card-group">
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Vaccinations Graph</h4>
@@ -163,7 +163,7 @@ $Page->showMessage();
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Visits Graph</h4>

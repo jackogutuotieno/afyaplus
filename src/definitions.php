@@ -185,6 +185,7 @@ return [
     "laboratory_reports2" => \DI\create(LaboratoryReports2::class),
     "Laboratory_Reports" => \DI\create(LaboratoryReports::class),
     "laboratory_reports" => \DI\create(LaboratoryReports::class),
+    "full_haemo_results" => \DI\create(FullHaemoResults::class),
 
     // User table
     "usertable" => \DI\get("users"),

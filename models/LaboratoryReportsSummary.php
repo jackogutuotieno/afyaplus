@@ -462,7 +462,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         $this->disease_name->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->report_month->setVisibility();
 
         // Set up groups per page dynamically
         $this->setupDisplayGroups();
@@ -668,8 +667,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         // date_created
 
         // date_updated
-
-        // report_month
         if ($this->RowType == RowType::SEARCH) { // Search row
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
@@ -697,9 +694,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
 
             // date_updated
             $this->date_updated->HrefValue = "";
-
-            // report_month
-            $this->report_month->HrefValue = "";
         } else {
             if ($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER) {
             } else {
@@ -746,10 +740,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
             $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // report_month
-            $this->report_month->ViewValue = $this->report_month->CurrentValue;
-            $this->report_month->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -781,10 +771,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // report_month
-            $this->report_month->HrefValue = "";
-            $this->report_month->TooltipValue = "";
         }
 
         // Call Cell_Rendered event
@@ -861,15 +847,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $hrefValue = &$this->date_updated->HrefValue;
             $linkAttrs = &$this->date_updated->LinkAttrs;
             $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // report_month
-            $currentValue = $this->report_month->CurrentValue;
-            $viewValue = &$this->report_month->ViewValue;
-            $viewAttrs = &$this->report_month->ViewAttrs;
-            $cellAttrs = &$this->report_month->CellAttrs;
-            $hrefValue = &$this->report_month->HrefValue;
-            $linkAttrs = &$this->report_month->LinkAttrs;
-            $this->cellRendered($this->report_month, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
         }
 
         // Call Row_Rendered event
@@ -932,9 +909,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->DetailColumnCount += 1;
         }
         if ($this->date_updated->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->report_month->Visible) {
             $this->DetailColumnCount += 1;
         }
     }
@@ -1238,7 +1212,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->disease_name->setSort("");
             $this->date_created->setSort("");
             $this->date_updated->setSort("");
-            $this->report_month->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
@@ -1252,7 +1225,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->updateSort($this->disease_name); // disease_name
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->report_month); // report_month
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);

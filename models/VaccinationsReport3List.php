@@ -146,15 +146,14 @@ class VaccinationsReport3List extends VaccinationsReport3
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->first_name->setVisibility();
-        $this->last_name->setVisibility();
-        $this->date_of_birth->setVisibility();
+        $this->patient_name->setVisibility();
+        $this->patient_age->setVisibility();
         $this->gender->setVisibility();
         $this->service_name->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->vaccination_month->setVisibility();
+        $this->vaccination_month->Visible = false;
     }
 
     // Constructor
@@ -1052,9 +1051,8 @@ class VaccinationsReport3List extends VaccinationsReport3
             $savedFilterList = Profile()->getSearchFilters("fvaccinations_report3srch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
-        $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
-        $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
+        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
+        $filterList = Concat($filterList, $this->patient_age->AdvancedSearch->toJson(), ","); // Field patient_age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->service_name->AdvancedSearch->toJson(), ","); // Field service_name
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
@@ -1108,29 +1106,21 @@ class VaccinationsReport3List extends VaccinationsReport3
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field first_name
-        $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator = @$filter["z_first_name"];
-        $this->first_name->AdvancedSearch->SearchCondition = @$filter["v_first_name"];
-        $this->first_name->AdvancedSearch->SearchValue2 = @$filter["y_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator2 = @$filter["w_first_name"];
-        $this->first_name->AdvancedSearch->save();
+        // Field patient_name
+        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
+        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
+        $this->patient_name->AdvancedSearch->save();
 
-        // Field last_name
-        $this->last_name->AdvancedSearch->SearchValue = @$filter["x_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator = @$filter["z_last_name"];
-        $this->last_name->AdvancedSearch->SearchCondition = @$filter["v_last_name"];
-        $this->last_name->AdvancedSearch->SearchValue2 = @$filter["y_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator2 = @$filter["w_last_name"];
-        $this->last_name->AdvancedSearch->save();
-
-        // Field date_of_birth
-        $this->date_of_birth->AdvancedSearch->SearchValue = @$filter["x_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator = @$filter["z_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchCondition = @$filter["v_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
-        $this->date_of_birth->AdvancedSearch->save();
+        // Field patient_age
+        $this->patient_age->AdvancedSearch->SearchValue = @$filter["x_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchOperator = @$filter["z_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchCondition = @$filter["v_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchValue2 = @$filter["y_patient_age"];
+        $this->patient_age->AdvancedSearch->SearchOperator2 = @$filter["w_patient_age"];
+        $this->patient_age->AdvancedSearch->save();
 
         // Field gender
         $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
@@ -1218,8 +1208,7 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->first_name;
-        $searchFlds[] = &$this->last_name;
+        $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->service_name;
         $searchFlds[] = &$this->status;
@@ -1303,15 +1292,13 @@ class VaccinationsReport3List extends VaccinationsReport3
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->first_name); // first_name
-            $this->updateSort($this->last_name); // last_name
-            $this->updateSort($this->date_of_birth); // date_of_birth
+            $this->updateSort($this->patient_name); // patient_name
+            $this->updateSort($this->patient_age); // patient_age
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->vaccination_month); // vaccination_month
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1337,9 +1324,8 @@ class VaccinationsReport3List extends VaccinationsReport3
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->first_name->setSort("");
-                $this->last_name->setSort("");
-                $this->date_of_birth->setSort("");
+                $this->patient_name->setSort("");
+                $this->patient_age->setSort("");
                 $this->gender->setSort("");
                 $this->service_name->setSort("");
                 $this->status->setSort("");
@@ -1492,15 +1478,13 @@ class VaccinationsReport3List extends VaccinationsReport3
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "first_name");
-            $this->createColumnOption($option, "last_name");
-            $this->createColumnOption($option, "date_of_birth");
+            $this->createColumnOption($option, "patient_name");
+            $this->createColumnOption($option, "patient_age");
             $this->createColumnOption($option, "gender");
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
-            $this->createColumnOption($option, "vaccination_month");
         }
 
         // Set up custom actions
@@ -1940,9 +1924,8 @@ class VaccinationsReport3List extends VaccinationsReport3
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->patient_age->setDbValue($row['patient_age']);
         $this->gender->setDbValue($row['gender']);
         $this->service_name->setDbValue($row['service_name']);
         $this->status->setDbValue($row['status']);
@@ -1956,9 +1939,8 @@ class VaccinationsReport3List extends VaccinationsReport3
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
-        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['patient_age'] = $this->patient_age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
@@ -2007,11 +1989,9 @@ class VaccinationsReport3List extends VaccinationsReport3
 
         // id
 
-        // first_name
+        // patient_name
 
-        // last_name
-
-        // date_of_birth
+        // patient_age
 
         // gender
 
@@ -2030,15 +2010,12 @@ class VaccinationsReport3List extends VaccinationsReport3
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // first_name
-            $this->first_name->ViewValue = $this->first_name->CurrentValue;
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
-            // last_name
-            $this->last_name->ViewValue = $this->last_name->CurrentValue;
-
-            // date_of_birth
-            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+            // patient_age
+            $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+            $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -2064,17 +2041,13 @@ class VaccinationsReport3List extends VaccinationsReport3
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // first_name
-            $this->first_name->HrefValue = "";
-            $this->first_name->TooltipValue = "";
+            // patient_name
+            $this->patient_name->HrefValue = "";
+            $this->patient_name->TooltipValue = "";
 
-            // last_name
-            $this->last_name->HrefValue = "";
-            $this->last_name->TooltipValue = "";
-
-            // date_of_birth
-            $this->date_of_birth->HrefValue = "";
-            $this->date_of_birth->TooltipValue = "";
+            // patient_age
+            $this->patient_age->HrefValue = "";
+            $this->patient_age->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";
@@ -2095,10 +2068,6 @@ class VaccinationsReport3List extends VaccinationsReport3
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // vaccination_month
-            $this->vaccination_month->HrefValue = "";
-            $this->vaccination_month->TooltipValue = "";
         }
 
         // Call Row Rendered event

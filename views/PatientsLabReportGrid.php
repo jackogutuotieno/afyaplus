@@ -23,8 +23,9 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null, ew.Validators.integer], fields.id.isInvalid],
             ["patient_name", [fields.patient_name.visible && fields.patient_name.required ? ew.Validators.required(fields.patient_name.caption) : null], fields.patient_name.isInvalid],
+            ["Group_Concat_service_name", [fields.Group_Concat_service_name.visible && fields.Group_Concat_service_name.required ? ew.Validators.required(fields.Group_Concat_service_name.caption) : null], fields.Group_Concat_service_name.isInvalid],
             ["patient_age", [fields.patient_age.visible && fields.patient_age.required ? ew.Validators.required(fields.patient_age.caption) : null, ew.Validators.integer], fields.patient_age.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
@@ -37,7 +38,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_name",false],["patient_age",false],["details",false],["status",false],["laboratorist",false],["date_created",false],["date_updated",false]];
+                    fields = [["id",false],["patient_name",false],["Group_Concat_service_name",false],["patient_age",false],["details",false],["status",false],["laboratorist",false],["date_created",false],["date_updated",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -97,6 +98,9 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Grid->patient_name->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_name" class="patients_lab_report_patient_name"><?= $Grid->renderFieldHeader($Grid->patient_name) ?></div></th>
 <?php } ?>
+<?php if ($Grid->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+        <th data-name="Group_Concat_service_name" class="<?= $Grid->Group_Concat_service_name->headerCellClass() ?>"><div id="elh_patients_lab_report_Group_Concat_service_name" class="patients_lab_report_Group_Concat_service_name"><?= $Grid->renderFieldHeader($Grid->Group_Concat_service_name) ?></div></th>
+<?php } ?>
 <?php if ($Grid->patient_age->Visible) { // patient_age ?>
         <th data-name="patient_age" class="<?= $Grid->patient_age->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_age" class="patients_lab_report_patient_age"><?= $Grid->renderFieldHeader($Grid->patient_age) ?></div></th>
 <?php } ?>
@@ -154,14 +158,17 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
     <?php if ($Grid->id->Visible) { // id ?>
         <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_id" class="el_patients_lab_report_id"></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_id" class="el_patients_lab_report_id">
+<input type="<?= $Grid->id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" data-table="patients_lab_report" data-field="x_id" value="<?= $Grid->id->EditValue ?>" placeholder="<?= HtmlEncode($Grid->id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->id->formatPattern()) ?>"<?= $Grid->id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->id->getErrorMessage() ?></div>
+</span>
 <input type="hidden" data-table="patients_lab_report" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_id" class="el_patients_lab_report_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="patients_lab_report" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
+<input type="<?= $Grid->id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" data-table="patients_lab_report" data-field="x_id" value="<?= $Grid->id->EditValue ?>" placeholder="<?= HtmlEncode($Grid->id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->id->formatPattern()) ?>"<?= $Grid->id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->id->getErrorMessage() ?></div>
+<input type="hidden" data-table="patients_lab_report" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue ?? $Grid->id->CurrentValue) ?>">
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -201,6 +208,33 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patients_lab_report" data-field="x_patient_name" data-hidden="1" name="fpatients_lab_reportgrid$x<?= $Grid->RowIndex ?>_patient_name" id="fpatients_lab_reportgrid$x<?= $Grid->RowIndex ?>_patient_name" value="<?= HtmlEncode($Grid->patient_name->FormValue) ?>">
 <input type="hidden" data-table="patients_lab_report" data-field="x_patient_name" data-hidden="1" data-old name="fpatients_lab_reportgrid$o<?= $Grid->RowIndex ?>_patient_name" id="fpatients_lab_reportgrid$o<?= $Grid->RowIndex ?>_patient_name" value="<?= HtmlEncode($Grid->patient_name->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+        <td data-name="Group_Concat_service_name"<?= $Grid->Group_Concat_service_name->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_Group_Concat_service_name" class="el_patients_lab_report_Group_Concat_service_name">
+<input type="<?= $Grid->Group_Concat_service_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_Group_Concat_service_name" id="x<?= $Grid->RowIndex ?>_Group_Concat_service_name" data-table="patients_lab_report" data-field="x_Group_Concat_service_name" value="<?= $Grid->Group_Concat_service_name->EditValue ?>" size="30" maxlength="4096" placeholder="<?= HtmlEncode($Grid->Group_Concat_service_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->Group_Concat_service_name->formatPattern()) ?>"<?= $Grid->Group_Concat_service_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->Group_Concat_service_name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="patients_lab_report" data-field="x_Group_Concat_service_name" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_Group_Concat_service_name" id="o<?= $Grid->RowIndex ?>_Group_Concat_service_name" value="<?= HtmlEncode($Grid->Group_Concat_service_name->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_Group_Concat_service_name" class="el_patients_lab_report_Group_Concat_service_name">
+<input type="<?= $Grid->Group_Concat_service_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_Group_Concat_service_name" id="x<?= $Grid->RowIndex ?>_Group_Concat_service_name" data-table="patients_lab_report" data-field="x_Group_Concat_service_name" value="<?= $Grid->Group_Concat_service_name->EditValue ?>" size="30" maxlength="4096" placeholder="<?= HtmlEncode($Grid->Group_Concat_service_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->Group_Concat_service_name->formatPattern()) ?>"<?= $Grid->Group_Concat_service_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->Group_Concat_service_name->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_lab_report_Group_Concat_service_name" class="el_patients_lab_report_Group_Concat_service_name">
+<span<?= $Grid->Group_Concat_service_name->viewAttributes() ?>>
+<?= $Grid->Group_Concat_service_name->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patients_lab_report" data-field="x_Group_Concat_service_name" data-hidden="1" name="fpatients_lab_reportgrid$x<?= $Grid->RowIndex ?>_Group_Concat_service_name" id="fpatients_lab_reportgrid$x<?= $Grid->RowIndex ?>_Group_Concat_service_name" value="<?= HtmlEncode($Grid->Group_Concat_service_name->FormValue) ?>">
+<input type="hidden" data-table="patients_lab_report" data-field="x_Group_Concat_service_name" data-hidden="1" data-old name="fpatients_lab_reportgrid$o<?= $Grid->RowIndex ?>_Group_Concat_service_name" id="fpatients_lab_reportgrid$o<?= $Grid->RowIndex ?>_Group_Concat_service_name" value="<?= HtmlEncode($Grid->Group_Concat_service_name->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

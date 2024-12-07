@@ -716,31 +716,12 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "patients_lab_report") {
-                $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "patients_lab_report"); // Add master User ID filter
-            }
             if ($this->getCurrentMasterTable() == "lab_test_reports") {
                 $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "lab_test_reports"); // Add master User ID filter
             }
         }
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_lab_report") {
-            $masterTbl = Container("patients_lab_report");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientslabreportlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "lab_test_reports") {
@@ -1371,7 +1352,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->lab_test_report_id->setSessionValue("");
                         $this->lab_test_report_id->setSessionValue("");
             }
 
@@ -2569,10 +2549,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "patients_lab_report") {
-            $this->lab_test_report_id->Visible = true; // Need to insert foreign key
-            $this->lab_test_report_id->CurrentValue = $this->lab_test_report_id->getSessionValue();
-        }
         if ($this->getCurrentMasterTable() == "lab_test_reports") {
             $this->lab_test_report_id->Visible = true; // Need to insert foreign key
             $this->lab_test_report_id->CurrentValue = $this->lab_test_report_id->getSessionValue();
@@ -2697,13 +2673,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "patients_lab_report") {
-            $masterTbl = Container("patients_lab_report");
-            $this->lab_test_report_id->Visible = false;
-            if ($masterTbl->EventCancelled) {
-                $this->EventCancelled = true;
-            }
-        }
         if ($masterTblVar == "lab_test_reports") {
             $masterTbl = Container("lab_test_reports");
             $this->lab_test_report_id->Visible = false;

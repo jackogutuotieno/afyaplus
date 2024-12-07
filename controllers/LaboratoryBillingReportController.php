@@ -22,6 +22,13 @@ class LaboratoryBillingReportController extends ControllerBase
         return $this->runPage($request, $response, $args, "LaboratoryBillingReportList");
     }
 
+    // view
+    #[Map(["GET","POST","OPTIONS"], "/laboratorybillingreportview[/{id}]", [PermissionMiddleware::class], "view.laboratory_billing_report")]
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "LaboratoryBillingReportView");
+    }
+
     // search
     #[Map(["GET","POST","OPTIONS"], "/laboratorybillingreportsearch", [PermissionMiddleware::class], "search.laboratory_billing_report")]
     public function search(Request $request, Response $response, array $args): Response

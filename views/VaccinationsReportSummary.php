@@ -91,6 +91,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "gender": <?= $Page->gender->toClientList($Page) ?>,
+            "service_name": <?= $Page->service_name->toClientList($Page) ?>,
         })
 
         // Filters
@@ -149,6 +150,44 @@ if (!$Page->gender->UseFilter) {
         </script>
     </div><!-- /.col-sm-auto -->
 <?php } ?>
+<?php if ($Page->service_name->Visible) { // service_name ?>
+<?php
+if (!$Page->service_name->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_service_name" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->service_name->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_service_name"
+            name="x_service_name[]"
+            class="form-control ew-select<?= $Page->service_name->isInvalidClass() ?>"
+            data-select2-id="fVaccinations_Reportsrch_x_service_name"
+            data-table="Vaccinations_Report"
+            data-field="x_service_name"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->service_name->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->service_name->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->service_name->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->service_name->editAttributes() ?>>
+            <?= $Page->service_name->selectOptionListHtml("x_service_name", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->service_name->getErrorMessage() ?></div>
+        <script>
+        loadjs.ready("fVaccinations_Reportsrch", function() {
+            var options = {
+                name: "x_service_name",
+                selectId: "fVaccinations_Reportsrch_x_service_name",
+                ajax: { id: "x_service_name", form: "fVaccinations_Reportsrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.Vaccinations_Report.fields.service_name.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
 <?php if ($Page->SearchColumnCount > 0) { ?>
    <div class="col-sm-auto mb-3">
        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
@@ -199,14 +238,11 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php if ($Page->id->Visible) { ?>
     <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div class="Vaccinations_Report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { ?>
-    <th data-name="first_name" class="<?= $Page->first_name->headerCellClass() ?>"><div class="Vaccinations_Report_first_name"><?= $Page->renderFieldHeader($Page->first_name) ?></div></th>
+<?php if ($Page->patient_name->Visible) { ?>
+    <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div class="Vaccinations_Report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->last_name->Visible) { ?>
-    <th data-name="last_name" class="<?= $Page->last_name->headerCellClass() ?>"><div class="Vaccinations_Report_last_name"><?= $Page->renderFieldHeader($Page->last_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { ?>
-    <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div class="Vaccinations_Report_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php if ($Page->patient_age->Visible) { ?>
+    <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div class="Vaccinations_Report_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { ?>
     <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div class="Vaccinations_Report_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
@@ -222,9 +258,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { ?>
     <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div class="Vaccinations_Report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
-<?php if ($Page->vaccination_month->Visible) { ?>
-    <th data-name="vaccination_month" class="<?= $Page->vaccination_month->headerCellClass() ?>"><div class="Vaccinations_Report_vaccination_month"><?= $Page->renderFieldHeader($Page->vaccination_month) ?></div></th>
 <?php } ?>
     </tr>
 </thead>
@@ -254,22 +287,16 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?= $Page->id->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->first_name->Visible) { ?>
-        <td data-field="first_name"<?= $Page->first_name->cellAttributes() ?>>
-<span<?= $Page->first_name->viewAttributes() ?>>
-<?= $Page->first_name->getViewValue() ?></span>
+<?php if ($Page->patient_name->Visible) { ?>
+        <td data-field="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </td>
 <?php } ?>
-<?php if ($Page->last_name->Visible) { ?>
-        <td data-field="last_name"<?= $Page->last_name->cellAttributes() ?>>
-<span<?= $Page->last_name->viewAttributes() ?>>
-<?= $Page->last_name->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->date_of_birth->Visible) { ?>
-        <td data-field="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
-<span<?= $Page->date_of_birth->viewAttributes() ?>>
-<?= $Page->date_of_birth->getViewValue() ?></span>
+<?php if ($Page->patient_age->Visible) { ?>
+        <td data-field="patient_age"<?= $Page->patient_age->cellAttributes() ?>>
+<span<?= $Page->patient_age->viewAttributes() ?>>
+<?= $Page->patient_age->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php if ($Page->gender->Visible) { ?>
@@ -300,12 +327,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         <td data-field="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->vaccination_month->Visible) { ?>
-        <td data-field="vaccination_month"<?= $Page->vaccination_month->cellAttributes() ?>>
-<span<?= $Page->vaccination_month->viewAttributes() ?>>
-<?= $Page->vaccination_month->getViewValue() ?></span>
 </td>
 <?php } ?>
     </tr>

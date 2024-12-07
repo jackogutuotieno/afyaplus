@@ -1517,6 +1517,19 @@ class CashPaymentsGrid extends CashPayments
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+
+        // Add
+        if ($this->CurrentMode == "view") { // Check view mode
+            $item = &$option->add("add");
+            $addcaption = HtmlTitle($Language->phrase("AddLink"));
+            $this->AddUrl = $this->getAddUrl();
+            if ($this->ModalAdd && !IsMobile()) {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"cash_payments\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            } else {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            }
+            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        }
     }
 
     // Active user filter
@@ -1554,7 +1567,7 @@ class CashPaymentsGrid extends CashPayments
                     $option->UseDropDownButton = false;
                     $item = &$option->add("addblankrow");
                     $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = false;
+                    $item->Visible = $Security->canAdd();
                     $this->ShowOtherOptions = $item->Visible;
                 }
             }

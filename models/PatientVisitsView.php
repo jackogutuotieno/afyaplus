@@ -1153,6 +1153,147 @@ class PatientVisitsView extends PatientVisits
             $item->Visible = false;
         }
 
+        // "detail_laboratory_billing_report"
+        $item = &$option->add("detail_laboratory_billing_report");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("laboratory_billing_report", "TblCaption");
+        $detailTbl = Container("laboratory_billing_report");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("laboratory_billing_report")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("laboratorybillingreportlist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("LaboratoryBillingReportGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=laboratory_billing_report"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "laboratory_billing_report";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=laboratory_billing_report"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "laboratory_billing_report";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'laboratory_billing_report');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "laboratory_billing_report";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_radiology_billing_report"
+        $item = &$option->add("detail_radiology_billing_report");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("radiology_billing_report", "TblCaption");
+        $detailTbl = Container("radiology_billing_report");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("radiology_billing_report")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("radiologybillingreportlist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("RadiologyBillingReportGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=radiology_billing_report"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "radiology_billing_report";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=radiology_billing_report"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "radiology_billing_report";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'radiology_billing_report');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "radiology_billing_report";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_pharmacy_billing_report"
+        $item = &$option->add("detail_pharmacy_billing_report");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("pharmacy_billing_report", "TblCaption");
+        $detailTbl = Container("pharmacy_billing_report");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("pharmacy_billing_report")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("pharmacybillingreportlist?" . Config("TABLE_SHOW_MASTER") . "=patient_visits&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("PharmacyBillingReportGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=pharmacy_billing_report"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "pharmacy_billing_report";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_visits')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=pharmacy_billing_report"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "pharmacy_billing_report";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'pharmacy_billing_report');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "pharmacy_billing_report";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
         // "detail_patients_lab_report"
         $item = &$option->add("detail_patients_lab_report");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patients_lab_report", "TblCaption");
@@ -1868,6 +2009,63 @@ class PatientVisitsView extends PatientVisits
             }
         }
 
+        // Export detail records (laboratory_billing_report)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("laboratory_billing_report", explode(",", $this->getCurrentDetailTable()))) {
+            $laboratory_billing_report = new LaboratoryBillingReportList();
+            $rsdetail = $laboratory_billing_report->loadRs($laboratory_billing_report->getDetailFilterFromSession(), $laboratory_billing_report->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($laboratory_billing_report);
+                    $laboratory_billing_report->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (radiology_billing_report)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("radiology_billing_report", explode(",", $this->getCurrentDetailTable()))) {
+            $radiology_billing_report = new RadiologyBillingReportList();
+            $rsdetail = $radiology_billing_report->loadRs($radiology_billing_report->getDetailFilterFromSession(), $radiology_billing_report->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($radiology_billing_report);
+                    $radiology_billing_report->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (pharmacy_billing_report)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("pharmacy_billing_report", explode(",", $this->getCurrentDetailTable()))) {
+            $pharmacy_billing_report = new PharmacyBillingReportList();
+            $rsdetail = $pharmacy_billing_report->loadRs($pharmacy_billing_report->getDetailFilterFromSession(), $pharmacy_billing_report->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($pharmacy_billing_report);
+                    $pharmacy_billing_report->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Export detail records (patients_lab_report)
         if (Config("EXPORT_DETAIL_RECORDS") && in_array("patients_lab_report", explode(",", $this->getCurrentDetailTable()))) {
             $patients_lab_report = new PatientsLabReportList();
@@ -2133,6 +2331,54 @@ class PatientVisitsView extends PatientVisits
                     $detailPageObj->visit_id->IsDetailKey = true;
                     $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("laboratory_billing_report", $detailTblVar)) {
+                $detailPageObj = Container("LaboratoryBillingReportGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("radiology_billing_report", $detailTblVar)) {
+                $detailPageObj = Container("RadiologyBillingReportGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->visit_id->IsDetailKey = true;
+                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("pharmacy_billing_report", $detailTblVar)) {
+                $detailPageObj = Container("PharmacyBillingReportGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
                     $detailPageObj->patient_id->IsDetailKey = true;
                     $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);

@@ -192,21 +192,46 @@ loadjs.ready("head", function () {
     </div> <!-- ./col -->
 </div> <!-- ./row --></div>
 </template>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<?php
+    $Page->DetailPages->ValidKeys = explode(",", $Page->getCurrentDetailTable());
+?>
+<div class="ew-detail-pages"><!-- detail-pages -->
+<div class="ew-nav<?= $Page->DetailPages->containerClasses() ?>" id="details_Page"><!-- tabs -->
+    <ul class="<?= $Page->DetailPages->navClasses() ?>" role="tablist"><!-- .nav -->
 <?php
     if (in_array("urinalysis_results", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_results->DetailView) {
 ?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("urinalysis_results", "TblCaption") ?></h4>
-<?php } ?>
+        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("urinalysis_results") ?><?= $Page->DetailPages->activeClasses("urinalysis_results") ?>" data-bs-target="#tab_urinalysis_results" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_urinalysis_results" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("urinalysis_results")) ?>"><?= $Language->tablePhrase("urinalysis_results", "TblCaption") ?></button></li>
+<?php
+    }
+?>
+<?php
+    if (in_array("full_haemogram_parameters", explode(",", $Page->getCurrentDetailTable())) && $full_haemogram_parameters->DetailView) {
+?>
+        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("full_haemogram_parameters") ?><?= $Page->DetailPages->activeClasses("full_haemogram_parameters") ?>" data-bs-target="#tab_full_haemogram_parameters" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_full_haemogram_parameters" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("full_haemogram_parameters")) ?>"><?= $Language->tablePhrase("full_haemogram_parameters", "TblCaption") ?></button></li>
+<?php
+    }
+?>
+    </ul><!-- /.nav -->
+    <div class="<?= $Page->DetailPages->tabContentClasses() ?>"><!-- .tab-content -->
+<?php
+    if (in_array("urinalysis_results", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_results->DetailView) {
+?>
+        <div class="<?= $Page->DetailPages->tabPaneClasses("urinalysis_results") ?><?= $Page->DetailPages->activeClasses("urinalysis_results") ?>" id="tab_urinalysis_results" role="tabpanel"><!-- page* -->
 <?php include_once "UrinalysisResultsGrid.php" ?>
+        </div><!-- /page* -->
 <?php } ?>
 <?php
     if (in_array("full_haemogram_parameters", explode(",", $Page->getCurrentDetailTable())) && $full_haemogram_parameters->DetailView) {
 ?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("full_haemogram_parameters", "TblCaption") ?></h4>
-<?php } ?>
+        <div class="<?= $Page->DetailPages->tabPaneClasses("full_haemogram_parameters") ?><?= $Page->DetailPages->activeClasses("full_haemogram_parameters") ?>" id="tab_full_haemogram_parameters" role="tabpanel"><!-- page* -->
 <?php include_once "FullHaemogramParametersGrid.php" ?>
+        </div><!-- /page* -->
+<?php } ?>
+    </div><!-- /.tab-content -->
+</div><!-- /tabs -->
+</div><!-- /detail-pages -->
 <?php } ?>
 </form>
 <script class="ew-apply-template">

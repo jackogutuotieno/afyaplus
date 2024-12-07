@@ -74,10 +74,6 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "patients_lab_report") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patients_lab_report">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "lab_test_reports") { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">

@@ -47,9 +47,8 @@ class VaccinationsReport3 extends DbTable
 
     // Fields
     public $id;
-    public $first_name;
-    public $last_name;
-    public $date_of_birth;
+    public $patient_name;
+    public $patient_age;
     public $gender;
     public $service_name;
     public $status;
@@ -129,79 +128,51 @@ class VaccinationsReport3 extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // first_name
-        $this->first_name = new DbField(
+        // patient_name
+        $this->patient_name = new DbField(
             $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
+            'x_patient_name', // Variable name
+            'patient_name', // Name
+            '`patient_name`', // Expression
+            '`patient_name`', // Basic search expression
             200, // Type
-            50, // Size
+            101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`first_name`', // Virtual expression
+            '`patient_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['first_name'] = &$this->first_name;
+        $this->patient_name->InputTextType = "text";
+        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_name'] = &$this->patient_name;
 
-        // last_name
-        $this->last_name = new DbField(
+        // patient_age
+        $this->patient_age = new DbField(
             $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
-            200, // Type
-            50, // Size
+            'x_patient_age', // Variable name
+            'patient_age', // Name
+            '`patient_age`', // Expression
+            '`patient_age`', // Basic search expression
+            20, // Type
+            21, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`last_name`', // Virtual expression
+            '`patient_age`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['last_name'] = &$this->last_name;
-
-        // date_of_birth
-        $this->date_of_birth = new DbField(
-            $this, // Table
-            'x_date_of_birth', // Variable name
-            'date_of_birth', // Name
-            '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_of_birth`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_of_birth->InputTextType = "text";
-        $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_of_birth'] = &$this->date_of_birth;
+        $this->patient_age->InputTextType = "text";
+        $this->patient_age->Raw = true;
+        $this->patient_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->patient_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_age'] = &$this->patient_age;
 
         // gender
         $this->gender = new DbField(
@@ -868,9 +839,8 @@ class VaccinationsReport3 extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->first_name->DbValue = $row['first_name'];
-        $this->last_name->DbValue = $row['last_name'];
-        $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->patient_name->DbValue = $row['patient_name'];
+        $this->patient_age->DbValue = $row['patient_age'];
         $this->gender->DbValue = $row['gender'];
         $this->service_name->DbValue = $row['service_name'];
         $this->status->DbValue = $row['status'];
@@ -1230,9 +1200,8 @@ class VaccinationsReport3 extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
-        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->patient_age->setDbValue($row['patient_age']);
         $this->gender->setDbValue($row['gender']);
         $this->service_name->setDbValue($row['service_name']);
         $this->status->setDbValue($row['status']);
@@ -1271,11 +1240,9 @@ class VaccinationsReport3 extends DbTable
 
         // id
 
-        // first_name
+        // patient_name
 
-        // last_name
-
-        // date_of_birth
+        // patient_age
 
         // gender
 
@@ -1292,15 +1259,12 @@ class VaccinationsReport3 extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // first_name
-        $this->first_name->ViewValue = $this->first_name->CurrentValue;
+        // patient_name
+        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
-        // last_name
-        $this->last_name->ViewValue = $this->last_name->CurrentValue;
-
-        // date_of_birth
-        $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
-        $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+        // patient_age
+        $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
+        $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -1326,17 +1290,13 @@ class VaccinationsReport3 extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // first_name
-        $this->first_name->HrefValue = "";
-        $this->first_name->TooltipValue = "";
+        // patient_name
+        $this->patient_name->HrefValue = "";
+        $this->patient_name->TooltipValue = "";
 
-        // last_name
-        $this->last_name->HrefValue = "";
-        $this->last_name->TooltipValue = "";
-
-        // date_of_birth
-        $this->date_of_birth->HrefValue = "";
-        $this->date_of_birth->TooltipValue = "";
+        // patient_age
+        $this->patient_age->HrefValue = "";
+        $this->patient_age->TooltipValue = "";
 
         // gender
         $this->gender->HrefValue = "";
@@ -1381,26 +1341,21 @@ class VaccinationsReport3 extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // first_name
-        $this->first_name->setupEditAttributes();
-        if (!$this->first_name->Raw) {
-            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
+        // patient_name
+        $this->patient_name->setupEditAttributes();
+        if (!$this->patient_name->Raw) {
+            $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
         }
-        $this->first_name->EditValue = $this->first_name->CurrentValue;
-        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
+        $this->patient_name->EditValue = $this->patient_name->CurrentValue;
+        $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
-        // last_name
-        $this->last_name->setupEditAttributes();
-        if (!$this->last_name->Raw) {
-            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
+        // patient_age
+        $this->patient_age->setupEditAttributes();
+        $this->patient_age->EditValue = $this->patient_age->CurrentValue;
+        $this->patient_age->PlaceHolder = RemoveHtml($this->patient_age->caption());
+        if (strval($this->patient_age->EditValue) != "" && is_numeric($this->patient_age->EditValue)) {
+            $this->patient_age->EditValue = FormatNumber($this->patient_age->EditValue, null);
         }
-        $this->last_name->EditValue = $this->last_name->CurrentValue;
-        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
-
-        // date_of_birth
-        $this->date_of_birth->setupEditAttributes();
-        $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
-        $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
 
         // gender
         $this->gender->setupEditAttributes();
@@ -1473,9 +1428,8 @@ class VaccinationsReport3 extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
-                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->patient_age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->status);
@@ -1484,9 +1438,8 @@ class VaccinationsReport3 extends DbTable
                     $doc->exportCaption($this->vaccination_month);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
-                    $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->patient_age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->status);
@@ -1520,9 +1473,8 @@ class VaccinationsReport3 extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
-                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->patient_age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->service_name);
                         $doc->exportField($this->status);
@@ -1531,9 +1483,8 @@ class VaccinationsReport3 extends DbTable
                         $doc->exportField($this->vaccination_month);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
-                        $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->patient_age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->service_name);
                         $doc->exportField($this->status);

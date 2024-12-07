@@ -21,4 +21,11 @@ class RadiologyBillingReportController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "RadiologyBillingReportList");
     }
+
+    // view
+    #[Map(["GET","POST","OPTIONS"], "/radiologybillingreportview[/{id}]", [PermissionMiddleware::class], "view.radiology_billing_report")]
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "RadiologyBillingReportView");
+    }
 }

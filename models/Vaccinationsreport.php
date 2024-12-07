@@ -50,9 +50,8 @@ class VaccinationsReport extends ReportTable
 
     // Fields
     public $id;
-    public $first_name;
-    public $last_name;
-    public $date_of_birth;
+    public $patient_name;
+    public $patient_age;
     public $gender;
     public $service_name;
     public $status;
@@ -122,82 +121,53 @@ class VaccinationsReport extends ReportTable
         $this->id->SourceTableVar = 'vaccinations_report3';
         $this->Fields['id'] = &$this->id;
 
-        // first_name
-        $this->first_name = new ReportField(
+        // patient_name
+        $this->patient_name = new ReportField(
             $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
+            'x_patient_name', // Variable name
+            'patient_name', // Name
+            '`patient_name`', // Expression
+            '`patient_name`', // Basic search expression
             200, // Type
-            50, // Size
+            101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`first_name`', // Virtual expression
+            '`patient_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->first_name->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['first_name'] = &$this->first_name;
+        $this->patient_name->InputTextType = "text";
+        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->patient_name->SourceTableVar = 'vaccinations_report3';
+        $this->Fields['patient_name'] = &$this->patient_name;
 
-        // last_name
-        $this->last_name = new ReportField(
+        // patient_age
+        $this->patient_age = new ReportField(
             $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
-            200, // Type
-            50, // Size
+            'x_patient_age', // Variable name
+            'patient_age', // Name
+            '`patient_age`', // Expression
+            '`patient_age`', // Basic search expression
+            20, // Type
+            21, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`last_name`', // Virtual expression
+            '`patient_age`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->last_name->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['last_name'] = &$this->last_name;
-
-        // date_of_birth
-        $this->date_of_birth = new ReportField(
-            $this, // Table
-            'x_date_of_birth', // Variable name
-            'date_of_birth', // Name
-            '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
-            133, // Type
-            40, // Size
-            7, // Date/Time format
-            false, // Is upload field
-            '`date_of_birth`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_of_birth->InputTextType = "text";
-        $this->date_of_birth->Raw = true;
-        $this->date_of_birth->Nullable = false; // NOT NULL field
-        $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
-        $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->date_of_birth->SourceTableVar = 'vaccinations_report3';
-        $this->Fields['date_of_birth'] = &$this->date_of_birth;
+        $this->patient_age->InputTextType = "text";
+        $this->patient_age->Raw = true;
+        $this->patient_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->patient_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->patient_age->SourceTableVar = 'vaccinations_report3';
+        $this->Fields['patient_age'] = &$this->patient_age;
 
         // gender
         $this->gender = new ReportField(
@@ -248,8 +218,11 @@ class VaccinationsReport extends ReportTable
         $this->service_name->InputTextType = "text";
         $this->service_name->Nullable = false; // NOT NULL field
         $this->service_name->Required = true; // Required field
+        $this->service_name->UseFilter = true; // Table header filter
+        $this->service_name->Lookup = new Lookup($this->service_name, 'Vaccinations_Report', true, 'service_name', ["service_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->service_name->SourceTableVar = 'vaccinations_report3';
+        $this->service_name->SearchType = "dropdown";
         $this->Fields['service_name'] = &$this->service_name;
 
         // status

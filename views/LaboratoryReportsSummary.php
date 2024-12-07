@@ -91,9 +91,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php if ($Page->date_updated->Visible) { ?>
     <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div class="Laboratory_Reports_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
-<?php if ($Page->report_month->Visible) { ?>
-    <th data-name="report_month" class="<?= $Page->report_month->headerCellClass() ?>"><div class="Laboratory_Reports_report_month"><?= $Page->renderFieldHeader($Page->report_month) ?></div></th>
-<?php } ?>
     </tr>
 </thead>
 <tbody>
@@ -162,12 +159,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         <td data-field="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->report_month->Visible) { ?>
-        <td data-field="report_month"<?= $Page->report_month->cellAttributes() ?>>
-<span<?= $Page->report_month->viewAttributes() ?>>
-<?= $Page->report_month->getViewValue() ?></span>
 </td>
 <?php } ?>
     </tr>

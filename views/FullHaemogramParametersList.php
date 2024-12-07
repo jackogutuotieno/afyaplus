@@ -52,13 +52,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patients_lab_report") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/PatientsLabReportMaster.php";
-    }
-}
-?>
-<?php
 if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_reports") {
     if ($Page->MasterRecordExists) {
         include_once "views/LabTestReportsMaster.php";
@@ -157,10 +150,6 @@ $Page->showMessage();
 <input type="hidden" name="t" value="full_haemogram_parameters">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
-<?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "patients_lab_report" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patients_lab_report">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->lab_test_report_id->getSessionValue()) ?>">
 <?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "lab_test_reports" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="lab_test_reports">

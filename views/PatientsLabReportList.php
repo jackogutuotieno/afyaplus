@@ -177,6 +177,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_name" class="patients_lab_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
+<?php if ($Page->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+        <th data-name="Group_Concat_service_name" class="<?= $Page->Group_Concat_service_name->headerCellClass() ?>"><div id="elh_patients_lab_report_Group_Concat_service_name" class="patients_lab_report_Group_Concat_service_name"><?= $Page->renderFieldHeader($Page->Group_Concat_service_name) ?></div></th>
+<?php } ?>
 <?php if ($Page->patient_age->Visible) { // patient_age ?>
         <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_age" class="patients_lab_report_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
 <?php } ?>
@@ -236,6 +239,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_patient_name" class="el_patients_lab_report_patient_name">
 <span<?= $Page->patient_name->viewAttributes() ?>>
 <?= $Page->patient_name->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+        <td data-name="Group_Concat_service_name"<?= $Page->Group_Concat_service_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_Group_Concat_service_name" class="el_patients_lab_report_Group_Concat_service_name">
+<span<?= $Page->Group_Concat_service_name->viewAttributes() ?>>
+<?= $Page->Group_Concat_service_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

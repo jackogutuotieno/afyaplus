@@ -494,6 +494,7 @@ class PatientsLabReportView extends PatientsLabReport
     public $RecordRange = 10;
     public $RecKey = [];
     public $IsModal = false;
+    public $DetailPages; // Detail pages object
 
     /**
      * Page run
@@ -551,6 +552,9 @@ class PatientsLabReportView extends PatientsLabReport
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
             $this->setUseLookupCache(false);
         }
+
+        // Set up detail page object
+        $this->setupDetailPages();
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -1429,6 +1433,19 @@ class PatientsLabReportView extends PatientsLabReport
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("patientslabreportlist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
+    }
+
+    // Set up detail pages
+    protected function setupDetailPages()
+    {
+        $pages = new SubPages();
+        $pages->Style = "tabs";
+        if ($pages->isAccordion()) {
+            $pages->Parent = "#accordion_" . $this->PageObjName;
+        }
+        $pages->add('urinalysis_results');
+        $pages->add('full_haemogram_parameters');
+        $this->DetailPages = $pages;
     }
 
     // Setup lookup options

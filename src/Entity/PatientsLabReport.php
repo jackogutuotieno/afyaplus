@@ -30,12 +30,10 @@ class PatientsLabReport extends AbstractEntity
 {
     #[Id]
     #[Column(type: "integer")]
-    #[GeneratedValue]
     private int $id;
 
     #[Id]
     #[Column(name: "visit_id", type: "integer")]
-    #[GeneratedValue]
     private int $visitId;
 
     #[Column(name: "patient_id", type: "integer")]
@@ -43,6 +41,9 @@ class PatientsLabReport extends AbstractEntity
 
     #[Column(name: "patient_name", type: "string", nullable: true)]
     private ?string $patientName;
+
+    #[Column(name: "Group_Concat_service_name", type: "text", nullable: true)]
+    private ?string $groupConcatServiceName;
 
     #[Column(name: "date_of_birth", type: "date")]
     private DateTime $dateOfBirth;
@@ -112,6 +113,17 @@ class PatientsLabReport extends AbstractEntity
     public function setPatientName(?string $value): static
     {
         $this->patientName = RemoveXss($value);
+        return $this;
+    }
+
+    public function getGroupConcatServiceName(): ?string
+    {
+        return HtmlDecode($this->groupConcatServiceName);
+    }
+
+    public function setGroupConcatServiceName(?string $value): static
+    {
+        $this->groupConcatServiceName = RemoveXss($value);
         return $this;
     }
 

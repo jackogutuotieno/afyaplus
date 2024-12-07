@@ -1565,6 +1565,17 @@ class CashPaymentsList extends CashPayments
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
+        $option = $options["addedit"];
+
+        // Add
+        $item = &$option->add("add");
+        $addcaption = HtmlTitle($Language->phrase("AddLink"));
+        if ($this->ModalAdd && !IsMobile()) {
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"cash_payments\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+        }
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility

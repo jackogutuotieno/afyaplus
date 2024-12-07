@@ -22,6 +22,13 @@ class CashPaymentsController extends ControllerBase
         return $this->runPage($request, $response, $args, "CashPaymentsList");
     }
 
+    // add
+    #[Map(["GET","POST","OPTIONS"], "/cashpaymentsadd[/{id}]", [PermissionMiddleware::class], "add.cash_payments")]
+    public function add(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "CashPaymentsAdd");
+    }
+
     // view
     #[Map(["GET","POST","OPTIONS"], "/cashpaymentsview[/{id}]", [PermissionMiddleware::class], "view.cash_payments")]
     public function view(Request $request, Response $response, array $args): Response

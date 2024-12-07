@@ -20630,4 +20630,8 @@ td button, .btn-primary {
   color: #540000;
 }
 
+#fpatient_visitsview .ew-add {
+  display: none !important;
+}
+
 /*END_USER_STYLES*/
