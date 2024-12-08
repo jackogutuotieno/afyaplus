@@ -123,12 +123,12 @@ $Page->showMessage();
                     My Prescriptions
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-hospital-user"></i></p>
+                    <p class="card-text"><i class="fas fa-prescription"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM prescriptions WHERE created_by_user_id = '" . $user_id . "'";
-                            $consulted_today = ExecuteScalar($sql);
-                            echo $consulted_today;
+                            $prescriptions = ExecuteScalar($sql);
+                            echo $prescriptions;
                         ?>
                     </p>
                 </div>
@@ -140,12 +140,12 @@ $Page->showMessage();
                     My Prescriptions Today
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-hospital-user"></i></p>
+                    <p class="card-text"><i class="fas fa-prescription"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM prescriptions WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE() and created_by_user_id = '" . $user_id . "'";
-                            $consulted_today = ExecuteScalar($sql);
-                            echo $consulted_today;
+                            $prescriptions_today = ExecuteScalar($sql);
+                            echo $prescriptions_today;
                         ?>
                     </p>
                 </div>
