@@ -85,13 +85,14 @@ $Page->showMessage();
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card counters">
                 <div class="card-header">
-                    Patients Consulted
+                    My Consultations
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
                     <p class="card-text"><i class="fas fa-hospital-user"></i></p>
                     <p class="record-count">
                         <?php
-                            $sql = "SELECT COUNT(*) FROM doctor_notes";
+                            $user_id = CurrentUserID();
+                            $sql = "SELECT COUNT(*) FROM doctor_notes where created_by_user_id = '" . $user_id . "'";
                             $patients_consulted = ExecuteScalar($sql);
                             echo $patients_consulted;
                         ?>
@@ -102,13 +103,47 @@ $Page->showMessage();
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card counters">
                 <div class="card-header">
-                    Patients Consulted Today
+                    My Consultations Today
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
                     <p class="card-text"><i class="fas fa-hospital-user"></i></p>
                     <p class="record-count">
                         <?php
-                            $sql = "SELECT COUNT(*) FROM doctor_notes WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE()";
+                            $sql = "SELECT COUNT(*) FROM doctor_notes WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE() and created_by_user_id = '" . $user_id . "'";
+                            $consulted_today = ExecuteScalar($sql);
+                            echo $consulted_today;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    My Prescriptions
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-hospital-user"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT COUNT(*) FROM prescriptions WHERE created_by_user_id = '" . $user_id . "'";
+                            $consulted_today = ExecuteScalar($sql);
+                            echo $consulted_today;
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card counters">
+                <div class="card-header">
+                    My Prescriptions Today
+                </div>
+                <div class="card-body d-flex align-items-center pt-0 pb-0">
+                    <p class="card-text"><i class="fas fa-hospital-user"></i></p>
+                    <p class="record-count">
+                        <?php
+                            $sql = "SELECT COUNT(*) FROM prescriptions WHERE STR_TO_DATE(date_created,'%Y-%m-%d')=CURRENT_DATE() and created_by_user_id = '" . $user_id . "'";
                             $consulted_today = ExecuteScalar($sql);
                             echo $consulted_today;
                         ?>
