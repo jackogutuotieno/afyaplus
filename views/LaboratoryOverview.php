@@ -105,7 +105,7 @@ $Page->showMessage();
             <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
-                        <h4>Reports Submissions Graph</h4>
+                        <h4>Lab Reports by Month</h4>
                     </div>
                     <div class="card-body">
                         <?= $LaboratoryOverview->renderItem($this, 1) ?>
@@ -115,20 +115,10 @@ $Page->showMessage();
             <div class="col-lg-6 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
-                        <h4>Tests Performed Graph</h4>
+                        <h4>Lab Reports by Test Type</h4>
                     </div>
                     <div class="card-body">
                         <?= $LaboratoryOverview->renderItem($this, 2) ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-md-12">
-                <div class="card">
-                    <div class="card-header content-header">
-                        <h4>Diseases Graph</h4>
-                    </div>
-                    <div class="card-body">
-                        <?= $LaboratoryOverview->renderItem($this, 3) ?>
                     </div>
                 </div>
             </div>

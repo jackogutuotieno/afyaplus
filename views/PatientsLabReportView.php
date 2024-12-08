@@ -196,7 +196,12 @@ loadjs.ready("head", function () {
             <p><slot class="ew-slot" name="tpc_patients_lab_report_patient_age"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_patient_age"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-12 col-md-6 col-sm-12">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patients_lab_report_Group_Concat_service_name"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_Group_Concat_service_name"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patients_lab_report_details"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_details"></slot></p>
         </div>
