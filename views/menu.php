@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(442, "mi_full_haemo_results", $Language->menuPhrase("442", "MenuText"), "fullhaemoresultslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}full_haemo_results'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334", "MenuText"), "radiologyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "fa-tachometer", "", false, true);
@@ -59,7 +58,7 @@ $sideMenu->addMenuItem(53, "mci_Financials", $Language->menuPhrase("53", "MenuTe
 $sideMenu->addMenuItem(26, "mi_payment_methods", $Language->menuPhrase("26", "MenuText"), "paymentmethodslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}payment_methods'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(10, "mi_invoices", $Language->menuPhrase("10", "MenuText"), "invoiceslist?cmd=resetall", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}invoices'), false, false, "fa-file-invoice", "", false, true);
 $sideMenu->addMenuItem(241, "mi_income", $Language->menuPhrase("241", "MenuText"), "incomelist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}income'), false, false, "fa-money-bill", "", false, true);
-$sideMenu->addMenuItem(8, "mi_expenses", $Language->menuPhrase("8", "MenuText"), "expenseslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}expenses'), false, false, "fa-invoice", "", false, true);
+$sideMenu->addMenuItem(8, "mi_expenses", $Language->menuPhrase("8", "MenuText"), "expenseslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}expenses'), false, false, "fa-file-invoice", "", false, true);
 $sideMenu->addMenuItem(16, "mi_medical_schemes", $Language->menuPhrase("16", "MenuText"), "medicalschemeslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}medical_schemes'), false, false, "fa-shield", "", false, true);
 $sideMenu->addMenuItem(34, "mi_service_categories", $Language->menuPhrase("34", "MenuText"), "servicecategorieslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}service_categories'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(36, "mi_service_subcategories", $Language->menuPhrase("36", "MenuText"), "servicesubcategorieslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}service_subcategories'), false, false, "fa-list", "", false, true);

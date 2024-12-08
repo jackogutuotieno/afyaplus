@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "fullhaemoresultslist";
+    public $CurrentPageName = "fullhaemoresultsgrid";
 
     // Page headings
     public $Heading = "";

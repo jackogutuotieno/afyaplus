@@ -73,6 +73,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
+    <tr id="r_Group_Concat_service_name"<?= $Page->Group_Concat_service_name->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_lab_report_Group_Concat_service_name"><template id="tpc_patients_lab_report_Group_Concat_service_name"><?= $Page->Group_Concat_service_name->caption() ?></template></span></td>
+        <td data-name="Group_Concat_service_name"<?= $Page->Group_Concat_service_name->cellAttributes() ?>>
+<template id="tpx_patients_lab_report_Group_Concat_service_name"><span id="el_patients_lab_report_Group_Concat_service_name">
+<span<?= $Page->Group_Concat_service_name->viewAttributes() ?>>
+<?= $Page->Group_Concat_service_name->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
     <tr id="r_date_of_birth"<?= $Page->date_of_birth->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_lab_report_date_of_birth"><template id="tpc_patients_lab_report_date_of_birth"><?= $Page->date_of_birth->caption() ?></template></span></td>
@@ -207,9 +218,9 @@ loadjs.ready("head", function () {
     }
 ?>
 <?php
-    if (in_array("full_haemogram_parameters", explode(",", $Page->getCurrentDetailTable())) && $full_haemogram_parameters->DetailView) {
+    if (in_array("full_haemo_results", explode(",", $Page->getCurrentDetailTable())) && $full_haemo_results->DetailView) {
 ?>
-        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("full_haemogram_parameters") ?><?= $Page->DetailPages->activeClasses("full_haemogram_parameters") ?>" data-bs-target="#tab_full_haemogram_parameters" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_full_haemogram_parameters" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("full_haemogram_parameters")) ?>"><?= $Language->tablePhrase("full_haemogram_parameters", "TblCaption") ?></button></li>
+        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("full_haemo_results") ?><?= $Page->DetailPages->activeClasses("full_haemo_results") ?>" data-bs-target="#tab_full_haemo_results" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_full_haemo_results" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("full_haemo_results")) ?>"><?= $Language->tablePhrase("full_haemo_results", "TblCaption") ?></button></li>
 <?php
     }
 ?>
@@ -223,10 +234,10 @@ loadjs.ready("head", function () {
         </div><!-- /page* -->
 <?php } ?>
 <?php
-    if (in_array("full_haemogram_parameters", explode(",", $Page->getCurrentDetailTable())) && $full_haemogram_parameters->DetailView) {
+    if (in_array("full_haemo_results", explode(",", $Page->getCurrentDetailTable())) && $full_haemo_results->DetailView) {
 ?>
-        <div class="<?= $Page->DetailPages->tabPaneClasses("full_haemogram_parameters") ?><?= $Page->DetailPages->activeClasses("full_haemogram_parameters") ?>" id="tab_full_haemogram_parameters" role="tabpanel"><!-- page* -->
-<?php include_once "FullHaemogramParametersGrid.php" ?>
+        <div class="<?= $Page->DetailPages->tabPaneClasses("full_haemo_results") ?><?= $Page->DetailPages->activeClasses("full_haemo_results") ?>" id="tab_full_haemo_results" role="tabpanel"><!-- page* -->
+<?php include_once "FullHaemoResultsGrid.php" ?>
         </div><!-- /page* -->
 <?php } ?>
     </div><!-- /.tab-content -->

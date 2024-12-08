@@ -98,7 +98,7 @@ class PatientsLabReport extends DbTable
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
         $this->DetailView = true; // Allow detail view
-        $this->ShowMultipleDetails = false; // Show multiple details
+        $this->ShowMultipleDetails = true; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
@@ -153,7 +153,6 @@ class PatientsLabReport extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
-        $this->visit_id->IsPrimaryKey = true; // Primary key field
         $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
@@ -604,6 +603,10 @@ class PatientsLabReport extends DbTable
             $detailUrl = Container("urinalysis_results")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "full_haemo_results") {
+            $detailUrl = Container("full_haemo_results")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
         if ($detailUrl == "") {
             $detailUrl = "patientslabreportlist";
         }
@@ -1020,9 +1023,6 @@ class PatientsLabReport extends DbTable
             if (array_key_exists('id', $rs)) {
                 AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
             }
-            if (array_key_exists('visit_id', $rs)) {
-                AddFilter($where, QuotedName('visit_id', $this->Dbid) . '=' . QuotedValue($rs['visit_id'], $this->visit_id->DataType, $this->Dbid));
-            }
         }
         $filter = $curfilter ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -1075,7 +1075,7 @@ class PatientsLabReport extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`id` = @id@ AND `visit_id` = @visit_id@";
+        return "`id` = @id@";
     }
 
     // Get Key
@@ -1083,12 +1083,6 @@ class PatientsLabReport extends DbTable
     {
         $keys = [];
         $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
-        if (EmptyValue($val)) {
-            return "";
-        } else {
-            $keys[] = $val;
-        }
-        $val = $current ? $this->visit_id->CurrentValue : $this->visit_id->OldValue;
         if (EmptyValue($val)) {
             return "";
         } else {
@@ -1104,16 +1098,11 @@ class PatientsLabReport extends DbTable
         $keySeparator ??= Config("COMPOSITE_KEY_SEPARATOR");
         $this->OldKey = strval($key);
         $keys = explode($keySeparator, $this->OldKey);
-        if (count($keys) == 2) {
+        if (count($keys) == 1) {
             if ($current) {
                 $this->id->CurrentValue = $keys[0];
             } else {
                 $this->id->OldValue = $keys[0];
-            }
-            if ($current) {
-                $this->visit_id->CurrentValue = $keys[1];
-            } else {
-                $this->visit_id->OldValue = $keys[1];
             }
         }
     }
@@ -1134,19 +1123,6 @@ class PatientsLabReport extends DbTable
             return "0=1"; // Invalid key
         } else {
             $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
-        }
-        if (is_array($row)) {
-            $val = array_key_exists('visit_id', $row) ? $row['visit_id'] : null;
-        } else {
-            $val = !EmptyValue($this->visit_id->OldValue) && !$current ? $this->visit_id->OldValue : $this->visit_id->CurrentValue;
-        }
-        if (!is_numeric($val)) {
-            return "0=1"; // Invalid key
-        }
-        if ($val === null) {
-            return "0=1"; // Invalid key
-        } else {
-            $keyFilter = str_replace("@visit_id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
         }
         return $keyFilter;
     }
@@ -1302,7 +1278,6 @@ class PatientsLabReport extends DbTable
     {
         $json = "";
         $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
-        $json .= ",\"visit_id\":" . VarToJson($this->visit_id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -1315,11 +1290,6 @@ class PatientsLabReport extends DbTable
     {
         if ($this->id->CurrentValue !== null) {
             $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
-        } else {
-            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
-        }
-        if ($this->visit_id->CurrentValue !== null) {
-            $url .= $this->RouteCompositeKeySeparator . $this->encodeKeyValue($this->visit_id->CurrentValue);
         } else {
             return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
         }
@@ -1388,43 +1358,26 @@ class PatientsLabReport extends DbTable
         if (Param("key_m") !== null) {
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
-            for ($i = 0; $i < $cnt; $i++) {
-                $arKeys[$i] = explode(Config("COMPOSITE_KEY_SEPARATOR"), $arKeys[$i]);
-            }
         } else {
             $isApi = IsApi();
             $keyValues = $isApi
                 ? (Route(0) == "export"
-                    ? array_map(fn ($i) => Route($i + 3), range(0, 1))  // Export API
-                    : array_map(fn ($i) => Route($i + 2), range(0, 1))) // Other API
+                    ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
+                    : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
                 : []; // Non-API
             if (($keyValue = Param("id") ?? Route("id")) !== null) {
-                $arKey[] = $keyValue;
+                $arKeys[] = $keyValue;
             } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
-                $arKey[] = $keyValue;
+                $arKeys[] = $keyValue;
             } else {
                 $arKeys = null; // Do not setup
             }
-            if (($keyValue = Param("visit_id") ?? Route("visit_id")) !== null) {
-                $arKey[] = $keyValue;
-            } elseif ($isApi && (($keyValue = Key(1) ?? $keyValues[1] ?? null) !== null)) {
-                $arKey[] = $keyValue;
-            } else {
-                $arKeys = null; // Do not setup
-            }
-            $arKeys[] = $arKey;
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
-                if (!is_array($key) || count($key) != 2) {
-                    continue; // Just skip so other keys will still work
-                }
-                if (!is_numeric($key[0])) { // id
-                    continue;
-                }
-                if (!is_numeric($key[1])) { // visit_id
+                if (!is_numeric($key)) {
                     continue;
                 }
                 $ar[] = $key;
@@ -1449,14 +1402,9 @@ class PatientsLabReport extends DbTable
                 $keyFilter .= " OR ";
             }
             if ($setCurrent) {
-                $this->id->CurrentValue = $key[0];
+                $this->id->CurrentValue = $key;
             } else {
-                $this->id->OldValue = $key[0];
-            }
-            if ($setCurrent) {
-                $this->visit_id->CurrentValue = $key[1];
-            } else {
-                $this->visit_id->OldValue = $key[1];
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1668,8 +1616,16 @@ class PatientsLabReport extends DbTable
 
         // visit_id
         $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+        } else {
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = $this->visit_id->EditValue;
+            }
+        }
 
         // patient_id
         $this->patient_id->setupEditAttributes();
@@ -2038,6 +1994,7 @@ class PatientsLabReport extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Report"; 
         } 
+        $this->patient_name->ViewValue = '<a href="patientslabreportview/' . $this->id->ViewValue . '?showdetail=urinalysis_results,full_haemo_results" target="_blank"> ' . $this->patient_name->ViewValue . ' </a>';
     }
 
     // User ID Filtering event

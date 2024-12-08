@@ -1,0 +1,29 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-12-08 04:20:25",/afyaplus/login,2,login,::1,,,,
+"2024-12-08 04:22:44",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-08 04:22:59",/afyaplus/login,4,login,::1,,,,
+"2024-12-08 04:30:30",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-08 04:30:40",/afyaplus/login,5,login,::1,,,,
+"2024-12-08 04:49:46",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-08 04:49:51",/afyaplus/login,5,login,::1,,,,
+"2024-12-08 10:59:34",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-08 10:59:46",/afyaplus/login,4,login,::1,,,,
+"2024-12-08 11:01:15",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-08 13:15:53",/afyaplus/login,2,login,::1,,,,
+"2024-12-08 13:48:41",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,7,,4
+"2024-12-08 13:48:42",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,7,,3
+"2024-12-08 13:48:42",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,7,,1
+"2024-12-08 13:48:42",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,7,,2
+"2024-12-08 13:48:42",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,7,,1
+"2024-12-08 13:48:42",/afyaplus/patientvisitsadd,2,A,patient_visits,id,7,,7
+"2024-12-08 13:49:48",/afyaplus/patientqueueadd,2,A,patient_queue,patient_id,5,,4
+"2024-12-08 13:49:48",/afyaplus/patientqueueadd,2,A,patient_queue,visit_id,5,,7
+"2024-12-08 13:49:48",/afyaplus/patientqueueadd,2,A,patient_queue,section,5,,Triage
+"2024-12-08 13:49:48",/afyaplus/patientqueueadd,2,A,patient_queue,status,5,,"Checked In"
+"2024-12-08 13:49:48",/afyaplus/patientqueueadd,2,A,patient_queue,id,5,,5
+"2024-12-08 13:51:31",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-08 13:51:48",/afyaplus/login,5,login,::1,,,,
+"2024-12-08 13:52:07",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-08 13:52:25",/afyaplus/login,4,login,::1,,,,
+"2024-12-08 14:14:49",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-08 14:15:14",/afyaplus/login,1,login,::1,,,,

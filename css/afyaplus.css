@@ -11,6 +11,7 @@
     can use the separate user stylesheet.
 */
 /*BEGIN_SYSTEM_STYLES*/
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 .btn-close {
   --bs-btn-close-color: #000000;
   --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e");
@@ -20203,8 +20204,12 @@ hr.divider-vertical-blurry {
   border-bottom: 1px solid #fff;
 }
 
-body {
-  font-family: montserrat;
+body, .chart-content .card-header h4 {
+  font-family: "Montserrat", sans-serif;
+}
+
+.chart-content .card-header h4 {
+  font-weight: 700;
 }
 
 .nav-sidebar .nav-item > .nav-link {
@@ -20631,6 +20636,15 @@ td button, .btn-primary {
 }
 
 #fpatient_visitsview .ew-add {
+  display: none !important;
+}
+
+#fpatients_lab_reportview .ew-detail-pages {
+  width: 100%;
+}
+
+.patient-visits .ew-detail-option .ew-list-options,
+#fpatient_visitssrch .ew-btn-group.ew-list-options {
   display: none !important;
 }
 

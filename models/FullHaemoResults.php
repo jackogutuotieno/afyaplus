@@ -91,7 +91,7 @@ class FullHaemoResults extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -146,6 +146,7 @@ class FullHaemoResults extends DbTable
         );
         $this->lab_test_report_id->InputTextType = "text";
         $this->lab_test_report_id->Raw = true;
+        $this->lab_test_report_id->IsForeignKey = true; // Foreign key field
         $this->lab_test_report_id->Nullable = false; // NOT NULL field
         $this->lab_test_report_id->Required = true; // Required field
         $this->lab_test_report_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -328,6 +329,88 @@ class FullHaemoResults extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTable = Container("patients_lab_report");
+            if ($this->lab_test_report_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->lab_test_report_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "patients_lab_report") {
+            $masterTable = Container("patients_lab_report");
+            if ($this->lab_test_report_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->lab_test_report_id, $this->lab_test_report_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "patients_lab_report":
+                $key = $keys["lab_test_report_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["lab_test_report_id"], $this->lab_test_report_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "patients_lab_report":
+                return GetKeyFilter($this->lab_test_report_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -991,6 +1074,10 @@ class FullHaemoResults extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "patients_lab_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->lab_test_report_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1272,10 +1359,16 @@ class FullHaemoResults extends DbTable
 
         // lab_test_report_id
         $this->lab_test_report_id->setupEditAttributes();
-        $this->lab_test_report_id->EditValue = $this->lab_test_report_id->CurrentValue;
-        $this->lab_test_report_id->PlaceHolder = RemoveHtml($this->lab_test_report_id->caption());
-        if (strval($this->lab_test_report_id->EditValue) != "" && is_numeric($this->lab_test_report_id->EditValue)) {
-            $this->lab_test_report_id->EditValue = FormatNumber($this->lab_test_report_id->EditValue, null);
+        if ($this->lab_test_report_id->getSessionValue() != "") {
+            $this->lab_test_report_id->CurrentValue = GetForeignKeyValue($this->lab_test_report_id->getSessionValue());
+            $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
+            $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
+        } else {
+            $this->lab_test_report_id->EditValue = $this->lab_test_report_id->CurrentValue;
+            $this->lab_test_report_id->PlaceHolder = RemoveHtml($this->lab_test_report_id->caption());
+            if (strval($this->lab_test_report_id->EditValue) != "" && is_numeric($this->lab_test_report_id->EditValue)) {
+                $this->lab_test_report_id->EditValue = FormatNumber($this->lab_test_report_id->EditValue, null);
+            }
         }
 
         // test

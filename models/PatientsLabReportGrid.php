@@ -382,8 +382,7 @@ class PatientsLabReportGrid extends PatientsLabReport
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'] . Config("COMPOSITE_KEY_SEPARATOR");
-            $key .= @$ar['visit_id'];
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -1061,10 +1060,6 @@ class PatientsLabReportGrid extends PatientsLabReport
                         $key .= Config("COMPOSITE_KEY_SEPARATOR");
                     }
                     $key .= $this->id->CurrentValue;
-                    if ($key != "") {
-                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
-                    }
-                    $key .= $this->visit_id->CurrentValue;
 
                     // Add filter for this record
                     AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
@@ -1334,6 +1329,12 @@ class PatientsLabReportGrid extends PatientsLabReport
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1402,7 +1403,19 @@ class PatientsLabReportGrid extends PatientsLabReport
                 }
             }
         }
-        if ($this->CurrentMode == "view") { // Check view mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if ($this->ModalView && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_lab_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
         $this->renderListOptionsExt();
 
@@ -1757,19 +1770,12 @@ class PatientsLabReportGrid extends PatientsLabReport
         if ($CurrentForm->hasValue("o_date_updated")) {
             $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
         }
-
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            $this->visit_id->setFormValue($val);
-        }
     }
 
     // Restore form values
     public function restoreFormValues()
     {
         global $CurrentForm;
-                        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_name->CurrentValue = $this->patient_name->FormValue;
         $this->Group_Concat_service_name->CurrentValue = $this->Group_Concat_service_name->FormValue;
@@ -2357,10 +2363,6 @@ class PatientsLabReportGrid extends PatientsLabReport
                 $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
             }
             $thisKey .= $row['id'];
-            if ($thisKey != "") {
-                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
-            }
-            $thisKey .= $row['visit_id'];
 
             // Call row deleting event
             $deleteRow = $this->rowDeleting($row);
@@ -2577,12 +2579,6 @@ class PatientsLabReportGrid extends PatientsLabReport
 
         // Check if key value entered
         if ($insertRow && $this->ValidateKey && strval($rsnew['id']) == "") {
-            $this->setFailureMessage($Language->phrase("InvalidKeyValue"));
-            $insertRow = false;
-        }
-
-        // Check if key value entered
-        if ($insertRow && $this->ValidateKey && strval($rsnew['visit_id']) == "") {
             $this->setFailureMessage($Language->phrase("InvalidKeyValue"));
             $insertRow = false;
         }

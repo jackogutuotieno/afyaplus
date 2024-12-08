@@ -32,7 +32,6 @@ class PatientsLabReport extends AbstractEntity
     #[Column(type: "integer")]
     private int $id;
 
-    #[Id]
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 
@@ -65,12 +64,6 @@ class PatientsLabReport extends AbstractEntity
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
-
-    public function __construct(int $id, int $visitId)
-    {
-        $this->id = $id;
-        $this->visitId = $visitId;
-    }
 
     public function getId(): int
     {

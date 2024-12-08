@@ -143,6 +143,7 @@ class PatientsLabReportView extends PatientsLabReport
         $this->visit_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->patient_name->setVisibility();
+        $this->Group_Concat_service_name->setVisibility();
         $this->date_of_birth->setVisibility();
         $this->gender->setVisibility();
         $this->patient_age->setVisibility();
@@ -181,9 +182,6 @@ class PatientsLabReportView extends PatientsLabReport
         // Set up record key
         if (($keyValue = Get("id") ?? Route("id")) !== null) {
             $this->RecKey["id"] = $keyValue;
-        }
-        if (($keyValue = Get("visit_id") ?? Route("visit_id")) !== null) {
-            $this->RecKey["visit_id"] = $keyValue;
         }
 
         // Table name (for backward compatibility only)
@@ -396,8 +394,7 @@ class PatientsLabReportView extends PatientsLabReport
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'] . Config("COMPOSITE_KEY_SEPARATOR");
-            $key .= @$ar['visit_id'];
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -597,18 +594,6 @@ class PatientsLabReportView extends PatientsLabReport
         } elseif (!$loadCurrentRecord) {
             $returnUrl = "patientslabreportlist"; // Return to list
         }
-        if (($keyValue = Get("visit_id") ?? Route("visit_id")) !== null) {
-            $this->visit_id->setQueryStringValue($keyValue);
-            $this->RecKey["visit_id"] = $this->visit_id->QueryStringValue;
-        } elseif (Post("visit_id") !== null) {
-            $this->visit_id->setFormValue(Post("visit_id"));
-            $this->RecKey["visit_id"] = $this->visit_id->FormValue;
-        } elseif (IsApi() && ($keyValue = Key(1) ?? Route(3)) !== null) {
-            $this->visit_id->setQueryStringValue($keyValue);
-            $this->RecKey["visit_id"] = $this->visit_id->QueryStringValue;
-        } elseif (!$loadCurrentRecord) {
-            $returnUrl = "patientslabreportlist"; // Return to list
-        }
 
         // Get action
         $this->CurrentAction = "show"; // Display
@@ -742,18 +727,18 @@ class PatientsLabReportView extends PatientsLabReport
             $item->Visible = false;
         }
 
-        // "detail_full_haemogram_parameters"
-        $item = &$option->add("detail_full_haemogram_parameters");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("full_haemogram_parameters", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("fullhaemogramparameterslist?" . Config("TABLE_SHOW_MASTER") . "=patients_lab_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        // "detail_full_haemo_results"
+        $item = &$option->add("detail_full_haemo_results");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("full_haemo_results", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("fullhaemoresultslist?" . Config("TABLE_SHOW_MASTER") . "=patients_lab_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
-        $detailPageObj = Container("FullHaemogramParametersGrid");
+        $detailPageObj = Container("FullHaemoResultsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients_lab_report')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemogram_parameters"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=full_haemo_results"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
             if ($detailViewTblVar != "") {
                 $detailViewTblVar .= ",";
             }
-            $detailViewTblVar .= "full_haemogram_parameters";
+            $detailViewTblVar .= "full_haemo_results";
         }
         if ($links != "") {
             $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
@@ -763,12 +748,12 @@ class PatientsLabReportView extends PatientsLabReport
         }
         $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
         $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'full_haemogram_parameters');
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'full_haemo_results');
         if ($item->Visible) {
             if ($detailTableLink != "") {
                 $detailTableLink .= ",";
             }
-            $detailTableLink .= "full_haemogram_parameters";
+            $detailTableLink .= "full_haemo_results";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -915,6 +900,7 @@ class PatientsLabReportView extends PatientsLabReport
         $this->visit_id->setDbValue($row['visit_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
+        $this->Group_Concat_service_name->setDbValue($row['Group_Concat_service_name']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
@@ -933,6 +919,7 @@ class PatientsLabReportView extends PatientsLabReport
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['Group_Concat_service_name'] = $this->Group_Concat_service_name->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['patient_age'] = $this->patient_age->DefaultValue;
@@ -970,6 +957,8 @@ class PatientsLabReportView extends PatientsLabReport
 
         // patient_name
 
+        // Group_Concat_service_name
+
         // date_of_birth
 
         // gender
@@ -1000,6 +989,9 @@ class PatientsLabReportView extends PatientsLabReport
 
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->ViewValue = $this->Group_Concat_service_name->CurrentValue;
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
@@ -1036,6 +1028,10 @@ class PatientsLabReportView extends PatientsLabReport
             // patient_name
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
+
+            // Group_Concat_service_name
+            $this->Group_Concat_service_name->HrefValue = "";
+            $this->Group_Concat_service_name->TooltipValue = "";
 
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
@@ -1206,9 +1202,8 @@ class PatientsLabReportView extends PatientsLabReport
     {
         global $Language;
         $rs = null;
-        if (count($keys) >= 2) {
+        if (count($keys) >= 1) {
             $this->id->OldValue = $keys[0];
-            $this->visit_id->OldValue = $keys[1];
             $rs = $this->loadRs($this->getRecordFilter());
         }
         if (!$rs || !$doc) {
@@ -1251,10 +1246,10 @@ class PatientsLabReportView extends PatientsLabReport
             }
         }
 
-        // Export detail records (full_haemogram_parameters)
-        if (Config("EXPORT_DETAIL_RECORDS") && in_array("full_haemogram_parameters", explode(",", $this->getCurrentDetailTable()))) {
-            $full_haemogram_parameters = new FullHaemogramParametersList();
-            $rsdetail = $full_haemogram_parameters->loadRs($full_haemogram_parameters->getDetailFilterFromSession(), $full_haemogram_parameters->getSessionOrderBy()); // Load detail records
+        // Export detail records (full_haemo_results)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("full_haemo_results", explode(",", $this->getCurrentDetailTable()))) {
+            $full_haemo_results = new FullHaemoResultsList();
+            $rsdetail = $full_haemo_results->loadRs($full_haemo_results->getDetailFilterFromSession(), $full_haemo_results->getSessionOrderBy()); // Load detail records
             if ($rsdetail) {
                 $exportStyle = $doc->Style;
                 $doc->setStyle("h"); // Change to horizontal
@@ -1262,8 +1257,8 @@ class PatientsLabReportView extends PatientsLabReport
                     $doc->exportEmptyRow();
                     $detailcnt = $rsdetail->rowCount();
                     $oldtbl = $doc->getTable();
-                    $doc->setTable($full_haemogram_parameters);
-                    $full_haemogram_parameters->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($full_haemo_results);
+                    $full_haemo_results->exportDocument($doc, $rsdetail, 1, $detailcnt);
                     $doc->setTable($oldtbl);
                 }
                 $doc->setStyle($exportStyle); // Restore
@@ -1407,8 +1402,8 @@ class PatientsLabReportView extends PatientsLabReport
                     $detailPageObj->lab_test_reports_id->setSessionValue($detailPageObj->lab_test_reports_id->CurrentValue);
                 }
             }
-            if (in_array("full_haemogram_parameters", $detailTblVar)) {
-                $detailPageObj = Container("FullHaemogramParametersGrid");
+            if (in_array("full_haemo_results", $detailTblVar)) {
+                $detailPageObj = Container("FullHaemoResultsGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";
@@ -1444,7 +1439,7 @@ class PatientsLabReportView extends PatientsLabReport
             $pages->Parent = "#accordion_" . $this->PageObjName;
         }
         $pages->add('urinalysis_results');
-        $pages->add('full_haemogram_parameters');
+        $pages->add('full_haemo_results');
         $this->DetailPages = $pages;
     }
 

@@ -4042,8 +4042,20 @@ class PatientVisitsList extends PatientVisits
     // ListOptions Rendered event
     public function listOptionsRendered()
     {
-        // Example:
-        //$this->ListOptions["new"]->Body = "xxx";
+        // Get the current date and time
+        $currDate = CurrentDate();
+        if ($this->date_created->CurrentValue < $currDate)  {
+            $this->ListOptions->Items["view"]->clear();
+            $this->ListOptions->Items["edit"]->clear();
+            $this->ListOptions->Items["delete"]->clear();
+            $this->ListOptions->Items["detail_patient_queue"]->clear();
+            $this->ListOptions->Items["detail_patient_vitals"]->clear();
+            $this->ListOptions->Items["detail_doctor_notes"]->clear();
+            $this->ListOptions->Items["detail_prescriptions"]->clear();
+            $this->ListOptions->Items["detail_radiology_requests"]->clear();
+            $this->ListOptions->Items["detail_patient_vaccinations"]->clear();
+            $this->ListOptions->Items["detail_lab_test_requests"]->clear();
+        } 
     }
 
     // Row Custom Action event
