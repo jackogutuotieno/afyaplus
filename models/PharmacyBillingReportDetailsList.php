@@ -145,8 +145,8 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->medicine_dispensation_id->setVisibility();
+        $this->id->Visible = false;
+        $this->medicine_dispensation_id->Visible = false;
         $this->brand_name->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->quantity->setVisibility();
@@ -1280,8 +1280,6 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->medicine_dispensation_id); // medicine_dispensation_id
             $this->updateSort($this->brand_name); // brand_name
             $this->updateSort($this->selling_price_per_unit); // selling_price_per_unit
             $this->updateSort($this->quantity); // quantity
@@ -1362,6 +1360,14 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1399,6 +1405,10 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
@@ -1469,8 +1479,6 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "medicine_dispensation_id");
             $this->createColumnOption($option, "brand_name");
             $this->createColumnOption($option, "selling_price_per_unit");
             $this->createColumnOption($option, "quantity");
@@ -2013,14 +2021,6 @@ class PharmacyBillingReportDetailsList extends PharmacyBillingReportDetails
             // line_total
             $this->line_total->ViewValue = $this->line_total->CurrentValue;
             $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
-            $this->medicine_dispensation_id->TooltipValue = "";
 
             // brand_name
             $this->brand_name->HrefValue = "";

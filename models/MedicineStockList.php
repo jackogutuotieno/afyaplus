@@ -163,9 +163,10 @@ class MedicineStockList extends MedicineStock
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->setVisibility();
+        $this->stock_status->setVisibility();
+        $this->expiry_status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->expiry_status->setVisibility();
     }
 
     // Constructor
@@ -1084,9 +1085,10 @@ class MedicineStockList extends MedicineStock
         $filterList = Concat($filterList, $this->buying_price_per_unit->AdvancedSearch->toJson(), ","); // Field buying_price_per_unit
         $filterList = Concat($filterList, $this->selling_price_per_unit->AdvancedSearch->toJson(), ","); // Field selling_price_per_unit
         $filterList = Concat($filterList, $this->expiry_date->AdvancedSearch->toJson(), ","); // Field expiry_date
+        $filterList = Concat($filterList, $this->stock_status->AdvancedSearch->toJson(), ","); // Field stock_status
+        $filterList = Concat($filterList, $this->expiry_status->AdvancedSearch->toJson(), ","); // Field expiry_status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->expiry_status->AdvancedSearch->toJson(), ","); // Field expiry_status
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1206,6 +1208,22 @@ class MedicineStockList extends MedicineStock
         $this->expiry_date->AdvancedSearch->SearchOperator2 = @$filter["w_expiry_date"];
         $this->expiry_date->AdvancedSearch->save();
 
+        // Field stock_status
+        $this->stock_status->AdvancedSearch->SearchValue = @$filter["x_stock_status"];
+        $this->stock_status->AdvancedSearch->SearchOperator = @$filter["z_stock_status"];
+        $this->stock_status->AdvancedSearch->SearchCondition = @$filter["v_stock_status"];
+        $this->stock_status->AdvancedSearch->SearchValue2 = @$filter["y_stock_status"];
+        $this->stock_status->AdvancedSearch->SearchOperator2 = @$filter["w_stock_status"];
+        $this->stock_status->AdvancedSearch->save();
+
+        // Field expiry_status
+        $this->expiry_status->AdvancedSearch->SearchValue = @$filter["x_expiry_status"];
+        $this->expiry_status->AdvancedSearch->SearchOperator = @$filter["z_expiry_status"];
+        $this->expiry_status->AdvancedSearch->SearchCondition = @$filter["v_expiry_status"];
+        $this->expiry_status->AdvancedSearch->SearchValue2 = @$filter["y_expiry_status"];
+        $this->expiry_status->AdvancedSearch->SearchOperator2 = @$filter["w_expiry_status"];
+        $this->expiry_status->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1221,14 +1239,6 @@ class MedicineStockList extends MedicineStock
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
-
-        // Field expiry_status
-        $this->expiry_status->AdvancedSearch->SearchValue = @$filter["x_expiry_status"];
-        $this->expiry_status->AdvancedSearch->SearchOperator = @$filter["z_expiry_status"];
-        $this->expiry_status->AdvancedSearch->SearchCondition = @$filter["v_expiry_status"];
-        $this->expiry_status->AdvancedSearch->SearchValue2 = @$filter["y_expiry_status"];
-        $this->expiry_status->AdvancedSearch->SearchOperator2 = @$filter["w_expiry_status"];
-        $this->expiry_status->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1270,6 +1280,7 @@ class MedicineStockList extends MedicineStock
         $searchFlds = [];
         $searchFlds[] = &$this->batch_number;
         $searchFlds[] = &$this->measuring_unit;
+        $searchFlds[] = &$this->stock_status;
         $searchFlds[] = &$this->expiry_status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
@@ -1360,9 +1371,10 @@ class MedicineStockList extends MedicineStock
             $this->updateSort($this->buying_price_per_unit); // buying_price_per_unit
             $this->updateSort($this->selling_price_per_unit); // selling_price_per_unit
             $this->updateSort($this->expiry_date); // expiry_date
+            $this->updateSort($this->stock_status); // stock_status
+            $this->updateSort($this->expiry_status); // expiry_status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->expiry_status); // expiry_status
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1397,9 +1409,10 @@ class MedicineStockList extends MedicineStock
                 $this->buying_price_per_unit->setSort("");
                 $this->selling_price_per_unit->setSort("");
                 $this->expiry_date->setSort("");
+                $this->stock_status->setSort("");
+                $this->expiry_status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
-                $this->expiry_status->setSort("");
             }
 
             // Reset start position
@@ -1625,9 +1638,10 @@ class MedicineStockList extends MedicineStock
             $this->createColumnOption($option, "buying_price_per_unit");
             $this->createColumnOption($option, "selling_price_per_unit");
             $this->createColumnOption($option, "expiry_date");
+            $this->createColumnOption($option, "stock_status");
+            $this->createColumnOption($option, "expiry_status");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
-            $this->createColumnOption($option, "expiry_status");
         }
 
         // Set up custom actions
@@ -2076,9 +2090,10 @@ class MedicineStockList extends MedicineStock
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
+        $this->stock_status->setDbValue($row['stock_status']);
+        $this->expiry_status->setDbValue($row['expiry_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Return a row with default values
@@ -2095,9 +2110,10 @@ class MedicineStockList extends MedicineStock
         $row['buying_price_per_unit'] = $this->buying_price_per_unit->DefaultValue;
         $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
+        $row['stock_status'] = $this->stock_status->DefaultValue;
+        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         return $row;
     }
 
@@ -2158,12 +2174,14 @@ class MedicineStockList extends MedicineStock
 
         // expiry_date
 
+        // stock_status
+
+        // expiry_status
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-
-        // expiry_status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2242,6 +2260,12 @@ class MedicineStockList extends MedicineStock
             $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
             $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
 
+            // stock_status
+            $this->stock_status->ViewValue = $this->stock_status->CurrentValue;
+
+            // expiry_status
+            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2249,9 +2273,6 @@ class MedicineStockList extends MedicineStock
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // expiry_status
-            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
             // id
             $this->id->HrefValue = "";
@@ -2293,6 +2314,14 @@ class MedicineStockList extends MedicineStock
             $this->expiry_date->HrefValue = "";
             $this->expiry_date->TooltipValue = "";
 
+            // stock_status
+            $this->stock_status->HrefValue = "";
+            $this->stock_status->TooltipValue = "";
+
+            // expiry_status
+            $this->expiry_status->HrefValue = "";
+            $this->expiry_status->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
@@ -2300,10 +2329,6 @@ class MedicineStockList extends MedicineStock
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // expiry_status
-            $this->expiry_status->HrefValue = "";
-            $this->expiry_status->TooltipValue = "";
         }
 
         // Call Row Rendered event

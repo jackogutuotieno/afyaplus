@@ -33,11 +33,10 @@ loadjs.ready(["wrapper", "head"], function () {
             ["brand_id", [fields.brand_id.visible && fields.brand_id.required ? ew.Validators.required(fields.brand_id.caption) : null], fields.brand_id.isInvalid],
             ["batch_number", [fields.batch_number.visible && fields.batch_number.required ? ew.Validators.required(fields.batch_number.caption) : null], fields.batch_number.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-            ["quantity_left", [fields.quantity_left.visible && fields.quantity_left.required ? ew.Validators.required(fields.quantity_left.caption) : null, ew.Validators.float], fields.quantity_left.isInvalid],
             ["measuring_unit", [fields.measuring_unit.visible && fields.measuring_unit.required ? ew.Validators.required(fields.measuring_unit.caption) : null], fields.measuring_unit.isInvalid],
             ["buying_price_per_unit", [fields.buying_price_per_unit.visible && fields.buying_price_per_unit.required ? ew.Validators.required(fields.buying_price_per_unit.caption) : null, ew.Validators.float], fields.buying_price_per_unit.isInvalid],
             ["selling_price_per_unit", [fields.selling_price_per_unit.visible && fields.selling_price_per_unit.required ? ew.Validators.required(fields.selling_price_per_unit.caption) : null, ew.Validators.float], fields.selling_price_per_unit.isInvalid],
-            ["expiry_status", [fields.expiry_status.visible && fields.expiry_status.required ? ew.Validators.required(fields.expiry_status.caption) : null], fields.expiry_status.isInvalid]
+            ["stock_status", [fields.stock_status.visible && fields.stock_status.required ? ew.Validators.required(fields.stock_status.caption) : null], fields.stock_status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -208,18 +207,6 @@ loadjs.ready("fmedicine_stockedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->quantity_left->Visible) { // quantity_left ?>
-    <div id="r_quantity_left"<?= $Page->quantity_left->rowAttributes() ?>>
-        <label id="elh_medicine_stock_quantity_left" for="x_quantity_left" class="<?= $Page->LeftColumnClass ?>"><?= $Page->quantity_left->caption() ?><?= $Page->quantity_left->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->quantity_left->cellAttributes() ?>>
-<span id="el_medicine_stock_quantity_left">
-<input type="<?= $Page->quantity_left->getInputTextType() ?>" name="x_quantity_left" id="x_quantity_left" data-table="medicine_stock" data-field="x_quantity_left" value="<?= $Page->quantity_left->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->quantity_left->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->quantity_left->formatPattern()) ?>"<?= $Page->quantity_left->editAttributes() ?> aria-describedby="x_quantity_left_help">
-<?= $Page->quantity_left->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->quantity_left->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
     <div id="r_measuring_unit"<?= $Page->measuring_unit->rowAttributes() ?>>
         <label id="elh_medicine_stock_measuring_unit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->measuring_unit->caption() ?><?= $Page->measuring_unit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -269,14 +256,14 @@ loadjs.ready("fmedicine_stockedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
-    <div id="r_expiry_status"<?= $Page->expiry_status->rowAttributes() ?>>
-        <label id="elh_medicine_stock_expiry_status" for="x_expiry_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->expiry_status->caption() ?><?= $Page->expiry_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->expiry_status->cellAttributes() ?>>
-<span id="el_medicine_stock_expiry_status">
-<input type="<?= $Page->expiry_status->getInputTextType() ?>" name="x_expiry_status" id="x_expiry_status" data-table="medicine_stock" data-field="x_expiry_status" value="<?= $Page->expiry_status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->expiry_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->expiry_status->formatPattern()) ?>"<?= $Page->expiry_status->editAttributes() ?> aria-describedby="x_expiry_status_help">
-<?= $Page->expiry_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->expiry_status->getErrorMessage() ?></div>
+<?php if ($Page->stock_status->Visible) { // stock_status ?>
+    <div id="r_stock_status"<?= $Page->stock_status->rowAttributes() ?>>
+        <label id="elh_medicine_stock_stock_status" for="x_stock_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->stock_status->caption() ?><?= $Page->stock_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->stock_status->cellAttributes() ?>>
+<span id="el_medicine_stock_stock_status">
+<input type="<?= $Page->stock_status->getInputTextType() ?>" name="x_stock_status" id="x_stock_status" data-table="medicine_stock" data-field="x_stock_status" value="<?= $Page->stock_status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->stock_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->stock_status->formatPattern()) ?>"<?= $Page->stock_status->editAttributes() ?> aria-describedby="x_stock_status_help">
+<?= $Page->stock_status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->stock_status->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

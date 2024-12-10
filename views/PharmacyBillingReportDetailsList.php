@@ -170,12 +170,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_id" class="pharmacy_billing_report_details_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
-<?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <th data-name="medicine_dispensation_id" class="<?= $Page->medicine_dispensation_id->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_medicine_dispensation_id" class="pharmacy_billing_report_details_medicine_dispensation_id"><?= $Page->renderFieldHeader($Page->medicine_dispensation_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <th data-name="brand_name" class="<?= $Page->brand_name->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_brand_name" class="pharmacy_billing_report_details_brand_name"><?= $Page->renderFieldHeader($Page->brand_name) ?></div></th>
 <?php } ?>
@@ -216,22 +210,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_pharmacy_billing_report_details_id" class="el_pharmacy_billing_report_details_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td data-name="medicine_dispensation_id"<?= $Page->medicine_dispensation_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_pharmacy_billing_report_details_medicine_dispensation_id" class="el_pharmacy_billing_report_details_medicine_dispensation_id">
-<span<?= $Page->medicine_dispensation_id->viewAttributes() ?>>
-<?= $Page->medicine_dispensation_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <td data-name="brand_name"<?= $Page->brand_name->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_pharmacy_billing_report_details_brand_name" class="el_pharmacy_billing_report_details_brand_name">
@@ -299,14 +277,6 @@ $Page->renderListOptions();
 // Render list options (footer, left)
 $Page->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Page->id->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_id" class="pharmacy_billing_report_details_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td data-name="medicine_dispensation_id" class="<?= $Page->medicine_dispensation_id->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_medicine_dispensation_id" class="pharmacy_billing_report_details_medicine_dispensation_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Page->brand_name->Visible) { // brand_name ?>
         <td data-name="brand_name" class="<?= $Page->brand_name->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_brand_name" class="pharmacy_billing_report_details_brand_name">
         </span></td>

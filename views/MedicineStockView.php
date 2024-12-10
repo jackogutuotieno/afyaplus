@@ -161,6 +161,28 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->stock_status->Visible) { // stock_status ?>
+    <tr id="r_stock_status"<?= $Page->stock_status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_stock_status"><?= $Page->stock_status->caption() ?></span></td>
+        <td data-name="stock_status"<?= $Page->stock_status->cellAttributes() ?>>
+<span id="el_medicine_stock_stock_status">
+<span<?= $Page->stock_status->viewAttributes() ?>>
+<?= $Page->stock_status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
+    <tr id="r_expiry_status"<?= $Page->expiry_status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_expiry_status"><?= $Page->expiry_status->caption() ?></span></td>
+        <td data-name="expiry_status"<?= $Page->expiry_status->cellAttributes() ?>>
+<span id="el_medicine_stock_expiry_status">
+<span<?= $Page->expiry_status->viewAttributes() ?>>
+<?= $Page->expiry_status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_date_created"><?= $Page->date_created->caption() ?></span></td>
@@ -179,17 +201,6 @@ loadjs.ready("head", function () {
 <span id="el_medicine_stock_date_updated">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->expiry_status->Visible) { // expiry_status ?>
-    <tr id="r_expiry_status"<?= $Page->expiry_status->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_expiry_status"><?= $Page->expiry_status->caption() ?></span></td>
-        <td data-name="expiry_status"<?= $Page->expiry_status->cellAttributes() ?>>
-<span id="el_medicine_stock_expiry_status">
-<span<?= $Page->expiry_status->viewAttributes() ?>>
-<?= $Page->expiry_status->getViewValue() ?></span>
 </span>
 </td>
     </tr>

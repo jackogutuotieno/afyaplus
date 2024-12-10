@@ -135,8 +135,8 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->medicine_dispensation_id->setVisibility();
+        $this->id->Visible = false;
+        $this->medicine_dispensation_id->Visible = false;
         $this->brand_name->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->quantity->setVisibility();
@@ -1094,14 +1094,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_medicine_dispensation_id") &&
-            $CurrentForm->hasValue("o_medicine_dispensation_id") &&
-            $this->medicine_dispensation_id->CurrentValue != $this->medicine_dispensation_id->DefaultValue &&
-            !($this->medicine_dispensation_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->medicine_dispensation_id->CurrentValue == $this->medicine_dispensation_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_brand_name") &&
             $CurrentForm->hasValue("o_brand_name") &&
             $this->brand_name->CurrentValue != $this->brand_name->DefaultValue &&
@@ -1294,6 +1286,14 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1362,6 +1362,10 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
         $this->renderListOptionsExt();
@@ -1599,25 +1603,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'medicine_dispensation_id' first before field var 'x_medicine_dispensation_id'
-        $val = $CurrentForm->hasValue("medicine_dispensation_id") ? $CurrentForm->getValue("medicine_dispensation_id") : $CurrentForm->getValue("x_medicine_dispensation_id");
-        if (!$this->medicine_dispensation_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->medicine_dispensation_id->Visible = false; // Disable update for API request
-            } else {
-                $this->medicine_dispensation_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_medicine_dispensation_id")) {
-            $this->medicine_dispensation_id->setOldValue($CurrentForm->getValue("o_medicine_dispensation_id"));
-        }
-
         // Check field name 'brand_name' first before field var 'x_brand_name'
         $val = $CurrentForm->hasValue("brand_name") ? $CurrentForm->getValue("brand_name") : $CurrentForm->getValue("x_brand_name");
         if (!$this->brand_name->IsDetailKey) {
@@ -1669,6 +1654,12 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         if ($CurrentForm->hasValue("o_line_total")) {
             $this->line_total->setOldValue($CurrentForm->getValue("o_line_total"));
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
     }
 
     // Restore form values
@@ -1678,7 +1669,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->medicine_dispensation_id->CurrentValue = $this->medicine_dispensation_id->FormValue;
         $this->brand_name->CurrentValue = $this->brand_name->FormValue;
         $this->selling_price_per_unit->CurrentValue = $this->selling_price_per_unit->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
@@ -1877,14 +1867,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
             $this->line_total->ViewValue = $this->line_total->CurrentValue;
             $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
-            $this->medicine_dispensation_id->TooltipValue = "";
-
             // brand_name
             $this->brand_name->HrefValue = "";
             $this->brand_name->TooltipValue = "";
@@ -1901,23 +1883,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
             $this->line_total->HrefValue = "";
             $this->line_total->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->setupEditAttributes();
-            if ($this->medicine_dispensation_id->getSessionValue() != "") {
-                $this->medicine_dispensation_id->CurrentValue = GetForeignKeyValue($this->medicine_dispensation_id->getSessionValue());
-                $this->medicine_dispensation_id->OldValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->ViewValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
-            } else {
-                $this->medicine_dispensation_id->EditValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->PlaceHolder = RemoveHtml($this->medicine_dispensation_id->caption());
-                if (strval($this->medicine_dispensation_id->EditValue) != "" && is_numeric($this->medicine_dispensation_id->EditValue)) {
-                    $this->medicine_dispensation_id->EditValue = FormatNumber($this->medicine_dispensation_id->EditValue, null);
-                }
-            }
-
             // brand_name
             $this->brand_name->setupEditAttributes();
             if (!$this->brand_name->Raw) {
@@ -1952,12 +1917,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
-
             // brand_name
             $this->brand_name->HrefValue = "";
 
@@ -1970,25 +1929,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
             // line_total
             $this->line_total->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->setupEditAttributes();
-            if ($this->medicine_dispensation_id->getSessionValue() != "") {
-                $this->medicine_dispensation_id->CurrentValue = GetForeignKeyValue($this->medicine_dispensation_id->getSessionValue());
-                $this->medicine_dispensation_id->OldValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->ViewValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
-            } else {
-                $this->medicine_dispensation_id->EditValue = $this->medicine_dispensation_id->CurrentValue;
-                $this->medicine_dispensation_id->PlaceHolder = RemoveHtml($this->medicine_dispensation_id->caption());
-                if (strval($this->medicine_dispensation_id->EditValue) != "" && is_numeric($this->medicine_dispensation_id->EditValue)) {
-                    $this->medicine_dispensation_id->EditValue = FormatNumber($this->medicine_dispensation_id->EditValue, null);
-                }
-            }
-
             // brand_name
             $this->brand_name->setupEditAttributes();
             if (!$this->brand_name->Raw) {
@@ -2022,12 +1962,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
             }
 
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
-
-            // medicine_dispensation_id
-            $this->medicine_dispensation_id->HrefValue = "";
 
             // brand_name
             $this->brand_name->HrefValue = "";
@@ -2068,19 +2002,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->medicine_dispensation_id->Visible && $this->medicine_dispensation_id->Required) {
-                if (!$this->medicine_dispensation_id->IsDetailKey && EmptyValue($this->medicine_dispensation_id->FormValue)) {
-                    $this->medicine_dispensation_id->addErrorMessage(str_replace("%s", $this->medicine_dispensation_id->caption(), $this->medicine_dispensation_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->medicine_dispensation_id->FormValue)) {
-                $this->medicine_dispensation_id->addErrorMessage($this->medicine_dispensation_id->getErrorMessage(false));
-            }
             if ($this->brand_name->Visible && $this->brand_name->Required) {
                 if (!$this->brand_name->IsDetailKey && EmptyValue($this->brand_name->FormValue)) {
                     $this->brand_name->addErrorMessage(str_replace("%s", $this->brand_name->caption(), $this->brand_name->RequiredErrorMessage));
@@ -2260,12 +2181,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         global $Security;
         $rsnew = [];
 
-        // medicine_dispensation_id
-        if ($this->medicine_dispensation_id->getSessionValue() != "") {
-            $this->medicine_dispensation_id->ReadOnly = true;
-        }
-        $this->medicine_dispensation_id->setDbValueDef($rsnew, $this->medicine_dispensation_id->CurrentValue, $this->medicine_dispensation_id->ReadOnly);
-
         // brand_name
         $this->brand_name->setDbValueDef($rsnew, $this->brand_name->CurrentValue, $this->brand_name->ReadOnly);
 
@@ -2286,9 +2201,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['medicine_dispensation_id'])) { // medicine_dispensation_id
-            $this->medicine_dispensation_id->CurrentValue = $row['medicine_dispensation_id'];
-        }
         if (isset($row['brand_name'])) { // brand_name
             $this->brand_name->CurrentValue = $row['brand_name'];
         }
@@ -2360,9 +2272,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         global $Security;
         $rsnew = [];
 
-        // medicine_dispensation_id
-        $this->medicine_dispensation_id->setDbValueDef($rsnew, $this->medicine_dispensation_id->CurrentValue, false);
-
         // brand_name
         $this->brand_name->setDbValueDef($rsnew, $this->brand_name->CurrentValue, false);
 
@@ -2374,6 +2283,11 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
 
         // line_total
         $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, false);
+
+        // medicine_dispensation_id
+        if ($this->medicine_dispensation_id->getSessionValue() != "") {
+            $rsnew['medicine_dispensation_id'] = $this->medicine_dispensation_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2383,9 +2297,6 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['medicine_dispensation_id'])) { // medicine_dispensation_id
-            $this->medicine_dispensation_id->setFormValue($row['medicine_dispensation_id']);
-        }
         if (isset($row['brand_name'])) { // brand_name
             $this->brand_name->setFormValue($row['brand_name']);
         }
@@ -2397,6 +2308,9 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         }
         if (isset($row['line_total'])) { // line_total
             $this->line_total->setFormValue($row['line_total']);
+        }
+        if (isset($row['medicine_dispensation_id'])) { // medicine_dispensation_id
+            $this->medicine_dispensation_id->setFormValue($row['medicine_dispensation_id']);
         }
     }
 

@@ -1,4 +1,4 @@
-<ew-language date="2024/12/8" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/10" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -797,14 +797,17 @@
       <field id="expiry_date">
         <phrase id="fldcaption" value="Expiry Date" />
       </field>
+      <field id="stock_status">
+        <phrase id="fldcaption" value="Stock Status" />
+      </field>
+      <field id="expiry_status">
+        <phrase id="fldcaption" value="Expiry Status" />
+      </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Update" />
-      </field>
-      <field id="expiry_status">
-        <phrase id="fldcaption" value="Expiry Status" />
       </field>
     </table>
     <table id="medicine_stock_report2">
@@ -2569,13 +2572,13 @@
         <phrase id="fldcaption" value="medicine dispensation id" />
       </field>
       <field id="brand_name">
-        <phrase id="fldcaption" value="brand name" />
+        <phrase id="fldcaption" value="Medicine" />
       </field>
       <field id="selling_price_per_unit">
-        <phrase id="fldcaption" value="selling price per unit" />
+        <phrase id="fldcaption" value="Cost (Kshs)" />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="quantity" />
+        <phrase id="fldcaption" value="Qty" />
       </field>
       <field id="line_total">
         <phrase id="fldcaption" value="Total (Kshs)" />

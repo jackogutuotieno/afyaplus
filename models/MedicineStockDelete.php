@@ -139,9 +139,10 @@ class MedicineStockDelete extends MedicineStock
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->setVisibility();
+        $this->stock_status->setVisibility();
+        $this->expiry_status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->expiry_status->setVisibility();
     }
 
     // Constructor
@@ -627,9 +628,10 @@ class MedicineStockDelete extends MedicineStock
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
+        $this->stock_status->setDbValue($row['stock_status']);
+        $this->expiry_status->setDbValue($row['expiry_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Return a row with default values
@@ -646,9 +648,10 @@ class MedicineStockDelete extends MedicineStock
         $row['buying_price_per_unit'] = $this->buying_price_per_unit->DefaultValue;
         $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
+        $row['stock_status'] = $this->stock_status->DefaultValue;
+        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['expiry_status'] = $this->expiry_status->DefaultValue;
         return $row;
     }
 
@@ -684,12 +687,14 @@ class MedicineStockDelete extends MedicineStock
 
         // expiry_date
 
+        // stock_status
+
+        // expiry_status
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-
-        // expiry_status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -768,6 +773,12 @@ class MedicineStockDelete extends MedicineStock
             $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
             $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
 
+            // stock_status
+            $this->stock_status->ViewValue = $this->stock_status->CurrentValue;
+
+            // expiry_status
+            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -775,9 +786,6 @@ class MedicineStockDelete extends MedicineStock
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // expiry_status
-            $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
             // id
             $this->id->HrefValue = "";
@@ -819,6 +827,14 @@ class MedicineStockDelete extends MedicineStock
             $this->expiry_date->HrefValue = "";
             $this->expiry_date->TooltipValue = "";
 
+            // stock_status
+            $this->stock_status->HrefValue = "";
+            $this->stock_status->TooltipValue = "";
+
+            // expiry_status
+            $this->expiry_status->HrefValue = "";
+            $this->expiry_status->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
@@ -826,10 +842,6 @@ class MedicineStockDelete extends MedicineStock
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // expiry_status
-            $this->expiry_status->HrefValue = "";
-            $this->expiry_status->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -64,9 +64,10 @@ class MedicineStock extends DbTable
     public $buying_price_per_unit;
     public $selling_price_per_unit;
     public $expiry_date;
+    public $stock_status;
+    public $expiry_status;
     public $date_created;
     public $date_updated;
-    public $expiry_status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -266,14 +267,14 @@ class MedicineStock extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
         $this->quantity_left->addMethod("getSearchDefault", fn() => 0);
         $this->quantity_left->InputTextType = "text";
         $this->quantity_left->Raw = true;
         $this->quantity_left->IsCustom = true; // Custom field
         $this->quantity_left->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->quantity_left->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->quantity_left->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->quantity_left->AdvancedSearch->SearchValueDefault = $this->quantity_left->getSearchDefault();
         $this->quantity_left->AdvancedSearch->SearchOperatorDefault = "=";
         $this->quantity_left->AdvancedSearch->SearchOperator2Default = "";
@@ -384,6 +385,52 @@ class MedicineStock extends DbTable
         $this->expiry_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['expiry_date'] = &$this->expiry_date;
 
+        // stock_status
+        $this->stock_status = new DbField(
+            $this, // Table
+            'x_stock_status', // Variable name
+            'stock_status', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->stock_status->InputTextType = "text";
+        $this->stock_status->IsCustom = true; // Custom field
+        $this->stock_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['stock_status'] = &$this->stock_status;
+
+        // expiry_status
+        $this->expiry_status = new DbField(
+            $this, // Table
+            'x_expiry_status', // Variable name
+            'expiry_status', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->expiry_status->InputTextType = "text";
+        $this->expiry_status->IsCustom = true; // Custom field
+        $this->expiry_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['expiry_status'] = &$this->expiry_status;
+
         // date_created
         $this->date_created = new DbField(
             $this, // Table
@@ -435,29 +482,6 @@ class MedicineStock extends DbTable
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // expiry_status
-        $this->expiry_status = new DbField(
-            $this, // Table
-            'x_expiry_status', // Variable name
-            'expiry_status', // Name
-            '\'\'', // Expression
-            '\'\'', // Basic search expression
-            200, // Type
-            0, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '\'\'', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->expiry_status->InputTextType = "text";
-        $this->expiry_status->IsCustom = true; // Custom field
-        $this->expiry_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['expiry_status'] = &$this->expiry_status;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -550,7 +574,7 @@ class MedicineStock extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id) AS `quantity_left`, '' AS `expiry_status`";
+        return "*, quantity - (SELECT SUM(quantity) FROM medicine_dispensation_details WHERE medicine_stock_id=medicine_stock.id) AS `quantity_left`, '' AS `stock_status`, '' AS `expiry_status`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -988,9 +1012,10 @@ class MedicineStock extends DbTable
         $this->buying_price_per_unit->DbValue = $row['buying_price_per_unit'];
         $this->selling_price_per_unit->DbValue = $row['selling_price_per_unit'];
         $this->expiry_date->DbValue = $row['expiry_date'];
+        $this->stock_status->DbValue = $row['stock_status'];
+        $this->expiry_status->DbValue = $row['expiry_status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->expiry_status->DbValue = $row['expiry_status'];
     }
 
     // Delete uploaded files
@@ -1353,9 +1378,10 @@ class MedicineStock extends DbTable
         $this->buying_price_per_unit->setDbValue($row['buying_price_per_unit']);
         $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
         $this->expiry_date->setDbValue($row['expiry_date']);
+        $this->stock_status->setDbValue($row['stock_status']);
+        $this->expiry_status->setDbValue($row['expiry_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->expiry_status->setDbValue($row['expiry_status']);
     }
 
     // Render list content
@@ -1406,12 +1432,14 @@ class MedicineStock extends DbTable
 
         // expiry_date
 
+        // stock_status
+
+        // expiry_status
+
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
-
-        // expiry_status
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1488,6 +1516,12 @@ class MedicineStock extends DbTable
         $this->expiry_date->ViewValue = $this->expiry_date->CurrentValue;
         $this->expiry_date->ViewValue = FormatDateTime($this->expiry_date->ViewValue, $this->expiry_date->formatPattern());
 
+        // stock_status
+        $this->stock_status->ViewValue = $this->stock_status->CurrentValue;
+
+        // expiry_status
+        $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1495,9 +1529,6 @@ class MedicineStock extends DbTable
         // date_updated
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-        // expiry_status
-        $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
@@ -1539,6 +1570,14 @@ class MedicineStock extends DbTable
         $this->expiry_date->HrefValue = "";
         $this->expiry_date->TooltipValue = "";
 
+        // stock_status
+        $this->stock_status->HrefValue = "";
+        $this->stock_status->TooltipValue = "";
+
+        // expiry_status
+        $this->expiry_status->HrefValue = "";
+        $this->expiry_status->TooltipValue = "";
+
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
@@ -1546,10 +1585,6 @@ class MedicineStock extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
-
-        // expiry_status
-        $this->expiry_status->HrefValue = "";
-        $this->expiry_status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1596,8 +1631,7 @@ class MedicineStock extends DbTable
 
         // quantity_left
         $this->quantity_left->setupEditAttributes();
-        $this->quantity_left->EditValue = $this->quantity_left->CurrentValue;
-        $this->quantity_left->PlaceHolder = RemoveHtml($this->quantity_left->caption());
+        $this->quantity_left->CurrentValue = FormatNumber($this->quantity_left->CurrentValue, $this->quantity_left->formatPattern());
         if (strval($this->quantity_left->EditValue) != "" && is_numeric($this->quantity_left->EditValue)) {
             $this->quantity_left->EditValue = FormatNumber($this->quantity_left->EditValue, null);
         }
@@ -1631,6 +1665,22 @@ class MedicineStock extends DbTable
         $this->expiry_date->EditValue = FormatDateTime($this->expiry_date->CurrentValue, $this->expiry_date->formatPattern());
         $this->expiry_date->PlaceHolder = RemoveHtml($this->expiry_date->caption());
 
+        // stock_status
+        $this->stock_status->setupEditAttributes();
+        if (!$this->stock_status->Raw) {
+            $this->stock_status->CurrentValue = HtmlDecode($this->stock_status->CurrentValue);
+        }
+        $this->stock_status->EditValue = $this->stock_status->CurrentValue;
+        $this->stock_status->PlaceHolder = RemoveHtml($this->stock_status->caption());
+
+        // expiry_status
+        $this->expiry_status->setupEditAttributes();
+        if (!$this->expiry_status->Raw) {
+            $this->expiry_status->CurrentValue = HtmlDecode($this->expiry_status->CurrentValue);
+        }
+        $this->expiry_status->EditValue = $this->expiry_status->CurrentValue;
+        $this->expiry_status->PlaceHolder = RemoveHtml($this->expiry_status->caption());
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1640,14 +1690,6 @@ class MedicineStock extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // expiry_status
-        $this->expiry_status->setupEditAttributes();
-        if (!$this->expiry_status->Raw) {
-            $this->expiry_status->CurrentValue = HtmlDecode($this->expiry_status->CurrentValue);
-        }
-        $this->expiry_status->EditValue = $this->expiry_status->CurrentValue;
-        $this->expiry_status->PlaceHolder = RemoveHtml($this->expiry_status->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1687,9 +1729,10 @@ class MedicineStock extends DbTable
                     $doc->exportCaption($this->buying_price_per_unit);
                     $doc->exportCaption($this->selling_price_per_unit);
                     $doc->exportCaption($this->expiry_date);
+                    $doc->exportCaption($this->stock_status);
+                    $doc->exportCaption($this->expiry_status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->expiry_status);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->supplier_id);
@@ -1701,9 +1744,10 @@ class MedicineStock extends DbTable
                     $doc->exportCaption($this->buying_price_per_unit);
                     $doc->exportCaption($this->selling_price_per_unit);
                     $doc->exportCaption($this->expiry_date);
+                    $doc->exportCaption($this->stock_status);
+                    $doc->exportCaption($this->expiry_status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->expiry_status);
                 }
                 $doc->endExportRow();
             }
@@ -1740,9 +1784,10 @@ class MedicineStock extends DbTable
                         $doc->exportField($this->buying_price_per_unit);
                         $doc->exportField($this->selling_price_per_unit);
                         $doc->exportField($this->expiry_date);
+                        $doc->exportField($this->stock_status);
+                        $doc->exportField($this->expiry_status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->expiry_status);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->supplier_id);
@@ -1754,9 +1799,10 @@ class MedicineStock extends DbTable
                         $doc->exportField($this->buying_price_per_unit);
                         $doc->exportField($this->selling_price_per_unit);
                         $doc->exportField($this->expiry_date);
+                        $doc->exportField($this->stock_status);
+                        $doc->exportField($this->expiry_status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
-                        $doc->exportField($this->expiry_status);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -2113,6 +2159,7 @@ class MedicineStock extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
+        // Check expiry status
         $current_date = CurrentDate();
         if ($this->expiry_date->CurrentValue > $current_date) {
             $this->expiry_status->CellAttrs["style"] = "background-color: #15b20b; color: white";
@@ -2121,9 +2168,20 @@ class MedicineStock extends DbTable
             $this->expiry_status->CellAttrs["style"] = "background-color: #e5064b; color: white";
             $this->expiry_status->ViewValue = "Expired"; 
         } 
+
+        // Add batch quantity to quantity left if unsued
         $batch_quantity = $this->quantity->ViewValue;
         if ($this->quantity_left->CurrentValue == "") {
             $this->quantity_left->ViewValue = $batch_quantity; 
+        } 
+
+        // Check stock stauts
+        if ($this->quantity_left->ViewValue > 0) {
+            $this->stock_status->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->stock_status->ViewValue = "In Stock"; 
+        } else if ($this->quantity_left->ViewValue <= 0) {
+            $this->stock_status->CellAttrs["style"] = "background-color: #e5064b; color: white";
+            $this->stock_status->ViewValue = "Out of Stock"; 
         }
     }
 

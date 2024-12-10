@@ -23,8 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["medicine_dispensation_id", [fields.medicine_dispensation_id.visible && fields.medicine_dispensation_id.required ? ew.Validators.required(fields.medicine_dispensation_id.caption) : null, ew.Validators.integer], fields.medicine_dispensation_id.isInvalid],
             ["brand_name", [fields.brand_name.visible && fields.brand_name.required ? ew.Validators.required(fields.brand_name.caption) : null], fields.brand_name.isInvalid],
             ["selling_price_per_unit", [fields.selling_price_per_unit.visible && fields.selling_price_per_unit.required ? ew.Validators.required(fields.selling_price_per_unit.caption) : null, ew.Validators.float], fields.selling_price_per_unit.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
@@ -35,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["medicine_dispensation_id",false],["brand_name",false],["selling_price_per_unit",false],["quantity",false],["line_total",false]];
+                    fields = [["brand_name",false],["selling_price_per_unit",false],["quantity",false],["line_total",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -89,12 +87,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_id" class="pharmacy_billing_report_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <th data-name="medicine_dispensation_id" class="<?= $Grid->medicine_dispensation_id->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_medicine_dispensation_id" class="pharmacy_billing_report_details_medicine_dispensation_id"><?= $Grid->renderFieldHeader($Grid->medicine_dispensation_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->brand_name->Visible) { // brand_name ?>
         <th data-name="brand_name" class="<?= $Grid->brand_name->headerCellClass() ?>"><div id="elh_pharmacy_billing_report_details_brand_name" class="pharmacy_billing_report_details_brand_name"><?= $Grid->renderFieldHeader($Grid->brand_name) ?></div></th>
 <?php } ?>
@@ -143,72 +135,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_id" class="el_pharmacy_billing_report_details_id"></span>
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_id" class="el_pharmacy_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_id" class="el_pharmacy_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_id" data-hidden="1" name="fpharmacy_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="fpharmacy_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_id" data-hidden="1" data-old name="fpharmacy_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="fpharmacy_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
-    <?php if ($Grid->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td data-name="medicine_dispensation_id"<?= $Grid->medicine_dispensation_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->medicine_dispensation_id->getSessionValue() != "") { ?>
-<span<?= $Grid->medicine_dispensation_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->medicine_dispensation_id->getDisplayValue($Grid->medicine_dispensation_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" name="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" value="<?= HtmlEncode($Grid->medicine_dispensation_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_medicine_dispensation_id" class="el_pharmacy_billing_report_details_medicine_dispensation_id">
-<input type="<?= $Grid->medicine_dispensation_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" id="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" data-table="pharmacy_billing_report_details" data-field="x_medicine_dispensation_id" value="<?= $Grid->medicine_dispensation_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->medicine_dispensation_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->medicine_dispensation_id->formatPattern()) ?>"<?= $Grid->medicine_dispensation_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->medicine_dispensation_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_medicine_dispensation_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_medicine_dispensation_id" id="o<?= $Grid->RowIndex ?>_medicine_dispensation_id" value="<?= HtmlEncode($Grid->medicine_dispensation_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->medicine_dispensation_id->getSessionValue() != "") { ?>
-<span<?= $Grid->medicine_dispensation_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->medicine_dispensation_id->getDisplayValue($Grid->medicine_dispensation_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" name="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" value="<?= HtmlEncode($Grid->medicine_dispensation_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_medicine_dispensation_id" class="el_pharmacy_billing_report_details_medicine_dispensation_id">
-<input type="<?= $Grid->medicine_dispensation_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" id="x<?= $Grid->RowIndex ?>_medicine_dispensation_id" data-table="pharmacy_billing_report_details" data-field="x_medicine_dispensation_id" value="<?= $Grid->medicine_dispensation_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->medicine_dispensation_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->medicine_dispensation_id->formatPattern()) ?>"<?= $Grid->medicine_dispensation_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->medicine_dispensation_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_pharmacy_billing_report_details_medicine_dispensation_id" class="el_pharmacy_billing_report_details_medicine_dispensation_id">
-<span<?= $Grid->medicine_dispensation_id->viewAttributes() ?>>
-<?= $Grid->medicine_dispensation_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_medicine_dispensation_id" data-hidden="1" name="fpharmacy_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_medicine_dispensation_id" id="fpharmacy_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_medicine_dispensation_id" value="<?= HtmlEncode($Grid->medicine_dispensation_id->FormValue) ?>">
-<input type="hidden" data-table="pharmacy_billing_report_details" data-field="x_medicine_dispensation_id" data-hidden="1" data-old name="fpharmacy_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_medicine_dispensation_id" id="fpharmacy_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_medicine_dispensation_id" value="<?= HtmlEncode($Grid->medicine_dispensation_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->brand_name->Visible) { // brand_name ?>
         <td data-name="brand_name"<?= $Grid->brand_name->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -358,14 +284,6 @@ $Grid->renderListOptions();
 // Render list options (footer, left)
 $Grid->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_id" class="pharmacy_billing_report_details_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->medicine_dispensation_id->Visible) { // medicine_dispensation_id ?>
-        <td data-name="medicine_dispensation_id" class="<?= $Grid->medicine_dispensation_id->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_medicine_dispensation_id" class="pharmacy_billing_report_details_medicine_dispensation_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Grid->brand_name->Visible) { // brand_name ?>
         <td data-name="brand_name" class="<?= $Grid->brand_name->footerCellClass() ?>"><span id="elf_pharmacy_billing_report_details_brand_name" class="pharmacy_billing_report_details_brand_name">
         </span></td>

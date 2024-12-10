@@ -111,15 +111,14 @@ class LaboratoryReports extends ReportTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
         $this->id->addMethod("getDefault", fn() => 0);
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
         $this->id->Nullable = false; // NOT NULL field
-        $this->id->Required = true; // Required field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->id->SearchOperators = ["=", "<>"];
         $this->id->SourceTableVar = 'laboratory_reports2';
         $this->Fields['id'] = &$this->id;
 
