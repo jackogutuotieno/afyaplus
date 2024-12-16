@@ -831,6 +831,53 @@ class PatientsView extends Patients
             $item->Visible = false;
         }
 
+        // "detail_patients_dependants"
+        $item = &$option->add("detail_patients_dependants");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patients_dependants", "TblCaption");
+        $detailTbl = Container("patients_dependants");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patients_dependants")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("patientsdependantslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("PatientsDependantsGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patients_dependants"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "patients_dependants";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patients')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patients_dependants"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "patients_dependants";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patients_dependants');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "patients_dependants";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
@@ -1365,6 +1412,25 @@ class PatientsView extends Patients
                 $doc->setStyle($exportStyle); // Restore
             }
         }
+
+        // Export detail records (patients_dependants)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("patients_dependants", explode(",", $this->getCurrentDetailTable()))) {
+            $patients_dependants = new PatientsDependantsList();
+            $rsdetail = $patients_dependants->loadRs($patients_dependants->getDetailFilterFromSession(), $patients_dependants->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($patients_dependants);
+                    $patients_dependants->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
         $rs->free();
 
         // Page footer
@@ -1407,6 +1473,20 @@ class PatientsView extends Patients
             }
             if (in_array("patient_visits", $detailTblVar)) {
                 $detailPageObj = Container("PatientVisitsGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patients_dependants", $detailTblVar)) {
+                $detailPageObj = Container("PatientsDependantsGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";

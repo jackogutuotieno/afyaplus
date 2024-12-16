@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "fullhaemoresultsgrid";
+    public $CurrentPageName = "patientsdependantsdelete";
 
     // Page headings
     public $Heading = "";

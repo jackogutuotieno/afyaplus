@@ -73,57 +73,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->test->Visible) { // test ?>
-    <tr id="r_test"<?= $Page->test->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters_test"><?= $Page->test->caption() ?></span></td>
-        <td data-name="test"<?= $Page->test->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_test">
-<span<?= $Page->test->viewAttributes() ?>>
-<?= $Page->test->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->results->Visible) { // results ?>
-    <tr id="r_results"<?= $Page->results->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters_results"><?= $Page->results->caption() ?></span></td>
-        <td data-name="results"<?= $Page->results->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_results">
-<span<?= $Page->results->viewAttributes() ?>>
-<?= $Page->results->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->unit->Visible) { // unit ?>
-    <tr id="r_unit"<?= $Page->unit->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters_unit"><?= $Page->unit->caption() ?></span></td>
-        <td data-name="unit"<?= $Page->unit->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_unit">
-<span<?= $Page->unit->viewAttributes() ?>>
-<?= $Page->unit->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->unit_references->Visible) { // unit_references ?>
-    <tr id="r_unit_references"<?= $Page->unit_references->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters_unit_references"><?= $Page->unit_references->caption() ?></span></td>
-        <td data-name="unit_references"<?= $Page->unit_references->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_unit_references">
-<span<?= $Page->unit_references->viewAttributes() ?>>
-<?= $Page->unit_references->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->comment->Visible) { // comment ?>
-    <tr id="r_comment"<?= $Page->comment->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters_comment"><?= $Page->comment->caption() ?></span></td>
-        <td data-name="comment"<?= $Page->comment->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_comment">
-<span<?= $Page->comment->viewAttributes() ?>>
-<?= $Page->comment->getViewValue() ?></span>
+<?php if ($Page->_template->Visible) { // template ?>
+    <tr id="r__template"<?= $Page->_template->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_full_haemogram_parameters__template"><?= $Page->_template->caption() ?></span></td>
+        <td data-name="_template"<?= $Page->_template->cellAttributes() ?>>
+<span id="el_full_haemogram_parameters__template">
+<span<?= $Page->_template->viewAttributes() ?>>
+<?= $Page->_template->getViewValue() ?></span>
 </span>
 </td>
     </tr>

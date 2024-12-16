@@ -12,3 +12,18 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-10 12:43:36",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,2,,3
 "2024-12-10 12:43:36",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,2,,2
 "2024-12-10 12:43:36",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
+"2024-12-10 19:43:29",/afyaplus/login,5,login,::1,,,,
+"2024-12-10 19:50:04",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,4,,1
+"2024-12-10 19:50:04",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,4,,
+"2024-12-10 19:50:04",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,4,,5
+"2024-12-10 19:50:04",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,4,,4
+"2024-12-10 20:22:32",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,5,,2
+"2024-12-10 20:22:33",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,5,,
+"2024-12-10 20:22:33",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,5,,5
+"2024-12-10 20:22:33",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,5,,5
+"2024-12-10 20:25:18",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-10 20:34:55",/afyaplus/login,5,login,::1,,,,
+"2024-12-10 20:38:02",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-10 20:38:08",/afyaplus/login,5,login,::1,,,,
+"2024-12-10 20:43:28",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-10 20:43:36",/afyaplus/login,5,login,::1,,,,

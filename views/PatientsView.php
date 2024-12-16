@@ -112,6 +112,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "PatientVisitsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patients_dependants", explode(",", $Page->getCurrentDetailTable())) && $patients_dependants->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_dependants", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patients_dependants")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientsDependantsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

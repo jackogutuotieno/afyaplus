@@ -36,20 +36,8 @@ class FullHaemogramParameter extends AbstractEntity
     #[Column(name: "lab_test_report_id", type: "integer")]
     private int $labTestReportId;
 
-    #[Column(type: "string")]
-    private string $test;
-
-    #[Column(type: "float")]
-    private float $results;
-
-    #[Column(type: "string")]
-    private string $unit;
-
-    #[Column(name: "unit_references", type: "string")]
-    private string $unitReferences;
-
-    #[Column(type: "text", nullable: true)]
-    private ?string $comment;
+    #[Column(type: "text")]
+    private string $template;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -79,58 +67,14 @@ class FullHaemogramParameter extends AbstractEntity
         return $this;
     }
 
-    public function getTest(): string
+    public function getTemplate(): string
     {
-        return HtmlDecode($this->test);
+        return HtmlDecode($this->template);
     }
 
-    public function setTest(string $value): static
+    public function setTemplate(string $value): static
     {
-        $this->test = RemoveXss($value);
-        return $this;
-    }
-
-    public function getResults(): float
-    {
-        return $this->results;
-    }
-
-    public function setResults(float $value): static
-    {
-        $this->results = $value;
-        return $this;
-    }
-
-    public function getUnit(): string
-    {
-        return HtmlDecode($this->unit);
-    }
-
-    public function setUnit(string $value): static
-    {
-        $this->unit = RemoveXss($value);
-        return $this;
-    }
-
-    public function getUnitReferences(): string
-    {
-        return HtmlDecode($this->unitReferences);
-    }
-
-    public function setUnitReferences(string $value): static
-    {
-        $this->unitReferences = RemoveXss($value);
-        return $this;
-    }
-
-    public function getComment(): ?string
-    {
-        return HtmlDecode($this->comment);
-    }
-
-    public function setComment(?string $value): static
-    {
-        $this->comment = RemoveXss($value);
+        $this->template = RemoveXss($value);
         return $this;
     }
 

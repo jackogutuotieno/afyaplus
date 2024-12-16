@@ -107,22 +107,6 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
-<?php
-    if (in_array("urinalysis_parameters", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_parameters->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("urinalysis_parameters", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "UrinalysisParametersGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("full_haemogram_parameters", explode(",", $Page->getCurrentDetailTable())) && $full_haemogram_parameters->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("full_haemogram_parameters", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "FullHaemogramParametersGrid.php" ?>
-<?php } ?>
 </form>
 </main>
 <?php

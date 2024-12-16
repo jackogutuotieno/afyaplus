@@ -30,11 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["lab_test_report_id", [fields.lab_test_report_id.visible && fields.lab_test_report_id.required ? ew.Validators.required(fields.lab_test_report_id.caption) : null, ew.Validators.integer], fields.lab_test_report_id.isInvalid],
-            ["test", [fields.test.visible && fields.test.required ? ew.Validators.required(fields.test.caption) : null], fields.test.isInvalid],
-            ["results", [fields.results.visible && fields.results.required ? ew.Validators.required(fields.results.caption) : null, ew.Validators.float], fields.results.isInvalid],
-            ["unit", [fields.unit.visible && fields.unit.required ? ew.Validators.required(fields.unit.caption) : null], fields.unit.isInvalid],
-            ["unit_references", [fields.unit_references.visible && fields.unit_references.required ? ew.Validators.required(fields.unit_references.caption) : null], fields.unit_references.isInvalid],
-            ["comment", [fields.comment.visible && fields.comment.required ? ew.Validators.required(fields.comment.caption) : null], fields.comment.isInvalid]
+            ["_template", [fields._template.visible && fields._template.required ? ew.Validators.required(fields._template.caption) : null], fields._template.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -50,7 +46,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "test": <?= $Page->test->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -109,95 +104,12 @@ loadjs.ready("head", function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->test->Visible) { // test ?>
-    <div id="r_test"<?= $Page->test->rowAttributes() ?>>
-        <label id="elh_full_haemogram_parameters_test" for="x_test" class="<?= $Page->LeftColumnClass ?>"><?= $Page->test->caption() ?><?= $Page->test->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->test->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_test">
-    <select
-        id="x_test"
-        name="x_test"
-        class="form-select ew-select<?= $Page->test->isInvalidClass() ?>"
-        <?php if (!$Page->test->IsNativeSelect) { ?>
-        data-select2-id="ffull_haemogram_parametersedit_x_test"
-        <?php } ?>
-        data-table="full_haemogram_parameters"
-        data-field="x_test"
-        data-value-separator="<?= $Page->test->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->test->getPlaceHolder()) ?>"
-        <?= $Page->test->editAttributes() ?>>
-        <?= $Page->test->selectOptionListHtml("x_test") ?>
-    </select>
-    <?= $Page->test->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->test->getErrorMessage() ?></div>
-<?php if (!$Page->test->IsNativeSelect) { ?>
-<script>
-loadjs.ready("ffull_haemogram_parametersedit", function() {
-    var options = { name: "x_test", selectId: "ffull_haemogram_parametersedit_x_test" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (ffull_haemogram_parametersedit.lists.test?.lookupOptions.length) {
-        options.data = { id: "x_test", form: "ffull_haemogram_parametersedit" };
-    } else {
-        options.ajax = { id: "x_test", form: "ffull_haemogram_parametersedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.full_haemogram_parameters.fields.test.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->results->Visible) { // results ?>
-    <div id="r_results"<?= $Page->results->rowAttributes() ?>>
-        <label id="elh_full_haemogram_parameters_results" for="x_results" class="<?= $Page->LeftColumnClass ?>"><?= $Page->results->caption() ?><?= $Page->results->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->results->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_results">
-<input type="<?= $Page->results->getInputTextType() ?>" name="x_results" id="x_results" data-table="full_haemogram_parameters" data-field="x_results" value="<?= $Page->results->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->results->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->results->formatPattern()) ?>"<?= $Page->results->editAttributes() ?> aria-describedby="x_results_help">
-<?= $Page->results->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->results->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->unit->Visible) { // unit ?>
-    <div id="r_unit"<?= $Page->unit->rowAttributes() ?>>
-        <label id="elh_full_haemogram_parameters_unit" for="x_unit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->unit->caption() ?><?= $Page->unit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->unit->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_unit">
-<input type="<?= $Page->unit->getInputTextType() ?>" name="x_unit" id="x_unit" data-table="full_haemogram_parameters" data-field="x_unit" value="<?= $Page->unit->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->unit->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->unit->formatPattern()) ?>"<?= $Page->unit->editAttributes() ?> aria-describedby="x_unit_help">
-<?= $Page->unit->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->unit->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->unit_references->Visible) { // unit_references ?>
-    <div id="r_unit_references"<?= $Page->unit_references->rowAttributes() ?>>
-        <label id="elh_full_haemogram_parameters_unit_references" for="x_unit_references" class="<?= $Page->LeftColumnClass ?>"><?= $Page->unit_references->caption() ?><?= $Page->unit_references->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->unit_references->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_unit_references">
-<input type="<?= $Page->unit_references->getInputTextType() ?>" name="x_unit_references" id="x_unit_references" data-table="full_haemogram_parameters" data-field="x_unit_references" value="<?= $Page->unit_references->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Page->unit_references->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->unit_references->formatPattern()) ?>"<?= $Page->unit_references->editAttributes() ?> aria-describedby="x_unit_references_help">
-<?= $Page->unit_references->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->unit_references->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->comment->Visible) { // comment ?>
-    <div id="r_comment"<?= $Page->comment->rowAttributes() ?>>
-        <label id="elh_full_haemogram_parameters_comment" for="x_comment" class="<?= $Page->LeftColumnClass ?>"><?= $Page->comment->caption() ?><?= $Page->comment->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->comment->cellAttributes() ?>>
-<span id="el_full_haemogram_parameters_comment">
-<input type="<?= $Page->comment->getInputTextType() ?>" name="x_comment" id="x_comment" data-table="full_haemogram_parameters" data-field="x_comment" value="<?= $Page->comment->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Page->comment->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->comment->formatPattern()) ?>"<?= $Page->comment->editAttributes() ?> aria-describedby="x_comment_help">
-<?= $Page->comment->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->comment->getErrorMessage() ?></div>
+<?php if ($Page->_template->Visible) { // template ?>
+    <div id="r__template"<?= $Page->_template->rowAttributes() ?>>
+        <label id="elh_full_haemogram_parameters__template" for="x__template" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_template->caption() ?><?= $Page->_template->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->_template->cellAttributes() ?>>
+<span id="el_full_haemogram_parameters__template">
+<?php echo '<table width="0">' ?>
 </span>
 </div></div>
     </div>

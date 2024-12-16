@@ -98,7 +98,7 @@ class PatientsLabReport extends DbTable
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
         $this->DetailView = true; // Allow detail view
-        $this->ShowMultipleDetails = true; // Show multiple details
+        $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
@@ -126,7 +126,6 @@ class PatientsLabReport extends DbTable
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Required = true; // Required field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -581,36 +580,6 @@ class PatientsLabReport extends DbTable
                 return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
         }
         return "";
-    }
-
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "urinalysis_results") {
-            $detailUrl = Container("urinalysis_results")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "full_haemo_results") {
-            $detailUrl = Container("full_haemo_results")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "patientslabreportlist";
-        }
-        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -1220,11 +1189,7 @@ class PatientsLabReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("patientslabreportedit", $parm);
-        } else {
-            $url = $this->keyUrl("patientslabreportedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("patientslabreportedit", $parm);
         return $this->addMasterUrl($url);
     }
 
@@ -1238,11 +1203,7 @@ class PatientsLabReport extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("patientslabreportadd", $parm);
-        } else {
-            $url = $this->keyUrl("patientslabreportadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("patientslabreportadd", $parm);
         return $this->addMasterUrl($url);
     }
 

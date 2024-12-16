@@ -155,11 +155,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
     {
         $this->id->setVisibility();
         $this->lab_test_report_id->setVisibility();
-        $this->test->setVisibility();
-        $this->results->setVisibility();
-        $this->unit->setVisibility();
-        $this->unit_references->setVisibility();
-        $this->comment->setVisibility();
+        $this->_template->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -720,9 +716,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->test);
-
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "ffull_haemogram_parametersgrid";
@@ -787,33 +780,8 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             $this->OtherOptions->hideAllOptions();
         }
 
-        // Get default search criteria
-        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
-
-        // Get basic search values
-        $this->loadBasicSearchValues();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
-
-        // Restore search parms from Session if not searching / reset / export
-        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-            $this->restoreSearchParms();
-        }
-
-        // Call Recordset SearchValidated event
-        $this->recordsetSearchValidated();
-
         // Set up sorting order
         $this->setupSortOrder();
-
-        // Get basic search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchBasic = $this->basicSearchWhere();
-        }
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -821,35 +789,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         } else {
             $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
-        }
-
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms() && !$query) {
-            // Load basic search from default
-            $this->BasicSearch->loadDefault();
-            if ($this->BasicSearch->Keyword != "") {
-                $srchBasic = $this->basicSearchWhere(); // Save to session
-            }
-        }
-
-        // Build search criteria
-        if ($query) {
-            AddFilter($this->SearchWhere, $query);
-        } else {
-            AddFilter($this->SearchWhere, $srchAdvanced);
-            AddFilter($this->SearchWhere, $srchBasic);
-        }
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json" && !$query) {
-            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -939,13 +878,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
-            }
-
-            // Audit trail on search
-            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
-                $searchParm = ServerVar("QUERY_STRING");
-                $searchSql = $this->getSessionWhere();
-                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -1087,242 +1019,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("ffull_haemogram_parameterssrch");
-        }
-        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->lab_test_report_id->AdvancedSearch->toJson(), ","); // Field lab_test_report_id
-        $filterList = Concat($filterList, $this->test->AdvancedSearch->toJson(), ","); // Field test
-        $filterList = Concat($filterList, $this->results->AdvancedSearch->toJson(), ","); // Field results
-        $filterList = Concat($filterList, $this->unit->AdvancedSearch->toJson(), ","); // Field unit
-        $filterList = Concat($filterList, $this->unit_references->AdvancedSearch->toJson(), ","); // Field unit_references
-        $filterList = Concat($filterList, $this->comment->AdvancedSearch->toJson(), ","); // Field comment
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        if ($this->BasicSearch->Keyword != "") {
-            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
-            $filterList = Concat($filterList, $wrk, ",");
-        }
-
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("ffull_haemogram_parameterssrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
-
-        // Field id
-        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-        $this->id->AdvancedSearch->save();
-
-        // Field lab_test_report_id
-        $this->lab_test_report_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_report_id"];
-        $this->lab_test_report_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_report_id"];
-        $this->lab_test_report_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_report_id"];
-        $this->lab_test_report_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_report_id"];
-        $this->lab_test_report_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_report_id"];
-        $this->lab_test_report_id->AdvancedSearch->save();
-
-        // Field test
-        $this->test->AdvancedSearch->SearchValue = @$filter["x_test"];
-        $this->test->AdvancedSearch->SearchOperator = @$filter["z_test"];
-        $this->test->AdvancedSearch->SearchCondition = @$filter["v_test"];
-        $this->test->AdvancedSearch->SearchValue2 = @$filter["y_test"];
-        $this->test->AdvancedSearch->SearchOperator2 = @$filter["w_test"];
-        $this->test->AdvancedSearch->save();
-
-        // Field results
-        $this->results->AdvancedSearch->SearchValue = @$filter["x_results"];
-        $this->results->AdvancedSearch->SearchOperator = @$filter["z_results"];
-        $this->results->AdvancedSearch->SearchCondition = @$filter["v_results"];
-        $this->results->AdvancedSearch->SearchValue2 = @$filter["y_results"];
-        $this->results->AdvancedSearch->SearchOperator2 = @$filter["w_results"];
-        $this->results->AdvancedSearch->save();
-
-        // Field unit
-        $this->unit->AdvancedSearch->SearchValue = @$filter["x_unit"];
-        $this->unit->AdvancedSearch->SearchOperator = @$filter["z_unit"];
-        $this->unit->AdvancedSearch->SearchCondition = @$filter["v_unit"];
-        $this->unit->AdvancedSearch->SearchValue2 = @$filter["y_unit"];
-        $this->unit->AdvancedSearch->SearchOperator2 = @$filter["w_unit"];
-        $this->unit->AdvancedSearch->save();
-
-        // Field unit_references
-        $this->unit_references->AdvancedSearch->SearchValue = @$filter["x_unit_references"];
-        $this->unit_references->AdvancedSearch->SearchOperator = @$filter["z_unit_references"];
-        $this->unit_references->AdvancedSearch->SearchCondition = @$filter["v_unit_references"];
-        $this->unit_references->AdvancedSearch->SearchValue2 = @$filter["y_unit_references"];
-        $this->unit_references->AdvancedSearch->SearchOperator2 = @$filter["w_unit_references"];
-        $this->unit_references->AdvancedSearch->save();
-
-        // Field comment
-        $this->comment->AdvancedSearch->SearchValue = @$filter["x_comment"];
-        $this->comment->AdvancedSearch->SearchOperator = @$filter["z_comment"];
-        $this->comment->AdvancedSearch->SearchCondition = @$filter["v_comment"];
-        $this->comment->AdvancedSearch->SearchValue2 = @$filter["y_comment"];
-        $this->comment->AdvancedSearch->SearchOperator2 = @$filter["w_comment"];
-        $this->comment->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
-        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
-        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-        if ($this->BasicSearch->Keyword != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
-        }
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Return basic search WHERE clause based on search keyword and type
-    public function basicSearchWhere($default = false)
-    {
-        global $Security;
-        $searchStr = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Fields to search
-        $searchFlds = [];
-        $searchFlds[] = &$this->test;
-        $searchFlds[] = &$this->unit;
-        $searchFlds[] = &$this->unit_references;
-        $searchFlds[] = &$this->comment;
-        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-        // Get search SQL
-        if ($searchKeyword != "") {
-            $ar = $this->BasicSearch->keywordList($default);
-            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
-            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
-                $this->Command = "search";
-            }
-        }
-        if (!$default && $this->Command == "search") {
-            $this->BasicSearch->setKeyword($searchKeyword);
-            $this->BasicSearch->setType($searchType);
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $searchStr;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        // Check basic search
-        if ($this->BasicSearch->issetSession()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Clear all search parameters
-    protected function resetSearchParms()
-    {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear basic search parameters
-        $this->resetBasicSearchParms();
-    }
-
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
-    {
-        return false;
-    }
-
-    // Clear all basic search parameters
-    protected function resetBasicSearchParms()
-    {
-        $this->BasicSearch->unsetSession();
-    }
-
-    // Restore all search parameters
-    protected function restoreSearchParms()
-    {
-        $this->RestoreSearch = true;
-
-        // Restore basic search values
-        $this->BasicSearch->load();
-    }
-
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1340,11 +1036,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->lab_test_report_id); // lab_test_report_id
-            $this->updateSort($this->test); // test
-            $this->updateSort($this->results); // results
-            $this->updateSort($this->unit); // unit
-            $this->updateSort($this->unit_references); // unit_references
-            $this->updateSort($this->comment); // comment
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1360,11 +1051,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
-            }
-
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
@@ -1379,11 +1065,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->lab_test_report_id->setSort("");
-                $this->test->setSort("");
-                $this->results->setSort("");
-                $this->unit->setSort("");
-                $this->unit_references->setSort("");
-                $this->comment->setSort("");
+                $this->_template->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1634,11 +1316,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "lab_test_report_id");
-            $this->createColumnOption($option, "test");
-            $this->createColumnOption($option, "results");
-            $this->createColumnOption($option, "unit");
-            $this->createColumnOption($option, "unit_references");
-            $this->createColumnOption($option, "comment");
         }
 
         // Set up custom actions
@@ -1664,10 +1341,10 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"ffull_haemogram_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"ffull_haemogram_parameterssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1974,16 +1651,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         $this->renderListOptions();
     }
 
-    // Load basic search values
-    protected function loadBasicSearchValues()
-    {
-        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
-        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
-            $this->Command = "search";
-        }
-        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
-    }
-
     /**
      * Load result set
      *
@@ -2079,11 +1746,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
-        $this->test->setDbValue($row['test']);
-        $this->results->setDbValue($row['results']);
-        $this->unit->setDbValue($row['unit']);
-        $this->unit_references->setDbValue($row['unit_references']);
-        $this->comment->setDbValue($row['comment']);
+        $this->_template->setDbValue($row['template']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2094,11 +1757,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_report_id'] = $this->lab_test_report_id->DefaultValue;
-        $row['test'] = $this->test->DefaultValue;
-        $row['results'] = $this->results->DefaultValue;
-        $row['unit'] = $this->unit->DefaultValue;
-        $row['unit_references'] = $this->unit_references->DefaultValue;
-        $row['comment'] = $this->comment->DefaultValue;
+        $row['template'] = $this->_template->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2145,15 +1804,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
 
         // lab_test_report_id
 
-        // test
-
-        // results
-
-        // unit
-
-        // unit_references
-
-        // comment
+        // template
 
         // date_created
 
@@ -2168,26 +1819,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
             $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
 
-            // test
-            if (strval($this->test->CurrentValue) != "") {
-                $this->test->ViewValue = $this->test->optionCaption($this->test->CurrentValue);
-            } else {
-                $this->test->ViewValue = null;
-            }
-
-            // results
-            $this->results->ViewValue = $this->results->CurrentValue;
-            $this->results->ViewValue = FormatNumber($this->results->ViewValue, $this->results->formatPattern());
-
-            // unit
-            $this->unit->ViewValue = $this->unit->CurrentValue;
-
-            // unit_references
-            $this->unit_references->ViewValue = $this->unit_references->CurrentValue;
-
-            // comment
-            $this->comment->ViewValue = $this->comment->CurrentValue;
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2195,26 +1826,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
             $this->lab_test_report_id->TooltipValue = "";
-
-            // test
-            $this->test->HrefValue = "";
-            $this->test->TooltipValue = "";
-
-            // results
-            $this->results->HrefValue = "";
-            $this->results->TooltipValue = "";
-
-            // unit
-            $this->unit->HrefValue = "";
-            $this->unit->TooltipValue = "";
-
-            // unit_references
-            $this->unit_references->HrefValue = "";
-            $this->unit_references->TooltipValue = "";
-
-            // comment
-            $this->comment->HrefValue = "";
-            $this->comment->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2334,21 +1945,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"ffull_haemogram_parameterssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
-
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -2372,7 +1968,7 @@ class FullHaemogramParametersList extends FullHaemogramParameters
     // Check if any search fields
     public function hasSearchFields()
     {
-        return true;
+        return false;
     }
 
     // Render search options
@@ -2567,8 +2163,6 @@ class FullHaemogramParametersList extends FullHaemogramParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_test":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

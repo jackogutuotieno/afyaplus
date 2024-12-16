@@ -24,19 +24,14 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["lab_test_report_id", [fields.lab_test_report_id.visible && fields.lab_test_report_id.required ? ew.Validators.required(fields.lab_test_report_id.caption) : null, ew.Validators.integer], fields.lab_test_report_id.isInvalid],
-            ["test", [fields.test.visible && fields.test.required ? ew.Validators.required(fields.test.caption) : null], fields.test.isInvalid],
-            ["results", [fields.results.visible && fields.results.required ? ew.Validators.required(fields.results.caption) : null, ew.Validators.float], fields.results.isInvalid],
-            ["unit", [fields.unit.visible && fields.unit.required ? ew.Validators.required(fields.unit.caption) : null], fields.unit.isInvalid],
-            ["unit_references", [fields.unit_references.visible && fields.unit_references.required ? ew.Validators.required(fields.unit_references.caption) : null], fields.unit_references.isInvalid],
-            ["comment", [fields.comment.visible && fields.comment.required ? ew.Validators.required(fields.comment.caption) : null], fields.comment.isInvalid]
+            ["lab_test_report_id", [fields.lab_test_report_id.visible && fields.lab_test_report_id.required ? ew.Validators.required(fields.lab_test_report_id.caption) : null, ew.Validators.integer], fields.lab_test_report_id.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["lab_test_report_id",false],["test",false],["results",false],["unit",false],["unit_references",false],["comment",false]];
+                    fields = [["lab_test_report_id",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -56,7 +51,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "test": <?= $Grid->test->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -96,21 +90,6 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->lab_test_report_id->Visible) { // lab_test_report_id ?>
         <th data-name="lab_test_report_id" class="<?= $Grid->lab_test_report_id->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_lab_test_report_id" class="full_haemogram_parameters_lab_test_report_id"><?= $Grid->renderFieldHeader($Grid->lab_test_report_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->test->Visible) { // test ?>
-        <th data-name="test" class="<?= $Grid->test->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_test" class="full_haemogram_parameters_test"><?= $Grid->renderFieldHeader($Grid->test) ?></div></th>
-<?php } ?>
-<?php if ($Grid->results->Visible) { // results ?>
-        <th data-name="results" class="<?= $Grid->results->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_results" class="full_haemogram_parameters_results"><?= $Grid->renderFieldHeader($Grid->results) ?></div></th>
-<?php } ?>
-<?php if ($Grid->unit->Visible) { // unit ?>
-        <th data-name="unit" class="<?= $Grid->unit->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_unit" class="full_haemogram_parameters_unit"><?= $Grid->renderFieldHeader($Grid->unit) ?></div></th>
-<?php } ?>
-<?php if ($Grid->unit_references->Visible) { // unit_references ?>
-        <th data-name="unit_references" class="<?= $Grid->unit_references->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_unit_references" class="full_haemogram_parameters_unit_references"><?= $Grid->renderFieldHeader($Grid->unit_references) ?></div></th>
-<?php } ?>
-<?php if ($Grid->comment->Visible) { // comment ?>
-        <th data-name="comment" class="<?= $Grid->comment->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_comment" class="full_haemogram_parameters_comment"><?= $Grid->renderFieldHeader($Grid->comment) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -210,207 +189,6 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="full_haemogram_parameters" data-field="x_lab_test_report_id" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_lab_test_report_id" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_lab_test_report_id" value="<?= HtmlEncode($Grid->lab_test_report_id->FormValue) ?>">
 <input type="hidden" data-table="full_haemogram_parameters" data-field="x_lab_test_report_id" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_lab_test_report_id" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_lab_test_report_id" value="<?= HtmlEncode($Grid->lab_test_report_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->test->Visible) { // test ?>
-        <td data-name="test"<?= $Grid->test->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_test" class="el_full_haemogram_parameters_test">
-    <select
-        id="x<?= $Grid->RowIndex ?>_test"
-        name="x<?= $Grid->RowIndex ?>_test"
-        class="form-select ew-select<?= $Grid->test->isInvalidClass() ?>"
-        <?php if (!$Grid->test->IsNativeSelect) { ?>
-        data-select2-id="ffull_haemogram_parametersgrid_x<?= $Grid->RowIndex ?>_test"
-        <?php } ?>
-        data-table="full_haemogram_parameters"
-        data-field="x_test"
-        data-value-separator="<?= $Grid->test->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->test->getPlaceHolder()) ?>"
-        <?= $Grid->test->editAttributes() ?>>
-        <?= $Grid->test->selectOptionListHtml("x{$Grid->RowIndex}_test") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->test->getErrorMessage() ?></div>
-<?php if (!$Grid->test->IsNativeSelect) { ?>
-<script>
-loadjs.ready("ffull_haemogram_parametersgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_test", selectId: "ffull_haemogram_parametersgrid_x<?= $Grid->RowIndex ?>_test" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (ffull_haemogram_parametersgrid.lists.test?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_test", form: "ffull_haemogram_parametersgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_test", form: "ffull_haemogram_parametersgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.full_haemogram_parameters.fields.test.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_test" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_test" id="o<?= $Grid->RowIndex ?>_test" value="<?= HtmlEncode($Grid->test->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_test" class="el_full_haemogram_parameters_test">
-    <select
-        id="x<?= $Grid->RowIndex ?>_test"
-        name="x<?= $Grid->RowIndex ?>_test"
-        class="form-select ew-select<?= $Grid->test->isInvalidClass() ?>"
-        <?php if (!$Grid->test->IsNativeSelect) { ?>
-        data-select2-id="ffull_haemogram_parametersgrid_x<?= $Grid->RowIndex ?>_test"
-        <?php } ?>
-        data-table="full_haemogram_parameters"
-        data-field="x_test"
-        data-value-separator="<?= $Grid->test->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->test->getPlaceHolder()) ?>"
-        <?= $Grid->test->editAttributes() ?>>
-        <?= $Grid->test->selectOptionListHtml("x{$Grid->RowIndex}_test") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->test->getErrorMessage() ?></div>
-<?php if (!$Grid->test->IsNativeSelect) { ?>
-<script>
-loadjs.ready("ffull_haemogram_parametersgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_test", selectId: "ffull_haemogram_parametersgrid_x<?= $Grid->RowIndex ?>_test" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (ffull_haemogram_parametersgrid.lists.test?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_test", form: "ffull_haemogram_parametersgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_test", form: "ffull_haemogram_parametersgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.full_haemogram_parameters.fields.test.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_test" class="el_full_haemogram_parameters_test">
-<span<?= $Grid->test->viewAttributes() ?>>
-<?= $Grid->test->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_test" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_test" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_test" value="<?= HtmlEncode($Grid->test->FormValue) ?>">
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_test" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_test" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_test" value="<?= HtmlEncode($Grid->test->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->results->Visible) { // results ?>
-        <td data-name="results"<?= $Grid->results->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_results" class="el_full_haemogram_parameters_results">
-<input type="<?= $Grid->results->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_results" id="x<?= $Grid->RowIndex ?>_results" data-table="full_haemogram_parameters" data-field="x_results" value="<?= $Grid->results->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->results->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->results->formatPattern()) ?>"<?= $Grid->results->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->results->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_results" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_results" id="o<?= $Grid->RowIndex ?>_results" value="<?= HtmlEncode($Grid->results->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_results" class="el_full_haemogram_parameters_results">
-<input type="<?= $Grid->results->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_results" id="x<?= $Grid->RowIndex ?>_results" data-table="full_haemogram_parameters" data-field="x_results" value="<?= $Grid->results->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->results->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->results->formatPattern()) ?>"<?= $Grid->results->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->results->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_results" class="el_full_haemogram_parameters_results">
-<span<?= $Grid->results->viewAttributes() ?>>
-<?= $Grid->results->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_results" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_results" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_results" value="<?= HtmlEncode($Grid->results->FormValue) ?>">
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_results" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_results" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_results" value="<?= HtmlEncode($Grid->results->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->unit->Visible) { // unit ?>
-        <td data-name="unit"<?= $Grid->unit->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit" class="el_full_haemogram_parameters_unit">
-<input type="<?= $Grid->unit->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_unit" id="x<?= $Grid->RowIndex ?>_unit" data-table="full_haemogram_parameters" data-field="x_unit" value="<?= $Grid->unit->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->unit->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->unit->formatPattern()) ?>"<?= $Grid->unit->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->unit->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_unit" id="o<?= $Grid->RowIndex ?>_unit" value="<?= HtmlEncode($Grid->unit->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit" class="el_full_haemogram_parameters_unit">
-<input type="<?= $Grid->unit->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_unit" id="x<?= $Grid->RowIndex ?>_unit" data-table="full_haemogram_parameters" data-field="x_unit" value="<?= $Grid->unit->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->unit->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->unit->formatPattern()) ?>"<?= $Grid->unit->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->unit->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit" class="el_full_haemogram_parameters_unit">
-<span<?= $Grid->unit->viewAttributes() ?>>
-<?= $Grid->unit->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_unit" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_unit" value="<?= HtmlEncode($Grid->unit->FormValue) ?>">
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_unit" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_unit" value="<?= HtmlEncode($Grid->unit->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->unit_references->Visible) { // unit_references ?>
-        <td data-name="unit_references"<?= $Grid->unit_references->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit_references" class="el_full_haemogram_parameters_unit_references">
-<input type="<?= $Grid->unit_references->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_unit_references" id="x<?= $Grid->RowIndex ?>_unit_references" data-table="full_haemogram_parameters" data-field="x_unit_references" value="<?= $Grid->unit_references->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->unit_references->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->unit_references->formatPattern()) ?>"<?= $Grid->unit_references->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->unit_references->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit_references" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_unit_references" id="o<?= $Grid->RowIndex ?>_unit_references" value="<?= HtmlEncode($Grid->unit_references->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit_references" class="el_full_haemogram_parameters_unit_references">
-<input type="<?= $Grid->unit_references->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_unit_references" id="x<?= $Grid->RowIndex ?>_unit_references" data-table="full_haemogram_parameters" data-field="x_unit_references" value="<?= $Grid->unit_references->EditValue ?>" size="30" maxlength="20" placeholder="<?= HtmlEncode($Grid->unit_references->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->unit_references->formatPattern()) ?>"<?= $Grid->unit_references->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->unit_references->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_unit_references" class="el_full_haemogram_parameters_unit_references">
-<span<?= $Grid->unit_references->viewAttributes() ?>>
-<?= $Grid->unit_references->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit_references" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_unit_references" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_unit_references" value="<?= HtmlEncode($Grid->unit_references->FormValue) ?>">
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_unit_references" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_unit_references" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_unit_references" value="<?= HtmlEncode($Grid->unit_references->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->comment->Visible) { // comment ?>
-        <td data-name="comment"<?= $Grid->comment->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_comment" class="el_full_haemogram_parameters_comment">
-<input type="<?= $Grid->comment->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_comment" id="x<?= $Grid->RowIndex ?>_comment" data-table="full_haemogram_parameters" data-field="x_comment" value="<?= $Grid->comment->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->comment->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->comment->formatPattern()) ?>"<?= $Grid->comment->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->comment->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_comment" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_comment" id="o<?= $Grid->RowIndex ?>_comment" value="<?= HtmlEncode($Grid->comment->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_comment" class="el_full_haemogram_parameters_comment">
-<input type="<?= $Grid->comment->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_comment" id="x<?= $Grid->RowIndex ?>_comment" data-table="full_haemogram_parameters" data-field="x_comment" value="<?= $Grid->comment->EditValue ?>" size="30" maxlength="65535" placeholder="<?= HtmlEncode($Grid->comment->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->comment->formatPattern()) ?>"<?= $Grid->comment->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->comment->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_full_haemogram_parameters_comment" class="el_full_haemogram_parameters_comment">
-<span<?= $Grid->comment->viewAttributes() ?>>
-<?= $Grid->comment->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_comment" data-hidden="1" name="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_comment" id="ffull_haemogram_parametersgrid$x<?= $Grid->RowIndex ?>_comment" value="<?= HtmlEncode($Grid->comment->FormValue) ?>">
-<input type="hidden" data-table="full_haemogram_parameters" data-field="x_comment" data-hidden="1" data-old name="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_comment" id="ffull_haemogram_parametersgrid$o<?= $Grid->RowIndex ?>_comment" value="<?= HtmlEncode($Grid->comment->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

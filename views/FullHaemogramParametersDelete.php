@@ -56,21 +56,6 @@ $Page->showMessage();
 <?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
         <th class="<?= $Page->lab_test_report_id->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_lab_test_report_id" class="full_haemogram_parameters_lab_test_report_id"><?= $Page->lab_test_report_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->test->Visible) { // test ?>
-        <th class="<?= $Page->test->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_test" class="full_haemogram_parameters_test"><?= $Page->test->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->results->Visible) { // results ?>
-        <th class="<?= $Page->results->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_results" class="full_haemogram_parameters_results"><?= $Page->results->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->unit->Visible) { // unit ?>
-        <th class="<?= $Page->unit->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_unit" class="full_haemogram_parameters_unit"><?= $Page->unit->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->unit_references->Visible) { // unit_references ?>
-        <th class="<?= $Page->unit_references->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_unit_references" class="full_haemogram_parameters_unit_references"><?= $Page->unit_references->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->comment->Visible) { // comment ?>
-        <th class="<?= $Page->comment->headerCellClass() ?>"><span id="elh_full_haemogram_parameters_comment" class="full_haemogram_parameters_comment"><?= $Page->comment->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -105,46 +90,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->lab_test_report_id->viewAttributes() ?>>
 <?= $Page->lab_test_report_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->test->Visible) { // test ?>
-        <td<?= $Page->test->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->test->viewAttributes() ?>>
-<?= $Page->test->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->results->Visible) { // results ?>
-        <td<?= $Page->results->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->results->viewAttributes() ?>>
-<?= $Page->results->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->unit->Visible) { // unit ?>
-        <td<?= $Page->unit->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->unit->viewAttributes() ?>>
-<?= $Page->unit->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->unit_references->Visible) { // unit_references ?>
-        <td<?= $Page->unit_references->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->unit_references->viewAttributes() ?>>
-<?= $Page->unit_references->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->comment->Visible) { // comment ?>
-        <td<?= $Page->comment->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->comment->viewAttributes() ?>>
-<?= $Page->comment->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

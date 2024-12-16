@@ -42,12 +42,6 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
-<?php if ($Page->SearchOptions->visible()) { ?>
-<?php $Page->SearchOptions->render("body") ?>
-<?php } ?>
-<?php if ($Page->FilterOptions->visible()) { ?>
-<?php $Page->FilterOptions->render("body") ?>
-<?php } ?>
 </div>
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
@@ -60,66 +54,6 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "lab_test_r
 ?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="ffull_haemogram_parameterssrch" id="ffull_haemogram_parameterssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="ffull_haemogram_parameterssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
-<script>
-var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { full_haemogram_parameters: currentTable } });
-var currentForm;
-var ffull_haemogram_parameterssrch, currentSearchForm, currentAdvancedSearchForm;
-loadjs.ready(["wrapper", "head"], function () {
-    let $ = jQuery,
-        fields = currentTable.fields;
-
-    // Form object for search
-    let form = new ew.FormBuilder()
-        .setId("ffull_haemogram_parameterssrch")
-        .setPageId("list")
-<?php if ($Page->UseAjaxActions) { ?>
-        .setSubmitWithFetch(true)
-<?php } ?>
-
-        // Dynamic selection lists
-        .setLists({
-        })
-
-        // Filters
-        .setFilterList(<?= $Page->getFilterList() ?>)
-        .build();
-    window[form.id] = form;
-    currentSearchForm = form;
-    loadjs.done(form.id);
-});
-</script>
-<input type="hidden" name="cmd" value="search">
-<?php if ($Security->canSearch()) { ?>
-<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
-<div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0">
-    <div class="col-sm-auto px-0 pe-sm-2">
-        <div class="ew-basic-search input-group">
-            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
-            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
-            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
-                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="ffull_haemogram_parameterssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="ffull_haemogram_parameterssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="ffull_haemogram_parameterssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="ffull_haemogram_parameterssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-auto mb-3">
-        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-    </div>
-</div>
-</div><!-- /.ew-extended-search -->
-<?php } ?>
-<?php } ?>
-</div><!-- /.ew-search-panel -->
-</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -176,21 +110,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
         <th data-name="lab_test_report_id" class="<?= $Page->lab_test_report_id->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_lab_test_report_id" class="full_haemogram_parameters_lab_test_report_id"><?= $Page->renderFieldHeader($Page->lab_test_report_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->test->Visible) { // test ?>
-        <th data-name="test" class="<?= $Page->test->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_test" class="full_haemogram_parameters_test"><?= $Page->renderFieldHeader($Page->test) ?></div></th>
-<?php } ?>
-<?php if ($Page->results->Visible) { // results ?>
-        <th data-name="results" class="<?= $Page->results->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_results" class="full_haemogram_parameters_results"><?= $Page->renderFieldHeader($Page->results) ?></div></th>
-<?php } ?>
-<?php if ($Page->unit->Visible) { // unit ?>
-        <th data-name="unit" class="<?= $Page->unit->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_unit" class="full_haemogram_parameters_unit"><?= $Page->renderFieldHeader($Page->unit) ?></div></th>
-<?php } ?>
-<?php if ($Page->unit_references->Visible) { // unit_references ?>
-        <th data-name="unit_references" class="<?= $Page->unit_references->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_unit_references" class="full_haemogram_parameters_unit_references"><?= $Page->renderFieldHeader($Page->unit_references) ?></div></th>
-<?php } ?>
-<?php if ($Page->comment->Visible) { // comment ?>
-        <th data-name="comment" class="<?= $Page->comment->headerCellClass() ?>"><div id="elh_full_haemogram_parameters_comment" class="full_haemogram_parameters_comment"><?= $Page->renderFieldHeader($Page->comment) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -232,46 +151,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_lab_test_report_id" class="el_full_haemogram_parameters_lab_test_report_id">
 <span<?= $Page->lab_test_report_id->viewAttributes() ?>>
 <?= $Page->lab_test_report_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->test->Visible) { // test ?>
-        <td data-name="test"<?= $Page->test->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_test" class="el_full_haemogram_parameters_test">
-<span<?= $Page->test->viewAttributes() ?>>
-<?= $Page->test->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->results->Visible) { // results ?>
-        <td data-name="results"<?= $Page->results->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_results" class="el_full_haemogram_parameters_results">
-<span<?= $Page->results->viewAttributes() ?>>
-<?= $Page->results->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->unit->Visible) { // unit ?>
-        <td data-name="unit"<?= $Page->unit->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_unit" class="el_full_haemogram_parameters_unit">
-<span<?= $Page->unit->viewAttributes() ?>>
-<?= $Page->unit->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->unit_references->Visible) { // unit_references ?>
-        <td data-name="unit_references"<?= $Page->unit_references->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_unit_references" class="el_full_haemogram_parameters_unit_references">
-<span<?= $Page->unit_references->viewAttributes() ?>>
-<?= $Page->unit_references->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->comment->Visible) { // comment ?>
-        <td data-name="comment"<?= $Page->comment->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_full_haemogram_parameters_comment" class="el_full_haemogram_parameters_comment">
-<span<?= $Page->comment->viewAttributes() ?>>
-<?= $Page->comment->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

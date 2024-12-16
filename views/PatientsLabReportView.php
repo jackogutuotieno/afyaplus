@@ -208,47 +208,6 @@ loadjs.ready("head", function () {
     </div> <!-- ./col -->
 </div> <!-- ./row --></div>
 </template>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<?php
-    $Page->DetailPages->ValidKeys = explode(",", $Page->getCurrentDetailTable());
-?>
-<div class="ew-detail-pages"><!-- detail-pages -->
-<div class="ew-nav<?= $Page->DetailPages->containerClasses() ?>" id="details_Page"><!-- tabs -->
-    <ul class="<?= $Page->DetailPages->navClasses() ?>" role="tablist"><!-- .nav -->
-<?php
-    if (in_array("urinalysis_results", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_results->DetailView) {
-?>
-        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("urinalysis_results") ?><?= $Page->DetailPages->activeClasses("urinalysis_results") ?>" data-bs-target="#tab_urinalysis_results" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_urinalysis_results" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("urinalysis_results")) ?>"><?= $Language->tablePhrase("urinalysis_results", "TblCaption") ?></button></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("full_haemo_results", explode(",", $Page->getCurrentDetailTable())) && $full_haemo_results->DetailView) {
-?>
-        <li class="nav-item"><button class="<?= $Page->DetailPages->navLinkClasses("full_haemo_results") ?><?= $Page->DetailPages->activeClasses("full_haemo_results") ?>" data-bs-target="#tab_full_haemo_results" data-bs-toggle="tab" type="button" role="tab" aria-controls="tab_full_haemo_results" aria-selected="<?= JsonEncode($Page->DetailPages->isActive("full_haemo_results")) ?>"><?= $Language->tablePhrase("full_haemo_results", "TblCaption") ?></button></li>
-<?php
-    }
-?>
-    </ul><!-- /.nav -->
-    <div class="<?= $Page->DetailPages->tabContentClasses() ?>"><!-- .tab-content -->
-<?php
-    if (in_array("urinalysis_results", explode(",", $Page->getCurrentDetailTable())) && $urinalysis_results->DetailView) {
-?>
-        <div class="<?= $Page->DetailPages->tabPaneClasses("urinalysis_results") ?><?= $Page->DetailPages->activeClasses("urinalysis_results") ?>" id="tab_urinalysis_results" role="tabpanel"><!-- page* -->
-<?php include_once "UrinalysisResultsGrid.php" ?>
-        </div><!-- /page* -->
-<?php } ?>
-<?php
-    if (in_array("full_haemo_results", explode(",", $Page->getCurrentDetailTable())) && $full_haemo_results->DetailView) {
-?>
-        <div class="<?= $Page->DetailPages->tabPaneClasses("full_haemo_results") ?><?= $Page->DetailPages->activeClasses("full_haemo_results") ?>" id="tab_full_haemo_results" role="tabpanel"><!-- page* -->
-<?php include_once "FullHaemoResultsGrid.php" ?>
-        </div><!-- /page* -->
-<?php } ?>
-    </div><!-- /.tab-content -->
-</div><!-- /tabs -->
-</div><!-- /detail-pages -->
-<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

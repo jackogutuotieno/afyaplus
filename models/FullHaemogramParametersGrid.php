@@ -145,11 +145,7 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
     {
         $this->id->setVisibility();
         $this->lab_test_report_id->setVisibility();
-        $this->test->setVisibility();
-        $this->results->setVisibility();
-        $this->unit->setVisibility();
-        $this->unit_references->setVisibility();
-        $this->comment->setVisibility();
+        $this->_template->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -632,9 +628,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->test);
-
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -872,7 +865,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
     // Exit inline mode
     protected function clearInlineMode()
     {
-        $this->results->FormValue = ""; // Clear form value
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1182,46 +1174,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             $CurrentForm->hasValue("o_lab_test_report_id") &&
             $this->lab_test_report_id->CurrentValue != $this->lab_test_report_id->DefaultValue &&
             !($this->lab_test_report_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->lab_test_report_id->CurrentValue == $this->lab_test_report_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_test") &&
-            $CurrentForm->hasValue("o_test") &&
-            $this->test->CurrentValue != $this->test->DefaultValue &&
-            !($this->test->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->test->CurrentValue == $this->test->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_results") &&
-            $CurrentForm->hasValue("o_results") &&
-            $this->results->CurrentValue != $this->results->DefaultValue &&
-            !($this->results->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->results->CurrentValue == $this->results->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_unit") &&
-            $CurrentForm->hasValue("o_unit") &&
-            $this->unit->CurrentValue != $this->unit->DefaultValue &&
-            !($this->unit->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->unit->CurrentValue == $this->unit->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_unit_references") &&
-            $CurrentForm->hasValue("o_unit_references") &&
-            $this->unit_references->CurrentValue != $this->unit_references->DefaultValue &&
-            !($this->unit_references->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->unit_references->CurrentValue == $this->unit_references->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_comment") &&
-            $CurrentForm->hasValue("o_comment") &&
-            $this->comment->CurrentValue != $this->comment->DefaultValue &&
-            !($this->comment->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->comment->CurrentValue == $this->comment->getSessionValue())
         ) {
             return false;
         }
@@ -1812,71 +1764,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
         if ($CurrentForm->hasValue("o_lab_test_report_id")) {
             $this->lab_test_report_id->setOldValue($CurrentForm->getValue("o_lab_test_report_id"));
         }
-
-        // Check field name 'test' first before field var 'x_test'
-        $val = $CurrentForm->hasValue("test") ? $CurrentForm->getValue("test") : $CurrentForm->getValue("x_test");
-        if (!$this->test->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->test->Visible = false; // Disable update for API request
-            } else {
-                $this->test->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_test")) {
-            $this->test->setOldValue($CurrentForm->getValue("o_test"));
-        }
-
-        // Check field name 'results' first before field var 'x_results'
-        $val = $CurrentForm->hasValue("results") ? $CurrentForm->getValue("results") : $CurrentForm->getValue("x_results");
-        if (!$this->results->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->results->Visible = false; // Disable update for API request
-            } else {
-                $this->results->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_results")) {
-            $this->results->setOldValue($CurrentForm->getValue("o_results"));
-        }
-
-        // Check field name 'unit' first before field var 'x_unit'
-        $val = $CurrentForm->hasValue("unit") ? $CurrentForm->getValue("unit") : $CurrentForm->getValue("x_unit");
-        if (!$this->unit->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->unit->Visible = false; // Disable update for API request
-            } else {
-                $this->unit->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_unit")) {
-            $this->unit->setOldValue($CurrentForm->getValue("o_unit"));
-        }
-
-        // Check field name 'unit_references' first before field var 'x_unit_references'
-        $val = $CurrentForm->hasValue("unit_references") ? $CurrentForm->getValue("unit_references") : $CurrentForm->getValue("x_unit_references");
-        if (!$this->unit_references->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->unit_references->Visible = false; // Disable update for API request
-            } else {
-                $this->unit_references->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_unit_references")) {
-            $this->unit_references->setOldValue($CurrentForm->getValue("o_unit_references"));
-        }
-
-        // Check field name 'comment' first before field var 'x_comment'
-        $val = $CurrentForm->hasValue("comment") ? $CurrentForm->getValue("comment") : $CurrentForm->getValue("x_comment");
-        if (!$this->comment->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->comment->Visible = false; // Disable update for API request
-            } else {
-                $this->comment->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_comment")) {
-            $this->comment->setOldValue($CurrentForm->getValue("o_comment"));
-        }
     }
 
     // Restore form values
@@ -1887,11 +1774,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             $this->id->CurrentValue = $this->id->FormValue;
         }
         $this->lab_test_report_id->CurrentValue = $this->lab_test_report_id->FormValue;
-        $this->test->CurrentValue = $this->test->FormValue;
-        $this->results->CurrentValue = $this->results->FormValue;
-        $this->unit->CurrentValue = $this->unit->FormValue;
-        $this->unit_references->CurrentValue = $this->unit_references->FormValue;
-        $this->comment->CurrentValue = $this->comment->FormValue;
     }
 
     /**
@@ -1989,11 +1871,7 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
-        $this->test->setDbValue($row['test']);
-        $this->results->setDbValue($row['results']);
-        $this->unit->setDbValue($row['unit']);
-        $this->unit_references->setDbValue($row['unit_references']);
-        $this->comment->setDbValue($row['comment']);
+        $this->_template->setDbValue($row['template']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2004,11 +1882,7 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_report_id'] = $this->lab_test_report_id->DefaultValue;
-        $row['test'] = $this->test->DefaultValue;
-        $row['results'] = $this->results->DefaultValue;
-        $row['unit'] = $this->unit->DefaultValue;
-        $row['unit_references'] = $this->unit_references->DefaultValue;
-        $row['comment'] = $this->comment->DefaultValue;
+        $row['template'] = $this->_template->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2053,15 +1927,7 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
         // lab_test_report_id
 
-        // test
-
-        // results
-
-        // unit
-
-        // unit_references
-
-        // comment
+        // template
 
         // date_created
 
@@ -2076,26 +1942,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
             $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
 
-            // test
-            if (strval($this->test->CurrentValue) != "") {
-                $this->test->ViewValue = $this->test->optionCaption($this->test->CurrentValue);
-            } else {
-                $this->test->ViewValue = null;
-            }
-
-            // results
-            $this->results->ViewValue = $this->results->CurrentValue;
-            $this->results->ViewValue = FormatNumber($this->results->ViewValue, $this->results->formatPattern());
-
-            // unit
-            $this->unit->ViewValue = $this->unit->CurrentValue;
-
-            // unit_references
-            $this->unit_references->ViewValue = $this->unit_references->CurrentValue;
-
-            // comment
-            $this->comment->ViewValue = $this->comment->CurrentValue;
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2103,26 +1949,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
             $this->lab_test_report_id->TooltipValue = "";
-
-            // test
-            $this->test->HrefValue = "";
-            $this->test->TooltipValue = "";
-
-            // results
-            $this->results->HrefValue = "";
-            $this->results->TooltipValue = "";
-
-            // unit
-            $this->unit->HrefValue = "";
-            $this->unit->TooltipValue = "";
-
-            // unit_references
-            $this->unit_references->HrefValue = "";
-            $this->unit_references->TooltipValue = "";
-
-            // comment
-            $this->comment->HrefValue = "";
-            $this->comment->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
@@ -2141,43 +1967,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
                 }
             }
 
-            // test
-            $this->test->setupEditAttributes();
-            $this->test->EditValue = $this->test->options(true);
-            $this->test->PlaceHolder = RemoveHtml($this->test->caption());
-
-            // results
-            $this->results->setupEditAttributes();
-            $this->results->EditValue = $this->results->CurrentValue;
-            $this->results->PlaceHolder = RemoveHtml($this->results->caption());
-            if (strval($this->results->EditValue) != "" && is_numeric($this->results->EditValue)) {
-                $this->results->EditValue = FormatNumber($this->results->EditValue, null);
-            }
-
-            // unit
-            $this->unit->setupEditAttributes();
-            if (!$this->unit->Raw) {
-                $this->unit->CurrentValue = HtmlDecode($this->unit->CurrentValue);
-            }
-            $this->unit->EditValue = HtmlEncode($this->unit->CurrentValue);
-            $this->unit->PlaceHolder = RemoveHtml($this->unit->caption());
-
-            // unit_references
-            $this->unit_references->setupEditAttributes();
-            if (!$this->unit_references->Raw) {
-                $this->unit_references->CurrentValue = HtmlDecode($this->unit_references->CurrentValue);
-            }
-            $this->unit_references->EditValue = HtmlEncode($this->unit_references->CurrentValue);
-            $this->unit_references->PlaceHolder = RemoveHtml($this->unit_references->caption());
-
-            // comment
-            $this->comment->setupEditAttributes();
-            if (!$this->comment->Raw) {
-                $this->comment->CurrentValue = HtmlDecode($this->comment->CurrentValue);
-            }
-            $this->comment->EditValue = HtmlEncode($this->comment->CurrentValue);
-            $this->comment->PlaceHolder = RemoveHtml($this->comment->caption());
-
             // Add refer script
 
             // id
@@ -2185,21 +1974,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
-
-            // test
-            $this->test->HrefValue = "";
-
-            // results
-            $this->results->HrefValue = "";
-
-            // unit
-            $this->unit->HrefValue = "";
-
-            // unit_references
-            $this->unit_references->HrefValue = "";
-
-            // comment
-            $this->comment->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -2220,43 +1994,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
                 }
             }
 
-            // test
-            $this->test->setupEditAttributes();
-            $this->test->EditValue = $this->test->options(true);
-            $this->test->PlaceHolder = RemoveHtml($this->test->caption());
-
-            // results
-            $this->results->setupEditAttributes();
-            $this->results->EditValue = $this->results->CurrentValue;
-            $this->results->PlaceHolder = RemoveHtml($this->results->caption());
-            if (strval($this->results->EditValue) != "" && is_numeric($this->results->EditValue)) {
-                $this->results->EditValue = FormatNumber($this->results->EditValue, null);
-            }
-
-            // unit
-            $this->unit->setupEditAttributes();
-            if (!$this->unit->Raw) {
-                $this->unit->CurrentValue = HtmlDecode($this->unit->CurrentValue);
-            }
-            $this->unit->EditValue = HtmlEncode($this->unit->CurrentValue);
-            $this->unit->PlaceHolder = RemoveHtml($this->unit->caption());
-
-            // unit_references
-            $this->unit_references->setupEditAttributes();
-            if (!$this->unit_references->Raw) {
-                $this->unit_references->CurrentValue = HtmlDecode($this->unit_references->CurrentValue);
-            }
-            $this->unit_references->EditValue = HtmlEncode($this->unit_references->CurrentValue);
-            $this->unit_references->PlaceHolder = RemoveHtml($this->unit_references->caption());
-
-            // comment
-            $this->comment->setupEditAttributes();
-            if (!$this->comment->Raw) {
-                $this->comment->CurrentValue = HtmlDecode($this->comment->CurrentValue);
-            }
-            $this->comment->EditValue = HtmlEncode($this->comment->CurrentValue);
-            $this->comment->PlaceHolder = RemoveHtml($this->comment->caption());
-
             // Edit refer script
 
             // id
@@ -2264,21 +2001,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
-
-            // test
-            $this->test->HrefValue = "";
-
-            // results
-            $this->results->HrefValue = "";
-
-            // unit
-            $this->unit->HrefValue = "";
-
-            // unit_references
-            $this->unit_references->HrefValue = "";
-
-            // comment
-            $this->comment->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2312,34 +2034,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             }
             if (!CheckInteger($this->lab_test_report_id->FormValue)) {
                 $this->lab_test_report_id->addErrorMessage($this->lab_test_report_id->getErrorMessage(false));
-            }
-            if ($this->test->Visible && $this->test->Required) {
-                if (!$this->test->IsDetailKey && EmptyValue($this->test->FormValue)) {
-                    $this->test->addErrorMessage(str_replace("%s", $this->test->caption(), $this->test->RequiredErrorMessage));
-                }
-            }
-            if ($this->results->Visible && $this->results->Required) {
-                if (!$this->results->IsDetailKey && EmptyValue($this->results->FormValue)) {
-                    $this->results->addErrorMessage(str_replace("%s", $this->results->caption(), $this->results->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->results->FormValue)) {
-                $this->results->addErrorMessage($this->results->getErrorMessage(false));
-            }
-            if ($this->unit->Visible && $this->unit->Required) {
-                if (!$this->unit->IsDetailKey && EmptyValue($this->unit->FormValue)) {
-                    $this->unit->addErrorMessage(str_replace("%s", $this->unit->caption(), $this->unit->RequiredErrorMessage));
-                }
-            }
-            if ($this->unit_references->Visible && $this->unit_references->Required) {
-                if (!$this->unit_references->IsDetailKey && EmptyValue($this->unit_references->FormValue)) {
-                    $this->unit_references->addErrorMessage(str_replace("%s", $this->unit_references->caption(), $this->unit_references->RequiredErrorMessage));
-                }
-            }
-            if ($this->comment->Visible && $this->comment->Required) {
-                if (!$this->comment->IsDetailKey && EmptyValue($this->comment->FormValue)) {
-                    $this->comment->addErrorMessage(str_replace("%s", $this->comment->caption(), $this->comment->RequiredErrorMessage));
-                }
             }
 
         // Return validate result
@@ -2499,21 +2193,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
             $this->lab_test_report_id->ReadOnly = true;
         }
         $this->lab_test_report_id->setDbValueDef($rsnew, $this->lab_test_report_id->CurrentValue, $this->lab_test_report_id->ReadOnly);
-
-        // test
-        $this->test->setDbValueDef($rsnew, $this->test->CurrentValue, $this->test->ReadOnly);
-
-        // results
-        $this->results->setDbValueDef($rsnew, $this->results->CurrentValue, $this->results->ReadOnly);
-
-        // unit
-        $this->unit->setDbValueDef($rsnew, $this->unit->CurrentValue, $this->unit->ReadOnly);
-
-        // unit_references
-        $this->unit_references->setDbValueDef($rsnew, $this->unit_references->CurrentValue, $this->unit_references->ReadOnly);
-
-        // comment
-        $this->comment->setDbValueDef($rsnew, $this->comment->CurrentValue, $this->comment->ReadOnly);
         return $rsnew;
     }
 
@@ -2525,21 +2204,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
     {
         if (isset($row['lab_test_report_id'])) { // lab_test_report_id
             $this->lab_test_report_id->CurrentValue = $row['lab_test_report_id'];
-        }
-        if (isset($row['test'])) { // test
-            $this->test->CurrentValue = $row['test'];
-        }
-        if (isset($row['results'])) { // results
-            $this->results->CurrentValue = $row['results'];
-        }
-        if (isset($row['unit'])) { // unit
-            $this->unit->CurrentValue = $row['unit'];
-        }
-        if (isset($row['unit_references'])) { // unit_references
-            $this->unit_references->CurrentValue = $row['unit_references'];
-        }
-        if (isset($row['comment'])) { // comment
-            $this->comment->CurrentValue = $row['comment'];
         }
     }
 
@@ -2624,21 +2288,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
         // lab_test_report_id
         $this->lab_test_report_id->setDbValueDef($rsnew, $this->lab_test_report_id->CurrentValue, false);
-
-        // test
-        $this->test->setDbValueDef($rsnew, $this->test->CurrentValue, false);
-
-        // results
-        $this->results->setDbValueDef($rsnew, $this->results->CurrentValue, false);
-
-        // unit
-        $this->unit->setDbValueDef($rsnew, $this->unit->CurrentValue, false);
-
-        // unit_references
-        $this->unit_references->setDbValueDef($rsnew, $this->unit_references->CurrentValue, false);
-
-        // comment
-        $this->comment->setDbValueDef($rsnew, $this->comment->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2650,21 +2299,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
     {
         if (isset($row['lab_test_report_id'])) { // lab_test_report_id
             $this->lab_test_report_id->setFormValue($row['lab_test_report_id']);
-        }
-        if (isset($row['test'])) { // test
-            $this->test->setFormValue($row['test']);
-        }
-        if (isset($row['results'])) { // results
-            $this->results->setFormValue($row['results']);
-        }
-        if (isset($row['unit'])) { // unit
-            $this->unit->setFormValue($row['unit']);
-        }
-        if (isset($row['unit_references'])) { // unit_references
-            $this->unit_references->setFormValue($row['unit_references']);
-        }
-        if (isset($row['comment'])) { // comment
-            $this->comment->setFormValue($row['comment']);
         }
     }
 
@@ -2697,8 +2331,6 @@ class FullHaemogramParametersGrid extends FullHaemogramParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_test":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

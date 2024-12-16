@@ -56,11 +56,7 @@ class FullHaemogramParameters extends DbTable
     // Fields
     public $id;
     public $lab_test_report_id;
-    public $test;
-    public $results;
-    public $unit;
-    public $unit_references;
-    public $comment;
+    public $_template;
     public $date_created;
     public $date_updated;
 
@@ -163,130 +159,29 @@ class FullHaemogramParameters extends DbTable
         $this->lab_test_report_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['lab_test_report_id'] = &$this->lab_test_report_id;
 
-        // test
-        $this->test = new DbField(
+        // template
+        $this->_template = new DbField(
             $this, // Table
-            'x_test', // Variable name
-            'test', // Name
-            '`test`', // Expression
-            '`test`', // Basic search expression
-            200, // Type
-            100, // Size
+            'x__template', // Variable name
+            'template', // Name
+            '`template`', // Expression
+            '`template`', // Basic search expression
+            201, // Type
+            2147483647, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`test`', // Virtual expression
+            '`template`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
-        $this->test->InputTextType = "text";
-        $this->test->Nullable = false; // NOT NULL field
-        $this->test->Required = true; // Required field
-        $this->test->setSelectMultiple(false); // Select one
-        $this->test->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->test->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->test->Lookup = new Lookup($this->test, 'full_haemogram_parameters', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->test->OptionCount = 20;
-        $this->test->SearchOperators = ["=", "<>"];
-        $this->Fields['test'] = &$this->test;
-
-        // results
-        $this->results = new DbField(
-            $this, // Table
-            'x_results', // Variable name
-            'results', // Name
-            '`results`', // Expression
-            '`results`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`results`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->results->InputTextType = "text";
-        $this->results->Raw = true;
-        $this->results->Nullable = false; // NOT NULL field
-        $this->results->Required = true; // Required field
-        $this->results->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->results->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['results'] = &$this->results;
-
-        // unit
-        $this->unit = new DbField(
-            $this, // Table
-            'x_unit', // Variable name
-            'unit', // Name
-            '`unit`', // Expression
-            '`unit`', // Basic search expression
-            200, // Type
-            20, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`unit`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->unit->InputTextType = "text";
-        $this->unit->Nullable = false; // NOT NULL field
-        $this->unit->Required = true; // Required field
-        $this->unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['unit'] = &$this->unit;
-
-        // unit_references
-        $this->unit_references = new DbField(
-            $this, // Table
-            'x_unit_references', // Variable name
-            'unit_references', // Name
-            '`unit_references`', // Expression
-            '`unit_references`', // Basic search expression
-            200, // Type
-            20, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`unit_references`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->unit_references->InputTextType = "text";
-        $this->unit_references->Nullable = false; // NOT NULL field
-        $this->unit_references->Required = true; // Required field
-        $this->unit_references->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['unit_references'] = &$this->unit_references;
-
-        // comment
-        $this->comment = new DbField(
-            $this, // Table
-            'x_comment', // Variable name
-            'comment', // Name
-            '`comment`', // Expression
-            '`comment`', // Basic search expression
-            200, // Type
-            65535, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`comment`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->comment->InputTextType = "text";
-        $this->comment->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['comment'] = &$this->comment;
+        $this->_template->InputTextType = "text";
+        $this->_template->Nullable = false; // NOT NULL field
+        $this->_template->Required = true; // Required field
+        $this->_template->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['template'] = &$this->_template;
 
         // date_created
         $this->date_created = new DbField(
@@ -965,11 +860,7 @@ class FullHaemogramParameters extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->lab_test_report_id->DbValue = $row['lab_test_report_id'];
-        $this->test->DbValue = $row['test'];
-        $this->results->DbValue = $row['results'];
-        $this->unit->DbValue = $row['unit'];
-        $this->unit_references->DbValue = $row['unit_references'];
-        $this->comment->DbValue = $row['comment'];
+        $this->_template->DbValue = $row['template'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1330,11 +1221,7 @@ class FullHaemogramParameters extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
-        $this->test->setDbValue($row['test']);
-        $this->results->setDbValue($row['results']);
-        $this->unit->setDbValue($row['unit']);
-        $this->unit_references->setDbValue($row['unit_references']);
-        $this->comment->setDbValue($row['comment']);
+        $this->_template->setDbValue($row['template']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1371,15 +1258,7 @@ class FullHaemogramParameters extends DbTable
 
         // lab_test_report_id
 
-        // test
-
-        // results
-
-        // unit
-
-        // unit_references
-
-        // comment
+        // template
 
         // date_created
 
@@ -1392,25 +1271,8 @@ class FullHaemogramParameters extends DbTable
         $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
         $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
 
-        // test
-        if (strval($this->test->CurrentValue) != "") {
-            $this->test->ViewValue = $this->test->optionCaption($this->test->CurrentValue);
-        } else {
-            $this->test->ViewValue = null;
-        }
-
-        // results
-        $this->results->ViewValue = $this->results->CurrentValue;
-        $this->results->ViewValue = FormatNumber($this->results->ViewValue, $this->results->formatPattern());
-
-        // unit
-        $this->unit->ViewValue = $this->unit->CurrentValue;
-
-        // unit_references
-        $this->unit_references->ViewValue = $this->unit_references->CurrentValue;
-
-        // comment
-        $this->comment->ViewValue = $this->comment->CurrentValue;
+        // template
+        $this->_template->ViewValue = $this->_template->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1428,25 +1290,9 @@ class FullHaemogramParameters extends DbTable
         $this->lab_test_report_id->HrefValue = "";
         $this->lab_test_report_id->TooltipValue = "";
 
-        // test
-        $this->test->HrefValue = "";
-        $this->test->TooltipValue = "";
-
-        // results
-        $this->results->HrefValue = "";
-        $this->results->TooltipValue = "";
-
-        // unit
-        $this->unit->HrefValue = "";
-        $this->unit->TooltipValue = "";
-
-        // unit_references
-        $this->unit_references->HrefValue = "";
-        $this->unit_references->TooltipValue = "";
-
-        // comment
-        $this->comment->HrefValue = "";
-        $this->comment->TooltipValue = "";
+        // template
+        $this->_template->HrefValue = "";
+        $this->_template->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1489,42 +1335,10 @@ class FullHaemogramParameters extends DbTable
             }
         }
 
-        // test
-        $this->test->setupEditAttributes();
-        $this->test->EditValue = $this->test->options(true);
-        $this->test->PlaceHolder = RemoveHtml($this->test->caption());
-
-        // results
-        $this->results->setupEditAttributes();
-        $this->results->EditValue = $this->results->CurrentValue;
-        $this->results->PlaceHolder = RemoveHtml($this->results->caption());
-        if (strval($this->results->EditValue) != "" && is_numeric($this->results->EditValue)) {
-            $this->results->EditValue = FormatNumber($this->results->EditValue, null);
-        }
-
-        // unit
-        $this->unit->setupEditAttributes();
-        if (!$this->unit->Raw) {
-            $this->unit->CurrentValue = HtmlDecode($this->unit->CurrentValue);
-        }
-        $this->unit->EditValue = $this->unit->CurrentValue;
-        $this->unit->PlaceHolder = RemoveHtml($this->unit->caption());
-
-        // unit_references
-        $this->unit_references->setupEditAttributes();
-        if (!$this->unit_references->Raw) {
-            $this->unit_references->CurrentValue = HtmlDecode($this->unit_references->CurrentValue);
-        }
-        $this->unit_references->EditValue = $this->unit_references->CurrentValue;
-        $this->unit_references->PlaceHolder = RemoveHtml($this->unit_references->caption());
-
-        // comment
-        $this->comment->setupEditAttributes();
-        if (!$this->comment->Raw) {
-            $this->comment->CurrentValue = HtmlDecode($this->comment->CurrentValue);
-        }
-        $this->comment->EditValue = $this->comment->CurrentValue;
-        $this->comment->PlaceHolder = RemoveHtml($this->comment->caption());
+        // template
+        $this->_template->setupEditAttributes();
+        $this->_template->EditValue = $this->_template->CurrentValue;
+        $this->_template->PlaceHolder = RemoveHtml($this->_template->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1566,19 +1380,10 @@ class FullHaemogramParameters extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_report_id);
-                    $doc->exportCaption($this->test);
-                    $doc->exportCaption($this->results);
-                    $doc->exportCaption($this->unit);
-                    $doc->exportCaption($this->unit_references);
-                    $doc->exportCaption($this->comment);
+                    $doc->exportCaption($this->_template);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_report_id);
-                    $doc->exportCaption($this->test);
-                    $doc->exportCaption($this->results);
-                    $doc->exportCaption($this->unit);
-                    $doc->exportCaption($this->unit_references);
-                    $doc->exportCaption($this->comment);
                 }
                 $doc->endExportRow();
             }
@@ -1607,19 +1412,10 @@ class FullHaemogramParameters extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_report_id);
-                        $doc->exportField($this->test);
-                        $doc->exportField($this->results);
-                        $doc->exportField($this->unit);
-                        $doc->exportField($this->unit_references);
-                        $doc->exportField($this->comment);
+                        $doc->exportField($this->_template);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_report_id);
-                        $doc->exportField($this->test);
-                        $doc->exportField($this->results);
-                        $doc->exportField($this->unit);
-                        $doc->exportField($this->unit_references);
-                        $doc->exportField($this->comment);
                     }
                     $doc->endExportRow($rowCnt);
                 }

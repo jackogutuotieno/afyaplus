@@ -131,11 +131,7 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
     {
         $this->id->setVisibility();
         $this->lab_test_report_id->setVisibility();
-        $this->test->setVisibility();
-        $this->results->setVisibility();
-        $this->unit->setVisibility();
-        $this->unit_references->setVisibility();
-        $this->comment->setVisibility();
+        $this->_template->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -426,9 +422,6 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
             $this->InlineDelete = true;
         }
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->test);
-
         // Set up master/detail parameters
         $this->setupMasterParms();
 
@@ -616,11 +609,7 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->lab_test_report_id->setDbValue($row['lab_test_report_id']);
-        $this->test->setDbValue($row['test']);
-        $this->results->setDbValue($row['results']);
-        $this->unit->setDbValue($row['unit']);
-        $this->unit_references->setDbValue($row['unit_references']);
-        $this->comment->setDbValue($row['comment']);
+        $this->_template->setDbValue($row['template']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -631,11 +620,7 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_report_id'] = $this->lab_test_report_id->DefaultValue;
-        $row['test'] = $this->test->DefaultValue;
-        $row['results'] = $this->results->DefaultValue;
-        $row['unit'] = $this->unit->DefaultValue;
-        $row['unit_references'] = $this->unit_references->DefaultValue;
-        $row['comment'] = $this->comment->DefaultValue;
+        $row['template'] = $this->_template->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -657,15 +642,7 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
 
         // lab_test_report_id
 
-        // test
-
-        // results
-
-        // unit
-
-        // unit_references
-
-        // comment
+        // template
 
         // date_created
 
@@ -680,26 +657,6 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
             $this->lab_test_report_id->ViewValue = $this->lab_test_report_id->CurrentValue;
             $this->lab_test_report_id->ViewValue = FormatNumber($this->lab_test_report_id->ViewValue, $this->lab_test_report_id->formatPattern());
 
-            // test
-            if (strval($this->test->CurrentValue) != "") {
-                $this->test->ViewValue = $this->test->optionCaption($this->test->CurrentValue);
-            } else {
-                $this->test->ViewValue = null;
-            }
-
-            // results
-            $this->results->ViewValue = $this->results->CurrentValue;
-            $this->results->ViewValue = FormatNumber($this->results->ViewValue, $this->results->formatPattern());
-
-            // unit
-            $this->unit->ViewValue = $this->unit->CurrentValue;
-
-            // unit_references
-            $this->unit_references->ViewValue = $this->unit_references->CurrentValue;
-
-            // comment
-            $this->comment->ViewValue = $this->comment->CurrentValue;
-
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -707,26 +664,6 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
             $this->lab_test_report_id->TooltipValue = "";
-
-            // test
-            $this->test->HrefValue = "";
-            $this->test->TooltipValue = "";
-
-            // results
-            $this->results->HrefValue = "";
-            $this->results->TooltipValue = "";
-
-            // unit
-            $this->unit->HrefValue = "";
-            $this->unit->TooltipValue = "";
-
-            // unit_references
-            $this->unit_references->HrefValue = "";
-            $this->unit_references->TooltipValue = "";
-
-            // comment
-            $this->comment->HrefValue = "";
-            $this->comment->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -960,8 +897,6 @@ class FullHaemogramParametersDelete extends FullHaemogramParameters
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_test":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
