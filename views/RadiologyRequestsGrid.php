@@ -172,9 +172,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_patient_id" class="el_radiology_requests_patient_id">
 <span<?= $Grid->patient_id->viewAttributes() ?>>
 <span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_patient_id" class="el_radiology_requests_patient_id">
     <select
@@ -219,9 +221,11 @@ loadjs.ready("fradiology_requestsgrid", function() {
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_patient_id" class="el_radiology_requests_patient_id">
 <span<?= $Grid->patient_id->viewAttributes() ?>>
 <span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_requests_patient_id" class="el_radiology_requests_patient_id">
     <select

@@ -182,9 +182,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
 <span<?= $Grid->patient_id->viewAttributes() ?>>
 <span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
     <select
@@ -229,9 +231,11 @@ loadjs.ready("fpatient_vaccinationsgrid", function() {
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
 <span<?= $Grid->patient_id->viewAttributes() ?>>
 <span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
     <select
@@ -289,9 +293,11 @@ loadjs.ready("fpatient_vaccinationsgrid", function() {
         <td data-name="visit_id"<?= $Grid->visit_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->visit_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
 <span<?= $Grid->visit_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
 <input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>
@@ -302,9 +308,11 @@ loadjs.ready("fpatient_vaccinationsgrid", function() {
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->visit_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
 <span<?= $Grid->visit_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
 <input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>

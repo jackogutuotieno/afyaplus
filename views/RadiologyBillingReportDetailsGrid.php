@@ -166,9 +166,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="radiology_request_id"<?= $Grid->radiology_request_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
 <span<?= $Grid->radiology_request_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
 <input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>
@@ -179,9 +181,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
 <span<?= $Grid->radiology_request_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
 <input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>

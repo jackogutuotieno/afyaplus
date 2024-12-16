@@ -57,11 +57,12 @@ class PrescriptionDetails extends DbTable
     public $id;
     public $prescription_id;
     public $medicine_stock_id;
+    public $method;
     public $dose_quantity;
     public $dose_type;
+    public $formulation;
     public $dose_interval;
     public $number_of_days;
-    public $method;
     public $date_created;
     public $date_updated;
 
@@ -194,6 +195,35 @@ class PrescriptionDetails extends DbTable
         $this->medicine_stock_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['medicine_stock_id'] = &$this->medicine_stock_id;
 
+        // method
+        $this->method = new DbField(
+            $this, // Table
+            'x_method', // Variable name
+            'method', // Name
+            '`method`', // Expression
+            '`method`', // Basic search expression
+            200, // Type
+            20, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`method`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->method->InputTextType = "text";
+        $this->method->Nullable = false; // NOT NULL field
+        $this->method->Required = true; // Required field
+        $this->method->setSelectMultiple(false); // Select one
+        $this->method->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->method->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->method->Lookup = new Lookup($this->method, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->method->OptionCount = 5;
+        $this->method->SearchOperators = ["=", "<>"];
+        $this->Fields['method'] = &$this->method;
+
         // dose_quantity
         $this->dose_quantity = new DbField(
             $this, // Table
@@ -245,9 +275,38 @@ class PrescriptionDetails extends DbTable
         $this->dose_type->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->dose_type->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->dose_type->Lookup = new Lookup($this->dose_type, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->dose_type->OptionCount = 3;
+        $this->dose_type->OptionCount = 5;
         $this->dose_type->SearchOperators = ["=", "<>"];
         $this->Fields['dose_type'] = &$this->dose_type;
+
+        // formulation
+        $this->formulation = new DbField(
+            $this, // Table
+            'x_formulation', // Variable name
+            'formulation', // Name
+            '`formulation`', // Expression
+            '`formulation`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`formulation`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->formulation->InputTextType = "text";
+        $this->formulation->Nullable = false; // NOT NULL field
+        $this->formulation->Required = true; // Required field
+        $this->formulation->setSelectMultiple(false); // Select one
+        $this->formulation->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->formulation->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->formulation->Lookup = new Lookup($this->formulation, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->formulation->OptionCount = 5;
+        $this->formulation->SearchOperators = ["=", "<>"];
+        $this->Fields['formulation'] = &$this->formulation;
 
         // dose_interval
         $this->dose_interval = new DbField(
@@ -300,40 +359,9 @@ class PrescriptionDetails extends DbTable
         $this->number_of_days->Raw = true;
         $this->number_of_days->Nullable = false; // NOT NULL field
         $this->number_of_days->Required = true; // Required field
-        $this->number_of_days->Lookup = new Lookup($this->number_of_days, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->number_of_days->OptionCount = 7;
         $this->number_of_days->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->number_of_days->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['number_of_days'] = &$this->number_of_days;
-
-        // method
-        $this->method = new DbField(
-            $this, // Table
-            'x_method', // Variable name
-            'method', // Name
-            '`method`', // Expression
-            '`method`', // Basic search expression
-            200, // Type
-            20, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`method`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->method->InputTextType = "text";
-        $this->method->Nullable = false; // NOT NULL field
-        $this->method->Required = true; // Required field
-        $this->method->setSelectMultiple(false); // Select one
-        $this->method->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->method->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->method->Lookup = new Lookup($this->method, 'prescription_details', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->method->OptionCount = 4;
-        $this->method->SearchOperators = ["=", "<>"];
-        $this->Fields['method'] = &$this->method;
 
         // date_created
         $this->date_created = new DbField(
@@ -1013,11 +1041,12 @@ class PrescriptionDetails extends DbTable
         $this->id->DbValue = $row['id'];
         $this->prescription_id->DbValue = $row['prescription_id'];
         $this->medicine_stock_id->DbValue = $row['medicine_stock_id'];
+        $this->method->DbValue = $row['method'];
         $this->dose_quantity->DbValue = $row['dose_quantity'];
         $this->dose_type->DbValue = $row['dose_type'];
+        $this->formulation->DbValue = $row['formulation'];
         $this->dose_interval->DbValue = $row['dose_interval'];
         $this->number_of_days->DbValue = $row['number_of_days'];
-        $this->method->DbValue = $row['method'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1379,11 +1408,12 @@ class PrescriptionDetails extends DbTable
         $this->id->setDbValue($row['id']);
         $this->prescription_id->setDbValue($row['prescription_id']);
         $this->medicine_stock_id->setDbValue($row['medicine_stock_id']);
+        $this->method->setDbValue($row['method']);
         $this->dose_quantity->setDbValue($row['dose_quantity']);
         $this->dose_type->setDbValue($row['dose_type']);
+        $this->formulation->setDbValue($row['formulation']);
         $this->dose_interval->setDbValue($row['dose_interval']);
         $this->number_of_days->setDbValue($row['number_of_days']);
-        $this->method->setDbValue($row['method']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1422,15 +1452,17 @@ class PrescriptionDetails extends DbTable
 
         // medicine_stock_id
 
+        // method
+
         // dose_quantity
 
         // dose_type
 
+        // formulation
+
         // dose_interval
 
         // number_of_days
-
-        // method
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -1468,6 +1500,13 @@ class PrescriptionDetails extends DbTable
             $this->medicine_stock_id->ViewValue = null;
         }
 
+        // method
+        if (strval($this->method->CurrentValue) != "") {
+            $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+        } else {
+            $this->method->ViewValue = null;
+        }
+
         // dose_quantity
         $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
         $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
@@ -1479,6 +1518,13 @@ class PrescriptionDetails extends DbTable
             $this->dose_type->ViewValue = null;
         }
 
+        // formulation
+        if (strval($this->formulation->CurrentValue) != "") {
+            $this->formulation->ViewValue = $this->formulation->optionCaption($this->formulation->CurrentValue);
+        } else {
+            $this->formulation->ViewValue = null;
+        }
+
         // dose_interval
         if (strval($this->dose_interval->CurrentValue) != "") {
             $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
@@ -1488,13 +1534,7 @@ class PrescriptionDetails extends DbTable
 
         // number_of_days
         $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-
-        // method
-        if (strval($this->method->CurrentValue) != "") {
-            $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
-        } else {
-            $this->method->ViewValue = null;
-        }
+        $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1516,6 +1556,10 @@ class PrescriptionDetails extends DbTable
         $this->medicine_stock_id->HrefValue = "";
         $this->medicine_stock_id->TooltipValue = "";
 
+        // method
+        $this->method->HrefValue = "";
+        $this->method->TooltipValue = "";
+
         // dose_quantity
         $this->dose_quantity->HrefValue = "";
         $this->dose_quantity->TooltipValue = "";
@@ -1524,6 +1568,10 @@ class PrescriptionDetails extends DbTable
         $this->dose_type->HrefValue = "";
         $this->dose_type->TooltipValue = "";
 
+        // formulation
+        $this->formulation->HrefValue = "";
+        $this->formulation->TooltipValue = "";
+
         // dose_interval
         $this->dose_interval->HrefValue = "";
         $this->dose_interval->TooltipValue = "";
@@ -1531,10 +1579,6 @@ class PrescriptionDetails extends DbTable
         // number_of_days
         $this->number_of_days->HrefValue = "";
         $this->number_of_days->TooltipValue = "";
-
-        // method
-        $this->method->HrefValue = "";
-        $this->method->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1581,6 +1625,11 @@ class PrescriptionDetails extends DbTable
         $this->medicine_stock_id->setupEditAttributes();
         $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
 
+        // method
+        $this->method->setupEditAttributes();
+        $this->method->EditValue = $this->method->options(true);
+        $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+
         // dose_quantity
         $this->dose_quantity->setupEditAttributes();
         $this->dose_quantity->EditValue = $this->dose_quantity->CurrentValue;
@@ -1594,6 +1643,11 @@ class PrescriptionDetails extends DbTable
         $this->dose_type->EditValue = $this->dose_type->options(true);
         $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
 
+        // formulation
+        $this->formulation->setupEditAttributes();
+        $this->formulation->EditValue = $this->formulation->options(true);
+        $this->formulation->PlaceHolder = RemoveHtml($this->formulation->caption());
+
         // dose_interval
         $this->dose_interval->setupEditAttributes();
         $this->dose_interval->EditValue = $this->dose_interval->options(true);
@@ -1603,11 +1657,9 @@ class PrescriptionDetails extends DbTable
         $this->number_of_days->setupEditAttributes();
         $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
         $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-
-        // method
-        $this->method->setupEditAttributes();
-        $this->method->EditValue = $this->method->options(true);
-        $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+        if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
+            $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
+        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1650,20 +1702,22 @@ class PrescriptionDetails extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->prescription_id);
                     $doc->exportCaption($this->medicine_stock_id);
+                    $doc->exportCaption($this->method);
                     $doc->exportCaption($this->dose_quantity);
                     $doc->exportCaption($this->dose_type);
+                    $doc->exportCaption($this->formulation);
                     $doc->exportCaption($this->dose_interval);
                     $doc->exportCaption($this->number_of_days);
-                    $doc->exportCaption($this->method);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->prescription_id);
                     $doc->exportCaption($this->medicine_stock_id);
+                    $doc->exportCaption($this->method);
                     $doc->exportCaption($this->dose_quantity);
                     $doc->exportCaption($this->dose_type);
+                    $doc->exportCaption($this->formulation);
                     $doc->exportCaption($this->dose_interval);
                     $doc->exportCaption($this->number_of_days);
-                    $doc->exportCaption($this->method);
                 }
                 $doc->endExportRow();
             }
@@ -1693,20 +1747,22 @@ class PrescriptionDetails extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->prescription_id);
                         $doc->exportField($this->medicine_stock_id);
+                        $doc->exportField($this->method);
                         $doc->exportField($this->dose_quantity);
                         $doc->exportField($this->dose_type);
+                        $doc->exportField($this->formulation);
                         $doc->exportField($this->dose_interval);
                         $doc->exportField($this->number_of_days);
-                        $doc->exportField($this->method);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->prescription_id);
                         $doc->exportField($this->medicine_stock_id);
+                        $doc->exportField($this->method);
                         $doc->exportField($this->dose_quantity);
                         $doc->exportField($this->dose_type);
+                        $doc->exportField($this->formulation);
                         $doc->exportField($this->dose_interval);
                         $doc->exportField($this->number_of_days);
-                        $doc->exportField($this->method);
                     }
                     $doc->endExportRow($rowCnt);
                 }

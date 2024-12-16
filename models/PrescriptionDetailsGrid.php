@@ -146,11 +146,12 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         $this->id->setVisibility();
         $this->prescription_id->setVisibility();
         $this->medicine_stock_id->setVisibility();
+        $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
         $this->dose_type->setVisibility();
+        $this->formulation->setVisibility();
         $this->dose_interval->setVisibility();
         $this->number_of_days->setVisibility();
-        $this->method->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -635,10 +636,10 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
         // Set up lookup cache
         $this->setupLookupOptions($this->medicine_stock_id);
-        $this->setupLookupOptions($this->dose_type);
-        $this->setupLookupOptions($this->dose_interval);
-        $this->setupLookupOptions($this->number_of_days);
         $this->setupLookupOptions($this->method);
+        $this->setupLookupOptions($this->dose_type);
+        $this->setupLookupOptions($this->formulation);
+        $this->setupLookupOptions($this->dose_interval);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -1198,6 +1199,14 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             return false;
         }
         if (
+            $CurrentForm->hasValue("x_method") &&
+            $CurrentForm->hasValue("o_method") &&
+            $this->method->CurrentValue != $this->method->DefaultValue &&
+            !($this->method->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->method->CurrentValue == $this->method->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
             $CurrentForm->hasValue("x_dose_quantity") &&
             $CurrentForm->hasValue("o_dose_quantity") &&
             $this->dose_quantity->CurrentValue != $this->dose_quantity->DefaultValue &&
@@ -1214,6 +1223,14 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             return false;
         }
         if (
+            $CurrentForm->hasValue("x_formulation") &&
+            $CurrentForm->hasValue("o_formulation") &&
+            $this->formulation->CurrentValue != $this->formulation->DefaultValue &&
+            !($this->formulation->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->formulation->CurrentValue == $this->formulation->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
             $CurrentForm->hasValue("x_dose_interval") &&
             $CurrentForm->hasValue("o_dose_interval") &&
             $this->dose_interval->CurrentValue != $this->dose_interval->DefaultValue &&
@@ -1226,14 +1243,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $CurrentForm->hasValue("o_number_of_days") &&
             $this->number_of_days->CurrentValue != $this->number_of_days->DefaultValue &&
             !($this->number_of_days->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->number_of_days->CurrentValue == $this->number_of_days->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_method") &&
-            $CurrentForm->hasValue("o_method") &&
-            $this->method->CurrentValue != $this->method->DefaultValue &&
-            !($this->method->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->method->CurrentValue == $this->method->getSessionValue())
         ) {
             return false;
         }
@@ -1826,6 +1835,19 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->medicine_stock_id->setOldValue($CurrentForm->getValue("o_medicine_stock_id"));
         }
 
+        // Check field name 'method' first before field var 'x_method'
+        $val = $CurrentForm->hasValue("method") ? $CurrentForm->getValue("method") : $CurrentForm->getValue("x_method");
+        if (!$this->method->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->method->Visible = false; // Disable update for API request
+            } else {
+                $this->method->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_method")) {
+            $this->method->setOldValue($CurrentForm->getValue("o_method"));
+        }
+
         // Check field name 'dose_quantity' first before field var 'x_dose_quantity'
         $val = $CurrentForm->hasValue("dose_quantity") ? $CurrentForm->getValue("dose_quantity") : $CurrentForm->getValue("x_dose_quantity");
         if (!$this->dose_quantity->IsDetailKey) {
@@ -1850,6 +1872,19 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         }
         if ($CurrentForm->hasValue("o_dose_type")) {
             $this->dose_type->setOldValue($CurrentForm->getValue("o_dose_type"));
+        }
+
+        // Check field name 'formulation' first before field var 'x_formulation'
+        $val = $CurrentForm->hasValue("formulation") ? $CurrentForm->getValue("formulation") : $CurrentForm->getValue("x_formulation");
+        if (!$this->formulation->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->formulation->Visible = false; // Disable update for API request
+            } else {
+                $this->formulation->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_formulation")) {
+            $this->formulation->setOldValue($CurrentForm->getValue("o_formulation"));
         }
 
         // Check field name 'dose_interval' first before field var 'x_dose_interval'
@@ -1877,19 +1912,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         if ($CurrentForm->hasValue("o_number_of_days")) {
             $this->number_of_days->setOldValue($CurrentForm->getValue("o_number_of_days"));
         }
-
-        // Check field name 'method' first before field var 'x_method'
-        $val = $CurrentForm->hasValue("method") ? $CurrentForm->getValue("method") : $CurrentForm->getValue("x_method");
-        if (!$this->method->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->method->Visible = false; // Disable update for API request
-            } else {
-                $this->method->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_method")) {
-            $this->method->setOldValue($CurrentForm->getValue("o_method"));
-        }
     }
 
     // Restore form values
@@ -1901,11 +1923,12 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         }
         $this->prescription_id->CurrentValue = $this->prescription_id->FormValue;
         $this->medicine_stock_id->CurrentValue = $this->medicine_stock_id->FormValue;
+        $this->method->CurrentValue = $this->method->FormValue;
         $this->dose_quantity->CurrentValue = $this->dose_quantity->FormValue;
         $this->dose_type->CurrentValue = $this->dose_type->FormValue;
+        $this->formulation->CurrentValue = $this->formulation->FormValue;
         $this->dose_interval->CurrentValue = $this->dose_interval->FormValue;
         $this->number_of_days->CurrentValue = $this->number_of_days->FormValue;
-        $this->method->CurrentValue = $this->method->FormValue;
     }
 
     /**
@@ -2004,11 +2027,12 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         $this->id->setDbValue($row['id']);
         $this->prescription_id->setDbValue($row['prescription_id']);
         $this->medicine_stock_id->setDbValue($row['medicine_stock_id']);
+        $this->method->setDbValue($row['method']);
         $this->dose_quantity->setDbValue($row['dose_quantity']);
         $this->dose_type->setDbValue($row['dose_type']);
+        $this->formulation->setDbValue($row['formulation']);
         $this->dose_interval->setDbValue($row['dose_interval']);
         $this->number_of_days->setDbValue($row['number_of_days']);
-        $this->method->setDbValue($row['method']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2020,11 +2044,12 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         $row['id'] = $this->id->DefaultValue;
         $row['prescription_id'] = $this->prescription_id->DefaultValue;
         $row['medicine_stock_id'] = $this->medicine_stock_id->DefaultValue;
+        $row['method'] = $this->method->DefaultValue;
         $row['dose_quantity'] = $this->dose_quantity->DefaultValue;
         $row['dose_type'] = $this->dose_type->DefaultValue;
+        $row['formulation'] = $this->formulation->DefaultValue;
         $row['dose_interval'] = $this->dose_interval->DefaultValue;
         $row['number_of_days'] = $this->number_of_days->DefaultValue;
-        $row['method'] = $this->method->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2071,15 +2096,17 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
         // medicine_stock_id
 
+        // method
+
         // dose_quantity
 
         // dose_type
 
+        // formulation
+
         // dose_interval
 
         // number_of_days
-
-        // method
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -2119,6 +2146,13 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
                 $this->medicine_stock_id->ViewValue = null;
             }
 
+            // method
+            if (strval($this->method->CurrentValue) != "") {
+                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+            } else {
+                $this->method->ViewValue = null;
+            }
+
             // dose_quantity
             $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
             $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
@@ -2130,6 +2164,13 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
                 $this->dose_type->ViewValue = null;
             }
 
+            // formulation
+            if (strval($this->formulation->CurrentValue) != "") {
+                $this->formulation->ViewValue = $this->formulation->optionCaption($this->formulation->CurrentValue);
+            } else {
+                $this->formulation->ViewValue = null;
+            }
+
             // dose_interval
             if (strval($this->dose_interval->CurrentValue) != "") {
                 $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
@@ -2139,13 +2180,7 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-
-            // method
-            if (strval($this->method->CurrentValue) != "") {
-                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
-            } else {
-                $this->method->ViewValue = null;
-            }
+            $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -2159,6 +2194,10 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->medicine_stock_id->HrefValue = "";
             $this->medicine_stock_id->TooltipValue = "";
 
+            // method
+            $this->method->HrefValue = "";
+            $this->method->TooltipValue = "";
+
             // dose_quantity
             $this->dose_quantity->HrefValue = "";
             $this->dose_quantity->TooltipValue = "";
@@ -2167,6 +2206,10 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->dose_type->HrefValue = "";
             $this->dose_type->TooltipValue = "";
 
+            // formulation
+            $this->formulation->HrefValue = "";
+            $this->formulation->TooltipValue = "";
+
             // dose_interval
             $this->dose_interval->HrefValue = "";
             $this->dose_interval->TooltipValue = "";
@@ -2174,10 +2217,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->HrefValue = "";
             $this->number_of_days->TooltipValue = "";
-
-            // method
-            $this->method->HrefValue = "";
-            $this->method->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // id
 
@@ -2223,6 +2262,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             }
             $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
 
+            // method
+            $this->method->setupEditAttributes();
+            $this->method->EditValue = $this->method->options(true);
+            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+
             // dose_quantity
             $this->dose_quantity->setupEditAttributes();
             $this->dose_quantity->EditValue = $this->dose_quantity->CurrentValue;
@@ -2236,6 +2280,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->dose_type->EditValue = $this->dose_type->options(true);
             $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
 
+            // formulation
+            $this->formulation->setupEditAttributes();
+            $this->formulation->EditValue = $this->formulation->options(true);
+            $this->formulation->PlaceHolder = RemoveHtml($this->formulation->caption());
+
             // dose_interval
             $this->dose_interval->setupEditAttributes();
             $this->dose_interval->EditValue = $this->dose_interval->options(true);
@@ -2245,11 +2294,9 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->number_of_days->setupEditAttributes();
             $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-
-            // method
-            $this->method->setupEditAttributes();
-            $this->method->EditValue = $this->method->options(true);
-            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+            if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
+                $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
+            }
 
             // Add refer script
 
@@ -2262,20 +2309,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";
 
+            // method
+            $this->method->HrefValue = "";
+
             // dose_quantity
             $this->dose_quantity->HrefValue = "";
 
             // dose_type
             $this->dose_type->HrefValue = "";
 
+            // formulation
+            $this->formulation->HrefValue = "";
+
             // dose_interval
             $this->dose_interval->HrefValue = "";
 
             // number_of_days
             $this->number_of_days->HrefValue = "";
-
-            // method
-            $this->method->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -2323,6 +2373,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             }
             $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
 
+            // method
+            $this->method->setupEditAttributes();
+            $this->method->EditValue = $this->method->options(true);
+            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+
             // dose_quantity
             $this->dose_quantity->setupEditAttributes();
             $this->dose_quantity->EditValue = $this->dose_quantity->CurrentValue;
@@ -2336,6 +2391,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->dose_type->EditValue = $this->dose_type->options(true);
             $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
 
+            // formulation
+            $this->formulation->setupEditAttributes();
+            $this->formulation->EditValue = $this->formulation->options(true);
+            $this->formulation->PlaceHolder = RemoveHtml($this->formulation->caption());
+
             // dose_interval
             $this->dose_interval->setupEditAttributes();
             $this->dose_interval->EditValue = $this->dose_interval->options(true);
@@ -2345,11 +2405,9 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->number_of_days->setupEditAttributes();
             $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-
-            // method
-            $this->method->setupEditAttributes();
-            $this->method->EditValue = $this->method->options(true);
-            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
+            if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
+                $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
+            }
 
             // Edit refer script
 
@@ -2362,20 +2420,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";
 
+            // method
+            $this->method->HrefValue = "";
+
             // dose_quantity
             $this->dose_quantity->HrefValue = "";
 
             // dose_type
             $this->dose_type->HrefValue = "";
 
+            // formulation
+            $this->formulation->HrefValue = "";
+
             // dose_interval
             $this->dose_interval->HrefValue = "";
 
             // number_of_days
             $this->number_of_days->HrefValue = "";
-
-            // method
-            $this->method->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2415,6 +2476,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
                     $this->medicine_stock_id->addErrorMessage(str_replace("%s", $this->medicine_stock_id->caption(), $this->medicine_stock_id->RequiredErrorMessage));
                 }
             }
+            if ($this->method->Visible && $this->method->Required) {
+                if (!$this->method->IsDetailKey && EmptyValue($this->method->FormValue)) {
+                    $this->method->addErrorMessage(str_replace("%s", $this->method->caption(), $this->method->RequiredErrorMessage));
+                }
+            }
             if ($this->dose_quantity->Visible && $this->dose_quantity->Required) {
                 if (!$this->dose_quantity->IsDetailKey && EmptyValue($this->dose_quantity->FormValue)) {
                     $this->dose_quantity->addErrorMessage(str_replace("%s", $this->dose_quantity->caption(), $this->dose_quantity->RequiredErrorMessage));
@@ -2426,6 +2492,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             if ($this->dose_type->Visible && $this->dose_type->Required) {
                 if (!$this->dose_type->IsDetailKey && EmptyValue($this->dose_type->FormValue)) {
                     $this->dose_type->addErrorMessage(str_replace("%s", $this->dose_type->caption(), $this->dose_type->RequiredErrorMessage));
+                }
+            }
+            if ($this->formulation->Visible && $this->formulation->Required) {
+                if (!$this->formulation->IsDetailKey && EmptyValue($this->formulation->FormValue)) {
+                    $this->formulation->addErrorMessage(str_replace("%s", $this->formulation->caption(), $this->formulation->RequiredErrorMessage));
                 }
             }
             if ($this->dose_interval->Visible && $this->dose_interval->Required) {
@@ -2440,11 +2511,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             }
             if (!CheckInteger($this->number_of_days->FormValue)) {
                 $this->number_of_days->addErrorMessage($this->number_of_days->getErrorMessage(false));
-            }
-            if ($this->method->Visible && $this->method->Required) {
-                if (!$this->method->IsDetailKey && EmptyValue($this->method->FormValue)) {
-                    $this->method->addErrorMessage(str_replace("%s", $this->method->caption(), $this->method->RequiredErrorMessage));
-                }
             }
 
         // Return validate result
@@ -2608,20 +2674,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         // medicine_stock_id
         $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->ReadOnly);
 
+        // method
+        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, $this->method->ReadOnly);
+
         // dose_quantity
         $this->dose_quantity->setDbValueDef($rsnew, $this->dose_quantity->CurrentValue, $this->dose_quantity->ReadOnly);
 
         // dose_type
         $this->dose_type->setDbValueDef($rsnew, $this->dose_type->CurrentValue, $this->dose_type->ReadOnly);
 
+        // formulation
+        $this->formulation->setDbValueDef($rsnew, $this->formulation->CurrentValue, $this->formulation->ReadOnly);
+
         // dose_interval
         $this->dose_interval->setDbValueDef($rsnew, $this->dose_interval->CurrentValue, $this->dose_interval->ReadOnly);
 
         // number_of_days
         $this->number_of_days->setDbValueDef($rsnew, $this->number_of_days->CurrentValue, $this->number_of_days->ReadOnly);
-
-        // method
-        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, $this->method->ReadOnly);
         return $rsnew;
     }
 
@@ -2637,20 +2706,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         if (isset($row['medicine_stock_id'])) { // medicine_stock_id
             $this->medicine_stock_id->CurrentValue = $row['medicine_stock_id'];
         }
+        if (isset($row['method'])) { // method
+            $this->method->CurrentValue = $row['method'];
+        }
         if (isset($row['dose_quantity'])) { // dose_quantity
             $this->dose_quantity->CurrentValue = $row['dose_quantity'];
         }
         if (isset($row['dose_type'])) { // dose_type
             $this->dose_type->CurrentValue = $row['dose_type'];
         }
+        if (isset($row['formulation'])) { // formulation
+            $this->formulation->CurrentValue = $row['formulation'];
+        }
         if (isset($row['dose_interval'])) { // dose_interval
             $this->dose_interval->CurrentValue = $row['dose_interval'];
         }
         if (isset($row['number_of_days'])) { // number_of_days
             $this->number_of_days->CurrentValue = $row['number_of_days'];
-        }
-        if (isset($row['method'])) { // method
-            $this->method->CurrentValue = $row['method'];
         }
     }
 
@@ -2739,20 +2811,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         // medicine_stock_id
         $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, false);
 
+        // method
+        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, false);
+
         // dose_quantity
         $this->dose_quantity->setDbValueDef($rsnew, $this->dose_quantity->CurrentValue, false);
 
         // dose_type
         $this->dose_type->setDbValueDef($rsnew, $this->dose_type->CurrentValue, false);
 
+        // formulation
+        $this->formulation->setDbValueDef($rsnew, $this->formulation->CurrentValue, false);
+
         // dose_interval
         $this->dose_interval->setDbValueDef($rsnew, $this->dose_interval->CurrentValue, false);
 
         // number_of_days
         $this->number_of_days->setDbValueDef($rsnew, $this->number_of_days->CurrentValue, false);
-
-        // method
-        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2768,20 +2843,23 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         if (isset($row['medicine_stock_id'])) { // medicine_stock_id
             $this->medicine_stock_id->setFormValue($row['medicine_stock_id']);
         }
+        if (isset($row['method'])) { // method
+            $this->method->setFormValue($row['method']);
+        }
         if (isset($row['dose_quantity'])) { // dose_quantity
             $this->dose_quantity->setFormValue($row['dose_quantity']);
         }
         if (isset($row['dose_type'])) { // dose_type
             $this->dose_type->setFormValue($row['dose_type']);
         }
+        if (isset($row['formulation'])) { // formulation
+            $this->formulation->setFormValue($row['formulation']);
+        }
         if (isset($row['dose_interval'])) { // dose_interval
             $this->dose_interval->setFormValue($row['dose_interval']);
         }
         if (isset($row['number_of_days'])) { // number_of_days
             $this->number_of_days->setFormValue($row['number_of_days']);
-        }
-        if (isset($row['method'])) { // method
-            $this->method->setFormValue($row['method']);
         }
     }
 
@@ -2816,13 +2894,13 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             switch ($fld->FieldVar) {
                 case "x_medicine_stock_id":
                     break;
+                case "x_method":
+                    break;
                 case "x_dose_type":
                     break;
+                case "x_formulation":
+                    break;
                 case "x_dose_interval":
-                    break;
-                case "x_number_of_days":
-                    break;
-                case "x_method":
                     break;
                 default:
                     $lookupFilter = "";

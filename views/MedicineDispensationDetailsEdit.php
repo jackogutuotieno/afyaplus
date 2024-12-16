@@ -93,9 +93,11 @@ loadjs.ready("head", function () {
         <label id="elh_medicine_dispensation_details_medicine_dispensation_id" for="x_medicine_dispensation_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->medicine_dispensation_id->caption() ?><?= $Page->medicine_dispensation_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->medicine_dispensation_id->cellAttributes() ?>>
 <?php if ($Page->medicine_dispensation_id->getSessionValue() != "") { ?>
+<span id="el_medicine_dispensation_details_medicine_dispensation_id">
 <span<?= $Page->medicine_dispensation_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->medicine_dispensation_id->getDisplayValue($Page->medicine_dispensation_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x_medicine_dispensation_id" name="x_medicine_dispensation_id" value="<?= HtmlEncode($Page->medicine_dispensation_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el_medicine_dispensation_details_medicine_dispensation_id">
 <input type="<?= $Page->medicine_dispensation_id->getInputTextType() ?>" name="x_medicine_dispensation_id" id="x_medicine_dispensation_id" data-table="medicine_dispensation_details" data-field="x_medicine_dispensation_id" value="<?= $Page->medicine_dispensation_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->medicine_dispensation_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->medicine_dispensation_id->formatPattern()) ?>"<?= $Page->medicine_dispensation_id->editAttributes() ?> aria-describedby="x_medicine_dispensation_id_help">

@@ -134,7 +134,7 @@ class InvoiceDetailsAdd extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
-        $this->line_total->setVisibility();
+        $this->line_total->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -733,16 +733,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
             }
         }
 
-        // Check field name 'line_total' first before field var 'x_line_total'
-        $val = $CurrentForm->hasValue("line_total") ? $CurrentForm->getValue("line_total") : $CurrentForm->getValue("x_line_total");
-        if (!$this->line_total->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->line_total->Visible = false; // Disable update for API request
-            } else {
-                $this->line_total->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -755,7 +745,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
         $this->item->CurrentValue = $this->item->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
-        $this->line_total->CurrentValue = $this->line_total->FormValue;
     }
 
     /**
@@ -911,9 +900,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
-
-            // line_total
-            $this->line_total->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // invoice_id
             $this->invoice_id->setupEditAttributes();
@@ -953,14 +939,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
-            // line_total
-            $this->line_total->setupEditAttributes();
-            $this->line_total->EditValue = $this->line_total->CurrentValue;
-            $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
-            if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
-                $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
-            }
-
             // Add refer script
 
             // invoice_id
@@ -974,9 +952,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
 
             // cost
             $this->cost->HrefValue = "";
-
-            // line_total
-            $this->line_total->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1026,14 +1001,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
             }
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
-            }
-            if ($this->line_total->Visible && $this->line_total->Required) {
-                if (!$this->line_total->IsDetailKey && EmptyValue($this->line_total->FormValue)) {
-                    $this->line_total->addErrorMessage(str_replace("%s", $this->line_total->caption(), $this->line_total->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->line_total->FormValue)) {
-                $this->line_total->addErrorMessage($this->line_total->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1142,9 +1109,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
-
-        // line_total
-        $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1165,9 +1129,6 @@ class InvoiceDetailsAdd extends InvoiceDetails
         }
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);
-        }
-        if (isset($row['line_total'])) { // line_total
-            $this->line_total->setFormValue($row['line_total']);
         }
     }
 

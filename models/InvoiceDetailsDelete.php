@@ -129,8 +129,8 @@ class InvoiceDetailsDelete extends InvoiceDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->invoice_id->setVisibility();
+        $this->id->Visible = false;
+        $this->invoice_id->Visible = false;
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
@@ -688,14 +688,6 @@ class InvoiceDetailsDelete extends InvoiceDetails
             // line_total
             $this->line_total->ViewValue = $this->line_total->CurrentValue;
             $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // invoice_id
-            $this->invoice_id->HrefValue = "";
-            $this->invoice_id->TooltipValue = "";
 
             // item
             $this->item->HrefValue = "";

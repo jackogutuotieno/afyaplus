@@ -170,12 +170,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_invoice_details_id" class="invoice_details_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
-<?php if ($Page->invoice_id->Visible) { // invoice_id ?>
-        <th data-name="invoice_id" class="<?= $Page->invoice_id->headerCellClass() ?>"><div id="elh_invoice_details_invoice_id" class="invoice_details_invoice_id"><?= $Page->renderFieldHeader($Page->invoice_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->item->Visible) { // item ?>
         <th data-name="item" class="<?= $Page->item->headerCellClass() ?>"><div id="elh_invoice_details_item" class="invoice_details_item"><?= $Page->renderFieldHeader($Page->item) ?></div></th>
 <?php } ?>
@@ -216,22 +210,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_id" class="el_invoice_details_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->invoice_id->Visible) { // invoice_id ?>
-        <td data-name="invoice_id"<?= $Page->invoice_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_invoice_id" class="el_invoice_details_invoice_id">
-<span<?= $Page->invoice_id->viewAttributes() ?>>
-<?= $Page->invoice_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->item->Visible) { // item ?>
         <td data-name="item"<?= $Page->item->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_item" class="el_invoice_details_item">
@@ -299,14 +277,6 @@ $Page->renderListOptions();
 // Render list options (footer, left)
 $Page->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Page->id->footerCellClass() ?>"><span id="elf_invoice_details_id" class="invoice_details_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->invoice_id->Visible) { // invoice_id ?>
-        <td data-name="invoice_id" class="<?= $Page->invoice_id->footerCellClass() ?>"><span id="elf_invoice_details_invoice_id" class="invoice_details_invoice_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Page->item->Visible) { // item ?>
         <td data-name="item" class="<?= $Page->item->footerCellClass() ?>"><span id="elf_invoice_details_item" class="invoice_details_item">
         </span></td>

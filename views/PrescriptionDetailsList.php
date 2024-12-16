@@ -179,20 +179,23 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th data-name="medicine_stock_id" class="<?= $Page->medicine_stock_id->headerCellClass() ?>"><div id="elh_prescription_details_medicine_stock_id" class="prescription_details_medicine_stock_id"><?= $Page->renderFieldHeader($Page->medicine_stock_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->method->Visible) { // method ?>
+        <th data-name="method" class="<?= $Page->method->headerCellClass() ?>"><div id="elh_prescription_details_method" class="prescription_details_method"><?= $Page->renderFieldHeader($Page->method) ?></div></th>
+<?php } ?>
 <?php if ($Page->dose_quantity->Visible) { // dose_quantity ?>
         <th data-name="dose_quantity" class="<?= $Page->dose_quantity->headerCellClass() ?>"><div id="elh_prescription_details_dose_quantity" class="prescription_details_dose_quantity"><?= $Page->renderFieldHeader($Page->dose_quantity) ?></div></th>
 <?php } ?>
 <?php if ($Page->dose_type->Visible) { // dose_type ?>
         <th data-name="dose_type" class="<?= $Page->dose_type->headerCellClass() ?>"><div id="elh_prescription_details_dose_type" class="prescription_details_dose_type"><?= $Page->renderFieldHeader($Page->dose_type) ?></div></th>
 <?php } ?>
+<?php if ($Page->formulation->Visible) { // formulation ?>
+        <th data-name="formulation" class="<?= $Page->formulation->headerCellClass() ?>"><div id="elh_prescription_details_formulation" class="prescription_details_formulation"><?= $Page->renderFieldHeader($Page->formulation) ?></div></th>
+<?php } ?>
 <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
         <th data-name="dose_interval" class="<?= $Page->dose_interval->headerCellClass() ?>"><div id="elh_prescription_details_dose_interval" class="prescription_details_dose_interval"><?= $Page->renderFieldHeader($Page->dose_interval) ?></div></th>
 <?php } ?>
 <?php if ($Page->number_of_days->Visible) { // number_of_days ?>
         <th data-name="number_of_days" class="<?= $Page->number_of_days->headerCellClass() ?>"><div id="elh_prescription_details_number_of_days" class="prescription_details_number_of_days"><?= $Page->renderFieldHeader($Page->number_of_days) ?></div></th>
-<?php } ?>
-<?php if ($Page->method->Visible) { // method ?>
-        <th data-name="method" class="<?= $Page->method->headerCellClass() ?>"><div id="elh_prescription_details_method" class="prescription_details_method"><?= $Page->renderFieldHeader($Page->method) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -246,6 +249,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->method->Visible) { // method ?>
+        <td data-name="method"<?= $Page->method->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
+<span<?= $Page->method->viewAttributes() ?>>
+<?= $Page->method->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->dose_quantity->Visible) { // dose_quantity ?>
         <td data-name="dose_quantity"<?= $Page->dose_quantity->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_dose_quantity" class="el_prescription_details_dose_quantity">
@@ -262,6 +273,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->formulation->Visible) { // formulation ?>
+        <td data-name="formulation"<?= $Page->formulation->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_formulation" class="el_prescription_details_formulation">
+<span<?= $Page->formulation->viewAttributes() ?>>
+<?= $Page->formulation->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
         <td data-name="dose_interval"<?= $Page->dose_interval->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_dose_interval" class="el_prescription_details_dose_interval">
@@ -275,14 +294,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_number_of_days" class="el_prescription_details_number_of_days">
 <span<?= $Page->number_of_days->viewAttributes() ?>>
 <?= $Page->number_of_days->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->method->Visible) { // method ?>
-        <td data-name="method"<?= $Page->method->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
-<span<?= $Page->method->viewAttributes() ?>>
-<?= $Page->method->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

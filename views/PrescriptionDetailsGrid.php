@@ -26,18 +26,19 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["prescription_id", [fields.prescription_id.visible && fields.prescription_id.required ? ew.Validators.required(fields.prescription_id.caption) : null, ew.Validators.integer], fields.prescription_id.isInvalid],
             ["medicine_stock_id", [fields.medicine_stock_id.visible && fields.medicine_stock_id.required ? ew.Validators.required(fields.medicine_stock_id.caption) : null], fields.medicine_stock_id.isInvalid],
+            ["method", [fields.method.visible && fields.method.required ? ew.Validators.required(fields.method.caption) : null], fields.method.isInvalid],
             ["dose_quantity", [fields.dose_quantity.visible && fields.dose_quantity.required ? ew.Validators.required(fields.dose_quantity.caption) : null, ew.Validators.integer], fields.dose_quantity.isInvalid],
             ["dose_type", [fields.dose_type.visible && fields.dose_type.required ? ew.Validators.required(fields.dose_type.caption) : null], fields.dose_type.isInvalid],
+            ["formulation", [fields.formulation.visible && fields.formulation.required ? ew.Validators.required(fields.formulation.caption) : null], fields.formulation.isInvalid],
             ["dose_interval", [fields.dose_interval.visible && fields.dose_interval.required ? ew.Validators.required(fields.dose_interval.caption) : null], fields.dose_interval.isInvalid],
-            ["number_of_days", [fields.number_of_days.visible && fields.number_of_days.required ? ew.Validators.required(fields.number_of_days.caption) : null, ew.Validators.integer], fields.number_of_days.isInvalid],
-            ["method", [fields.method.visible && fields.method.required ? ew.Validators.required(fields.method.caption) : null], fields.method.isInvalid]
+            ["number_of_days", [fields.number_of_days.visible && fields.number_of_days.required ? ew.Validators.required(fields.number_of_days.caption) : null, ew.Validators.integer], fields.number_of_days.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["prescription_id",false],["medicine_stock_id",false],["dose_quantity",false],["dose_type",false],["dose_interval",false],["number_of_days",false],["method",false]];
+                    fields = [["prescription_id",false],["medicine_stock_id",false],["method",false],["dose_quantity",false],["dose_type",false],["formulation",false],["dose_interval",false],["number_of_days",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -58,10 +59,10 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "medicine_stock_id": <?= $Grid->medicine_stock_id->toClientList($Grid) ?>,
-            "dose_type": <?= $Grid->dose_type->toClientList($Grid) ?>,
-            "dose_interval": <?= $Grid->dose_interval->toClientList($Grid) ?>,
-            "number_of_days": <?= $Grid->number_of_days->toClientList($Grid) ?>,
             "method": <?= $Grid->method->toClientList($Grid) ?>,
+            "dose_type": <?= $Grid->dose_type->toClientList($Grid) ?>,
+            "formulation": <?= $Grid->formulation->toClientList($Grid) ?>,
+            "dose_interval": <?= $Grid->dose_interval->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -105,20 +106,23 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th data-name="medicine_stock_id" class="<?= $Grid->medicine_stock_id->headerCellClass() ?>"><div id="elh_prescription_details_medicine_stock_id" class="prescription_details_medicine_stock_id"><?= $Grid->renderFieldHeader($Grid->medicine_stock_id) ?></div></th>
 <?php } ?>
+<?php if ($Grid->method->Visible) { // method ?>
+        <th data-name="method" class="<?= $Grid->method->headerCellClass() ?>"><div id="elh_prescription_details_method" class="prescription_details_method"><?= $Grid->renderFieldHeader($Grid->method) ?></div></th>
+<?php } ?>
 <?php if ($Grid->dose_quantity->Visible) { // dose_quantity ?>
         <th data-name="dose_quantity" class="<?= $Grid->dose_quantity->headerCellClass() ?>"><div id="elh_prescription_details_dose_quantity" class="prescription_details_dose_quantity"><?= $Grid->renderFieldHeader($Grid->dose_quantity) ?></div></th>
 <?php } ?>
 <?php if ($Grid->dose_type->Visible) { // dose_type ?>
         <th data-name="dose_type" class="<?= $Grid->dose_type->headerCellClass() ?>"><div id="elh_prescription_details_dose_type" class="prescription_details_dose_type"><?= $Grid->renderFieldHeader($Grid->dose_type) ?></div></th>
 <?php } ?>
+<?php if ($Grid->formulation->Visible) { // formulation ?>
+        <th data-name="formulation" class="<?= $Grid->formulation->headerCellClass() ?>"><div id="elh_prescription_details_formulation" class="prescription_details_formulation"><?= $Grid->renderFieldHeader($Grid->formulation) ?></div></th>
+<?php } ?>
 <?php if ($Grid->dose_interval->Visible) { // dose_interval ?>
         <th data-name="dose_interval" class="<?= $Grid->dose_interval->headerCellClass() ?>"><div id="elh_prescription_details_dose_interval" class="prescription_details_dose_interval"><?= $Grid->renderFieldHeader($Grid->dose_interval) ?></div></th>
 <?php } ?>
 <?php if ($Grid->number_of_days->Visible) { // number_of_days ?>
         <th data-name="number_of_days" class="<?= $Grid->number_of_days->headerCellClass() ?>"><div id="elh_prescription_details_number_of_days" class="prescription_details_number_of_days"><?= $Grid->renderFieldHeader($Grid->number_of_days) ?></div></th>
-<?php } ?>
-<?php if ($Grid->method->Visible) { // method ?>
-        <th data-name="method" class="<?= $Grid->method->headerCellClass() ?>"><div id="elh_prescription_details_method" class="prescription_details_method"><?= $Grid->renderFieldHeader($Grid->method) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -187,9 +191,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="prescription_id"<?= $Grid->prescription_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <?php if ($Grid->prescription_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
 <span<?= $Grid->prescription_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->prescription_id->getDisplayValue($Grid->prescription_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_prescription_id" name="x<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
 <input type="<?= $Grid->prescription_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_prescription_id" id="x<?= $Grid->RowIndex ?>_prescription_id" data-table="prescription_details" data-field="x_prescription_id" value="<?= $Grid->prescription_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->prescription_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->prescription_id->formatPattern()) ?>"<?= $Grid->prescription_id->editAttributes() ?>>
@@ -200,9 +206,11 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <?php if ($Grid->prescription_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
 <span<?= $Grid->prescription_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->prescription_id->getDisplayValue($Grid->prescription_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_prescription_id" name="x<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
 <input type="<?= $Grid->prescription_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_prescription_id" id="x<?= $Grid->RowIndex ?>_prescription_id" data-table="prescription_details" data-field="x_prescription_id" value="<?= $Grid->prescription_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->prescription_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->prescription_id->formatPattern()) ?>"<?= $Grid->prescription_id->editAttributes() ?>>
@@ -313,6 +321,99 @@ loadjs.ready("fprescription_detailsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="prescription_details" data-field="x_medicine_stock_id" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_medicine_stock_id" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_medicine_stock_id" value="<?= HtmlEncode($Grid->medicine_stock_id->FormValue) ?>">
 <input type="hidden" data-table="prescription_details" data-field="x_medicine_stock_id" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_medicine_stock_id" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_medicine_stock_id" value="<?= HtmlEncode($Grid->medicine_stock_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->method->Visible) { // method ?>
+        <td data-name="method"<?= $Grid->method->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
+    <select
+        id="x<?= $Grid->RowIndex ?>_method"
+        name="x<?= $Grid->RowIndex ?>_method"
+        class="form-select ew-select<?= $Grid->method->isInvalidClass() ?>"
+        <?php if (!$Grid->method->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_method"
+        data-value-separator="<?= $Grid->method->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->method->getPlaceHolder()) ?>"
+        <?= $Grid->method->editAttributes() ?>>
+        <?= $Grid->method->selectOptionListHtml("x{$Grid->RowIndex}_method") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->method->getErrorMessage() ?></div>
+<?php if (!$Grid->method->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_method", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsgrid.lists.method?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_method" id="o<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
+    <select
+        id="x<?= $Grid->RowIndex ?>_method"
+        name="x<?= $Grid->RowIndex ?>_method"
+        class="form-select ew-select<?= $Grid->method->isInvalidClass() ?>"
+        <?php if (!$Grid->method->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_method"
+        data-value-separator="<?= $Grid->method->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->method->getPlaceHolder()) ?>"
+        <?= $Grid->method->editAttributes() ?>>
+        <?= $Grid->method->selectOptionListHtml("x{$Grid->RowIndex}_method") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->method->getErrorMessage() ?></div>
+<?php if (!$Grid->method->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_method", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsgrid.lists.method?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
+<span<?= $Grid->method->viewAttributes() ?>>
+<?= $Grid->method->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_method" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->FormValue) ?>">
+<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_method" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -437,6 +538,99 @@ loadjs.ready("fprescription_detailsgrid", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->formulation->Visible) { // formulation ?>
+        <td data-name="formulation"<?= $Grid->formulation->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_formulation" class="el_prescription_details_formulation">
+    <select
+        id="x<?= $Grid->RowIndex ?>_formulation"
+        name="x<?= $Grid->RowIndex ?>_formulation"
+        class="form-select ew-select<?= $Grid->formulation->isInvalidClass() ?>"
+        <?php if (!$Grid->formulation->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_formulation"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_formulation"
+        data-value-separator="<?= $Grid->formulation->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->formulation->getPlaceHolder()) ?>"
+        <?= $Grid->formulation->editAttributes() ?>>
+        <?= $Grid->formulation->selectOptionListHtml("x{$Grid->RowIndex}_formulation") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->formulation->getErrorMessage() ?></div>
+<?php if (!$Grid->formulation->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_formulation", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_formulation" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsgrid.lists.formulation?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_formulation", form: "fprescription_detailsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_formulation", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.formulation.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="prescription_details" data-field="x_formulation" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_formulation" id="o<?= $Grid->RowIndex ?>_formulation" value="<?= HtmlEncode($Grid->formulation->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_formulation" class="el_prescription_details_formulation">
+    <select
+        id="x<?= $Grid->RowIndex ?>_formulation"
+        name="x<?= $Grid->RowIndex ?>_formulation"
+        class="form-select ew-select<?= $Grid->formulation->isInvalidClass() ?>"
+        <?php if (!$Grid->formulation->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_formulation"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_formulation"
+        data-value-separator="<?= $Grid->formulation->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->formulation->getPlaceHolder()) ?>"
+        <?= $Grid->formulation->editAttributes() ?>>
+        <?= $Grid->formulation->selectOptionListHtml("x{$Grid->RowIndex}_formulation") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->formulation->getErrorMessage() ?></div>
+<?php if (!$Grid->formulation->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_formulation", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_formulation" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsgrid.lists.formulation?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_formulation", form: "fprescription_detailsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_formulation", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.formulation.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_formulation" class="el_prescription_details_formulation">
+<span<?= $Grid->formulation->viewAttributes() ?>>
+<?= $Grid->formulation->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="prescription_details" data-field="x_formulation" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_formulation" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_formulation" value="<?= HtmlEncode($Grid->formulation->FormValue) ?>">
+<input type="hidden" data-table="prescription_details" data-field="x_formulation" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_formulation" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_formulation" value="<?= HtmlEncode($Grid->formulation->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->dose_interval->Visible) { // dose_interval ?>
         <td data-name="dose_interval"<?= $Grid->dose_interval->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -534,41 +728,15 @@ loadjs.ready("fprescription_detailsgrid", function() {
         <td data-name="number_of_days"<?= $Grid->number_of_days->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_number_of_days" class="el_prescription_details_number_of_days">
-<?php
-if (IsRTL()) {
-    $Grid->number_of_days->EditAttrs["dir"] = "rtl";
-}
-?>
-<span id="as_x<?= $Grid->RowIndex ?>_number_of_days" class="ew-auto-suggest">
-    <input type="<?= $Grid->number_of_days->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_number_of_days" id="sv_x<?= $Grid->RowIndex ?>_number_of_days" value="<?= RemoveHtml($Grid->number_of_days->EditValue) ?>" autocomplete="off" size="30" placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->number_of_days->formatPattern()) ?>"<?= $Grid->number_of_days->editAttributes() ?>>
-</span>
-<selection-list hidden class="form-control" data-table="prescription_details" data-field="x_number_of_days" data-input="sv_x<?= $Grid->RowIndex ?>_number_of_days" data-value-separator="<?= $Grid->number_of_days->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_number_of_days" id="x<?= $Grid->RowIndex ?>_number_of_days" value="<?= HtmlEncode($Grid->number_of_days->CurrentValue) ?>"></selection-list>
+<input type="<?= $Grid->number_of_days->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_number_of_days" id="x<?= $Grid->RowIndex ?>_number_of_days" data-table="prescription_details" data-field="x_number_of_days" value="<?= $Grid->number_of_days->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->number_of_days->formatPattern()) ?>"<?= $Grid->number_of_days->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->number_of_days->getErrorMessage() ?></div>
-<script>
-loadjs.ready("fprescription_detailsgrid", function() {
-    fprescription_detailsgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_number_of_days","forceSelect":false}, { lookupAllDisplayFields: <?= $Grid->number_of_days->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.prescription_details.fields.number_of_days.autoSuggestOptions));
-});
-</script>
 </span>
 <input type="hidden" data-table="prescription_details" data-field="x_number_of_days" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_number_of_days" id="o<?= $Grid->RowIndex ?>_number_of_days" value="<?= HtmlEncode($Grid->number_of_days->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_number_of_days" class="el_prescription_details_number_of_days">
-<?php
-if (IsRTL()) {
-    $Grid->number_of_days->EditAttrs["dir"] = "rtl";
-}
-?>
-<span id="as_x<?= $Grid->RowIndex ?>_number_of_days" class="ew-auto-suggest">
-    <input type="<?= $Grid->number_of_days->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_number_of_days" id="sv_x<?= $Grid->RowIndex ?>_number_of_days" value="<?= RemoveHtml($Grid->number_of_days->EditValue) ?>" autocomplete="off" size="30" placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->number_of_days->formatPattern()) ?>"<?= $Grid->number_of_days->editAttributes() ?>>
-</span>
-<selection-list hidden class="form-control" data-table="prescription_details" data-field="x_number_of_days" data-input="sv_x<?= $Grid->RowIndex ?>_number_of_days" data-value-separator="<?= $Grid->number_of_days->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_number_of_days" id="x<?= $Grid->RowIndex ?>_number_of_days" value="<?= HtmlEncode($Grid->number_of_days->CurrentValue) ?>"></selection-list>
+<input type="<?= $Grid->number_of_days->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_number_of_days" id="x<?= $Grid->RowIndex ?>_number_of_days" data-table="prescription_details" data-field="x_number_of_days" value="<?= $Grid->number_of_days->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->number_of_days->formatPattern()) ?>"<?= $Grid->number_of_days->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->number_of_days->getErrorMessage() ?></div>
-<script>
-loadjs.ready("fprescription_detailsgrid", function() {
-    fprescription_detailsgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_number_of_days","forceSelect":false}, { lookupAllDisplayFields: <?= $Grid->number_of_days->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.prescription_details.fields.number_of_days.autoSuggestOptions));
-});
-</script>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
@@ -579,99 +747,6 @@ loadjs.ready("fprescription_detailsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="prescription_details" data-field="x_number_of_days" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_number_of_days" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_number_of_days" value="<?= HtmlEncode($Grid->number_of_days->FormValue) ?>">
 <input type="hidden" data-table="prescription_details" data-field="x_number_of_days" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_number_of_days" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_number_of_days" value="<?= HtmlEncode($Grid->number_of_days->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->method->Visible) { // method ?>
-        <td data-name="method"<?= $Grid->method->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
-    <select
-        id="x<?= $Grid->RowIndex ?>_method"
-        name="x<?= $Grid->RowIndex ?>_method"
-        class="form-select ew-select<?= $Grid->method->isInvalidClass() ?>"
-        <?php if (!$Grid->method->IsNativeSelect) { ?>
-        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method"
-        <?php } ?>
-        data-table="prescription_details"
-        data-field="x_method"
-        data-value-separator="<?= $Grid->method->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->method->getPlaceHolder()) ?>"
-        <?= $Grid->method->editAttributes() ?>>
-        <?= $Grid->method->selectOptionListHtml("x{$Grid->RowIndex}_method") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->method->getErrorMessage() ?></div>
-<?php if (!$Grid->method->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescription_detailsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_method", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescription_detailsgrid.lists.method?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_method" id="o<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
-    <select
-        id="x<?= $Grid->RowIndex ?>_method"
-        name="x<?= $Grid->RowIndex ?>_method"
-        class="form-select ew-select<?= $Grid->method->isInvalidClass() ?>"
-        <?php if (!$Grid->method->IsNativeSelect) { ?>
-        data-select2-id="fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method"
-        <?php } ?>
-        data-table="prescription_details"
-        data-field="x_method"
-        data-value-separator="<?= $Grid->method->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->method->getPlaceHolder()) ?>"
-        <?= $Grid->method->editAttributes() ?>>
-        <?= $Grid->method->selectOptionListHtml("x{$Grid->RowIndex}_method") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->method->getErrorMessage() ?></div>
-<?php if (!$Grid->method->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescription_detailsgrid", function() {
-    var options = { name: "x<?= $Grid->RowIndex ?>_method", selectId: "fprescription_detailsgrid_x<?= $Grid->RowIndex ?>_method" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescription_detailsgrid.lists.method?.lookupOptions.length) {
-        options.data = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid" };
-    } else {
-        options.ajax = { id: "x<?= $Grid->RowIndex ?>_method", form: "fprescription_detailsgrid", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_method" class="el_prescription_details_method">
-<span<?= $Grid->method->viewAttributes() ?>>
-<?= $Grid->method->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_method" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->FormValue) ?>">
-<input type="hidden" data-table="prescription_details" data-field="x_method" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_method" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_method" value="<?= HtmlEncode($Grid->method->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

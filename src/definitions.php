@@ -185,6 +185,7 @@ return [
     "full_haemogram_report" => \DI\create(FullHaemogramReport::class),
     "urinalysis_report" => \DI\create(UrinalysisReport::class),
     "patients_dependants" => \DI\create(PatientsDependants::class),
+    "branding" => \DI\create(Branding::class),
 
     // User table
     "usertable" => \DI\get("users"),

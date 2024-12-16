@@ -23,8 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["invoice_id", [fields.invoice_id.visible && fields.invoice_id.required ? ew.Validators.required(fields.invoice_id.caption) : null, ew.Validators.integer], fields.invoice_id.isInvalid],
             ["item", [fields.item.visible && fields.item.required ? ew.Validators.required(fields.item.caption) : null], fields.item.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
             ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
@@ -35,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["invoice_id",false],["item",false],["quantity",false],["cost",false],["line_total",false]];
+                    fields = [["item",false],["quantity",false],["cost",false],["line_total",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -89,12 +87,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_invoice_details_id" class="invoice_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->invoice_id->Visible) { // invoice_id ?>
-        <th data-name="invoice_id" class="<?= $Grid->invoice_id->headerCellClass() ?>"><div id="elh_invoice_details_invoice_id" class="invoice_details_invoice_id"><?= $Grid->renderFieldHeader($Grid->invoice_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->item->Visible) { // item ?>
         <th data-name="item" class="<?= $Grid->item->headerCellClass() ?>"><div id="elh_invoice_details_item" class="invoice_details_item"><?= $Grid->renderFieldHeader($Grid->item) ?></div></th>
 <?php } ?>
@@ -143,72 +135,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_id" class="el_invoice_details_id"></span>
-<input type="hidden" data-table="invoice_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_id" class="el_invoice_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="invoice_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_id" class="el_invoice_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="invoice_details" data-field="x_id" data-hidden="1" name="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="invoice_details" data-field="x_id" data-hidden="1" data-old name="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="invoice_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
-    <?php if ($Grid->invoice_id->Visible) { // invoice_id ?>
-        <td data-name="invoice_id"<?= $Grid->invoice_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->invoice_id->getSessionValue() != "") { ?>
-<span<?= $Grid->invoice_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->invoice_id->getDisplayValue($Grid->invoice_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_invoice_id" name="x<?= $Grid->RowIndex ?>_invoice_id" value="<?= HtmlEncode($Grid->invoice_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_invoice_id" class="el_invoice_details_invoice_id">
-<input type="<?= $Grid->invoice_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_invoice_id" id="x<?= $Grid->RowIndex ?>_invoice_id" data-table="invoice_details" data-field="x_invoice_id" value="<?= $Grid->invoice_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->invoice_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->invoice_id->formatPattern()) ?>"<?= $Grid->invoice_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->invoice_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="invoice_details" data-field="x_invoice_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_invoice_id" id="o<?= $Grid->RowIndex ?>_invoice_id" value="<?= HtmlEncode($Grid->invoice_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->invoice_id->getSessionValue() != "") { ?>
-<span<?= $Grid->invoice_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->invoice_id->getDisplayValue($Grid->invoice_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_invoice_id" name="x<?= $Grid->RowIndex ?>_invoice_id" value="<?= HtmlEncode($Grid->invoice_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_invoice_id" class="el_invoice_details_invoice_id">
-<input type="<?= $Grid->invoice_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_invoice_id" id="x<?= $Grid->RowIndex ?>_invoice_id" data-table="invoice_details" data-field="x_invoice_id" value="<?= $Grid->invoice_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->invoice_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->invoice_id->formatPattern()) ?>"<?= $Grid->invoice_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->invoice_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_invoice_id" class="el_invoice_details_invoice_id">
-<span<?= $Grid->invoice_id->viewAttributes() ?>>
-<?= $Grid->invoice_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="invoice_details" data-field="x_invoice_id" data-hidden="1" name="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_invoice_id" id="finvoice_detailsgrid$x<?= $Grid->RowIndex ?>_invoice_id" value="<?= HtmlEncode($Grid->invoice_id->FormValue) ?>">
-<input type="hidden" data-table="invoice_details" data-field="x_invoice_id" data-hidden="1" data-old name="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_invoice_id" id="finvoice_detailsgrid$o<?= $Grid->RowIndex ?>_invoice_id" value="<?= HtmlEncode($Grid->invoice_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->item->Visible) { // item ?>
         <td data-name="item"<?= $Grid->item->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -358,14 +284,6 @@ $Grid->renderListOptions();
 // Render list options (footer, left)
 $Grid->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_invoice_details_id" class="invoice_details_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->invoice_id->Visible) { // invoice_id ?>
-        <td data-name="invoice_id" class="<?= $Grid->invoice_id->footerCellClass() ?>"><span id="elf_invoice_details_invoice_id" class="invoice_details_invoice_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Grid->item->Visible) { // item ?>
         <td data-name="item" class="<?= $Grid->item->footerCellClass() ?>"><span id="elf_invoice_details_item" class="invoice_details_item">
         </span></td>

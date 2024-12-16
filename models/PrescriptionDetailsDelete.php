@@ -132,11 +132,12 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
         $this->id->setVisibility();
         $this->prescription_id->setVisibility();
         $this->medicine_stock_id->setVisibility();
+        $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
         $this->dose_type->setVisibility();
+        $this->formulation->setVisibility();
         $this->dose_interval->setVisibility();
         $this->number_of_days->setVisibility();
-        $this->method->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -429,10 +430,10 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
 
         // Set up lookup cache
         $this->setupLookupOptions($this->medicine_stock_id);
-        $this->setupLookupOptions($this->dose_type);
-        $this->setupLookupOptions($this->dose_interval);
-        $this->setupLookupOptions($this->number_of_days);
         $this->setupLookupOptions($this->method);
+        $this->setupLookupOptions($this->dose_type);
+        $this->setupLookupOptions($this->formulation);
+        $this->setupLookupOptions($this->dose_interval);
 
         // Set up master/detail parameters
         $this->setupMasterParms();
@@ -622,11 +623,12 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
         $this->id->setDbValue($row['id']);
         $this->prescription_id->setDbValue($row['prescription_id']);
         $this->medicine_stock_id->setDbValue($row['medicine_stock_id']);
+        $this->method->setDbValue($row['method']);
         $this->dose_quantity->setDbValue($row['dose_quantity']);
         $this->dose_type->setDbValue($row['dose_type']);
+        $this->formulation->setDbValue($row['formulation']);
         $this->dose_interval->setDbValue($row['dose_interval']);
         $this->number_of_days->setDbValue($row['number_of_days']);
-        $this->method->setDbValue($row['method']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -638,11 +640,12 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
         $row['id'] = $this->id->DefaultValue;
         $row['prescription_id'] = $this->prescription_id->DefaultValue;
         $row['medicine_stock_id'] = $this->medicine_stock_id->DefaultValue;
+        $row['method'] = $this->method->DefaultValue;
         $row['dose_quantity'] = $this->dose_quantity->DefaultValue;
         $row['dose_type'] = $this->dose_type->DefaultValue;
+        $row['formulation'] = $this->formulation->DefaultValue;
         $row['dose_interval'] = $this->dose_interval->DefaultValue;
         $row['number_of_days'] = $this->number_of_days->DefaultValue;
-        $row['method'] = $this->method->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -666,15 +669,17 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
 
         // medicine_stock_id
 
+        // method
+
         // dose_quantity
 
         // dose_type
 
+        // formulation
+
         // dose_interval
 
         // number_of_days
-
-        // method
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -714,6 +719,13 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
                 $this->medicine_stock_id->ViewValue = null;
             }
 
+            // method
+            if (strval($this->method->CurrentValue) != "") {
+                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+            } else {
+                $this->method->ViewValue = null;
+            }
+
             // dose_quantity
             $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
             $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
@@ -725,6 +737,13 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
                 $this->dose_type->ViewValue = null;
             }
 
+            // formulation
+            if (strval($this->formulation->CurrentValue) != "") {
+                $this->formulation->ViewValue = $this->formulation->optionCaption($this->formulation->CurrentValue);
+            } else {
+                $this->formulation->ViewValue = null;
+            }
+
             // dose_interval
             if (strval($this->dose_interval->CurrentValue) != "") {
                 $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
@@ -734,13 +753,7 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
 
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-
-            // method
-            if (strval($this->method->CurrentValue) != "") {
-                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
-            } else {
-                $this->method->ViewValue = null;
-            }
+            $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -754,6 +767,10 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
             $this->medicine_stock_id->HrefValue = "";
             $this->medicine_stock_id->TooltipValue = "";
 
+            // method
+            $this->method->HrefValue = "";
+            $this->method->TooltipValue = "";
+
             // dose_quantity
             $this->dose_quantity->HrefValue = "";
             $this->dose_quantity->TooltipValue = "";
@@ -762,6 +779,10 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
             $this->dose_type->HrefValue = "";
             $this->dose_type->TooltipValue = "";
 
+            // formulation
+            $this->formulation->HrefValue = "";
+            $this->formulation->TooltipValue = "";
+
             // dose_interval
             $this->dose_interval->HrefValue = "";
             $this->dose_interval->TooltipValue = "";
@@ -769,10 +790,6 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->HrefValue = "";
             $this->number_of_days->TooltipValue = "";
-
-            // method
-            $this->method->HrefValue = "";
-            $this->method->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1008,13 +1025,13 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
             switch ($fld->FieldVar) {
                 case "x_medicine_stock_id":
                     break;
+                case "x_method":
+                    break;
                 case "x_dose_type":
                     break;
+                case "x_formulation":
+                    break;
                 case "x_dose_interval":
-                    break;
-                case "x_number_of_days":
-                    break;
-                case "x_method":
                     break;
                 default:
                     $lookupFilter = "";

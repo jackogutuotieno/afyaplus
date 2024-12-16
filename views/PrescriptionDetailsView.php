@@ -84,6 +84,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->method->Visible) { // method ?>
+    <tr id="r_method"<?= $Page->method->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescription_details_method"><?= $Page->method->caption() ?></span></td>
+        <td data-name="method"<?= $Page->method->cellAttributes() ?>>
+<span id="el_prescription_details_method">
+<span<?= $Page->method->viewAttributes() ?>>
+<?= $Page->method->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->dose_quantity->Visible) { // dose_quantity ?>
     <tr id="r_dose_quantity"<?= $Page->dose_quantity->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescription_details_dose_quantity"><?= $Page->dose_quantity->caption() ?></span></td>
@@ -106,6 +117,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->formulation->Visible) { // formulation ?>
+    <tr id="r_formulation"<?= $Page->formulation->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescription_details_formulation"><?= $Page->formulation->caption() ?></span></td>
+        <td data-name="formulation"<?= $Page->formulation->cellAttributes() ?>>
+<span id="el_prescription_details_formulation">
+<span<?= $Page->formulation->viewAttributes() ?>>
+<?= $Page->formulation->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
     <tr id="r_dose_interval"<?= $Page->dose_interval->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescription_details_dose_interval"><?= $Page->dose_interval->caption() ?></span></td>
@@ -124,17 +146,6 @@ loadjs.ready("head", function () {
 <span id="el_prescription_details_number_of_days">
 <span<?= $Page->number_of_days->viewAttributes() ?>>
 <?= $Page->number_of_days->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->method->Visible) { // method ?>
-    <tr id="r_method"<?= $Page->method->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_prescription_details_method"><?= $Page->method->caption() ?></span></td>
-        <td data-name="method"<?= $Page->method->cellAttributes() ?>>
-<span id="el_prescription_details_method">
-<span<?= $Page->method->viewAttributes() ?>>
-<?= $Page->method->getViewValue() ?></span>
 </span>
 </td>
     </tr>

@@ -143,8 +143,8 @@ class InvoiceDetailsGrid extends InvoiceDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->invoice_id->setVisibility();
+        $this->id->Visible = false;
+        $this->invoice_id->Visible = false;
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
@@ -1175,14 +1175,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_invoice_id") &&
-            $CurrentForm->hasValue("o_invoice_id") &&
-            $this->invoice_id->CurrentValue != $this->invoice_id->DefaultValue &&
-            !($this->invoice_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->invoice_id->CurrentValue == $this->invoice_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_item") &&
             $CurrentForm->hasValue("o_item") &&
             $this->item->CurrentValue != $this->item->DefaultValue &&
@@ -1387,17 +1379,19 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
@@ -1467,6 +1461,10 @@ class InvoiceDetailsGrid extends InvoiceDetails
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1489,19 +1487,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"invoice_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"invoice_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1771,25 +1756,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'invoice_id' first before field var 'x_invoice_id'
-        $val = $CurrentForm->hasValue("invoice_id") ? $CurrentForm->getValue("invoice_id") : $CurrentForm->getValue("x_invoice_id");
-        if (!$this->invoice_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->invoice_id->Visible = false; // Disable update for API request
-            } else {
-                $this->invoice_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_invoice_id")) {
-            $this->invoice_id->setOldValue($CurrentForm->getValue("o_invoice_id"));
-        }
-
         // Check field name 'item' first before field var 'x_item'
         $val = $CurrentForm->hasValue("item") ? $CurrentForm->getValue("item") : $CurrentForm->getValue("x_item");
         if (!$this->item->IsDetailKey) {
@@ -1841,6 +1807,12 @@ class InvoiceDetailsGrid extends InvoiceDetails
         if ($CurrentForm->hasValue("o_line_total")) {
             $this->line_total->setOldValue($CurrentForm->getValue("o_line_total"));
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
     }
 
     // Restore form values
@@ -1850,7 +1822,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->invoice_id->CurrentValue = $this->invoice_id->FormValue;
         $this->item->CurrentValue = $this->item->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
@@ -2059,14 +2030,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
             $this->line_total->ViewValue = $this->line_total->CurrentValue;
             $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // invoice_id
-            $this->invoice_id->HrefValue = "";
-            $this->invoice_id->TooltipValue = "";
-
             // item
             $this->item->HrefValue = "";
             $this->item->TooltipValue = "";
@@ -2083,23 +2046,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
             $this->line_total->HrefValue = "";
             $this->line_total->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
-            // invoice_id
-            $this->invoice_id->setupEditAttributes();
-            if ($this->invoice_id->getSessionValue() != "") {
-                $this->invoice_id->CurrentValue = GetForeignKeyValue($this->invoice_id->getSessionValue());
-                $this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
-            } else {
-                $this->invoice_id->EditValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->PlaceHolder = RemoveHtml($this->invoice_id->caption());
-                if (strval($this->invoice_id->EditValue) != "" && is_numeric($this->invoice_id->EditValue)) {
-                    $this->invoice_id->EditValue = FormatNumber($this->invoice_id->EditValue, null);
-                }
-            }
-
             // item
             $this->item->setupEditAttributes();
             if (!$this->item->Raw) {
@@ -2134,12 +2080,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // invoice_id
-            $this->invoice_id->HrefValue = "";
-
             // item
             $this->item->HrefValue = "";
 
@@ -2152,25 +2092,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
             // line_total
             $this->line_total->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
-            // invoice_id
-            $this->invoice_id->setupEditAttributes();
-            if ($this->invoice_id->getSessionValue() != "") {
-                $this->invoice_id->CurrentValue = GetForeignKeyValue($this->invoice_id->getSessionValue());
-                $this->invoice_id->OldValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->ViewValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->ViewValue = FormatNumber($this->invoice_id->ViewValue, $this->invoice_id->formatPattern());
-            } else {
-                $this->invoice_id->EditValue = $this->invoice_id->CurrentValue;
-                $this->invoice_id->PlaceHolder = RemoveHtml($this->invoice_id->caption());
-                if (strval($this->invoice_id->EditValue) != "" && is_numeric($this->invoice_id->EditValue)) {
-                    $this->invoice_id->EditValue = FormatNumber($this->invoice_id->EditValue, null);
-                }
-            }
-
             // item
             $this->item->setupEditAttributes();
             if (!$this->item->Raw) {
@@ -2204,12 +2125,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
             }
 
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
-
-            // invoice_id
-            $this->invoice_id->HrefValue = "";
 
             // item
             $this->item->HrefValue = "";
@@ -2250,19 +2165,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->invoice_id->Visible && $this->invoice_id->Required) {
-                if (!$this->invoice_id->IsDetailKey && EmptyValue($this->invoice_id->FormValue)) {
-                    $this->invoice_id->addErrorMessage(str_replace("%s", $this->invoice_id->caption(), $this->invoice_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->invoice_id->FormValue)) {
-                $this->invoice_id->addErrorMessage($this->invoice_id->getErrorMessage(false));
-            }
             if ($this->item->Visible && $this->item->Required) {
                 if (!$this->item->IsDetailKey && EmptyValue($this->item->FormValue)) {
                     $this->item->addErrorMessage(str_replace("%s", $this->item->caption(), $this->item->RequiredErrorMessage));
@@ -2445,12 +2347,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
         global $Security;
         $rsnew = [];
 
-        // invoice_id
-        if ($this->invoice_id->getSessionValue() != "") {
-            $this->invoice_id->ReadOnly = true;
-        }
-        $this->invoice_id->setDbValueDef($rsnew, $this->invoice_id->CurrentValue, $this->invoice_id->ReadOnly);
-
         // item
         $this->item->setDbValueDef($rsnew, $this->item->CurrentValue, $this->item->ReadOnly);
 
@@ -2471,9 +2367,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['invoice_id'])) { // invoice_id
-            $this->invoice_id->CurrentValue = $row['invoice_id'];
-        }
         if (isset($row['item'])) { // item
             $this->item->CurrentValue = $row['item'];
         }
@@ -2567,9 +2460,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
         global $Security;
         $rsnew = [];
 
-        // invoice_id
-        $this->invoice_id->setDbValueDef($rsnew, $this->invoice_id->CurrentValue, false);
-
         // item
         $this->item->setDbValueDef($rsnew, $this->item->CurrentValue, false);
 
@@ -2581,6 +2471,11 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
         // line_total
         $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, false);
+
+        // invoice_id
+        if ($this->invoice_id->getSessionValue() != "") {
+            $rsnew['invoice_id'] = $this->invoice_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2590,9 +2485,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['invoice_id'])) { // invoice_id
-            $this->invoice_id->setFormValue($row['invoice_id']);
-        }
         if (isset($row['item'])) { // item
             $this->item->setFormValue($row['item']);
         }
@@ -2604,6 +2496,9 @@ class InvoiceDetailsGrid extends InvoiceDetails
         }
         if (isset($row['line_total'])) { // line_total
             $this->line_total->setFormValue($row['line_total']);
+        }
+        if (isset($row['invoice_id'])) { // invoice_id
+            $this->invoice_id->setFormValue($row['invoice_id']);
         }
     }
 

@@ -94,9 +94,11 @@ loadjs.ready("head", function () {
         <label id="elh_radiology_requests_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
 <?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span id="el_radiology_requests_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
 <input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el_radiology_requests_patient_id">
     <select

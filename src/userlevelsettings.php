@@ -998,7 +998,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_dependants","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_dependants","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_dependants","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patients_dependants","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_dependants","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}branding","9","0"]];
 
 /**
  * Tables
@@ -1019,7 +1030,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["doctor_charges","doctor_charges","Doctor Charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctorchargeslist"],
     ["doctor_notes","doctor_notes","Medical Notes",true,"{32536B8D-F37B-4419-80D5-260932800712}","doctornoteslist"],
     ["expenses","expenses","Expenses",true,"{32536B8D-F37B-4419-80D5-260932800712}","expenseslist"],
-    ["invoice_details","invoice_details","invoice details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicedetailslist"],
+    ["invoice_details","invoice_details","Invoice Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicedetailslist"],
     ["invoice_reports","invoice_reports","invoice reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportslist"],
     ["invoices","invoices","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoiceslist"],
     ["lab_test_reports","lab_test_reports","Test Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","labtestreportslist"],
@@ -1098,4 +1109,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Laboratory Reports","Laboratory_Reports","Laboratory Reports",true,"{32536B8D-F37B-4419-80D5-260932800712}","laboratoryreports"],
     ["full_haemogram_report","full_haemogram_report","full haemogram report",true,"{32536B8D-F37B-4419-80D5-260932800712}","fullhaemogramreportlist"],
     ["urinalysis_report","urinalysis_report","urinalysis report",true,"{32536B8D-F37B-4419-80D5-260932800712}","urinalysisreportlist"],
-    ["patients_dependants","patients_dependants","Dependants",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdependantslist"]];
+    ["patients_dependants","patients_dependants","Dependants",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdependantslist"],
+    ["branding","branding","Header",true,"{32536B8D-F37B-4419-80D5-260932800712}","brandinglist"]];

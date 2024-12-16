@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(542, "mi_patients_dependants", $Language->menuPhrase("542", "MenuText"), "patientsdependantslist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients_dependants'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334", "MenuText"), "radiologyoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Radiology Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(327, "mi_Triage_Overview", $Language->menuPhrase("327", "MenuText"), "triageoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Triage Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(328, "mi_Doctor_Overview", $Language->menuPhrase("328", "MenuText"), "doctoroverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Doctor Overview'), false, false, "fa-tachometer", "", false, true);
@@ -20,6 +19,7 @@ $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325",
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "fa-users", "", false, true);
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "fa-cog", "", false, true);
+$sideMenu->addMenuItem(543, "mi_branding", $Language->menuPhrase("543", "MenuText"), "brandinglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}branding'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(108, "mi_subscriptions", $Language->menuPhrase("108", "MenuText"), "subscriptionslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}subscriptions'), false, false, "fa-bell", "", false, true);
 $sideMenu->addMenuItem(51, "mci_Patients", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(48, "mi_patients", $Language->menuPhrase("48", "MenuText"), "patientslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients'), false, false, "fa-hospital-user", "", false, true);
@@ -30,10 +30,9 @@ $sideMenu->addMenuItem(109, "mi_Appointments", $Language->menuPhrase("109", "Men
 $sideMenu->addMenuItem(25, "mi_patient_vitals", $Language->menuPhrase("25", "MenuText"), "patientvitalslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_vitals'), false, false, "fa-weight-scale", "", false, true);
 $sideMenu->addMenuItem(38, "mi_visit_types", $Language->menuPhrase("38", "MenuText"), "visittypeslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}visit_types'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(23, "mi_patient_vaccinations", $Language->menuPhrase("23", "MenuText"), "patientvaccinationslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_vaccinations'), false, false, "fa-syringe", "", false, true);
-$sideMenu->addMenuItem(27, "mi_prescription_details", $Language->menuPhrase("27", "MenuText"), "prescriptiondetailslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}prescription_details'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(28, "mi_prescriptions", $Language->menuPhrase("28", "MenuText"), "prescriptionslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}prescriptions'), false, false, "fa-prescription-bottle", "", false, true);
 $sideMenu->addMenuItem(7, "mi_doctor_notes", $Language->menuPhrase("7", "MenuText"), "doctornoteslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_notes'), false, false, "fa-file-medical", "", false, true);
 $sideMenu->addMenuItem(4, "mi_diagnosis", $Language->menuPhrase("4", "MenuText"), "diagnosislist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diagnosis'), false, false, "fa-viruses", "", false, true);
-$sideMenu->addMenuItem(28, "mi_prescriptions", $Language->menuPhrase("28", "MenuText"), "prescriptionslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}prescriptions'), false, false, "fa-prescription-bottle", "", false, true);
 $sideMenu->addMenuItem(50, "mci_Doctor_Panel", $Language->menuPhrase("50", "MenuText"), "", -1, "", true, false, true, "fa-user-doctor", "", false, true);
 $sideMenu->addMenuItem(5, "mi_diseases", $Language->menuPhrase("5", "MenuText"), "diseaseslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diseases'), false, false, "fa-viruses", "", false, true);
 $sideMenu->addMenuItem(6, "mi_doctor_charges", $Language->menuPhrase("6", "MenuText"), "doctorchargeslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_charges'), false, false, "fa-money-bill", "", false, true);

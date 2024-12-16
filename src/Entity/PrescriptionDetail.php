@@ -39,20 +39,23 @@ class PrescriptionDetail extends AbstractEntity
     #[Column(name: "medicine_stock_id", type: "integer")]
     private int $medicineStockId;
 
+    #[Column(type: "string")]
+    private string $method;
+
     #[Column(name: "dose_quantity", type: "integer")]
     private int $doseQuantity;
 
     #[Column(name: "dose_type", type: "string")]
     private string $doseType;
 
+    #[Column(type: "string")]
+    private string $formulation;
+
     #[Column(name: "dose_interval", type: "string")]
     private string $doseInterval;
 
     #[Column(name: "number_of_days", type: "integer")]
     private int $numberOfDays;
-
-    #[Column(type: "string")]
-    private string $method;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -93,6 +96,17 @@ class PrescriptionDetail extends AbstractEntity
         return $this;
     }
 
+    public function getMethod(): string
+    {
+        return HtmlDecode($this->method);
+    }
+
+    public function setMethod(string $value): static
+    {
+        $this->method = RemoveXss($value);
+        return $this;
+    }
+
     public function getDoseQuantity(): int
     {
         return $this->doseQuantity;
@@ -115,6 +129,17 @@ class PrescriptionDetail extends AbstractEntity
         return $this;
     }
 
+    public function getFormulation(): string
+    {
+        return HtmlDecode($this->formulation);
+    }
+
+    public function setFormulation(string $value): static
+    {
+        $this->formulation = RemoveXss($value);
+        return $this;
+    }
+
     public function getDoseInterval(): string
     {
         return HtmlDecode($this->doseInterval);
@@ -134,17 +159,6 @@ class PrescriptionDetail extends AbstractEntity
     public function setNumberOfDays(int $value): static
     {
         $this->numberOfDays = $value;
-        return $this;
-    }
-
-    public function getMethod(): string
-    {
-        return HtmlDecode($this->method);
-    }
-
-    public function setMethod(string $value): static
-    {
-        $this->method = RemoveXss($value);
         return $this;
     }
 

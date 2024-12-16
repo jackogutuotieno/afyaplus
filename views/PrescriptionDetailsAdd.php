@@ -24,11 +24,12 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["prescription_id", [fields.prescription_id.visible && fields.prescription_id.required ? ew.Validators.required(fields.prescription_id.caption) : null, ew.Validators.integer], fields.prescription_id.isInvalid],
             ["medicine_stock_id", [fields.medicine_stock_id.visible && fields.medicine_stock_id.required ? ew.Validators.required(fields.medicine_stock_id.caption) : null], fields.medicine_stock_id.isInvalid],
+            ["method", [fields.method.visible && fields.method.required ? ew.Validators.required(fields.method.caption) : null], fields.method.isInvalid],
             ["dose_quantity", [fields.dose_quantity.visible && fields.dose_quantity.required ? ew.Validators.required(fields.dose_quantity.caption) : null, ew.Validators.integer], fields.dose_quantity.isInvalid],
             ["dose_type", [fields.dose_type.visible && fields.dose_type.required ? ew.Validators.required(fields.dose_type.caption) : null], fields.dose_type.isInvalid],
+            ["formulation", [fields.formulation.visible && fields.formulation.required ? ew.Validators.required(fields.formulation.caption) : null], fields.formulation.isInvalid],
             ["dose_interval", [fields.dose_interval.visible && fields.dose_interval.required ? ew.Validators.required(fields.dose_interval.caption) : null], fields.dose_interval.isInvalid],
-            ["number_of_days", [fields.number_of_days.visible && fields.number_of_days.required ? ew.Validators.required(fields.number_of_days.caption) : null, ew.Validators.integer], fields.number_of_days.isInvalid],
-            ["method", [fields.method.visible && fields.method.required ? ew.Validators.required(fields.method.caption) : null], fields.method.isInvalid]
+            ["number_of_days", [fields.number_of_days.visible && fields.number_of_days.required ? ew.Validators.required(fields.number_of_days.caption) : null, ew.Validators.integer], fields.number_of_days.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -45,10 +46,10 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "medicine_stock_id": <?= $Page->medicine_stock_id->toClientList($Page) ?>,
-            "dose_type": <?= $Page->dose_type->toClientList($Page) ?>,
-            "dose_interval": <?= $Page->dose_interval->toClientList($Page) ?>,
-            "number_of_days": <?= $Page->number_of_days->toClientList($Page) ?>,
             "method": <?= $Page->method->toClientList($Page) ?>,
+            "dose_type": <?= $Page->dose_type->toClientList($Page) ?>,
+            "formulation": <?= $Page->formulation->toClientList($Page) ?>,
+            "dose_interval": <?= $Page->dose_interval->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -87,9 +88,11 @@ $Page->showMessage();
         <label id="elh_prescription_details_prescription_id" for="x_prescription_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->prescription_id->caption() ?><?= $Page->prescription_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->prescription_id->cellAttributes() ?>>
 <?php if ($Page->prescription_id->getSessionValue() != "") { ?>
+<span id="el_prescription_details_prescription_id">
 <span<?= $Page->prescription_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->prescription_id->getDisplayValue($Page->prescription_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x_prescription_id" name="x_prescription_id" value="<?= HtmlEncode($Page->prescription_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el_prescription_details_prescription_id">
 <input type="<?= $Page->prescription_id->getInputTextType() ?>" name="x_prescription_id" id="x_prescription_id" data-table="prescription_details" data-field="x_prescription_id" value="<?= $Page->prescription_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->prescription_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->prescription_id->formatPattern()) ?>"<?= $Page->prescription_id->editAttributes() ?> aria-describedby="x_prescription_id_help">
@@ -138,6 +141,51 @@ loadjs.ready("fprescription_detailsadd", function() {
     }
     options.minimumInputLength = ew.selectMinimumInputLength;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.medicine_stock_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->method->Visible) { // method ?>
+    <div id="r_method"<?= $Page->method->rowAttributes() ?>>
+        <label id="elh_prescription_details_method" for="x_method" class="<?= $Page->LeftColumnClass ?>"><?= $Page->method->caption() ?><?= $Page->method->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->method->cellAttributes() ?>>
+<span id="el_prescription_details_method">
+    <select
+        id="x_method"
+        name="x_method"
+        class="form-select ew-select<?= $Page->method->isInvalidClass() ?>"
+        <?php if (!$Page->method->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsadd_x_method"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_method"
+        data-value-separator="<?= $Page->method->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->method->getPlaceHolder()) ?>"
+        <?= $Page->method->editAttributes() ?>>
+        <?= $Page->method->selectOptionListHtml("x_method") ?>
+    </select>
+    <?= $Page->method->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->method->getErrorMessage() ?></div>
+<?php if (!$Page->method->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsadd", function() {
+    var options = { name: "x_method", selectId: "fprescription_detailsadd_x_method" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsadd.lists.method?.lookupOptions.length) {
+        options.data = { id: "x_method", form: "fprescription_detailsadd" };
+    } else {
+        options.ajax = { id: "x_method", form: "fprescription_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
     ew.createSelect(options);
 });
 </script>
@@ -203,6 +251,51 @@ loadjs.ready("fprescription_detailsadd", function() {
 </div></div>
     </div>
 <?php } ?>
+<?php if ($Page->formulation->Visible) { // formulation ?>
+    <div id="r_formulation"<?= $Page->formulation->rowAttributes() ?>>
+        <label id="elh_prescription_details_formulation" for="x_formulation" class="<?= $Page->LeftColumnClass ?>"><?= $Page->formulation->caption() ?><?= $Page->formulation->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->formulation->cellAttributes() ?>>
+<span id="el_prescription_details_formulation">
+    <select
+        id="x_formulation"
+        name="x_formulation"
+        class="form-select ew-select<?= $Page->formulation->isInvalidClass() ?>"
+        <?php if (!$Page->formulation->IsNativeSelect) { ?>
+        data-select2-id="fprescription_detailsadd_x_formulation"
+        <?php } ?>
+        data-table="prescription_details"
+        data-field="x_formulation"
+        data-value-separator="<?= $Page->formulation->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->formulation->getPlaceHolder()) ?>"
+        <?= $Page->formulation->editAttributes() ?>>
+        <?= $Page->formulation->selectOptionListHtml("x_formulation") ?>
+    </select>
+    <?= $Page->formulation->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->formulation->getErrorMessage() ?></div>
+<?php if (!$Page->formulation->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprescription_detailsadd", function() {
+    var options = { name: "x_formulation", selectId: "fprescription_detailsadd_x_formulation" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprescription_detailsadd.lists.formulation?.lookupOptions.length) {
+        options.data = { id: "x_formulation", form: "fprescription_detailsadd" };
+    } else {
+        options.ajax = { id: "x_formulation", form: "fprescription_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.formulation.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
     <div id="r_dose_interval"<?= $Page->dose_interval->rowAttributes() ?>>
         <label id="elh_prescription_details_dose_interval" for="x_dose_interval" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dose_interval->caption() ?><?= $Page->dose_interval->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -250,70 +343,12 @@ loadjs.ready("fprescription_detailsadd", function() {
 <?php } ?>
 <?php if ($Page->number_of_days->Visible) { // number_of_days ?>
     <div id="r_number_of_days"<?= $Page->number_of_days->rowAttributes() ?>>
-        <label id="elh_prescription_details_number_of_days" class="<?= $Page->LeftColumnClass ?>"><?= $Page->number_of_days->caption() ?><?= $Page->number_of_days->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_prescription_details_number_of_days" for="x_number_of_days" class="<?= $Page->LeftColumnClass ?>"><?= $Page->number_of_days->caption() ?><?= $Page->number_of_days->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->number_of_days->cellAttributes() ?>>
 <span id="el_prescription_details_number_of_days">
-<?php
-if (IsRTL()) {
-    $Page->number_of_days->EditAttrs["dir"] = "rtl";
-}
-?>
-<span id="as_x_number_of_days" class="ew-auto-suggest">
-    <input type="<?= $Page->number_of_days->getInputTextType() ?>" class="form-control" name="sv_x_number_of_days" id="sv_x_number_of_days" value="<?= RemoveHtml($Page->number_of_days->EditValue) ?>" autocomplete="off" size="30" placeholder="<?= HtmlEncode($Page->number_of_days->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->number_of_days->formatPattern()) ?>"<?= $Page->number_of_days->editAttributes() ?> aria-describedby="x_number_of_days_help">
-</span>
-<selection-list hidden class="form-control" data-table="prescription_details" data-field="x_number_of_days" data-input="sv_x_number_of_days" data-value-separator="<?= $Page->number_of_days->displayValueSeparatorAttribute() ?>" name="x_number_of_days" id="x_number_of_days" value="<?= HtmlEncode($Page->number_of_days->CurrentValue) ?>"></selection-list>
+<input type="<?= $Page->number_of_days->getInputTextType() ?>" name="x_number_of_days" id="x_number_of_days" data-table="prescription_details" data-field="x_number_of_days" value="<?= $Page->number_of_days->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->number_of_days->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->number_of_days->formatPattern()) ?>"<?= $Page->number_of_days->editAttributes() ?> aria-describedby="x_number_of_days_help">
 <?= $Page->number_of_days->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->number_of_days->getErrorMessage() ?></div>
-<script>
-loadjs.ready("fprescription_detailsadd", function() {
-    fprescription_detailsadd.createAutoSuggest(Object.assign({"id":"x_number_of_days","forceSelect":false}, { lookupAllDisplayFields: <?= $Page->number_of_days->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.prescription_details.fields.number_of_days.autoSuggestOptions));
-});
-</script>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->method->Visible) { // method ?>
-    <div id="r_method"<?= $Page->method->rowAttributes() ?>>
-        <label id="elh_prescription_details_method" for="x_method" class="<?= $Page->LeftColumnClass ?>"><?= $Page->method->caption() ?><?= $Page->method->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->method->cellAttributes() ?>>
-<span id="el_prescription_details_method">
-    <select
-        id="x_method"
-        name="x_method"
-        class="form-select ew-select<?= $Page->method->isInvalidClass() ?>"
-        <?php if (!$Page->method->IsNativeSelect) { ?>
-        data-select2-id="fprescription_detailsadd_x_method"
-        <?php } ?>
-        data-table="prescription_details"
-        data-field="x_method"
-        data-value-separator="<?= $Page->method->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->method->getPlaceHolder()) ?>"
-        <?= $Page->method->editAttributes() ?>>
-        <?= $Page->method->selectOptionListHtml("x_method") ?>
-    </select>
-    <?= $Page->method->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->method->getErrorMessage() ?></div>
-<?php if (!$Page->method->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprescription_detailsadd", function() {
-    var options = { name: "x_method", selectId: "fprescription_detailsadd_x_method" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprescription_detailsadd.lists.method?.lookupOptions.length) {
-        options.data = { id: "x_method", form: "fprescription_detailsadd" };
-    } else {
-        options.ajax = { id: "x_method", form: "fprescription_detailsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescription_details.fields.method.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>

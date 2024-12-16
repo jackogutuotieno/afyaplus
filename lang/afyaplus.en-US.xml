@@ -41,6 +41,9 @@
     <menu id="105">
       <phrase id="menutext" value="Export Log" />
     </menu>
+    <menu id="543">
+      <phrase id="menutext" value="Branding" />
+    </menu>
     <menu id="108">
       <phrase id="menutext" value="Notifications" />
     </menu>
@@ -71,6 +74,9 @@
     <menu id="23">
       <phrase id="menutext" value="Vaccinations" />
     </menu>
+    <menu id="28">
+      <phrase id="menutext" value="Prescriptions" />
+    </menu>
     <menu id="27">
       <phrase id="menutext" value="Prescription Details" />
     </menu>
@@ -79,9 +85,6 @@
     </menu>
     <menu id="4">
       <phrase id="menutext" value="Diagnosis" />
-    </menu>
-    <menu id="28">
-      <phrase id="menutext" value="Prescriptions" />
     </menu>
     <menu id="432">
       <phrase id="menutext" value="Cash Payments" />
@@ -189,7 +192,7 @@
       <phrase id="menutext" value="Income" />
     </menu>
     <menu id="9">
-      <phrase id="menutext" value="invoice details" />
+      <phrase id="menutext" value="Invoice Details" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="Expenses" />
@@ -504,30 +507,30 @@
       </field>
     </table>
     <table id="invoice_details">
-      <phrase id="tblcaption" value="invoice details" />
+      <phrase id="tblcaption" value="Invoice Details" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="invoice_id">
-        <phrase id="fldcaption" value="invoice id" />
+        <phrase id="fldcaption" value="Invoice ID" />
       </field>
       <field id="item">
-        <phrase id="fldcaption" value="item" />
+        <phrase id="fldcaption" value="Service" />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="quantity" />
+        <phrase id="fldcaption" value="Qty" />
       </field>
       <field id="cost">
-        <phrase id="fldcaption" value="cost" />
+        <phrase id="fldcaption" value="Cost (Kshs)" />
       </field>
       <field id="line_total">
         <phrase id="fldcaption" value="Line Total (Kshs)" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date Added" />
+        <phrase id="fldcaption" value="Invoice Date" />
       </field>
       <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="invoice_reports">
@@ -563,7 +566,7 @@
     <table id="invoices">
       <phrase id="tblcaption" value="Invoices" />
       <field id="id">
-        <phrase id="fldcaption" value="Invoice ID" />
+        <phrase id="fldcaption" value="Invoice No" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Invoice To" />
@@ -1143,58 +1146,63 @@
         <phrase id="fldcaption" value="Prescription ID" />
       </field>
       <field id="medicine_stock_id">
-        <phrase id="fldcaption" value="Medicine Brand" />
-      </field>
-      <field id="dose_quantity">
-        <phrase id="fldcaption" value="Dose Qty" />
-      </field>
-      <field id="dose_type">
-        <phrase id="fldcaption" value="Dose Type" />
-        <phrase id="fldtagvalue1" value="Mls" />
-        <phrase id="fldtagcaption1" value="Mls" />
-        <phrase id="fldtagvalue2" value="Pills" />
-        <phrase id="fldtagcaption2" value="Pills" />
-        <phrase id="fldtagvalue3" value="Rubs" />
-        <phrase id="fldtagcaption3" value="Rubs" />
-      </field>
-      <field id="dose_interval">
-        <phrase id="fldcaption" value="Dose Interval" />
-        <phrase id="fldtagvalue1" value="1X a Day" />
-        <phrase id="fldtagcaption1" value="1X a Day" />
-        <phrase id="fldtagvalue2" value="2X a Day" />
-        <phrase id="fldtagcaption2" value="2X a Day" />
-        <phrase id="fldtagvalue3" value="3X a Day" />
-        <phrase id="fldtagcaption3" value="3X a Day" />
-        <phrase id="fldtagvalue4" value="4X a Day" />
-        <phrase id="fldtagcaption4" value="4X a Day" />
-      </field>
-      <field id="number_of_days">
-        <phrase id="fldcaption" value="number of days" />
-        <phrase id="fldtagvalue1" value="7" />
-        <phrase id="fldtagcaption1" value="7" />
-        <phrase id="fldtagvalue2" value="1" />
-        <phrase id="fldtagcaption2" value="1" />
-        <phrase id="fldtagvalue3" value="2" />
-        <phrase id="fldtagcaption3" value="2" />
-        <phrase id="fldtagvalue4" value="3" />
-        <phrase id="fldtagcaption4" value="3" />
-        <phrase id="fldtagvalue5" value="4" />
-        <phrase id="fldtagcaption5" value="4" />
-        <phrase id="fldtagvalue6" value="5" />
-        <phrase id="fldtagcaption6" value="5" />
-        <phrase id="fldtagvalue7" value="6" />
-        <phrase id="fldtagcaption7" value="6" />
+        <phrase id="fldcaption" value="Medicine" />
       </field>
       <field id="method">
-        <phrase id="fldcaption" value="method" />
-        <phrase id="fldtagvalue1" value="Rubbing" />
-        <phrase id="fldtagcaption1" value="Rubbing" />
-        <phrase id="fldtagvalue2" value="Inhalation" />
-        <phrase id="fldtagcaption2" value="Inhalation" />
-        <phrase id="fldtagvalue3" value="Injection" />
-        <phrase id="fldtagcaption3" value="Injection" />
-        <phrase id="fldtagvalue4" value="Oral" />
-        <phrase id="fldtagcaption4" value="Oral" />
+        <phrase id="fldcaption" value="Route/Method" />
+        <phrase id="fldtagvalue1" value="Oral" />
+        <phrase id="fldtagcaption1" value="Oral" />
+        <phrase id="fldtagvalue2" value="IV" />
+        <phrase id="fldtagcaption2" value="IV" />
+        <phrase id="fldtagvalue3" value="IM" />
+        <phrase id="fldtagcaption3" value="IM" />
+        <phrase id="fldtagvalue4" value="PR" />
+        <phrase id="fldtagcaption4" value="PR" />
+        <phrase id="fldtagvalue5" value="SC" />
+        <phrase id="fldtagcaption5" value="SC" />
+      </field>
+      <field id="dose_quantity">
+        <phrase id="fldcaption" value="Dose" />
+      </field>
+      <field id="dose_type">
+        <phrase id="fldcaption" value="Units" />
+        <phrase id="fldtagvalue1" value="mg" />
+        <phrase id="fldtagcaption1" value="mg" />
+        <phrase id="fldtagvalue2" value="mls" />
+        <phrase id="fldtagcaption2" value="mls" />
+        <phrase id="fldtagvalue3" value="grams" />
+        <phrase id="fldtagcaption3" value="grams" />
+        <phrase id="fldtagvalue4" value="units" />
+        <phrase id="fldtagcaption4" value="units" />
+        <phrase id="fldtagvalue5" value="micrograms" />
+        <phrase id="fldtagcaption5" value="micrograms" />
+      </field>
+      <field id="formulation">
+        <phrase id="fldcaption" value="Formulation" />
+        <phrase id="fldtagvalue1" value="Tabs" />
+        <phrase id="fldtagcaption1" value="Tabs" />
+        <phrase id="fldtagvalue2" value="Capsules" />
+        <phrase id="fldtagcaption2" value="Capsules" />
+        <phrase id="fldtagvalue3" value="Syrup" />
+        <phrase id="fldtagcaption3" value="Syrup" />
+        <phrase id="fldtagvalue4" value="Cream" />
+        <phrase id="fldtagcaption4" value="Cream" />
+        <phrase id="fldtagvalue5" value="Injection" />
+        <phrase id="fldtagcaption5" value="Injection" />
+      </field>
+      <field id="dose_interval">
+        <phrase id="fldcaption" value="Frequency/Interval" />
+        <phrase id="fldtagvalue1" value="Once/Day (OD)" />
+        <phrase id="fldtagcaption1" value="Once/Day (OD)" />
+        <phrase id="fldtagvalue2" value="Twice Daily (BD)" />
+        <phrase id="fldtagcaption2" value="Twice Daily (BD)" />
+        <phrase id="fldtagvalue3" value="Thrice Daily (TDS)" />
+        <phrase id="fldtagcaption3" value="Thrice Daily (TDS)" />
+        <phrase id="fldtagvalue4" value="Four Times (QID)" />
+        <phrase id="fldtagcaption4" value="Four Times (QID)" />
+      </field>
+      <field id="number_of_days">
+        <phrase id="fldcaption" value="Number of Days" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Date Added" />
@@ -2873,6 +2881,22 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="branding">
+      <phrase id="tblcaption" value="Header" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="header_image">
+        <phrase id="fldcaption" value="Header Image" />
+        <phrase id="custommsg" value="Drag/Drop print header image" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Date Added" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

@@ -79,9 +79,11 @@ $Page->showMessage();
         <label id="elh_radiology_requests_details_radiology_request_id" for="x_radiology_request_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->radiology_request_id->caption() ?><?= $Page->radiology_request_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->radiology_request_id->cellAttributes() ?>>
 <?php if ($Page->radiology_request_id->getSessionValue() != "") { ?>
+<span id="el_radiology_requests_details_radiology_request_id">
 <span<?= $Page->radiology_request_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->radiology_request_id->getDisplayValue($Page->radiology_request_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x_radiology_request_id" name="x_radiology_request_id" value="<?= HtmlEncode($Page->radiology_request_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el_radiology_requests_details_radiology_request_id">
 <input type="<?= $Page->radiology_request_id->getInputTextType() ?>" name="x_radiology_request_id" id="x_radiology_request_id" data-table="radiology_requests_details" data-field="x_radiology_request_id" value="<?= $Page->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->radiology_request_id->formatPattern()) ?>"<?= $Page->radiology_request_id->editAttributes() ?> aria-describedby="x_radiology_request_id_help">

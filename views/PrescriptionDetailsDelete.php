@@ -59,20 +59,23 @@ $Page->showMessage();
 <?php if ($Page->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th class="<?= $Page->medicine_stock_id->headerCellClass() ?>"><span id="elh_prescription_details_medicine_stock_id" class="prescription_details_medicine_stock_id"><?= $Page->medicine_stock_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->method->Visible) { // method ?>
+        <th class="<?= $Page->method->headerCellClass() ?>"><span id="elh_prescription_details_method" class="prescription_details_method"><?= $Page->method->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->dose_quantity->Visible) { // dose_quantity ?>
         <th class="<?= $Page->dose_quantity->headerCellClass() ?>"><span id="elh_prescription_details_dose_quantity" class="prescription_details_dose_quantity"><?= $Page->dose_quantity->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->dose_type->Visible) { // dose_type ?>
         <th class="<?= $Page->dose_type->headerCellClass() ?>"><span id="elh_prescription_details_dose_type" class="prescription_details_dose_type"><?= $Page->dose_type->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->formulation->Visible) { // formulation ?>
+        <th class="<?= $Page->formulation->headerCellClass() ?>"><span id="elh_prescription_details_formulation" class="prescription_details_formulation"><?= $Page->formulation->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
         <th class="<?= $Page->dose_interval->headerCellClass() ?>"><span id="elh_prescription_details_dose_interval" class="prescription_details_dose_interval"><?= $Page->dose_interval->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->number_of_days->Visible) { // number_of_days ?>
         <th class="<?= $Page->number_of_days->headerCellClass() ?>"><span id="elh_prescription_details_number_of_days" class="prescription_details_number_of_days"><?= $Page->number_of_days->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->method->Visible) { // method ?>
-        <th class="<?= $Page->method->headerCellClass() ?>"><span id="elh_prescription_details_method" class="prescription_details_method"><?= $Page->method->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -119,6 +122,14 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->method->Visible) { // method ?>
+        <td<?= $Page->method->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->method->viewAttributes() ?>>
+<?= $Page->method->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->dose_quantity->Visible) { // dose_quantity ?>
         <td<?= $Page->dose_quantity->cellAttributes() ?>>
 <span id="">
@@ -135,6 +146,14 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->formulation->Visible) { // formulation ?>
+        <td<?= $Page->formulation->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->formulation->viewAttributes() ?>>
+<?= $Page->formulation->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->dose_interval->Visible) { // dose_interval ?>
         <td<?= $Page->dose_interval->cellAttributes() ?>>
 <span id="">
@@ -148,14 +167,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->number_of_days->viewAttributes() ?>>
 <?= $Page->number_of_days->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->method->Visible) { // method ?>
-        <td<?= $Page->method->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->method->viewAttributes() ?>>
-<?= $Page->method->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

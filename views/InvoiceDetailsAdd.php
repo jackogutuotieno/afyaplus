@@ -25,8 +25,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["invoice_id", [fields.invoice_id.visible && fields.invoice_id.required ? ew.Validators.required(fields.invoice_id.caption) : null, ew.Validators.integer], fields.invoice_id.isInvalid],
             ["item", [fields.item.visible && fields.item.required ? ew.Validators.required(fields.item.caption) : null], fields.item.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
-            ["line_total", [fields.line_total.visible && fields.line_total.required ? ew.Validators.required(fields.line_total.caption) : null, ew.Validators.float], fields.line_total.isInvalid]
+            ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -80,9 +79,11 @@ $Page->showMessage();
         <label id="elh_invoice_details_invoice_id" for="x_invoice_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->invoice_id->caption() ?><?= $Page->invoice_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->invoice_id->cellAttributes() ?>>
 <?php if ($Page->invoice_id->getSessionValue() != "") { ?>
+<span id="el_invoice_details_invoice_id">
 <span<?= $Page->invoice_id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->invoice_id->getDisplayValue($Page->invoice_id->ViewValue))) ?>"></span>
 <input type="hidden" id="x_invoice_id" name="x_invoice_id" value="<?= HtmlEncode($Page->invoice_id->CurrentValue) ?>" data-hidden="1">
+</span>
 <?php } else { ?>
 <span id="el_invoice_details_invoice_id">
 <input type="<?= $Page->invoice_id->getInputTextType() ?>" name="x_invoice_id" id="x_invoice_id" data-table="invoice_details" data-field="x_invoice_id" value="<?= $Page->invoice_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->invoice_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->invoice_id->formatPattern()) ?>"<?= $Page->invoice_id->editAttributes() ?> aria-describedby="x_invoice_id_help">
@@ -125,18 +126,6 @@ $Page->showMessage();
 <input type="<?= $Page->cost->getInputTextType() ?>" name="x_cost" id="x_cost" data-table="invoice_details" data-field="x_cost" value="<?= $Page->cost->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->cost->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->cost->formatPattern()) ?>"<?= $Page->cost->editAttributes() ?> aria-describedby="x_cost_help">
 <?= $Page->cost->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->cost->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->line_total->Visible) { // line_total ?>
-    <div id="r_line_total"<?= $Page->line_total->rowAttributes() ?>>
-        <label id="elh_invoice_details_line_total" for="x_line_total" class="<?= $Page->LeftColumnClass ?>"><?= $Page->line_total->caption() ?><?= $Page->line_total->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->line_total->cellAttributes() ?>>
-<span id="el_invoice_details_line_total">
-<input type="<?= $Page->line_total->getInputTextType() ?>" name="x_line_total" id="x_line_total" data-table="invoice_details" data-field="x_line_total" value="<?= $Page->line_total->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->line_total->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->line_total->formatPattern()) ?>"<?= $Page->line_total->editAttributes() ?> aria-describedby="x_line_total_help">
-<?= $Page->line_total->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->line_total->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

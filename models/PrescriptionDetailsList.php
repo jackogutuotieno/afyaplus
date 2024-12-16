@@ -156,11 +156,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $this->id->setVisibility();
         $this->prescription_id->setVisibility();
         $this->medicine_stock_id->setVisibility();
+        $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
         $this->dose_type->setVisibility();
+        $this->formulation->setVisibility();
         $this->dose_interval->setVisibility();
         $this->number_of_days->setVisibility();
-        $this->method->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -723,10 +724,10 @@ class PrescriptionDetailsList extends PrescriptionDetails
 
         // Set up lookup cache
         $this->setupLookupOptions($this->medicine_stock_id);
-        $this->setupLookupOptions($this->dose_type);
-        $this->setupLookupOptions($this->dose_interval);
-        $this->setupLookupOptions($this->number_of_days);
         $this->setupLookupOptions($this->method);
+        $this->setupLookupOptions($this->dose_type);
+        $this->setupLookupOptions($this->formulation);
+        $this->setupLookupOptions($this->dose_interval);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1106,11 +1107,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->prescription_id->AdvancedSearch->toJson(), ","); // Field prescription_id
         $filterList = Concat($filterList, $this->medicine_stock_id->AdvancedSearch->toJson(), ","); // Field medicine_stock_id
+        $filterList = Concat($filterList, $this->method->AdvancedSearch->toJson(), ","); // Field method
         $filterList = Concat($filterList, $this->dose_quantity->AdvancedSearch->toJson(), ","); // Field dose_quantity
         $filterList = Concat($filterList, $this->dose_type->AdvancedSearch->toJson(), ","); // Field dose_type
+        $filterList = Concat($filterList, $this->formulation->AdvancedSearch->toJson(), ","); // Field formulation
         $filterList = Concat($filterList, $this->dose_interval->AdvancedSearch->toJson(), ","); // Field dose_interval
         $filterList = Concat($filterList, $this->number_of_days->AdvancedSearch->toJson(), ","); // Field number_of_days
-        $filterList = Concat($filterList, $this->method->AdvancedSearch->toJson(), ","); // Field method
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1176,6 +1178,14 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $this->medicine_stock_id->AdvancedSearch->SearchOperator2 = @$filter["w_medicine_stock_id"];
         $this->medicine_stock_id->AdvancedSearch->save();
 
+        // Field method
+        $this->method->AdvancedSearch->SearchValue = @$filter["x_method"];
+        $this->method->AdvancedSearch->SearchOperator = @$filter["z_method"];
+        $this->method->AdvancedSearch->SearchCondition = @$filter["v_method"];
+        $this->method->AdvancedSearch->SearchValue2 = @$filter["y_method"];
+        $this->method->AdvancedSearch->SearchOperator2 = @$filter["w_method"];
+        $this->method->AdvancedSearch->save();
+
         // Field dose_quantity
         $this->dose_quantity->AdvancedSearch->SearchValue = @$filter["x_dose_quantity"];
         $this->dose_quantity->AdvancedSearch->SearchOperator = @$filter["z_dose_quantity"];
@@ -1192,6 +1202,14 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $this->dose_type->AdvancedSearch->SearchOperator2 = @$filter["w_dose_type"];
         $this->dose_type->AdvancedSearch->save();
 
+        // Field formulation
+        $this->formulation->AdvancedSearch->SearchValue = @$filter["x_formulation"];
+        $this->formulation->AdvancedSearch->SearchOperator = @$filter["z_formulation"];
+        $this->formulation->AdvancedSearch->SearchCondition = @$filter["v_formulation"];
+        $this->formulation->AdvancedSearch->SearchValue2 = @$filter["y_formulation"];
+        $this->formulation->AdvancedSearch->SearchOperator2 = @$filter["w_formulation"];
+        $this->formulation->AdvancedSearch->save();
+
         // Field dose_interval
         $this->dose_interval->AdvancedSearch->SearchValue = @$filter["x_dose_interval"];
         $this->dose_interval->AdvancedSearch->SearchOperator = @$filter["z_dose_interval"];
@@ -1207,14 +1225,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $this->number_of_days->AdvancedSearch->SearchValue2 = @$filter["y_number_of_days"];
         $this->number_of_days->AdvancedSearch->SearchOperator2 = @$filter["w_number_of_days"];
         $this->number_of_days->AdvancedSearch->save();
-
-        // Field method
-        $this->method->AdvancedSearch->SearchValue = @$filter["x_method"];
-        $this->method->AdvancedSearch->SearchOperator = @$filter["z_method"];
-        $this->method->AdvancedSearch->SearchCondition = @$filter["v_method"];
-        $this->method->AdvancedSearch->SearchValue2 = @$filter["y_method"];
-        $this->method->AdvancedSearch->SearchOperator2 = @$filter["w_method"];
-        $this->method->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1270,9 +1280,10 @@ class PrescriptionDetailsList extends PrescriptionDetails
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->dose_type;
-        $searchFlds[] = &$this->dose_interval;
         $searchFlds[] = &$this->method;
+        $searchFlds[] = &$this->dose_type;
+        $searchFlds[] = &$this->formulation;
+        $searchFlds[] = &$this->dose_interval;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1354,11 +1365,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
             $this->updateSort($this->id); // id
             $this->updateSort($this->prescription_id); // prescription_id
             $this->updateSort($this->medicine_stock_id); // medicine_stock_id
+            $this->updateSort($this->method); // method
             $this->updateSort($this->dose_quantity); // dose_quantity
             $this->updateSort($this->dose_type); // dose_type
+            $this->updateSort($this->formulation); // formulation
             $this->updateSort($this->dose_interval); // dose_interval
             $this->updateSort($this->number_of_days); // number_of_days
-            $this->updateSort($this->method); // method
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1394,11 +1406,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
                 $this->id->setSort("");
                 $this->prescription_id->setSort("");
                 $this->medicine_stock_id->setSort("");
+                $this->method->setSort("");
                 $this->dose_quantity->setSort("");
                 $this->dose_type->setSort("");
+                $this->formulation->setSort("");
                 $this->dose_interval->setSort("");
                 $this->number_of_days->setSort("");
-                $this->method->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1638,11 +1651,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "prescription_id");
             $this->createColumnOption($option, "medicine_stock_id");
+            $this->createColumnOption($option, "method");
             $this->createColumnOption($option, "dose_quantity");
             $this->createColumnOption($option, "dose_type");
+            $this->createColumnOption($option, "formulation");
             $this->createColumnOption($option, "dose_interval");
             $this->createColumnOption($option, "number_of_days");
-            $this->createColumnOption($option, "method");
         }
 
         // Set up custom actions
@@ -2084,11 +2098,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $this->id->setDbValue($row['id']);
         $this->prescription_id->setDbValue($row['prescription_id']);
         $this->medicine_stock_id->setDbValue($row['medicine_stock_id']);
+        $this->method->setDbValue($row['method']);
         $this->dose_quantity->setDbValue($row['dose_quantity']);
         $this->dose_type->setDbValue($row['dose_type']);
+        $this->formulation->setDbValue($row['formulation']);
         $this->dose_interval->setDbValue($row['dose_interval']);
         $this->number_of_days->setDbValue($row['number_of_days']);
-        $this->method->setDbValue($row['method']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2100,11 +2115,12 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $row['id'] = $this->id->DefaultValue;
         $row['prescription_id'] = $this->prescription_id->DefaultValue;
         $row['medicine_stock_id'] = $this->medicine_stock_id->DefaultValue;
+        $row['method'] = $this->method->DefaultValue;
         $row['dose_quantity'] = $this->dose_quantity->DefaultValue;
         $row['dose_type'] = $this->dose_type->DefaultValue;
+        $row['formulation'] = $this->formulation->DefaultValue;
         $row['dose_interval'] = $this->dose_interval->DefaultValue;
         $row['number_of_days'] = $this->number_of_days->DefaultValue;
-        $row['method'] = $this->method->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2153,15 +2169,17 @@ class PrescriptionDetailsList extends PrescriptionDetails
 
         // medicine_stock_id
 
+        // method
+
         // dose_quantity
 
         // dose_type
 
+        // formulation
+
         // dose_interval
 
         // number_of_days
-
-        // method
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -2201,6 +2219,13 @@ class PrescriptionDetailsList extends PrescriptionDetails
                 $this->medicine_stock_id->ViewValue = null;
             }
 
+            // method
+            if (strval($this->method->CurrentValue) != "") {
+                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
+            } else {
+                $this->method->ViewValue = null;
+            }
+
             // dose_quantity
             $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
             $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
@@ -2212,6 +2237,13 @@ class PrescriptionDetailsList extends PrescriptionDetails
                 $this->dose_type->ViewValue = null;
             }
 
+            // formulation
+            if (strval($this->formulation->CurrentValue) != "") {
+                $this->formulation->ViewValue = $this->formulation->optionCaption($this->formulation->CurrentValue);
+            } else {
+                $this->formulation->ViewValue = null;
+            }
+
             // dose_interval
             if (strval($this->dose_interval->CurrentValue) != "") {
                 $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
@@ -2221,13 +2253,7 @@ class PrescriptionDetailsList extends PrescriptionDetails
 
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-
-            // method
-            if (strval($this->method->CurrentValue) != "") {
-                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
-            } else {
-                $this->method->ViewValue = null;
-            }
+            $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -2241,6 +2267,10 @@ class PrescriptionDetailsList extends PrescriptionDetails
             $this->medicine_stock_id->HrefValue = "";
             $this->medicine_stock_id->TooltipValue = "";
 
+            // method
+            $this->method->HrefValue = "";
+            $this->method->TooltipValue = "";
+
             // dose_quantity
             $this->dose_quantity->HrefValue = "";
             $this->dose_quantity->TooltipValue = "";
@@ -2249,6 +2279,10 @@ class PrescriptionDetailsList extends PrescriptionDetails
             $this->dose_type->HrefValue = "";
             $this->dose_type->TooltipValue = "";
 
+            // formulation
+            $this->formulation->HrefValue = "";
+            $this->formulation->TooltipValue = "";
+
             // dose_interval
             $this->dose_interval->HrefValue = "";
             $this->dose_interval->TooltipValue = "";
@@ -2256,10 +2290,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->HrefValue = "";
             $this->number_of_days->TooltipValue = "";
-
-            // method
-            $this->method->HrefValue = "";
-            $this->method->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2614,13 +2644,13 @@ class PrescriptionDetailsList extends PrescriptionDetails
             switch ($fld->FieldVar) {
                 case "x_medicine_stock_id":
                     break;
+                case "x_method":
+                    break;
                 case "x_dose_type":
                     break;
+                case "x_formulation":
+                    break;
                 case "x_dose_interval":
-                    break;
-                case "x_number_of_days":
-                    break;
-                case "x_method":
                     break;
                 default:
                     $lookupFilter = "";
