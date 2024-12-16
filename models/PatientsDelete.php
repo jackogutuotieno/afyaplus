@@ -134,12 +134,12 @@ class PatientsDelete extends Patients
         $this->patient_name->setVisibility();
         $this->first_name->Visible = false;
         $this->last_name->Visible = false;
-        $this->national_id->Visible = false;
-        $this->date_of_birth->Visible = false;
+        $this->national_id->setVisibility();
+        $this->date_of_birth->setVisibility();
         $this->age->setVisibility();
         $this->gender->setVisibility();
-        $this->phone->Visible = false;
-        $this->email_address->Visible = false;
+        $this->phone->setVisibility();
+        $this->email_address->setVisibility();
         $this->physical_address->Visible = false;
         $this->employment_status->Visible = false;
         $this->religion->Visible = false;
@@ -810,6 +810,14 @@ class PatientsDelete extends Patients
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
 
+            // national_id
+            $this->national_id->HrefValue = "";
+            $this->national_id->TooltipValue = "";
+
+            // date_of_birth
+            $this->date_of_birth->HrefValue = "";
+            $this->date_of_birth->TooltipValue = "";
+
             // age
             $this->age->HrefValue = "";
             $this->age->TooltipValue = "";
@@ -817,6 +825,30 @@ class PatientsDelete extends Patients
             // gender
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
+
+            // phone
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
+            $this->phone->TooltipValue = "";
+
+            // email_address
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
+            $this->email_address->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

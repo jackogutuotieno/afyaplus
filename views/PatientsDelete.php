@@ -56,11 +56,23 @@ $Page->showMessage();
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th class="<?= $Page->patient_name->headerCellClass() ?>"><span id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->patient_name->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->national_id->Visible) { // national_id ?>
+        <th class="<?= $Page->national_id->headerCellClass() ?>"><span id="elh_patients_national_id" class="patients_national_id"><?= $Page->national_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <th class="<?= $Page->date_of_birth->headerCellClass() ?>"><span id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->date_of_birth->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <th class="<?= $Page->age->headerCellClass() ?>"><span id="elh_patients_age" class="patients_age"><?= $Page->age->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th class="<?= $Page->gender->headerCellClass() ?>"><span id="elh_patients_gender" class="patients_gender"><?= $Page->gender->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->phone->Visible) { // phone ?>
+        <th class="<?= $Page->phone->headerCellClass() ?>"><span id="elh_patients_phone" class="patients_phone"><?= $Page->phone->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->email_address->Visible) { // email_address ?>
+        <th class="<?= $Page->email_address->headerCellClass() ?>"><span id="elh_patients_email_address" class="patients_email_address"><?= $Page->email_address->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patients_date_created" class="patients_date_created"><?= $Page->date_created->caption() ?></span></th>
@@ -102,6 +114,22 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->national_id->Visible) { // national_id ?>
+        <td<?= $Page->national_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->national_id->viewAttributes() ?>>
+<?= $Page->national_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <td<?= $Page->date_of_birth->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->date_of_birth->viewAttributes() ?>>
+<?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <td<?= $Page->age->cellAttributes() ?>>
 <span id="">
@@ -115,6 +143,32 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->gender->viewAttributes() ?>>
 <?= $Page->gender->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->phone->Visible) { // phone ?>
+        <td<?= $Page->phone->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->phone->viewAttributes() ?>>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->email_address->Visible) { // email_address ?>
+        <td<?= $Page->email_address->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->email_address->viewAttributes() ?>>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>

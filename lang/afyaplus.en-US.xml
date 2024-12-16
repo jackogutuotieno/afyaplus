@@ -48,7 +48,7 @@
       <phrase id="menutext" value="Patients" />
     </menu>
     <menu id="48">
-      <phrase id="menutext" value="OPD Patients" />
+      <phrase id="menutext" value="Patients List" />
     </menu>
     <menu id="114">
       <phrase id="menutext" value="Patient Flow" />
@@ -65,26 +65,26 @@
     <menu id="25">
       <phrase id="menutext" value="Vitals" />
     </menu>
-    <menu id="7">
-      <phrase id="menutext" value="Medical Notes" />
-    </menu>
-    <menu id="432">
-      <phrase id="menutext" value="Cash Payments" />
-    </menu>
-    <menu id="28">
-      <phrase id="menutext" value="Prescriptions" />
-    </menu>
-    <menu id="4">
-      <phrase id="menutext" value="Diagnosis" />
-    </menu>
-    <menu id="27">
-      <phrase id="menutext" value="Prescription Details" />
+    <menu id="38">
+      <phrase id="menutext" value="Visit Types" />
     </menu>
     <menu id="23">
       <phrase id="menutext" value="Vaccinations" />
     </menu>
-    <menu id="38">
-      <phrase id="menutext" value="Visit Types" />
+    <menu id="27">
+      <phrase id="menutext" value="Prescription Details" />
+    </menu>
+    <menu id="7">
+      <phrase id="menutext" value="Medical Notes" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="Diagnosis" />
+    </menu>
+    <menu id="28">
+      <phrase id="menutext" value="Prescriptions" />
+    </menu>
+    <menu id="432">
+      <phrase id="menutext" value="Cash Payments" />
     </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />

@@ -32,6 +32,28 @@ $patients->TableClass = "table table-bordered table-hover table-sm ew-table ew-m
 </td>
         </tr>
 <?php } ?>
+<?php if ($patients->national_id->Visible) { // national_id ?>
+        <tr id="r_national_id"<?= $patients->national_id->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->national_id->caption() ?></td>
+            <td<?= $patients->national_id->cellAttributes() ?>>
+<span id="el_patients_national_id">
+<span<?= $patients->national_id->viewAttributes() ?>>
+<?= $patients->national_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patients->date_of_birth->Visible) { // date_of_birth ?>
+        <tr id="r_date_of_birth"<?= $patients->date_of_birth->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->date_of_birth->caption() ?></td>
+            <td<?= $patients->date_of_birth->cellAttributes() ?>>
+<span id="el_patients_date_of_birth">
+<span<?= $patients->date_of_birth->viewAttributes() ?>>
+<?= $patients->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patients->age->Visible) { // age ?>
         <tr id="r_age"<?= $patients->age->rowAttributes() ?>>
             <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->age->caption() ?></td>
@@ -50,6 +72,38 @@ $patients->TableClass = "table table-bordered table-hover table-sm ew-table ew-m
 <span id="el_patients_gender">
 <span<?= $patients->gender->viewAttributes() ?>>
 <?= $patients->gender->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patients->phone->Visible) { // phone ?>
+        <tr id="r_phone"<?= $patients->phone->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->phone->caption() ?></td>
+            <td<?= $patients->phone->cellAttributes() ?>>
+<span id="el_patients_phone">
+<span<?= $patients->phone->viewAttributes() ?>>
+<?php if (!EmptyString($patients->phone->getViewValue()) && $patients->phone->linkAttributes() != "") { ?>
+<a<?= $patients->phone->linkAttributes() ?>><?= $patients->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $patients->phone->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patients->email_address->Visible) { // email_address ?>
+        <tr id="r_email_address"<?= $patients->email_address->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->email_address->caption() ?></td>
+            <td<?= $patients->email_address->cellAttributes() ?>>
+<span id="el_patients_email_address">
+<span<?= $patients->email_address->viewAttributes() ?>>
+<?php if (!EmptyString($patients->email_address->getViewValue()) && $patients->email_address->linkAttributes() != "") { ?>
+<a<?= $patients->email_address->linkAttributes() ?>><?= $patients->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $patients->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>

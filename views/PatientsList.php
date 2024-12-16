@@ -163,11 +163,23 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_patient_name" class="patients_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
+<?php if ($Page->national_id->Visible) { // national_id ?>
+        <th data-name="national_id" class="<?= $Page->national_id->headerCellClass() ?>"><div id="elh_patients_national_id" class="patients_national_id"><?= $Page->renderFieldHeader($Page->national_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_patients_date_of_birth" class="patients_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php } ?>
 <?php if ($Page->age->Visible) { // age ?>
         <th data-name="age" class="<?= $Page->age->headerCellClass() ?>"><div id="elh_patients_age" class="patients_age"><?= $Page->renderFieldHeader($Page->age) ?></div></th>
 <?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_patients_gender" class="patients_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
+<?php } ?>
+<?php if ($Page->phone->Visible) { // phone ?>
+        <th data-name="phone" class="<?= $Page->phone->headerCellClass() ?>"><div id="elh_patients_phone" class="patients_phone"><?= $Page->renderFieldHeader($Page->phone) ?></div></th>
+<?php } ?>
+<?php if ($Page->email_address->Visible) { // email_address ?>
+        <th data-name="email_address" class="<?= $Page->email_address->headerCellClass() ?>"><div id="elh_patients_email_address" class="patients_email_address"><?= $Page->renderFieldHeader($Page->email_address) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_date_created" class="patients_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -216,6 +228,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->national_id->Visible) { // national_id ?>
+        <td data-name="national_id"<?= $Page->national_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_national_id" class="el_patients_national_id">
+<span<?= $Page->national_id->viewAttributes() ?>>
+<?= $Page->national_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_of_birth" class="el_patients_date_of_birth">
+<span<?= $Page->date_of_birth->viewAttributes() ?>>
+<?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->age->Visible) { // age ?>
         <td data-name="age"<?= $Page->age->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_age" class="el_patients_age">
@@ -229,6 +257,32 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_gender" class="el_patients_gender">
 <span<?= $Page->gender->viewAttributes() ?>>
 <?= $Page->gender->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->phone->Visible) { // phone ?>
+        <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_phone" class="el_patients_phone">
+<span<?= $Page->phone->viewAttributes() ?>>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->email_address->Visible) { // email_address ?>
+        <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_email_address" class="el_patients_email_address">
+<span<?= $Page->email_address->viewAttributes() ?>>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
