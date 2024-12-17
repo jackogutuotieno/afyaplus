@@ -56,6 +56,9 @@ class PatientsLabReport extends AbstractEntity
     #[Column(type: "text", nullable: true)]
     private ?string $details;
 
+    #[Column(name: "report_template", type: "blob", nullable: true)]
+    private mixed $reportTemplate;
+
     #[Column(type: "string", nullable: true)]
     private ?string $laboratorist;
 
@@ -161,6 +164,17 @@ class PatientsLabReport extends AbstractEntity
     public function setDetails(?string $value): static
     {
         $this->details = RemoveXss($value);
+        return $this;
+    }
+
+    public function getReportTemplate(): mixed
+    {
+        return $this->reportTemplate;
+    }
+
+    public function setReportTemplate(mixed $value): static
+    {
+        $this->reportTemplate = $value;
         return $this;
     }
 

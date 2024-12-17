@@ -154,6 +154,7 @@ class PatientsLabReportList extends PatientsLabReport
         $this->gender->Visible = false;
         $this->patient_age->setVisibility();
         $this->details->setVisibility();
+        $this->report_template->Visible = false;
         $this->status->setVisibility();
         $this->laboratorist->setVisibility();
         $this->date_created->setVisibility();
@@ -2025,6 +2026,10 @@ class PatientsLabReportList extends PatientsLabReport
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
         $this->details->setDbValue($row['details']);
+        $this->report_template->Upload->DbValue = $row['report_template'];
+        if (is_resource($this->report_template->Upload->DbValue) && get_resource_type($this->report_template->Upload->DbValue) == "stream") { // Byte array
+            $this->report_template->Upload->DbValue = stream_get_contents($this->report_template->Upload->DbValue);
+        }
         $this->status->setDbValue($row['status']);
         $this->laboratorist->setDbValue($row['laboratorist']);
         $this->date_created->setDbValue($row['date_created']);
@@ -2044,6 +2049,7 @@ class PatientsLabReportList extends PatientsLabReport
         $row['gender'] = $this->gender->DefaultValue;
         $row['patient_age'] = $this->patient_age->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['report_template'] = $this->report_template->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['laboratorist'] = $this->laboratorist->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -2105,6 +2111,8 @@ class PatientsLabReportList extends PatientsLabReport
         // patient_age
 
         // details
+
+        // report_template
 
         // status
 

@@ -230,7 +230,7 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php if ($Page->report_template->Visible) { // report_template ?>
         <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_report_template" class="el_lab_test_reports_report_template">
-<span<?= $Page->report_template->viewAttributes() ?>>
+<span>
 <?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
 </span>
 </span>

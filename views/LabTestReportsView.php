@@ -89,7 +89,7 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_report_template"><?= $Page->report_template->caption() ?></span></td>
         <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
 <span id="el_lab_test_reports_report_template">
-<span<?= $Page->report_template->viewAttributes() ?>>
+<span>
 <?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
 </span>
 </span>

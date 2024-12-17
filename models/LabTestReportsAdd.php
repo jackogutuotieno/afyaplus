@@ -896,6 +896,8 @@ class LabTestReportsAdd extends LabTestReports
 
             // report_template
             if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ImageAlt = $this->report_template->alt();
+                $this->report_template->ImageCssClass = "ew-image";
                 $this->report_template->ViewValue = $this->id->CurrentValue;
                 $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
             } else {
@@ -936,7 +938,18 @@ class LabTestReportsAdd extends LabTestReports
             $this->details->HrefValue = "";
 
             // report_template
-            $this->report_template->HrefValue = "";
+            if (!empty($this->report_template->Upload->DbValue)) {
+                $this->report_template->HrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+                $this->report_template->LinkAttrs["target"] = "";
+                if ($this->report_template->IsBlobImage && empty($this->report_template->LinkAttrs["target"])) {
+                    $this->report_template->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->report_template->HrefValue = FullUrl($this->report_template->HrefValue, "href");
+                }
+            } else {
+                $this->report_template->HrefValue = "";
+            }
             $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
 
             // created_by_user_id
@@ -977,6 +990,8 @@ class LabTestReportsAdd extends LabTestReports
             // report_template
             $this->report_template->setupEditAttributes();
             if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ImageAlt = $this->report_template->alt();
+                $this->report_template->ImageCssClass = "ew-image";
                 $this->report_template->EditValue = $this->id->CurrentValue;
                 $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
             } else {
@@ -990,56 +1005,6 @@ class LabTestReportsAdd extends LabTestReports
             }
 
             // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->created_by_user_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                    if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                        } else {
-                            $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->created_by_user_id->EditValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->created_by_user_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                } else {
-                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->Lookup !== null && is_array($this->created_by_user_id->lookupOptions()) && count($this->created_by_user_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->created_by_user_id->ViewValue !== null) { // Load from cache
-                    $this->created_by_user_id->EditValue = array_values($this->created_by_user_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->created_by_user_id->CurrentValue, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->created_by_user_id->EditValue = $arwrk;
-                }
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            }
 
             // Add refer script
 
@@ -1050,7 +1015,18 @@ class LabTestReportsAdd extends LabTestReports
             $this->details->HrefValue = "";
 
             // report_template
-            $this->report_template->HrefValue = "";
+            if (!empty($this->report_template->Upload->DbValue)) {
+                $this->report_template->HrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+                $this->report_template->LinkAttrs["target"] = "";
+                if ($this->report_template->IsBlobImage && empty($this->report_template->LinkAttrs["target"])) {
+                    $this->report_template->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->report_template->HrefValue = FullUrl($this->report_template->HrefValue, "href");
+                }
+            } else {
+                $this->report_template->HrefValue = "";
+            }
             $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
 
             // created_by_user_id
@@ -1119,18 +1095,6 @@ class LabTestReportsAdd extends LabTestReports
 
         // Update current values
         $this->setCurrentValues($rsnew);
-
-        // Check if valid User ID
-        if (
-            !EmptyValue($Security->currentUserID()) &&
-            !$Security->isAdmin() && // Non system admin
-            !$Security->isValidUserID($this->created_by_user_id->CurrentValue)
-        ) {
-            $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
-            $userIdMsg = str_replace("%u", strval($this->created_by_user_id->CurrentValue), $userIdMsg);
-            $this->setFailureMessage($userIdMsg);
-            return false;
-        }
         $conn = $this->getConnection();
 
         // Load db values from old row
@@ -1198,6 +1162,7 @@ class LabTestReportsAdd extends LabTestReports
         }
 
         // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
         return $rsnew;
     }

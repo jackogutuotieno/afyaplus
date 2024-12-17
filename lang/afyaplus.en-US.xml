@@ -2660,16 +2660,19 @@
         <phrase id="fldcaption" value="Tests" />
       </field>
       <field id="date_of_birth">
-        <phrase id="fldcaption" value="date of birth" />
+        <phrase id="fldcaption" value="DoB" />
       </field>
       <field id="gender">
-        <phrase id="fldcaption" value="gender" />
+        <phrase id="fldcaption" value="Gender" />
       </field>
       <field id="patient_age">
         <phrase id="fldcaption" value="Age" />
       </field>
       <field id="details">
         <phrase id="fldcaption" value="Findings" />
+      </field>
+      <field id="report_template">
+        <phrase id="fldcaption" value="Report Template" />
       </field>
       <field id="status">
         <phrase id="fldcaption" value="Status" />

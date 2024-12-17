@@ -148,6 +148,7 @@ class PatientsLabReportView extends PatientsLabReport
         $this->gender->setVisibility();
         $this->patient_age->setVisibility();
         $this->details->setVisibility();
+        $this->report_template->setVisibility();
         $this->status->setVisibility();
         $this->laboratorist->setVisibility();
         $this->date_created->setVisibility();
@@ -795,6 +796,10 @@ class PatientsLabReportView extends PatientsLabReport
         $this->gender->setDbValue($row['gender']);
         $this->patient_age->setDbValue($row['patient_age']);
         $this->details->setDbValue($row['details']);
+        $this->report_template->Upload->DbValue = $row['report_template'];
+        if (is_resource($this->report_template->Upload->DbValue) && get_resource_type($this->report_template->Upload->DbValue) == "stream") { // Byte array
+            $this->report_template->Upload->DbValue = stream_get_contents($this->report_template->Upload->DbValue);
+        }
         $this->status->setDbValue($row['status']);
         $this->laboratorist->setDbValue($row['laboratorist']);
         $this->date_created->setDbValue($row['date_created']);
@@ -814,6 +819,7 @@ class PatientsLabReportView extends PatientsLabReport
         $row['gender'] = $this->gender->DefaultValue;
         $row['patient_age'] = $this->patient_age->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['report_template'] = $this->report_template->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['laboratorist'] = $this->laboratorist->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -857,6 +863,8 @@ class PatientsLabReportView extends PatientsLabReport
 
         // details
 
+        // report_template
+
         // status
 
         // laboratorist
@@ -896,6 +904,14 @@ class PatientsLabReportView extends PatientsLabReport
 
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
+
+            // report_template
+            if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ViewValue = $this->id->CurrentValue;
+                $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+            } else {
+                $this->report_template->ViewValue = "";
+            }
 
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
@@ -938,6 +954,22 @@ class PatientsLabReportView extends PatientsLabReport
             // details
             $this->details->HrefValue = "";
             $this->details->TooltipValue = "";
+
+            // report_template
+            if (!empty($this->report_template->Upload->DbValue)) {
+                $this->report_template->HrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+                $this->report_template->LinkAttrs["target"] = "";
+                if ($this->report_template->IsBlobImage && empty($this->report_template->LinkAttrs["target"])) {
+                    $this->report_template->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->report_template->HrefValue = FullUrl($this->report_template->HrefValue, "href");
+                }
+            } else {
+                $this->report_template->HrefValue = "";
+            }
+            $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+            $this->report_template->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

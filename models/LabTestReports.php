@@ -204,7 +204,7 @@ class LabTestReports extends DbTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'FILE' // Edit Tag
         );
         $this->report_template->InputTextType = "text";
@@ -233,10 +233,10 @@ class LabTestReports extends DbTable
             'FORMATTED TEXT', // View Tag
             'SELECT' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
         $this->created_by_user_id->setSelectMultiple(false); // Select one
         $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -1277,6 +1277,8 @@ class LabTestReports extends DbTable
 
         // report_template
         if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->ImageAlt = $this->report_template->alt();
+            $this->report_template->ImageCssClass = "ew-image";
             $this->report_template->ViewValue = $this->id->CurrentValue;
             $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
         } else {
@@ -1327,9 +1329,27 @@ class LabTestReports extends DbTable
         $this->details->TooltipValue = "";
 
         // report_template
-        $this->report_template->HrefValue = "";
+        if (!empty($this->report_template->Upload->DbValue)) {
+            $this->report_template->HrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+            $this->report_template->LinkAttrs["target"] = "";
+            if ($this->report_template->IsBlobImage && empty($this->report_template->LinkAttrs["target"])) {
+                $this->report_template->LinkAttrs["target"] = "_blank";
+            }
+            if ($this->isExport()) {
+                $this->report_template->HrefValue = FullUrl($this->report_template->HrefValue, "href");
+            }
+        } else {
+            $this->report_template->HrefValue = "";
+        }
         $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
         $this->report_template->TooltipValue = "";
+        if ($this->report_template->UseColorbox) {
+            if (EmptyValue($this->report_template->TooltipValue)) {
+                $this->report_template->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->report_template->LinkAttrs["data-rel"] = "lab_test_reports_x_report_template";
+            $this->report_template->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
@@ -1374,6 +1394,8 @@ class LabTestReports extends DbTable
         // report_template
         $this->report_template->setupEditAttributes();
         if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->ImageAlt = $this->report_template->alt();
+            $this->report_template->ImageCssClass = "ew-image";
             $this->report_template->EditValue = $this->id->CurrentValue;
             $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
         } else {
@@ -1381,33 +1403,6 @@ class LabTestReports extends DbTable
         }
 
         // created_by_user_id
-        $this->created_by_user_id->setupEditAttributes();
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->created_by_user_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->EditValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->EditValue = null;
-            }
-        } else {
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1457,7 +1452,6 @@ class LabTestReports extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_request_id);
                     $doc->exportCaption($this->details);
-                    $doc->exportCaption($this->report_template);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 }
@@ -1496,7 +1490,6 @@ class LabTestReports extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_request_id);
                         $doc->exportField($this->details);
-                        $doc->exportField($this->report_template);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     }
