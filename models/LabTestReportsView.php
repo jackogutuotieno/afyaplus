@@ -150,6 +150,7 @@ class LabTestReportsView extends LabTestReports
         $this->id->setVisibility();
         $this->lab_test_request_id->setVisibility();
         $this->details->setVisibility();
+        $this->report_template->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -823,6 +824,10 @@ class LabTestReportsView extends LabTestReports
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
         $this->details->setDbValue($row['details']);
+        $this->report_template->Upload->DbValue = $row['report_template'];
+        if (is_resource($this->report_template->Upload->DbValue) && get_resource_type($this->report_template->Upload->DbValue) == "stream") { // Byte array
+            $this->report_template->Upload->DbValue = stream_get_contents($this->report_template->Upload->DbValue);
+        }
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -835,6 +840,7 @@ class LabTestReportsView extends LabTestReports
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['report_template'] = $this->report_template->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -864,6 +870,8 @@ class LabTestReportsView extends LabTestReports
         // lab_test_request_id
 
         // details
+
+        // report_template
 
         // created_by_user_id
 
@@ -901,6 +909,14 @@ class LabTestReportsView extends LabTestReports
 
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
+
+            // report_template
+            if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ViewValue = $this->id->CurrentValue;
+                $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+            } else {
+                $this->report_template->ViewValue = "";
+            }
 
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
@@ -940,6 +956,11 @@ class LabTestReportsView extends LabTestReports
             // details
             $this->details->HrefValue = "";
             $this->details->TooltipValue = "";
+
+            // report_template
+            $this->report_template->HrefValue = "";
+            $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+            $this->report_template->TooltipValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";

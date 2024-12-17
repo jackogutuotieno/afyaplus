@@ -31,6 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["lab_test_request_id", [fields.lab_test_request_id.visible && fields.lab_test_request_id.required ? ew.Validators.required(fields.lab_test_request_id.caption) : null], fields.lab_test_request_id.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
+            ["report_template", [fields.report_template.visible && fields.report_template.required ? ew.Validators.fileRequired(fields.report_template.caption) : null], fields.report_template.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
@@ -145,6 +146,41 @@ loadjs.ready(["flab_test_reportsedit", "editor"], function() {
     ew.createEditor("flab_test_reportsedit", "x_details", 0, 0, <?= $Page->details->ReadOnly || false ? "true" : "false" ?>);
 });
 </script>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->report_template->Visible) { // report_template ?>
+    <div id="r_report_template"<?= $Page->report_template->rowAttributes() ?>>
+        <label id="elh_lab_test_reports_report_template" class="<?= $Page->LeftColumnClass ?>"><?= $Page->report_template->caption() ?><?= $Page->report_template->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->report_template->cellAttributes() ?>>
+<span id="el_lab_test_reports_report_template">
+<div id="fd_x_report_template" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_report_template"
+        name="x_report_template"
+        class="form-control ew-file-input"
+        title="<?= $Page->report_template->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="lab_test_reports"
+        data-field="x_report_template"
+        data-size="2147483647"
+        data-accept-file-types="<?= $Page->report_template->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->report_template->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->report_template->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_report_template_help"
+        <?= ($Page->report_template->ReadOnly || $Page->report_template->Disabled) ? " disabled" : "" ?>
+        <?= $Page->report_template->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->report_template->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->report_template->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_report_template" id= "fn_x_report_template" value="<?= $Page->report_template->Upload->FileName ?>">
+<input type="hidden" name="fa_x_report_template" id= "fa_x_report_template" value="<?= (Post("fa_x_report_template") == "0") ? "0" : "1" ?>">
+<table id="ft_x_report_template" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>

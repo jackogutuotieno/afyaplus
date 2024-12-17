@@ -59,6 +59,9 @@ $Page->showMessage();
 <?php if ($Page->details->Visible) { // details ?>
         <th class="<?= $Page->details->headerCellClass() ?>"><span id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->details->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->report_template->Visible) { // report_template ?>
+        <th class="<?= $Page->report_template->headerCellClass() ?>"><span id="elh_lab_test_reports_report_template" class="lab_test_reports_report_template"><?= $Page->report_template->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_lab_test_reports_created_by_user_id" class="lab_test_reports_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
@@ -107,6 +110,15 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->details->viewAttributes() ?>>
 <?= $Page->details->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->report_template->Visible) { // report_template ?>
+        <td<?= $Page->report_template->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->report_template->viewAttributes() ?>>
+<?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>

@@ -84,6 +84,18 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->report_template->Visible) { // report_template ?>
+    <tr id="r_report_template"<?= $Page->report_template->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_report_template"><?= $Page->report_template->caption() ?></span></td>
+        <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
+<span id="el_lab_test_reports_report_template">
+<span<?= $Page->report_template->viewAttributes() ?>>
+<?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
+</span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
     <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_lab_test_reports_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>

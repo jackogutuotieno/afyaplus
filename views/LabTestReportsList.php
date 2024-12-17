@@ -166,6 +166,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->details->Visible) { // details ?>
         <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
 <?php } ?>
+<?php if ($Page->report_template->Visible) { // report_template ?>
+        <th data-name="report_template" class="<?= $Page->report_template->headerCellClass() ?>"><div id="elh_lab_test_reports_report_template" class="lab_test_reports_report_template"><?= $Page->renderFieldHeader($Page->report_template) ?></div></th>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_lab_test_reports_created_by_user_id" class="lab_test_reports_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
@@ -221,6 +224,15 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_details" class="el_lab_test_reports_details">
 <span<?= $Page->details->viewAttributes() ?>>
 <?= $Page->details->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->report_template->Visible) { // report_template ?>
+        <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_report_template" class="el_lab_test_reports_report_template">
+<span<?= $Page->report_template->viewAttributes() ?>>
+<?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>

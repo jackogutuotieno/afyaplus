@@ -57,6 +57,7 @@ class LabTestReports extends DbTable
     public $id;
     public $lab_test_request_id;
     public $details;
+    public $report_template;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
@@ -187,6 +188,32 @@ class LabTestReports extends DbTable
         $this->details->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->details->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->details->Param, "CustomMsg");
         $this->Fields['details'] = &$this->details;
+
+        // report_template
+        $this->report_template = new DbField(
+            $this, // Table
+            'x_report_template', // Variable name
+            'report_template', // Name
+            '`report_template`', // Expression
+            '`report_template`', // Basic search expression
+            205, // Type
+            2147483647, // Size
+            -1, // Date/Time format
+            true, // Is upload field
+            '`report_template`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'FILE' // Edit Tag
+        );
+        $this->report_template->InputTextType = "text";
+        $this->report_template->Raw = true;
+        $this->report_template->Sortable = false; // Allow sort
+        $this->report_template->UploadAllowedFileExt = "pdf";
+        $this->report_template->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->report_template->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->report_template->Param, "CustomMsg");
+        $this->Fields['report_template'] = &$this->report_template;
 
         // created_by_user_id
         $this->created_by_user_id = new DbField(
@@ -811,6 +838,7 @@ class LabTestReports extends DbTable
         $this->id->DbValue = $row['id'];
         $this->lab_test_request_id->DbValue = $row['lab_test_request_id'];
         $this->details->DbValue = $row['details'];
+        $this->report_template->Upload->DbValue = $row['report_template'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1169,6 +1197,7 @@ class LabTestReports extends DbTable
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
         $this->details->setDbValue($row['details']);
+        $this->report_template->Upload->DbValue = $row['report_template'];
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1208,6 +1237,8 @@ class LabTestReports extends DbTable
 
         // details
 
+        // report_template
+
         // created_by_user_id
 
         // date_created
@@ -1243,6 +1274,14 @@ class LabTestReports extends DbTable
 
         // details
         $this->details->ViewValue = $this->details->CurrentValue;
+
+        // report_template
+        if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->ViewValue = $this->id->CurrentValue;
+            $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+        } else {
+            $this->report_template->ViewValue = "";
+        }
 
         // created_by_user_id
         $curVal = strval($this->created_by_user_id->CurrentValue);
@@ -1287,6 +1326,11 @@ class LabTestReports extends DbTable
         $this->details->HrefValue = "";
         $this->details->TooltipValue = "";
 
+        // report_template
+        $this->report_template->HrefValue = "";
+        $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+        $this->report_template->TooltipValue = "";
+
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
         $this->created_by_user_id->TooltipValue = "";
@@ -1326,6 +1370,15 @@ class LabTestReports extends DbTable
         $this->details->setupEditAttributes();
         $this->details->EditValue = $this->details->CurrentValue;
         $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
+        // report_template
+        $this->report_template->setupEditAttributes();
+        if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->EditValue = $this->id->CurrentValue;
+            $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+        } else {
+            $this->report_template->EditValue = "";
+        }
 
         // created_by_user_id
         $this->created_by_user_id->setupEditAttributes();
@@ -1397,12 +1450,14 @@ class LabTestReports extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_request_id);
                     $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->report_template);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->lab_test_request_id);
                     $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->report_template);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 }
@@ -1434,12 +1489,14 @@ class LabTestReports extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_request_id);
                         $doc->exportField($this->details);
+                        $doc->exportField($this->report_template);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->lab_test_request_id);
                         $doc->exportField($this->details);
+                        $doc->exportField($this->report_template);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     }
@@ -1507,8 +1564,122 @@ class LabTestReports extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'report_template') {
+            $fldName = "report_template";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

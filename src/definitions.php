@@ -182,8 +182,6 @@ return [
     "laboratory_reports2" => \DI\create(LaboratoryReports2::class),
     "Laboratory_Reports" => \DI\create(LaboratoryReports::class),
     "laboratory_reports" => \DI\create(LaboratoryReports::class),
-    "full_haemogram_report" => \DI\create(FullHaemogramReport::class),
-    "urinalysis_report" => \DI\create(UrinalysisReport::class),
     "patients_dependants" => \DI\create(PatientsDependants::class),
     "branding" => \DI\create(Branding::class),
 

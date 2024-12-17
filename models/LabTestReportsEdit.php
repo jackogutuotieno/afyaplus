@@ -132,6 +132,7 @@ class LabTestReportsEdit extends LabTestReports
         $this->id->setVisibility();
         $this->lab_test_request_id->setVisibility();
         $this->details->setVisibility();
+        $this->report_template->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -710,6 +711,8 @@ class LabTestReportsEdit extends LabTestReports
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->report_template->Upload->Index = $CurrentForm->Index;
+        $this->report_template->Upload->uploadFile();
     }
 
     // Load form values
@@ -754,6 +757,7 @@ class LabTestReportsEdit extends LabTestReports
                 $this->created_by_user_id->setFormValue($val);
             }
         }
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -816,6 +820,10 @@ class LabTestReportsEdit extends LabTestReports
         $this->id->setDbValue($row['id']);
         $this->lab_test_request_id->setDbValue($row['lab_test_request_id']);
         $this->details->setDbValue($row['details']);
+        $this->report_template->Upload->DbValue = $row['report_template'];
+        if (is_resource($this->report_template->Upload->DbValue) && get_resource_type($this->report_template->Upload->DbValue) == "stream") { // Byte array
+            $this->report_template->Upload->DbValue = stream_get_contents($this->report_template->Upload->DbValue);
+        }
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -828,6 +836,7 @@ class LabTestReportsEdit extends LabTestReports
         $row['id'] = $this->id->DefaultValue;
         $row['lab_test_request_id'] = $this->lab_test_request_id->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['report_template'] = $this->report_template->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -874,6 +883,9 @@ class LabTestReportsEdit extends LabTestReports
         // details
         $this->details->RowCssClass = "row";
 
+        // report_template
+        $this->report_template->RowCssClass = "row";
+
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
 
@@ -914,6 +926,14 @@ class LabTestReportsEdit extends LabTestReports
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
+            // report_template
+            if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ViewValue = $this->id->CurrentValue;
+                $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+            } else {
+                $this->report_template->ViewValue = "";
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -949,6 +969,10 @@ class LabTestReportsEdit extends LabTestReports
 
             // details
             $this->details->HrefValue = "";
+
+            // report_template
+            $this->report_template->HrefValue = "";
+            $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -988,6 +1012,18 @@ class LabTestReportsEdit extends LabTestReports
             $this->details->setupEditAttributes();
             $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
             $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
+            // report_template
+            $this->report_template->setupEditAttributes();
+            if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->EditValue = $this->id->CurrentValue;
+                $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
+            } else {
+                $this->report_template->EditValue = "";
+            }
+            if ($this->isShow()) {
+                RenderUploadField($this->report_template);
+            }
 
             // created_by_user_id
             $this->created_by_user_id->setupEditAttributes();
@@ -1052,6 +1088,10 @@ class LabTestReportsEdit extends LabTestReports
             // details
             $this->details->HrefValue = "";
 
+            // report_template
+            $this->report_template->HrefValue = "";
+            $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
+
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
         }
@@ -1088,6 +1128,11 @@ class LabTestReportsEdit extends LabTestReports
             if ($this->details->Visible && $this->details->Required) {
                 if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
                     $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
+                }
+            }
+            if ($this->report_template->Visible && $this->report_template->Required) {
+                if ($this->report_template->Upload->FileName == "" && !$this->report_template->Upload->KeepFile) {
+                    $this->report_template->addErrorMessage(str_replace("%s", $this->report_template->caption(), $this->report_template->RequiredErrorMessage));
                 }
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
@@ -1195,6 +1240,15 @@ class LabTestReportsEdit extends LabTestReports
         // details
         $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, $this->details->ReadOnly);
 
+        // report_template
+        if ($this->report_template->Visible && !$this->report_template->ReadOnly && !$this->report_template->Upload->KeepFile) {
+            if ($this->report_template->Upload->Value === null) {
+                $rsnew['report_template'] = null;
+            } else {
+                $rsnew['report_template'] = $this->report_template->Upload->Value;
+            }
+        }
+
         // created_by_user_id
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
         return $rsnew;
@@ -1211,6 +1265,9 @@ class LabTestReportsEdit extends LabTestReports
         }
         if (isset($row['details'])) { // details
             $this->details->CurrentValue = $row['details'];
+        }
+        if (isset($row['report_template'])) { // report_template
+            $this->report_template->CurrentValue = $row['report_template'];
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
