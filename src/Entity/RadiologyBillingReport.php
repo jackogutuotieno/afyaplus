@@ -39,6 +39,9 @@ class RadiologyBillingReport extends AbstractEntity
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 
+    #[Column(name: "created_by_user_id", type: "integer")]
+    private int $createdByUserId;
+
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -75,6 +78,17 @@ class RadiologyBillingReport extends AbstractEntity
     public function setVisitId(int $value): static
     {
         $this->visitId = $value;
+        return $this;
+    }
+
+    public function getCreatedByUserId(): int
+    {
+        return $this->createdByUserId;
+    }
+
+    public function setCreatedByUserId(int $value): static
+    {
+        $this->createdByUserId = $value;
         return $this;
     }
 

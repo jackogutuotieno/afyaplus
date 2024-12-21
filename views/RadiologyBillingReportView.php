@@ -84,13 +84,13 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <tr id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_billing_report_visit_id"><?= $Page->visit_id->caption() ?></span></td>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el_radiology_billing_report_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+    <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_billing_report_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
+        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="el_radiology_billing_report_created_by_user_id">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -102,17 +102,6 @@ loadjs.ready("head", function () {
 <span id="el_radiology_billing_report_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_radiology_billing_report_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_radiology_billing_report_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     </tr>

@@ -10,13 +10,13 @@ $radiology_billing_report->TableClass = "table table-bordered table-hover table-
 <div class="ew-master-div">
 <table id="tbl_radiology_billing_reportmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($radiology_billing_report->id->Visible) { // id ?>
-        <tr id="r_id"<?= $radiology_billing_report->id->rowAttributes() ?>>
-            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->id->caption() ?></td>
-            <td<?= $radiology_billing_report->id->cellAttributes() ?>>
-<span id="el_radiology_billing_report_id">
-<span<?= $radiology_billing_report->id->viewAttributes() ?>>
-<?= $radiology_billing_report->id->getViewValue() ?></span>
+<?php if ($radiology_billing_report->patient_id->Visible) { // patient_id ?>
+        <tr id="r_patient_id"<?= $radiology_billing_report->patient_id->rowAttributes() ?>>
+            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->patient_id->caption() ?></td>
+            <td<?= $radiology_billing_report->patient_id->cellAttributes() ?>>
+<span id="el_radiology_billing_report_patient_id">
+<span<?= $radiology_billing_report->patient_id->viewAttributes() ?>>
+<?= $radiology_billing_report->patient_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>
@@ -32,13 +32,13 @@ $radiology_billing_report->TableClass = "table table-bordered table-hover table-
 </td>
         </tr>
 <?php } ?>
-<?php if ($radiology_billing_report->visit_id->Visible) { // visit_id ?>
-        <tr id="r_visit_id"<?= $radiology_billing_report->visit_id->rowAttributes() ?>>
-            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->visit_id->caption() ?></td>
-            <td<?= $radiology_billing_report->visit_id->cellAttributes() ?>>
-<span id="el_radiology_billing_report_visit_id">
-<span<?= $radiology_billing_report->visit_id->viewAttributes() ?>>
-<?= $radiology_billing_report->visit_id->getViewValue() ?></span>
+<?php if ($radiology_billing_report->created_by_user_id->Visible) { // created_by_user_id ?>
+        <tr id="r_created_by_user_id"<?= $radiology_billing_report->created_by_user_id->rowAttributes() ?>>
+            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->created_by_user_id->caption() ?></td>
+            <td<?= $radiology_billing_report->created_by_user_id->cellAttributes() ?>>
+<span id="el_radiology_billing_report_created_by_user_id">
+<span<?= $radiology_billing_report->created_by_user_id->viewAttributes() ?>>
+<?= $radiology_billing_report->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>
@@ -50,17 +50,6 @@ $radiology_billing_report->TableClass = "table table-bordered table-hover table-
 <span id="el_radiology_billing_report_date_created">
 <span<?= $radiology_billing_report->date_created->viewAttributes() ?>>
 <?= $radiology_billing_report->date_created->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($radiology_billing_report->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $radiology_billing_report->date_updated->rowAttributes() ?>>
-            <td class="<?= $radiology_billing_report->TableLeftColumnClass ?>"><?= $radiology_billing_report->date_updated->caption() ?></td>
-            <td<?= $radiology_billing_report->date_updated->cellAttributes() ?>>
-<span id="el_radiology_billing_report_date_updated">
-<span<?= $radiology_billing_report->date_updated->viewAttributes() ?>>
-<?= $radiology_billing_report->date_updated->getViewValue() ?></span>
 </span>
 </td>
         </tr>
