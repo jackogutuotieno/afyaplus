@@ -342,7 +342,7 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vitalsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -378,7 +378,7 @@ loadjs.ready(["fpatient_vitalsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpatient_vitalsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

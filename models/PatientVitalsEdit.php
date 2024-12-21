@@ -131,7 +131,7 @@ class PatientVitalsEdit extends PatientVitals
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->height->setVisibility();
         $this->weight->setVisibility();
         $this->bmi->Visible = false;
@@ -744,16 +744,6 @@ class PatientVitalsEdit extends PatientVitals
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'height' first before field var 'x_height'
         $val = $CurrentForm->hasValue("height") ? $CurrentForm->getValue("height") : $CurrentForm->getValue("x_height");
         if (!$this->height->IsDetailKey) {
@@ -811,7 +801,6 @@ class PatientVitalsEdit extends PatientVitals
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->height->CurrentValue = $this->height->FormValue;
         $this->weight->CurrentValue = $this->weight->FormValue;
         $this->temperature->CurrentValue = $this->temperature->FormValue;
@@ -994,10 +983,6 @@ class PatientVitalsEdit extends PatientVitals
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // height
             $this->height->ViewValue = $this->height->CurrentValue;
             $this->height->ViewValue = FormatNumber($this->height->ViewValue, $this->height->formatPattern());
@@ -1030,9 +1015,6 @@ class PatientVitalsEdit extends PatientVitals
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // height
             $this->height->HrefValue = "";
@@ -1105,20 +1087,6 @@ class PatientVitalsEdit extends PatientVitals
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-            } else {
-                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-                $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
-                }
-            }
-
             // height
             $this->height->setupEditAttributes();
             $this->height->EditValue = $this->height->CurrentValue;
@@ -1167,9 +1135,6 @@ class PatientVitalsEdit extends PatientVitals
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-
             // height
             $this->height->HrefValue = "";
 
@@ -1214,14 +1179,6 @@ class PatientVitalsEdit extends PatientVitals
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
-            }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->height->Visible && $this->height->Required) {
                 if (!$this->height->IsDetailKey && EmptyValue($this->height->FormValue)) {
@@ -1360,12 +1317,6 @@ class PatientVitalsEdit extends PatientVitals
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // visit_id
-        if ($this->visit_id->getSessionValue() != "") {
-            $this->visit_id->ReadOnly = true;
-        }
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
-
         // height
         $this->height->setDbValueDef($rsnew, $this->height->CurrentValue, $this->height->ReadOnly);
 
@@ -1391,9 +1342,6 @@ class PatientVitalsEdit extends PatientVitals
     {
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
-        }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->CurrentValue = $row['visit_id'];
         }
         if (isset($row['height'])) { // height
             $this->height->CurrentValue = $row['height'];

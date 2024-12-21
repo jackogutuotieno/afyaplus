@@ -2152,17 +2152,17 @@ class PatientVisits extends DbTable
             $this->status->ViewValue = "Past Visit"; 
         }
         if (CurrentUserlevel() == 1 || CurrentUserlevel() == -1) {
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,prescriptions,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,cash_payments,patient_vitals,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 2) {
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions,lab_test_requests,lab_test_reports,daignosis,radiology_requests,radiology_reports" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions,lab_test_requests,radiology_requests" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 3){
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,patient_vaccinations" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 4){
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=lab_test_requests,lab_test_reports,laboratory_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,lab_test_requests,lab_test_reports,laboratory_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 5){
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=prescriptions,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,prescriptions,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 6){
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=radiology_requests,radiology_reports,radiology_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,radiology_requests,radiology_reports,radiology_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         }
     }
 

@@ -45,7 +45,7 @@ class PatientQueue extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = false;
+    public $ModalAdd = true;
     public $ModalEdit = false;
     public $ModalUpdate = false;
     public $InlineDelete = false;
@@ -256,10 +256,10 @@ class PatientQueue extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
             135, // Type
             19, // Size
-            11, // Date/Time format
+            3, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -272,7 +272,7 @@ class PatientQueue extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -1544,7 +1544,6 @@ class PatientQueue extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->section);
                     $doc->exportCaption($this->status);
                 } else {
@@ -1582,7 +1581,6 @@ class PatientQueue extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->section);
                         $doc->exportField($this->status);
                     } else {
@@ -1813,10 +1811,10 @@ class PatientQueue extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        if (IsLoggedIn() && CurrentUserLevel() == 2) {
+        if (IsLoggedIn() && CurrentUserlevel() == 2) {
             $consultation = "Consultation";
             AddFilter($filter, "section= '" . $consultation . "'");
-        } else if (IsLoggedIn() && CurrentUserLevel() == 3) {
+        } else if (IsLoggedIn() && CurrentUserlevel() == 3) {
             $triage = "Triage";
             AddFilter($filter, "section= '" . $triage . "'");
         } 

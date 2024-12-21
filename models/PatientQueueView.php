@@ -938,10 +938,6 @@ class PatientQueueView extends PatientQueue
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
-
             // section
             $this->section->HrefValue = "";
             $this->section->TooltipValue = "";

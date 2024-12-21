@@ -45,7 +45,7 @@ class CashPayments extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = false;
+    public $ModalAdd = true;
     public $ModalEdit = false;
     public $ModalUpdate = false;
     public $InlineDelete = false;

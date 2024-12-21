@@ -2132,10 +2132,6 @@ class PatientVitalsGrid extends PatientVitals
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // height
             $this->height->ViewValue = $this->height->CurrentValue;
             $this->height->ViewValue = FormatNumber($this->height->ViewValue, $this->height->formatPattern());

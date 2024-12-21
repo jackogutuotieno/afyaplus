@@ -20637,8 +20637,11 @@ table td a {
   color: #540000;
 }
 
-#fpatient_visitsview .ew-add {
-  display: none !important;
+/* #fpatient_visitsview .ew-add {
+	display: none !important;
+} */
+#fpatient_visitsview .ew-toolbar {
+  display: none;
 }
 
 #fpatients_lab_reportview .ew-detail-pages {
@@ -20653,6 +20656,10 @@ table td a {
 td[data-name=detail_patient_appointments],
 td[data-name=detail_patient_visits],
 td[data-name=detail_patients_dependants] {
+  display: none;
+}
+
+.content .btn-toolbar, .content .ew-detail-option {
   display: none;
 }
 

@@ -932,10 +932,6 @@ class PatientVitalsView extends PatientVitals
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // height
             $this->height->ViewValue = $this->height->CurrentValue;
             $this->height->ViewValue = FormatNumber($this->height->ViewValue, $this->height->formatPattern());
@@ -970,10 +966,6 @@ class PatientVitalsView extends PatientVitals
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // height
             $this->height->HrefValue = "";

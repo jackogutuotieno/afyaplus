@@ -73,17 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-    <tr id="r_visit_id"<?= $Page->visit_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_vitals_visit_id"><?= $Page->visit_id->caption() ?></span></td>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el_patient_vitals_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->height->Visible) { // height ?>
     <tr id="r_height"<?= $Page->height->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_vitals_height"><?= $Page->height->caption() ?></span></td>
