@@ -42,6 +42,9 @@ class PharmacyBillingReport extends AbstractEntity
     #[Column(name: "dispensation_type", type: "string")]
     private string $dispensationType;
 
+    #[Column(name: "created_by_user_id", type: "integer")]
+    private int $createdByUserId;
+
     #[Column(type: "string")]
     private string $status;
 
@@ -92,6 +95,17 @@ class PharmacyBillingReport extends AbstractEntity
     public function setDispensationType(string $value): static
     {
         $this->dispensationType = RemoveXss($value);
+        return $this;
+    }
+
+    public function getCreatedByUserId(): int
+    {
+        return $this->createdByUserId;
+    }
+
+    public function setCreatedByUserId(int $value): static
+    {
+        $this->createdByUserId = $value;
         return $this;
     }
 

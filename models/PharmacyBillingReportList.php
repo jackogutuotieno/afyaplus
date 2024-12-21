@@ -145,13 +145,14 @@ class PharmacyBillingReportList extends PharmacyBillingReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->prescription_id->Visible = false;
         $this->dispensation_type->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -712,6 +713,7 @@ class PharmacyBillingReportList extends PharmacyBillingReport
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1078,6 +1080,7 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->prescription_id->AdvancedSearch->toJson(), ","); // Field prescription_id
         $filterList = Concat($filterList, $this->dispensation_type->AdvancedSearch->toJson(), ","); // Field dispensation_type
+        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
@@ -1151,6 +1154,14 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         $this->dispensation_type->AdvancedSearch->SearchValue2 = @$filter["y_dispensation_type"];
         $this->dispensation_type->AdvancedSearch->SearchOperator2 = @$filter["w_dispensation_type"];
         $this->dispensation_type->AdvancedSearch->save();
+
+        // Field created_by_user_id
+        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->save();
 
         // Field status
         $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
@@ -1294,12 +1305,11 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->dispensation_type); // dispensation_type
+            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1336,6 +1346,7 @@ class PharmacyBillingReportList extends PharmacyBillingReport
                 $this->patient_id->setSort("");
                 $this->prescription_id->setSort("");
                 $this->dispensation_type->setSort("");
+                $this->created_by_user_id->setSort("");
                 $this->status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
@@ -1405,6 +1416,14 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1442,6 +1461,10 @@ class PharmacyBillingReportList extends PharmacyBillingReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1577,12 +1600,11 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "dispensation_type");
+            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2025,6 +2047,7 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         $this->patient_id->setDbValue($row['patient_id']);
         $this->prescription_id->setDbValue($row['prescription_id']);
         $this->dispensation_type->setDbValue($row['dispensation_type']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -2038,6 +2061,7 @@ class PharmacyBillingReportList extends PharmacyBillingReport
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['prescription_id'] = $this->prescription_id->DefaultValue;
         $row['dispensation_type'] = $this->dispensation_type->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2089,6 +2113,8 @@ class PharmacyBillingReportList extends PharmacyBillingReport
 
         // dispensation_type
 
+        // created_by_user_id
+
         // status
 
         // date_created
@@ -2130,6 +2156,29 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             // dispensation_type
             $this->dispensation_type->ViewValue = $this->dispensation_type->CurrentValue;
 
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -2141,10 +2190,6 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -2153,6 +2198,10 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             $this->dispensation_type->HrefValue = "";
             $this->dispensation_type->TooltipValue = "";
 
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
+
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
@@ -2160,10 +2209,6 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2517,6 +2562,8 @@ class PharmacyBillingReportList extends PharmacyBillingReport
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

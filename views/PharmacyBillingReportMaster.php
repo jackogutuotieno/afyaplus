@@ -10,17 +10,6 @@ $pharmacy_billing_report->TableClass = "table table-bordered table-hover table-s
 <div class="ew-master-div">
 <table id="tbl_pharmacy_billing_reportmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($pharmacy_billing_report->id->Visible) { // id ?>
-        <tr id="r_id"<?= $pharmacy_billing_report->id->rowAttributes() ?>>
-            <td class="<?= $pharmacy_billing_report->TableLeftColumnClass ?>"><?= $pharmacy_billing_report->id->caption() ?></td>
-            <td<?= $pharmacy_billing_report->id->cellAttributes() ?>>
-<span id="el_pharmacy_billing_report_id">
-<span<?= $pharmacy_billing_report->id->viewAttributes() ?>>
-<?= $pharmacy_billing_report->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($pharmacy_billing_report->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $pharmacy_billing_report->patient_id->rowAttributes() ?>>
             <td class="<?= $pharmacy_billing_report->TableLeftColumnClass ?>"><?= $pharmacy_billing_report->patient_id->caption() ?></td>
@@ -43,6 +32,17 @@ $pharmacy_billing_report->TableClass = "table table-bordered table-hover table-s
 </td>
         </tr>
 <?php } ?>
+<?php if ($pharmacy_billing_report->created_by_user_id->Visible) { // created_by_user_id ?>
+        <tr id="r_created_by_user_id"<?= $pharmacy_billing_report->created_by_user_id->rowAttributes() ?>>
+            <td class="<?= $pharmacy_billing_report->TableLeftColumnClass ?>"><?= $pharmacy_billing_report->created_by_user_id->caption() ?></td>
+            <td<?= $pharmacy_billing_report->created_by_user_id->cellAttributes() ?>>
+<span id="el_pharmacy_billing_report_created_by_user_id">
+<span<?= $pharmacy_billing_report->created_by_user_id->viewAttributes() ?>>
+<?= $pharmacy_billing_report->created_by_user_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($pharmacy_billing_report->status->Visible) { // status ?>
         <tr id="r_status"<?= $pharmacy_billing_report->status->rowAttributes() ?>>
             <td class="<?= $pharmacy_billing_report->TableLeftColumnClass ?>"><?= $pharmacy_billing_report->status->caption() ?></td>
@@ -61,17 +61,6 @@ $pharmacy_billing_report->TableClass = "table table-bordered table-hover table-s
 <span id="el_pharmacy_billing_report_date_created">
 <span<?= $pharmacy_billing_report->date_created->viewAttributes() ?>>
 <?= $pharmacy_billing_report->date_created->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($pharmacy_billing_report->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $pharmacy_billing_report->date_updated->rowAttributes() ?>>
-            <td class="<?= $pharmacy_billing_report->TableLeftColumnClass ?>"><?= $pharmacy_billing_report->date_updated->caption() ?></td>
-            <td<?= $pharmacy_billing_report->date_updated->cellAttributes() ?>>
-<span id="el_pharmacy_billing_report_date_updated">
-<span<?= $pharmacy_billing_report->date_updated->viewAttributes() ?>>
-<?= $pharmacy_billing_report->date_updated->getViewValue() ?></span>
 </span>
 </td>
         </tr>

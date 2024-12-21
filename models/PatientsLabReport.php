@@ -342,7 +342,7 @@ class PatientsLabReport extends DbTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'FILE' // Edit Tag
         );
         $this->report_template->InputTextType = "text";
@@ -1520,6 +1520,8 @@ class PatientsLabReport extends DbTable
 
         // report_template
         if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->ImageAlt = $this->report_template->alt();
+            $this->report_template->ImageCssClass = "ew-image";
             $this->report_template->ViewValue = $this->id->CurrentValue;
             $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
         } else {
@@ -1591,6 +1593,13 @@ class PatientsLabReport extends DbTable
         }
         $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
         $this->report_template->TooltipValue = "";
+        if ($this->report_template->UseColorbox) {
+            if (EmptyValue($this->report_template->TooltipValue)) {
+                $this->report_template->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->report_template->LinkAttrs["data-rel"] = "patients_lab_report_x_report_template";
+            $this->report_template->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // status
         $this->status->HrefValue = "";
@@ -1703,6 +1712,8 @@ class PatientsLabReport extends DbTable
         // report_template
         $this->report_template->setupEditAttributes();
         if (!EmptyValue($this->report_template->Upload->DbValue)) {
+            $this->report_template->ImageAlt = $this->report_template->alt();
+            $this->report_template->ImageCssClass = "ew-image";
             $this->report_template->EditValue = $this->id->CurrentValue;
             $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
         } else {

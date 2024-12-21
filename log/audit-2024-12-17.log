@@ -9,3 +9,6 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-17 09:06:49",/afyaplus/login,1,login,::1,,,,
 "2024-12-17 09:13:08",/afyaplus/logout,1,logout,::1,,,,
 "2024-12-17 09:23:22",/afyaplus/login,1,login,::1,,,,
+"2024-12-17 12:24:57",/afyaplus/logout,1,logout,::1,,,,
+"2024-12-17 12:25:08",/afyaplus/login,4,login,::1,,,,
+"2024-12-17 13:11:21",/afyaplus/logout,4,logout,::1,,,,

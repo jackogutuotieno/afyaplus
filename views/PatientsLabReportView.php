@@ -133,7 +133,7 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_lab_report_report_template"><template id="tpc_patients_lab_report_report_template"><?= $Page->report_template->caption() ?></template></span></td>
         <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
 <template id="tpx_patients_lab_report_report_template"><span id="el_patients_lab_report_report_template">
-<span<?= $Page->report_template->viewAttributes() ?>>
+<span>
 <?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
 </span>
 </span></template>
