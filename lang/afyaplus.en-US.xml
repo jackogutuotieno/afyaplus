@@ -48,7 +48,7 @@
       <phrase id="menutext" value="Notifications" />
     </menu>
     <menu id="51">
-      <phrase id="menutext" value="Patients" />
+      <phrase id="menutext" value="OPD" />
     </menu>
     <menu id="48">
       <phrase id="menutext" value="Patients List" />

@@ -1059,6 +1059,8 @@ class LaboratoryReportsSummary extends LaboratoryReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_report_month":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

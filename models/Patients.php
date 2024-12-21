@@ -275,10 +275,10 @@ class Patients extends DbTable
             'x_date_of_birth', // Variable name
             'date_of_birth', // Name
             '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
             133, // Type
             10, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
             false, // Is virtual
@@ -291,7 +291,7 @@ class Patients extends DbTable
         $this->date_of_birth->Raw = true;
         $this->date_of_birth->Nullable = false; // NOT NULL field
         $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
 

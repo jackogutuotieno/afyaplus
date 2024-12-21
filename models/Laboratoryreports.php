@@ -311,10 +311,14 @@ class LaboratoryReports extends ReportTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->report_month->InputTextType = "text";
-        $this->report_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->report_month->setSelectMultiple(false); // Select one
+        $this->report_month->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->report_month->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->report_month->Lookup = new Lookup($this->report_month, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->report_month->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->report_month->SourceTableVar = 'laboratory_reports2';
         $this->Fields['report_month'] = &$this->report_month;
 
@@ -535,6 +539,31 @@ class LaboratoryReports extends ReportTable
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
+        if ($chartVar == "GraphbySubmission") {
+            $this->report_month->CurrentValue = $chartRow[0];
+            $curVal = strval($this->report_month->CurrentValue);
+            if ($curVal != "") {
+                $this->report_month->ViewValue = $this->report_month->lookupCacheOption($curVal);
+                if ($this->report_month->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->report_month->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->report_month->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->report_month->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->report_month->Lookup->renderViewRow($rswrk[0]);
+                        $this->report_month->ViewValue = $this->report_month->displayValue($arwrk);
+                    } else {
+                        $this->report_month->ViewValue = $this->report_month->CurrentValue;
+                    }
+                }
+            } else {
+                $this->report_month->ViewValue = null;
+            }
+            $chartRow[0] = is_object($this->report_month->ViewValue) ? $this->report_month->ViewValue->__toString() : $this->report_month->ViewValue;
+        }
         return $chartRow;
     }
 

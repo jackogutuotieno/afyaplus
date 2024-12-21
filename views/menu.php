@@ -21,7 +21,7 @@ $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), 
 $sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(543, "mi_branding", $Language->menuPhrase("543", "MenuText"), "brandinglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}branding'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(108, "mi_subscriptions", $Language->menuPhrase("108", "MenuText"), "subscriptionslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}subscriptions'), false, false, "fa-bell", "", false, true);
-$sideMenu->addMenuItem(51, "mci_Patients", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
+$sideMenu->addMenuItem(51, "mci_OPD", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(48, "mi_patients", $Language->menuPhrase("48", "MenuText"), "patientslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients'), false, false, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(114, "mi_patient_queue", $Language->menuPhrase("114", "MenuText"), "patientqueuelist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_queue'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(24, "mi_patient_visits", $Language->menuPhrase("24", "MenuText"), "patientvisitslist?cmd=resetall", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_visits'), false, false, "fa-list", "", false, true);
