@@ -50,6 +50,7 @@ class LaboratoryBillingReport extends DbTable
     public $patient_id;
     public $visit_id;
     public $status;
+    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -207,16 +208,46 @@ class LaboratoryBillingReport extends DbTable
         $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['status'] = &$this->status;
 
+        // created_by_user_id
+        $this->created_by_user_id = new DbField(
+            $this, // Table
+            'x_created_by_user_id', // Variable name
+            'created_by_user_id', // Name
+            '`created_by_user_id`', // Expression
+            '`created_by_user_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`created_by_user_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->created_by_user_id->InputTextType = "text";
+        $this->created_by_user_id->Raw = true;
+        $this->created_by_user_id->Nullable = false; // NOT NULL field
+        $this->created_by_user_id->Required = true; // Required field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
+
         // date_created
         $this->date_created = new DbField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            11, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -229,7 +260,7 @@ class LaboratoryBillingReport extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -255,6 +286,7 @@ class LaboratoryBillingReport extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -895,6 +927,7 @@ class LaboratoryBillingReport extends DbTable
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
         $this->status->DbValue = $row['status'];
+        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1266,6 +1299,7 @@ class LaboratoryBillingReport extends DbTable
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->status->setDbValue($row['status']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1306,6 +1340,8 @@ class LaboratoryBillingReport extends DbTable
 
         // status
 
+        // created_by_user_id
+
         // date_created
 
         // date_updated
@@ -1343,6 +1379,29 @@ class LaboratoryBillingReport extends DbTable
         // status
         $this->status->ViewValue = $this->status->CurrentValue;
 
+        // created_by_user_id
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1366,6 +1425,10 @@ class LaboratoryBillingReport extends DbTable
         // status
         $this->status->HrefValue = "";
         $this->status->TooltipValue = "";
+
+        // created_by_user_id
+        $this->created_by_user_id->HrefValue = "";
+        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1445,6 +1508,10 @@ class LaboratoryBillingReport extends DbTable
         $this->status->EditValue = $this->status->CurrentValue;
         $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
+        // created_by_user_id
+        $this->created_by_user_id->setupEditAttributes();
+        $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1487,15 +1554,15 @@ class LaboratoryBillingReport extends DbTable
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1526,15 +1593,15 @@ class LaboratoryBillingReport extends DbTable
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->status);
+                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->status);
+                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }

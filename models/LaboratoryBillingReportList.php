@@ -145,12 +145,13 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->status->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -711,6 +712,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1104,6 +1106,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
+        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1177,6 +1180,14 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
         $this->status->AdvancedSearch->save();
 
+        // Field created_by_user_id
+        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1208,6 +1219,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->buildSearchSql($where, $this->patient_id, $default, false); // patient_id
         $this->buildSearchSql($where, $this->visit_id, $default, false); // visit_id
         $this->buildSearchSql($where, $this->status, $default, false); // status
+        $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
         $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
         $this->buildSearchSql($where, $this->date_updated, $default, false); // date_updated
 
@@ -1220,6 +1232,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $this->patient_id->AdvancedSearch->save(); // patient_id
             $this->visit_id->AdvancedSearch->save(); // visit_id
             $this->status->AdvancedSearch->save(); // status
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
             $this->date_created->AdvancedSearch->save(); // date_created
             $this->date_updated->AdvancedSearch->save(); // date_updated
 
@@ -1256,6 +1269,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $this->patient_id->AdvancedSearch->save(); // patient_id
             $this->visit_id->AdvancedSearch->save(); // visit_id
             $this->status->AdvancedSearch->save(); // status
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
             $this->date_created->AdvancedSearch->save(); // date_created
             $this->date_updated->AdvancedSearch->save(); // date_updated
             $this->setSessionRules($rules);
@@ -1314,15 +1328,6 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
 
-        // Field id
-        $filter = $this->queryBuilderWhere("id");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->id, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
         // Field patient_id
         $filter = $this->queryBuilderWhere("patient_id");
         if (!$filter) {
@@ -1341,6 +1346,15 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
 
+        // Field created_by_user_id
+        $filter = $this->queryBuilderWhere("created_by_user_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->created_by_user_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->created_by_user_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
         // Field date_created
         $filter = $this->queryBuilderWhere("date_created");
         if (!$filter) {
@@ -1348,15 +1362,6 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field date_updated
-        $filter = $this->queryBuilderWhere("date_updated");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->date_updated, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_updated->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
@@ -1425,6 +1430,9 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         if ($this->status->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->created_by_user_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
         if ($this->date_created->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1470,6 +1478,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->patient_id->AdvancedSearch->unsetSession();
         $this->visit_id->AdvancedSearch->unsetSession();
         $this->status->AdvancedSearch->unsetSession();
+        $this->created_by_user_id->AdvancedSearch->unsetSession();
         $this->date_created->AdvancedSearch->unsetSession();
         $this->date_updated->AdvancedSearch->unsetSession();
     }
@@ -1487,6 +1496,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->patient_id->AdvancedSearch->load();
         $this->visit_id->AdvancedSearch->load();
         $this->status->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
         $this->date_updated->AdvancedSearch->load();
     }
@@ -1506,11 +1516,10 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->status); // status
+            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1548,6 +1557,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
                 $this->patient_id->setSort("");
                 $this->visit_id->setSort("");
                 $this->status->setSort("");
+                $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1616,6 +1626,14 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1653,6 +1671,10 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1788,11 +1810,10 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2183,6 +2204,14 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             }
         }
 
+        // created_by_user_id
+        if ($this->created_by_user_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->created_by_user_id->AdvancedSearch->SearchValue != "" || $this->created_by_user_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
         // date_created
         if ($this->date_created->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2298,6 +2327,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->status->setDbValue($row['status']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2310,6 +2340,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2360,6 +2391,8 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
 
         // status
 
+        // created_by_user_id
+
         // date_created
 
         // date_updated
@@ -2399,17 +2432,32 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -2419,13 +2467,13 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
 
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2461,6 +2509,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $this->patient_id->AdvancedSearch->load();
         $this->visit_id->AdvancedSearch->load();
         $this->status->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
         $this->date_updated->AdvancedSearch->load();
     }
@@ -2844,6 +2893,8 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

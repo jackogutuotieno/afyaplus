@@ -29,6 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["patient_id", [], fields.patient_id.isInvalid],
             ["visit_id", [ew.Validators.integer], fields.visit_id.isInvalid],
             ["status", [], fields.status.isInvalid],
+            ["created_by_user_id", [], fields.created_by_user_id.isInvalid],
             ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
@@ -66,6 +67,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -211,6 +213,60 @@ loadjs.ready("flaboratory_billing_reportsearch", function() {
         </div>
     </div>
 <?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+    <div id="r_created_by_user_id" class="row"<?= $Page->created_by_user_id->rowAttributes() ?>>
+        <label for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_laboratory_billing_report_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_created_by_user_id" id="z_created_by_user_id" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div<?= $Page->created_by_user_id->cellAttributes() ?>>
+                <div class="d-flex align-items-start">
+                <span id="el_laboratory_billing_report_created_by_user_id" class="ew-search-field ew-search-field-single">
+    <select
+        id="x_created_by_user_id"
+        name="x_created_by_user_id"
+        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
+        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
+        data-select2-id="flaboratory_billing_reportsearch_x_created_by_user_id"
+        <?php } ?>
+        data-table="laboratory_billing_report"
+        data-field="x_created_by_user_id"
+        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
+        <?= $Page->created_by_user_id->editAttributes() ?>>
+        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage(false) ?></div>
+<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
+<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("flaboratory_billing_reportsearch", function() {
+    var options = { name: "x_created_by_user_id", selectId: "flaboratory_billing_reportsearch_x_created_by_user_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (flaboratory_billing_reportsearch.lists.created_by_user_id?.lookupOptions.length) {
+        options.data = { id: "x_created_by_user_id", form: "flaboratory_billing_reportsearch" };
+    } else {
+        options.ajax = { id: "x_created_by_user_id", form: "flaboratory_billing_reportsearch", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.laboratory_billing_report.fields.created_by_user_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <div id="r_date_created" class="row"<?= $Page->date_created->rowAttributes() ?>>
         <label for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><span id="elh_laboratory_billing_report_date_created"><?= $Page->date_created->caption() ?></span>
@@ -228,7 +284,7 @@ loadjs.ready("flaboratory_billing_reportsearch", function() {
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(7) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
