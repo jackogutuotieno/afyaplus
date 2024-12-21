@@ -177,7 +177,10 @@ class PatientsView extends Patients
         $this->TableName = 'patients';
 
         // Table CSS class
-        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
+        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table d-none";
+
+        // Custom template
+        $this->UseCustomTemplate = true;
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -417,9 +420,6 @@ class PatientsView extends Patients
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -1223,6 +1223,11 @@ class PatientsView extends Patients
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+
+        // Save data for Custom Template
+        if ($this->RowType == RowType::VIEW || $this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) {
+            $this->Rows[] = $this->customTemplateFieldValues();
+        }
     }
 
     // Get export HTML tag
@@ -1262,7 +1267,7 @@ class PatientsView extends Patients
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatientsview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatientsview" data-ew-action="email" data-custom="true" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -1280,12 +1285,12 @@ class PatientsView extends Patients
 
         // Export to Excel
         $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
+        $item->Body = $this->getExportTag("excel", !Config("USE_PHPEXCEL"));
         $item->Visible = true;
 
         // Export to Word
         $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
+        $item->Body = $this->getExportTag("word", !Config("USE_PHPWORD"));
         $item->Visible = true;
 
         // Export to HTML
@@ -1305,12 +1310,12 @@ class PatientsView extends Patients
 
         // Export to PDF
         $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
+        $item->Body = $this->getExportTag("pdf", true);
         $item->Visible = true;
 
         // Export to Email
         $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
+        $item->Body = $this->getExportTag("email", true);
         $item->Visible = true;
 
         // Drop down button for export

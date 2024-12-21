@@ -1031,7 +1031,7 @@
     <table id="patients">
       <phrase id="tblcaption" value="OPD Patients" />
       <field id="id">
-        <phrase id="fldcaption" value="Patient ID" />
+        <phrase id="fldcaption" value="UHID" />
       </field>
       <field id="photo">
         <phrase id="fldcaption" value="Photo" />

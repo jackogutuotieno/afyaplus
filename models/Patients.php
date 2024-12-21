@@ -2513,8 +2513,7 @@ class Patients extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $this->patient_name->ViewValue = '<a href="patientsview/' . $this->id->ViewValue . '?showdetail=patient_appointments,patient_visits,patients_dependants" target="_blank"> ' . $this->patient_name->ViewValue . ' </a>';
     }
 
     // User ID Filtering event

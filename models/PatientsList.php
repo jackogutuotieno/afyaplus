@@ -3151,8 +3151,10 @@ class PatientsList extends Patients
     // ListOptions Rendered event
     public function listOptionsRendered()
     {
-        // Example:
-        //$this->ListOptions["new"]->Body = "xxx";
+        $this->ListOptions->Items["view"]->clear();
+        $this->ListOptions->Items["detail_patient_appointments"]->clear();
+        $this->ListOptions->Items["detail_patient_visits"]->clear();
+        $this->ListOptions->Items["detail_patients_dependants"]->clear();
     }
 
     // Row Custom Action event

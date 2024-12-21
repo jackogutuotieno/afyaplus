@@ -20629,7 +20629,9 @@ td button, .btn-primary {
   font-weight: 600;
 }
 
-.el_patient_visits_patient_id a {
+.el_patient_visits_patient_id a,
+.el_patients_patient_name a,
+table td a {
   font-size: 0.83rem;
   font-weight: 600;
   color: #540000;
@@ -20646,6 +20648,12 @@ td button, .btn-primary {
 .patient-visits .ew-detail-option .ew-list-options,
 #fpatient_visitssrch .ew-btn-group.ew-list-options {
   display: none !important;
+}
+
+td[data-name=detail_patient_appointments],
+td[data-name=detail_patient_visits],
+td[data-name=detail_patients_dependants] {
+  display: none;
 }
 
 /*END_USER_STYLES*/
