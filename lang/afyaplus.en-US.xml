@@ -2,14 +2,14 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="542">
-      <phrase id="menutext" value="Dependants" />
+    <menu id="642">
+      <phrase id="menutext" value="Dashboard" />
     </menu>
-    <menu id="439">
-      <phrase id="menutext" value="Radiology Results" />
+    <menu id="325">
+      <phrase id="menutext" value="Facility Overview" />
     </menu>
-    <menu id="334">
-      <phrase id="menutext" value="Radiology Overview" />
+    <menu id="326">
+      <phrase id="menutext" value="Front Office Overview" />
     </menu>
     <menu id="327">
       <phrase id="menutext" value="Triage Overview" />
@@ -20,17 +20,14 @@
     <menu id="329">
       <phrase id="menutext" value="Laboratory Overview" />
     </menu>
+    <menu id="334">
+      <phrase id="menutext" value="Radiology Overview" />
+    </menu>
     <menu id="330">
       <phrase id="menutext" value="Pharmacy Overview" />
     </menu>
     <menu id="331">
       <phrase id="menutext" value="Financials Overview" />
-    </menu>
-    <menu id="326">
-      <phrase id="menutext" value="Front Office Overview" />
-    </menu>
-    <menu id="325">
-      <phrase id="menutext" value="Facility Overview" />
     </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />
@@ -301,6 +298,12 @@
     </menu>
     <menu id="430">
       <phrase id="menutext" value="medicine stock data" />
+    </menu>
+    <menu id="439">
+      <phrase id="menutext" value="Radiology Results" />
+    </menu>
+    <menu id="542">
+      <phrase id="menutext" value="Dependants" />
     </menu>
     <table id="appointments_report2">
       <phrase id="tblcaption" value="Appointments Report" />
