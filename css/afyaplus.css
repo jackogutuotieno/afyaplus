@@ -20659,7 +20659,7 @@ td[data-name=detail_patients_dependants] {
   display: none;
 }
 
-.content .btn-toolbar, .content .ew-detail-option {
+.content .ew-detail-option {
   display: none;
 }
 

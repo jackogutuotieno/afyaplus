@@ -2146,17 +2146,17 @@ class PatientVisits extends DbTable
         $current_date = CurrentDate();
         if ($this->date_created->CurrentValue > $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New Visit"; 
+            $this->status->ViewValue = "Check-In Today"; 
         } else if ($this->date_created->CurrentValue < $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
-            $this->status->ViewValue = "Past Visit"; 
+            $this->status->ViewValue = "Past Check-In"; 
         }
         if (CurrentUserlevel() == 1 || CurrentUserlevel() == -1) {
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,cash_payments,patient_vitals,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report" target="_blank">' . $this->patient_id->ViewValue . '</a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,cash_payments,patient_vitals,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report,invoices" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 2) {
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,prescriptions,lab_test_requests,radiology_requests" target="_blank">' . $this->patient_id->ViewValue . '</a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,lab_test_requests,radiology_requests,laboratory_reports,patients_radiology_reports,prescriptions" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 3){
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,patient_vaccinations" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,patient_vaccinations" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 4){
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,lab_test_requests,lab_test_reports,laboratory_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 5){

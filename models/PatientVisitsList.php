@@ -3954,7 +3954,7 @@ class PatientVisitsList extends PatientVisits
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "create visit");
+        $Language->setPhrase("addlink", "CheckIn Patient");
     }
 
     // Page Unload event
@@ -4045,17 +4045,24 @@ class PatientVisitsList extends PatientVisits
         // Get the current date and time
         $currDate = CurrentDate();
         if ($this->date_created->CurrentValue < $currDate)  {
-            $this->ListOptions->Items["view"]->clear();
-            $this->ListOptions->Items["edit"]->clear();
-            $this->ListOptions->Items["delete"]->clear();
-            $this->ListOptions->Items["detail_patient_queue"]->clear();
-            $this->ListOptions->Items["detail_patient_vitals"]->clear();
-            $this->ListOptions->Items["detail_doctor_notes"]->clear();
-            $this->ListOptions->Items["detail_prescriptions"]->clear();
-            $this->ListOptions->Items["detail_radiology_requests"]->clear();
-            $this->ListOptions->Items["detail_patient_vaccinations"]->clear();
-            $this->ListOptions->Items["detail_lab_test_requests"]->clear();
+            // dff
         } 
+        $this->ListOptions->Items["view"]->clear();
+        $this->ListOptions->Items["edit"]->clear();
+        $this->ListOptions->Items["delete"]->clear();
+        $this->ListOptions->Items["detail_patient_queue"]->clear();
+        $this->ListOptions->Items["detail_patient_vitals"]->clear();
+        $this->ListOptions->Items["detail_doctor_notes"]->clear();
+        $this->ListOptions->Items["detail_prescriptions"]->clear();
+        $this->ListOptions->Items["detail_radiology_requests"]->clear();
+        $this->ListOptions->Items["detail_patient_vaccinations"]->clear();
+        $this->ListOptions->Items["detail_lab_test_requests"]->clear();
+        $this->ListOptions->Items["detail_invoices"]->clear();
+        $this->ListOptions->Items["detail_cash_payments"]->clear();
+        $this->ListOptions->Items["detail_laboratory_billing_report"]->clear();
+        $this->ListOptions->Items["detail_radiology_billing_report"]->clear();
+        $this->ListOptions->Items["detail_pharmacy_billing_report"]->clear();
+        $this->ListOptions->Items["detail_patients_lab_report"]->clear();
     }
 
     // Row Custom Action event

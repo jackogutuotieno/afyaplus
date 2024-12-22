@@ -182,7 +182,7 @@ loadjs.ready("fprescriptionsgrid", function() {
     } else {
         options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fprescriptionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
     }
-    options.minimumResultsForSearch = Infinity;
+    options.minimumInputLength = ew.selectMinimumInputLength;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.patient_id.selectOptions);
     ew.createSelect(options);
 });
@@ -231,7 +231,7 @@ loadjs.ready("fprescriptionsgrid", function() {
     } else {
         options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fprescriptionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
     }
-    options.minimumResultsForSearch = Infinity;
+    options.minimumInputLength = ew.selectMinimumInputLength;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.patient_id.selectOptions);
     ew.createSelect(options);
 });

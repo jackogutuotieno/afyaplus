@@ -2944,7 +2944,7 @@ class PatientVisitsGrid extends PatientVisits
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "create visit");
+        $Language->setPhrase("addlink", "CheckIn Patient");
     }
 
     // Page Unload event

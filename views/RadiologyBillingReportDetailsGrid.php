@@ -23,8 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["radiology_request_id", [fields.radiology_request_id.visible && fields.radiology_request_id.required ? ew.Validators.required(fields.radiology_request_id.caption) : null, ew.Validators.integer], fields.radiology_request_id.isInvalid],
             ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
             ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
         ])
@@ -33,7 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["radiology_request_id",false],["service_name",false],["cost",false]];
+                    fields = [["service_name",false],["cost",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -87,12 +85,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_radiology_billing_report_details_id" class="radiology_billing_report_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->radiology_request_id->Visible) { // radiology_request_id ?>
-        <th data-name="radiology_request_id" class="<?= $Grid->radiology_request_id->headerCellClass() ?>"><div id="elh_radiology_billing_report_details_radiology_request_id" class="radiology_billing_report_details_radiology_request_id"><?= $Grid->renderFieldHeader($Grid->radiology_request_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Grid->service_name->headerCellClass() ?>"><div id="elh_radiology_billing_report_details_service_name" class="radiology_billing_report_details_service_name"><?= $Grid->renderFieldHeader($Grid->service_name) ?></div></th>
 <?php } ?>
@@ -135,76 +127,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_id" class="el_radiology_billing_report_details_id"></span>
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_id" class="el_radiology_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_id" class="el_radiology_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_id" data-hidden="1" name="fradiology_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="fradiology_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_id" data-hidden="1" data-old name="fradiology_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="fradiology_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="radiology_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
-    <?php if ($Grid->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td data-name="radiology_request_id"<?= $Grid->radiology_request_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
-<input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_request_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_radiology_request_id" id="o<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->radiology_request_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->radiology_request_id->getDisplayValue($Grid->radiology_request_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_radiology_request_id" name="x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
-<input type="<?= $Grid->radiology_request_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_request_id" id="x<?= $Grid->RowIndex ?>_radiology_request_id" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" value="<?= $Grid->radiology_request_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_request_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_request_id->formatPattern()) ?>"<?= $Grid->radiology_request_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_request_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_details_radiology_request_id" class="el_radiology_billing_report_details_radiology_request_id">
-<span<?= $Grid->radiology_request_id->viewAttributes() ?>>
-<?= $Grid->radiology_request_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" data-hidden="1" name="fradiology_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_radiology_request_id" id="fradiology_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->FormValue) ?>">
-<input type="hidden" data-table="radiology_billing_report_details" data-field="x_radiology_request_id" data-hidden="1" data-old name="fradiology_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_radiology_request_id" id="fradiology_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_radiology_request_id" value="<?= HtmlEncode($Grid->radiology_request_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->service_name->Visible) { // service_name ?>
         <td data-name="service_name"<?= $Grid->service_name->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -300,14 +222,6 @@ $Grid->renderListOptions();
 // Render list options (footer, left)
 $Grid->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_radiology_billing_report_details_id" class="radiology_billing_report_details_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->radiology_request_id->Visible) { // radiology_request_id ?>
-        <td data-name="radiology_request_id" class="<?= $Grid->radiology_request_id->footerCellClass() ?>"><span id="elf_radiology_billing_report_details_radiology_request_id" class="radiology_billing_report_details_radiology_request_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Grid->service_name->Visible) { // service_name ?>
         <td data-name="service_name" class="<?= $Grid->service_name->footerCellClass() ?>"><span id="elf_radiology_billing_report_details_service_name" class="radiology_billing_report_details_service_name">
         </span></td>

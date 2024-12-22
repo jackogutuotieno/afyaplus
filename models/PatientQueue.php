@@ -45,7 +45,7 @@ class PatientQueue extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = true;
+    public $ModalAdd = false;
     public $ModalEdit = false;
     public $ModalUpdate = false;
     public $InlineDelete = false;
@@ -1811,13 +1811,13 @@ class PatientQueue extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        if (IsLoggedIn() && CurrentUserlevel() == 2) {
+        /* if (IsLoggedIn() && CurrentUserlevel() == 2) {
             $consultation = "Consultation";
             AddFilter($filter, "section= '" . $consultation . "'");
         } else if (IsLoggedIn() && CurrentUserlevel() == 3) {
             $triage = "Triage";
             AddFilter($filter, "section= '" . $triage . "'");
-        } 
+        } */
     }
 
     // Recordset Selected event

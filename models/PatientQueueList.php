@@ -2722,7 +2722,7 @@ class PatientQueueList extends PatientQueue
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add to queue");
+        $Language->setPhrase("addlink", "add patient flow");
     }
 
     // Page Unload event

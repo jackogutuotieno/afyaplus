@@ -45,7 +45,7 @@ class PatientVitals extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = true;
+    public $ModalAdd = false;
     public $ModalEdit = false;
     public $ModalUpdate = false;
     public $InlineDelete = false;

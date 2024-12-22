@@ -118,7 +118,7 @@ loadjs.ready("fprescriptionsadd", function() {
     } else {
         options.ajax = { id: "x_patient_id", form: "fprescriptionsadd", limit: ew.LOOKUP_PAGE_SIZE };
     }
-    options.minimumResultsForSearch = Infinity;
+    options.minimumInputLength = ew.selectMinimumInputLength;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.prescriptions.fields.patient_id.selectOptions);
     ew.createSelect(options);
 });
