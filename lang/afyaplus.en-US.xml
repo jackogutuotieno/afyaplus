@@ -727,6 +727,9 @@
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
       </field>
+      <field id="visit_id">
+        <phrase id="fldcaption" value="Visit ID" />
+      </field>
       <field id="prescription_id">
         <phrase id="fldcaption" value="Prescription ID" />
       </field>
@@ -750,7 +753,7 @@
         <phrase id="fldcaption" value="Prepared By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date Added" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1223,14 +1226,14 @@
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="Prescribed By" />
       </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Prescription Date" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
-      </field>
-      <field id="status">
-        <phrase id="fldcaption" value="Status" />
       </field>
     </table>
     <table id="radiology_reports">

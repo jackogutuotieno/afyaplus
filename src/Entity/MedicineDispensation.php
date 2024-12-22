@@ -36,8 +36,11 @@ class MedicineDispensation extends AbstractEntity
     #[Column(name: "patient_id", type: "integer")]
     private int $patientId;
 
-    #[Column(name: "prescription_id", type: "integer")]
-    private int $prescriptionId;
+    #[Column(name: "visit_id", type: "integer")]
+    private int $visitId;
+
+    #[Column(name: "prescription_id", type: "integer", nullable: true)]
+    private ?int $prescriptionId;
 
     #[Column(name: "dispensation_type", type: "string")]
     private string $dispensationType;
@@ -76,12 +79,23 @@ class MedicineDispensation extends AbstractEntity
         return $this;
     }
 
-    public function getPrescriptionId(): int
+    public function getVisitId(): int
+    {
+        return $this->visitId;
+    }
+
+    public function setVisitId(int $value): static
+    {
+        $this->visitId = $value;
+        return $this;
+    }
+
+    public function getPrescriptionId(): ?int
     {
         return $this->prescriptionId;
     }
 
-    public function setPrescriptionId(int $value): static
+    public function setPrescriptionId(?int $value): static
     {
         $this->prescriptionId = $value;
         return $this;

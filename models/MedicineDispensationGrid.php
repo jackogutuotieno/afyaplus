@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class PrescriptionsGrid extends Prescriptions
+class MedicineDispensationGrid extends MedicineDispensation
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class PrescriptionsGrid extends Prescriptions
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PrescriptionsGrid";
+    public $PageObjName = "MedicineDispensationGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class PrescriptionsGrid extends Prescriptions
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fprescriptionsgrid";
+    public $FormName = "fmedicine_dispensationgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "prescriptionsgrid";
+    public $CurrentPageName = "medicinedispensationgrid";
 
     // Page URLs
     public $AddUrl;
@@ -143,11 +143,13 @@ class PrescriptionsGrid extends Prescriptions
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
-        $this->created_by_user_id->setVisibility();
+        $this->prescription_id->setVisibility();
+        $this->dispensation_type->setVisibility();
         $this->status->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -160,8 +162,8 @@ class PrescriptionsGrid extends Prescriptions
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'prescriptions';
-        $this->TableName = 'prescriptions';
+        $this->TableVar = 'medicine_dispensation';
+        $this->TableName = 'medicine_dispensation';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -185,15 +187,15 @@ class PrescriptionsGrid extends Prescriptions
         // Language object
         $Language = Container("app.language");
 
-        // Table object (prescriptions)
-        if (!isset($GLOBALS["prescriptions"]) || $GLOBALS["prescriptions"]::class == PROJECT_NAMESPACE . "prescriptions") {
-            $GLOBALS["prescriptions"] = &$this;
+        // Table object (medicine_dispensation)
+        if (!isset($GLOBALS["medicine_dispensation"]) || $GLOBALS["medicine_dispensation"]::class == PROJECT_NAMESPACE . "medicine_dispensation") {
+            $GLOBALS["medicine_dispensation"] = &$this;
         }
-        $this->AddUrl = "prescriptionsadd";
+        $this->AddUrl = "medicinedispensationadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'prescriptions');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'medicine_dispensation');
         }
 
         // Start timer
@@ -635,6 +637,8 @@ class PrescriptionsGrid extends Prescriptions
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->dispensation_type);
+        $this->setupLookupOptions($this->status);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Load default values for add
@@ -642,7 +646,7 @@ class PrescriptionsGrid extends Prescriptions
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fprescriptionsgrid";
+            $this->FormName = "fmedicine_dispensationgrid";
         }
 
         // Set up page action
@@ -988,7 +992,7 @@ class PrescriptionsGrid extends Prescriptions
             $this->clearInlineMode(); // Clear inline edit mode
 
             // Send notify email
-            $table = 'prescriptions';
+            $table = 'medicine_dispensation';
             $subject = $table . " " . $Language->phrase("RecordUpdated");
             $action = $Language->phrase("ActionUpdatedGridEdit");
             $email = new Email();
@@ -1136,7 +1140,7 @@ class PrescriptionsGrid extends Prescriptions
             $this->clearInlineMode(); // Clear grid add mode
 
             // Send notify email
-            $table = 'prescriptions';
+            $table = 'medicine_dispensation';
             $subject = $table . " " . $Language->phrase("RecordInserted");
             $action = $Language->phrase("ActionInsertedGridAdd");
             $email = new Email();
@@ -1176,6 +1180,22 @@ class PrescriptionsGrid extends Prescriptions
             $CurrentForm->hasValue("o_patient_id") &&
             $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
             !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_prescription_id") &&
+            $CurrentForm->hasValue("o_prescription_id") &&
+            $this->prescription_id->CurrentValue != $this->prescription_id->DefaultValue &&
+            !($this->prescription_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->prescription_id->CurrentValue == $this->prescription_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_dispensation_type") &&
+            $CurrentForm->hasValue("o_dispensation_type") &&
+            $this->dispensation_type->CurrentValue != $this->dispensation_type->DefaultValue &&
+            !($this->dispensation_type->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->dispensation_type->CurrentValue == $this->dispensation_type->getSessionValue())
         ) {
             return false;
         }
@@ -1292,7 +1312,7 @@ class PrescriptionsGrid extends Prescriptions
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
+            $defaultSort = ""; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1322,8 +1342,8 @@ class PrescriptionsGrid extends Prescriptions
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->visit_id->setSessionValue("");
                         $this->patient_id->setSessionValue("");
+                        $this->visit_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1374,14 +1394,6 @@ class PrescriptionsGrid extends Prescriptions
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
-
-        // "sequence"
-        $item = &$this->ListOptions->add("sequence");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = true; // Always on left
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
@@ -1451,17 +1463,13 @@ class PrescriptionsGrid extends Prescriptions
                 }
             }
         }
-
-        // "sequence"
-        $opt = $this->ListOptions["sequence"];
-        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView() && $this->showOptionLink("view")) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"prescriptions\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"medicine_dispensation\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1474,7 +1482,7 @@ class PrescriptionsGrid extends Prescriptions
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"prescriptions\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"medicine_dispensation\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 }
@@ -1526,7 +1534,7 @@ class PrescriptionsGrid extends Prescriptions
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
             if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"prescriptions\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"medicine_dispensation\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
             } else {
                 $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
@@ -1623,7 +1631,7 @@ class PrescriptionsGrid extends Prescriptions
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_prescriptions", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_medicine_dispensation", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1711,7 +1719,7 @@ class PrescriptionsGrid extends Prescriptions
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_prescriptions",
+            "id" => "r" . $this->RowCount . "_medicine_dispensation",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1748,6 +1756,12 @@ class PrescriptionsGrid extends Prescriptions
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1761,17 +1775,30 @@ class PrescriptionsGrid extends Prescriptions
             $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
+        // Check field name 'prescription_id' first before field var 'x_prescription_id'
+        $val = $CurrentForm->hasValue("prescription_id") ? $CurrentForm->getValue("prescription_id") : $CurrentForm->getValue("x_prescription_id");
+        if (!$this->prescription_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
+                $this->prescription_id->Visible = false; // Disable update for API request
             } else {
-                $this->created_by_user_id->setFormValue($val);
+                $this->prescription_id->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_created_by_user_id")) {
-            $this->created_by_user_id->setOldValue($CurrentForm->getValue("o_created_by_user_id"));
+        if ($CurrentForm->hasValue("o_prescription_id")) {
+            $this->prescription_id->setOldValue($CurrentForm->getValue("o_prescription_id"));
+        }
+
+        // Check field name 'dispensation_type' first before field var 'x_dispensation_type'
+        $val = $CurrentForm->hasValue("dispensation_type") ? $CurrentForm->getValue("dispensation_type") : $CurrentForm->getValue("x_dispensation_type");
+        if (!$this->dispensation_type->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->dispensation_type->Visible = false; // Disable update for API request
+            } else {
+                $this->dispensation_type->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_dispensation_type")) {
+            $this->dispensation_type->setOldValue($CurrentForm->getValue("o_dispensation_type"));
         }
 
         // Check field name 'status' first before field var 'x_status'
@@ -1787,6 +1814,19 @@ class PrescriptionsGrid extends Prescriptions
             $this->status->setOldValue($CurrentForm->getValue("o_status"));
         }
 
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_created_by_user_id")) {
+            $this->created_by_user_id->setOldValue($CurrentForm->getValue("o_created_by_user_id"));
+        }
+
         // Check field name 'date_created' first before field var 'x_date_created'
         $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
         if (!$this->date_created->IsDetailKey) {
@@ -1800,12 +1840,6 @@ class PrescriptionsGrid extends Prescriptions
         if ($CurrentForm->hasValue("o_date_created")) {
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
     }
 
     // Restore form values
@@ -1816,8 +1850,10 @@ class PrescriptionsGrid extends Prescriptions
             $this->id->CurrentValue = $this->id->FormValue;
         }
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->prescription_id->CurrentValue = $this->prescription_id->FormValue;
+        $this->dispensation_type->CurrentValue = $this->dispensation_type->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
     }
@@ -1918,8 +1954,10 @@ class PrescriptionsGrid extends Prescriptions
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->prescription_id->setDbValue($row['prescription_id']);
+        $this->dispensation_type->setDbValue($row['dispensation_type']);
         $this->status->setDbValue($row['status']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1931,8 +1969,10 @@ class PrescriptionsGrid extends Prescriptions
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['prescription_id'] = $this->prescription_id->DefaultValue;
+        $row['dispensation_type'] = $this->dispensation_type->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1980,13 +2020,18 @@ class PrescriptionsGrid extends Prescriptions
         // visit_id
         $this->visit_id->CellCssStyle = "white-space: nowrap;";
 
-        // created_by_user_id
+        // prescription_id
+
+        // dispensation_type
 
         // status
+
+        // created_by_user_id
 
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2016,6 +2061,24 @@ class PrescriptionsGrid extends Prescriptions
                 $this->patient_id->ViewValue = null;
             }
 
+            // prescription_id
+            $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
+            $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+
+            // dispensation_type
+            if (strval($this->dispensation_type->CurrentValue) != "") {
+                $this->dispensation_type->ViewValue = $this->dispensation_type->optionCaption($this->dispensation_type->CurrentValue);
+            } else {
+                $this->dispensation_type->ViewValue = null;
+            }
+
+            // status
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -2039,29 +2102,40 @@ class PrescriptionsGrid extends Prescriptions
                 $this->created_by_user_id->ViewValue = null;
             }
 
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
+            // prescription_id
+            $this->prescription_id->HrefValue = "";
+            $this->prescription_id->TooltipValue = "";
+
+            // dispensation_type
+            $this->dispensation_type->HrefValue = "";
+            $this->dispensation_type->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
 
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // id
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2115,15 +2189,25 @@ class PrescriptionsGrid extends Prescriptions
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // created_by_user_id
+            // prescription_id
+            $this->prescription_id->setupEditAttributes();
+            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
+            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
+            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
+                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+            }
+
+            // dispensation_type
+            $this->dispensation_type->setupEditAttributes();
+            $this->dispensation_type->EditValue = $this->dispensation_type->options(true);
+            $this->dispensation_type->PlaceHolder = RemoveHtml($this->dispensation_type->caption());
 
             // status
             $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->EditValue = $this->status->options(true);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2132,18 +2216,31 @@ class PrescriptionsGrid extends Prescriptions
 
             // Add refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // prescription_id
+            $this->prescription_id->HrefValue = "";
+
+            // dispensation_type
+            $this->dispensation_type->HrefValue = "";
 
             // status
             $this->status->HrefValue = "";
 
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2197,15 +2294,25 @@ class PrescriptionsGrid extends Prescriptions
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // created_by_user_id
+            // prescription_id
+            $this->prescription_id->setupEditAttributes();
+            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
+            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
+            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
+                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+            }
+
+            // dispensation_type
+            $this->dispensation_type->setupEditAttributes();
+            $this->dispensation_type->EditValue = $this->dispensation_type->options(true);
+            $this->dispensation_type->PlaceHolder = RemoveHtml($this->dispensation_type->caption());
 
             // status
             $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->EditValue = $this->status->options(true);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // created_by_user_id
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2214,14 +2321,23 @@ class PrescriptionsGrid extends Prescriptions
 
             // Edit refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // prescription_id
+            $this->prescription_id->HrefValue = "";
+
+            // dispensation_type
+            $this->dispensation_type->HrefValue = "";
 
             // status
             $this->status->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2246,19 +2362,37 @@ class PrescriptionsGrid extends Prescriptions
             return true;
         }
         $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+            if ($this->prescription_id->Visible && $this->prescription_id->Required) {
+                if (!$this->prescription_id->IsDetailKey && EmptyValue($this->prescription_id->FormValue)) {
+                    $this->prescription_id->addErrorMessage(str_replace("%s", $this->prescription_id->caption(), $this->prescription_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->prescription_id->FormValue)) {
+                $this->prescription_id->addErrorMessage($this->prescription_id->getErrorMessage(false));
+            }
+            if ($this->dispensation_type->Visible && $this->dispensation_type->Required) {
+                if (!$this->dispensation_type->IsDetailKey && EmptyValue($this->dispensation_type->FormValue)) {
+                    $this->dispensation_type->addErrorMessage(str_replace("%s", $this->dispensation_type->caption(), $this->dispensation_type->RequiredErrorMessage));
                 }
             }
             if ($this->status->Visible && $this->status->Required) {
                 if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
                     $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+                }
+            }
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
             if ($this->date_created->Visible && $this->date_created->Required) {
@@ -2428,12 +2562,18 @@ class PrescriptionsGrid extends Prescriptions
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
+        // prescription_id
+        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, $this->prescription_id->ReadOnly);
+
+        // dispensation_type
+        $this->dispensation_type->setDbValueDef($rsnew, $this->dispensation_type->CurrentValue, $this->dispensation_type->ReadOnly);
 
         // status
         $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
@@ -2449,11 +2589,17 @@ class PrescriptionsGrid extends Prescriptions
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
+        if (isset($row['prescription_id'])) { // prescription_id
+            $this->prescription_id->CurrentValue = $row['prescription_id'];
+        }
+        if (isset($row['dispensation_type'])) { // dispensation_type
+            $this->dispensation_type->CurrentValue = $row['dispensation_type'];
         }
         if (isset($row['status'])) { // status
             $this->status->CurrentValue = $row['status'];
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
@@ -2467,10 +2613,10 @@ class PrescriptionsGrid extends Prescriptions
 
         // Set up foreign key field value from Session
         if ($this->getCurrentMasterTable() == "patient_visits") {
-            $this->visit_id->Visible = true; // Need to insert foreign key
-            $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
             $this->patient_id->Visible = true; // Need to insert foreign key
             $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+            $this->visit_id->Visible = true; // Need to insert foreign key
+            $this->visit_id->CurrentValue = $this->visit_id->getSessionValue();
         }
 
         // Get new row
@@ -2522,12 +2668,18 @@ class PrescriptionsGrid extends Prescriptions
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // created_by_user_id
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+        // prescription_id
+        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, false);
+
+        // dispensation_type
+        $this->dispensation_type->setDbValueDef($rsnew, $this->dispensation_type->CurrentValue, false);
 
         // status
         $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
@@ -2548,11 +2700,17 @@ class PrescriptionsGrid extends Prescriptions
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        if (isset($row['prescription_id'])) { // prescription_id
+            $this->prescription_id->setFormValue($row['prescription_id']);
+        }
+        if (isset($row['dispensation_type'])) { // dispensation_type
+            $this->dispensation_type->setFormValue($row['dispensation_type']);
         }
         if (isset($row['status'])) { // status
             $this->status->setFormValue($row['status']);
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
@@ -2579,11 +2737,11 @@ class PrescriptionsGrid extends Prescriptions
         $masterTblVar = $this->getCurrentMasterTable();
         if ($masterTblVar == "patient_visits") {
             $masterTbl = Container("patient_visits");
-            $this->visit_id->Visible = false;
+            $this->patient_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
-            $this->patient_id->Visible = false;
+            $this->visit_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
@@ -2606,6 +2764,10 @@ class PrescriptionsGrid extends Prescriptions
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_dispensation_type":
+                    break;
+                case "x_status":
                     break;
                 case "x_created_by_user_id":
                     break;
@@ -2644,7 +2806,7 @@ class PrescriptionsGrid extends Prescriptions
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add prescription");
+        $Language->setPhrase("addlink", "dispense medicine");
     }
 
     // Page Unload event

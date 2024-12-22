@@ -157,9 +157,9 @@ class PrescriptionsList extends Prescriptions
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
         $this->status->setVisibility();
+        $this->date_created->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -1097,9 +1097,9 @@ class PrescriptionsList extends Prescriptions
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1171,6 +1171,14 @@ class PrescriptionsList extends Prescriptions
         $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
         $this->created_by_user_id->AdvancedSearch->save();
 
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1186,14 +1194,6 @@ class PrescriptionsList extends Prescriptions
         $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
         $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
         $this->date_updated->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1316,9 +1316,8 @@ class PrescriptionsList extends Prescriptions
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->created_by_user_id); // created_by_user_id
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->updateSort($this->status); // status
+            $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1356,9 +1355,9 @@ class PrescriptionsList extends Prescriptions
                 $this->patient_id->setSort("");
                 $this->visit_id->setSort("");
                 $this->created_by_user_id->setSort("");
+                $this->status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
-                $this->status->setSort("");
             }
 
             // Reset start position
@@ -1711,9 +1710,8 @@ class PrescriptionsList extends Prescriptions
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "created_by_user_id");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
             $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "date_created");
         }
 
         // Set up custom actions
@@ -2156,9 +2154,9 @@ class PrescriptionsList extends Prescriptions
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -2169,9 +2167,9 @@ class PrescriptionsList extends Prescriptions
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -2221,11 +2219,11 @@ class PrescriptionsList extends Prescriptions
 
         // created_by_user_id
 
+        // status
+
         // date_created
 
         // date_updated
-
-        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2278,16 +2276,12 @@ class PrescriptionsList extends Prescriptions
                 $this->created_by_user_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -2297,17 +2291,13 @@ class PrescriptionsList extends Prescriptions
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
 
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
-
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+
+            // date_created
+            $this->date_created->HrefValue = "";
+            $this->date_created->TooltipValue = "";
         }
 
         // Call Row Rendered event

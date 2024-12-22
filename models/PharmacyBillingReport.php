@@ -179,10 +179,9 @@ class PharmacyBillingReport extends DbTable
         );
         $this->prescription_id->InputTextType = "text";
         $this->prescription_id->Raw = true;
-        $this->prescription_id->Nullable = false; // NOT NULL field
         $this->prescription_id->Required = true; // Required field
         $this->prescription_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->prescription_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->prescription_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['prescription_id'] = &$this->prescription_id;
 
         // dispensation_type

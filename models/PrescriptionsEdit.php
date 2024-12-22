@@ -133,9 +133,9 @@ class PrescriptionsEdit extends Prescriptions
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->created_by_user_id->setVisibility();
+        $this->status->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
-        $this->status->Visible = false;
     }
 
     // Constructor
@@ -823,9 +823,9 @@ class PrescriptionsEdit extends Prescriptions
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -836,9 +836,9 @@ class PrescriptionsEdit extends Prescriptions
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -885,14 +885,14 @@ class PrescriptionsEdit extends Prescriptions
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
 
+        // status
+        $this->status->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
         // date_updated
         $this->date_updated->RowCssClass = "row";
-
-        // status
-        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -945,16 +945,12 @@ class PrescriptionsEdit extends Prescriptions
                 $this->created_by_user_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
 
             // id
             $this->id->HrefValue = "";

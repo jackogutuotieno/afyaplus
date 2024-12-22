@@ -576,6 +576,11 @@ class PatientVisits extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "medicine_dispensation") {
+            $detailUrl = Container("medicine_dispensation")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
         if ($detailUrl == "") {
             $detailUrl = "patientvisitslist";
         }
@@ -2160,7 +2165,7 @@ class PatientVisits extends DbTable
         } else if (CurrentUserlevel() == 4){
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,lab_test_requests,lab_test_reports,laboratory_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 5){
-            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,prescriptions,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
+            $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,prescriptions,medicine_dispensation,pharmacy_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         } else if (CurrentUserlevel() == 6){
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,radiology_requests,radiology_reports,radiology_billing_report" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
         }

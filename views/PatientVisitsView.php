@@ -247,6 +247,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "PatientsLabReportGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("medicine_dispensation", explode(",", $Page->getCurrentDetailTable())) && $medicine_dispensation->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("medicine_dispensation", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("medicine_dispensation")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "MedicineDispensationGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

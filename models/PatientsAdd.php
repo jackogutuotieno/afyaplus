@@ -1483,13 +1483,13 @@ class PatientsAdd extends Patients
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("PatientVisitsGrid");
-        if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailAdd) {
+        $detailPage = Container("PatientsDependantsGrid");
+        if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("PatientsDependantsGrid");
-        if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailAdd) {
+        $detailPage = Container("PatientVisitsGrid");
+        if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
@@ -1589,20 +1589,20 @@ class PatientsAdd extends Patients
                 $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
-            $detailPage = Container("PatientVisitsGrid");
-            if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+            $detailPage = Container("PatientsDependantsGrid");
+            if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
                 $detailPage->patient_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
+                $Security->loadCurrentUserLevel($this->ProjectID . "patients_dependants"); // Load user level of detail table
                 $addRow = $detailPage->gridInsert();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
                 $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
-            $detailPage = Container("PatientsDependantsGrid");
-            if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+            $detailPage = Container("PatientVisitsGrid");
+            if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
                 $detailPage->patient_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "patients_dependants"); // Load user level of detail table
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
                 $addRow = $detailPage->gridInsert();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
@@ -1785,8 +1785,8 @@ class PatientsAdd extends Patients
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
-            if (in_array("patient_visits", $detailTblVar)) {
-                $detailPageObj = Container("PatientVisitsGrid");
+            if (in_array("patients_dependants", $detailTblVar)) {
+                $detailPageObj = Container("PatientsDependantsGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     if ($this->CopyRecord) {
@@ -1804,8 +1804,8 @@ class PatientsAdd extends Patients
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
-            if (in_array("patients_dependants", $detailTblVar)) {
-                $detailPageObj = Container("PatientsDependantsGrid");
+            if (in_array("patient_visits", $detailTblVar)) {
+                $detailPageObj = Container("PatientVisitsGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     if ($this->CopyRecord) {

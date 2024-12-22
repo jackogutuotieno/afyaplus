@@ -87,17 +87,6 @@ $medicine_dispensation->TableClass = "table table-bordered table-hover table-sm 
 </td>
         </tr>
 <?php } ?>
-<?php if ($medicine_dispensation->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $medicine_dispensation->date_updated->rowAttributes() ?>>
-            <td class="<?= $medicine_dispensation->TableLeftColumnClass ?>"><?= $medicine_dispensation->date_updated->caption() ?></td>
-            <td<?= $medicine_dispensation->date_updated->cellAttributes() ?>>
-<span id="el_medicine_dispensation_date_updated">
-<span<?= $medicine_dispensation->date_updated->viewAttributes() ?>>
-<?= $medicine_dispensation->date_updated->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>

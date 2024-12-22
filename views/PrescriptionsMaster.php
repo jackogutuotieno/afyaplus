@@ -32,28 +32,6 @@ $prescriptions->TableClass = "table table-bordered table-hover table-sm ew-table
 </td>
         </tr>
 <?php } ?>
-<?php if ($prescriptions->date_created->Visible) { // date_created ?>
-        <tr id="r_date_created"<?= $prescriptions->date_created->rowAttributes() ?>>
-            <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->date_created->caption() ?></td>
-            <td<?= $prescriptions->date_created->cellAttributes() ?>>
-<span id="el_prescriptions_date_created">
-<span<?= $prescriptions->date_created->viewAttributes() ?>>
-<?= $prescriptions->date_created->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($prescriptions->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $prescriptions->date_updated->rowAttributes() ?>>
-            <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->date_updated->caption() ?></td>
-            <td<?= $prescriptions->date_updated->cellAttributes() ?>>
-<span id="el_prescriptions_date_updated">
-<span<?= $prescriptions->date_updated->viewAttributes() ?>>
-<?= $prescriptions->date_updated->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($prescriptions->status->Visible) { // status ?>
         <tr id="r_status"<?= $prescriptions->status->rowAttributes() ?>>
             <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->status->caption() ?></td>
@@ -61,6 +39,17 @@ $prescriptions->TableClass = "table table-bordered table-hover table-sm ew-table
 <span id="el_prescriptions_status">
 <span<?= $prescriptions->status->viewAttributes() ?>>
 <?= $prescriptions->status->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($prescriptions->date_created->Visible) { // date_created ?>
+        <tr id="r_date_created"<?= $prescriptions->date_created->rowAttributes() ?>>
+            <td class="<?= $prescriptions->TableLeftColumnClass ?>"><?= $prescriptions->date_created->caption() ?></td>
+            <td<?= $prescriptions->date_created->cellAttributes() ?>>
+<span id="el_prescriptions_date_created">
+<span<?= $prescriptions->date_created->viewAttributes() ?>>
+<?= $prescriptions->date_created->getViewValue() ?></span>
 </span>
 </td>
         </tr>

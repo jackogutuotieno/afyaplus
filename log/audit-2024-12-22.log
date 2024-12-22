@@ -81,3 +81,24 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-22 14:25:19",/afyaplus/prescriptionsadd,4,A,prescription_details,number_of_days,6,,3
 "2024-12-22 14:25:19",/afyaplus/prescriptionsadd,4,A,prescription_details,id,6,,6
 "2024-12-22 14:25:19",/afyaplus/prescriptionsadd,4,"*** Batch insert successful ***",prescription_details,,,,
+"2024-12-22 14:32:40",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-22 14:32:51",/afyaplus/login,4,login,::1,,,,
+"2024-12-22 14:33:35",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-22 14:33:44",/afyaplus/login,6,login,::1,,,,
+"2024-12-22 14:39:27",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-22 14:43:47",/afyaplus/login,6,login,::1,,,,
+"2024-12-22 14:55:54",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-22 14:56:03",/afyaplus/login,6,login,::1,,,,
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,patient_id,1,,1
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,prescription_id,1,,6
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,dispensation_type,1,,Internal
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,status,1,,Done
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,created_by_user_id,1,,6
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,visit_id,1,,9
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,id,1,,1
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,"*** Batch insert begin ***",medicine_dispensation_details,,,,
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_stock_id,1,,1
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,quantity,1,,6
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,1,,1
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,1,,1
+"2024-12-22 14:58:49",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,

@@ -74,11 +74,23 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "patient_visits") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_medicine_dispensation_patient_id" for="x_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
+<?php if ($Page->patient_id->getSessionValue() != "") { ?>
+<span id="el_medicine_dispensation_patient_id">
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+</span>
+<?php } else { ?>
 <span id="el_medicine_dispensation_patient_id">
     <select
         id="x_patient_id"
@@ -118,6 +130,7 @@ loadjs.ready("fmedicine_dispensationadd", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -223,59 +236,10 @@ loadjs.ready("fmedicine_dispensationadd", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-    <div id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
-        <label id="elh_medicine_dispensation_created_by_user_id" for="x_created_by_user_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_by_user_id->caption() ?><?= $Page->created_by_user_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_by_user_id->cellAttributes() ?>>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->created_by_user_id->getDisplayValue($Page->created_by_user_id->EditValue) ?></span></span>
-<input type="hidden" data-table="medicine_dispensation" data-field="x_created_by_user_id" data-hidden="1" name="x_created_by_user_id" id="x_created_by_user_id" value="<?= HtmlEncode($Page->created_by_user_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_medicine_dispensation_created_by_user_id">
-    <select
-        id="x_created_by_user_id"
-        name="x_created_by_user_id"
-        class="form-select ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
-        <?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-        data-select2-id="fmedicine_dispensationadd_x_created_by_user_id"
-        <?php } ?>
-        data-table="medicine_dispensation"
-        data-field="x_created_by_user_id"
-        data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
-        <?= $Page->created_by_user_id->editAttributes() ?>>
-        <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id") ?>
-    </select>
-    <?= $Page->created_by_user_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage() ?></div>
-<?= $Page->created_by_user_id->Lookup->getParamTag($Page, "p_x_created_by_user_id") ?>
-<?php if (!$Page->created_by_user_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fmedicine_dispensationadd", function() {
-    var options = { name: "x_created_by_user_id", selectId: "fmedicine_dispensationadd_x_created_by_user_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fmedicine_dispensationadd.lists.created_by_user_id?.lookupOptions.length) {
-        options.data = { id: "x_created_by_user_id", form: "fmedicine_dispensationadd" };
-    } else {
-        options.ajax = { id: "x_created_by_user_id", form: "fmedicine_dispensationadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.medicine_dispensation.fields.created_by_user_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
 </div><!-- /page* -->
+    <?php if (strval($Page->visit_id->getSessionValue()) != "") { ?>
+    <input type="hidden" name="x_visit_id" id="x_visit_id" value="<?= HtmlEncode(strval($Page->visit_id->getSessionValue())) ?>">
+    <?php } ?>
 <?php
     if (in_array("medicine_dispensation_details", explode(",", $Page->getCurrentDetailTable())) && $medicine_dispensation_details->DetailAdd) {
 ?>

@@ -1527,13 +1527,13 @@ class PatientsEdit extends Patients
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("PatientVisitsGrid");
-        if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit) {
+        $detailPage = Container("PatientsDependantsGrid");
+        if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailEdit) {
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("PatientsDependantsGrid");
-        if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailEdit) {
+        $detailPage = Container("PatientVisitsGrid");
+        if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit) {
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
@@ -1658,15 +1658,15 @@ class PatientsEdit extends Patients
                 $editRow = $detailPage->gridUpdate();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
             }
-            $detailPage = Container("PatientVisitsGrid");
-            if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
-                $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
-                $editRow = $detailPage->gridUpdate();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-            }
             $detailPage = Container("PatientsDependantsGrid");
             if (in_array("patients_dependants", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
                 $Security->loadCurrentUserLevel($this->ProjectID . "patients_dependants"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+            $detailPage = Container("PatientVisitsGrid");
+            if (in_array("patient_visits", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_visits"); // Load user level of detail table
                 $editRow = $detailPage->gridUpdate();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
             }
@@ -1855,8 +1855,8 @@ class PatientsEdit extends Patients
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
-            if (in_array("patient_visits", $detailTblVar)) {
-                $detailPageObj = Container("PatientVisitsGrid");
+            if (in_array("patients_dependants", $detailTblVar)) {
+                $detailPageObj = Container("PatientsDependantsGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";
@@ -1870,8 +1870,8 @@ class PatientsEdit extends Patients
                     $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
                 }
             }
-            if (in_array("patients_dependants", $detailTblVar)) {
-                $detailPageObj = Container("PatientsDependantsGrid");
+            if (in_array("patient_visits", $detailTblVar)) {
+                $detailPageObj = Container("PatientVisitsGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";

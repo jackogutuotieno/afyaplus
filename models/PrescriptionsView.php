@@ -151,9 +151,9 @@ class PrescriptionsView extends Prescriptions
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->created_by_user_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
-        $this->status->setVisibility();
     }
 
     // Constructor
@@ -917,9 +917,9 @@ class PrescriptionsView extends Prescriptions
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -930,9 +930,9 @@ class PrescriptionsView extends Prescriptions
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -962,11 +962,11 @@ class PrescriptionsView extends Prescriptions
 
         // created_by_user_id
 
+        // status
+
         // date_created
 
         // date_updated
-
-        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1019,6 +1019,9 @@ class PrescriptionsView extends Prescriptions
                 $this->created_by_user_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1026,9 +1029,6 @@ class PrescriptionsView extends Prescriptions
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
 
             // id
             $this->id->HrefValue = "";
@@ -1042,6 +1042,10 @@ class PrescriptionsView extends Prescriptions
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
 
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
@@ -1049,10 +1053,6 @@ class PrescriptionsView extends Prescriptions
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event
