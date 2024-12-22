@@ -135,7 +135,7 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->lab_test_request_id->Visible = false;
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
@@ -1267,6 +1267,14 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1335,6 +1343,10 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
         $this->renderListOptionsExt();
@@ -1572,12 +1584,6 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'service_name' first before field var 'x_service_name'
         $val = $CurrentForm->hasValue("service_name") ? $CurrentForm->getValue("service_name") : $CurrentForm->getValue("x_service_name");
         if (!$this->service_name->IsDetailKey) {
@@ -1602,6 +1608,12 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
         }
         if ($CurrentForm->hasValue("o_cost")) {
             $this->cost->setOldValue($CurrentForm->getValue("o_cost"));
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -1792,10 +1804,6 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // service_name
             $this->service_name->HrefValue = "";
             $this->service_name->TooltipValue = "";
@@ -1804,8 +1812,6 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
             // service_name
             $this->service_name->setupEditAttributes();
             if (!$this->service_name->Raw) {
@@ -1824,19 +1830,12 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // service_name
             $this->service_name->HrefValue = "";
 
             // cost
             $this->cost->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
             // service_name
             $this->service_name->setupEditAttributes();
             if (!$this->service_name->Raw) {
@@ -1854,9 +1853,6 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
             }
 
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -1891,11 +1887,6 @@ class LaboratoryBillingReportDetailsGrid extends LaboratoryBillingReportDetails
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
             if ($this->service_name->Visible && $this->service_name->Required) {
                 if (!$this->service_name->IsDetailKey && EmptyValue($this->service_name->FormValue)) {
                     $this->service_name->addErrorMessage(str_replace("%s", $this->service_name->caption(), $this->service_name->RequiredErrorMessage));

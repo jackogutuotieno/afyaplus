@@ -23,7 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
             ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
         ])
@@ -86,9 +85,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_laboratory_billing_report_details_id" class="laboratory_billing_report_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Grid->service_name->headerCellClass() ?>"><div id="elh_laboratory_billing_report_details_service_name" class="laboratory_billing_report_details_service_name"><?= $Grid->renderFieldHeader($Grid->service_name) ?></div></th>
 <?php } ?>
@@ -131,33 +127,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_details_id" class="el_laboratory_billing_report_details_id"></span>
-<input type="hidden" data-table="laboratory_billing_report_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_details_id" class="el_laboratory_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="laboratory_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_laboratory_billing_report_details_id" class="el_laboratory_billing_report_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="laboratory_billing_report_details" data-field="x_id" data-hidden="1" name="flaboratory_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="flaboratory_billing_report_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="laboratory_billing_report_details" data-field="x_id" data-hidden="1" data-old name="flaboratory_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="flaboratory_billing_report_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="laboratory_billing_report_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Grid->service_name->Visible) { // service_name ?>
         <td data-name="service_name"<?= $Grid->service_name->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -253,10 +222,6 @@ $Grid->renderListOptions();
 // Render list options (footer, left)
 $Grid->ListOptions->render("footer", "left");
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" class="<?= $Grid->id->footerCellClass() ?>"><span id="elf_laboratory_billing_report_details_id" class="laboratory_billing_report_details_id">
-        </span></td>
-    <?php } ?>
     <?php if ($Grid->service_name->Visible) { // service_name ?>
         <td data-name="service_name" class="<?= $Grid->service_name->footerCellClass() ?>"><span id="elf_laboratory_billing_report_details_service_name" class="laboratory_billing_report_details_service_name">
         </span></td>

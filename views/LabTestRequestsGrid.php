@@ -334,7 +334,7 @@ loadjs.ready("flab_test_requestsgrid", function() {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -370,7 +370,7 @@ loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["flab_test_requestsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

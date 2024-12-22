@@ -145,7 +145,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->status->setVisibility();
@@ -1328,6 +1328,15 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
 
+        // Field id
+        $filter = $this->queryBuilderWhere("id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
         // Field patient_id
         $filter = $this->queryBuilderWhere("patient_id");
         if (!$filter) {
@@ -1516,6 +1525,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
+            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->created_by_user_id); // created_by_user_id
@@ -1810,6 +1820,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
+            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "created_by_user_id");
@@ -2458,6 +2469,10 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";

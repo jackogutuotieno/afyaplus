@@ -635,7 +635,7 @@
         <phrase id="fldcaption" value="Status" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Request DateTime" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1680,7 +1680,7 @@
         <phrase id="fldtagcaption5" value="Medicines Issued" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Queue Time" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1710,7 +1710,7 @@
     <table id="laboratory_billing_report">
       <phrase id="tblcaption" value="Laboratory Billing" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Bill No" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
@@ -1725,7 +1725,7 @@
         <phrase id="fldcaption" value="Prepared By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date" />
+        <phrase id="fldcaption" value="Bill Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1806,7 +1806,7 @@
         <phrase id="fldcaption" value="Status" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date" />
+        <phrase id="fldcaption" value="Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Date Updated" />

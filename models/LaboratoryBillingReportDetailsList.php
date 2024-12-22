@@ -145,7 +145,7 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->lab_test_request_id->Visible = false;
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
@@ -1260,7 +1260,6 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->cost); // cost
             $this->setStartRecordNumber(1); // Reset start position
@@ -1337,6 +1336,14 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1374,6 +1381,10 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
@@ -1444,7 +1455,6 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "cost");
         }
@@ -1969,10 +1979,6 @@ class LaboratoryBillingReportDetailsList extends LaboratoryBillingReportDetails
             // cost
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";

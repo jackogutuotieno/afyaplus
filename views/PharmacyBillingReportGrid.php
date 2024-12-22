@@ -410,7 +410,7 @@ loadjs.ready("fpharmacy_billing_reportgrid", function() {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpharmacy_billing_reportgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -446,7 +446,7 @@ loadjs.ready(["fpharmacy_billing_reportgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fpharmacy_billing_reportgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(0) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),

@@ -131,7 +131,7 @@ class LabTestRequestsAdd extends LabTestRequests
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->status->Visible = false;
         $this->date_created->Visible = false;
@@ -719,16 +719,6 @@ class LabTestRequestsAdd extends LabTestRequests
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
         $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
         if (!$this->created_by_user_id->IsDetailKey) {
@@ -748,7 +738,6 @@ class LabTestRequestsAdd extends LabTestRequests
     {
         global $CurrentForm;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
@@ -902,10 +891,6 @@ class LabTestRequestsAdd extends LabTestRequests
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -938,9 +923,6 @@ class LabTestRequestsAdd extends LabTestRequests
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -997,29 +979,12 @@ class LabTestRequestsAdd extends LabTestRequests
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-            } else {
-                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-                $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
-                }
-            }
-
             // created_by_user_id
 
             // Add refer script
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1048,14 +1013,6 @@ class LabTestRequestsAdd extends LabTestRequests
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
-            }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
                 if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
@@ -1184,12 +1141,14 @@ class LabTestRequestsAdd extends LabTestRequests
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
-        // visit_id
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
-
         // created_by_user_id
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
+
+        // visit_id
+        if ($this->visit_id->getSessionValue() != "") {
+            $rsnew['visit_id'] = $this->visit_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -1202,11 +1161,11 @@ class LabTestRequestsAdd extends LabTestRequests
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
         }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->setFormValue($row['visit_id']);
-        }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
+        }
+        if (isset($row['visit_id'])) { // visit_id
+            $this->visit_id->setFormValue($row['visit_id']);
         }
     }
 

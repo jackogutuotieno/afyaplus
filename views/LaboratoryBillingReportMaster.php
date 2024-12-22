@@ -10,6 +10,17 @@ $laboratory_billing_report->TableClass = "table table-bordered table-hover table
 <div class="ew-master-div">
 <table id="tbl_laboratory_billing_reportmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
+<?php if ($laboratory_billing_report->id->Visible) { // id ?>
+        <tr id="r_id"<?= $laboratory_billing_report->id->rowAttributes() ?>>
+            <td class="<?= $laboratory_billing_report->TableLeftColumnClass ?>"><?= $laboratory_billing_report->id->caption() ?></td>
+            <td<?= $laboratory_billing_report->id->cellAttributes() ?>>
+<span id="el_laboratory_billing_report_id">
+<span<?= $laboratory_billing_report->id->viewAttributes() ?>>
+<?= $laboratory_billing_report->id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($laboratory_billing_report->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $laboratory_billing_report->patient_id->rowAttributes() ?>>
             <td class="<?= $laboratory_billing_report->TableLeftColumnClass ?>"><?= $laboratory_billing_report->patient_id->caption() ?></td>
