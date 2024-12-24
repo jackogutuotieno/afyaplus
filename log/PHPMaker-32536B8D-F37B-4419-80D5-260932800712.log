@@ -24,7 +24,6 @@ C:\wamp64\www\afyaplus\controllers\ExportlogController.php
 C:\wamp64\www\afyaplus\controllers\FacilityOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FinancialsOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FrontOfficeOverviewController.php
-C:\wamp64\www\afyaplus\controllers\FullHaemogramReportController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\IncomeReportController.php
@@ -85,7 +84,6 @@ C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceSubcategoriesController.php
 C:\wamp64\www\afyaplus\controllers\SubscriptionsController.php
 C:\wamp64\www\afyaplus\controllers\TriageOverviewController.php
-C:\wamp64\www\afyaplus\controllers\UrinalysisReportController.php
 C:\wamp64\www\afyaplus\controllers\UsersController.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReport3Controller.php
 C:\wamp64\www\afyaplus\controllers\VaccinationsReportController.php
@@ -116,7 +114,6 @@ C:\wamp64\www\afyaplus\models\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\models\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\models\AppointmentsView.php
 C:\wamp64\www\afyaplus\models\Branding.php
-C:\wamp64\www\afyaplus\models\BrandingAdd.php
 C:\wamp64\www\afyaplus\models\BrandingDelete.php
 C:\wamp64\www\afyaplus\models\BrandingEdit.php
 C:\wamp64\www\afyaplus\models\BrandingList.php
@@ -186,12 +183,6 @@ C:\wamp64\www\afyaplus\models\ExportlogView.php
 C:\wamp64\www\afyaplus\models\FacilityOverview.php
 C:\wamp64\www\afyaplus\models\FinancialsOverview.php
 C:\wamp64\www\afyaplus\models\FrontOfficeOverview.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReport.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReportAdd.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReportDelete.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReportEdit.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReportList.php
-C:\wamp64\www\afyaplus\models\FullHaemogramReportView.php
 C:\wamp64\www\afyaplus\models\Income.php
 C:\wamp64\www\afyaplus\models\IncomeAdd.php
 C:\wamp64\www\afyaplus\models\IncomeDelete.php
@@ -460,12 +451,6 @@ C:\wamp64\www\afyaplus\models\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\models\SubscriptionsList.php
 C:\wamp64\www\afyaplus\models\SubscriptionsView.php
 C:\wamp64\www\afyaplus\models\TriageOverview.php
-C:\wamp64\www\afyaplus\models\UrinalysisReport.php
-C:\wamp64\www\afyaplus\models\UrinalysisReportAdd.php
-C:\wamp64\www\afyaplus\models\UrinalysisReportDelete.php
-C:\wamp64\www\afyaplus\models\UrinalysisReportEdit.php
-C:\wamp64\www\afyaplus\models\UrinalysisReportList.php
-C:\wamp64\www\afyaplus\models\UrinalysisReportView.php
 C:\wamp64\www\afyaplus\models\Users.php
 C:\wamp64\www\afyaplus\models\UsersAdd.php
 C:\wamp64\www\afyaplus\models\UsersDelete.php
@@ -551,7 +536,6 @@ C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
 C:\wamp64\www\afyaplus\src\Entity\Expense.php
 C:\wamp64\www\afyaplus\src\Entity\ExpensesReport.php
 C:\wamp64\www\afyaplus\src\Entity\Exportlog.php
-C:\wamp64\www\afyaplus\src\Entity\FullHaemogramReport.php
 C:\wamp64\www\afyaplus\src\Entity\Income.php
 C:\wamp64\www\afyaplus\src\Entity\IncomeReport.php
 C:\wamp64\www\afyaplus\src\Entity\Invoice.php
@@ -601,7 +585,6 @@ C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceSubcategory.php
 C:\wamp64\www\afyaplus\src\Entity\Subscription.php
-C:\wamp64\www\afyaplus\src\Entity\UrinalysisReport.php
 C:\wamp64\www\afyaplus\src\Entity\User.php
 C:\wamp64\www\afyaplus\src\Entity\VaccinationsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Vaccinationsreport.php
@@ -704,7 +687,6 @@ C:\wamp64\www\afyaplus\views\AppointmentsEdit.php
 C:\wamp64\www\afyaplus\views\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\views\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\views\AppointmentsView.php
-C:\wamp64\www\afyaplus\views\BrandingAdd.php
 C:\wamp64\www\afyaplus\views\BrandingDelete.php
 C:\wamp64\www\afyaplus\views\BrandingEdit.php
 C:\wamp64\www\afyaplus\views\BrandingList.php
@@ -763,11 +745,6 @@ C:\wamp64\www\afyaplus\views\ExportlogView.php
 C:\wamp64\www\afyaplus\views\FacilityOverview.php
 C:\wamp64\www\afyaplus\views\FinancialsOverview.php
 C:\wamp64\www\afyaplus\views\FrontOfficeOverview.php
-C:\wamp64\www\afyaplus\views\FullHaemogramReportAdd.php
-C:\wamp64\www\afyaplus\views\FullHaemogramReportDelete.php
-C:\wamp64\www\afyaplus\views\FullHaemogramReportEdit.php
-C:\wamp64\www\afyaplus\views\FullHaemogramReportList.php
-C:\wamp64\www\afyaplus\views\FullHaemogramReportView.php
 C:\wamp64\www\afyaplus\views\IncomeAdd.php
 C:\wamp64\www\afyaplus\views\IncomeDelete.php
 C:\wamp64\www\afyaplus\views\IncomeEdit.php
@@ -991,11 +968,6 @@ C:\wamp64\www\afyaplus\views\SubscriptionsEdit.php
 C:\wamp64\www\afyaplus\views\SubscriptionsList.php
 C:\wamp64\www\afyaplus\views\SubscriptionsView.php
 C:\wamp64\www\afyaplus\views\TriageOverview.php
-C:\wamp64\www\afyaplus\views\UrinalysisReportAdd.php
-C:\wamp64\www\afyaplus\views\UrinalysisReportDelete.php
-C:\wamp64\www\afyaplus\views\UrinalysisReportEdit.php
-C:\wamp64\www\afyaplus\views\UrinalysisReportList.php
-C:\wamp64\www\afyaplus\views\UrinalysisReportView.php
 C:\wamp64\www\afyaplus\views\UsersAdd.php
 C:\wamp64\www\afyaplus\views\UsersDelete.php
 C:\wamp64\www\afyaplus\views\UsersEdit.php

@@ -153,8 +153,8 @@ class PrescriptionDetailsList extends PrescriptionDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->prescription_id->setVisibility();
+        $this->id->Visible = false;
+        $this->prescription_id->Visible = false;
         $this->medicine_stock_id->setVisibility();
         $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
@@ -1362,8 +1362,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->prescription_id); // prescription_id
             $this->updateSort($this->medicine_stock_id); // medicine_stock_id
             $this->updateSort($this->method); // method
             $this->updateSort($this->dose_quantity); // dose_quantity
@@ -1445,12 +1443,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1473,6 +1465,14 @@ class PrescriptionDetailsList extends PrescriptionDetails
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1513,6 +1513,10 @@ class PrescriptionDetailsList extends PrescriptionDetails
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1536,19 +1540,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"prescription_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"prescription_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1648,8 +1639,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "prescription_id");
             $this->createColumnOption($option, "medicine_stock_id");
             $this->createColumnOption($option, "method");
             $this->createColumnOption($option, "dose_quantity");
@@ -2254,14 +2243,6 @@ class PrescriptionDetailsList extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
 
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";

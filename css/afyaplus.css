@@ -20637,9 +20637,10 @@ table td a {
   color: #540000;
 }
 
-/* #fpatient_visitsview .ew-add {
-	display: none !important;
-} */
+#fpatient_visitsview .ew-add {
+  display: none !important;
+}
+
 #fpatient_visitsview .ew-toolbar {
   display: none;
 }

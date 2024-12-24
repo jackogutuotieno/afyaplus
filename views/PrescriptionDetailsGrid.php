@@ -23,8 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["prescription_id", [fields.prescription_id.visible && fields.prescription_id.required ? ew.Validators.required(fields.prescription_id.caption) : null, ew.Validators.integer], fields.prescription_id.isInvalid],
             ["medicine_stock_id", [fields.medicine_stock_id.visible && fields.medicine_stock_id.required ? ew.Validators.required(fields.medicine_stock_id.caption) : null], fields.medicine_stock_id.isInvalid],
             ["method", [fields.method.visible && fields.method.required ? ew.Validators.required(fields.method.caption) : null], fields.method.isInvalid],
             ["dose_quantity", [fields.dose_quantity.visible && fields.dose_quantity.required ? ew.Validators.required(fields.dose_quantity.caption) : null, ew.Validators.integer], fields.dose_quantity.isInvalid],
@@ -38,7 +36,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["prescription_id",false],["medicine_stock_id",false],["method",false],["dose_quantity",false],["dose_type",false],["formulation",false],["dose_interval",false],["number_of_days",false]];
+                    fields = [["medicine_stock_id",false],["method",false],["dose_quantity",false],["dose_type",false],["formulation",false],["dose_interval",false],["number_of_days",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -97,12 +95,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_prescription_details_id" class="prescription_details_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->prescription_id->Visible) { // prescription_id ?>
-        <th data-name="prescription_id" class="<?= $Grid->prescription_id->headerCellClass() ?>"><div id="elh_prescription_details_prescription_id" class="prescription_details_prescription_id"><?= $Grid->renderFieldHeader($Grid->prescription_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <th data-name="medicine_stock_id" class="<?= $Grid->medicine_stock_id->headerCellClass() ?>"><div id="elh_prescription_details_medicine_stock_id" class="prescription_details_medicine_stock_id"><?= $Grid->renderFieldHeader($Grid->medicine_stock_id) ?></div></th>
 <?php } ?>
@@ -160,76 +152,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_id" class="el_prescription_details_id"></span>
-<input type="hidden" data-table="prescription_details" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_id" class="el_prescription_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="prescription_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_id" class="el_prescription_details_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="prescription_details" data-field="x_id" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_id" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="prescription_details" data-field="x_id" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_id" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="prescription_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
-    <?php if ($Grid->prescription_id->Visible) { // prescription_id ?>
-        <td data-name="prescription_id"<?= $Grid->prescription_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->prescription_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
-<span<?= $Grid->prescription_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->prescription_id->getDisplayValue($Grid->prescription_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_prescription_id" name="x<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
-<input type="<?= $Grid->prescription_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_prescription_id" id="x<?= $Grid->RowIndex ?>_prescription_id" data-table="prescription_details" data-field="x_prescription_id" value="<?= $Grid->prescription_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->prescription_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->prescription_id->formatPattern()) ?>"<?= $Grid->prescription_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->prescription_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="prescription_details" data-field="x_prescription_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_prescription_id" id="o<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->prescription_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
-<span<?= $Grid->prescription_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->prescription_id->getDisplayValue($Grid->prescription_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_prescription_id" name="x<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
-<input type="<?= $Grid->prescription_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_prescription_id" id="x<?= $Grid->RowIndex ?>_prescription_id" data-table="prescription_details" data-field="x_prescription_id" value="<?= $Grid->prescription_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->prescription_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->prescription_id->formatPattern()) ?>"<?= $Grid->prescription_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->prescription_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_prescription_details_prescription_id" class="el_prescription_details_prescription_id">
-<span<?= $Grid->prescription_id->viewAttributes() ?>>
-<?= $Grid->prescription_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="prescription_details" data-field="x_prescription_id" data-hidden="1" name="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_prescription_id" id="fprescription_detailsgrid$x<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->FormValue) ?>">
-<input type="hidden" data-table="prescription_details" data-field="x_prescription_id" data-hidden="1" data-old name="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_prescription_id" id="fprescription_detailsgrid$o<?= $Grid->RowIndex ?>_prescription_id" value="<?= HtmlEncode($Grid->prescription_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->medicine_stock_id->Visible) { // medicine_stock_id ?>
         <td data-name="medicine_stock_id"<?= $Grid->medicine_stock_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>

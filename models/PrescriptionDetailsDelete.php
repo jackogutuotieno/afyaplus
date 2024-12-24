@@ -129,8 +129,8 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->prescription_id->setVisibility();
+        $this->id->Visible = false;
+        $this->prescription_id->Visible = false;
         $this->medicine_stock_id->setVisibility();
         $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
@@ -754,14 +754,6 @@ class PrescriptionDetailsDelete extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
 
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";

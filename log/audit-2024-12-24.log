@@ -1,0 +1,87 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-12-24 12:12:37",/afyaplus/login,2,login,::1,,,,
+"2024-12-24 12:14:05",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-24 12:14:13",/afyaplus/login,5,login,::1,,,,
+"2024-12-24 12:15:42",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-24 13:23:44",/afyaplus/login,5,login,::1,,,,
+"2024-12-24 13:25:42",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-24 13:25:52",/afyaplus/login,2,login,::1,,,,
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,10,,4
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,10,,4
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,10,,6
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,10,,9
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,10,,1
+"2024-12-24 13:29:14",/afyaplus/patientvisitsadd,2,A,patient_visits,id,10,,10
+"2024-12-24 13:30:12",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-24 13:30:24",/afyaplus/login,5,login,::1,,,,
+"2024-12-24 13:33:36",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-24 13:33:50",/afyaplus/login,3,login,::1,,,,
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,patient_id,6,,4
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,height,6,,1.87
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,weight,6,,79
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,temperature,6,,37
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,pulse,6,,72
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,blood_pressure,6,,121/90
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,visit_id,6,,10
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,created_by_user_id,6,,3
+"2024-12-24 13:34:52",/afyaplus/patientvitalsadd,3,A,patient_vitals,id,6,,6
+"2024-12-24 13:35:06",/afyaplus/logout,3,logout,::1,,,,
+"2024-12-24 13:35:15",/afyaplus/login,4,login,::1,,,,
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,patient_id,5,,4
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,created_by_user_id,5,,4
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,visit_id,5,,10
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,id,5,,5
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,"*** Batch insert begin ***",lab_test_requests_details,,,,
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,6,,12
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,6,,5
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,6,,6
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,7,,34
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,7,,5
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,7,,7
+"2024-12-24 13:36:28",/afyaplus/labtestrequestsadd,4,"*** Batch insert successful ***",lab_test_requests_details,,,,
+"2024-12-24 13:36:42",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-24 13:36:50",/afyaplus/login,5,login,::1,,,,
+"2024-12-24 13:38:59",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,2,,5
+"2024-12-24 13:38:59",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,2,,"<p>Sample Report</p>"
+"2024-12-24 13:38:59",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,2,,5
+"2024-12-24 13:38:59",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,2,,2
+"2024-12-24 13:39:17",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-24 13:39:28",/afyaplus/login,4,login,::1,,,,
+"2024-12-24 13:46:55",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-24 13:47:02",/afyaplus/login,4,login,::1,,,,
+"2024-12-24 14:14:06",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-24 14:14:33",/afyaplus/login,4,login,::1,,,,
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescriptions,patient_id,7,,4
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescriptions,created_by_user_id,7,,4
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescriptions,visit_id,7,,10
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescriptions,id,7,,7
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,"*** Batch insert begin ***",prescription_details,,,,
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,prescription_id,7,,7
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,medicine_stock_id,7,,1
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,method,7,,Oral
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_quantity,7,,2
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_type,7,,grams
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,formulation,7,,Tabs
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_interval,7,,"Once/Day (OD)"
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,number_of_days,7,,2
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,A,prescription_details,id,7,,7
+"2024-12-24 14:17:56",/afyaplus/prescriptionsadd,4,"*** Batch insert successful ***",prescription_details,,,,
+"2024-12-24 14:26:00",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-24 14:26:06",/afyaplus/login,4,login,::1,,,,
+"2024-12-24 14:27:19",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-24 14:27:28",/afyaplus/login,6,login,::1,,,,
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,patient_id,2,,4
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,prescription_id,2,,7
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,dispensation_type,2,,Internal
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,status,2,,Done
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,created_by_user_id,2,,6
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,visit_id,2,,10
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,id,2,,2
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,"*** Batch insert begin ***",medicine_dispensation_details,,,,
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_stock_id,2,,1
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,quantity,2,,2
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,2,,2
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,2,,2
+"2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
+"2024-12-24 14:29:26",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-24 14:29:35",/afyaplus/login,5,login,::1,,,,

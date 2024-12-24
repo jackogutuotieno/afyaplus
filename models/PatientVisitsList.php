@@ -4112,18 +4112,18 @@ class PatientVisitsList extends PatientVisits
         $currDate = CurrentDate();
         if ($this->date_created->CurrentValue < $currDate)  {
             // dff
+            $this->ListOptions->Items["view"]->clear();
+            $this->ListOptions->Items["edit"]->clear();
+            $this->ListOptions->Items["delete"]->clear();
+            $this->ListOptions->Items["detail_patient_queue"]->clear();
+            $this->ListOptions->Items["detail_patient_vitals"]->clear();
+            $this->ListOptions->Items["detail_doctor_notes"]->clear();
+            $this->ListOptions->Items["detail_prescriptions"]->clear();
+            $this->ListOptions->Items["detail_cash_payments"]->clear();
+            $this->ListOptions->Items["detail_laboratory_billing_report"]->clear();
+            $this->ListOptions->Items["detail_radiology_billing_report"]->clear();
+            $this->ListOptions->Items["detail_pharmacy_billing_report"]->clear();
         } 
-        $this->ListOptions->Items["view"]->clear();
-        $this->ListOptions->Items["edit"]->clear();
-        $this->ListOptions->Items["delete"]->clear();
-        $this->ListOptions->Items["detail_patient_queue"]->clear();
-        $this->ListOptions->Items["detail_patient_vitals"]->clear();
-        $this->ListOptions->Items["detail_doctor_notes"]->clear();
-        $this->ListOptions->Items["detail_prescriptions"]->clear();
-        $this->ListOptions->Items["detail_cash_payments"]->clear();
-        $this->ListOptions->Items["detail_laboratory_billing_report"]->clear();
-        $this->ListOptions->Items["detail_radiology_billing_report"]->clear();
-        $this->ListOptions->Items["detail_pharmacy_billing_report"]->clear();
     }
 
     // Row Custom Action event

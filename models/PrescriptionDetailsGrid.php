@@ -143,8 +143,8 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->prescription_id->setVisibility();
+        $this->id->Visible = false;
+        $this->prescription_id->Visible = false;
         $this->medicine_stock_id->setVisibility();
         $this->method->setVisibility();
         $this->dose_quantity->setVisibility();
@@ -1183,14 +1183,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_prescription_id") &&
-            $CurrentForm->hasValue("o_prescription_id") &&
-            $this->prescription_id->CurrentValue != $this->prescription_id->DefaultValue &&
-            !($this->prescription_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->prescription_id->CurrentValue == $this->prescription_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_medicine_stock_id") &&
             $CurrentForm->hasValue("o_medicine_stock_id") &&
             $this->medicine_stock_id->CurrentValue != $this->medicine_stock_id->DefaultValue &&
@@ -1419,17 +1411,19 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
@@ -1499,6 +1493,10 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1521,19 +1519,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"prescription_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"prescription_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1803,25 +1788,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'prescription_id' first before field var 'x_prescription_id'
-        $val = $CurrentForm->hasValue("prescription_id") ? $CurrentForm->getValue("prescription_id") : $CurrentForm->getValue("x_prescription_id");
-        if (!$this->prescription_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->prescription_id->Visible = false; // Disable update for API request
-            } else {
-                $this->prescription_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_prescription_id")) {
-            $this->prescription_id->setOldValue($CurrentForm->getValue("o_prescription_id"));
-        }
-
         // Check field name 'medicine_stock_id' first before field var 'x_medicine_stock_id'
         $val = $CurrentForm->hasValue("medicine_stock_id") ? $CurrentForm->getValue("medicine_stock_id") : $CurrentForm->getValue("x_medicine_stock_id");
         if (!$this->medicine_stock_id->IsDetailKey) {
@@ -1912,6 +1878,12 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         if ($CurrentForm->hasValue("o_number_of_days")) {
             $this->number_of_days->setOldValue($CurrentForm->getValue("o_number_of_days"));
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
     }
 
     // Restore form values
@@ -1921,7 +1893,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->prescription_id->CurrentValue = $this->prescription_id->FormValue;
         $this->medicine_stock_id->CurrentValue = $this->medicine_stock_id->FormValue;
         $this->method->CurrentValue = $this->method->FormValue;
         $this->dose_quantity->CurrentValue = $this->dose_quantity->FormValue;
@@ -2182,14 +2153,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
             $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
-
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";
             $this->medicine_stock_id->TooltipValue = "";
@@ -2218,23 +2181,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             $this->number_of_days->HrefValue = "";
             $this->number_of_days->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            if ($this->prescription_id->getSessionValue() != "") {
-                $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
-                $this->prescription_id->OldValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
-            } else {
-                $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-                if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                    $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
-                }
-            }
-
             // medicine_stock_id
             $this->medicine_stock_id->setupEditAttributes();
             $curVal = trim(strval($this->medicine_stock_id->CurrentValue));
@@ -2300,12 +2246,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";
 
@@ -2327,25 +2267,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             // number_of_days
             $this->number_of_days->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            if ($this->prescription_id->getSessionValue() != "") {
-                $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
-                $this->prescription_id->OldValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
-            } else {
-                $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-                if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                    $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
-                }
-            }
-
             // medicine_stock_id
             $this->medicine_stock_id->setupEditAttributes();
             $curVal = trim(strval($this->medicine_stock_id->CurrentValue));
@@ -2411,12 +2332,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
             // Edit refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-
             // medicine_stock_id
             $this->medicine_stock_id->HrefValue = "";
 
@@ -2458,19 +2373,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->prescription_id->Visible && $this->prescription_id->Required) {
-                if (!$this->prescription_id->IsDetailKey && EmptyValue($this->prescription_id->FormValue)) {
-                    $this->prescription_id->addErrorMessage(str_replace("%s", $this->prescription_id->caption(), $this->prescription_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->prescription_id->FormValue)) {
-                $this->prescription_id->addErrorMessage($this->prescription_id->getErrorMessage(false));
-            }
             if ($this->medicine_stock_id->Visible && $this->medicine_stock_id->Required) {
                 if (!$this->medicine_stock_id->IsDetailKey && EmptyValue($this->medicine_stock_id->FormValue)) {
                     $this->medicine_stock_id->addErrorMessage(str_replace("%s", $this->medicine_stock_id->caption(), $this->medicine_stock_id->RequiredErrorMessage));
@@ -2665,12 +2567,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         global $Security;
         $rsnew = [];
 
-        // prescription_id
-        if ($this->prescription_id->getSessionValue() != "") {
-            $this->prescription_id->ReadOnly = true;
-        }
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, $this->prescription_id->ReadOnly);
-
         // medicine_stock_id
         $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->ReadOnly);
 
@@ -2700,9 +2596,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->CurrentValue = $row['prescription_id'];
-        }
         if (isset($row['medicine_stock_id'])) { // medicine_stock_id
             $this->medicine_stock_id->CurrentValue = $row['medicine_stock_id'];
         }
@@ -2805,9 +2698,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         global $Security;
         $rsnew = [];
 
-        // prescription_id
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, false);
-
         // medicine_stock_id
         $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, false);
 
@@ -2828,6 +2718,11 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
 
         // number_of_days
         $this->number_of_days->setDbValueDef($rsnew, $this->number_of_days->CurrentValue, false);
+
+        // prescription_id
+        if ($this->prescription_id->getSessionValue() != "") {
+            $rsnew['prescription_id'] = $this->prescription_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2837,9 +2732,6 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->setFormValue($row['prescription_id']);
-        }
         if (isset($row['medicine_stock_id'])) { // medicine_stock_id
             $this->medicine_stock_id->setFormValue($row['medicine_stock_id']);
         }
@@ -2860,6 +2752,9 @@ class PrescriptionDetailsGrid extends PrescriptionDetails
         }
         if (isset($row['number_of_days'])) { // number_of_days
             $this->number_of_days->setFormValue($row['number_of_days']);
+        }
+        if (isset($row['prescription_id'])) { // prescription_id
+            $this->prescription_id->setFormValue($row['prescription_id']);
         }
     }
 
