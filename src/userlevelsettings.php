@@ -862,7 +862,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","2","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","3","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","4","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","5","1903"],
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}medicine_dispensation_details","8","0"],

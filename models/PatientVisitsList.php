@@ -4192,6 +4192,7 @@ class PatientVisitsList extends PatientVisits
             $this->ListOptions->Items["detail_lab_test_requests"]->clear();
             $this->ListOptions->Items["detail_radiology_requests"]->clear();
             $this->ListOptions->Items["detail_patient_vaccinations"]->clear();
+            $this->ListOptions->Items["detail_medicine_dispensation"]->clear();
         } 
     }
 
