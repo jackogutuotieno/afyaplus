@@ -129,7 +129,7 @@ class IncomeDelete extends Income
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->income_title->setVisibility();
         $this->description->setVisibility();
         $this->cost->setVisibility();
@@ -680,10 +680,6 @@ class IncomeDelete extends Income
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // income_title
             $this->income_title->HrefValue = "";

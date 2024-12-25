@@ -228,9 +228,11 @@ class Income extends DbTable
         );
         $this->invoice_attachment->InputTextType = "text";
         $this->invoice_attachment->Raw = true;
+        $this->invoice_attachment->Nullable = false; // NOT NULL field
+        $this->invoice_attachment->Required = true; // Required field
         $this->invoice_attachment->Sortable = false; // Allow sort
         $this->invoice_attachment->UploadAllowedFileExt = "pdf";
-        $this->invoice_attachment->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->invoice_attachment->SearchOperators = ["=", "<>"];
         $this->invoice_attachment->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->invoice_attachment->Param, "CustomMsg");
         $this->Fields['invoice_attachment'] = &$this->invoice_attachment;
 

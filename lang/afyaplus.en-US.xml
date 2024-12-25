@@ -1837,7 +1837,7 @@
         <phrase id="custommsg" value="Attach invoice in pdf format" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Date Added" />
+        <phrase id="fldcaption" value="Submission Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

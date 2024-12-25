@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_income_id" class="income_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->income_title->Visible) { // income_title ?>
         <th class="<?= $Page->income_title->headerCellClass() ?>"><span id="elh_income_income_title" class="income_income_title"><?= $Page->income_title->caption() ?></span></th>
 <?php } ?>
@@ -89,14 +86,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->income_title->Visible) { // income_title ?>
         <td<?= $Page->income_title->cellAttributes() ?>>
 <span id="">

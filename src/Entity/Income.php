@@ -42,7 +42,7 @@ class Income extends AbstractEntity
     #[Column(type: "float")]
     private float $cost;
 
-    #[Column(name: "invoice_attachment", type: "blob", nullable: true)]
+    #[Column(name: "invoice_attachment", type: "blob")]
     private mixed $invoiceAttachment;
 
     #[Column(name: "date_created", type: "datetime")]

@@ -1958,6 +1958,8 @@ class PatientQueue extends DbTable
             $this->status->CellAttrs["style"] = "background-color: purple; color: white";
         } else if ($this->status->CurrentValue == "Doctor Consulted") {
             $this->status->CellAttrs["style"] = "background-color: magenta; color: white";
+        } else if ($this->status->CurrentValue == "Tests Performed") {
+            $this->status->CellAttrs["style"] = "background-color: #0099ff; color: white";
         } else if ($this->status->CurrentValue == "Medicines Issued") {
             $this->status->CellAttrs["style"] = "background-color: cyan; color: grey";
         } 
