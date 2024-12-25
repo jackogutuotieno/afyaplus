@@ -3302,5 +3302,8 @@ input[type="search"] {
 .invoices .ew-add {
 	display: none;
 }
+.ew-view.dropdown-item .icon-view::before {
+    color: black;
+}
 
 /*END_USER_STYLES*/

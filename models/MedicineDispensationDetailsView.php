@@ -719,7 +719,7 @@ class MedicineDispensationDetailsView extends MedicineDispensationDetails
         // Set up action default
         $option = $options["action"];
         $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
-        $option->UseDropDownButton = !IsJsonResponse() && false;
+        $option->UseDropDownButton = !IsJsonResponse() && true;
         $option->UseButtonGroup = true;
         $item = &$option->addGroupOption();
         $item->Body = "";
