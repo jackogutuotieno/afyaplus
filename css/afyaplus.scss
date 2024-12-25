@@ -3294,4 +3294,13 @@ input[type="search"] {
 	background-color: #cdcdcd;
 }
 
+/* ====== disabled add buttons of master/detail pages ====== */
+.medicine-dispensation .ew-add,
+.lab-test-requests .ew-add,
+.radiology-requests .ew-add,
+.prescriptions .ew-add,
+.invoices .ew-add {
+	display: none;
+}
+
 /*END_USER_STYLES*/

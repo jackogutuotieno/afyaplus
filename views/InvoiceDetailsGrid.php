@@ -26,7 +26,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["item", [fields.item.visible && fields.item.required ? ew.Validators.required(fields.item.caption) : null], fields.item.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
             ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid],
-            ["line_total", [fields.line_total.visible && fields.line_total.required ? ew.Validators.required(fields.line_total.caption) : null, ew.Validators.float], fields.line_total.isInvalid]
+            ["line_total", [fields.line_total.visible && fields.line_total.required ? ew.Validators.required(fields.line_total.caption) : null], fields.line_total.isInvalid]
         ])
 
         // Check empty row
@@ -227,8 +227,9 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_invoice_details_line_total" class="el_invoice_details_line_total">
-<input type="<?= $Grid->line_total->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_line_total" id="x<?= $Grid->RowIndex ?>_line_total" data-table="invoice_details" data-field="x_line_total" value="<?= $Grid->line_total->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->line_total->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->line_total->formatPattern()) ?>"<?= $Grid->line_total->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->line_total->getErrorMessage() ?></div>
+<span<?= $Grid->line_total->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->line_total->getDisplayValue($Grid->line_total->EditValue))) ?>"></span>
+<input type="hidden" data-table="invoice_details" data-field="x_line_total" data-hidden="1" name="x<?= $Grid->RowIndex ?>_line_total" id="x<?= $Grid->RowIndex ?>_line_total" value="<?= HtmlEncode($Grid->line_total->CurrentValue) ?>">
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>

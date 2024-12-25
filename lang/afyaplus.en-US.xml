@@ -1682,8 +1682,10 @@
         <phrase id="fldtagcaption3" value="Doctor Consulted" />
         <phrase id="fldtagvalue4" value="Tests Performed" />
         <phrase id="fldtagcaption4" value="Tests Performed" />
-        <phrase id="fldtagvalue5" value="Medicines Issued" />
-        <phrase id="fldtagcaption5" value="Medicines Issued" />
+        <phrase id="fldtagvalue5" value="Medicines Prescribed" />
+        <phrase id="fldtagcaption5" value="Medicines Prescribed" />
+        <phrase id="fldtagvalue6" value="Medicines Issued" />
+        <phrase id="fldtagcaption6" value="Medicines Issued" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Time" />

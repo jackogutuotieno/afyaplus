@@ -1467,10 +1467,7 @@ class InvoiceDetails extends DbTable
         // line_total
         $this->line_total->setupEditAttributes();
         $this->line_total->EditValue = $this->line_total->CurrentValue;
-        $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
-        if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
-            $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
-        }
+        $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, $this->line_total->formatPattern());
 
         // date_created
         $this->date_created->setupEditAttributes();

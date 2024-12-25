@@ -246,7 +246,7 @@ class PatientQueue extends DbTable
         $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->status->Lookup = new Lookup($this->status, 'patient_queue', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->status->OptionCount = 5;
+        $this->status->OptionCount = 6;
         $this->status->SearchOperators = ["=", "<>"];
         $this->Fields['status'] = &$this->status;
 
@@ -1960,6 +1960,8 @@ class PatientQueue extends DbTable
             $this->status->CellAttrs["style"] = "background-color: magenta; color: white";
         } else if ($this->status->CurrentValue == "Tests Performed") {
             $this->status->CellAttrs["style"] = "background-color: #0099ff; color: white";
+        } else if ($this->status->CurrentValue == "Medicines Prescribed") {
+            $this->status->CellAttrs["style"] = "background-color: cyan; color: #b1802c";
         } else if ($this->status->CurrentValue == "Medicines Issued") {
             $this->status->CellAttrs["style"] = "background-color: cyan; color: grey";
         } 

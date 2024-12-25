@@ -1801,7 +1801,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
             if (IsApi() && $val === null) {
                 $this->line_total->Visible = false; // Disable update for API request
             } else {
-                $this->line_total->setFormValue($val, true, $validate);
+                $this->line_total->setFormValue($val);
             }
         }
         if ($CurrentForm->hasValue("o_line_total")) {
@@ -2119,10 +2119,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
             // line_total
             $this->line_total->setupEditAttributes();
             $this->line_total->EditValue = $this->line_total->CurrentValue;
-            $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
-            if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
-                $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
-            }
+            $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, $this->line_total->formatPattern());
 
             // Edit refer script
 
@@ -2137,6 +2134,7 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
             // line_total
             $this->line_total->HrefValue = "";
+            $this->line_total->TooltipValue = "";
         } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
                     $this->line_total->Total = 0; // Initialize total
         } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
@@ -2190,9 +2188,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
                 if (!$this->line_total->IsDetailKey && EmptyValue($this->line_total->FormValue)) {
                     $this->line_total->addErrorMessage(str_replace("%s", $this->line_total->caption(), $this->line_total->RequiredErrorMessage));
                 }
-            }
-            if (!CheckNumber($this->line_total->FormValue)) {
-                $this->line_total->addErrorMessage($this->line_total->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2355,9 +2350,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
-
-        // line_total
-        $this->line_total->setDbValueDef($rsnew, $this->line_total->CurrentValue, $this->line_total->ReadOnly);
         return $rsnew;
     }
 
@@ -2375,9 +2367,6 @@ class InvoiceDetailsGrid extends InvoiceDetails
         }
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
-        }
-        if (isset($row['line_total'])) { // line_total
-            $this->line_total->CurrentValue = $row['line_total'];
         }
     }
 
