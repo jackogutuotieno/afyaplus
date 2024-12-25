@@ -20664,4 +20664,13 @@ td[data-name=detail_patients_dependants] {
   display: none;
 }
 
+.tbl-invoices p {
+  font-weight: 700;
+}
+
+.tbl-invoices span {
+  font-weight: 400;
+  display: blockquote;
+}
+
 /*END_USER_STYLES*/

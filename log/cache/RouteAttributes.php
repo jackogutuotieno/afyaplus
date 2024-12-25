@@ -157,6 +157,9 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -301,6 +304,21 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1782,6 +1800,9 @@
                 '/invoicedetailsview[/{id}]',
                 '/invoicedetailsedit[/{id}]',
                 '/invoicedetailsdelete[/{id}]',
+                '/invoicereportlist[/{id}]',
+                '/invoicereportview[/{id}]',
+                '/invoicereportdetailslist[/{id}]',
                 '/invoicereportslist[/{id}]',
                 '/invoiceslist[/{id}]',
                 '/invoicesadd[/{id}]',
@@ -2068,6 +2089,9 @@
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:view',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:edit',
                 'PHPMaker2024\\afyaplus\\InvoiceDetailsController:delete',
+                'PHPMaker2024\\afyaplus\\InvoiceReportController:list',
+                'PHPMaker2024\\afyaplus\\InvoiceReportController:view',
+                'PHPMaker2024\\afyaplus\\InvoiceReportDetailsController:list',
                 'PHPMaker2024\\afyaplus\\InvoiceReportsController:list',
                 'PHPMaker2024\\afyaplus\\InvoicesController:list',
                 'PHPMaker2024\\afyaplus\\InvoicesController:add',
@@ -2278,6 +2302,15 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3206,6 +3239,9 @@
                 'view.invoice_details',
                 'edit.invoice_details',
                 'delete.invoice_details',
+                'list.invoice_report',
+                'view.invoice_report',
+                'list.invoice_report_details',
                 'list.invoice_reports',
                 'list.invoices',
                 'add.invoices',
@@ -3416,6 +3452,9 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3988,6 +4027,9 @@
         $o[281],
         $o[282],
         $o[283],
+        $o[284],
+        $o[285],
+        $o[286],
     ],
     []
 );

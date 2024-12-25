@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "brandingdelete";
+    public $CurrentPageName = "invoicereportdetailsgrid";
 
     // Page headings
     public $Heading = "";

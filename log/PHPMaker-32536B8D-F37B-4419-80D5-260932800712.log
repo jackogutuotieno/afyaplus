@@ -28,6 +28,8 @@ C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\IncomeReportController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceDetailsController.php
+C:\wamp64\www\afyaplus\controllers\InvoiceReportController.php
+C:\wamp64\www\afyaplus\controllers\InvoiceReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceReportsController.php
 C:\wamp64\www\afyaplus\controllers\InvoicesController.php
 C:\wamp64\www\afyaplus\controllers\LabTestReportsController.php
@@ -200,6 +202,12 @@ C:\wamp64\www\afyaplus\models\InvoiceDetailsEdit.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsGrid.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsList.php
 C:\wamp64\www\afyaplus\models\InvoiceDetailsView.php
+C:\wamp64\www\afyaplus\models\InvoiceReport.php
+C:\wamp64\www\afyaplus\models\InvoiceReportDetails.php
+C:\wamp64\www\afyaplus\models\InvoiceReportDetailsGrid.php
+C:\wamp64\www\afyaplus\models\InvoiceReportDetailsList.php
+C:\wamp64\www\afyaplus\models\InvoiceReportList.php
+C:\wamp64\www\afyaplus\models\InvoiceReportView.php
 C:\wamp64\www\afyaplus\models\InvoiceReports.php
 C:\wamp64\www\afyaplus\models\InvoiceReportsList.php
 C:\wamp64\www\afyaplus\models\Invoices.php
@@ -358,6 +366,7 @@ C:\wamp64\www\afyaplus\models\PatientsRadiologyReports.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetails.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsGrid.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsList.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsGrid.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsList.php
 C:\wamp64\www\afyaplus\models\PatientsView.php
 C:\wamp64\www\afyaplus\models\PaymentMethods.php
@@ -541,6 +550,7 @@ C:\wamp64\www\afyaplus\src\Entity\IncomeReport.php
 C:\wamp64\www\afyaplus\src\Entity\Invoice.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceDetail.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceReport.php
+C:\wamp64\www\afyaplus\src\Entity\InvoiceReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestReport.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequest.php
 C:\wamp64\www\afyaplus\src\Entity\LabTestRequestsDetail.php
@@ -591,6 +601,7 @@ C:\wamp64\www\afyaplus\src\Entity\Vaccinationsreport.php
 C:\wamp64\www\afyaplus\src\Entity\VisitType.php
 C:\wamp64\www\afyaplus\src\Entity\VisitsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Vitalsreport.php
+C:\wamp64\www\afyaplus\src\Entity\_InvoiceReport.php
 C:\wamp64\www\afyaplus\src\Entity\_RadiologyReport.php
 C:\wamp64\www\afyaplus\src\ExportCsv.php
 C:\wamp64\www\afyaplus\src\ExportEmail.php
@@ -758,6 +769,11 @@ C:\wamp64\www\afyaplus\views\InvoiceDetailsEdit.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsGrid.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsList.php
 C:\wamp64\www\afyaplus\views\InvoiceDetailsView.php
+C:\wamp64\www\afyaplus\views\InvoiceReportDetailsGrid.php
+C:\wamp64\www\afyaplus\views\InvoiceReportDetailsList.php
+C:\wamp64\www\afyaplus\views\InvoiceReportList.php
+C:\wamp64\www\afyaplus\views\InvoiceReportMaster.php
+C:\wamp64\www\afyaplus\views\InvoiceReportView.php
 C:\wamp64\www\afyaplus\views\InvoiceReportsList.php
 C:\wamp64\www\afyaplus\views\InvoicesAdd.php
 C:\wamp64\www\afyaplus\views\InvoicesDelete.php
@@ -888,6 +904,7 @@ C:\wamp64\www\afyaplus\views\PatientsList.php
 C:\wamp64\www\afyaplus\views\PatientsMaster.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsDetailsGrid.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsDetailsList.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsGrid.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsList.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsMaster.php
 C:\wamp64\www\afyaplus\views\PatientsView.php

@@ -85,3 +85,4 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-24 14:28:53",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
 "2024-12-24 14:29:26",/afyaplus/logout,6,logout,::1,,,,
 "2024-12-24 14:29:35",/afyaplus/login,5,login,::1,,,,
+"2024-12-24 14:31:51",/afyaplus/logout,5,logout,::1,,,,

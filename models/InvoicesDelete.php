@@ -136,7 +136,7 @@ class InvoicesDelete extends Invoices
         $this->payment_status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -783,10 +783,6 @@ class InvoicesDelete extends Invoices
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -76,17 +76,6 @@ $invoices->TableClass = "table table-bordered table-hover table-sm ew-table ew-m
 </td>
         </tr>
 <?php } ?>
-<?php if ($invoices->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $invoices->date_updated->rowAttributes() ?>>
-            <td class="<?= $invoices->TableLeftColumnClass ?>"><?= $invoices->date_updated->caption() ?></td>
-            <td<?= $invoices->date_updated->cellAttributes() ?>>
-<span id="el_invoices_date_updated">
-<span<?= $invoices->date_updated->viewAttributes() ?>>
-<?= $invoices->date_updated->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>
