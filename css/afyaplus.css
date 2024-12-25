@@ -20620,10 +20620,9 @@ td button, .btn-primary {
   margin-bottom: 0.5rem;
 }
 
-[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
-  background-color: #08819a;
-}
-
+/* [type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
+	background-color: #08819a;
+} */
 .counters .card-header {
   font-size: 0.9rem;
   font-weight: 600;

@@ -185,3 +185,4 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-25 19:27:01",/afyaplus/incomeadd,7,A,income,cost,2,,3150
 "2024-12-25 19:27:01",/afyaplus/incomeadd,7,A,income,id,2,,2
 "2024-12-25 19:27:35",/afyaplus/logout,7,logout,::1,,,,
+"2024-12-25 19:28:43",/afyaplus/login,6,login,::1,,,,

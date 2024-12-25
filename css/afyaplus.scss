@@ -3247,9 +3247,10 @@ td button, .btn-primary  {
 	backgground-color: rgba(0,0,0,.4);
 	margin-bottom: .5rem;
 }
-[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
+
+/* [type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
 	background-color: #08819a;
-}
+} */
 .counters .card-header {
 	font-size: .9rem;
 	font-weight: 600;
