@@ -381,6 +381,7 @@ C:\wamp64\www\afyaplus\models\PharmacyBillingReport.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetails.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\models\PharmacyBillingReportDetailsView.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportGrid.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportList.php
 C:\wamp64\www\afyaplus\models\PharmacyBillingReportView.php
@@ -918,6 +919,7 @@ C:\wamp64\www\afyaplus\views\PaymentMethodsView.php
 C:\wamp64\www\afyaplus\views\PersonalData.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsList.php
+C:\wamp64\www\afyaplus\views\PharmacyBillingReportDetailsView.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportGrid.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportList.php
 C:\wamp64\www\afyaplus\views\PharmacyBillingReportMaster.php

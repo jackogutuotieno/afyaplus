@@ -288,6 +288,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1728,6 +1729,11 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -1942,6 +1948,7 @@
                 '/pharmacybillingreportlist[/{id}]',
                 '/pharmacybillingreportview[/{id}]',
                 '/pharmacybillingreportdetailslist[/{id}]',
+                '/pharmacybillingreportdetailsview[/{id}]',
                 '/pharmacyoverview',
                 '/prescriptiondetailslist[/{id}]',
                 '/prescriptiondetailsadd[/{id}]',
@@ -2232,6 +2239,7 @@
                 'PHPMaker2024\\afyaplus\\PharmacyBillingReportController:list',
                 'PHPMaker2024\\afyaplus\\PharmacyBillingReportController:view',
                 'PHPMaker2024\\afyaplus\\PharmacyBillingReportDetailsController:list',
+                'PHPMaker2024\\afyaplus\\PharmacyBillingReportDetailsController:view',
                 'PHPMaker2024\\afyaplus\\PharmacyOverviewController:dashboard',
                 'PHPMaker2024\\afyaplus\\PrescriptionDetailsController:list',
                 'PHPMaker2024\\afyaplus\\PrescriptionDetailsController:add',
@@ -3172,6 +3180,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3386,6 +3397,7 @@
                 'list.pharmacy_billing_report',
                 'view.pharmacy_billing_report',
                 'list.pharmacy_billing_report_details',
+                'view.pharmacy_billing_report_details',
                 'dashboard.Pharmacy_Overview',
                 'list.prescription_details',
                 'add.prescription_details',
@@ -3464,6 +3476,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -4044,6 +4057,7 @@
         $o[285],
         $o[286],
         $o[287],
+        $o[288],
     ],
     []
 );

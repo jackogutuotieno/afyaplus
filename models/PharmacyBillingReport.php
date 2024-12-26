@@ -268,10 +268,10 @@ class PharmacyBillingReport extends DbTable
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 3, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            3, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -284,7 +284,7 @@ class PharmacyBillingReport extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(3), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
@@ -1810,11 +1810,12 @@ class PharmacyBillingReport extends DbTable
         $current_date = CurrentDate();
         if ($this->date_created->CurrentValue > $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New Dispense"; 
+            $this->status->ViewValue = "New Bill"; 
         } else if ($this->date_created->CurrentValue < $current_date) {
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
-            $this->status->ViewValue = "Past Dispense"; 
+            $this->status->ViewValue = "Billed"; 
         } 
+        $this->patient_id->ViewValue = '<a href="pharmacybillingreportview/' . $this->id->ViewValue . '?showdetail=pharmacy_billing_report_details" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
     }
 
     // User ID Filtering event

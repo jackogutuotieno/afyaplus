@@ -122,3 +122,49 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-26 09:30:34",/afyaplus/login,4,login,::1,,,,
 "2024-12-26 09:49:19",/afyaplus/logout,4,logout,::1,,,,
 "2024-12-26 09:49:44",/afyaplus/login,4,login,::1,,,,
+"2024-12-26 09:55:30",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-26 09:55:46",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 09:55:56",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 10:33:20",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 10:33:31",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 10:34:04",/afyaplus/login,4,login,::1,,,,
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescriptions,patient_id,9,,8
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescriptions,created_by_user_id,9,,4
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescriptions,visit_id,9,,12
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescriptions,id,9,,9
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,"*** Batch insert begin ***",prescription_details,,,,
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,medicine_stock_id,9,,2
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,method,9,,Oral
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_quantity,9,,3
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_type,9,,units
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,formulation,9,,Tabs
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_interval,9,,"Once/Day (OD)"
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,number_of_days,9,,3
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,prescription_id,9,,9
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,A,prescription_details,id,9,,9
+"2024-12-26 10:35:43",/afyaplus/prescriptionsadd,4,"*** Batch insert successful ***",prescription_details,,,,
+"2024-12-26 10:37:29",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-26 10:37:58",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,patient_id,4,,8
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,prescription_id,4,,9
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,dispensation_type,4,,Internal
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,status,4,,Done
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,created_by_user_id,4,,6
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,visit_id,4,,12
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,id,4,,4
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,"*** Batch insert begin ***",medicine_dispensation_details,,,,
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_stock_id,4,,2
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,quantity,4,,3
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,4,,4
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,4,,4
+"2024-12-26 10:40:38",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
+"2024-12-26 10:48:05",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 10:48:16",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 10:54:24",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 10:54:44",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 11:03:51",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 11:04:09",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 11:10:06",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 11:10:16",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 11:33:35",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 11:33:49",/afyaplus/login,6,login,::1,,,,

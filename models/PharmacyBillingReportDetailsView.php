@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class PharmacyBillingReportView extends PharmacyBillingReport
+class PharmacyBillingReportDetailsView extends PharmacyBillingReportDetails
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PharmacyBillingReportView";
+    public $PageObjName = "PharmacyBillingReportDetailsView";
 
     // View file path
     public $View = null;
@@ -38,7 +38,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "pharmacybillingreportview";
+    public $CurrentPageName = "pharmacybillingreportdetailsview";
 
     // Page URLs
     public $AddUrl;
@@ -140,13 +140,11 @@ class PharmacyBillingReportView extends PharmacyBillingReport
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->prescription_id->setVisibility();
-        $this->dispensation_type->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->status->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->medicine_dispensation_id->setVisibility();
+        $this->brand_name->setVisibility();
+        $this->selling_price_per_unit->setVisibility();
+        $this->quantity->setVisibility();
+        $this->line_total->setVisibility();
     }
 
     // Constructor
@@ -154,14 +152,11 @@ class PharmacyBillingReportView extends PharmacyBillingReport
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'pharmacy_billing_report';
-        $this->TableName = 'pharmacy_billing_report';
+        $this->TableVar = 'pharmacy_billing_report_details';
+        $this->TableName = 'pharmacy_billing_report_details';
 
         // Table CSS class
-        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table d-none";
-
-        // Custom template
-        $this->UseCustomTemplate = true;
+        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -169,9 +164,9 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         // Language object
         $Language = Container("app.language");
 
-        // Table object (pharmacy_billing_report)
-        if (!isset($GLOBALS["pharmacy_billing_report"]) || $GLOBALS["pharmacy_billing_report"]::class == PROJECT_NAMESPACE . "pharmacy_billing_report") {
-            $GLOBALS["pharmacy_billing_report"] = &$this;
+        // Table object (pharmacy_billing_report_details)
+        if (!isset($GLOBALS["pharmacy_billing_report_details"]) || $GLOBALS["pharmacy_billing_report_details"]::class == PROJECT_NAMESPACE . "pharmacy_billing_report_details") {
+            $GLOBALS["pharmacy_billing_report_details"] = &$this;
         }
 
         // Set up record key
@@ -181,7 +176,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'pharmacy_billing_report');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'pharmacy_billing_report_details');
         }
 
         // Start timer
@@ -301,7 +296,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "pharmacybillingreportview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "pharmacybillingreportdetailsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -401,6 +396,9 @@ class PharmacyBillingReportView extends PharmacyBillingReport
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -561,10 +559,6 @@ class PharmacyBillingReportView extends PharmacyBillingReport
             $this->InlineDelete = true;
         }
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->created_by_user_id);
-
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -587,7 +581,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
         } elseif (!$loadCurrentRecord) {
-            $returnUrl = "pharmacybillingreportlist"; // Return to list
+            $returnUrl = "pharmacybillingreportdetailslist"; // Return to list
         }
 
         // Get action
@@ -609,7 +603,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "pharmacybillingreportlist"; // No matching record, return to list
+                        $returnUrl = "pharmacybillingreportdetailslist"; // No matching record, return to list
                     }
                 break;
         }
@@ -630,9 +624,6 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         $this->RowType = RowType::VIEW;
         $this->resetAttributes();
         $this->renderRow();
-
-        // Set up detail parameters
-        $this->setupDetailParms();
 
         // Normal return
         if (IsApi()) {
@@ -684,77 +675,6 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         */
         $options = &$this->OtherOptions;
         $option = $options["action"];
-        $option = $options["detail"];
-        $detailTableLink = "";
-        $detailViewTblVar = "";
-        $detailCopyTblVar = "";
-        $detailEditTblVar = "";
-
-        // "detail_pharmacy_billing_report_details"
-        $item = &$option->add("detail_pharmacy_billing_report_details");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("pharmacy_billing_report_details", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("pharmacybillingreportdetailslist?" . Config("TABLE_SHOW_MASTER") . "=pharmacy_billing_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("PharmacyBillingReportDetailsGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'pharmacy_billing_report')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=pharmacy_billing_report_details"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "pharmacy_billing_report_details";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'pharmacy_billing_report_details');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "pharmacy_billing_report_details";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
-        // Multiple details
-        if ($this->ShowMultipleDetails) {
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
-            $links = "";
-            if ($detailViewTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            }
-            if ($detailEditTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            }
-            if ($detailCopyTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar))) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
-                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
-            }
-            $body .= "</div>";
-            // Multiple details
-            $item = &$option->add("details");
-            $item->Body = $body;
-        }
-
-        // Set up detail default
-        $option = $options["detail"];
-        $options["detail"]->DropDownButtonPhrase = $Language->phrase("ButtonDetails");
-        $ar = explode(",", $detailTableLink);
-        $cnt = count($ar);
-        $option->UseDropDownButton = ($cnt > 1);
-        $option->UseButtonGroup = true;
-        $item = &$option->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
 
         // Set up action default
         $option = $options["action"];
@@ -860,13 +780,11 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->prescription_id->setDbValue($row['prescription_id']);
-        $this->dispensation_type->setDbValue($row['dispensation_type']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
-        $this->status->setDbValue($row['status']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->medicine_dispensation_id->setDbValue($row['medicine_dispensation_id']);
+        $this->brand_name->setDbValue($row['brand_name']);
+        $this->selling_price_per_unit->setDbValue($row['selling_price_per_unit']);
+        $this->quantity->setDbValue($row['quantity']);
+        $this->line_total->setDbValue($row['line_total']);
     }
 
     // Return a row with default values
@@ -874,13 +792,11 @@ class PharmacyBillingReportView extends PharmacyBillingReport
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['prescription_id'] = $this->prescription_id->DefaultValue;
-        $row['dispensation_type'] = $this->dispensation_type->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['medicine_dispensation_id'] = $this->medicine_dispensation_id->DefaultValue;
+        $row['brand_name'] = $this->brand_name->DefaultValue;
+        $row['selling_price_per_unit'] = $this->selling_price_per_unit->DefaultValue;
+        $row['quantity'] = $this->quantity->DefaultValue;
+        $row['line_total'] = $this->line_total->DefaultValue;
         return $row;
     }
 
@@ -904,122 +820,68 @@ class PharmacyBillingReportView extends PharmacyBillingReport
 
         // id
 
-        // patient_id
+        // medicine_dispensation_id
 
-        // prescription_id
+        // brand_name
 
-        // dispensation_type
+        // selling_price_per_unit
 
-        // created_by_user_id
+        // quantity
 
-        // status
-
-        // date_created
-
-        // date_updated
+        // line_total
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                    } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->patient_id->ViewValue = null;
-            }
+            // medicine_dispensation_id
+            $this->medicine_dispensation_id->ViewValue = $this->medicine_dispensation_id->CurrentValue;
+            $this->medicine_dispensation_id->ViewValue = FormatNumber($this->medicine_dispensation_id->ViewValue, $this->medicine_dispensation_id->formatPattern());
 
-            // prescription_id
-            $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-            $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+            // brand_name
+            $this->brand_name->ViewValue = $this->brand_name->CurrentValue;
 
-            // dispensation_type
-            $this->dispensation_type->ViewValue = $this->dispensation_type->CurrentValue;
+            // selling_price_per_unit
+            $this->selling_price_per_unit->ViewValue = $this->selling_price_per_unit->CurrentValue;
+            $this->selling_price_per_unit->ViewValue = FormatNumber($this->selling_price_per_unit->ViewValue, $this->selling_price_per_unit->formatPattern());
 
-            // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->ViewValue = null;
-            }
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
 
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
+            // line_total
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // medicine_dispensation_id
+            $this->medicine_dispensation_id->HrefValue = "";
+            $this->medicine_dispensation_id->TooltipValue = "";
 
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
+            // brand_name
+            $this->brand_name->HrefValue = "";
+            $this->brand_name->TooltipValue = "";
 
-            // dispensation_type
-            $this->dispensation_type->HrefValue = "";
-            $this->dispensation_type->TooltipValue = "";
+            // selling_price_per_unit
+            $this->selling_price_per_unit->HrefValue = "";
+            $this->selling_price_per_unit->TooltipValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
+            // quantity
+            $this->quantity->HrefValue = "";
+            $this->quantity->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
+            // line_total
+            $this->line_total->HrefValue = "";
+            $this->line_total->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
-        }
-
-        // Save data for Custom Template
-        if ($this->RowType == RowType::VIEW || $this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) {
-            $this->Rows[] = $this->customTemplateFieldValues();
         }
     }
 
@@ -1036,19 +898,19 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpharmacy_billing_reportview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpharmacy_billing_report_detailsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpharmacy_billing_reportview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpharmacy_billing_report_detailsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpharmacy_billing_reportview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpharmacy_billing_report_detailsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -1060,7 +922,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpharmacy_billing_reportview" data-ew-action="email" data-custom="true" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpharmacy_billing_report_detailsview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -1078,12 +940,12 @@ class PharmacyBillingReportView extends PharmacyBillingReport
 
         // Export to Excel
         $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel", !Config("USE_PHPEXCEL"));
+        $item->Body = $this->getExportTag("excel");
         $item->Visible = true;
 
         // Export to Word
         $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word", !Config("USE_PHPWORD"));
+        $item->Body = $this->getExportTag("word");
         $item->Visible = true;
 
         // Export to HTML
@@ -1103,12 +965,12 @@ class PharmacyBillingReportView extends PharmacyBillingReport
 
         // Export to PDF
         $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf", true);
+        $item->Body = $this->getExportTag("pdf");
         $item->Visible = true;
 
         // Export to Email
         $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email", true);
+        $item->Body = $this->getExportTag("email");
         $item->Visible = true;
 
         // Drop down button for export
@@ -1169,28 +1031,6 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         $this->pageDataRendering($header);
         $doc->Text .= $header;
         $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "view");
-
-        // Set up detail parameters
-        $this->setupDetailParms();
-
-        // Export detail records (pharmacy_billing_report_details)
-        if (Config("EXPORT_DETAIL_RECORDS") && in_array("pharmacy_billing_report_details", explode(",", $this->getCurrentDetailTable()))) {
-            $pharmacy_billing_report_details = new PharmacyBillingReportDetailsList();
-            $rsdetail = $pharmacy_billing_report_details->loadRs($pharmacy_billing_report_details->getDetailFilterFromSession(), $pharmacy_billing_report_details->getSessionOrderBy()); // Load detail records
-            if ($rsdetail) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("h"); // Change to horizontal
-                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
-                    $doc->exportEmptyRow();
-                    $detailcnt = $rsdetail->rowCount();
-                    $oldtbl = $doc->getTable();
-                    $doc->setTable($pharmacy_billing_report_details);
-                    $pharmacy_billing_report_details->exportDocument($doc, $rsdetail, 1, $detailcnt);
-                    $doc->setTable($oldtbl);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
         $rs->free();
 
         // Page footer
@@ -1218,15 +1058,15 @@ class PharmacyBillingReportView extends PharmacyBillingReport
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "patient_visits") {
+            if ($masterTblVar == "pharmacy_billing_report") {
                 $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                $masterTbl = Container("pharmacy_billing_report");
+                if (($parm = Get("fk_id", Get("medicine_dispensation_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->medicine_dispensation_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->medicine_dispensation_id->setSessionValue($this->medicine_dispensation_id->QueryStringValue);
+                    $foreignKeys["medicine_dispensation_id"] = $this->medicine_dispensation_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1240,15 +1080,15 @@ class PharmacyBillingReportView extends PharmacyBillingReport
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "patient_visits") {
+            if ($masterTblVar == "pharmacy_billing_report") {
                 $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                $masterTbl = Container("pharmacy_billing_report");
+                if (($parm = Post("fk_id", Post("medicine_dispensation_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->medicine_dispensation_id->FormValue = $masterTbl->id->FormValue;
+                    $this->medicine_dispensation_id->setSessionValue($this->medicine_dispensation_id->FormValue);
+                    $foreignKeys["medicine_dispensation_id"] = $this->medicine_dispensation_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1268,43 +1108,14 @@ class PharmacyBillingReportView extends PharmacyBillingReport
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
+            if ($masterTblVar != "pharmacy_billing_report") {
+                if (!array_key_exists("medicine_dispensation_id", $foreignKeys)) { // Not current foreign key
+                    $this->medicine_dispensation_id->setSessionValue("");
                 }
             }
         }
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("pharmacy_billing_report_details", $detailTblVar)) {
-                $detailPageObj = Container("PharmacyBillingReportDetailsGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "view";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->medicine_dispensation_id->IsDetailKey = true;
-                    $detailPageObj->medicine_dispensation_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->medicine_dispensation_id->setSessionValue($detailPageObj->medicine_dispensation_id->CurrentValue);
-                }
-            }
-        }
     }
 
     // Set up Breadcrumb
@@ -1313,7 +1124,7 @@ class PharmacyBillingReportView extends PharmacyBillingReport
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("pharmacybillingreportlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("pharmacybillingreportdetailslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }
@@ -1331,10 +1142,6 @@ class PharmacyBillingReportView extends PharmacyBillingReport
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
-                    break;
-                case "x_created_by_user_id":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

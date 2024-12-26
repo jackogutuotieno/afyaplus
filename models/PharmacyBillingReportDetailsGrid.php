@@ -1286,6 +1286,12 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
         // "sequence"
         $item = &$this->ListOptions->add("sequence");
         $item->CssClass = "text-nowrap";
@@ -1366,7 +1372,19 @@ class PharmacyBillingReportDetailsGrid extends PharmacyBillingReportDetails
         // "sequence"
         $opt = $this->ListOptions["sequence"];
         $opt->Body = FormatSequenceNumber($this->RecordCount);
-        if ($this->CurrentMode == "view") { // Check view mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if ($this->ModalView && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"pharmacy_billing_report_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
         $this->renderListOptionsExt();
 

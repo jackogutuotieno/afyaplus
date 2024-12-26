@@ -21,4 +21,11 @@ class PharmacyBillingReportDetailsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "PharmacyBillingReportDetailsList");
     }
+
+    // view
+    #[Map(["GET","POST","OPTIONS"], "/pharmacybillingreportdetailsview[/{id}]", [PermissionMiddleware::class], "view.pharmacy_billing_report_details")]
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "PharmacyBillingReportDetailsView");
+    }
 }

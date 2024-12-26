@@ -23,7 +23,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
@@ -90,9 +89,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_radiology_billing_report_id" class="radiology_billing_report_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_radiology_billing_report_patient_id" class="radiology_billing_report_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
@@ -141,33 +137,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_id" class="el_radiology_billing_report_id"></span>
-<input type="hidden" data-table="radiology_billing_report" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_id" class="el_radiology_billing_report_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="radiology_billing_report" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_radiology_billing_report_id" class="el_radiology_billing_report_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="radiology_billing_report" data-field="x_id" data-hidden="1" name="fradiology_billing_reportgrid$x<?= $Grid->RowIndex ?>_id" id="fradiology_billing_reportgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="radiology_billing_report" data-field="x_id" data-hidden="1" data-old name="fradiology_billing_reportgrid$o<?= $Grid->RowIndex ?>_id" id="fradiology_billing_reportgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="radiology_billing_report" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -410,7 +379,7 @@ loadjs.ready("fradiology_billing_reportgrid", function() {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fradiology_billing_reportgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -446,7 +415,7 @@ loadjs.ready(["fradiology_billing_reportgrid", "datetimepicker"], function () {
 <?php if (!$Grid->date_created->ReadOnly && !$Grid->date_created->Disabled && !isset($Grid->date_created->EditAttrs["readonly"]) && !isset($Grid->date_created->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fradiology_billing_reportgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(7) ?>",
+    let format = "<?= DateFormat(11) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
