@@ -1597,6 +1597,13 @@ class InvoiceReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
+        if ($this->payment_status->CurrentValue == 'Paid') {
+            $this->payment_status->CellAttrs["style"] = "background-color: green; color: white";
+        } else if ($this->payment_status->CurrentValue == 'Unpaid') {
+            $this->payment_status->CellAttrs["style"] = "background-color: orange; color: white";
+        } else if ($this->payment_status->CurrentValue == 'Voided') {
+            $this->payment_status->CellAttrs["style"] = "background-color: red; color: white";
+        } 
         $this->patient_id->ViewValue = '<a href="invoicereportview/' . $this->id->ViewValue . '?showdetail=invoice_report_details" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
     }
 

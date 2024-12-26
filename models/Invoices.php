@@ -2120,8 +2120,13 @@ class Invoices extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        if ($this->payment_status->CurrentValue == 'Paid') {
+            $this->payment_status->CellAttrs["style"] = "background-color: green; color: white";
+        } else if ($this->payment_status->CurrentValue == 'Unpaid') {
+            $this->status->CellAttrs["style"] = "background-color: orange; color: white";
+        } else if ($this->payment_status->CurrentValue == 'Voided') {
+            $this->status->CellAttrs["style"] = "background-color: red; color: white";
+        } 
     }
 
     // User ID Filtering event

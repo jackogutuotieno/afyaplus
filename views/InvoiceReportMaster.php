@@ -10,17 +10,6 @@ $invoice_report->TableClass = "table table-bordered table-hover table-sm ew-tabl
 <div class="ew-master-div">
 <table id="tbl_invoice_reportmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($invoice_report->id->Visible) { // id ?>
-        <tr id="r_id"<?= $invoice_report->id->rowAttributes() ?>>
-            <td class="<?= $invoice_report->TableLeftColumnClass ?>"><?= $invoice_report->id->caption() ?></td>
-            <td<?= $invoice_report->id->cellAttributes() ?>>
-<span id="el_invoice_report_id">
-<span<?= $invoice_report->id->viewAttributes() ?>>
-<?= $invoice_report->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($invoice_report->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $invoice_report->patient_id->rowAttributes() ?>>
             <td class="<?= $invoice_report->TableLeftColumnClass ?>"><?= $invoice_report->patient_id->caption() ?></td>

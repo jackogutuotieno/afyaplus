@@ -1569,8 +1569,6 @@ class IncomeReport2 extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

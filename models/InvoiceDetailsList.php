@@ -158,7 +158,7 @@ class InvoiceDetailsList extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
-        $this->line_total->setVisibility();
+        $this->line_total->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -1325,7 +1325,6 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->updateSort($this->item); // item
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->cost); // cost
-            $this->updateSort($this->line_total); // line_total
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1596,7 +1595,6 @@ class InvoiceDetailsList extends InvoiceDetails
             $this->createColumnOption($option, "item");
             $this->createColumnOption($option, "quantity");
             $this->createColumnOption($option, "cost");
-            $this->createColumnOption($option, "line_total");
         }
 
         // Set up custom actions
@@ -2115,13 +2113,6 @@ class InvoiceDetailsList extends InvoiceDetails
         // date_updated
         $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
-        // Accumulate aggregate value
-        if ($this->RowType != RowType::AGGREGATEINIT && $this->RowType != RowType::AGGREGATE && $this->RowType != RowType::PREVIEWFIELD) {
-            if (is_numeric($this->line_total->CurrentValue)) {
-                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
-            }
-        }
-
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -2157,17 +2148,6 @@ class InvoiceDetailsList extends InvoiceDetails
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
-
-            // line_total
-            $this->line_total->HrefValue = "";
-            $this->line_total->TooltipValue = "";
-        } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
-                    $this->line_total->Total = 0; // Initialize total
-        } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
-            $this->line_total->CurrentValue = $this->line_total->Total;
-            $this->line_total->ViewValue = $this->line_total->CurrentValue;
-            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
-            $this->line_total->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event

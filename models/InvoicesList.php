@@ -1311,7 +1311,7 @@ class InvoicesList extends Invoices
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = ""; // Set up default sort
+            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }

@@ -185,3 +185,19 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-26 12:18:26",/afyaplus/patientsedit/1,2,U,patients,religion,1,Christianity,
 "2024-12-26 12:18:26",/afyaplus/patientsedit/1,2,U,patients,is_ipd,1,0,1
 "2024-12-26 12:18:57",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 12:24:37",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,patient_id,3,,8
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,visit_id,3,,12
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,description,3,,<p>wewre</p>
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,payment_status,3,,Paid
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,created_by_user_id,3,,2
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoices,id,3,,3
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,"*** Batch insert begin ***",invoice_details,,,,
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoice_details,item,5,,Consultation
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoice_details,quantity,5,,1
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoice_details,cost,5,,2000
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoice_details,invoice_id,5,,3
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,A,invoice_details,id,5,,5
+"2024-12-26 12:29:10",/afyaplus/invoicesadd,2,"*** Batch insert successful ***",invoice_details,,,,
+"2024-12-26 12:36:56",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 12:37:10",/afyaplus/login,2,login,::1,,,,

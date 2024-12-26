@@ -179,9 +179,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->cost->Visible) { // cost ?>
         <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_invoice_details_cost" class="invoice_details_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
-<?php if ($Page->line_total->Visible) { // line_total ?>
-        <th data-name="line_total" class="<?= $Page->line_total->headerCellClass() ?>"><div id="elh_invoice_details_line_total" class="invoice_details_line_total"><?= $Page->renderFieldHeader($Page->line_total) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -234,14 +231,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->line_total->Visible) { // line_total ?>
-        <td data-name="line_total"<?= $Page->line_total->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_invoice_details_line_total" class="el_invoice_details_line_total">
-<span<?= $Page->line_total->viewAttributes() ?>>
-<?= $Page->line_total->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -261,47 +250,6 @@ $Page->ListOptions->render("body", "right", $Page->RowCount);
 }
 ?>
 </tbody>
-<?php
-// Render aggregate row
-$Page->RowType = RowType::AGGREGATE;
-$Page->resetAttributes();
-$Page->renderRow();
-?>
-<?php if ($Page->TotalRecords > 0 && !$Page->isGridAdd() && !$Page->isGridEdit() && !$Page->isMultiEdit()) { ?>
-<tfoot><!-- Table footer -->
-    <tr class="ew-table-footer">
-<?php
-// Render list options
-$Page->renderListOptions();
-
-// Render list options (footer, left)
-$Page->ListOptions->render("footer", "left");
-?>
-    <?php if ($Page->item->Visible) { // item ?>
-        <td data-name="item" class="<?= $Page->item->footerCellClass() ?>"><span id="elf_invoice_details_item" class="invoice_details_item">
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->quantity->Visible) { // quantity ?>
-        <td data-name="quantity" class="<?= $Page->quantity->footerCellClass() ?>"><span id="elf_invoice_details_quantity" class="invoice_details_quantity">
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->cost->Visible) { // cost ?>
-        <td data-name="cost" class="<?= $Page->cost->footerCellClass() ?>"><span id="elf_invoice_details_cost" class="invoice_details_cost">
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->line_total->Visible) { // line_total ?>
-        <td data-name="line_total" class="<?= $Page->line_total->footerCellClass() ?>"><span id="elf_invoice_details_line_total" class="invoice_details_line_total">
-        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
-        <?= $Page->line_total->ViewValue ?></span>
-        </span></td>
-    <?php } ?>
-<?php
-// Render list options (footer, right)
-$Page->ListOptions->render("footer", "right");
-?>
-    </tr>
-</tfoot>
-<?php } ?>
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->

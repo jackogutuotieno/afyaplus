@@ -1546,7 +1546,6 @@ class InvoiceDetails extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
-                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1576,23 +1575,6 @@ class InvoiceDetails extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
-            }
-        }
-
-        // Export aggregates (horizontal format only)
-        if ($doc->Horizontal) {
-            $this->RowType = RowType::AGGREGATE;
-            $this->resetAttributes();
-            $this->aggregateListRow();
-            if (!$doc->ExportCustom) {
-                $doc->beginExportRow(-1);
-                $doc->exportAggregate($this->id, '');
-                $doc->exportAggregate($this->invoice_id, '');
-                $doc->exportAggregate($this->item, '');
-                $doc->exportAggregate($this->quantity, '');
-                $doc->exportAggregate($this->cost, '');
-                $doc->exportAggregate($this->line_total, 'TOTAL');
-                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {

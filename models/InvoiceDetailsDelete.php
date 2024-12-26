@@ -134,7 +134,7 @@ class InvoiceDetailsDelete extends InvoiceDetails
         $this->item->setVisibility();
         $this->quantity->setVisibility();
         $this->cost->setVisibility();
-        $this->line_total->setVisibility();
+        $this->line_total->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -700,10 +700,6 @@ class InvoiceDetailsDelete extends InvoiceDetails
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
-
-            // line_total
-            $this->line_total->HrefValue = "";
-            $this->line_total->TooltipValue = "";
         }
 
         // Call Row Rendered event

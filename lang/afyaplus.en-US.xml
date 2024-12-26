@@ -587,8 +587,8 @@
         <phrase id="fldcaption" value="Payment Status" />
         <phrase id="fldtagvalue1" value="Paid" />
         <phrase id="fldtagcaption1" value="Paid" />
-        <phrase id="fldtagvalue2" value="Partially Paid" />
-        <phrase id="fldtagcaption2" value="Partially Paid" />
+        <phrase id="fldtagvalue2" value="Unpaid" />
+        <phrase id="fldtagcaption2" value="Unpaid" />
         <phrase id="fldtagvalue3" value="Voided" />
         <phrase id="fldtagcaption3" value="Voided" />
       </field>
