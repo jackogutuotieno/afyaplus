@@ -13,9 +13,9 @@ use Slim\App;
 use Closure;
 
 /**
- * Table class for registered_patients_report
+ * Table class for ipd_patients
  */
-class RegisteredPatientsReport extends DbTable
+class IpdPatients extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -47,20 +47,12 @@ class RegisteredPatientsReport extends DbTable
 
     // Fields
     public $id;
-    public $patient_full_name;
-    public $first_name;
-    public $last_name;
+    public $patient_name;
+    public $national_id;
     public $date_of_birth;
-    public $patient_age;
     public $gender;
     public $phone;
-    public $email_address;
-    public $marital_status;
-    public $date_created;
-    public $date_updated;
-    public $next_of_kin;
-    public $next_of_kin_phone;
-    public $registration_month;
+    public $is_ipd;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -73,14 +65,14 @@ class RegisteredPatientsReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "registered_patients_report";
-        $this->TableName = 'registered_patients_report';
+        $this->TableVar = "ipd_patients";
+        $this->TableName = 'ipd_patients';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "registered_patients_report";
+        $this->UpdateTable = "ipd_patients";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -134,76 +126,51 @@ class RegisteredPatientsReport extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // patient_full_name
-        $this->patient_full_name = new DbField(
+        // patient_name
+        $this->patient_name = new DbField(
             $this, // Table
-            'x_patient_full_name', // Variable name
-            'patient_full_name', // Name
-            'CONCAT(first_name,\' \',last_name)', // Expression
-            'CONCAT(first_name,\' \',last_name)', // Basic search expression
+            'x_patient_name', // Variable name
+            'patient_name', // Name
+            '`patient_name`', // Expression
+            '`patient_name`', // Basic search expression
             200, // Type
             101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            'CONCAT(first_name,\' \',last_name)', // Virtual expression
+            '`patient_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->patient_full_name->InputTextType = "text";
-        $this->patient_full_name->IsCustom = true; // Custom field
-        $this->patient_full_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['patient_full_name'] = &$this->patient_full_name;
+        $this->patient_name->InputTextType = "text";
+        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['patient_name'] = &$this->patient_name;
 
-        // first_name
-        $this->first_name = new DbField(
+        // national_id
+        $this->national_id = new DbField(
             $this, // Table
-            'x_first_name', // Variable name
-            'first_name', // Name
-            '`first_name`', // Expression
-            '`first_name`', // Basic search expression
-            200, // Type
-            50, // Size
+            'x_national_id', // Variable name
+            'national_id', // Name
+            '`national_id`', // Expression
+            '`national_id`', // Basic search expression
+            3, // Type
+            11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`first_name`', // Virtual expression
+            '`national_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->first_name->InputTextType = "text";
-        $this->first_name->Nullable = false; // NOT NULL field
-        $this->first_name->Required = true; // Required field
-        $this->first_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['first_name'] = &$this->first_name;
-
-        // last_name
-        $this->last_name = new DbField(
-            $this, // Table
-            'x_last_name', // Variable name
-            'last_name', // Name
-            '`last_name`', // Expression
-            '`last_name`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`last_name`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->last_name->InputTextType = "text";
-        $this->last_name->Nullable = false; // NOT NULL field
-        $this->last_name->Required = true; // Required field
-        $this->last_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['last_name'] = &$this->last_name;
+        $this->national_id->InputTextType = "text";
+        $this->national_id->Raw = true;
+        $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['national_id'] = &$this->national_id;
 
         // date_of_birth
         $this->date_of_birth = new DbField(
@@ -230,31 +197,6 @@ class RegisteredPatientsReport extends DbTable
         $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
-
-        // patient_age
-        $this->patient_age = new DbField(
-            $this, // Table
-            'x_patient_age', // Variable name
-            'patient_age', // Name
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Expression
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Basic search expression
-            20, // Type
-            21, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '(SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE()))', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->patient_age->InputTextType = "text";
-        $this->patient_age->Raw = true;
-        $this->patient_age->IsCustom = true; // Custom field
-        $this->patient_age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['patient_age'] = &$this->patient_age;
 
         // gender
         $this->gender = new DbField(
@@ -298,180 +240,41 @@ class RegisteredPatientsReport extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->phone->addMethod("getLinkPrefix", fn() => "tel:");
         $this->phone->InputTextType = "text";
         $this->phone->Nullable = false; // NOT NULL field
         $this->phone->Required = true; // Required field
         $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['phone'] = &$this->phone;
 
-        // email_address
-        $this->email_address = new DbField(
+        // is_ipd
+        $this->is_ipd = new DbField(
             $this, // Table
-            'x_email_address', // Variable name
-            'email_address', // Name
-            '`email_address`', // Expression
-            '`email_address`', // Basic search expression
-            200, // Type
-            50, // Size
+            'x_is_ipd', // Variable name
+            'is_ipd', // Name
+            '`is_ipd`', // Expression
+            '`is_ipd`', // Basic search expression
+            16, // Type
+            1, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`email_address`', // Virtual expression
+            '`is_ipd`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'CHECKBOX' // Edit Tag
         );
-        $this->email_address->addMethod("getLinkPrefix", fn() => "mailto:");
-        $this->email_address->InputTextType = "text";
-        $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['email_address'] = &$this->email_address;
-
-        // marital_status
-        $this->marital_status = new DbField(
-            $this, // Table
-            'x_marital_status', // Variable name
-            'marital_status', // Name
-            '`marital_status`', // Expression
-            '`marital_status`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`marital_status`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->marital_status->InputTextType = "text";
-        $this->marital_status->Required = true; // Required field
-        $this->marital_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['marital_status'] = &$this->marital_status;
-
-        // date_created
-        $this->date_created = new DbField(
-            $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 0, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_created`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 0, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            0, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
-
-        // next_of_kin
-        $this->next_of_kin = new DbField(
-            $this, // Table
-            'x_next_of_kin', // Variable name
-            'next_of_kin', // Name
-            '`next_of_kin`', // Expression
-            '`next_of_kin`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`next_of_kin`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->next_of_kin->InputTextType = "text";
-        $this->next_of_kin->Nullable = false; // NOT NULL field
-        $this->next_of_kin->Required = true; // Required field
-        $this->next_of_kin->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['next_of_kin'] = &$this->next_of_kin;
-
-        // next_of_kin_phone
-        $this->next_of_kin_phone = new DbField(
-            $this, // Table
-            'x_next_of_kin_phone', // Variable name
-            'next_of_kin_phone', // Name
-            '`next_of_kin_phone`', // Expression
-            '`next_of_kin_phone`', // Basic search expression
-            129, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`next_of_kin_phone`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->next_of_kin_phone->InputTextType = "text";
-        $this->next_of_kin_phone->Nullable = false; // NOT NULL field
-        $this->next_of_kin_phone->Required = true; // Required field
-        $this->next_of_kin_phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['next_of_kin_phone'] = &$this->next_of_kin_phone;
-
-        // registration_month
-        $this->registration_month = new DbField(
-            $this, // Table
-            'x_registration_month', // Variable name
-            'registration_month', // Name
-            '`registration_month`', // Expression
-            '`registration_month`', // Basic search expression
-            200, // Type
-            9, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`registration_month`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->registration_month->InputTextType = "text";
-        $this->registration_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['registration_month'] = &$this->registration_month;
+        $this->is_ipd->addMethod("getDefault", fn() => 0);
+        $this->is_ipd->InputTextType = "text";
+        $this->is_ipd->Raw = true;
+        $this->is_ipd->Nullable = false; // NOT NULL field
+        $this->is_ipd->Required = true; // Required field
+        $this->is_ipd->setDataType(DataType::BOOLEAN);
+        $this->is_ipd->Lookup = new Lookup($this->is_ipd, 'ipd_patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->is_ipd->OptionCount = 2;
+        $this->is_ipd->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->is_ipd->SearchOperators = ["=", "<>"];
+        $this->Fields['is_ipd'] = &$this->is_ipd;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -540,7 +343,7 @@ class RegisteredPatientsReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "registered_patients_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "ipd_patients";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -564,7 +367,20 @@ class RegisteredPatientsReport extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, CONCAT(first_name,' ',last_name) AS `patient_full_name`, (SELECT TIMESTAMPDIFF(YEAR,date_of_birth, CURDATE())) AS `patient_age`";
+        $useFieldNames = false;
+        $fieldNames = [];
+        $platform = $this->getConnection()->getDatabasePlatform();
+        foreach ($this->Fields as $field) {
+            $expr = $field->Expression;
+            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
+            if ($customExpr != $expr) {
+                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
+                $useFieldNames = true;
+            } else {
+                $fieldNames[] = $expr;
+            }
+        }
+        return $useFieldNames ? implode(", ", $fieldNames) : "*";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -979,20 +795,12 @@ class RegisteredPatientsReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->patient_full_name->DbValue = $row['patient_full_name'];
-        $this->first_name->DbValue = $row['first_name'];
-        $this->last_name->DbValue = $row['last_name'];
+        $this->patient_name->DbValue = $row['patient_name'];
+        $this->national_id->DbValue = $row['national_id'];
         $this->date_of_birth->DbValue = $row['date_of_birth'];
-        $this->patient_age->DbValue = $row['patient_age'];
         $this->gender->DbValue = $row['gender'];
         $this->phone->DbValue = $row['phone'];
-        $this->email_address->DbValue = $row['email_address'];
-        $this->marital_status->DbValue = $row['marital_status'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
-        $this->next_of_kin->DbValue = $row['next_of_kin'];
-        $this->next_of_kin_phone->DbValue = $row['next_of_kin_phone'];
-        $this->registration_month->DbValue = $row['registration_month'];
+        $this->is_ipd->DbValue = $row['is_ipd'];
     }
 
     // Delete uploaded files
@@ -1066,7 +874,7 @@ class RegisteredPatientsReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("registeredpatientsreportlist");
+        return $_SESSION[$name] ?? GetUrl("ipdpatientslist");
     }
 
     // Set return page URL
@@ -1080,9 +888,9 @@ class RegisteredPatientsReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "registeredpatientsreportview" => $Language->phrase("View"),
-            "registeredpatientsreportedit" => $Language->phrase("Edit"),
-            "registeredpatientsreportadd" => $Language->phrase("Add"),
+            "ipdpatientsview" => $Language->phrase("View"),
+            "ipdpatientsedit" => $Language->phrase("Edit"),
+            "ipdpatientsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1090,18 +898,18 @@ class RegisteredPatientsReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "registeredpatientsreportlist";
+        return "ipdpatientslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "RegisteredPatientsReportView",
-            Config("API_ADD_ACTION") => "RegisteredPatientsReportAdd",
-            Config("API_EDIT_ACTION") => "RegisteredPatientsReportEdit",
-            Config("API_DELETE_ACTION") => "RegisteredPatientsReportDelete",
-            Config("API_LIST_ACTION") => "RegisteredPatientsReportList",
+            Config("API_VIEW_ACTION") => "IpdPatientsView",
+            Config("API_ADD_ACTION") => "IpdPatientsAdd",
+            Config("API_EDIT_ACTION") => "IpdPatientsEdit",
+            Config("API_DELETE_ACTION") => "IpdPatientsDelete",
+            Config("API_LIST_ACTION") => "IpdPatientsList",
             default => ""
         };
     }
@@ -1121,16 +929,16 @@ class RegisteredPatientsReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "registeredpatientsreportlist";
+        return "ipdpatientslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("registeredpatientsreportview", $parm);
+            $url = $this->keyUrl("ipdpatientsview", $parm);
         } else {
-            $url = $this->keyUrl("registeredpatientsreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("ipdpatientsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1139,9 +947,9 @@ class RegisteredPatientsReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "registeredpatientsreportadd?" . $parm;
+            $url = "ipdpatientsadd?" . $parm;
         } else {
-            $url = "registeredpatientsreportadd";
+            $url = "ipdpatientsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1149,28 +957,28 @@ class RegisteredPatientsReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("registeredpatientsreportedit", $parm);
+        $url = $this->keyUrl("ipdpatientsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("registeredpatientsreportlist", "action=edit");
+        $url = $this->keyUrl("ipdpatientslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("registeredpatientsreportadd", $parm);
+        $url = $this->keyUrl("ipdpatientsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("registeredpatientsreportlist", "action=copy");
+        $url = $this->keyUrl("ipdpatientslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1180,7 +988,7 @@ class RegisteredPatientsReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("registeredpatientsreportdelete", $parm);
+            return $this->keyUrl("ipdpatientsdelete", $parm);
         }
     }
 
@@ -1346,27 +1154,19 @@ class RegisteredPatientsReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->patient_full_name->setDbValue($row['patient_full_name']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->patient_age->setDbValue($row['patient_age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
-        $this->email_address->setDbValue($row['email_address']);
-        $this->marital_status->setDbValue($row['marital_status']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
-        $this->next_of_kin->setDbValue($row['next_of_kin']);
-        $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
-        $this->registration_month->setDbValue($row['registration_month']);
+        $this->is_ipd->setDbValue($row['is_ipd']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "RegisteredPatientsReportList";
+        $listPage = "IpdPatientsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1392,53 +1192,31 @@ class RegisteredPatientsReport extends DbTable
 
         // id
 
-        // patient_full_name
+        // patient_name
 
-        // first_name
-
-        // last_name
+        // national_id
 
         // date_of_birth
-
-        // patient_age
 
         // gender
 
         // phone
 
-        // email_address
-
-        // marital_status
-
-        // date_created
-
-        // date_updated
-
-        // next_of_kin
-
-        // next_of_kin_phone
-
-        // registration_month
+        // is_ipd
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // patient_full_name
-        $this->patient_full_name->ViewValue = $this->patient_full_name->CurrentValue;
+        // patient_name
+        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
-        // first_name
-        $this->first_name->ViewValue = $this->first_name->CurrentValue;
-
-        // last_name
-        $this->last_name->ViewValue = $this->last_name->CurrentValue;
+        // national_id
+        $this->national_id->ViewValue = $this->national_id->CurrentValue;
+        $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
         // date_of_birth
         $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
         $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
-
-        // patient_age
-        $this->patient_age->ViewValue = $this->patient_age->CurrentValue;
-        $this->patient_age->ViewValue = FormatNumber($this->patient_age->ViewValue, $this->patient_age->formatPattern());
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -1446,104 +1224,40 @@ class RegisteredPatientsReport extends DbTable
         // phone
         $this->phone->ViewValue = $this->phone->CurrentValue;
 
-        // email_address
-        $this->email_address->ViewValue = $this->email_address->CurrentValue;
-
-        // marital_status
-        $this->marital_status->ViewValue = $this->marital_status->CurrentValue;
-
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-        // next_of_kin
-        $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
-
-        // next_of_kin_phone
-        $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
-
-        // registration_month
-        $this->registration_month->ViewValue = $this->registration_month->CurrentValue;
+        // is_ipd
+        if (ConvertToBool($this->is_ipd->CurrentValue)) {
+            $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(1) != "" ? $this->is_ipd->tagCaption(1) : "Yes";
+        } else {
+            $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(2) != "" ? $this->is_ipd->tagCaption(2) : "No";
+        }
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // patient_full_name
-        $this->patient_full_name->HrefValue = "";
-        $this->patient_full_name->TooltipValue = "";
+        // patient_name
+        $this->patient_name->HrefValue = "";
+        $this->patient_name->TooltipValue = "";
 
-        // first_name
-        $this->first_name->HrefValue = "";
-        $this->first_name->TooltipValue = "";
-
-        // last_name
-        $this->last_name->HrefValue = "";
-        $this->last_name->TooltipValue = "";
+        // national_id
+        $this->national_id->HrefValue = "";
+        $this->national_id->TooltipValue = "";
 
         // date_of_birth
         $this->date_of_birth->HrefValue = "";
         $this->date_of_birth->TooltipValue = "";
-
-        // patient_age
-        $this->patient_age->HrefValue = "";
-        $this->patient_age->TooltipValue = "";
 
         // gender
         $this->gender->HrefValue = "";
         $this->gender->TooltipValue = "";
 
         // phone
-        if (!EmptyValue($this->phone->CurrentValue)) {
-            $this->phone->HrefValue = $this->phone->getLinkPrefix() . (!empty($this->phone->ViewValue) && !is_array($this->phone->ViewValue) ? RemoveHtml($this->phone->ViewValue) : $this->phone->CurrentValue); // Add prefix/suffix
-            $this->phone->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-            }
-        } else {
-            $this->phone->HrefValue = "";
-        }
+        $this->phone->HrefValue = "";
         $this->phone->TooltipValue = "";
 
-        // email_address
-        if (!EmptyValue($this->email_address->CurrentValue)) {
-            $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . (!empty($this->email_address->ViewValue) && !is_array($this->email_address->ViewValue) ? RemoveHtml($this->email_address->ViewValue) : $this->email_address->CurrentValue); // Add prefix/suffix
-            $this->email_address->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-            }
-        } else {
-            $this->email_address->HrefValue = "";
-        }
-        $this->email_address->TooltipValue = "";
-
-        // marital_status
-        $this->marital_status->HrefValue = "";
-        $this->marital_status->TooltipValue = "";
-
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
-
-        // next_of_kin
-        $this->next_of_kin->HrefValue = "";
-        $this->next_of_kin->TooltipValue = "";
-
-        // next_of_kin_phone
-        $this->next_of_kin_phone->HrefValue = "";
-        $this->next_of_kin_phone->TooltipValue = "";
-
-        // registration_month
-        $this->registration_month->HrefValue = "";
-        $this->registration_month->TooltipValue = "";
+        // is_ipd
+        $this->is_ipd->HrefValue = "";
+        $this->is_ipd->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1564,42 +1278,26 @@ class RegisteredPatientsReport extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // patient_full_name
-        $this->patient_full_name->setupEditAttributes();
-        if (!$this->patient_full_name->Raw) {
-            $this->patient_full_name->CurrentValue = HtmlDecode($this->patient_full_name->CurrentValue);
+        // patient_name
+        $this->patient_name->setupEditAttributes();
+        if (!$this->patient_name->Raw) {
+            $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
         }
-        $this->patient_full_name->EditValue = $this->patient_full_name->CurrentValue;
-        $this->patient_full_name->PlaceHolder = RemoveHtml($this->patient_full_name->caption());
+        $this->patient_name->EditValue = $this->patient_name->CurrentValue;
+        $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
 
-        // first_name
-        $this->first_name->setupEditAttributes();
-        if (!$this->first_name->Raw) {
-            $this->first_name->CurrentValue = HtmlDecode($this->first_name->CurrentValue);
+        // national_id
+        $this->national_id->setupEditAttributes();
+        $this->national_id->EditValue = $this->national_id->CurrentValue;
+        $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
+        if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
+            $this->national_id->EditValue = FormatNumber($this->national_id->EditValue, null);
         }
-        $this->first_name->EditValue = $this->first_name->CurrentValue;
-        $this->first_name->PlaceHolder = RemoveHtml($this->first_name->caption());
-
-        // last_name
-        $this->last_name->setupEditAttributes();
-        if (!$this->last_name->Raw) {
-            $this->last_name->CurrentValue = HtmlDecode($this->last_name->CurrentValue);
-        }
-        $this->last_name->EditValue = $this->last_name->CurrentValue;
-        $this->last_name->PlaceHolder = RemoveHtml($this->last_name->caption());
 
         // date_of_birth
         $this->date_of_birth->setupEditAttributes();
         $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
         $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
-
-        // patient_age
-        $this->patient_age->setupEditAttributes();
-        $this->patient_age->EditValue = $this->patient_age->CurrentValue;
-        $this->patient_age->PlaceHolder = RemoveHtml($this->patient_age->caption());
-        if (strval($this->patient_age->EditValue) != "" && is_numeric($this->patient_age->EditValue)) {
-            $this->patient_age->EditValue = FormatNumber($this->patient_age->EditValue, null);
-        }
 
         // gender
         $this->gender->setupEditAttributes();
@@ -1617,55 +1315,9 @@ class RegisteredPatientsReport extends DbTable
         $this->phone->EditValue = $this->phone->CurrentValue;
         $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
 
-        // email_address
-        $this->email_address->setupEditAttributes();
-        if (!$this->email_address->Raw) {
-            $this->email_address->CurrentValue = HtmlDecode($this->email_address->CurrentValue);
-        }
-        $this->email_address->EditValue = $this->email_address->CurrentValue;
-        $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
-
-        // marital_status
-        $this->marital_status->setupEditAttributes();
-        if (!$this->marital_status->Raw) {
-            $this->marital_status->CurrentValue = HtmlDecode($this->marital_status->CurrentValue);
-        }
-        $this->marital_status->EditValue = $this->marital_status->CurrentValue;
-        $this->marital_status->PlaceHolder = RemoveHtml($this->marital_status->caption());
-
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
-        // next_of_kin
-        $this->next_of_kin->setupEditAttributes();
-        if (!$this->next_of_kin->Raw) {
-            $this->next_of_kin->CurrentValue = HtmlDecode($this->next_of_kin->CurrentValue);
-        }
-        $this->next_of_kin->EditValue = $this->next_of_kin->CurrentValue;
-        $this->next_of_kin->PlaceHolder = RemoveHtml($this->next_of_kin->caption());
-
-        // next_of_kin_phone
-        $this->next_of_kin_phone->setupEditAttributes();
-        if (!$this->next_of_kin_phone->Raw) {
-            $this->next_of_kin_phone->CurrentValue = HtmlDecode($this->next_of_kin_phone->CurrentValue);
-        }
-        $this->next_of_kin_phone->EditValue = $this->next_of_kin_phone->CurrentValue;
-        $this->next_of_kin_phone->PlaceHolder = RemoveHtml($this->next_of_kin_phone->caption());
-
-        // registration_month
-        $this->registration_month->setupEditAttributes();
-        if (!$this->registration_month->Raw) {
-            $this->registration_month->CurrentValue = HtmlDecode($this->registration_month->CurrentValue);
-        }
-        $this->registration_month->EditValue = $this->registration_month->CurrentValue;
-        $this->registration_month->PlaceHolder = RemoveHtml($this->registration_month->caption());
+        // is_ipd
+        $this->is_ipd->EditValue = $this->is_ipd->options(false);
+        $this->is_ipd->PlaceHolder = RemoveHtml($this->is_ipd->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1696,36 +1348,20 @@ class RegisteredPatientsReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_full_name);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->patient_age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->email_address);
-                    $doc->exportCaption($this->marital_status);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->next_of_kin);
-                    $doc->exportCaption($this->next_of_kin_phone);
-                    $doc->exportCaption($this->registration_month);
+                    $doc->exportCaption($this->is_ipd);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->patient_full_name);
-                    $doc->exportCaption($this->first_name);
-                    $doc->exportCaption($this->last_name);
+                    $doc->exportCaption($this->patient_name);
+                    $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->date_of_birth);
-                    $doc->exportCaption($this->patient_age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
-                    $doc->exportCaption($this->email_address);
-                    $doc->exportCaption($this->marital_status);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
-                    $doc->exportCaption($this->next_of_kin);
-                    $doc->exportCaption($this->next_of_kin_phone);
-                    $doc->exportCaption($this->registration_month);
+                    $doc->exportCaption($this->is_ipd);
                 }
                 $doc->endExportRow();
             }
@@ -1753,36 +1389,20 @@ class RegisteredPatientsReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_full_name);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->national_id);
                         $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->patient_age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
-                        $doc->exportField($this->email_address);
-                        $doc->exportField($this->marital_status);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->next_of_kin);
-                        $doc->exportField($this->next_of_kin_phone);
-                        $doc->exportField($this->registration_month);
+                        $doc->exportField($this->is_ipd);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->patient_full_name);
-                        $doc->exportField($this->first_name);
-                        $doc->exportField($this->last_name);
+                        $doc->exportField($this->patient_name);
+                        $doc->exportField($this->national_id);
                         $doc->exportField($this->date_of_birth);
-                        $doc->exportField($this->patient_age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
-                        $doc->exportField($this->email_address);
-                        $doc->exportField($this->marital_status);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
-                        $doc->exportField($this->next_of_kin);
-                        $doc->exportField($this->next_of_kin_phone);
-                        $doc->exportField($this->registration_month);
+                        $doc->exportField($this->is_ipd);
                     }
                     $doc->endExportRow($rowCnt);
                 }

@@ -129,14 +129,15 @@ class CashPaymentsDelete extends CashPayments
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->Visible = false;
         $this->visit_id->Visible = false;
         $this->amount->setVisibility();
         $this->details->setVisibility();
+        $this->paid->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -427,6 +428,7 @@ class CashPaymentsDelete extends CashPayments
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->paid);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Set up master/detail parameters
@@ -619,6 +621,7 @@ class CashPaymentsDelete extends CashPayments
         $this->visit_id->setDbValue($row['visit_id']);
         $this->amount->setDbValue($row['amount']);
         $this->details->setDbValue($row['details']);
+        $this->paid->setDbValue($row['paid']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -633,6 +636,7 @@ class CashPaymentsDelete extends CashPayments
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['amount'] = $this->amount->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['paid'] = $this->paid->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -661,11 +665,14 @@ class CashPaymentsDelete extends CashPayments
 
         // details
 
+        // paid
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -706,6 +713,13 @@ class CashPaymentsDelete extends CashPayments
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
+            // paid
+            if (ConvertToBool($this->paid->CurrentValue)) {
+                $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
+            } else {
+                $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -733,14 +747,6 @@ class CashPaymentsDelete extends CashPayments
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // amount
             $this->amount->HrefValue = "";
             $this->amount->TooltipValue = "";
@@ -756,10 +762,6 @@ class CashPaymentsDelete extends CashPayments
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1019,6 +1021,8 @@ class CashPaymentsDelete extends CashPayments
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_paid":
                     break;
                 case "x_created_by_user_id":
                     break;

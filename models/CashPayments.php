@@ -45,7 +45,7 @@ class CashPayments extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = true;
+    public $ModalAdd = false;
     public $ModalEdit = false;
     public $ModalUpdate = false;
     public $InlineDelete = false;
@@ -59,6 +59,7 @@ class CashPayments extends DbTable
     public $visit_id;
     public $amount;
     public $details;
+    public $paid;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
@@ -243,6 +244,35 @@ class CashPayments extends DbTable
         $this->details->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->details->Param, "CustomMsg");
         $this->Fields['details'] = &$this->details;
 
+        // paid
+        $this->paid = new DbField(
+            $this, // Table
+            'x_paid', // Variable name
+            'paid', // Name
+            '`paid`', // Expression
+            '`paid`', // Basic search expression
+            16, // Type
+            1, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`paid`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'CHECKBOX' // Edit Tag
+        );
+        $this->paid->addMethod("getDefault", fn() => 0);
+        $this->paid->InputTextType = "text";
+        $this->paid->Raw = true;
+        $this->paid->Nullable = false; // NOT NULL field
+        $this->paid->setDataType(DataType::BOOLEAN);
+        $this->paid->Lookup = new Lookup($this->paid, 'cash_payments', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->paid->OptionCount = 2;
+        $this->paid->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->paid->SearchOperators = ["=", "<>"];
+        $this->Fields['paid'] = &$this->paid;
+
         // created_by_user_id
         $this->created_by_user_id = new DbField(
             $this, // Table
@@ -321,6 +351,7 @@ class CashPayments extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -963,6 +994,7 @@ class CashPayments extends DbTable
         $this->visit_id->DbValue = $row['visit_id'];
         $this->amount->DbValue = $row['amount'];
         $this->details->DbValue = $row['details'];
+        $this->paid->DbValue = $row['paid'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1328,6 +1360,7 @@ class CashPayments extends DbTable
         $this->visit_id->setDbValue($row['visit_id']);
         $this->amount->setDbValue($row['amount']);
         $this->details->setDbValue($row['details']);
+        $this->paid->setDbValue($row['paid']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1371,11 +1404,14 @@ class CashPayments extends DbTable
 
         // details
 
+        // paid
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1413,6 +1449,13 @@ class CashPayments extends DbTable
 
         // details
         $this->details->ViewValue = $this->details->CurrentValue;
+
+        // paid
+        if (ConvertToBool($this->paid->CurrentValue)) {
+            $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
+        } else {
+            $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
+        }
 
         // created_by_user_id
         $curVal = strval($this->created_by_user_id->CurrentValue);
@@ -1464,6 +1507,10 @@ class CashPayments extends DbTable
         // details
         $this->details->HrefValue = "";
         $this->details->TooltipValue = "";
+
+        // paid
+        $this->paid->HrefValue = "";
+        $this->paid->TooltipValue = "";
 
         // created_by_user_id
         $this->created_by_user_id->HrefValue = "";
@@ -1552,6 +1599,10 @@ class CashPayments extends DbTable
         $this->details->EditValue = $this->details->CurrentValue;
         $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
+        // paid
+        $this->paid->EditValue = $this->paid->options(false);
+        $this->paid->PlaceHolder = RemoveHtml($this->paid->caption());
+
         // created_by_user_id
 
         // date_created
@@ -1597,18 +1648,18 @@ class CashPayments extends DbTable
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->amount);
                     $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->paid);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->amount);
                     $doc->exportCaption($this->details);
+                    $doc->exportCaption($this->paid);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1640,18 +1691,18 @@ class CashPayments extends DbTable
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->amount);
                         $doc->exportField($this->details);
+                        $doc->exportField($this->paid);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
                         $doc->exportField($this->amount);
                         $doc->exportField($this->details);
+                        $doc->exportField($this->paid);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }

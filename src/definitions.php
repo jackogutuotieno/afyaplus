@@ -186,6 +186,7 @@ return [
     "branding" => \DI\create(Branding::class),
     "invoice_report" => \DI\create(InvoiceReport::class),
     "invoice_report_details" => \DI\create(InvoiceReportDetails::class),
+    "ipd_patients" => \DI\create(IpdPatients::class),
 
     // User table
     "usertable" => \DI\get("users"),

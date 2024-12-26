@@ -143,14 +143,15 @@ class CashPaymentsGrid extends CashPayments
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->Visible = false;
         $this->visit_id->Visible = false;
         $this->amount->setVisibility();
         $this->details->setVisibility();
+        $this->paid->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -636,6 +637,7 @@ class CashPaymentsGrid extends CashPayments
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->paid);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Load default values for add
@@ -1197,14 +1199,6 @@ class CashPaymentsGrid extends CashPayments
         ) {
             return false;
         }
-        if (
-            $CurrentForm->hasValue("x_date_updated") &&
-            $CurrentForm->hasValue("o_date_updated") &&
-            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
-            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
-        ) {
-            return false;
-        }
         return true;
     }
 
@@ -1385,6 +1379,14 @@ class CashPaymentsGrid extends CashPayments
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1453,6 +1455,10 @@ class CashPaymentsGrid extends CashPayments
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1734,6 +1740,8 @@ class CashPaymentsGrid extends CashPayments
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->paid->DefaultValue = $this->paid->getDefault(); // PHP
+        $this->paid->OldValue = $this->paid->DefaultValue;
     }
 
     // Load form values
@@ -1743,12 +1751,6 @@ class CashPaymentsGrid extends CashPayments
         global $CurrentForm;
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
 
         // Check field name 'amount' first before field var 'x_amount'
         $val = $CurrentForm->hasValue("amount") ? $CurrentForm->getValue("amount") : $CurrentForm->getValue("x_amount");
@@ -1803,18 +1805,10 @@ class CashPaymentsGrid extends CashPayments
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-        if ($CurrentForm->hasValue("o_date_updated")) {
-            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -1830,8 +1824,6 @@ class CashPaymentsGrid extends CashPayments
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1932,6 +1924,7 @@ class CashPaymentsGrid extends CashPayments
         $this->visit_id->setDbValue($row['visit_id']);
         $this->amount->setDbValue($row['amount']);
         $this->details->setDbValue($row['details']);
+        $this->paid->setDbValue($row['paid']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1946,6 +1939,7 @@ class CashPaymentsGrid extends CashPayments
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['amount'] = $this->amount->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['paid'] = $this->paid->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -1997,11 +1991,14 @@ class CashPaymentsGrid extends CashPayments
 
         // details
 
+        // paid
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2042,6 +2039,13 @@ class CashPaymentsGrid extends CashPayments
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
+            // paid
+            if (ConvertToBool($this->paid->CurrentValue)) {
+                $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
+            } else {
+                $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -2069,14 +2073,6 @@ class CashPaymentsGrid extends CashPayments
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // amount
             $this->amount->HrefValue = "";
             $this->amount->TooltipValue = "";
@@ -2092,13 +2088,7 @@ class CashPaymentsGrid extends CashPayments
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
             // amount
             $this->amount->setupEditAttributes();
             $this->amount->EditValue = $this->amount->CurrentValue;
@@ -2118,17 +2108,9 @@ class CashPaymentsGrid extends CashPayments
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // amount
             $this->amount->HrefValue = "";
 
@@ -2140,14 +2122,7 @@ class CashPaymentsGrid extends CashPayments
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
             // amount
             $this->amount->setupEditAttributes();
             $this->amount->EditValue = $this->amount->CurrentValue;
@@ -2168,15 +2143,7 @@ class CashPaymentsGrid extends CashPayments
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
 
             // amount
             $this->amount->HrefValue = "";
@@ -2189,9 +2156,6 @@ class CashPaymentsGrid extends CashPayments
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2213,11 +2177,6 @@ class CashPaymentsGrid extends CashPayments
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
             if ($this->amount->Visible && $this->amount->Required) {
                 if (!$this->amount->IsDetailKey && EmptyValue($this->amount->FormValue)) {
                     $this->amount->addErrorMessage(str_replace("%s", $this->amount->caption(), $this->amount->RequiredErrorMessage));
@@ -2243,14 +2202,6 @@ class CashPaymentsGrid extends CashPayments
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2417,9 +2368,6 @@ class CashPaymentsGrid extends CashPayments
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -2440,9 +2388,6 @@ class CashPaymentsGrid extends CashPayments
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
         }
     }
 
@@ -2518,9 +2463,6 @@ class CashPaymentsGrid extends CashPayments
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
 
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
-
         // patient_id
         if ($this->patient_id->getSessionValue() != "") {
             $rsnew['patient_id'] = $this->patient_id->getSessionValue();
@@ -2550,9 +2492,6 @@ class CashPaymentsGrid extends CashPayments
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
         }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
@@ -2596,6 +2535,8 @@ class CashPaymentsGrid extends CashPayments
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_paid":
                     break;
                 case "x_created_by_user_id":
                     break;

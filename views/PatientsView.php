@@ -95,6 +95,21 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+    <tr id="r_is_ipd"<?= $Page->is_ipd->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_is_ipd"><template id="tpc_patients_is_ipd"><?= $Page->is_ipd->caption() ?></template></span></td>
+        <td data-name="is_ipd"<?= $Page->is_ipd->cellAttributes() ?>>
+<template id="tpx_patients_is_ipd"><span id="el_patients_is_ipd">
+<span<?= $Page->is_ipd->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_ipd_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_ipd->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_ipd->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_ipd_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <div id="tpd_patientsview" class="ew-custom-template"></div>
 <template id="tpm_patientsview">

@@ -32,6 +32,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["amount", [fields.amount.visible && fields.amount.required ? ew.Validators.required(fields.amount.caption) : null, ew.Validators.float], fields.amount.isInvalid],
             ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
+            ["paid", [fields.paid.visible && fields.paid.required ? ew.Validators.required(fields.paid.caption) : null], fields.paid.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
@@ -49,6 +50,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "paid": <?= $Page->paid->toClientList($Page) ?>,
             "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
@@ -159,18 +161,26 @@ loadjs.ready("fcash_paymentsedit", function() {
 <?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
     <div id="r_details"<?= $Page->details->rowAttributes() ?>>
-        <label id="elh_cash_payments_details" class="<?= $Page->LeftColumnClass ?>"><?= $Page->details->caption() ?><?= $Page->details->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_cash_payments_details" for="x_details" class="<?= $Page->LeftColumnClass ?>"><?= $Page->details->caption() ?><?= $Page->details->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->details->cellAttributes() ?>>
 <span id="el_cash_payments_details">
-<?php $Page->details->EditAttrs->appendClass("editor"); ?>
 <textarea data-table="cash_payments" data-field="x_details" name="x_details" id="x_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>"<?= $Page->details->editAttributes() ?> aria-describedby="x_details_help"><?= $Page->details->EditValue ?></textarea>
 <?= $Page->details->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->details->getErrorMessage() ?></div>
-<script>
-loadjs.ready(["fcash_paymentsedit", "editor"], function() {
-    ew.createEditor("fcash_paymentsedit", "x_details", 0, 0, <?= $Page->details->ReadOnly || false ? "true" : "false" ?>);
-});
-</script>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->paid->Visible) { // paid ?>
+    <div id="r_paid"<?= $Page->paid->rowAttributes() ?>>
+        <label id="elh_cash_payments_paid" class="<?= $Page->LeftColumnClass ?>"><?= $Page->paid->caption() ?><?= $Page->paid->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->paid->cellAttributes() ?>>
+<span id="el_cash_payments_paid">
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" class="form-check-input<?= $Page->paid->isInvalidClass() ?>" data-table="cash_payments" data-field="x_paid" data-boolean name="x_paid" id="x_paid" value="1"<?= ConvertToBool($Page->paid->CurrentValue) ? " checked" : "" ?><?= $Page->paid->editAttributes() ?> aria-describedby="x_paid_help">
+    <div class="invalid-feedback"><?= $Page->paid->getErrorMessage() ?></div>
+</div>
+<?= $Page->paid->getCustomMessage() ?>
 </span>
 </div></div>
     </div>

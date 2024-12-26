@@ -134,6 +134,7 @@ class CashPaymentsAdd extends CashPayments
         $this->visit_id->Visible = false;
         $this->amount->setVisibility();
         $this->details->setVisibility();
+        $this->paid->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -532,6 +533,7 @@ class CashPaymentsAdd extends CashPayments
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->paid);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Load default values for add
@@ -688,6 +690,8 @@ class CashPaymentsAdd extends CashPayments
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->paid->DefaultValue = $this->paid->getDefault(); // PHP
+        $this->paid->OldValue = $this->paid->DefaultValue;
     }
 
     // Load form values
@@ -727,6 +731,16 @@ class CashPaymentsAdd extends CashPayments
             }
         }
 
+        // Check field name 'paid' first before field var 'x_paid'
+        $val = $CurrentForm->hasValue("paid") ? $CurrentForm->getValue("paid") : $CurrentForm->getValue("x_paid");
+        if (!$this->paid->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->paid->Visible = false; // Disable update for API request
+            } else {
+                $this->paid->setFormValue($val);
+            }
+        }
+
         // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
         $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
         if (!$this->created_by_user_id->IsDetailKey) {
@@ -748,6 +762,7 @@ class CashPaymentsAdd extends CashPayments
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->amount->CurrentValue = $this->amount->FormValue;
         $this->details->CurrentValue = $this->details->FormValue;
+        $this->paid->CurrentValue = $this->paid->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
@@ -794,6 +809,7 @@ class CashPaymentsAdd extends CashPayments
         $this->visit_id->setDbValue($row['visit_id']);
         $this->amount->setDbValue($row['amount']);
         $this->details->setDbValue($row['details']);
+        $this->paid->setDbValue($row['paid']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -808,6 +824,7 @@ class CashPaymentsAdd extends CashPayments
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['amount'] = $this->amount->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['paid'] = $this->paid->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -860,6 +877,9 @@ class CashPaymentsAdd extends CashPayments
         // details
         $this->details->RowCssClass = "row";
 
+        // paid
+        $this->paid->RowCssClass = "row";
+
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
 
@@ -908,6 +928,13 @@ class CashPaymentsAdd extends CashPayments
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
+            // paid
+            if (ConvertToBool($this->paid->CurrentValue)) {
+                $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
+            } else {
+                $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -935,10 +962,6 @@ class CashPaymentsAdd extends CashPayments
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -947,6 +970,9 @@ class CashPaymentsAdd extends CashPayments
 
             // details
             $this->details->HrefValue = "";
+
+            // paid
+            $this->paid->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1016,6 +1042,10 @@ class CashPaymentsAdd extends CashPayments
             $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
             $this->details->PlaceHolder = RemoveHtml($this->details->caption());
 
+            // paid
+            $this->paid->EditValue = $this->paid->options(false);
+            $this->paid->PlaceHolder = RemoveHtml($this->paid->caption());
+
             // created_by_user_id
 
             // Add refer script
@@ -1028,6 +1058,9 @@ class CashPaymentsAdd extends CashPayments
 
             // details
             $this->details->HrefValue = "";
+
+            // paid
+            $this->paid->HrefValue = "";
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
@@ -1068,6 +1101,11 @@ class CashPaymentsAdd extends CashPayments
             if ($this->details->Visible && $this->details->Required) {
                 if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
                     $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
+                }
+            }
+            if ($this->paid->Visible && $this->paid->Required) {
+                if ($this->paid->FormValue == "") {
+                    $this->paid->addErrorMessage(str_replace("%s", $this->paid->caption(), $this->paid->RequiredErrorMessage));
                 }
             }
             if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
@@ -1158,6 +1196,13 @@ class CashPaymentsAdd extends CashPayments
         // details
         $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, false);
 
+        // paid
+        $tmpBool = $this->paid->CurrentValue;
+        if ($tmpBool != "1" && $tmpBool != "0") {
+            $tmpBool = !empty($tmpBool) ? "1" : "0";
+        }
+        $this->paid->setDbValueDef($rsnew, $tmpBool, strval($this->paid->CurrentValue) == "");
+
         // created_by_user_id
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
         $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, false);
@@ -1183,6 +1228,9 @@ class CashPaymentsAdd extends CashPayments
         }
         if (isset($row['details'])) { // details
             $this->details->setFormValue($row['details']);
+        }
+        if (isset($row['paid'])) { // paid
+            $this->paid->setFormValue($row['paid']);
         }
         if (isset($row['created_by_user_id'])) { // created_by_user_id
             $this->created_by_user_id->setFormValue($row['created_by_user_id']);
@@ -1314,6 +1362,8 @@ class CashPaymentsAdd extends CashPayments
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_paid":
                     break;
                 case "x_created_by_user_id":
                     break;

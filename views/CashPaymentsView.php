@@ -106,6 +106,21 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->paid->Visible) { // paid ?>
+    <tr id="r_paid"<?= $Page->paid->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_cash_payments_paid"><?= $Page->paid->caption() ?></span></td>
+        <td data-name="paid"<?= $Page->paid->cellAttributes() ?>>
+<span id="el_cash_payments_paid">
+<span<?= $Page->paid->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_paid_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->paid->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->paid->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_paid_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
     <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_cash_payments_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
@@ -124,17 +139,6 @@ loadjs.ready("head", function () {
 <span id="el_cash_payments_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_cash_payments_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_cash_payments_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     </tr>

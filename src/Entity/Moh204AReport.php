@@ -51,8 +51,8 @@ class Moh204AReport extends AbstractEntity
     #[Column(name: "email_address", type: "string", nullable: true)]
     private ?string $emailAddress;
 
-    #[Column(name: "marital_status", type: "string")]
-    private string $maritalStatus;
+    #[Column(name: "marital_status", type: "string", nullable: true)]
+    private ?string $maritalStatus;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -146,12 +146,12 @@ class Moh204AReport extends AbstractEntity
         return $this;
     }
 
-    public function getMaritalStatus(): string
+    public function getMaritalStatus(): ?string
     {
         return HtmlDecode($this->maritalStatus);
     }
 
-    public function setMaritalStatus(string $value): static
+    public function setMaritalStatus(?string $value): static
     {
         $this->maritalStatus = RemoveXss($value);
         return $this;

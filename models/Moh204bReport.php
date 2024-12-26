@@ -293,9 +293,8 @@ class Moh204bReport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->marital_status->InputTextType = "text";
-        $this->marital_status->Nullable = false; // NOT NULL field
         $this->marital_status->Required = true; // Required field
-        $this->marital_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->marital_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['marital_status'] = &$this->marital_status;
 
         // date_created

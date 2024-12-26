@@ -153,14 +153,15 @@ class CashPaymentsList extends CashPayments
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->Visible = false;
         $this->visit_id->Visible = false;
         $this->amount->setVisibility();
         $this->details->setVisibility();
+        $this->paid->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -724,6 +725,7 @@ class CashPaymentsList extends CashPayments
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->paid);
         $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
@@ -1099,6 +1101,7 @@ class CashPaymentsList extends CashPayments
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
         $filterList = Concat($filterList, $this->amount->AdvancedSearch->toJson(), ","); // Field amount
         $filterList = Concat($filterList, $this->details->AdvancedSearch->toJson(), ","); // Field details
+        $filterList = Concat($filterList, $this->paid->AdvancedSearch->toJson(), ","); // Field paid
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
@@ -1180,6 +1183,14 @@ class CashPaymentsList extends CashPayments
         $this->details->AdvancedSearch->SearchValue2 = @$filter["y_details"];
         $this->details->AdvancedSearch->SearchOperator2 = @$filter["w_details"];
         $this->details->AdvancedSearch->save();
+
+        // Field paid
+        $this->paid->AdvancedSearch->SearchValue = @$filter["x_paid"];
+        $this->paid->AdvancedSearch->SearchOperator = @$filter["z_paid"];
+        $this->paid->AdvancedSearch->SearchCondition = @$filter["v_paid"];
+        $this->paid->AdvancedSearch->SearchValue2 = @$filter["y_paid"];
+        $this->paid->AdvancedSearch->SearchOperator2 = @$filter["w_paid"];
+        $this->paid->AdvancedSearch->save();
 
         // Field created_by_user_id
         $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
@@ -1322,12 +1333,10 @@ class CashPaymentsList extends CashPayments
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->amount); // amount
             $this->updateSort($this->details); // details
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1366,6 +1375,7 @@ class CashPaymentsList extends CashPayments
                 $this->visit_id->setSort("");
                 $this->amount->setSort("");
                 $this->details->setSort("");
+                $this->paid->setSort("");
                 $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
@@ -1425,6 +1435,14 @@ class CashPaymentsList extends CashPayments
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1462,6 +1480,10 @@ class CashPaymentsList extends CashPayments
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1584,12 +1606,10 @@ class CashPaymentsList extends CashPayments
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "amount");
             $this->createColumnOption($option, "details");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2033,6 +2053,7 @@ class CashPaymentsList extends CashPayments
         $this->visit_id->setDbValue($row['visit_id']);
         $this->amount->setDbValue($row['amount']);
         $this->details->setDbValue($row['details']);
+        $this->paid->setDbValue($row['paid']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -2047,6 +2068,7 @@ class CashPaymentsList extends CashPayments
         $row['visit_id'] = $this->visit_id->DefaultValue;
         $row['amount'] = $this->amount->DefaultValue;
         $row['details'] = $this->details->DefaultValue;
+        $row['paid'] = $this->paid->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2100,11 +2122,14 @@ class CashPaymentsList extends CashPayments
 
         // details
 
+        // paid
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2145,6 +2170,13 @@ class CashPaymentsList extends CashPayments
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
+            // paid
+            if (ConvertToBool($this->paid->CurrentValue)) {
+                $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
+            } else {
+                $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -2172,14 +2204,6 @@ class CashPaymentsList extends CashPayments
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // amount
             $this->amount->HrefValue = "";
             $this->amount->TooltipValue = "";
@@ -2195,10 +2219,6 @@ class CashPaymentsList extends CashPayments
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2577,6 +2597,8 @@ class CashPaymentsList extends CashPayments
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_paid":
                     break;
                 case "x_created_by_user_id":
                     break;

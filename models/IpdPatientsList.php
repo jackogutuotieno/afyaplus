@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientsList extends Patients
+class IpdPatientsList extends IpdPatients
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class PatientsList extends Patients
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientsList";
+    public $PageObjName = "IpdPatientsList";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class PatientsList extends Patients
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fpatientslist";
+    public $FormName = "fipd_patientslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "patientslist";
+    public $CurrentPageName = "ipdpatientslist";
 
     // Page URLs
     public $AddUrl;
@@ -63,14 +63,6 @@ class PatientsList extends Patients
     public $MultiEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -154,25 +146,12 @@ class PatientsList extends Patients
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->photo->Visible = false;
         $this->patient_name->setVisibility();
-        $this->first_name->Visible = false;
-        $this->last_name->Visible = false;
         $this->national_id->setVisibility();
         $this->date_of_birth->setVisibility();
-        $this->age->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
-        $this->email_address->setVisibility();
-        $this->physical_address->Visible = false;
-        $this->employment_status->Visible = false;
-        $this->marital_status->Visible = false;
-        $this->religion->Visible = false;
-        $this->next_of_kin->Visible = false;
-        $this->next_of_kin_phone->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->Visible = false;
-        $this->is_ipd->setVisibility();
+        $this->is_ipd->Visible = false;
     }
 
     // Constructor
@@ -183,8 +162,8 @@ class PatientsList extends Patients
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'patients';
-        $this->TableName = 'patients';
+        $this->TableVar = 'ipd_patients';
+        $this->TableName = 'ipd_patients';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -204,26 +183,26 @@ class PatientsList extends Patients
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patients)
-        if (!isset($GLOBALS["patients"]) || $GLOBALS["patients"]::class == PROJECT_NAMESPACE . "patients") {
-            $GLOBALS["patients"] = &$this;
+        // Table object (ipd_patients)
+        if (!isset($GLOBALS["ipd_patients"]) || $GLOBALS["ipd_patients"]::class == PROJECT_NAMESPACE . "ipd_patients") {
+            $GLOBALS["ipd_patients"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "patientsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "ipdpatientsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "patientsdelete";
-        $this->MultiUpdateUrl = "patientsupdate";
+        $this->MultiDeleteUrl = "ipdpatientsdelete";
+        $this->MultiUpdateUrl = "ipdpatientsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patients');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'ipd_patients');
         }
 
         // Start timer
@@ -374,7 +353,7 @@ class PatientsList extends Patients
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "patientsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "ipdpatientsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -729,15 +708,11 @@ class PatientsList extends Patients
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->gender);
-        $this->setupLookupOptions($this->employment_status);
-        $this->setupLookupOptions($this->marital_status);
-        $this->setupLookupOptions($this->religion);
         $this->setupLookupOptions($this->is_ipd);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fpatientsgrid";
+            $this->FormName = "fipd_patientsgrid";
         }
 
         // Set up page action
@@ -925,13 +900,6 @@ class PatientsList extends Patients
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
             }
-
-            // Audit trail on search
-            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
-                $searchParm = ServerVar("QUERY_STRING");
-                $searchSql = $this->getSessionWhere();
-                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
-            }
         }
 
         // Set up list action columns
@@ -1081,26 +1049,14 @@ class PatientsList extends Patients
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fpatientssrch");
+            $savedFilterList = Profile()->getSearchFilters("fipd_patientssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
-        $filterList = Concat($filterList, $this->first_name->AdvancedSearch->toJson(), ","); // Field first_name
-        $filterList = Concat($filterList, $this->last_name->AdvancedSearch->toJson(), ","); // Field last_name
         $filterList = Concat($filterList, $this->national_id->AdvancedSearch->toJson(), ","); // Field national_id
         $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
-        $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
-        $filterList = Concat($filterList, $this->email_address->AdvancedSearch->toJson(), ","); // Field email_address
-        $filterList = Concat($filterList, $this->physical_address->AdvancedSearch->toJson(), ","); // Field physical_address
-        $filterList = Concat($filterList, $this->employment_status->AdvancedSearch->toJson(), ","); // Field employment_status
-        $filterList = Concat($filterList, $this->marital_status->AdvancedSearch->toJson(), ","); // Field marital_status
-        $filterList = Concat($filterList, $this->religion->AdvancedSearch->toJson(), ","); // Field religion
-        $filterList = Concat($filterList, $this->next_of_kin->AdvancedSearch->toJson(), ","); // Field next_of_kin
-        $filterList = Concat($filterList, $this->next_of_kin_phone->AdvancedSearch->toJson(), ","); // Field next_of_kin_phone
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         $filterList = Concat($filterList, $this->is_ipd->AdvancedSearch->toJson(), ","); // Field is_ipd
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
@@ -1122,7 +1078,7 @@ class PatientsList extends Patients
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fpatientssrch", $filters);
+            Profile()->setSearchFilters("fipd_patientssrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1157,22 +1113,6 @@ class PatientsList extends Patients
         $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
         $this->patient_name->AdvancedSearch->save();
 
-        // Field first_name
-        $this->first_name->AdvancedSearch->SearchValue = @$filter["x_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator = @$filter["z_first_name"];
-        $this->first_name->AdvancedSearch->SearchCondition = @$filter["v_first_name"];
-        $this->first_name->AdvancedSearch->SearchValue2 = @$filter["y_first_name"];
-        $this->first_name->AdvancedSearch->SearchOperator2 = @$filter["w_first_name"];
-        $this->first_name->AdvancedSearch->save();
-
-        // Field last_name
-        $this->last_name->AdvancedSearch->SearchValue = @$filter["x_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator = @$filter["z_last_name"];
-        $this->last_name->AdvancedSearch->SearchCondition = @$filter["v_last_name"];
-        $this->last_name->AdvancedSearch->SearchValue2 = @$filter["y_last_name"];
-        $this->last_name->AdvancedSearch->SearchOperator2 = @$filter["w_last_name"];
-        $this->last_name->AdvancedSearch->save();
-
         // Field national_id
         $this->national_id->AdvancedSearch->SearchValue = @$filter["x_national_id"];
         $this->national_id->AdvancedSearch->SearchOperator = @$filter["z_national_id"];
@@ -1189,14 +1129,6 @@ class PatientsList extends Patients
         $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
         $this->date_of_birth->AdvancedSearch->save();
 
-        // Field age
-        $this->age->AdvancedSearch->SearchValue = @$filter["x_age"];
-        $this->age->AdvancedSearch->SearchOperator = @$filter["z_age"];
-        $this->age->AdvancedSearch->SearchCondition = @$filter["v_age"];
-        $this->age->AdvancedSearch->SearchValue2 = @$filter["y_age"];
-        $this->age->AdvancedSearch->SearchOperator2 = @$filter["w_age"];
-        $this->age->AdvancedSearch->save();
-
         // Field gender
         $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
         $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
@@ -1212,78 +1144,6 @@ class PatientsList extends Patients
         $this->phone->AdvancedSearch->SearchValue2 = @$filter["y_phone"];
         $this->phone->AdvancedSearch->SearchOperator2 = @$filter["w_phone"];
         $this->phone->AdvancedSearch->save();
-
-        // Field email_address
-        $this->email_address->AdvancedSearch->SearchValue = @$filter["x_email_address"];
-        $this->email_address->AdvancedSearch->SearchOperator = @$filter["z_email_address"];
-        $this->email_address->AdvancedSearch->SearchCondition = @$filter["v_email_address"];
-        $this->email_address->AdvancedSearch->SearchValue2 = @$filter["y_email_address"];
-        $this->email_address->AdvancedSearch->SearchOperator2 = @$filter["w_email_address"];
-        $this->email_address->AdvancedSearch->save();
-
-        // Field physical_address
-        $this->physical_address->AdvancedSearch->SearchValue = @$filter["x_physical_address"];
-        $this->physical_address->AdvancedSearch->SearchOperator = @$filter["z_physical_address"];
-        $this->physical_address->AdvancedSearch->SearchCondition = @$filter["v_physical_address"];
-        $this->physical_address->AdvancedSearch->SearchValue2 = @$filter["y_physical_address"];
-        $this->physical_address->AdvancedSearch->SearchOperator2 = @$filter["w_physical_address"];
-        $this->physical_address->AdvancedSearch->save();
-
-        // Field employment_status
-        $this->employment_status->AdvancedSearch->SearchValue = @$filter["x_employment_status"];
-        $this->employment_status->AdvancedSearch->SearchOperator = @$filter["z_employment_status"];
-        $this->employment_status->AdvancedSearch->SearchCondition = @$filter["v_employment_status"];
-        $this->employment_status->AdvancedSearch->SearchValue2 = @$filter["y_employment_status"];
-        $this->employment_status->AdvancedSearch->SearchOperator2 = @$filter["w_employment_status"];
-        $this->employment_status->AdvancedSearch->save();
-
-        // Field marital_status
-        $this->marital_status->AdvancedSearch->SearchValue = @$filter["x_marital_status"];
-        $this->marital_status->AdvancedSearch->SearchOperator = @$filter["z_marital_status"];
-        $this->marital_status->AdvancedSearch->SearchCondition = @$filter["v_marital_status"];
-        $this->marital_status->AdvancedSearch->SearchValue2 = @$filter["y_marital_status"];
-        $this->marital_status->AdvancedSearch->SearchOperator2 = @$filter["w_marital_status"];
-        $this->marital_status->AdvancedSearch->save();
-
-        // Field religion
-        $this->religion->AdvancedSearch->SearchValue = @$filter["x_religion"];
-        $this->religion->AdvancedSearch->SearchOperator = @$filter["z_religion"];
-        $this->religion->AdvancedSearch->SearchCondition = @$filter["v_religion"];
-        $this->religion->AdvancedSearch->SearchValue2 = @$filter["y_religion"];
-        $this->religion->AdvancedSearch->SearchOperator2 = @$filter["w_religion"];
-        $this->religion->AdvancedSearch->save();
-
-        // Field next_of_kin
-        $this->next_of_kin->AdvancedSearch->SearchValue = @$filter["x_next_of_kin"];
-        $this->next_of_kin->AdvancedSearch->SearchOperator = @$filter["z_next_of_kin"];
-        $this->next_of_kin->AdvancedSearch->SearchCondition = @$filter["v_next_of_kin"];
-        $this->next_of_kin->AdvancedSearch->SearchValue2 = @$filter["y_next_of_kin"];
-        $this->next_of_kin->AdvancedSearch->SearchOperator2 = @$filter["w_next_of_kin"];
-        $this->next_of_kin->AdvancedSearch->save();
-
-        // Field next_of_kin_phone
-        $this->next_of_kin_phone->AdvancedSearch->SearchValue = @$filter["x_next_of_kin_phone"];
-        $this->next_of_kin_phone->AdvancedSearch->SearchOperator = @$filter["z_next_of_kin_phone"];
-        $this->next_of_kin_phone->AdvancedSearch->SearchCondition = @$filter["v_next_of_kin_phone"];
-        $this->next_of_kin_phone->AdvancedSearch->SearchValue2 = @$filter["y_next_of_kin_phone"];
-        $this->next_of_kin_phone->AdvancedSearch->SearchOperator2 = @$filter["w_next_of_kin_phone"];
-        $this->next_of_kin_phone->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
 
         // Field is_ipd
         $this->is_ipd->AdvancedSearch->SearchValue = @$filter["x_is_ipd"];
@@ -1334,13 +1194,6 @@ class PatientsList extends Patients
         $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->phone;
-        $searchFlds[] = &$this->email_address;
-        $searchFlds[] = &$this->physical_address;
-        $searchFlds[] = &$this->employment_status;
-        $searchFlds[] = &$this->marital_status;
-        $searchFlds[] = &$this->religion;
-        $searchFlds[] = &$this->next_of_kin;
-        $searchFlds[] = &$this->next_of_kin_phone;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1423,12 +1276,8 @@ class PatientsList extends Patients
             $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->national_id); // national_id
             $this->updateSort($this->date_of_birth); // date_of_birth
-            $this->updateSort($this->age); // age
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->phone); // phone
-            $this->updateSort($this->email_address); // email_address
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->is_ipd); // is_ipd
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1455,22 +1304,10 @@ class PatientsList extends Patients
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->patient_name->setSort("");
-                $this->first_name->setSort("");
-                $this->last_name->setSort("");
                 $this->national_id->setSort("");
                 $this->date_of_birth->setSort("");
-                $this->age->setSort("");
                 $this->gender->setSort("");
                 $this->phone->setSort("");
-                $this->email_address->setSort("");
-                $this->physical_address->setSort("");
-                $this->employment_status->setSort("");
-                $this->marital_status->setSort("");
-                $this->religion->setSort("");
-                $this->next_of_kin->setSort("");
-                $this->next_of_kin_phone->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
                 $this->is_ipd->setSort("");
             }
 
@@ -1491,61 +1328,11 @@ class PatientsList extends Patients
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
         // "edit"
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
-
-        // "detail_patient_appointments"
-        $item = &$this->ListOptions->add("detail_patient_appointments");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_appointments');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_patients_dependants"
-        $item = &$this->ListOptions->add("detail_patients_dependants");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'patients_dependants');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_patient_visits"
-        $item = &$this->ListOptions->add("detail_patient_visits");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_visits');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // Multiple details
-        if ($this->ShowMultipleDetails) {
-            $item = &$this->ListOptions->add("details");
-            $item->CssClass = "text-nowrap";
-            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
-            $item->OnLeft = false;
-            $item->ShowInButtonGroup = false;
-            $this->ListOptions->hideDetailItems();
-        }
-
-        // Set up detail pages
-        $pages = new SubPages();
-        $pages->add("patient_appointments");
-        $pages->add("patients_dependants");
-        $pages->add("patient_visits");
-        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1605,43 +1392,14 @@ class PatientsList extends Patients
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patients\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"ipd_patients\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1664,12 +1422,12 @@ class PatientsList extends Patients
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fpatientslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_patientslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fpatientslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_patientslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1683,168 +1441,6 @@ class PatientsList extends Patients
             if (count($links) > 0) {
                 $opt->Body = $body;
             }
-        }
-        $detailViewTblVar = "";
-        $detailCopyTblVar = "";
-        $detailEditTblVar = "";
-
-        // "detail_patient_appointments"
-        $opt = $this->ListOptions["detail_patient_appointments"];
-        if ($Security->allowList(CurrentProjectID() . 'patient_appointments')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_appointments", "TblCaption");
-            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
-                $detailTbl = Container("patient_appointments");
-                $detailFilter = $detailTbl->getDetailFilter($this);
-                $detailTbl->setCurrentMasterTable($this->TableVar);
-                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
-                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
-                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_appointments")->Count, "red"], $Language->phrase("DetailCount"));
-            }
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientappointmentslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("PatientAppointmentsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_appointments");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "patient_appointments";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_appointments");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "patient_appointments";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_patients_dependants"
-        $opt = $this->ListOptions["detail_patients_dependants"];
-        if ($Security->allowList(CurrentProjectID() . 'patients_dependants')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patients_dependants", "TblCaption");
-            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
-                $detailTbl = Container("patients_dependants");
-                $detailFilter = $detailTbl->getDetailFilter($this);
-                $detailTbl->setCurrentMasterTable($this->TableVar);
-                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
-                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
-                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patients_dependants")->Count, "red"], $Language->phrase("DetailCount"));
-            }
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientsdependantslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("PatientsDependantsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patients_dependants");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "patients_dependants";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patients_dependants");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "patients_dependants";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_patient_visits"
-        $opt = $this->ListOptions["detail_patient_visits"];
-        if ($Security->allowList(CurrentProjectID() . 'patient_visits')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_visits", "TblCaption");
-            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
-                $detailTbl = Container("patient_visits");
-                $detailFilter = $detailTbl->getDetailFilter($this);
-                $detailTbl->setCurrentMasterTable($this->TableVar);
-                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
-                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
-                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_visits")->Count, "red"], $Language->phrase("DetailCount"));
-            }
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientvisitslist?" . Config("TABLE_SHOW_MASTER") . "=patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("PatientVisitsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_visits");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "patient_visits";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patients')) {
-                $caption = $Language->phrase("MasterDetailEditLink", null);
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_visits");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "patient_visits";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-        if ($this->ShowMultipleDetails) {
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
-            $links = "";
-            if ($detailViewTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            }
-            if ($detailEditTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            }
-            if ($detailCopyTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
-                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
-            }
-            $body .= "</div>";
-            // Multiple details
-            $opt = $this->ListOptions["details"];
-            $opt->Body = $body;
         }
 
         // "checkbox"
@@ -1868,72 +1464,6 @@ class PatientsList extends Patients
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["addedit"];
-
-        // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"patients\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        $option = $options["detail"];
-        $detailTableLink = "";
-        $item = &$option->add("detailadd_patient_appointments");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patient_appointments");
-        $detailPage = Container("PatientAppointmentsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patients') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "patient_appointments";
-        }
-        $item = &$option->add("detailadd_patients_dependants");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patients_dependants");
-        $detailPage = Container("PatientsDependantsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patients') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "patients_dependants";
-        }
-        $item = &$option->add("detailadd_patient_visits");
-        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patient_visits");
-        $detailPage = Container("PatientVisitsGrid");
-        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patients') && $Security->canAdd());
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "patient_visits";
-        }
-
-        // Add multiple details
-        if ($this->ShowMultipleDetails) {
-            $item = &$option->add("detailsadd");
-            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
-            $caption = $Language->phrase("AddMasterDetailLink");
-            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-            $item->Visible = $detailTableLink != "" && $Security->canAdd();
-            // Hide single master/detail items
-            $ar = explode(",", $detailTableLink);
-            $cnt = count($ar);
-            for ($i = 0; $i < $cnt; $i++) {
-                if ($item = $option["detailadd_" . $ar[$i]]) {
-                    $item->Visible = false;
-                }
-            }
-        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1946,12 +1476,8 @@ class PatientsList extends Patients
             $this->createColumnOption($option, "patient_name");
             $this->createColumnOption($option, "national_id");
             $this->createColumnOption($option, "date_of_birth");
-            $this->createColumnOption($option, "age");
             $this->createColumnOption($option, "gender");
             $this->createColumnOption($option, "phone");
-            $this->createColumnOption($option, "email_address");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "is_ipd");
         }
 
         // Set up custom actions
@@ -1976,10 +1502,10 @@ class PatientsList extends Patients
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fpatientssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fipd_patientssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fpatientssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fipd_patientssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -2039,7 +1565,7 @@ class PatientsList extends Patients
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fpatientslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fipd_patientslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -2210,7 +1736,7 @@ class PatientsList extends Patients
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_patients", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_ipd_patients", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -2271,7 +1797,7 @@ class PatientsList extends Patients
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_patients",
+            "id" => "r" . $this->RowCount . "_ipd_patients",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2391,27 +1917,11 @@ class PatientsList extends Patients
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->photo->Upload->DbValue = $row['photo'];
-        if (is_resource($this->photo->Upload->DbValue) && get_resource_type($this->photo->Upload->DbValue) == "stream") { // Byte array
-            $this->photo->Upload->DbValue = stream_get_contents($this->photo->Upload->DbValue);
-        }
         $this->patient_name->setDbValue($row['patient_name']);
-        $this->first_name->setDbValue($row['first_name']);
-        $this->last_name->setDbValue($row['last_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
-        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
-        $this->email_address->setDbValue($row['email_address']);
-        $this->physical_address->setDbValue($row['physical_address']);
-        $this->employment_status->setDbValue($row['employment_status']);
-        $this->marital_status->setDbValue($row['marital_status']);
-        $this->religion->setDbValue($row['religion']);
-        $this->next_of_kin->setDbValue($row['next_of_kin']);
-        $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
         $this->is_ipd->setDbValue($row['is_ipd']);
     }
 
@@ -2420,24 +1930,11 @@ class PatientsList extends Patients
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['photo'] = $this->photo->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
-        $row['first_name'] = $this->first_name->DefaultValue;
-        $row['last_name'] = $this->last_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
-        $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
-        $row['email_address'] = $this->email_address->DefaultValue;
-        $row['physical_address'] = $this->physical_address->DefaultValue;
-        $row['employment_status'] = $this->employment_status->DefaultValue;
-        $row['marital_status'] = $this->marital_status->DefaultValue;
-        $row['religion'] = $this->religion->DefaultValue;
-        $row['next_of_kin'] = $this->next_of_kin->DefaultValue;
-        $row['next_of_kin_phone'] = $this->next_of_kin_phone->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
         $row['is_ipd'] = $this->is_ipd->DefaultValue;
         return $row;
     }
@@ -2481,41 +1978,15 @@ class PatientsList extends Patients
 
         // id
 
-        // photo
-
         // patient_name
-
-        // first_name
-
-        // last_name
 
         // national_id
 
         // date_of_birth
 
-        // age
-
         // gender
 
         // phone
-
-        // email_address
-
-        // physical_address
-
-        // employment_status
-
-        // marital_status
-
-        // religion
-
-        // next_of_kin
-
-        // next_of_kin_phone
-
-        // date_created
-
-        // date_updated
 
         // is_ipd
 
@@ -2524,78 +1995,22 @@ class PatientsList extends Patients
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // photo
-            if (!EmptyValue($this->photo->Upload->DbValue)) {
-                $this->photo->ViewValue = $this->id->CurrentValue;
-                $this->photo->IsBlobImage = IsImageFile(ContentExtension($this->photo->Upload->DbValue));
-            } else {
-                $this->photo->ViewValue = "";
-            }
-
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
+            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
 
-            // age
-            $this->age->ViewValue = $this->age->CurrentValue;
-            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
-
             // gender
-            if (strval($this->gender->CurrentValue) != "") {
-                $this->gender->ViewValue = $this->gender->optionCaption($this->gender->CurrentValue);
-            } else {
-                $this->gender->ViewValue = null;
-            }
+            $this->gender->ViewValue = $this->gender->CurrentValue;
 
             // phone
             $this->phone->ViewValue = $this->phone->CurrentValue;
-
-            // email_address
-            $this->email_address->ViewValue = $this->email_address->CurrentValue;
-
-            // physical_address
-            $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
-
-            // employment_status
-            if (strval($this->employment_status->CurrentValue) != "") {
-                $this->employment_status->ViewValue = $this->employment_status->optionCaption($this->employment_status->CurrentValue);
-            } else {
-                $this->employment_status->ViewValue = null;
-            }
-
-            // marital_status
-            if (strval($this->marital_status->CurrentValue) != "") {
-                $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
-            } else {
-                $this->marital_status->ViewValue = null;
-            }
-
-            // religion
-            if (strval($this->religion->CurrentValue) != "") {
-                $this->religion->ViewValue = $this->religion->optionCaption($this->religion->CurrentValue);
-            } else {
-                $this->religion->ViewValue = null;
-            }
-
-            // next_of_kin
-            $this->next_of_kin->ViewValue = $this->next_of_kin->CurrentValue;
-
-            // next_of_kin_phone
-            $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // is_ipd
             if (ConvertToBool($this->is_ipd->CurrentValue)) {
@@ -2620,45 +2035,13 @@ class PatientsList extends Patients
             $this->date_of_birth->HrefValue = "";
             $this->date_of_birth->TooltipValue = "";
 
-            // age
-            $this->age->HrefValue = "";
-            $this->age->TooltipValue = "";
-
             // gender
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
 
             // phone
-            if (!EmptyValue($this->phone->CurrentValue)) {
-                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
-                $this->phone->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
-                }
-            } else {
-                $this->phone->HrefValue = "";
-            }
+            $this->phone->HrefValue = "";
             $this->phone->TooltipValue = "";
-
-            // email_address
-            if (!EmptyValue($this->email_address->CurrentValue)) {
-                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
-                $this->email_address->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
-                }
-            } else {
-                $this->email_address->HrefValue = "";
-            }
-            $this->email_address->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // is_ipd
-            $this->is_ipd->HrefValue = "";
-            $this->is_ipd->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2679,19 +2062,19 @@ class PatientsList extends Patients
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fipd_patientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fipd_patientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fipd_patientslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2703,7 +2086,7 @@ class PatientsList extends Patients
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatientslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fipd_patientslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2781,7 +2164,7 @@ class PatientsList extends Patients
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fpatientssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fipd_patientssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2910,14 +2293,6 @@ class PatientsList extends Patients
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_gender":
-                    break;
-                case "x_employment_status":
-                    break;
-                case "x_marital_status":
-                    break;
-                case "x_religion":
-                    break;
                 case "x_is_ipd":
                     break;
                 default:
@@ -3092,10 +2467,7 @@ class PatientsList extends Patients
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "register patient");
+        //Log("Page Load");
     }
 
     // Page Unload event
@@ -3182,10 +2554,8 @@ class PatientsList extends Patients
     // ListOptions Rendered event
     public function listOptionsRendered()
     {
-        $this->ListOptions->Items["view"]->clear();
-        $this->ListOptions->Items["detail_patient_appointments"]->clear();
-        $this->ListOptions->Items["detail_patient_visits"]->clear();
-        $this->ListOptions->Items["detail_patients_dependants"]->clear();
+        // Example:
+        //$this->ListOptions["new"]->Body = "xxx";
     }
 
     // Row Custom Action event

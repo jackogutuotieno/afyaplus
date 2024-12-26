@@ -45,7 +45,7 @@
       <phrase id="menutext" value="Notifications" />
     </menu>
     <menu id="51">
-      <phrase id="menutext" value="OPD" />
+      <phrase id="menutext" value="OPD Patients" />
     </menu>
     <menu id="48">
       <phrase id="menutext" value="Patients List" />
@@ -85,6 +85,12 @@
     </menu>
     <menu id="432">
       <phrase id="menutext" value="Cash Payments" />
+    </menu>
+    <menu id="746">
+      <phrase id="menutext" value="IPD Patients" />
+    </menu>
+    <menu id="645">
+      <phrase id="menutext" value="Patients List" />
     </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />
@@ -150,7 +156,7 @@
       <phrase id="menutext" value="Dispense Details" />
     </menu>
     <menu id="236">
-      <phrase id="menutext" value="Billing Details" />
+      <phrase id="menutext" value="Billing" />
     </menu>
     <menu id="174">
       <phrase id="menutext" value="Laboratory" />
@@ -1092,6 +1098,17 @@
         <phrase id="fldtagvalue2" value="Unemployed" />
         <phrase id="fldtagcaption2" value="Unemployed" />
       </field>
+      <field id="marital_status">
+        <phrase id="fldcaption" value="Marital Status" />
+        <phrase id="fldtagvalue1" value="Single" />
+        <phrase id="fldtagcaption1" value="Single" />
+        <phrase id="fldtagvalue2" value="Married" />
+        <phrase id="fldtagcaption2" value="Married" />
+        <phrase id="fldtagvalue3" value="Divorced" />
+        <phrase id="fldtagcaption3" value="Divorced" />
+        <phrase id="fldtagvalue4" value="Widowed" />
+        <phrase id="fldtagcaption4" value="Widowed" />
+      </field>
       <field id="religion">
         <phrase id="fldcaption" value="Religion" />
         <phrase id="fldtagvalue1" value="Christian" />
@@ -1111,22 +1128,18 @@
       <field id="next_of_kin_phone">
         <phrase id="fldcaption" value="NoK Phone" />
       </field>
-      <field id="marital_status">
-        <phrase id="fldcaption" value="Marital Status" />
-        <phrase id="fldtagvalue1" value="Single" />
-        <phrase id="fldtagcaption1" value="Single" />
-        <phrase id="fldtagvalue2" value="Married" />
-        <phrase id="fldtagcaption2" value="Married" />
-        <phrase id="fldtagvalue3" value="Divorced" />
-        <phrase id="fldtagcaption3" value="Divorced" />
-        <phrase id="fldtagvalue4" value="Widowed" />
-        <phrase id="fldtagcaption4" value="Widowed" />
-      </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Registration Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="date updated" />
+      </field>
+      <field id="is_ipd">
+        <phrase id="fldcaption" value="Is IPD?" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
     </table>
     <table id="payment_methods">
@@ -2613,7 +2626,7 @@
     <table id="cash_payments">
       <phrase id="tblcaption" value="Cash Payments" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Receipt No" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
@@ -2627,6 +2640,13 @@
       <field id="details">
         <phrase id="fldcaption" value="Details" />
         <phrase id="custommsg" value="Enter the details (E.g. Pharmacy bill payment)" />
+      </field>
+      <field id="paid">
+        <phrase id="fldcaption" value="Paid" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
       <field id="created_by_user_id">
         <phrase id="fldcaption" value="Received By" />
@@ -2818,10 +2838,10 @@
         <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="patient_name">
-        <phrase id="fldcaption" value="Patient Name" />
+        <phrase id="fldcaption" value="Date of Birth" />
       </field>
       <field id="gender">
-        <phrase id="fldcaption" value="Gender" />
+        <phrase id="fldcaption" value="Phone" />
       </field>
       <field id="patient_age">
         <phrase id="fldcaption" value="Age" />
@@ -2930,6 +2950,34 @@
       </field>
       <field id="total_amount">
         <phrase id="fldcaption" value="Total (Kshs)" />
+      </field>
+    </table>
+    <table id="ipd_patients">
+      <phrase id="tblcaption" value="IPD Patients" />
+      <field id="id">
+        <phrase id="fldcaption" value="UHID" />
+      </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="patient name" />
+      </field>
+      <field id="national_id">
+        <phrase id="fldcaption" value="national id" />
+      </field>
+      <field id="date_of_birth">
+        <phrase id="fldcaption" value="date of birth" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="gender" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="phone" />
+      </field>
+      <field id="is_ipd">
+        <phrase id="fldcaption" value="is ipd" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
     </table>
   </project>

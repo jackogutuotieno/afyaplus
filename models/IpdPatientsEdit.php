@@ -15,7 +15,7 @@ use Closure;
 /**
  * Page class
  */
-class CashPaymentsEdit extends CashPayments
+class IpdPatientsEdit extends IpdPatients
 {
     use MessagesTrait;
 
@@ -26,7 +26,7 @@ class CashPaymentsEdit extends CashPayments
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "CashPaymentsEdit";
+    public $PageObjName = "IpdPatientsEdit";
 
     // View file path
     public $View = null;
@@ -38,15 +38,7 @@ class CashPaymentsEdit extends CashPayments
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "cashpaymentsedit";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "ipdpatientsedit";
 
     // Page headings
     public $Heading = "";
@@ -130,14 +122,12 @@ class CashPaymentsEdit extends CashPayments
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->visit_id->Visible = false;
-        $this->amount->setVisibility();
-        $this->details->setVisibility();
-        $this->paid->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->Visible = false;
-        $this->date_updated->Visible = false;
+        $this->patient_name->Visible = false;
+        $this->national_id->Visible = false;
+        $this->date_of_birth->Visible = false;
+        $this->gender->Visible = false;
+        $this->phone->Visible = false;
+        $this->is_ipd->setVisibility();
     }
 
     // Constructor
@@ -145,8 +135,8 @@ class CashPaymentsEdit extends CashPayments
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'cash_payments';
-        $this->TableName = 'cash_payments';
+        $this->TableVar = 'ipd_patients';
+        $this->TableName = 'ipd_patients';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-edit-table";
@@ -157,14 +147,14 @@ class CashPaymentsEdit extends CashPayments
         // Language object
         $Language = Container("app.language");
 
-        // Table object (cash_payments)
-        if (!isset($GLOBALS["cash_payments"]) || $GLOBALS["cash_payments"]::class == PROJECT_NAMESPACE . "cash_payments") {
-            $GLOBALS["cash_payments"] = &$this;
+        // Table object (ipd_patients)
+        if (!isset($GLOBALS["ipd_patients"]) || $GLOBALS["ipd_patients"]::class == PROJECT_NAMESPACE . "ipd_patients") {
+            $GLOBALS["ipd_patients"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'cash_payments');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'ipd_patients');
         }
 
         // Start timer
@@ -278,7 +268,7 @@ class CashPaymentsEdit extends CashPayments
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "cashpaymentsview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "ipdpatientsview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -538,9 +528,7 @@ class CashPaymentsEdit extends CashPayments
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->paid);
-        $this->setupLookupOptions($this->created_by_user_id);
+        $this->setupLookupOptions($this->is_ipd);
 
         // Check modal
         if ($this->IsModal) {
@@ -598,9 +586,6 @@ class CashPaymentsEdit extends CashPayments
                 }
             }
 
-            // Set up master detail parameters
-            $this->setupMasterParms();
-
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -635,13 +620,13 @@ class CashPaymentsEdit extends CashPayments
                         if ($this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                         }
-                        $this->terminate("cashpaymentslist"); // No matching record, return to list
+                        $this->terminate("ipdpatientslist"); // No matching record, return to list
                         return;
                     }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "cashpaymentslist") {
+                if (GetPageName($returnUrl) == "ipdpatientslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -651,11 +636,11 @@ class CashPaymentsEdit extends CashPayments
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
+                    if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "cashpaymentslist") {
+                        if (GetPageName($returnUrl) != "ipdpatientslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "cashpaymentslist"; // Return list page content
+                            $returnUrl = "ipdpatientslist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) {
@@ -732,53 +717,13 @@ class CashPaymentsEdit extends CashPayments
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'patient_id' first before field var 'x_patient_id'
-        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
-        if (!$this->patient_id->IsDetailKey) {
+        // Check field name 'is_ipd' first before field var 'x_is_ipd'
+        $val = $CurrentForm->hasValue("is_ipd") ? $CurrentForm->getValue("is_ipd") : $CurrentForm->getValue("x_is_ipd");
+        if (!$this->is_ipd->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->patient_id->Visible = false; // Disable update for API request
+                $this->is_ipd->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'amount' first before field var 'x_amount'
-        $val = $CurrentForm->hasValue("amount") ? $CurrentForm->getValue("amount") : $CurrentForm->getValue("x_amount");
-        if (!$this->amount->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->amount->Visible = false; // Disable update for API request
-            } else {
-                $this->amount->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'details' first before field var 'x_details'
-        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
-        if (!$this->details->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->details->Visible = false; // Disable update for API request
-            } else {
-                $this->details->setFormValue($val);
-            }
-        }
-
-        // Check field name 'paid' first before field var 'x_paid'
-        $val = $CurrentForm->hasValue("paid") ? $CurrentForm->getValue("paid") : $CurrentForm->getValue("x_paid");
-        if (!$this->paid->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->paid->Visible = false; // Disable update for API request
-            } else {
-                $this->paid->setFormValue($val);
-            }
-        }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val);
+                $this->is_ipd->setFormValue($val);
             }
         }
     }
@@ -788,11 +733,7 @@ class CashPaymentsEdit extends CashPayments
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
-        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->amount->CurrentValue = $this->amount->FormValue;
-        $this->details->CurrentValue = $this->details->FormValue;
-        $this->paid->CurrentValue = $this->paid->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
+        $this->is_ipd->CurrentValue = $this->is_ipd->FormValue;
     }
 
     /**
@@ -834,14 +775,12 @@ class CashPaymentsEdit extends CashPayments
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->amount->setDbValue($row['amount']);
-        $this->details->setDbValue($row['details']);
-        $this->paid->setDbValue($row['paid']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->patient_name->setDbValue($row['patient_name']);
+        $this->national_id->setDbValue($row['national_id']);
+        $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->gender->setDbValue($row['gender']);
+        $this->phone->setDbValue($row['phone']);
+        $this->is_ipd->setDbValue($row['is_ipd']);
     }
 
     // Return a row with default values
@@ -849,14 +788,12 @@ class CashPaymentsEdit extends CashPayments
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['amount'] = $this->amount->DefaultValue;
-        $row['details'] = $this->details->DefaultValue;
-        $row['paid'] = $this->paid->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['national_id'] = $this->national_id->DefaultValue;
+        $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['gender'] = $this->gender->DefaultValue;
+        $row['phone'] = $this->phone->DefaultValue;
+        $row['is_ipd'] = $this->is_ipd->DefaultValue;
         return $row;
     }
 
@@ -894,215 +831,74 @@ class CashPaymentsEdit extends CashPayments
         // id
         $this->id->RowCssClass = "row";
 
-        // patient_id
-        $this->patient_id->RowCssClass = "row";
+        // patient_name
+        $this->patient_name->RowCssClass = "row";
 
-        // visit_id
-        $this->visit_id->RowCssClass = "row";
+        // national_id
+        $this->national_id->RowCssClass = "row";
 
-        // amount
-        $this->amount->RowCssClass = "row";
+        // date_of_birth
+        $this->date_of_birth->RowCssClass = "row";
 
-        // details
-        $this->details->RowCssClass = "row";
+        // gender
+        $this->gender->RowCssClass = "row";
 
-        // paid
-        $this->paid->RowCssClass = "row";
+        // phone
+        $this->phone->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
-        // date_created
-        $this->date_created->RowCssClass = "row";
-
-        // date_updated
-        $this->date_updated->RowCssClass = "row";
+        // is_ipd
+        $this->is_ipd->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                    } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                    }
-                }
+            // patient_name
+            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // national_id
+            $this->national_id->ViewValue = $this->national_id->CurrentValue;
+            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
+
+            // date_of_birth
+            $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
+            $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // gender
+            $this->gender->ViewValue = $this->gender->CurrentValue;
+
+            // phone
+            $this->phone->ViewValue = $this->phone->CurrentValue;
+
+            // is_ipd
+            if (ConvertToBool($this->is_ipd->CurrentValue)) {
+                $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(1) != "" ? $this->is_ipd->tagCaption(1) : "Yes";
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(2) != "" ? $this->is_ipd->tagCaption(2) : "No";
             }
-
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
-            // amount
-            $this->amount->ViewValue = $this->amount->CurrentValue;
-            $this->amount->ViewValue = FormatNumber($this->amount->ViewValue, $this->amount->formatPattern());
-
-            // details
-            $this->details->ViewValue = $this->details->CurrentValue;
-
-            // paid
-            if (ConvertToBool($this->paid->CurrentValue)) {
-                $this->paid->ViewValue = $this->paid->tagCaption(1) != "" ? $this->paid->tagCaption(1) : "Yes";
-            } else {
-                $this->paid->ViewValue = $this->paid->tagCaption(2) != "" ? $this->paid->tagCaption(2) : "No";
-            }
-
-            // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
-                    } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->created_by_user_id->ViewValue = null;
-            }
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
             // id
             $this->id->HrefValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-
-            // amount
-            $this->amount->HrefValue = "";
-
-            // details
-            $this->details->HrefValue = "";
-
-            // paid
-            $this->paid->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // is_ipd
+            $this->is_ipd->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
 
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->patient_id->ViewValue = null;
-                }
-            } else {
-                $curVal = trim(strval($this->patient_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                } else {
-                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
-                }
-                if ($this->patient_id->ViewValue !== null) { // Load from cache
-                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    }
-                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->patient_id->EditValue = $arwrk;
-                }
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            }
-
-            // amount
-            $this->amount->setupEditAttributes();
-            $this->amount->EditValue = $this->amount->CurrentValue;
-            $this->amount->PlaceHolder = RemoveHtml($this->amount->caption());
-            if (strval($this->amount->EditValue) != "" && is_numeric($this->amount->EditValue)) {
-                $this->amount->EditValue = FormatNumber($this->amount->EditValue, null);
-            }
-
-            // details
-            $this->details->setupEditAttributes();
-            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
-            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
-
-            // paid
-            $this->paid->EditValue = $this->paid->options(false);
-            $this->paid->PlaceHolder = RemoveHtml($this->paid->caption());
-
-            // created_by_user_id
+            // is_ipd
+            $this->is_ipd->EditValue = $this->is_ipd->options(false);
+            $this->is_ipd->PlaceHolder = RemoveHtml($this->is_ipd->caption());
 
             // Edit refer script
 
             // id
             $this->id->HrefValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-
-            // amount
-            $this->amount->HrefValue = "";
-
-            // details
-            $this->details->HrefValue = "";
-
-            // paid
-            $this->paid->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
+            // is_ipd
+            $this->is_ipd->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1129,32 +925,9 @@ class CashPaymentsEdit extends CashPayments
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->patient_id->Visible && $this->patient_id->Required) {
-                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
-                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
-                }
-            }
-            if ($this->amount->Visible && $this->amount->Required) {
-                if (!$this->amount->IsDetailKey && EmptyValue($this->amount->FormValue)) {
-                    $this->amount->addErrorMessage(str_replace("%s", $this->amount->caption(), $this->amount->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->amount->FormValue)) {
-                $this->amount->addErrorMessage($this->amount->getErrorMessage(false));
-            }
-            if ($this->details->Visible && $this->details->Required) {
-                if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
-                    $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
-                }
-            }
-            if ($this->paid->Visible && $this->paid->Required) {
-                if ($this->paid->FormValue == "") {
-                    $this->paid->addErrorMessage(str_replace("%s", $this->paid->caption(), $this->paid->RequiredErrorMessage));
-                }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
+            if ($this->is_ipd->Visible && $this->is_ipd->Required) {
+                if ($this->is_ipd->FormValue == "") {
+                    $this->is_ipd->addErrorMessage(str_replace("%s", $this->is_ipd->caption(), $this->is_ipd->RequiredErrorMessage));
                 }
             }
 
@@ -1226,11 +999,6 @@ class CashPaymentsEdit extends CashPayments
         if ($editRow) {
             $this->rowUpdated($rsold, $rsnew);
         }
-        if ($editRow) {
-            if ($this->SendEmail) {
-                $this->sendEmailOnEdit($rsold, $rsnew);
-            }
-        }
 
         // Write JSON response
         if (IsJsonResponse() && $editRow) {
@@ -1251,28 +1019,12 @@ class CashPaymentsEdit extends CashPayments
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->ReadOnly = true;
-        }
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
-
-        // amount
-        $this->amount->setDbValueDef($rsnew, $this->amount->CurrentValue, $this->amount->ReadOnly);
-
-        // details
-        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, $this->details->ReadOnly);
-
-        // paid
-        $tmpBool = $this->paid->CurrentValue;
+        // is_ipd
+        $tmpBool = $this->is_ipd->CurrentValue;
         if ($tmpBool != "1" && $tmpBool != "0") {
             $tmpBool = !empty($tmpBool) ? "1" : "0";
         }
-        $this->paid->setDbValueDef($rsnew, $tmpBool, $this->paid->ReadOnly);
-
-        // created_by_user_id
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
+        $this->is_ipd->setDbValueDef($rsnew, $tmpBool, $this->is_ipd->ReadOnly);
         return $rsnew;
     }
 
@@ -1282,119 +1034,9 @@ class CashPaymentsEdit extends CashPayments
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->CurrentValue = $row['patient_id'];
+        if (isset($row['is_ipd'])) { // is_ipd
+            $this->is_ipd->CurrentValue = $row['is_ipd'];
         }
-        if (isset($row['amount'])) { // amount
-            $this->amount->CurrentValue = $row['amount'];
-        }
-        if (isset($row['details'])) { // details
-            $this->details->CurrentValue = $row['details'];
-        }
-        if (isset($row['paid'])) { // paid
-            $this->paid->CurrentValue = $row['paid'];
-        }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
-                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-            $this->setSessionWhere($this->getDetailFilterFromSession());
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
-                    $this->visit_id->setSessionValue("");
-                }
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -1403,7 +1045,7 @@ class CashPaymentsEdit extends CashPayments
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("cashpaymentslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ipdpatientslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }
@@ -1421,11 +1063,7 @@ class CashPaymentsEdit extends CashPayments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
-                    break;
-                case "x_paid":
-                    break;
-                case "x_created_by_user_id":
+                case "x_is_ipd":
                     break;
                 default:
                     $lookupFilter = "";

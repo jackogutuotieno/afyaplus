@@ -168,3 +168,20 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-26 11:10:16",/afyaplus/login,2,login,::1,,,,
 "2024-12-26 11:33:35",/afyaplus/logout,2,logout,::1,,,,
 "2024-12-26 11:33:49",/afyaplus/login,6,login,::1,,,,
+"2024-12-26 11:41:00",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-26 11:41:10",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 11:56:38",/afyaplus/cashpaymentsadd,2,A,cash_payments,patient_id,2,,8
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,amount,2,,2000
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,details,2,,"Pharmacy Bill"
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,paid,2,,1
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,created_by_user_id,2,,2
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,visit_id,2,,12
+"2024-12-26 11:56:39",/afyaplus/cashpaymentsadd,2,A,cash_payments,id,2,,2
+"2024-12-26 12:15:28",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 12:15:34",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 12:17:41",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 12:17:47",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 12:18:26",/afyaplus/patientsedit/1,2,U,patients,physical_address,1,"Box 002 - 00100, Nairobi.","<p>Box 002 - 00100, Nairobi.</p>"
+"2024-12-26 12:18:26",/afyaplus/patientsedit/1,2,U,patients,religion,1,Christianity,
+"2024-12-26 12:18:26",/afyaplus/patientsedit/1,2,U,patients,is_ipd,1,0,1
+"2024-12-26 12:18:57",/afyaplus/logout,2,logout,::1,,,,

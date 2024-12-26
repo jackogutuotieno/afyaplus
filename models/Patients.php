@@ -67,12 +67,13 @@ class Patients extends DbTable
     public $email_address;
     public $physical_address;
     public $employment_status;
+    public $marital_status;
     public $religion;
     public $next_of_kin;
     public $next_of_kin_phone;
-    public $marital_status;
     public $date_created;
     public $date_updated;
+    public $is_ipd;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -445,6 +446,33 @@ class Patients extends DbTable
         $this->employment_status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['employment_status'] = &$this->employment_status;
 
+        // marital_status
+        $this->marital_status = new DbField(
+            $this, // Table
+            'x_marital_status', // Variable name
+            'marital_status', // Name
+            '`marital_status`', // Expression
+            '`marital_status`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`marital_status`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->marital_status->InputTextType = "text";
+        $this->marital_status->setSelectMultiple(false); // Select one
+        $this->marital_status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->marital_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->marital_status->Lookup = new Lookup($this->marital_status, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->marital_status->OptionCount = 4;
+        $this->marital_status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->Fields['marital_status'] = &$this->marital_status;
+
         // religion
         $this->religion = new DbField(
             $this, // Table
@@ -520,35 +548,6 @@ class Patients extends DbTable
         $this->next_of_kin_phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['next_of_kin_phone'] = &$this->next_of_kin_phone;
 
-        // marital_status
-        $this->marital_status = new DbField(
-            $this, // Table
-            'x_marital_status', // Variable name
-            'marital_status', // Name
-            '`marital_status`', // Expression
-            '`marital_status`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`marital_status`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->marital_status->InputTextType = "text";
-        $this->marital_status->Nullable = false; // NOT NULL field
-        $this->marital_status->Required = true; // Required field
-        $this->marital_status->setSelectMultiple(false); // Select one
-        $this->marital_status->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->marital_status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->marital_status->Lookup = new Lookup($this->marital_status, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->marital_status->OptionCount = 4;
-        $this->marital_status->SearchOperators = ["=", "<>"];
-        $this->Fields['marital_status'] = &$this->marital_status;
-
         // date_created
         $this->date_created = new DbField(
             $this, // Table
@@ -600,6 +599,35 @@ class Patients extends DbTable
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
+
+        // is_ipd
+        $this->is_ipd = new DbField(
+            $this, // Table
+            'x_is_ipd', // Variable name
+            'is_ipd', // Name
+            '`is_ipd`', // Expression
+            '`is_ipd`', // Basic search expression
+            16, // Type
+            1, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`is_ipd`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'CHECKBOX' // Edit Tag
+        );
+        $this->is_ipd->addMethod("getDefault", fn() => 0);
+        $this->is_ipd->InputTextType = "text";
+        $this->is_ipd->Raw = true;
+        $this->is_ipd->Nullable = false; // NOT NULL field
+        $this->is_ipd->setDataType(DataType::BOOLEAN);
+        $this->is_ipd->Lookup = new Lookup($this->is_ipd, 'patients', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->is_ipd->OptionCount = 2;
+        $this->is_ipd->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->is_ipd->SearchOperators = ["=", "<>"];
+        $this->Fields['is_ipd'] = &$this->is_ipd;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -1167,12 +1195,13 @@ class Patients extends DbTable
         $this->email_address->DbValue = $row['email_address'];
         $this->physical_address->DbValue = $row['physical_address'];
         $this->employment_status->DbValue = $row['employment_status'];
+        $this->marital_status->DbValue = $row['marital_status'];
         $this->religion->DbValue = $row['religion'];
         $this->next_of_kin->DbValue = $row['next_of_kin'];
         $this->next_of_kin_phone->DbValue = $row['next_of_kin_phone'];
-        $this->marital_status->DbValue = $row['marital_status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
+        $this->is_ipd->DbValue = $row['is_ipd'];
     }
 
     // Delete uploaded files
@@ -1546,12 +1575,13 @@ class Patients extends DbTable
         $this->email_address->setDbValue($row['email_address']);
         $this->physical_address->setDbValue($row['physical_address']);
         $this->employment_status->setDbValue($row['employment_status']);
+        $this->marital_status->setDbValue($row['marital_status']);
         $this->religion->setDbValue($row['religion']);
         $this->next_of_kin->setDbValue($row['next_of_kin']);
         $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
-        $this->marital_status->setDbValue($row['marital_status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
+        $this->is_ipd->setDbValue($row['is_ipd']);
     }
 
     // Render list content
@@ -1608,17 +1638,19 @@ class Patients extends DbTable
 
         // employment_status
 
+        // marital_status
+
         // religion
 
         // next_of_kin
 
         // next_of_kin_phone
 
-        // marital_status
-
         // date_created
 
         // date_updated
+
+        // is_ipd
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1674,6 +1706,13 @@ class Patients extends DbTable
             $this->employment_status->ViewValue = null;
         }
 
+        // marital_status
+        if (strval($this->marital_status->CurrentValue) != "") {
+            $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
+        } else {
+            $this->marital_status->ViewValue = null;
+        }
+
         // religion
         if (strval($this->religion->CurrentValue) != "") {
             $this->religion->ViewValue = $this->religion->optionCaption($this->religion->CurrentValue);
@@ -1687,13 +1726,6 @@ class Patients extends DbTable
         // next_of_kin_phone
         $this->next_of_kin_phone->ViewValue = $this->next_of_kin_phone->CurrentValue;
 
-        // marital_status
-        if (strval($this->marital_status->CurrentValue) != "") {
-            $this->marital_status->ViewValue = $this->marital_status->optionCaption($this->marital_status->CurrentValue);
-        } else {
-            $this->marital_status->ViewValue = null;
-        }
-
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1701,6 +1733,13 @@ class Patients extends DbTable
         // date_updated
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+        // is_ipd
+        if (ConvertToBool($this->is_ipd->CurrentValue)) {
+            $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(1) != "" ? $this->is_ipd->tagCaption(1) : "Yes";
+        } else {
+            $this->is_ipd->ViewValue = $this->is_ipd->tagCaption(2) != "" ? $this->is_ipd->tagCaption(2) : "No";
+        }
 
         // id
         $this->id->HrefValue = "";
@@ -1782,6 +1821,10 @@ class Patients extends DbTable
         $this->employment_status->HrefValue = "";
         $this->employment_status->TooltipValue = "";
 
+        // marital_status
+        $this->marital_status->HrefValue = "";
+        $this->marital_status->TooltipValue = "";
+
         // religion
         $this->religion->HrefValue = "";
         $this->religion->TooltipValue = "";
@@ -1794,10 +1837,6 @@ class Patients extends DbTable
         $this->next_of_kin_phone->HrefValue = "";
         $this->next_of_kin_phone->TooltipValue = "";
 
-        // marital_status
-        $this->marital_status->HrefValue = "";
-        $this->marital_status->TooltipValue = "";
-
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
@@ -1805,6 +1844,10 @@ class Patients extends DbTable
         // date_updated
         $this->date_updated->HrefValue = "";
         $this->date_updated->TooltipValue = "";
+
+        // is_ipd
+        $this->is_ipd->HrefValue = "";
+        $this->is_ipd->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1909,6 +1952,11 @@ class Patients extends DbTable
         $this->employment_status->EditValue = $this->employment_status->options(true);
         $this->employment_status->PlaceHolder = RemoveHtml($this->employment_status->caption());
 
+        // marital_status
+        $this->marital_status->setupEditAttributes();
+        $this->marital_status->EditValue = $this->marital_status->options(true);
+        $this->marital_status->PlaceHolder = RemoveHtml($this->marital_status->caption());
+
         // religion
         $this->religion->setupEditAttributes();
         $this->religion->EditValue = $this->religion->options(true);
@@ -1930,11 +1978,6 @@ class Patients extends DbTable
         $this->next_of_kin_phone->EditValue = $this->next_of_kin_phone->CurrentValue;
         $this->next_of_kin_phone->PlaceHolder = RemoveHtml($this->next_of_kin_phone->caption());
 
-        // marital_status
-        $this->marital_status->setupEditAttributes();
-        $this->marital_status->EditValue = $this->marital_status->options(true);
-        $this->marital_status->PlaceHolder = RemoveHtml($this->marital_status->caption());
-
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1944,6 +1987,10 @@ class Patients extends DbTable
         $this->date_updated->setupEditAttributes();
         $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+
+        // is_ipd
+        $this->is_ipd->EditValue = $this->is_ipd->options(false);
+        $this->is_ipd->PlaceHolder = RemoveHtml($this->is_ipd->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1977,6 +2024,7 @@ class Patients extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->is_ipd);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->photo);
@@ -1989,12 +2037,13 @@ class Patients extends DbTable
                     $doc->exportCaption($this->email_address);
                     $doc->exportCaption($this->physical_address);
                     $doc->exportCaption($this->employment_status);
+                    $doc->exportCaption($this->marital_status);
                     $doc->exportCaption($this->religion);
                     $doc->exportCaption($this->next_of_kin);
                     $doc->exportCaption($this->next_of_kin_phone);
-                    $doc->exportCaption($this->marital_status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
+                    $doc->exportCaption($this->is_ipd);
                 }
                 $doc->endExportRow();
             }
@@ -2025,6 +2074,7 @@ class Patients extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->is_ipd);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->photo);
@@ -2037,12 +2087,13 @@ class Patients extends DbTable
                         $doc->exportField($this->email_address);
                         $doc->exportField($this->physical_address);
                         $doc->exportField($this->employment_status);
+                        $doc->exportField($this->marital_status);
                         $doc->exportField($this->religion);
                         $doc->exportField($this->next_of_kin);
                         $doc->exportField($this->next_of_kin_phone);
-                        $doc->exportField($this->marital_status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
+                        $doc->exportField($this->is_ipd);
                     }
                     $doc->endExportRow($rowCnt);
                 }

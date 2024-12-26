@@ -39,10 +39,11 @@ loadjs.ready(["wrapper", "head"], function () {
             ["email_address", [fields.email_address.visible && fields.email_address.required ? ew.Validators.required(fields.email_address.caption) : null], fields.email_address.isInvalid],
             ["physical_address", [fields.physical_address.visible && fields.physical_address.required ? ew.Validators.required(fields.physical_address.caption) : null], fields.physical_address.isInvalid],
             ["employment_status", [fields.employment_status.visible && fields.employment_status.required ? ew.Validators.required(fields.employment_status.caption) : null], fields.employment_status.isInvalid],
+            ["marital_status", [fields.marital_status.visible && fields.marital_status.required ? ew.Validators.required(fields.marital_status.caption) : null], fields.marital_status.isInvalid],
             ["religion", [fields.religion.visible && fields.religion.required ? ew.Validators.required(fields.religion.caption) : null], fields.religion.isInvalid],
             ["next_of_kin", [fields.next_of_kin.visible && fields.next_of_kin.required ? ew.Validators.required(fields.next_of_kin.caption) : null], fields.next_of_kin.isInvalid],
             ["next_of_kin_phone", [fields.next_of_kin_phone.visible && fields.next_of_kin_phone.required ? ew.Validators.required(fields.next_of_kin_phone.caption) : null], fields.next_of_kin_phone.isInvalid],
-            ["marital_status", [fields.marital_status.visible && fields.marital_status.required ? ew.Validators.required(fields.marital_status.caption) : null], fields.marital_status.isInvalid]
+            ["is_ipd", [fields.is_ipd.visible && fields.is_ipd.required ? ew.Validators.required(fields.is_ipd.caption) : null], fields.is_ipd.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -60,8 +61,9 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "gender": <?= $Page->gender->toClientList($Page) ?>,
             "employment_status": <?= $Page->employment_status->toClientList($Page) ?>,
-            "religion": <?= $Page->religion->toClientList($Page) ?>,
             "marital_status": <?= $Page->marital_status->toClientList($Page) ?>,
+            "religion": <?= $Page->religion->toClientList($Page) ?>,
+            "is_ipd": <?= $Page->is_ipd->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -328,6 +330,51 @@ loadjs.ready("fpatientsedit", function() {
 </div></div>
     </div>
 <?php } ?>
+<?php if ($Page->marital_status->Visible) { // marital_status ?>
+    <div id="r_marital_status"<?= $Page->marital_status->rowAttributes() ?>>
+        <label id="elh_patients_marital_status" for="x_marital_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->marital_status->caption() ?><?= $Page->marital_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->marital_status->cellAttributes() ?>>
+<span id="el_patients_marital_status">
+    <select
+        id="x_marital_status"
+        name="x_marital_status"
+        class="form-select ew-select<?= $Page->marital_status->isInvalidClass() ?>"
+        <?php if (!$Page->marital_status->IsNativeSelect) { ?>
+        data-select2-id="fpatientsedit_x_marital_status"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_marital_status"
+        data-value-separator="<?= $Page->marital_status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->marital_status->getPlaceHolder()) ?>"
+        <?= $Page->marital_status->editAttributes() ?>>
+        <?= $Page->marital_status->selectOptionListHtml("x_marital_status") ?>
+    </select>
+    <?= $Page->marital_status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->marital_status->getErrorMessage() ?></div>
+<?php if (!$Page->marital_status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatientsedit", function() {
+    var options = { name: "x_marital_status", selectId: "fpatientsedit_x_marital_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsedit.lists.marital_status?.lookupOptions.length) {
+        options.data = { id: "x_marital_status", form: "fpatientsedit" };
+    } else {
+        options.ajax = { id: "x_marital_status", form: "fpatientsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.marital_status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->religion->Visible) { // religion ?>
     <div id="r_religion"<?= $Page->religion->rowAttributes() ?>>
         <label id="elh_patients_religion" for="x_religion" class="<?= $Page->LeftColumnClass ?>"><?= $Page->religion->caption() ?><?= $Page->religion->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -397,47 +444,16 @@ loadjs.ready("fpatientsedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->marital_status->Visible) { // marital_status ?>
-    <div id="r_marital_status"<?= $Page->marital_status->rowAttributes() ?>>
-        <label id="elh_patients_marital_status" for="x_marital_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->marital_status->caption() ?><?= $Page->marital_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->marital_status->cellAttributes() ?>>
-<span id="el_patients_marital_status">
-    <select
-        id="x_marital_status"
-        name="x_marital_status"
-        class="form-select ew-select<?= $Page->marital_status->isInvalidClass() ?>"
-        <?php if (!$Page->marital_status->IsNativeSelect) { ?>
-        data-select2-id="fpatientsedit_x_marital_status"
-        <?php } ?>
-        data-table="patients"
-        data-field="x_marital_status"
-        data-value-separator="<?= $Page->marital_status->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->marital_status->getPlaceHolder()) ?>"
-        <?= $Page->marital_status->editAttributes() ?>>
-        <?= $Page->marital_status->selectOptionListHtml("x_marital_status") ?>
-    </select>
-    <?= $Page->marital_status->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->marital_status->getErrorMessage() ?></div>
-<?php if (!$Page->marital_status->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fpatientsedit", function() {
-    var options = { name: "x_marital_status", selectId: "fpatientsedit_x_marital_status" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fpatientsedit.lists.marital_status?.lookupOptions.length) {
-        options.data = { id: "x_marital_status", form: "fpatientsedit" };
-    } else {
-        options.ajax = { id: "x_marital_status", form: "fpatientsedit", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.marital_status.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
+<?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+    <div id="r_is_ipd"<?= $Page->is_ipd->rowAttributes() ?>>
+        <label id="elh_patients_is_ipd" class="<?= $Page->LeftColumnClass ?>"><?= $Page->is_ipd->caption() ?><?= $Page->is_ipd->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->is_ipd->cellAttributes() ?>>
+<span id="el_patients_is_ipd">
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" class="form-check-input<?= $Page->is_ipd->isInvalidClass() ?>" data-table="patients" data-field="x_is_ipd" data-boolean name="x_is_ipd" id="x_is_ipd" value="1"<?= ConvertToBool($Page->is_ipd->CurrentValue) ? " checked" : "" ?><?= $Page->is_ipd->editAttributes() ?> aria-describedby="x_is_ipd_help">
+    <div class="invalid-feedback"><?= $Page->is_ipd->getErrorMessage() ?></div>
+</div>
+<?= $Page->is_ipd->getCustomMessage() ?>
 </span>
 </div></div>
     </div>

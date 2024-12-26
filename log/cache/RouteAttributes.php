@@ -160,6 +160,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -306,6 +308,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1821,6 +1833,8 @@
                 '/invoicesview[/{id}]',
                 '/invoicesedit[/{id}]',
                 '/invoicesdelete[/{id}]',
+                '/ipdpatientslist[/{id}]',
+                '/ipdpatientsedit[/{id}]',
                 '/laboratorybillingreportlist[/{id}]',
                 '/laboratorybillingreportview[/{id}]',
                 '/laboratorybillingreportsearch',
@@ -2112,6 +2126,8 @@
                 'PHPMaker2024\\afyaplus\\InvoicesController:view',
                 'PHPMaker2024\\afyaplus\\InvoicesController:edit',
                 'PHPMaker2024\\afyaplus\\InvoicesController:delete',
+                'PHPMaker2024\\afyaplus\\IpdPatientsController:list',
+                'PHPMaker2024\\afyaplus\\IpdPatientsController:edit',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportController:list',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportController:view',
                 'PHPMaker2024\\afyaplus\\LaboratoryBillingReportController:search',
@@ -2318,6 +2334,12 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3270,6 +3292,8 @@
                 'view.invoices',
                 'edit.invoices',
                 'delete.invoices',
+                'list.ipd_patients',
+                'edit.ipd_patients',
                 'list.laboratory_billing_report',
                 'view.laboratory_billing_report',
                 'search.laboratory_billing_report',
@@ -3476,6 +3500,8 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4058,6 +4084,8 @@
         $o[286],
         $o[287],
         $o[288],
+        $o[289],
+        $o[290],
     ],
     []
 );

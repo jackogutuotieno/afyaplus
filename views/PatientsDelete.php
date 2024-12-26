@@ -77,6 +77,9 @@ $Page->showMessage();
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patients_date_created" class="patients_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+        <th class="<?= $Page->is_ipd->headerCellClass() ?>"><span id="elh_patients_is_ipd" class="patients_is_ipd"><?= $Page->is_ipd->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -177,6 +180,18 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+        <td<?= $Page->is_ipd->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->is_ipd->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_ipd_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_ipd->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_ipd->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_ipd_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
 </span>
 </td>
 <?php } ?>

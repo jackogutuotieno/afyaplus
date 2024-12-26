@@ -45,6 +45,9 @@ class CashPayment extends AbstractEntity
     #[Column(type: "text", nullable: true)]
     private ?string $details;
 
+    #[Column(type: "boolean")]
+    private bool $paid;
+
     #[Column(name: "created_by_user_id", type: "integer")]
     private int $createdByUserId;
 
@@ -53,6 +56,11 @@ class CashPayment extends AbstractEntity
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    public function __construct()
+    {
+        $this->paid = false;
+    }
 
     public function getId(): int
     {
@@ -106,6 +114,17 @@ class CashPayment extends AbstractEntity
     public function setDetails(?string $value): static
     {
         $this->details = RemoveXss($value);
+        return $this;
+    }
+
+    public function getPaid(): bool
+    {
+        return $this->paid;
+    }
+
+    public function setPaid(bool $value): static
+    {
+        $this->paid = $value;
         return $this;
     }
 

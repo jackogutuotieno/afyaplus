@@ -63,6 +63,9 @@ class Patient extends AbstractEntity
     #[Column(name: "employment_status", type: "string", nullable: true)]
     private ?string $employmentStatus;
 
+    #[Column(name: "marital_status", type: "string", nullable: true)]
+    private ?string $maritalStatus;
+
     #[Column(type: "string", nullable: true)]
     private ?string $religion;
 
@@ -72,14 +75,19 @@ class Patient extends AbstractEntity
     #[Column(name: "next_of_kin_phone", type: "string")]
     private string $nextOfKinPhone;
 
-    #[Column(name: "marital_status", type: "string")]
-    private string $maritalStatus;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    #[Column(name: "is_ipd", type: "boolean")]
+    private bool $isIpd;
+
+    public function __construct()
+    {
+        $this->isIpd = false;
+    }
 
     public function getId(): int
     {
@@ -202,6 +210,17 @@ class Patient extends AbstractEntity
         return $this;
     }
 
+    public function getMaritalStatus(): ?string
+    {
+        return HtmlDecode($this->maritalStatus);
+    }
+
+    public function setMaritalStatus(?string $value): static
+    {
+        $this->maritalStatus = RemoveXss($value);
+        return $this;
+    }
+
     public function getReligion(): ?string
     {
         return HtmlDecode($this->religion);
@@ -235,17 +254,6 @@ class Patient extends AbstractEntity
         return $this;
     }
 
-    public function getMaritalStatus(): string
-    {
-        return HtmlDecode($this->maritalStatus);
-    }
-
-    public function setMaritalStatus(string $value): static
-    {
-        $this->maritalStatus = RemoveXss($value);
-        return $this;
-    }
-
     public function getDateCreated(): DateTime
     {
         return $this->dateCreated;
@@ -265,6 +273,17 @@ class Patient extends AbstractEntity
     public function setDateUpdated(DateTime $value): static
     {
         $this->dateUpdated = $value;
+        return $this;
+    }
+
+    public function getIsIpd(): bool
+    {
+        return $this->isIpd;
+    }
+
+    public function setIsIpd(bool $value): static
+    {
+        $this->isIpd = $value;
         return $this;
     }
 }

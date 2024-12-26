@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$CashPaymentsList = &$Page;
+$IpdPatientsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { cash_payments: currentTable } });
+ew.deepAssign(ew.vars, { tables: { ipd_patients: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -50,30 +50,21 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/PatientVisitsMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fcash_paymentssrch" id="fcash_paymentssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fcash_paymentssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fipd_patientssrch" id="fipd_patientssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fipd_patientssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { cash_payments: currentTable } });
+ew.deepAssign(ew.vars, { tables: { ipd_patients: currentTable } });
 var currentForm;
-var fcash_paymentssrch, currentSearchForm, currentAdvancedSearchForm;
+var fipd_patientssrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fcash_paymentssrch")
+        .setId("fipd_patientssrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -104,10 +95,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fcash_paymentssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fcash_paymentssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fcash_paymentssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fcash_paymentssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fipd_patientssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fipd_patientssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fipd_patientssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fipd_patientssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -147,18 +138,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="cash_payments">
+<input type="hidden" name="t" value="ipd_patients">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
-<?php } ?>
-<div id="gmp_cash_payments" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_ipd_patients" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_cash_paymentslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_ipd_patientslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -171,17 +157,23 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->amount->Visible) { // amount ?>
-        <th data-name="amount" class="<?= $Page->amount->headerCellClass() ?>"><div id="elh_cash_payments_amount" class="cash_payments_amount"><?= $Page->renderFieldHeader($Page->amount) ?></div></th>
+<?php if ($Page->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_ipd_patients_id" class="ipd_patients_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-        <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_cash_payments_details" class="cash_payments_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_ipd_patients_patient_name" class="ipd_patients_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_cash_payments_created_by_user_id" class="cash_payments_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
+<?php if ($Page->national_id->Visible) { // national_id ?>
+        <th data-name="national_id" class="<?= $Page->national_id->headerCellClass() ?>"><div id="elh_ipd_patients_national_id" class="ipd_patients_national_id"><?= $Page->renderFieldHeader($Page->national_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_cash_payments_date_created" class="cash_payments_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+<?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_ipd_patients_date_of_birth" class="ipd_patients_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
+<?php } ?>
+<?php if ($Page->gender->Visible) { // gender ?>
+        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_ipd_patients_gender" class="ipd_patients_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
+<?php } ?>
+<?php if ($Page->phone->Visible) { // phone ?>
+        <th data-name="phone" class="<?= $Page->phone->headerCellClass() ?>"><div id="elh_ipd_patients_phone" class="ipd_patients_phone"><?= $Page->renderFieldHeader($Page->phone) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -211,35 +203,51 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->amount->Visible) { // amount ?>
-        <td data-name="amount"<?= $Page->amount->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_cash_payments_amount" class="el_cash_payments_amount">
-<span<?= $Page->amount->viewAttributes() ?>>
-<?= $Page->amount->getViewValue() ?></span>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_id" class="el_ipd_patients_id">
+<span<?= $Page->id->viewAttributes() ?>>
+<?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->details->Visible) { // details ?>
-        <td data-name="details"<?= $Page->details->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_cash_payments_details" class="el_cash_payments_details">
-<span<?= $Page->details->viewAttributes() ?>>
-<?= $Page->details->getViewValue() ?></span>
+    <?php if ($Page->patient_name->Visible) { // patient_name ?>
+        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_patient_name" class="el_ipd_patients_patient_name">
+<span<?= $Page->patient_name->viewAttributes() ?>>
+<?= $Page->patient_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_cash_payments_created_by_user_id" class="el_cash_payments_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
+    <?php if ($Page->national_id->Visible) { // national_id ?>
+        <td data-name="national_id"<?= $Page->national_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_national_id" class="el_ipd_patients_national_id">
+<span<?= $Page->national_id->viewAttributes() ?>>
+<?= $Page->national_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_cash_payments_date_created" class="el_cash_payments_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
+    <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
+        <td data-name="date_of_birth"<?= $Page->date_of_birth->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_date_of_birth" class="el_ipd_patients_date_of_birth">
+<span<?= $Page->date_of_birth->viewAttributes() ?>>
+<?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->gender->Visible) { // gender ?>
+        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_gender" class="el_ipd_patients_gender">
+<span<?= $Page->gender->viewAttributes() ?>>
+<?= $Page->gender->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->phone->Visible) { // phone ?>
+        <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_phone" class="el_ipd_patients_phone">
+<span<?= $Page->phone->viewAttributes() ?>>
+<?= $Page->phone->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -302,7 +310,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("cash_payments");
+    ew.addEventHandlers("ipd_patients");
 });
 </script>
 <script>

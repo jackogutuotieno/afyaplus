@@ -1009,7 +1009,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}invoice_report_details","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}invoice_report_details","7","1896"],
     ["{32536B8D-F37B-4419-80D5-260932800712}invoice_report_details","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}invoice_report_details","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}invoice_report_details","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","1","1900"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","9","0"]];
 
 /**
  * Tables
@@ -1110,4 +1121,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["patients_dependants","patients_dependants","Dependants",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdependantslist"],
     ["branding","branding","Header",true,"{32536B8D-F37B-4419-80D5-260932800712}","brandinglist"],
     ["invoice_report","invoice_report","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportlist"],
-    ["invoice_report_details","invoice_report_details","Invoice Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportdetailslist"]];
+    ["invoice_report_details","invoice_report_details","Invoice Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportdetailslist"],
+    ["ipd_patients","ipd_patients","IPD Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdpatientslist"]];

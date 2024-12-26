@@ -184,6 +184,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_date_created" class="patients_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
+<?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+        <th data-name="is_ipd" class="<?= $Page->is_ipd->headerCellClass() ?>"><div id="elh_patients_is_ipd" class="patients_is_ipd"><?= $Page->renderFieldHeader($Page->is_ipd) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -291,6 +294,18 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_date_created" class="el_patients_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->is_ipd->Visible) { // is_ipd ?>
+        <td data-name="is_ipd"<?= $Page->is_ipd->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_is_ipd" class="el_patients_is_ipd">
+<span<?= $Page->is_ipd->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_ipd_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_ipd->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_ipd->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_ipd_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
 </span>
 </td>
     <?php } ?>
