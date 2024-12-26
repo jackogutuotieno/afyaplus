@@ -135,17 +135,18 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     // Set field visibility
     public function setVisibility()
     {
-        $this->radiology_requests_id->setVisibility();
-        $this->patient_id->Visible = false;
+        $this->id->setVisibility();
+        $this->radiology_requests_id->Visible = false;
+        $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
-        $this->patient_name->setVisibility();
+        $this->patient_name->Visible = false;
         $this->patient_age->Visible = false;
-        $this->gender->setVisibility();
+        $this->gender->Visible = false;
         $this->service_name->setVisibility();
         $this->status->setVisibility();
         $this->radiologist->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -623,6 +624,9 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -1094,26 +1098,18 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_radiology_requests_id") &&
-            $CurrentForm->hasValue("o_radiology_requests_id") &&
-            $this->radiology_requests_id->CurrentValue != $this->radiology_requests_id->DefaultValue &&
-            !($this->radiology_requests_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->radiology_requests_id->CurrentValue == $this->radiology_requests_id->getSessionValue())
+            $CurrentForm->hasValue("x_id") &&
+            $CurrentForm->hasValue("o_id") &&
+            $this->id->CurrentValue != $this->id->DefaultValue &&
+            !($this->id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->id->CurrentValue == $this->id->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_patient_name") &&
-            $CurrentForm->hasValue("o_patient_name") &&
-            $this->patient_name->CurrentValue != $this->patient_name->DefaultValue &&
-            !($this->patient_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_name->CurrentValue == $this->patient_name->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_gender") &&
-            $CurrentForm->hasValue("o_gender") &&
-            $this->gender->CurrentValue != $this->gender->DefaultValue &&
-            !($this->gender->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->gender->CurrentValue == $this->gender->getSessionValue())
+            $CurrentForm->hasValue("x_patient_id") &&
+            $CurrentForm->hasValue("o_patient_id") &&
+            $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
+            !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
         ) {
             return false;
         }
@@ -1146,14 +1142,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $CurrentForm->hasValue("o_date_created") &&
             $this->date_created->CurrentValue != $this->date_created->DefaultValue &&
             !($this->date_created->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_created->CurrentValue == $this->date_created->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_date_updated") &&
-            $CurrentForm->hasValue("o_date_updated") &&
-            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
-            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
         ) {
             return false;
         }
@@ -1254,7 +1242,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = ""; // Set up default sort
+            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1318,6 +1306,20 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
+
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
@@ -1387,7 +1389,23 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
                 }
             }
         }
-        if ($this->CurrentMode == "view") { // Check view mode
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if ($this->ModalView && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_radiology_reports\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
         $this->renderListOptionsExt();
 
@@ -1614,6 +1632,8 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     // Load default values
     protected function loadDefaultValues()
     {
+        $this->id->DefaultValue = $this->id->getDefault(); // PHP
+        $this->id->OldValue = $this->id->DefaultValue;
     }
 
     // Load form values
@@ -1624,43 +1644,30 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'radiology_requests_id' first before field var 'x_radiology_requests_id'
-        $val = $CurrentForm->hasValue("radiology_requests_id") ? $CurrentForm->getValue("radiology_requests_id") : $CurrentForm->getValue("x_radiology_requests_id");
-        if (!$this->radiology_requests_id->IsDetailKey) {
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->radiology_requests_id->Visible = false; // Disable update for API request
+                $this->id->Visible = false; // Disable update for API request
             } else {
-                $this->radiology_requests_id->setFormValue($val, true, $validate);
+                $this->id->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_radiology_requests_id")) {
-            $this->radiology_requests_id->setOldValue($CurrentForm->getValue("o_radiology_requests_id"));
+        if ($CurrentForm->hasValue("o_id")) {
+            $this->id->setOldValue($CurrentForm->getValue("o_id"));
         }
 
-        // Check field name 'patient_name' first before field var 'x_patient_name'
-        $val = $CurrentForm->hasValue("patient_name") ? $CurrentForm->getValue("patient_name") : $CurrentForm->getValue("x_patient_name");
-        if (!$this->patient_name->IsDetailKey) {
+        // Check field name 'patient_id' first before field var 'x_patient_id'
+        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
+        if (!$this->patient_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->patient_name->Visible = false; // Disable update for API request
+                $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_name->setFormValue($val);
+                $this->patient_id->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o_patient_name")) {
-            $this->patient_name->setOldValue($CurrentForm->getValue("o_patient_name"));
-        }
-
-        // Check field name 'gender' first before field var 'x_gender'
-        $val = $CurrentForm->hasValue("gender") ? $CurrentForm->getValue("gender") : $CurrentForm->getValue("x_gender");
-        if (!$this->gender->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->gender->Visible = false; // Disable update for API request
-            } else {
-                $this->gender->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_gender")) {
-            $this->gender->setOldValue($CurrentForm->getValue("o_gender"));
+        if ($CurrentForm->hasValue("o_patient_id")) {
+            $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
         }
 
         // Check field name 'service_name' first before field var 'x_service_name'
@@ -1716,20 +1723,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-        if ($CurrentForm->hasValue("o_date_updated")) {
-            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
-        }
-
         // Check field name 'visit_id' first before field var 'x_visit_id'
         $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
         if (!$this->visit_id->IsDetailKey) {
@@ -1742,16 +1735,13 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     {
         global $CurrentForm;
                         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->radiology_requests_id->CurrentValue = $this->radiology_requests_id->FormValue;
-        $this->patient_name->CurrentValue = $this->patient_name->FormValue;
-        $this->gender->CurrentValue = $this->gender->FormValue;
+        $this->id->CurrentValue = $this->id->FormValue;
+        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->service_name->CurrentValue = $this->service_name->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
         $this->radiologist->CurrentValue = $this->radiologist->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -1847,6 +1837,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
         // Call Row Selected event
         $this->rowSelected($row);
+        $this->id->setDbValue($row['id']);
         $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
@@ -1864,6 +1855,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     protected function newRow()
     {
         $row = [];
+        $row['id'] = $this->id->DefaultValue;
         $row['radiology_requests_id'] = $this->radiology_requests_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
@@ -1913,6 +1905,8 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
         // Common render codes for all row types
 
+        // id
+
         // radiology_requests_id
 
         // patient_id
@@ -1934,16 +1928,40 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
+            // id
+            $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
+
             // radiology_requests_id
             $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
             $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->ViewValue, $this->radiology_requests_id->formatPattern());
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // visit_id
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
@@ -1971,21 +1989,13 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // radiology_requests_id
-            $this->radiology_requests_id->HrefValue = "";
-            $this->radiology_requests_id->TooltipValue = "";
-
-            // patient_name
-            $this->patient_name->HrefValue = "";
-            $this->patient_name->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -2002,34 +2012,67 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // radiology_requests_id
-            $this->radiology_requests_id->setupEditAttributes();
-            $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
-            $this->radiology_requests_id->PlaceHolder = RemoveHtml($this->radiology_requests_id->caption());
-            if (strval($this->radiology_requests_id->EditValue) != "" && is_numeric($this->radiology_requests_id->EditValue)) {
-                $this->radiology_requests_id->EditValue = FormatNumber($this->radiology_requests_id->EditValue, null);
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+                $this->id->EditValue = FormatNumber($this->id->EditValue, null);
             }
 
-            // patient_name
-            $this->patient_name->setupEditAttributes();
-            if (!$this->patient_name->Raw) {
-                $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
+                }
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
-            $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
-            $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
-
-            // gender
-            $this->gender->setupEditAttributes();
-            if (!$this->gender->Raw) {
-                $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
-            }
-            $this->gender->EditValue = HtmlEncode($this->gender->CurrentValue);
-            $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
             // service_name
             $this->service_name->setupEditAttributes();
@@ -2059,22 +2102,14 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
-            // radiology_requests_id
-            $this->radiology_requests_id->HrefValue = "";
+            // id
+            $this->id->HrefValue = "";
 
-            // patient_name
-            $this->patient_name->HrefValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -2087,33 +2122,67 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // radiology_requests_id
-            $this->radiology_requests_id->setupEditAttributes();
-            $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
-            $this->radiology_requests_id->PlaceHolder = RemoveHtml($this->radiology_requests_id->caption());
-            if (strval($this->radiology_requests_id->EditValue) != "" && is_numeric($this->radiology_requests_id->EditValue)) {
-                $this->radiology_requests_id->EditValue = FormatNumber($this->radiology_requests_id->EditValue, null);
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+                $this->id->EditValue = FormatNumber($this->id->EditValue, null);
             }
 
-            // patient_name
-            $this->patient_name->setupEditAttributes();
-            if (!$this->patient_name->Raw) {
-                $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
+            // patient_id
+            $this->patient_id->setupEditAttributes();
+            if ($this->patient_id->getSessionValue() != "") {
+                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
+                $curVal = strval($this->patient_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                    if ($this->patient_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        } else {
+                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        }
+                    }
+                } else {
+                    $this->patient_id->ViewValue = null;
+                }
+            } else {
+                $curVal = trim(strval($this->patient_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                } else {
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
+                }
+                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
-            $this->patient_name->EditValue = HtmlEncode($this->patient_name->CurrentValue);
-            $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
-
-            // gender
-            $this->gender->setupEditAttributes();
-            if (!$this->gender->Raw) {
-                $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
-            }
-            $this->gender->EditValue = HtmlEncode($this->gender->CurrentValue);
-            $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
             // service_name
             $this->service_name->setupEditAttributes();
@@ -2144,21 +2213,13 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Edit refer script
 
-            // radiology_requests_id
-            $this->radiology_requests_id->HrefValue = "";
+            // id
+            $this->id->HrefValue = "";
 
-            // patient_name
-            $this->patient_name->HrefValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -2171,9 +2232,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2195,22 +2253,17 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             return true;
         }
         $validateForm = true;
-            if ($this->radiology_requests_id->Visible && $this->radiology_requests_id->Required) {
-                if (!$this->radiology_requests_id->IsDetailKey && EmptyValue($this->radiology_requests_id->FormValue)) {
-                    $this->radiology_requests_id->addErrorMessage(str_replace("%s", $this->radiology_requests_id->caption(), $this->radiology_requests_id->RequiredErrorMessage));
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->radiology_requests_id->FormValue)) {
-                $this->radiology_requests_id->addErrorMessage($this->radiology_requests_id->getErrorMessage(false));
+            if (!CheckInteger($this->id->FormValue)) {
+                $this->id->addErrorMessage($this->id->getErrorMessage(false));
             }
-            if ($this->patient_name->Visible && $this->patient_name->Required) {
-                if (!$this->patient_name->IsDetailKey && EmptyValue($this->patient_name->FormValue)) {
-                    $this->patient_name->addErrorMessage(str_replace("%s", $this->patient_name->caption(), $this->patient_name->RequiredErrorMessage));
-                }
-            }
-            if ($this->gender->Visible && $this->gender->Required) {
-                if (!$this->gender->IsDetailKey && EmptyValue($this->gender->FormValue)) {
-                    $this->gender->addErrorMessage(str_replace("%s", $this->gender->caption(), $this->gender->RequiredErrorMessage));
+            if ($this->patient_id->Visible && $this->patient_id->Required) {
+                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
+                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
             if ($this->service_name->Visible && $this->service_name->Required) {
@@ -2235,14 +2288,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2407,14 +2452,14 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         global $Security;
         $rsnew = [];
 
-        // radiology_requests_id
-        $this->radiology_requests_id->setDbValueDef($rsnew, $this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->ReadOnly);
+        // id
+        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, $this->id->ReadOnly);
 
-        // patient_name
-        $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, $this->patient_name->ReadOnly);
-
-        // gender
-        $this->gender->setDbValueDef($rsnew, $this->gender->CurrentValue, $this->gender->ReadOnly);
+        // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->ReadOnly = true;
+        }
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
         // service_name
         $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, $this->service_name->ReadOnly);
@@ -2427,9 +2472,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -2439,14 +2481,11 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['radiology_requests_id'])) { // radiology_requests_id
-            $this->radiology_requests_id->CurrentValue = $row['radiology_requests_id'];
+        if (isset($row['id'])) { // id
+            $this->id->CurrentValue = $row['id'];
         }
-        if (isset($row['patient_name'])) { // patient_name
-            $this->patient_name->CurrentValue = $row['patient_name'];
-        }
-        if (isset($row['gender'])) { // gender
-            $this->gender->CurrentValue = $row['gender'];
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->CurrentValue = $row['patient_id'];
         }
         if (isset($row['service_name'])) { // service_name
             $this->service_name->CurrentValue = $row['service_name'];
@@ -2459,9 +2498,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
         }
     }
 
@@ -2541,14 +2577,11 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         global $Security;
         $rsnew = [];
 
-        // radiology_requests_id
-        $this->radiology_requests_id->setDbValueDef($rsnew, $this->radiology_requests_id->CurrentValue, false);
+        // id
+        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, strval($this->id->CurrentValue) == "");
 
-        // patient_name
-        $this->patient_name->setDbValueDef($rsnew, $this->patient_name->CurrentValue, false);
-
-        // gender
-        $this->gender->setDbValueDef($rsnew, $this->gender->CurrentValue, false);
+        // patient_id
+        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
         // service_name
         $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, false);
@@ -2561,14 +2594,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
-
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $rsnew['patient_id'] = $this->patient_id->getSessionValue();
-        }
 
         // visit_id
         if ($this->visit_id->getSessionValue() != "") {
@@ -2583,14 +2608,11 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['radiology_requests_id'])) { // radiology_requests_id
-            $this->radiology_requests_id->setFormValue($row['radiology_requests_id']);
+        if (isset($row['id'])) { // id
+            $this->id->setFormValue($row['id']);
         }
-        if (isset($row['patient_name'])) { // patient_name
-            $this->patient_name->setFormValue($row['patient_name']);
-        }
-        if (isset($row['gender'])) { // gender
-            $this->gender->setFormValue($row['gender']);
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
         }
         if (isset($row['service_name'])) { // service_name
             $this->service_name->setFormValue($row['service_name']);
@@ -2603,12 +2625,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         }
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
-        }
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
         }
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->setFormValue($row['visit_id']);
@@ -2648,6 +2664,8 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

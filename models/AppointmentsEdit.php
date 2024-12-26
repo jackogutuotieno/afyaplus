@@ -661,7 +661,7 @@ class AppointmentsEdit extends Appointments
             if (IsApi() && $val === null) {
                 $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val, true, $validate);
+                $this->patient_id->setFormValue($val);
             }
         }
 
@@ -691,7 +691,7 @@ class AppointmentsEdit extends Appointments
             if (IsApi() && $val === null) {
                 $this->doctor_id->Visible = false; // Disable update for API request
             } else {
-                $this->doctor_id->setFormValue($val, true, $validate);
+                $this->doctor_id->setFormValue($val);
             }
         }
 
@@ -717,38 +717,6 @@ class AppointmentsEdit extends Appointments
             $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
         }
 
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-
         // Check field name 'is_all_day' first before field var 'x_is_all_day'
         $val = $CurrentForm->hasValue("is_all_day") ? $CurrentForm->getValue("is_all_day") : $CurrentForm->getValue("x_is_all_day");
         if (!$this->is_all_day->IsDetailKey) {
@@ -756,6 +724,16 @@ class AppointmentsEdit extends Appointments
                 $this->is_all_day->Visible = false; // Disable update for API request
             } else {
                 $this->is_all_day->setFormValue($val);
+            }
+        }
+
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
             }
         }
     }
@@ -773,12 +751,8 @@ class AppointmentsEdit extends Appointments
         $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
         $this->end_date->CurrentValue = $this->end_date->FormValue;
         $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
         $this->is_all_day->CurrentValue = $this->is_all_day->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
     /**
@@ -826,10 +800,10 @@ class AppointmentsEdit extends Appointments
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->is_all_day->setDbValue($row['is_all_day']);
     }
 
     // Return a row with default values
@@ -843,10 +817,10 @@ class AppointmentsEdit extends Appointments
         $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
+        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         return $row;
     }
 
@@ -902,6 +876,9 @@ class AppointmentsEdit extends Appointments
         // end_date
         $this->end_date->RowCssClass = "row";
 
+        // is_all_day
+        $this->is_all_day->RowCssClass = "row";
+
         // created_by_user_id
         $this->created_by_user_id->RowCssClass = "row";
 
@@ -911,17 +888,33 @@ class AppointmentsEdit extends Appointments
         // date_updated
         $this->date_updated->RowCssClass = "row";
 
-        // is_all_day
-        $this->is_all_day->RowCssClass = "row";
-
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // title
             $this->_title->ViewValue = $this->_title->CurrentValue;
@@ -941,6 +934,13 @@ class AppointmentsEdit extends Appointments
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
+            // is_all_day
+            if (ConvertToBool($this->is_all_day->CurrentValue)) {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+            } else {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
             $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
@@ -952,13 +952,6 @@ class AppointmentsEdit extends Appointments
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // is_all_day
-            if (ConvertToBool($this->is_all_day->CurrentValue)) {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
-            } else {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
-            }
 
             // id
             $this->id->HrefValue = "";
@@ -981,17 +974,11 @@ class AppointmentsEdit extends Appointments
             // end_date
             $this->end_date->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-
             // is_all_day
             $this->is_all_day->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -999,11 +986,30 @@ class AppointmentsEdit extends Appointments
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+            $curVal = trim(strval($this->patient_id->CurrentValue));
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            } else {
+                $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->patient_id->ViewValue !== null) { // Load from cache
+                $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->patient_id->EditValue = $arwrk;
+            }
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
 
             // title
             $this->_title->setupEditAttributes();
@@ -1015,19 +1021,10 @@ class AppointmentsEdit extends Appointments
 
             // description
             $this->description->setupEditAttributes();
-            if (!$this->description->Raw) {
-                $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-            }
             $this->description->EditValue = HtmlEncode($this->description->CurrentValue);
             $this->description->PlaceHolder = RemoveHtml($this->description->caption());
 
             // doctor_id
-            $this->doctor_id->setupEditAttributes();
-            $this->doctor_id->EditValue = $this->doctor_id->CurrentValue;
-            $this->doctor_id->PlaceHolder = RemoveHtml($this->doctor_id->caption());
-            if (strval($this->doctor_id->EditValue) != "" && is_numeric($this->doctor_id->EditValue)) {
-                $this->doctor_id->EditValue = FormatNumber($this->doctor_id->EditValue, null);
-            }
 
             // start_date
             $this->start_date->setupEditAttributes();
@@ -1039,27 +1036,11 @@ class AppointmentsEdit extends Appointments
             $this->end_date->EditValue = HtmlEncode(FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern()));
             $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-            if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-            }
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // is_all_day
             $this->is_all_day->EditValue = $this->is_all_day->options(false);
             $this->is_all_day->PlaceHolder = RemoveHtml($this->is_all_day->caption());
+
+            // created_by_user_id
 
             // Edit refer script
 
@@ -1084,17 +1065,11 @@ class AppointmentsEdit extends Appointments
             // end_date
             $this->end_date->HrefValue = "";
 
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-
             // is_all_day
             $this->is_all_day->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1126,9 +1101,6 @@ class AppointmentsEdit extends Appointments
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
-            }
             if ($this->_title->Visible && $this->_title->Required) {
                 if (!$this->_title->IsDetailKey && EmptyValue($this->_title->FormValue)) {
                     $this->_title->addErrorMessage(str_replace("%s", $this->_title->caption(), $this->_title->RequiredErrorMessage));
@@ -1143,9 +1115,6 @@ class AppointmentsEdit extends Appointments
                 if (!$this->doctor_id->IsDetailKey && EmptyValue($this->doctor_id->FormValue)) {
                     $this->doctor_id->addErrorMessage(str_replace("%s", $this->doctor_id->caption(), $this->doctor_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->doctor_id->FormValue)) {
-                $this->doctor_id->addErrorMessage($this->doctor_id->getErrorMessage(false));
             }
             if ($this->start_date->Visible && $this->start_date->Required) {
                 if (!$this->start_date->IsDetailKey && EmptyValue($this->start_date->FormValue)) {
@@ -1163,33 +1132,14 @@ class AppointmentsEdit extends Appointments
             if (!CheckDate($this->end_date->FormValue, $this->end_date->formatPattern())) {
                 $this->end_date->addErrorMessage($this->end_date->getErrorMessage(false));
             }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
-            }
             if ($this->is_all_day->Visible && $this->is_all_day->Required) {
                 if ($this->is_all_day->FormValue == "") {
                     $this->is_all_day->addErrorMessage(str_replace("%s", $this->is_all_day->caption(), $this->is_all_day->RequiredErrorMessage));
+                }
+            }
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
 
@@ -1292,6 +1242,7 @@ class AppointmentsEdit extends Appointments
         $this->description->setDbValueDef($rsnew, $this->description->CurrentValue, $this->description->ReadOnly);
 
         // doctor_id
+        $this->doctor_id->CurrentValue = $this->doctor_id->getAutoUpdateValue(); // PHP
         $this->doctor_id->setDbValueDef($rsnew, $this->doctor_id->CurrentValue, $this->doctor_id->ReadOnly);
 
         // start_date
@@ -1300,21 +1251,16 @@ class AppointmentsEdit extends Appointments
         // end_date
         $this->end_date->setDbValueDef($rsnew, UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern()), $this->end_date->ReadOnly);
 
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
-
         // is_all_day
         $tmpBool = $this->is_all_day->CurrentValue;
         if ($tmpBool != "1" && $tmpBool != "0") {
             $tmpBool = !empty($tmpBool) ? "1" : "0";
         }
         $this->is_all_day->setDbValueDef($rsnew, $tmpBool, $this->is_all_day->ReadOnly);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1342,17 +1288,11 @@ class AppointmentsEdit extends Appointments
         if (isset($row['end_date'])) { // end_date
             $this->end_date->CurrentValue = $row['end_date'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
-        }
         if (isset($row['is_all_day'])) { // is_all_day
             $this->is_all_day->CurrentValue = $row['is_all_day'];
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
     }
 
@@ -1380,6 +1320,8 @@ class AppointmentsEdit extends Appointments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 case "x_is_all_day":
                     break;
                 default:

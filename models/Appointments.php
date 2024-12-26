@@ -53,10 +53,10 @@ class Appointments extends DbTable
     public $doctor_id;
     public $start_date;
     public $end_date;
+    public $is_all_day;
     public $created_by_user_id;
     public $date_created;
     public $date_updated;
-    public $is_all_day;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -137,14 +137,18 @@ class Appointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->patient_id->SourceTableVar = 'patient_appointments';
         $this->Fields['patient_id'] = &$this->patient_id;
 
@@ -189,7 +193,7 @@ class Appointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'TEXTAREA' // Edit Tag
         );
         $this->description->InputTextType = "text";
         $this->description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
@@ -212,14 +216,14 @@ class Appointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->doctor_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->doctor_id->InputTextType = "text";
         $this->doctor_id->Raw = true;
         $this->doctor_id->Nullable = false; // NOT NULL field
-        $this->doctor_id->Required = true; // Required field
         $this->doctor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->doctor_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->doctor_id->SearchOperators = ["=", "<>"];
         $this->doctor_id->SourceTableVar = 'patient_appointments';
         $this->Fields['doctor_id'] = &$this->doctor_id;
 
@@ -277,6 +281,34 @@ class Appointments extends DbTable
         $this->end_date->SourceTableVar = 'patient_appointments';
         $this->Fields['end_date'] = &$this->end_date;
 
+        // is_all_day
+        $this->is_all_day = new ReportField(
+            $this, // Table
+            'x_is_all_day', // Variable name
+            'is_all_day', // Name
+            '`is_all_day`', // Expression
+            '`is_all_day`', // Basic search expression
+            16, // Type
+            1, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`is_all_day`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'CHECKBOX' // Edit Tag
+        );
+        $this->is_all_day->InputTextType = "text";
+        $this->is_all_day->Raw = true;
+        $this->is_all_day->setDataType(DataType::BOOLEAN);
+        $this->is_all_day->Lookup = new Lookup($this->is_all_day, 'Appointments', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->is_all_day->OptionCount = 2;
+        $this->is_all_day->DefaultErrorMessage = $Language->phrase("IncorrectField");
+        $this->is_all_day->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
+        $this->is_all_day->SourceTableVar = 'patient_appointments';
+        $this->Fields['is_all_day'] = &$this->is_all_day;
+
         // created_by_user_id
         $this->created_by_user_id = new ReportField(
             $this, // Table
@@ -293,14 +325,14 @@ class Appointments extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'HIDDEN' // Edit Tag
         );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->created_by_user_id->InputTextType = "text";
         $this->created_by_user_id->Raw = true;
         $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Required = true; // Required field
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->created_by_user_id->SearchOperators = ["=", "<>"];
         $this->created_by_user_id->SourceTableVar = 'patient_appointments';
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
@@ -357,34 +389,6 @@ class Appointments extends DbTable
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_updated->SourceTableVar = 'patient_appointments';
         $this->Fields['date_updated'] = &$this->date_updated;
-
-        // is_all_day
-        $this->is_all_day = new ReportField(
-            $this, // Table
-            'x_is_all_day', // Variable name
-            'is_all_day', // Name
-            '`is_all_day`', // Expression
-            '`is_all_day`', // Basic search expression
-            16, // Type
-            1, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`is_all_day`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'CHECKBOX' // Edit Tag
-        );
-        $this->is_all_day->InputTextType = "text";
-        $this->is_all_day->Raw = true;
-        $this->is_all_day->setDataType(DataType::BOOLEAN);
-        $this->is_all_day->Lookup = new Lookup($this->is_all_day, 'Appointments', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->is_all_day->OptionCount = 2;
-        $this->is_all_day->DefaultErrorMessage = $Language->phrase("IncorrectField");
-        $this->is_all_day->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
-        $this->is_all_day->SourceTableVar = 'patient_appointments';
-        $this->Fields['is_all_day'] = &$this->is_all_day;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -924,10 +928,10 @@ class Appointments extends DbTable
         $this->doctor_id->DbValue = $row['doctor_id'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
+        $this->is_all_day->DbValue = $row['is_all_day'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
-        $this->is_all_day->DbValue = $row['is_all_day'];
     }
 
     // Delete uploaded files

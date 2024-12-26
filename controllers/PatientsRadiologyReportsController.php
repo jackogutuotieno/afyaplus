@@ -21,4 +21,11 @@ class PatientsRadiologyReportsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "PatientsRadiologyReportsList");
     }
+
+    // view
+    #[Map(["GET","POST","OPTIONS"], "/patientsradiologyreportsview[/{visit_id}]", [PermissionMiddleware::class], "view.patients_radiology_reports")]
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "PatientsRadiologyReportsView");
+    }
 }

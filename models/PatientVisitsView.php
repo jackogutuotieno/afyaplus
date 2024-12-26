@@ -1766,6 +1766,10 @@ class PatientVisitsView extends PatientVisits
             $this->medical_scheme_id->HrefValue = "";
             $this->medical_scheme_id->TooltipValue = "";
 
+            // date_created
+            $this->date_created->HrefValue = "";
+            $this->date_created->TooltipValue = "";
+
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";

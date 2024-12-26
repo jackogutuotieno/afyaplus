@@ -1741,6 +1741,7 @@ class PatientVisits extends DbTable
                     $doc->exportCaption($this->visit_type_id);
                     $doc->exportCaption($this->payment_method_id);
                     $doc->exportCaption($this->medical_scheme_id);
+                    $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->status);
                 } else {
                     $doc->exportCaption($this->id);
@@ -1782,6 +1783,7 @@ class PatientVisits extends DbTable
                         $doc->exportField($this->visit_type_id);
                         $doc->exportField($this->payment_method_id);
                         $doc->exportField($this->medical_scheme_id);
+                        $doc->exportField($this->date_created);
                         $doc->exportField($this->status);
                     } else {
                         $doc->exportField($this->id);

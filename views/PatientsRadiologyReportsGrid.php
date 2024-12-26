@@ -23,21 +23,19 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["radiology_requests_id", [fields.radiology_requests_id.visible && fields.radiology_requests_id.required ? ew.Validators.required(fields.radiology_requests_id.caption) : null, ew.Validators.integer], fields.radiology_requests_id.isInvalid],
-            ["patient_name", [fields.patient_name.visible && fields.patient_name.required ? ew.Validators.required(fields.patient_name.caption) : null], fields.patient_name.isInvalid],
-            ["gender", [fields.gender.visible && fields.gender.required ? ew.Validators.required(fields.gender.caption) : null], fields.gender.isInvalid],
+            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null, ew.Validators.integer], fields.id.isInvalid],
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["radiologist", [fields.radiologist.visible && fields.radiologist.required ? ew.Validators.required(fields.radiologist.caption) : null], fields.radiologist.isInvalid],
-            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
-            ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
+            ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["radiology_requests_id",false],["patient_name",false],["gender",false],["service_name",false],["status",false],["radiologist",false],["date_created",false],["date_updated",false]];
+                    fields = [["id",false],["patient_id",false],["service_name",false],["status",false],["radiologist",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -57,6 +55,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -91,14 +90,11 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <th data-name="radiology_requests_id" class="<?= $Grid->radiology_requests_id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_radiology_requests_id" class="patients_radiology_reports_radiology_requests_id"><?= $Grid->renderFieldHeader($Grid->radiology_requests_id) ?></div></th>
+<?php if ($Grid->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_id" class="patients_radiology_reports_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
 <?php } ?>
-<?php if ($Grid->patient_name->Visible) { // patient_name ?>
-        <th data-name="patient_name" class="<?= $Grid->patient_name->headerCellClass() ?>"><div id="elh_patients_radiology_reports_patient_name" class="patients_radiology_reports_patient_name"><?= $Grid->renderFieldHeader($Grid->patient_name) ?></div></th>
-<?php } ?>
-<?php if ($Grid->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Grid->gender->headerCellClass() ?>"><div id="elh_patients_radiology_reports_gender" class="patients_radiology_reports_gender"><?= $Grid->renderFieldHeader($Grid->gender) ?></div></th>
+<?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_patient_id" class="patients_radiology_reports_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Grid->service_name->headerCellClass() ?>"><div id="elh_patients_radiology_reports_service_name" class="patients_radiology_reports_service_name"><?= $Grid->renderFieldHeader($Grid->service_name) ?></div></th>
@@ -111,9 +107,6 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patients_radiology_reports_date_created" class="patients_radiology_reports_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Grid->date_updated->headerCellClass() ?>"><div id="elh_patients_radiology_reports_date_updated" class="patients_radiology_reports_date_updated"><?= $Grid->renderFieldHeader($Grid->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -151,83 +144,140 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <td data-name="radiology_requests_id"<?= $Grid->radiology_requests_id->cellAttributes() ?>>
+    <?php if ($Grid->id->Visible) { // id ?>
+        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_radiology_requests_id" class="el_patients_radiology_reports_radiology_requests_id">
-<input type="<?= $Grid->radiology_requests_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_requests_id" id="x<?= $Grid->RowIndex ?>_radiology_requests_id" data-table="patients_radiology_reports" data-field="x_radiology_requests_id" value="<?= $Grid->radiology_requests_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_requests_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_requests_id->formatPattern()) ?>"<?= $Grid->radiology_requests_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_requests_id->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_id" class="el_patients_radiology_reports_id">
+<input type="<?= $Grid->id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" data-table="patients_radiology_reports" data-field="x_id" value="<?= $Grid->id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->id->formatPattern()) ?>"<?= $Grid->id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->id->getErrorMessage() ?></div>
 </span>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_radiology_requests_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_radiology_requests_id" id="o<?= $Grid->RowIndex ?>_radiology_requests_id" value="<?= HtmlEncode($Grid->radiology_requests_id->OldValue) ?>">
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_radiology_requests_id" class="el_patients_radiology_reports_radiology_requests_id">
-<input type="<?= $Grid->radiology_requests_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_radiology_requests_id" id="x<?= $Grid->RowIndex ?>_radiology_requests_id" data-table="patients_radiology_reports" data-field="x_radiology_requests_id" value="<?= $Grid->radiology_requests_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->radiology_requests_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->radiology_requests_id->formatPattern()) ?>"<?= $Grid->radiology_requests_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->radiology_requests_id->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_id" class="el_patients_radiology_reports_id">
+<input type="<?= $Grid->id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" data-table="patients_radiology_reports" data-field="x_id" value="<?= $Grid->id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->id->formatPattern()) ?>"<?= $Grid->id->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->id->getErrorMessage() ?></div>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_radiology_requests_id" class="el_patients_radiology_reports_radiology_requests_id">
-<span<?= $Grid->radiology_requests_id->viewAttributes() ?>>
-<?= $Grid->radiology_requests_id->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_id" class="el_patients_radiology_reports_id">
+<span<?= $Grid->id->viewAttributes() ?>>
+<?= $Grid->id->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_radiology_requests_id" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_radiology_requests_id" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_radiology_requests_id" value="<?= HtmlEncode($Grid->radiology_requests_id->FormValue) ?>">
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_radiology_requests_id" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_radiology_requests_id" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_radiology_requests_id" value="<?= HtmlEncode($Grid->radiology_requests_id->OldValue) ?>">
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_id" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_id" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_id" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_id" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->patient_name->Visible) { // patient_name ?>
-        <td data-name="patient_name"<?= $Grid->patient_name->cellAttributes() ?>>
+    <?php if ($Grid->patient_id->Visible) { // patient_id ?>
+        <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_name" class="el_patients_radiology_reports_patient_name">
-<input type="<?= $Grid->patient_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_patient_name" id="x<?= $Grid->RowIndex ?>_patient_name" data-table="patients_radiology_reports" data-field="x_patient_name" value="<?= $Grid->patient_name->EditValue ?>" size="30" maxlength="101" placeholder="<?= HtmlEncode($Grid->patient_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->patient_name->formatPattern()) ?>"<?= $Grid->patient_name->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->patient_name->getErrorMessage() ?></div>
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
 </span>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_name" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_name" id="o<?= $Grid->RowIndex ?>_patient_name" value="<?= HtmlEncode($Grid->patient_name->OldValue) ?>">
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fpatients_radiology_reportsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="patients_radiology_reports"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatients_radiology_reportsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "fpatients_radiology_reportsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatients_radiology_reportsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatients_radiology_reportsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatients_radiology_reportsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients_radiology_reports.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_patient_id" id="o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_name" class="el_patients_radiology_reports_patient_name">
-<input type="<?= $Grid->patient_name->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_patient_name" id="x<?= $Grid->RowIndex ?>_patient_name" data-table="patients_radiology_reports" data-field="x_patient_name" value="<?= $Grid->patient_name->EditValue ?>" size="30" maxlength="101" placeholder="<?= HtmlEncode($Grid->patient_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->patient_name->formatPattern()) ?>"<?= $Grid->patient_name->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->patient_name->getErrorMessage() ?></div>
+<?php if ($Grid->patient_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Grid->patient_id->getDisplayValue($Grid->patient_id->ViewValue) ?></span></span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_patient_id" name="x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->CurrentValue) ?>" data-hidden="1">
 </span>
+<?php } else { ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_patient_id"
+        name="x<?= $Grid->RowIndex ?>_patient_id"
+        class="form-select ew-select<?= $Grid->patient_id->isInvalidClass() ?>"
+        <?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+        data-select2-id="fpatients_radiology_reportsgrid_x<?= $Grid->RowIndex ?>_patient_id"
+        <?php } ?>
+        data-table="patients_radiology_reports"
+        data-field="x_patient_id"
+        data-value-separator="<?= $Grid->patient_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->patient_id->getPlaceHolder()) ?>"
+        <?= $Grid->patient_id->editAttributes() ?>>
+        <?= $Grid->patient_id->selectOptionListHtml("x{$Grid->RowIndex}_patient_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->patient_id->getErrorMessage() ?></div>
+<?= $Grid->patient_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_patient_id") ?>
+<?php if (!$Grid->patient_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatients_radiology_reportsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_patient_id", selectId: "fpatients_radiology_reportsgrid_x<?= $Grid->RowIndex ?>_patient_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatients_radiology_reportsgrid.lists.patient_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatients_radiology_reportsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_patient_id", form: "fpatients_radiology_reportsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients_radiology_reports.fields.patient_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_name" class="el_patients_radiology_reports_patient_name">
-<span<?= $Grid->patient_name->viewAttributes() ?>>
-<?= $Grid->patient_name->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+<span<?= $Grid->patient_id->viewAttributes() ?>>
+<?= $Grid->patient_id->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_name" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_patient_name" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_patient_name" value="<?= HtmlEncode($Grid->patient_name->FormValue) ?>">
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_name" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_patient_name" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_patient_name" value="<?= HtmlEncode($Grid->patient_name->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Grid->gender->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_gender" class="el_patients_radiology_reports_gender">
-<input type="<?= $Grid->gender->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_gender" id="x<?= $Grid->RowIndex ?>_gender" data-table="patients_radiology_reports" data-field="x_gender" value="<?= $Grid->gender->EditValue ?>" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->gender->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->gender->formatPattern()) ?>"<?= $Grid->gender->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->gender->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_gender" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_gender" id="o<?= $Grid->RowIndex ?>_gender" value="<?= HtmlEncode($Grid->gender->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_gender" class="el_patients_radiology_reports_gender">
-<input type="<?= $Grid->gender->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_gender" id="x<?= $Grid->RowIndex ?>_gender" data-table="patients_radiology_reports" data-field="x_gender" value="<?= $Grid->gender->EditValue ?>" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->gender->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->gender->formatPattern()) ?>"<?= $Grid->gender->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->gender->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_gender" class="el_patients_radiology_reports_gender">
-<span<?= $Grid->gender->viewAttributes() ?>>
-<?= $Grid->gender->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_gender" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_gender" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_gender" value="<?= HtmlEncode($Grid->gender->FormValue) ?>">
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_gender" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_gender" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_gender" value="<?= HtmlEncode($Grid->gender->OldValue) ?>">
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_id" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_patient_id" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->FormValue) ?>">
+<input type="hidden" data-table="patients_radiology_reports" data-field="x_patient_id" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_patient_id" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -394,91 +444,6 @@ loadjs.ready(["fpatients_radiology_reportsgrid", "datetimepicker"], function () 
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patients_radiology_reports" data-field="x_date_created" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_date_created" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->FormValue) ?>">
 <input type="hidden" data-table="patients_radiology_reports" data-field="x_date_created" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_date_created" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_date_created" value="<?= HtmlEncode($Grid->date_created->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Grid->date_updated->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_date_updated" class="el_patients_radiology_reports_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="patients_radiology_reports" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatients_radiology_reportsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatients_radiology_reportsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_date_updated" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_date_updated" id="o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_date_updated" class="el_patients_radiology_reports_date_updated">
-<input type="<?= $Grid->date_updated->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_date_updated" id="x<?= $Grid->RowIndex ?>_date_updated" data-table="patients_radiology_reports" data-field="x_date_updated" value="<?= $Grid->date_updated->EditValue ?>" placeholder="<?= HtmlEncode($Grid->date_updated->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->date_updated->formatPattern()) ?>"<?= $Grid->date_updated->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->date_updated->getErrorMessage() ?></div>
-<?php if (!$Grid->date_updated->ReadOnly && !$Grid->date_updated->Disabled && !isset($Grid->date_updated->EditAttrs["readonly"]) && !isset($Grid->date_updated->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fpatients_radiology_reportsgrid", "datetimepicker"], function () {
-    let format = "<?= DateFormat(11) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fpatients_radiology_reportsgrid", "x<?= $Grid->RowIndex ?>_date_updated", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_radiology_reports_date_updated" class="el_patients_radiology_reports_date_updated">
-<span<?= $Grid->date_updated->viewAttributes() ?>>
-<?= $Grid->date_updated->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_date_updated" data-hidden="1" name="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_date_updated" id="fpatients_radiology_reportsgrid$x<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->FormValue) ?>">
-<input type="hidden" data-table="patients_radiology_reports" data-field="x_date_updated" data-hidden="1" data-old name="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_date_updated" id="fpatients_radiology_reportsgrid$o<?= $Grid->RowIndex ?>_date_updated" value="<?= HtmlEncode($Grid->date_updated->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

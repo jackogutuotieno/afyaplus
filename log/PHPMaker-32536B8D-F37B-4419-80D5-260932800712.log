@@ -368,6 +368,7 @@ C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsGrid.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsDetailsList.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsGrid.php
 C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsList.php
+C:\wamp64\www\afyaplus\models\PatientsRadiologyReportsView.php
 C:\wamp64\www\afyaplus\models\PatientsView.php
 C:\wamp64\www\afyaplus\models\PaymentMethods.php
 C:\wamp64\www\afyaplus\models\PaymentMethodsAdd.php
@@ -907,6 +908,7 @@ C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsDetailsList.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsGrid.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsList.php
 C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsMaster.php
+C:\wamp64\www\afyaplus\views\PatientsRadiologyReportsView.php
 C:\wamp64\www\afyaplus\views\PatientsView.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsAdd.php
 C:\wamp64\www\afyaplus\views\PaymentMethodsDelete.php

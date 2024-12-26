@@ -171,14 +171,11 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <th data-name="radiology_requests_id" class="<?= $Page->radiology_requests_id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_radiology_requests_id" class="patients_radiology_reports_radiology_requests_id"><?= $Page->renderFieldHeader($Page->radiology_requests_id) ?></div></th>
+<?php if ($Page->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_id" class="patients_radiology_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_radiology_reports_patient_name" class="patients_radiology_reports_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_patients_radiology_reports_gender" class="patients_radiology_reports_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+        <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patients_radiology_reports_patient_id" class="patients_radiology_reports_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->service_name->Visible) { // service_name ?>
         <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_patients_radiology_reports_service_name" class="patients_radiology_reports_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
@@ -191,9 +188,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_radiology_reports_date_created" class="patients_radiology_reports_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_patients_radiology_reports_date_updated" class="patients_radiology_reports_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -223,27 +217,19 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <td data-name="radiology_requests_id"<?= $Page->radiology_requests_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_radiology_requests_id" class="el_patients_radiology_reports_radiology_requests_id">
-<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_id->getViewValue() ?></span>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_id" class="el_patients_radiology_reports_id">
+<span<?= $Page->id->viewAttributes() ?>>
+<?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_patient_name" class="el_patients_radiology_reports_patient_name">
-<span<?= $Page->patient_name->viewAttributes() ?>>
-<?= $Page->patient_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_gender" class="el_patients_radiology_reports_gender">
-<span<?= $Page->gender->viewAttributes() ?>>
-<?= $Page->gender->getViewValue() ?></span>
+    <?php if ($Page->patient_id->Visible) { // patient_id ?>
+        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_patient_id" class="el_patients_radiology_reports_patient_id">
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<?= $Page->patient_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -276,14 +262,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_date_created" class="el_patients_radiology_reports_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_radiology_reports_date_updated" class="el_patients_radiology_reports_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

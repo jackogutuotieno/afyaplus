@@ -1,4 +1,4 @@
-<ew-language date="2024/12/25" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/26" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -974,7 +974,7 @@
     <table id="patient_visits">
       <phrase id="tblcaption" value="Patient Check-Ins" />
       <field id="id">
-        <phrase id="fldcaption" value="Visit ID" />
+        <phrase id="fldcaption" value="CheckIn ID" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
@@ -992,7 +992,7 @@
         <phrase id="fldcaption" value="User Role" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Visit Date/Time" />
+        <phrase id="fldcaption" value="Checkin Date/Time" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1611,41 +1611,41 @@
     <table id="appointments">
       <phrase id="tblcaption" value="Patients Appointments" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="patient id" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="_title">
-        <phrase id="fldcaption" value="title" />
+        <phrase id="fldcaption" value="Title" />
       </field>
       <field id="description">
-        <phrase id="fldcaption" value="description" />
+        <phrase id="fldcaption" value="Appointment Details" />
       </field>
       <field id="doctor_id">
-        <phrase id="fldcaption" value="doctor id" />
+        <phrase id="fldcaption" value="Doctor" />
       </field>
       <field id="start_date">
-        <phrase id="fldcaption" value="start date" />
+        <phrase id="fldcaption" value="Start Date" />
       </field>
       <field id="end_date">
-        <phrase id="fldcaption" value="end date" />
-      </field>
-      <field id="created_by_user_id">
-        <phrase id="fldcaption" value="created by user id" />
-      </field>
-      <field id="date_created">
-        <phrase id="fldcaption" value="date created" />
-      </field>
-      <field id="date_updated">
-        <phrase id="fldcaption" value="date updated" />
+        <phrase id="fldcaption" value="End Date" />
       </field>
       <field id="is_all_day">
-        <phrase id="fldcaption" value="is all day" />
+        <phrase id="fldcaption" value="All Day" />
         <phrase id="fldtagvalue1" value="1" />
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_by_user_id">
+        <phrase id="fldcaption" value="Created By" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
     <table id="patient_queue">
@@ -1757,7 +1757,7 @@
     <table id="radiology_billing_report">
       <phrase id="tblcaption" value="Radiology Billing" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Bill No." />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient Name" />
@@ -2712,8 +2712,11 @@
     </table>
     <table id="patients_radiology_reports">
       <phrase id="tblcaption" value="Radiology Reports" />
+      <field id="id">
+        <phrase id="fldcaption" value="Bill No." />
+      </field>
       <field id="radiology_requests_id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Request ID" />
       </field>
       <field id="patient_id">
         <phrase id="fldcaption" value="Patient ID" />

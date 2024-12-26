@@ -153,7 +153,7 @@ class PatientVaccinationsList extends PatientVaccinations
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->service_id->setVisibility();
@@ -1324,7 +1324,6 @@ class PatientVaccinationsList extends PatientVaccinations
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->service_id); // service_id
@@ -1428,6 +1427,14 @@ class PatientVaccinationsList extends PatientVaccinations
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1465,6 +1472,10 @@ class PatientVaccinationsList extends PatientVaccinations
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1587,7 +1598,6 @@ class PatientVaccinationsList extends PatientVaccinations
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "service_id");
@@ -2200,10 +2210,6 @@ class PatientVaccinationsList extends PatientVaccinations
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";

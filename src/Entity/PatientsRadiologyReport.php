@@ -28,6 +28,9 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 #[Table(name: "patients_radiology_reports")]
 class PatientsRadiologyReport extends AbstractEntity
 {
+    #[Column(type: "integer")]
+    private int $id;
+
     #[Column(name: "radiology_requests_id", type: "integer")]
     private int $radiologyRequestsId;
 
@@ -58,6 +61,22 @@ class PatientsRadiologyReport extends AbstractEntity
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    public function __construct()
+    {
+        $this->id = 0;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $value): static
+    {
+        $this->id = $value;
+        return $this;
+    }
 
     public function getRadiologyRequestsId(): int
     {

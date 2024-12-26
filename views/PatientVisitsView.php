@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->date_created->Visible) { // date_created ?>
+    <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_visits_date_created"><template id="tpc_patient_visits_date_created"><?= $Page->date_created->caption() ?></template></span></td>
+        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
+<template id="tpx_patient_visits_date_created"><span id="el_patient_visits_date_created">
+<span<?= $Page->date_created->viewAttributes() ?>>
+<?= $Page->date_created->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
     <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_visits_status"><template id="tpc_patient_visits_status"><?= $Page->status->caption() ?></template></span></td>
@@ -121,24 +132,34 @@ loadjs.ready("head", function () {
 <div id="tpd_patient_visitsview" class="ew-custom-template"></div>
 <template id="tpm_patient_visitsview">
 <div id="ct_PatientVisitsView"><div class="row gridder-view">
-    <div class="col-lg-6 col-md-6 col-sm-12">
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_id"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_patient_id"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-6 col-md-6 col-sm-12">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_visit_type_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_visit_type_id"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-6 col-md-6 col-sm-12">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_payment_method_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_payment_method_id"></slot></p>
         </div>
     </div> <!-- ./col -->
-    <div class="col-lg-6 col-md-6 col-sm-12">
+    <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card">
             <p><slot class="ew-slot" name="tpc_patient_visits_medical_scheme_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_medical_scheme_id"></slot></p>
+        </div>
+    </div> <!-- ./col --> 
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_visits_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_visits_date_created"></slot></p>
         </div>
     </div> <!-- ./col --> 
 </div> <!-- ./row --></div>

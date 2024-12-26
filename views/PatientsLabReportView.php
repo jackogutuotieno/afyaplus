@@ -187,7 +187,7 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_patients_lab_reportview" class="ew-custom-template"></div>
 <template id="tpm_patients_lab_reportview">
-<div id="ct_PatientsLabReportView"><table style="width: 100%">
+<div id="ct_PatientsLabReportView"><table class="tbl-group" style="width: 100%">
     <tr style="border-top: 2px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_id"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_patient_name"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_patient_name"></slot></p></td>

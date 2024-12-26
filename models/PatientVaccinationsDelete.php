@@ -129,7 +129,7 @@ class PatientVaccinationsDelete extends PatientVaccinations
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
         $this->service_id->setVisibility();
@@ -778,10 +778,6 @@ class PatientVaccinationsDelete extends PatientVaccinations
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";

@@ -145,17 +145,18 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
     // Set field visibility
     public function setVisibility()
     {
-        $this->radiology_requests_id->setVisibility();
-        $this->patient_id->Visible = false;
+        $this->id->setVisibility();
+        $this->radiology_requests_id->Visible = false;
+        $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
-        $this->patient_name->setVisibility();
+        $this->patient_name->Visible = false;
         $this->patient_age->Visible = false;
-        $this->gender->setVisibility();
+        $this->gender->Visible = false;
         $this->service_name->setVisibility();
         $this->status->setVisibility();
         $this->radiologist->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -711,6 +712,9 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         // Setup other options
         $this->setupOtherOptions();
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "fpatients_radiology_reportsgrid";
@@ -1072,6 +1076,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
             $savedFilterList = Profile()->getSearchFilters("fpatients_radiology_reportssrch");
         }
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->radiology_requests_id->AdvancedSearch->toJson(), ","); // Field radiology_requests_id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
@@ -1121,6 +1126,14 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         }
         $filter = json_decode(Post("filter"), true);
         $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
 
         // Field radiology_requests_id
         $this->radiology_requests_id->AdvancedSearch->SearchValue = @$filter["x_radiology_requests_id"];
@@ -1252,7 +1265,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->service_name;
         $searchFlds[] = &$this->status;
-        $searchFlds[] = &$this->radiologist;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1321,7 +1333,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = ""; // Set up default sort
+            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1331,14 +1343,12 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->radiology_requests_id); // radiology_requests_id
-            $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->gender); // gender
+            $this->updateSort($this->id); // id
+            $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->status); // status
             $this->updateSort($this->radiologist); // radiologist
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1372,6 +1382,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
+                $this->id->setSort("");
                 $this->radiology_requests_id->setSort("");
                 $this->patient_id->setSort("");
                 $this->visit_id->setSort("");
@@ -1401,6 +1412,12 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
+
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
 
         // "detail_patients_radiology_reports_details"
         $item = &$this->ListOptions->add("detail_patients_radiology_reports_details");
@@ -1443,6 +1460,14 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1480,8 +1505,24 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") { // Check view mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if ($this->ModalView && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_radiology_reports\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
 
         // Set up list action buttons
@@ -1531,6 +1572,15 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientsradiologyreportsdetailslist?" . Config("TABLE_SHOW_MASTER") . "=patients_radiology_reports&" . GetForeignKeyUrl("fk_radiology_requests_id", $this->radiology_requests_id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("PatientsRadiologyReportsDetailsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patients_radiology_reports')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patients_radiology_reports_details");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patients_radiology_reports_details";
+            }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
                 $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
@@ -1594,14 +1644,12 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "radiology_requests_id");
-            $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "gender");
+            $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "radiologist");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2040,6 +2088,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
 
         // Call Row Selected event
         $this->rowSelected($row);
+        $this->id->setDbValue($row['id']);
         $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
@@ -2057,6 +2106,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
     protected function newRow()
     {
         $row = [];
+        $row['id'] = $this->id->DefaultValue;
         $row['radiology_requests_id'] = $this->radiology_requests_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
@@ -2108,6 +2158,8 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
 
         // Common render codes for all row types
 
+        // id
+
         // radiology_requests_id
 
         // patient_id
@@ -2129,16 +2181,40 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
+            // id
+            $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
+
             // radiology_requests_id
             $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
             $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->ViewValue, $this->radiology_requests_id->formatPattern());
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // visit_id
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
@@ -2166,21 +2242,13 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // radiology_requests_id
-            $this->radiology_requests_id->HrefValue = "";
-            $this->radiology_requests_id->TooltipValue = "";
-
-            // patient_name
-            $this->patient_name->HrefValue = "";
-            $this->patient_name->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
             // service_name
             $this->service_name->HrefValue = "";
@@ -2197,10 +2265,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2578,6 +2642,8 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

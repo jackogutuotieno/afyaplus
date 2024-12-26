@@ -135,7 +135,7 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->status->setVisibility();
         $this->visit_id->Visible = false;
@@ -1225,7 +1225,7 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = ""; // Set up default sort
+            $defaultSort = $this->date_created->Expression . " DESC"; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1625,6 +1625,12 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1676,12 +1682,6 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
         }
         if ($CurrentForm->hasValue("o_date_created")) {
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
-        }
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
         }
     }
 
@@ -1924,6 +1924,10 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -1940,6 +1944,8 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // id
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2035,6 +2041,9 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
 
             // Add refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2047,6 +2056,10 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
             // date_created
             $this->date_created->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2142,6 +2155,9 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
 
             // Edit refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2174,6 +2190,11 @@ class RadiologyBillingReportGrid extends RadiologyBillingReport
             return true;
         }
         $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));

@@ -71,6 +71,9 @@ $Page->showMessage();
 <?php if ($Page->end_date->Visible) { // end_date ?>
         <th class="<?= $Page->end_date->headerCellClass() ?>"><span id="elh_Appointments_end_date" class="Appointments_end_date"><?= $Page->end_date->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+        <th class="<?= $Page->is_all_day->headerCellClass() ?>"><span id="elh_Appointments_is_all_day" class="Appointments_is_all_day"><?= $Page->is_all_day->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_Appointments_created_by_user_id" class="Appointments_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
@@ -79,9 +82,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->date_updated->Visible) { // date_updated ?>
         <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_Appointments_date_updated" class="Appointments_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
-        <th class="<?= $Page->is_all_day->headerCellClass() ?>"><span id="elh_Appointments_is_all_day" class="Appointments_is_all_day"><?= $Page->is_all_day->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -160,6 +160,18 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
+        <td<?= $Page->is_all_day->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->is_all_day->viewAttributes() ?>>
+<div class="form-check form-switch d-inline-block">
+    <input type="checkbox" id="x_is_all_day_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_all_day->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_all_day->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="form-check-label" for="x_is_all_day_<?= $Page->RowCount ?>"></label>
+</div>
+</span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <td<?= $Page->created_by_user_id->cellAttributes() ?>>
 <span id="">
@@ -181,18 +193,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_updated->viewAttributes() ?>>
 <?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->is_all_day->Visible) { // is_all_day ?>
-        <td<?= $Page->is_all_day->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->is_all_day->viewAttributes() ?>>
-<div class="form-check form-switch d-inline-block">
-    <input type="checkbox" id="x_is_all_day_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->is_all_day->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->is_all_day->CurrentValue)) { ?> checked<?php } ?>>
-    <label class="form-check-label" for="x_is_all_day_<?= $Page->RowCount ?>"></label>
-</div>
-</span>
 </span>
 </td>
 <?php } ?>

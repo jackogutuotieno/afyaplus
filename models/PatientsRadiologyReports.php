@@ -46,6 +46,7 @@ class PatientsRadiologyReports extends DbTable
     public $ModalMultiEdit = false;
 
     // Fields
+    public $id;
     public $radiology_requests_id;
     public $patient_id;
     public $visit_id;
@@ -103,6 +104,32 @@ class PatientsRadiologyReports extends DbTable
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this);
 
+        // id
+        $this->id = new DbField(
+            $this, // Table
+            'x_id', // Variable name
+            'id', // Name
+            '`id`', // Expression
+            '`id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->id->addMethod("getDefault", fn() => 0);
+        $this->id->InputTextType = "text";
+        $this->id->Raw = true;
+        $this->id->Nullable = false; // NOT NULL field
+        $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['id'] = &$this->id;
+
         // radiology_requests_id
         $this->radiology_requests_id = new DbField(
             $this, // Table
@@ -146,15 +173,19 @@ class PatientsRadiologyReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->patient_id->InputTextType = "text";
         $this->patient_id->Raw = true;
         $this->patient_id->IsForeignKey = true; // Foreign key field
         $this->patient_id->Nullable = false; // NOT NULL field
         $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
 
         // visit_id
@@ -370,6 +401,7 @@ class PatientsRadiologyReports extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -997,6 +1029,7 @@ class PatientsRadiologyReports extends DbTable
         if (!is_array($row)) {
             return;
         }
+        $this->id->DbValue = $row['id'];
         $this->radiology_requests_id->DbValue = $row['radiology_requests_id'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
@@ -1373,6 +1406,7 @@ class PatientsRadiologyReports extends DbTable
         } else {
             return;
         }
+        $this->id->setDbValue($row['id']);
         $this->radiology_requests_id->setDbValue($row['radiology_requests_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
@@ -1414,6 +1448,8 @@ class PatientsRadiologyReports extends DbTable
 
         // Common render codes
 
+        // id
+
         // radiology_requests_id
 
         // patient_id
@@ -1435,14 +1471,38 @@ class PatientsRadiologyReports extends DbTable
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
+
+        // id
+        $this->id->ViewValue = $this->id->CurrentValue;
+        $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
         // radiology_requests_id
         $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
         $this->radiology_requests_id->ViewValue = FormatNumber($this->radiology_requests_id->ViewValue, $this->radiology_requests_id->formatPattern());
 
         // patient_id
-        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+        $curVal = strval($this->patient_id->CurrentValue);
+        if ($curVal != "") {
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                } else {
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                }
+            }
+        } else {
+            $this->patient_id->ViewValue = null;
+        }
 
         // visit_id
         $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
@@ -1473,6 +1533,10 @@ class PatientsRadiologyReports extends DbTable
         // date_updated
         $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
         $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+        // id
+        $this->id->HrefValue = "";
+        $this->id->TooltipValue = "";
 
         // radiology_requests_id
         $this->radiology_requests_id->HrefValue = "";
@@ -1533,6 +1597,14 @@ class PatientsRadiologyReports extends DbTable
         // Call Row Rendering event
         $this->rowRendering();
 
+        // id
+        $this->id->setupEditAttributes();
+        $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
+        }
+
         // radiology_requests_id
         $this->radiology_requests_id->setupEditAttributes();
         $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
@@ -1545,14 +1617,29 @@ class PatientsRadiologyReports extends DbTable
         $this->patient_id->setupEditAttributes();
         if ($this->patient_id->getSessionValue() != "") {
             $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-        } else {
-            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-            if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
             }
+        } else {
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
         }
 
         // visit_id
@@ -1646,6 +1733,7 @@ class PatientsRadiologyReports extends DbTable
             if ($doc->Horizontal) { // Horizontal format, write header
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
+                    $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_requests_id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
@@ -1656,8 +1744,8 @@ class PatientsRadiologyReports extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->radiologist);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
+                    $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_requests_id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->visit_id);
@@ -1668,7 +1756,6 @@ class PatientsRadiologyReports extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->radiologist);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1695,6 +1782,7 @@ class PatientsRadiologyReports extends DbTable
                 if (!$doc->ExportCustom) {
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
+                        $doc->exportField($this->id);
                         $doc->exportField($this->radiology_requests_id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
@@ -1705,8 +1793,8 @@ class PatientsRadiologyReports extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->radiologist);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
+                        $doc->exportField($this->id);
                         $doc->exportField($this->radiology_requests_id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->visit_id);
@@ -1717,7 +1805,6 @@ class PatientsRadiologyReports extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->radiologist);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1896,6 +1983,7 @@ class PatientsRadiologyReports extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Report"; 
         } 
+        $this->patient_id->ViewValue = '<a href="patientsradiologyreportsview/' . $this->visit_id->ViewValue . '?showdetail=patients_radiology_reports_details" target="_blank">' . $this->patient_id->ViewValue . '</a>';
     }
 
     // User ID Filtering event

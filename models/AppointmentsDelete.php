@@ -571,10 +571,10 @@ class AppointmentsDelete extends Appointments
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->is_all_day->setDbValue($row['is_all_day']);
     }
 
     // Return a row with default values
@@ -588,10 +588,10 @@ class AppointmentsDelete extends Appointments
         $row['doctor_id'] = $this->doctor_id->DefaultValue;
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
+        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
-        $row['is_all_day'] = $this->is_all_day->DefaultValue;
         return $row;
     }
 
@@ -621,13 +621,13 @@ class AppointmentsDelete extends Appointments
 
         // end_date
 
+        // is_all_day
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
-
-        // is_all_day
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -635,8 +635,27 @@ class AppointmentsDelete extends Appointments
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // title
             $this->_title->ViewValue = $this->_title->CurrentValue;
@@ -656,6 +675,13 @@ class AppointmentsDelete extends Appointments
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
+            // is_all_day
+            if (ConvertToBool($this->is_all_day->CurrentValue)) {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+            } else {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
             $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
@@ -667,13 +693,6 @@ class AppointmentsDelete extends Appointments
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // is_all_day
-            if (ConvertToBool($this->is_all_day->CurrentValue)) {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
-            } else {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
-            }
 
             // id
             $this->id->HrefValue = "";
@@ -703,6 +722,10 @@ class AppointmentsDelete extends Appointments
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
 
+            // is_all_day
+            $this->is_all_day->HrefValue = "";
+            $this->is_all_day->TooltipValue = "";
+
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
@@ -714,10 +737,6 @@ class AppointmentsDelete extends Appointments
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // is_all_day
-            $this->is_all_day->HrefValue = "";
-            $this->is_all_day->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -852,6 +871,8 @@ class AppointmentsDelete extends Appointments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 case "x_is_all_day":
                     break;
                 default:

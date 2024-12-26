@@ -1,0 +1,118 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-12-26 07:54:31",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,first_name,8,,Patient
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,last_name,8,,Eight
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,national_id,8,,9087873
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,date_of_birth,8,,1977-04-09
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,gender,8,,Male
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,phone,8,,0118911244
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,email_address,8,,patient.eight@example.com
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,physical_address,8,,"<p>Box 788 - 00100, Nairobi</p>"
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,employment_status,8,,Employed
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,religion,8,,Christian
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,next_of_kin,8,,"Patient Eight Kin"
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,next_of_kin_phone,8,,0720008775
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,marital_status,8,,Divorced
+"2024-12-26 08:03:36",/afyaplus/patientsadd,2,A,patients,id,8,,8
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,12,,8
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,12,,1
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,12,,3
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,12,,8
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,12,,1
+"2024-12-26 08:04:27",/afyaplus/patientvisitsadd,2,A,patient_visits,id,12,,12
+"2024-12-26 08:05:01",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 08:05:10",/afyaplus/login,3,login,::1,,,,
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,patient_id,8,,8
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,height,8,,1.78
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,weight,8,,73
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,temperature,8,,37
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,pulse,8,,72
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,blood_pressure,8,,119/88
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,visit_id,8,,12
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,created_by_user_id,8,,3
+"2024-12-26 08:06:14",/afyaplus/patientvitalsadd,3,A,patient_vitals,id,8,,8
+"2024-12-26 08:06:46",/afyaplus/logout,3,logout,::1,,,,
+"2024-12-26 08:06:57",/afyaplus/login,2,login,::1,,,,
+"2024-12-26 08:07:31",/afyaplus/patientqueueadd,2,A,patient_queue,patient_id,16,,8
+"2024-12-26 08:07:31",/afyaplus/patientqueueadd,2,A,patient_queue,section,16,,Triage
+"2024-12-26 08:07:31",/afyaplus/patientqueueadd,2,A,patient_queue,status,16,,"Checked In"
+"2024-12-26 08:07:31",/afyaplus/patientqueueadd,2,A,patient_queue,visit_id,16,,12
+"2024-12-26 08:07:31",/afyaplus/patientqueueadd,2,A,patient_queue,id,16,,16
+"2024-12-26 08:07:55",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-26 08:08:05",/afyaplus/login,3,login,::1,,,,
+"2024-12-26 08:08:57",/afyaplus/patientqueueadd,3,A,patient_queue,patient_id,17,,8
+"2024-12-26 08:08:57",/afyaplus/patientqueueadd,3,A,patient_queue,section,17,,Consultation
+"2024-12-26 08:08:57",/afyaplus/patientqueueadd,3,A,patient_queue,status,17,,"Vitals Taken"
+"2024-12-26 08:08:57",/afyaplus/patientqueueadd,3,A,patient_queue,visit_id,17,,12
+"2024-12-26 08:08:57",/afyaplus/patientqueueadd,3,A,patient_queue,id,17,,17
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,patient_id,5,,8
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,visit_id,5,,12
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,service_id,5,,40
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,status,5,,Done
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,created_by_user_id,5,,3
+"2024-12-26 08:10:30",/afyaplus/patientvaccinationsadd,3,A,patient_vaccinations,id,5,,5
+"2024-12-26 08:13:40",/afyaplus/logout,3,logout,::1,,,,
+"2024-12-26 08:13:56",/afyaplus/login,4,login,::1,,,,
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,patient_id,5,,8
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,chief_complaint,5,,"tesrktk  m3klr"
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,history_of_presenting_illness,5,,"kelrkkl erkltkrc"
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,past_medical_history,5,,"me,mfm,"
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,family_history,5,,"gfkgjkg fgkjgg"
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,allergies,5,,"dfm,fgm gmfgflgf"
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,created_by_user_id,5,,4
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,visit_id,5,,12
+"2024-12-26 08:15:01",/afyaplus/doctornotesadd,4,A,doctor_notes,id,5,,5
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,patient_id,8,,8
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,created_by_user_id,8,,4
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,visit_id,8,,12
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,id,8,,8
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,"*** Batch insert begin ***",lab_test_requests_details,,,,
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,12,,12
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,12,,8
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,12,,12
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,13,,4
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,13,,8
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,13,,13
+"2024-12-26 08:16:56",/afyaplus/labtestrequestsadd,4,"*** Batch insert successful ***",lab_test_requests_details,,,,
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,patient_id,3,,8
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,visit_id,3,,12
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,created_by_user_id,3,,4
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,id,3,,3
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,"*** Batch insert begin ***",radiology_requests_details,,,,
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,service_id,4,,41
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,comments,4,,"Scan on the head"
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,radiology_request_id,4,,3
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,id,4,,4
+"2024-12-26 08:18:54",/afyaplus/radiologyrequestsadd,4,"*** Batch insert successful ***",radiology_requests_details,,,,
+"2024-12-26 08:21:18",/afyaplus/patientqueueadd,4,A,patient_queue,patient_id,18,,8
+"2024-12-26 08:21:18",/afyaplus/patientqueueadd,4,A,patient_queue,section,18,,Laboratory
+"2024-12-26 08:21:18",/afyaplus/patientqueueadd,4,A,patient_queue,status,18,,"Doctor Consulted"
+"2024-12-26 08:21:18",/afyaplus/patientqueueadd,4,A,patient_queue,visit_id,18,,12
+"2024-12-26 08:21:18",/afyaplus/patientqueueadd,4,A,patient_queue,id,18,,18
+"2024-12-26 08:22:04",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-26 08:22:13",/afyaplus/login,5,login,::1,,,,
+"2024-12-26 08:26:24",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,4,,8
+"2024-12-26 08:26:24",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,4,,"<p>Request 8 sample report</p>"
+"2024-12-26 08:26:24",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,4,,5
+"2024-12-26 08:26:24",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,4,,4
+"2024-12-26 08:29:52",/afyaplus/patientqueueadd,5,A,patient_queue,patient_id,19,,8
+"2024-12-26 08:29:52",/afyaplus/patientqueueadd,5,A,patient_queue,section,19,,Consultation
+"2024-12-26 08:29:52",/afyaplus/patientqueueadd,5,A,patient_queue,status,19,,"Tests Performed"
+"2024-12-26 08:29:52",/afyaplus/patientqueueadd,5,A,patient_queue,visit_id,19,,12
+"2024-12-26 08:29:52",/afyaplus/patientqueueadd,5,A,patient_queue,id,19,,19
+"2024-12-26 08:31:16",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-26 08:31:22",/afyaplus/login,5,login,::1,,,,
+"2024-12-26 08:33:00",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-26 08:33:11",/afyaplus/login,9,login,::1,,,,
+"2024-12-26 08:36:14",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-26 08:36:20",/afyaplus/login,9,login,::1,,,,
+"2024-12-26 08:38:06",/afyaplus/radiologyreportsadd,9,A,radiology_reports,radiology_requests_id,2,,3
+"2024-12-26 08:38:06",/afyaplus/radiologyreportsadd,9,A,radiology_reports,findings,2,,"<p>Sample test 3 findings.</p>"
+"2024-12-26 08:38:06",/afyaplus/radiologyreportsadd,9,A,radiology_reports,created_by_user_id,2,,9
+"2024-12-26 08:38:06",/afyaplus/radiologyreportsadd,9,A,radiology_reports,id,2,,2
+"2024-12-26 08:47:58",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-26 08:48:04",/afyaplus/login,9,login,::1,,,,
+"2024-12-26 08:59:25",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-26 08:59:31",/afyaplus/login,9,login,::1,,,,
+"2024-12-26 09:02:21",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-26 09:02:27",/afyaplus/login,9,login,::1,,,,

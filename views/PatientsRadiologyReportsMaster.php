@@ -10,35 +10,24 @@ $patients_radiology_reports->TableClass = "table table-bordered table-hover tabl
 <div class="ew-master-div">
 <table id="tbl_patients_radiology_reportsmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($patients_radiology_reports->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <tr id="r_radiology_requests_id"<?= $patients_radiology_reports->radiology_requests_id->rowAttributes() ?>>
-            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->radiology_requests_id->caption() ?></td>
-            <td<?= $patients_radiology_reports->radiology_requests_id->cellAttributes() ?>>
-<span id="el_patients_radiology_reports_radiology_requests_id">
-<span<?= $patients_radiology_reports->radiology_requests_id->viewAttributes() ?>>
-<?= $patients_radiology_reports->radiology_requests_id->getViewValue() ?></span>
+<?php if ($patients_radiology_reports->id->Visible) { // id ?>
+        <tr id="r_id"<?= $patients_radiology_reports->id->rowAttributes() ?>>
+            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->id->caption() ?></td>
+            <td<?= $patients_radiology_reports->id->cellAttributes() ?>>
+<span id="el_patients_radiology_reports_id">
+<span<?= $patients_radiology_reports->id->viewAttributes() ?>>
+<?= $patients_radiology_reports->id->getViewValue() ?></span>
 </span>
 </td>
         </tr>
 <?php } ?>
-<?php if ($patients_radiology_reports->patient_name->Visible) { // patient_name ?>
-        <tr id="r_patient_name"<?= $patients_radiology_reports->patient_name->rowAttributes() ?>>
-            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->patient_name->caption() ?></td>
-            <td<?= $patients_radiology_reports->patient_name->cellAttributes() ?>>
-<span id="el_patients_radiology_reports_patient_name">
-<span<?= $patients_radiology_reports->patient_name->viewAttributes() ?>>
-<?= $patients_radiology_reports->patient_name->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($patients_radiology_reports->gender->Visible) { // gender ?>
-        <tr id="r_gender"<?= $patients_radiology_reports->gender->rowAttributes() ?>>
-            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->gender->caption() ?></td>
-            <td<?= $patients_radiology_reports->gender->cellAttributes() ?>>
-<span id="el_patients_radiology_reports_gender">
-<span<?= $patients_radiology_reports->gender->viewAttributes() ?>>
-<?= $patients_radiology_reports->gender->getViewValue() ?></span>
+<?php if ($patients_radiology_reports->patient_id->Visible) { // patient_id ?>
+        <tr id="r_patient_id"<?= $patients_radiology_reports->patient_id->rowAttributes() ?>>
+            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->patient_id->caption() ?></td>
+            <td<?= $patients_radiology_reports->patient_id->cellAttributes() ?>>
+<span id="el_patients_radiology_reports_patient_id">
+<span<?= $patients_radiology_reports->patient_id->viewAttributes() ?>>
+<?= $patients_radiology_reports->patient_id->getViewValue() ?></span>
 </span>
 </td>
         </tr>
@@ -83,17 +72,6 @@ $patients_radiology_reports->TableClass = "table table-bordered table-hover tabl
 <span id="el_patients_radiology_reports_date_created">
 <span<?= $patients_radiology_reports->date_created->viewAttributes() ?>>
 <?= $patients_radiology_reports->date_created->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($patients_radiology_reports->date_updated->Visible) { // date_updated ?>
-        <tr id="r_date_updated"<?= $patients_radiology_reports->date_updated->rowAttributes() ?>>
-            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->date_updated->caption() ?></td>
-            <td<?= $patients_radiology_reports->date_updated->cellAttributes() ?>>
-<span id="el_patients_radiology_reports_date_updated">
-<span<?= $patients_radiology_reports->date_updated->viewAttributes() ?>>
-<?= $patients_radiology_reports->date_updated->getViewValue() ?></span>
 </span>
 </td>
         </tr>

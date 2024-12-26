@@ -417,7 +417,6 @@ class AppointmentsCalendar extends Appointments
         $this->ViewUrl = $Security->canView() ? "appointmentsview" : "";
         $this->AddUrl = $Security->canAdd() ? "appointmentsadd" : "";
         $this->EditUrl = $Security->canEdit() ? "appointmentsedit" : "";
-        $this->CopyUrl = $Security->canAdd() ? "appointmentsadd" : "";
         $this->DeleteUrl = $Security->canDelete() ? "appointmentsdelete" : "";
 
         // Check if search command
@@ -535,10 +534,10 @@ class AppointmentsCalendar extends Appointments
         $this->doctor_id->setDbValue($row['doctor_id']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->is_all_day->setDbValue($row['is_all_day']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
-        $this->is_all_day->setDbValue($row['is_all_day']);
     }
 
     /**
@@ -568,21 +567,40 @@ class AppointmentsCalendar extends Appointments
 
         // end_date
 
+        // is_all_day
+
         // created_by_user_id
 
         // date_created
 
         // date_updated
-
-        // is_all_day
         if ($this->RowType == RowType::SEARCH) { // Search row
         } elseif ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // title
             $this->_title->ViewValue = $this->_title->CurrentValue;
@@ -602,6 +620,13 @@ class AppointmentsCalendar extends Appointments
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
+            // is_all_day
+            if (ConvertToBool($this->is_all_day->CurrentValue)) {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
+            } else {
+                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
+            }
+
             // created_by_user_id
             $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
             $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
@@ -613,13 +638,6 @@ class AppointmentsCalendar extends Appointments
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // is_all_day
-            if (ConvertToBool($this->is_all_day->CurrentValue)) {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(1) != "" ? $this->is_all_day->tagCaption(1) : "Yes";
-            } else {
-                $this->is_all_day->ViewValue = $this->is_all_day->tagCaption(2) != "" ? $this->is_all_day->tagCaption(2) : "No";
-            }
 
             // id
             $this->id->HrefValue = "";
@@ -649,6 +667,10 @@ class AppointmentsCalendar extends Appointments
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
 
+            // is_all_day
+            $this->is_all_day->HrefValue = "";
+            $this->is_all_day->TooltipValue = "";
+
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
@@ -660,10 +682,6 @@ class AppointmentsCalendar extends Appointments
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
-
-            // is_all_day
-            $this->is_all_day->HrefValue = "";
-            $this->is_all_day->TooltipValue = "";
         }
 
         // Call Row_Rendered event
@@ -677,7 +695,7 @@ class AppointmentsCalendar extends Appointments
      */
     protected function getEvent()
     {
-        $eventListFields = ["id","patient_id","title","description","doctor_id","start_date","end_date","created_by_user_id","date_created","date_updated","is_all_day"];
+        $eventListFields = ["id","patient_id","title","description","doctor_id","start_date","end_date","is_all_day","created_by_user_id","date_created","date_updated"];
         $event = [];
         // Default permissions for event
         $event["_view"] = !EmptyValue($this->ViewUrl);
@@ -799,6 +817,8 @@ class AppointmentsCalendar extends Appointments
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 case "x_is_all_day":
                     break;
                 default:
@@ -953,10 +973,10 @@ class AppointmentsCalendar extends Appointments
             $this->doctor_id->setSort("");
             $this->start_date->setSort("");
             $this->end_date->setSort("");
+            $this->is_all_day->setSort("");
             $this->created_by_user_id->setSort("");
             $this->date_created->setSort("");
             $this->date_updated->setSort("");
-            $this->is_all_day->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
@@ -969,10 +989,10 @@ class AppointmentsCalendar extends Appointments
             $this->updateSort($this->doctor_id); // doctor_id
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
+            $this->updateSort($this->is_all_day); // is_all_day
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
-            $this->updateSort($this->is_all_day); // is_all_day
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);
@@ -983,7 +1003,10 @@ class AppointmentsCalendar extends Appointments
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add appointment");
     }
 
     // Page Unload event

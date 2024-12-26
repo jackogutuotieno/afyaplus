@@ -120,7 +120,7 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_invoice_reportview" class="ew-custom-template"></div>
 <template id="tpm_invoice_reportview">
-<div id="ct_InvoiceReportView"><table class="tbl-invoices" style="width: 100%">
+<div id="ct_InvoiceReportView"><table class="tbl-group" style="width: 100%">
     <tr style="border-top: 2px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_invoice_report_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_invoice_report_id"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_invoice_report_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_invoice_report_patient_id"></slot></p></td>

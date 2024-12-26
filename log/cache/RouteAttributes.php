@@ -287,6 +287,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1722,6 +1723,11 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -1910,6 +1916,7 @@
                 '/patientslabreportlist[/{id}]',
                 '/patientslabreportview[/{id}]',
                 '/patientsradiologyreportslist[/{visit_id}]',
+                '/patientsradiologyreportsview[/{visit_id}]',
                 '/patientsradiologyreportsdetailslist[/{id}]',
                 '/patientvaccinationslist[/{id}]',
                 '/patientvaccinationsadd[/{id}]',
@@ -2199,6 +2206,7 @@
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:list',
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:view',
                 'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsController:list',
+                'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsController:view',
                 'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsDetailsController:list',
                 'PHPMaker2024\\afyaplus\\PatientVaccinationsController:list',
                 'PHPMaker2024\\afyaplus\\PatientVaccinationsController:add',
@@ -3161,6 +3169,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3349,6 +3360,7 @@
                 'list.patients_lab_report',
                 'view.patients_lab_report',
                 'list.patients_radiology_reports',
+                'view.patients_radiology_reports',
                 'list.patients_radiology_reports_details',
                 'list.patient_vaccinations',
                 'add.patient_vaccinations',
@@ -3452,6 +3464,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -4030,6 +4043,7 @@
         $o[284],
         $o[285],
         $o[286],
+        $o[287],
     ],
     []
 );

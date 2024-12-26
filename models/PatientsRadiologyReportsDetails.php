@@ -89,7 +89,7 @@ class PatientsRadiologyReportsDetails extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
