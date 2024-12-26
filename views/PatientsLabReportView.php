@@ -173,17 +173,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_lab_report_date_updated"><template id="tpc_patients_lab_report_date_updated"><?= $Page->date_updated->caption() ?></template></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<template id="tpx_patients_lab_report_date_updated"><span id="el_patients_lab_report_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span></template>
-</td>
-    </tr>
-<?php } ?>
 </table>
 <div id="tpd_patients_lab_reportview" class="ew-custom-template"></div>
 <template id="tpm_patients_lab_reportview">

@@ -28,6 +28,7 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 #[Table(name: "patients_radiology_reports")]
 class PatientsRadiologyReport extends AbstractEntity
 {
+    #[Id]
     #[Column(type: "integer")]
     private int $id;
 
@@ -37,7 +38,6 @@ class PatientsRadiologyReport extends AbstractEntity
     #[Column(name: "patient_id", type: "integer")]
     private int $patientId;
 
-    #[Id]
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 

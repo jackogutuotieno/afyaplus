@@ -444,6 +444,7 @@ class PatientsLabReport extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -1487,6 +1488,7 @@ class PatientsLabReport extends DbTable
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1785,7 +1787,6 @@ class PatientsLabReport extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->laboratorist);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->visit_id);
@@ -1799,7 +1800,6 @@ class PatientsLabReport extends DbTable
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->laboratorist);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1837,7 +1837,6 @@ class PatientsLabReport extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->laboratorist);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->visit_id);
@@ -1851,7 +1850,6 @@ class PatientsLabReport extends DbTable
                         $doc->exportField($this->status);
                         $doc->exportField($this->laboratorist);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }

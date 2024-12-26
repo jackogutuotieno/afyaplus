@@ -10,17 +10,6 @@ $patients_radiology_reports->TableClass = "table table-bordered table-hover tabl
 <div class="ew-master-div">
 <table id="tbl_patients_radiology_reportsmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($patients_radiology_reports->id->Visible) { // id ?>
-        <tr id="r_id"<?= $patients_radiology_reports->id->rowAttributes() ?>>
-            <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->id->caption() ?></td>
-            <td<?= $patients_radiology_reports->id->cellAttributes() ?>>
-<span id="el_patients_radiology_reports_id">
-<span<?= $patients_radiology_reports->id->viewAttributes() ?>>
-<?= $patients_radiology_reports->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($patients_radiology_reports->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $patients_radiology_reports->patient_id->rowAttributes() ?>>
             <td class="<?= $patients_radiology_reports->TableLeftColumnClass ?>"><?= $patients_radiology_reports->patient_id->caption() ?></td>

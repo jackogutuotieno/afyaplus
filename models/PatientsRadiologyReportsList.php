@@ -145,7 +145,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->radiology_requests_id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
@@ -449,7 +449,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['visit_id'];
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -1343,7 +1343,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->service_name); // service_name
             $this->updateSort($this->status); // status
@@ -1617,7 +1616,7 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->visit_id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
+        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1644,7 +1643,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "service_name");
             $this->createColumnOption($option, "status");
@@ -2241,10 +2239,6 @@ class PatientsRadiologyReportsList extends PatientsRadiologyReports
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";

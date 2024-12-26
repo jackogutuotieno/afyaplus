@@ -16,14 +16,14 @@ use PHPMaker2024\afyaplus\Attributes\Put;
 class PatientsRadiologyReportsController extends ControllerBase
 {
     // list
-    #[Map(["GET","POST","OPTIONS"], "/patientsradiologyreportslist[/{visit_id}]", [PermissionMiddleware::class], "list.patients_radiology_reports")]
+    #[Map(["GET","POST","OPTIONS"], "/patientsradiologyreportslist[/{id}]", [PermissionMiddleware::class], "list.patients_radiology_reports")]
     public function list(Request $request, Response $response, array $args): Response
     {
         return $this->runPage($request, $response, $args, "PatientsRadiologyReportsList");
     }
 
     // view
-    #[Map(["GET","POST","OPTIONS"], "/patientsradiologyreportsview[/{visit_id}]", [PermissionMiddleware::class], "view.patients_radiology_reports")]
+    #[Map(["GET","POST","OPTIONS"], "/patientsradiologyreportsview[/{id}]", [PermissionMiddleware::class], "view.patients_radiology_reports")]
     public function view(Request $request, Response $response, array $args): Response
     {
         return $this->runPage($request, $response, $args, "PatientsRadiologyReportsView");

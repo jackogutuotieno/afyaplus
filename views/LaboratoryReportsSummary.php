@@ -67,9 +67,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <thead>
 	<!-- Table header -->
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { ?>
-    <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div class="Laboratory_Reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_name->Visible) { ?>
     <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div class="Laboratory_Reports_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
@@ -113,12 +110,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         $Page->renderRow();
 ?>
     <tr<?= $Page->rowAttributes(); ?>>
-<?php if ($Page->id->Visible) { ?>
-        <td data-field="id"<?= $Page->id->cellAttributes() ?>>
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_name->Visible) { ?>
         <td data-field="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
 <span<?= $Page->patient_name->viewAttributes() ?>>

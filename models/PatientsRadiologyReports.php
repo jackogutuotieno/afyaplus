@@ -125,6 +125,7 @@ class PatientsRadiologyReports extends DbTable
         $this->id->addMethod("getDefault", fn() => 0);
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
+        $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -208,7 +209,6 @@ class PatientsRadiologyReports extends DbTable
         );
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
-        $this->visit_id->IsPrimaryKey = true; // Primary key field
         $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
@@ -998,8 +998,8 @@ class PatientsRadiologyReports extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
-            if (array_key_exists('visit_id', $rs)) {
-                AddFilter($where, QuotedName('visit_id', $this->Dbid) . '=' . QuotedValue($rs['visit_id'], $this->visit_id->DataType, $this->Dbid));
+            if (array_key_exists('id', $rs)) {
+                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
             }
         }
         $filter = $curfilter ? $this->CurrentFilter : "";
@@ -1052,14 +1052,14 @@ class PatientsRadiologyReports extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`visit_id` = @visit_id@";
+        return "`id` = @id@";
     }
 
     // Get Key
     public function getKey($current = false, $keySeparator = null)
     {
         $keys = [];
-        $val = $current ? $this->visit_id->CurrentValue : $this->visit_id->OldValue;
+        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
         if (EmptyValue($val)) {
             return "";
         } else {
@@ -1077,9 +1077,9 @@ class PatientsRadiologyReports extends DbTable
         $keys = explode($keySeparator, $this->OldKey);
         if (count($keys) == 1) {
             if ($current) {
-                $this->visit_id->CurrentValue = $keys[0];
+                $this->id->CurrentValue = $keys[0];
             } else {
-                $this->visit_id->OldValue = $keys[0];
+                $this->id->OldValue = $keys[0];
             }
         }
     }
@@ -1089,9 +1089,9 @@ class PatientsRadiologyReports extends DbTable
     {
         $keyFilter = $this->sqlKeyFilter();
         if (is_array($row)) {
-            $val = array_key_exists('visit_id', $row) ? $row['visit_id'] : null;
+            $val = array_key_exists('id', $row) ? $row['id'] : null;
         } else {
-            $val = !EmptyValue($this->visit_id->OldValue) && !$current ? $this->visit_id->OldValue : $this->visit_id->CurrentValue;
+            $val = !EmptyValue($this->id->OldValue) && !$current ? $this->id->OldValue : $this->id->CurrentValue;
         }
         if (!is_numeric($val)) {
             return "0=1"; // Invalid key
@@ -1099,7 +1099,7 @@ class PatientsRadiologyReports extends DbTable
         if ($val === null) {
             return "0=1"; // Invalid key
         } else {
-            $keyFilter = str_replace("@visit_id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
         }
         return $keyFilter;
     }
@@ -1254,7 +1254,7 @@ class PatientsRadiologyReports extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
-        $json .= "\"visit_id\":" . VarToJson($this->visit_id->CurrentValue, "number");
+        $json .= "\"id\":" . VarToJson($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -1265,8 +1265,8 @@ class PatientsRadiologyReports extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
-        if ($this->visit_id->CurrentValue !== null) {
-            $url .= "/" . $this->encodeKeyValue($this->visit_id->CurrentValue);
+        if ($this->id->CurrentValue !== null) {
+            $url .= "/" . $this->encodeKeyValue($this->id->CurrentValue);
         } else {
             return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
         }
@@ -1342,7 +1342,7 @@ class PatientsRadiologyReports extends DbTable
                     ? array_map(fn ($i) => Route($i + 3), range(0, 0))  // Export API
                     : array_map(fn ($i) => Route($i + 2), range(0, 0))) // Other API
                 : []; // Non-API
-            if (($keyValue = Param("visit_id") ?? Route("visit_id")) !== null) {
+            if (($keyValue = Param("id") ?? Route("id")) !== null) {
                 $arKeys[] = $keyValue;
             } elseif ($isApi && (($keyValue = Key(0) ?? $keyValues[0] ?? null) !== null)) {
                 $arKeys[] = $keyValue;
@@ -1379,9 +1379,9 @@ class PatientsRadiologyReports extends DbTable
                 $keyFilter .= " OR ";
             }
             if ($setCurrent) {
-                $this->visit_id->CurrentValue = $key;
+                $this->id->CurrentValue = $key;
             } else {
-                $this->visit_id->OldValue = $key;
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1601,9 +1601,6 @@ class PatientsRadiologyReports extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
         $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
-            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
-        }
 
         // radiology_requests_id
         $this->radiology_requests_id->setupEditAttributes();
@@ -1644,8 +1641,16 @@ class PatientsRadiologyReports extends DbTable
 
         // visit_id
         $this->visit_id->setupEditAttributes();
-        $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-        $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+        if ($this->visit_id->getSessionValue() != "") {
+            $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
+            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
+        } else {
+            $this->visit_id->EditValue = $this->visit_id->CurrentValue;
+            $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
+            if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
+                $this->visit_id->EditValue = $this->visit_id->EditValue;
+            }
+        }
 
         // patient_name
         $this->patient_name->setupEditAttributes();
@@ -1983,7 +1988,7 @@ class PatientsRadiologyReports extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Report"; 
         } 
-        $this->patient_id->ViewValue = '<a href="patientsradiologyreportsview/' . $this->visit_id->ViewValue . '?showdetail=patients_radiology_reports_details" target="_blank">' . $this->patient_id->ViewValue . '</a>';
+        $this->patient_id->ViewValue = '<a href="patientsradiologyreportsview/' . $this->id->ViewValue . '?showdetail=patients_radiology_reports_details" target="_blank">' . $this->patient_id->ViewValue . '</a>';
     }
 
     // User ID Filtering event

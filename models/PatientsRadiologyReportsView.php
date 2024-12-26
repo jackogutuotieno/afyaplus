@@ -179,8 +179,8 @@ class PatientsRadiologyReportsView extends PatientsRadiologyReports
         }
 
         // Set up record key
-        if (($keyValue = Get("visit_id") ?? Route("visit_id")) !== null) {
-            $this->RecKey["visit_id"] = $keyValue;
+        if (($keyValue = Get("id") ?? Route("id")) !== null) {
+            $this->RecKey["id"] = $keyValue;
         }
 
         // Table name (for backward compatibility only)
@@ -393,7 +393,7 @@ class PatientsRadiologyReportsView extends PatientsRadiologyReports
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['visit_id'];
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -580,15 +580,15 @@ class PatientsRadiologyReportsView extends PatientsRadiologyReports
 
         // Set up master/detail parameters
         $this->setupMasterParms();
-        if (($keyValue = Get("visit_id") ?? Route("visit_id")) !== null) {
-            $this->visit_id->setQueryStringValue($keyValue);
-            $this->RecKey["visit_id"] = $this->visit_id->QueryStringValue;
-        } elseif (Post("visit_id") !== null) {
-            $this->visit_id->setFormValue(Post("visit_id"));
-            $this->RecKey["visit_id"] = $this->visit_id->FormValue;
+        if (($keyValue = Get("id") ?? Route("id")) !== null) {
+            $this->id->setQueryStringValue($keyValue);
+            $this->RecKey["id"] = $this->id->QueryStringValue;
+        } elseif (Post("id") !== null) {
+            $this->id->setFormValue(Post("id"));
+            $this->RecKey["id"] = $this->id->FormValue;
         } elseif (IsApi() && ($keyValue = Key(0) ?? Route(2)) !== null) {
-            $this->visit_id->setQueryStringValue($keyValue);
-            $this->RecKey["visit_id"] = $this->visit_id->QueryStringValue;
+            $this->id->setQueryStringValue($keyValue);
+            $this->RecKey["id"] = $this->id->QueryStringValue;
         } elseif (!$loadCurrentRecord) {
             $returnUrl = "patientsradiologyreportslist"; // Return to list
         }
@@ -1178,7 +1178,7 @@ class PatientsRadiologyReportsView extends PatientsRadiologyReports
         global $Language;
         $rs = null;
         if (count($keys) >= 1) {
-            $this->visit_id->OldValue = $keys[0];
+            $this->id->OldValue = $keys[0];
             $rs = $this->loadRs($this->getRecordFilter());
         }
         if (!$rs || !$doc) {

@@ -171,20 +171,8 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_patients_lab_report_id" class="patients_lab_report_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_name" class="patients_lab_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
-        <th data-name="Group_Concat_service_name" class="<?= $Page->Group_Concat_service_name->headerCellClass() ?>"><div id="elh_patients_lab_report_Group_Concat_service_name" class="patients_lab_report_Group_Concat_service_name"><?= $Page->renderFieldHeader($Page->Group_Concat_service_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->patient_age->Visible) { // patient_age ?>
-        <th data-name="patient_age" class="<?= $Page->patient_age->headerCellClass() ?>"><div id="elh_patients_lab_report_patient_age" class="patients_lab_report_patient_age"><?= $Page->renderFieldHeader($Page->patient_age) ?></div></th>
-<?php } ?>
-<?php if ($Page->details->Visible) { // details ?>
-        <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_patients_lab_report_details" class="patients_lab_report_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
 <?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_patients_lab_report_status" class="patients_lab_report_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
@@ -194,9 +182,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_lab_report_date_created" class="patients_lab_report_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_patients_lab_report_date_updated" class="patients_lab_report_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -226,43 +211,11 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_id" class="el_patients_lab_report_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_patient_name" class="el_patients_lab_report_patient_name">
 <span<?= $Page->patient_name->viewAttributes() ?>>
 <?= $Page->patient_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->Group_Concat_service_name->Visible) { // Group_Concat_service_name ?>
-        <td data-name="Group_Concat_service_name"<?= $Page->Group_Concat_service_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_Group_Concat_service_name" class="el_patients_lab_report_Group_Concat_service_name">
-<span<?= $Page->Group_Concat_service_name->viewAttributes() ?>>
-<?= $Page->Group_Concat_service_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->patient_age->Visible) { // patient_age ?>
-        <td data-name="patient_age"<?= $Page->patient_age->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_patient_age" class="el_patients_lab_report_patient_age">
-<span<?= $Page->patient_age->viewAttributes() ?>>
-<?= $Page->patient_age->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->details->Visible) { // details ?>
-        <td data-name="details"<?= $Page->details->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_details" class="el_patients_lab_report_details">
-<span<?= $Page->details->viewAttributes() ?>>
-<?= $Page->details->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -287,14 +240,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_date_created" class="el_patients_lab_report_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_lab_report_date_updated" class="el_patients_lab_report_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

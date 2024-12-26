@@ -2668,7 +2668,7 @@
     <table id="patients_lab_report">
       <phrase id="tblcaption" value="Lab Reports" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Report No." />
       </field>
       <field id="visit_id">
         <phrase id="fldcaption" value="Visit ID" />
@@ -2713,7 +2713,7 @@
     <table id="patients_radiology_reports">
       <phrase id="tblcaption" value="Radiology Reports" />
       <field id="id">
-        <phrase id="fldcaption" value="Bill No." />
+        <phrase id="fldcaption" value="Report No." />
       </field>
       <field id="radiology_requests_id">
         <phrase id="fldcaption" value="Request ID" />

@@ -145,20 +145,20 @@ class PatientsLabReportList extends PatientsLabReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->visit_id->Visible = false;
         $this->patient_id->Visible = false;
         $this->patient_name->setVisibility();
-        $this->Group_Concat_service_name->setVisibility();
+        $this->Group_Concat_service_name->Visible = false;
         $this->date_of_birth->Visible = false;
         $this->gender->Visible = false;
-        $this->patient_age->setVisibility();
-        $this->details->setVisibility();
+        $this->patient_age->Visible = false;
+        $this->details->Visible = false;
         $this->report_template->Visible = false;
         $this->status->setVisibility();
         $this->laboratorist->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -1352,15 +1352,10 @@ class PatientsLabReportList extends PatientsLabReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->Group_Concat_service_name); // Group_Concat_service_name
-            $this->updateSort($this->patient_age); // patient_age
-            $this->updateSort($this->details); // details
             $this->updateSort($this->status); // status
             $this->updateSort($this->laboratorist); // laboratorist
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1451,6 +1446,14 @@ class PatientsLabReportList extends PatientsLabReport
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1488,6 +1491,10 @@ class PatientsLabReportList extends PatientsLabReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1570,15 +1577,10 @@ class PatientsLabReportList extends PatientsLabReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "Group_Concat_service_name");
-            $this->createColumnOption($option, "patient_age");
-            $this->createColumnOption($option, "details");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "laboratorist");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2121,6 +2123,7 @@ class PatientsLabReportList extends PatientsLabReport
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2164,29 +2167,9 @@ class PatientsLabReportList extends PatientsLabReport
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // patient_name
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
-
-            // Group_Concat_service_name
-            $this->Group_Concat_service_name->HrefValue = "";
-            $this->Group_Concat_service_name->TooltipValue = "";
-
-            // patient_age
-            $this->patient_age->HrefValue = "";
-            $this->patient_age->TooltipValue = "";
-
-            // details
-            $this->details->HrefValue = "";
-            $this->details->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -2199,10 +2182,6 @@ class PatientsLabReportList extends PatientsLabReport
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

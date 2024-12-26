@@ -454,7 +454,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         }
 
         // Set field visibility for detail fields
-        $this->id->setVisibility();
         $this->patient_name->setVisibility();
         $this->gender->setVisibility();
         $this->patient_age->setVisibility();
@@ -652,8 +651,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         // Call Row_Rendering event
         $this->rowRendering();
 
-        // id
-
         // patient_name
 
         // gender
@@ -670,9 +667,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         if ($this->RowType == RowType::SEARCH) { // Search row
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
-
-            // id
-            $this->id->HrefValue = "";
 
             // patient_name
             $this->patient_name->HrefValue = "";
@@ -704,11 +698,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
                 $this->RowCount++;
             }
 
-            // id
-            $this->id->ViewValue = $this->id->CurrentValue;
-            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
-            $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
             $this->patient_name->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
@@ -739,10 +728,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
             $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_name
             $this->patient_name->HrefValue = "";
@@ -776,15 +761,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         // Call Cell_Rendered event
         if ($this->RowType == RowType::TOTAL) { // Summary row
         } else {
-            // id
-            $currentValue = $this->id->CurrentValue;
-            $viewValue = &$this->id->ViewValue;
-            $viewAttrs = &$this->id->ViewAttrs;
-            $cellAttrs = &$this->id->CellAttrs;
-            $hrefValue = &$this->id->HrefValue;
-            $linkAttrs = &$this->id->LinkAttrs;
-            $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
             // patient_name
             $currentValue = $this->patient_name->CurrentValue;
             $viewValue = &$this->patient_name->ViewValue;
@@ -887,9 +863,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         $this->GroupColumnCount = 0;
         $this->SubGroupColumnCount = 0;
         $this->DetailColumnCount = 0;
-        if ($this->id->Visible) {
-            $this->DetailColumnCount += 1;
-        }
         if ($this->patient_name->Visible) {
             $this->DetailColumnCount += 1;
         }
@@ -1206,7 +1179,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         if ($resetSort) {
             $this->setOrderBy("");
             $this->setStartGroup(1);
-            $this->id->setSort("");
             $this->patient_name->setSort("");
             $this->gender->setSort("");
             $this->patient_age->setSort("");
@@ -1219,7 +1191,6 @@ class LaboratoryReportsSummary extends LaboratoryReports
         } elseif ($orderBy != "") {
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->patient_age); // patient_age

@@ -135,7 +135,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->radiology_requests_id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
@@ -381,7 +381,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['visit_id'];
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -1061,7 +1061,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
                     if ($key != "") {
                         $key .= Config("COMPOSITE_KEY_SEPARATOR");
                     }
-                    $key .= $this->visit_id->CurrentValue;
+                    $key .= $this->id->CurrentValue;
 
                     // Add filter for this record
                     AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
@@ -1097,14 +1097,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     public function emptyRow()
     {
         global $CurrentForm;
-        if (
-            $CurrentForm->hasValue("x_id") &&
-            $CurrentForm->hasValue("o_id") &&
-            $this->id->CurrentValue != $this->id->DefaultValue &&
-            !($this->id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->id->CurrentValue == $this->id->getSessionValue())
-        ) {
-            return false;
-        }
         if (
             $CurrentForm->hasValue("x_patient_id") &&
             $CurrentForm->hasValue("o_patient_id") &&
@@ -1644,19 +1636,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->id->Visible = false; // Disable update for API request
-            } else {
-                $this->id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_id")) {
-            $this->id->setOldValue($CurrentForm->getValue("o_id"));
-        }
-
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1723,10 +1702,10 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            $this->visit_id->setFormValue($val);
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -1734,8 +1713,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
     public function restoreFormValues()
     {
         global $CurrentForm;
-                        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->id->CurrentValue = $this->id->FormValue;
+                        $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->service_name->CurrentValue = $this->service_name->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
@@ -1989,10 +1967,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -2013,14 +1987,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
-                $this->id->EditValue = FormatNumber($this->id->EditValue, null);
-            }
-
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2105,9 +2071,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2123,14 +2086,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             // date_created
             $this->date_created->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
-                $this->id->EditValue = FormatNumber($this->id->EditValue, null);
-            }
-
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2215,9 +2170,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
 
             // Edit refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2253,14 +2205,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->id->FormValue)) {
-                $this->id->addErrorMessage($this->id->getErrorMessage(false));
-            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
@@ -2327,7 +2271,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
             if ($thisKey != "") {
                 $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
             }
-            $thisKey .= $row['visit_id'];
+            $thisKey .= $row['id'];
 
             // Call row deleting event
             $deleteRow = $this->rowDeleting($row);
@@ -2452,9 +2396,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         global $Security;
         $rsnew = [];
 
-        // id
-        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, $this->id->ReadOnly);
-
         // patient_id
         if ($this->patient_id->getSessionValue() != "") {
             $this->patient_id->ReadOnly = true;
@@ -2481,9 +2422,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['id'])) { // id
-            $this->id->CurrentValue = $row['id'];
-        }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
@@ -2528,7 +2466,7 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         $insertRow = $this->rowInserting($rsold, $rsnew);
 
         // Check if key value entered
-        if ($insertRow && $this->ValidateKey && strval($rsnew['visit_id']) == "") {
+        if ($insertRow && $this->ValidateKey && strval($rsnew['id']) == "") {
             $this->setFailureMessage($Language->phrase("InvalidKeyValue"));
             $insertRow = false;
         }
@@ -2577,9 +2515,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
         global $Security;
         $rsnew = [];
 
-        // id
-        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, strval($this->id->CurrentValue) == "");
-
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
@@ -2608,9 +2543,6 @@ class PatientsRadiologyReportsGrid extends PatientsRadiologyReports
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['id'])) { // id
-            $this->id->setFormValue($row['id']);
-        }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
         }
