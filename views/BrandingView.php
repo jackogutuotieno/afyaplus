@@ -67,7 +67,7 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_branding_header_image"><?= $Page->header_image->caption() ?></span></td>
         <td data-name="header_image"<?= $Page->header_image->cellAttributes() ?>>
 <span id="el_branding_header_image">
-<span<?= $Page->header_image->viewAttributes() ?>>
+<span>
 <?= GetFileViewTag($Page->header_image, $Page->header_image->getViewValue(), false) ?>
 </span>
 </span>

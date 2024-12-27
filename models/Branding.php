@@ -138,14 +138,16 @@ class Branding extends DbTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'FILE' // Edit Tag
         );
+        $this->header_image->addMethod("getUploadPath", fn() => 'images');
         $this->header_image->InputTextType = "text";
         $this->header_image->Raw = true;
         $this->header_image->Nullable = false; // NOT NULL field
         $this->header_image->Required = true; // Required field
         $this->header_image->Sortable = false; // Allow sort
+        $this->header_image->UploadAllowedFileExt = "jpg,jpeg";
         $this->header_image->SearchOperators = ["=", "<>"];
         $this->header_image->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->header_image->Param, "CustomMsg");
         $this->Fields['header_image'] = &$this->header_image;
@@ -1122,7 +1124,12 @@ class Branding extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // header_image
+        $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
         if (!EmptyValue($this->header_image->Upload->DbValue)) {
+            $this->header_image->ImageWidth = 800;
+            $this->header_image->ImageHeight = 170;
+            $this->header_image->ImageAlt = $this->header_image->alt();
+            $this->header_image->ImageCssClass = "ew-image";
             $this->header_image->ViewValue = $this->id->CurrentValue;
             $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
         } else {
@@ -1156,6 +1163,13 @@ class Branding extends DbTable
         }
         $this->header_image->ExportHrefValue = GetFileUploadUrl($this->header_image, $this->id->CurrentValue);
         $this->header_image->TooltipValue = "";
+        if ($this->header_image->UseColorbox) {
+            if (EmptyValue($this->header_image->TooltipValue)) {
+                $this->header_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->header_image->LinkAttrs["data-rel"] = "branding_x_header_image";
+            $this->header_image->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1186,7 +1200,12 @@ class Branding extends DbTable
 
         // header_image
         $this->header_image->setupEditAttributes();
+        $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
         if (!EmptyValue($this->header_image->Upload->DbValue)) {
+            $this->header_image->ImageWidth = 800;
+            $this->header_image->ImageHeight = 170;
+            $this->header_image->ImageAlt = $this->header_image->alt();
+            $this->header_image->ImageCssClass = "ew-image";
             $this->header_image->EditValue = $this->id->CurrentValue;
             $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
         } else {

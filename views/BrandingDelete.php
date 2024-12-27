@@ -53,6 +53,9 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_branding_id" class="branding_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->header_image->Visible) { // header_image ?>
+        <th class="<?= $Page->header_image->headerCellClass() ?>"><span id="elh_branding_header_image" class="branding_header_image"><?= $Page->header_image->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -79,6 +82,15 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->header_image->Visible) { // header_image ?>
+        <td<?= $Page->header_image->cellAttributes() ?>>
+<span id="">
+<span>
+<?= GetFileViewTag($Page->header_image, $Page->header_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>

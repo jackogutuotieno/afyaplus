@@ -310,7 +310,7 @@ class LaboratoryReports extends ReportTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'SELECT' // Edit Tag
         );
         $this->report_month->InputTextType = "text";

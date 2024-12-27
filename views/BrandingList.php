@@ -94,6 +94,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_branding_id" class="branding_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
+<?php if ($Page->header_image->Visible) { // header_image ?>
+        <th data-name="header_image" class="<?= $Page->header_image->headerCellClass() ?>"><div id="elh_branding_header_image" class="branding_header_image"><?= $Page->renderFieldHeader($Page->header_image) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -127,6 +130,15 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_branding_id" class="el_branding_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->header_image->Visible) { // header_image ?>
+        <td data-name="header_image"<?= $Page->header_image->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_branding_header_image" class="el_branding_header_image">
+<span>
+<?= GetFileViewTag($Page->header_image, $Page->header_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>

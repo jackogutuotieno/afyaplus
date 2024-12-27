@@ -146,7 +146,7 @@ class BrandingList extends Branding
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->header_image->Visible = false;
+        $this->header_image->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -1223,6 +1223,7 @@ class BrandingList extends Branding
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "header_image");
         }
 
         // Set up custom actions
@@ -1721,6 +1722,19 @@ class BrandingList extends Branding
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
+            // header_image
+            $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->header_image->Upload->DbValue)) {
+                $this->header_image->ImageWidth = 800;
+                $this->header_image->ImageHeight = 170;
+                $this->header_image->ImageAlt = $this->header_image->alt();
+                $this->header_image->ImageCssClass = "ew-image";
+                $this->header_image->ViewValue = $this->id->CurrentValue;
+                $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
+            } else {
+                $this->header_image->ViewValue = "";
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1732,6 +1746,29 @@ class BrandingList extends Branding
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
+
+            // header_image
+            if (!empty($this->header_image->Upload->DbValue)) {
+                $this->header_image->HrefValue = GetFileUploadUrl($this->header_image, $this->id->CurrentValue);
+                $this->header_image->LinkAttrs["target"] = "";
+                if ($this->header_image->IsBlobImage && empty($this->header_image->LinkAttrs["target"])) {
+                    $this->header_image->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->header_image->HrefValue = FullUrl($this->header_image->HrefValue, "href");
+                }
+            } else {
+                $this->header_image->HrefValue = "";
+            }
+            $this->header_image->ExportHrefValue = GetFileUploadUrl($this->header_image, $this->id->CurrentValue);
+            $this->header_image->TooltipValue = "";
+            if ($this->header_image->UseColorbox) {
+                if (EmptyValue($this->header_image->TooltipValue)) {
+                    $this->header_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+                }
+                $this->header_image->LinkAttrs["data-rel"] = "branding_x" . $this->RowCount . "_header_image";
+                $this->header_image->LinkAttrs->appendClass("ew-lightbox");
+            }
         }
 
         // Call Row Rendered event

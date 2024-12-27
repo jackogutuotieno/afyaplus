@@ -1,4 +1,4 @@
-<ew-language date="2024/12/26" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/27" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -2898,6 +2898,7 @@
       <phrase id="tblcaption" value="Header" />
       <field id="id">
         <phrase id="fldcaption" value="ID" />
+        <phrase id="fldalt" value="AfyaPlus | Healthcare Management Information System" />
       </field>
       <field id="header_image">
         <phrase id="fldcaption" value="Header Image" />

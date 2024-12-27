@@ -845,7 +845,12 @@ class BrandingView extends Branding
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // header_image
+            $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
             if (!EmptyValue($this->header_image->Upload->DbValue)) {
+                $this->header_image->ImageWidth = 800;
+                $this->header_image->ImageHeight = 170;
+                $this->header_image->ImageAlt = $this->header_image->alt();
+                $this->header_image->ImageCssClass = "ew-image";
                 $this->header_image->ViewValue = $this->id->CurrentValue;
                 $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
             } else {
@@ -879,6 +884,13 @@ class BrandingView extends Branding
             }
             $this->header_image->ExportHrefValue = GetFileUploadUrl($this->header_image, $this->id->CurrentValue);
             $this->header_image->TooltipValue = "";
+            if ($this->header_image->UseColorbox) {
+                if (EmptyValue($this->header_image->TooltipValue)) {
+                    $this->header_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+                }
+                $this->header_image->LinkAttrs["data-rel"] = "branding_x_header_image";
+                $this->header_image->LinkAttrs->appendClass("ew-lightbox");
+            }
         }
 
         // Call Row Rendered event

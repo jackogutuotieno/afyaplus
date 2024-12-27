@@ -829,7 +829,12 @@ class BrandingEdit extends Branding
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // header_image
+            $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
             if (!EmptyValue($this->header_image->Upload->DbValue)) {
+                $this->header_image->ImageWidth = 800;
+                $this->header_image->ImageHeight = 170;
+                $this->header_image->ImageAlt = $this->header_image->alt();
+                $this->header_image->ImageCssClass = "ew-image";
                 $this->header_image->ViewValue = $this->id->CurrentValue;
                 $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
             } else {
@@ -868,7 +873,12 @@ class BrandingEdit extends Branding
 
             // header_image
             $this->header_image->setupEditAttributes();
+            $this->header_image->UploadPath = $this->header_image->getUploadPath(); // PHP
             if (!EmptyValue($this->header_image->Upload->DbValue)) {
+                $this->header_image->ImageWidth = 800;
+                $this->header_image->ImageHeight = 170;
+                $this->header_image->ImageAlt = $this->header_image->alt();
+                $this->header_image->ImageCssClass = "ew-image";
                 $this->header_image->EditValue = $this->id->CurrentValue;
                 $this->header_image->IsBlobImage = IsImageFile(ContentExtension($this->header_image->Upload->DbValue));
             } else {

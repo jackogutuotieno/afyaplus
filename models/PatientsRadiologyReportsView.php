@@ -1493,8 +1493,7 @@ class PatientsRadiologyReportsView extends PatientsRadiologyReports
     // Page Data Rendering event
     public function pageDataRendering(&$header)
     {
-        // Example:
-        //$header = "your header";
+        $header = '<img src="http://' . $_SERVER['HTTP_HOST'] . '/afyaplus/images/header.jpg" style="width:100%" />';
     }
 
     // Page Data Rendered event
