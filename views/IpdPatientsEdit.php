@@ -29,6 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["age", [fields.age.visible && fields.age.required ? ew.Validators.required(fields.age.caption) : null, ew.Validators.integer], fields.age.isInvalid],
             ["is_ipd", [fields.is_ipd.visible && fields.is_ipd.required ? ew.Validators.required(fields.is_ipd.caption) : null], fields.is_ipd.isInvalid]
         ])
 
@@ -78,6 +79,18 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="ipd_patients" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+    <div id="r_age"<?= $Page->age->rowAttributes() ?>>
+        <label id="elh_ipd_patients_age" for="x_age" class="<?= $Page->LeftColumnClass ?>"><?= $Page->age->caption() ?><?= $Page->age->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->age->cellAttributes() ?>>
+<span id="el_ipd_patients_age">
+<input type="<?= $Page->age->getInputTextType() ?>" name="x_age" id="x_age" data-table="ipd_patients" data-field="x_age" value="<?= $Page->age->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->age->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->age->formatPattern()) ?>"<?= $Page->age->editAttributes() ?> aria-describedby="x_age_help">
+<?= $Page->age->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->age->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

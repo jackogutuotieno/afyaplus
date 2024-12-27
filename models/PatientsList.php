@@ -172,7 +172,7 @@ class PatientsList extends Patients
         $this->next_of_kin_phone->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
-        $this->is_ipd->setVisibility();
+        $this->is_ipd->Visible = false;
     }
 
     // Constructor
@@ -1428,7 +1428,6 @@ class PatientsList extends Patients
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->is_ipd); // is_ipd
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1951,7 +1950,6 @@ class PatientsList extends Patients
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "is_ipd");
         }
 
         // Set up custom actions
@@ -2655,10 +2653,6 @@ class PatientsList extends Patients
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // is_ipd
-            $this->is_ipd->HrefValue = "";
-            $this->is_ipd->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -169,6 +169,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->date_of_birth->Visible) { // date_of_birth ?>
         <th data-name="date_of_birth" class="<?= $Page->date_of_birth->headerCellClass() ?>"><div id="elh_ipd_patients_date_of_birth" class="ipd_patients_date_of_birth"><?= $Page->renderFieldHeader($Page->date_of_birth) ?></div></th>
 <?php } ?>
+<?php if ($Page->age->Visible) { // age ?>
+        <th data-name="age" class="<?= $Page->age->headerCellClass() ?>"><div id="elh_ipd_patients_age" class="ipd_patients_age"><?= $Page->renderFieldHeader($Page->age) ?></div></th>
+<?php } ?>
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_ipd_patients_gender" class="ipd_patients_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
@@ -232,6 +235,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_date_of_birth" class="el_ipd_patients_date_of_birth">
 <span<?= $Page->date_of_birth->viewAttributes() ?>>
 <?= $Page->date_of_birth->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->age->Visible) { // age ?>
+        <td data-name="age"<?= $Page->age->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_patients_age" class="el_ipd_patients_age">
+<span<?= $Page->age->viewAttributes() ?>>
+<?= $Page->age->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

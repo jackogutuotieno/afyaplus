@@ -149,6 +149,7 @@ class IpdPatientsList extends IpdPatients
         $this->patient_name->setVisibility();
         $this->national_id->setVisibility();
         $this->date_of_birth->setVisibility();
+        $this->age->setVisibility();
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->is_ipd->Visible = false;
@@ -1055,6 +1056,7 @@ class IpdPatientsList extends IpdPatients
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
         $filterList = Concat($filterList, $this->national_id->AdvancedSearch->toJson(), ","); // Field national_id
         $filterList = Concat($filterList, $this->date_of_birth->AdvancedSearch->toJson(), ","); // Field date_of_birth
+        $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
         $filterList = Concat($filterList, $this->is_ipd->AdvancedSearch->toJson(), ","); // Field is_ipd
@@ -1128,6 +1130,14 @@ class IpdPatientsList extends IpdPatients
         $this->date_of_birth->AdvancedSearch->SearchValue2 = @$filter["y_date_of_birth"];
         $this->date_of_birth->AdvancedSearch->SearchOperator2 = @$filter["w_date_of_birth"];
         $this->date_of_birth->AdvancedSearch->save();
+
+        // Field age
+        $this->age->AdvancedSearch->SearchValue = @$filter["x_age"];
+        $this->age->AdvancedSearch->SearchOperator = @$filter["z_age"];
+        $this->age->AdvancedSearch->SearchCondition = @$filter["v_age"];
+        $this->age->AdvancedSearch->SearchValue2 = @$filter["y_age"];
+        $this->age->AdvancedSearch->SearchOperator2 = @$filter["w_age"];
+        $this->age->AdvancedSearch->save();
 
         // Field gender
         $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
@@ -1276,6 +1286,7 @@ class IpdPatientsList extends IpdPatients
             $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->national_id); // national_id
             $this->updateSort($this->date_of_birth); // date_of_birth
+            $this->updateSort($this->age); // age
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->phone); // phone
             $this->setStartRecordNumber(1); // Reset start position
@@ -1306,6 +1317,7 @@ class IpdPatientsList extends IpdPatients
                 $this->patient_name->setSort("");
                 $this->national_id->setSort("");
                 $this->date_of_birth->setSort("");
+                $this->age->setSort("");
                 $this->gender->setSort("");
                 $this->phone->setSort("");
                 $this->is_ipd->setSort("");
@@ -1476,6 +1488,7 @@ class IpdPatientsList extends IpdPatients
             $this->createColumnOption($option, "patient_name");
             $this->createColumnOption($option, "national_id");
             $this->createColumnOption($option, "date_of_birth");
+            $this->createColumnOption($option, "age");
             $this->createColumnOption($option, "gender");
             $this->createColumnOption($option, "phone");
         }
@@ -1920,6 +1933,7 @@ class IpdPatientsList extends IpdPatients
         $this->patient_name->setDbValue($row['patient_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->is_ipd->setDbValue($row['is_ipd']);
@@ -1933,6 +1947,7 @@ class IpdPatientsList extends IpdPatients
         $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['is_ipd'] = $this->is_ipd->DefaultValue;
@@ -1984,6 +1999,8 @@ class IpdPatientsList extends IpdPatients
 
         // date_of_birth
 
+        // age
+
         // gender
 
         // phone
@@ -2000,11 +2017,14 @@ class IpdPatientsList extends IpdPatients
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // age
+            $this->age->ViewValue = $this->age->CurrentValue;
+            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -2034,6 +2054,10 @@ class IpdPatientsList extends IpdPatients
             // date_of_birth
             $this->date_of_birth->HrefValue = "";
             $this->date_of_birth->TooltipValue = "";
+
+            // age
+            $this->age->HrefValue = "";
+            $this->age->TooltipValue = "";
 
             // gender
             $this->gender->HrefValue = "";

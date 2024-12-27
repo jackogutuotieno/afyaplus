@@ -125,6 +125,7 @@ class IpdPatientsEdit extends IpdPatients
         $this->patient_name->Visible = false;
         $this->national_id->Visible = false;
         $this->date_of_birth->Visible = false;
+        $this->age->setVisibility();
         $this->gender->Visible = false;
         $this->phone->Visible = false;
         $this->is_ipd->setVisibility();
@@ -717,6 +718,16 @@ class IpdPatientsEdit extends IpdPatients
             $this->id->setFormValue($val);
         }
 
+        // Check field name 'age' first before field var 'x_age'
+        $val = $CurrentForm->hasValue("age") ? $CurrentForm->getValue("age") : $CurrentForm->getValue("x_age");
+        if (!$this->age->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->age->Visible = false; // Disable update for API request
+            } else {
+                $this->age->setFormValue($val, true, $validate);
+            }
+        }
+
         // Check field name 'is_ipd' first before field var 'x_is_ipd'
         $val = $CurrentForm->hasValue("is_ipd") ? $CurrentForm->getValue("is_ipd") : $CurrentForm->getValue("x_is_ipd");
         if (!$this->is_ipd->IsDetailKey) {
@@ -733,6 +744,7 @@ class IpdPatientsEdit extends IpdPatients
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
+        $this->age->CurrentValue = $this->age->FormValue;
         $this->is_ipd->CurrentValue = $this->is_ipd->FormValue;
     }
 
@@ -778,6 +790,7 @@ class IpdPatientsEdit extends IpdPatients
         $this->patient_name->setDbValue($row['patient_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->is_ipd->setDbValue($row['is_ipd']);
@@ -791,6 +804,7 @@ class IpdPatientsEdit extends IpdPatients
         $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['national_id'] = $this->national_id->DefaultValue;
         $row['date_of_birth'] = $this->date_of_birth->DefaultValue;
+        $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['is_ipd'] = $this->is_ipd->DefaultValue;
@@ -840,6 +854,9 @@ class IpdPatientsEdit extends IpdPatients
         // date_of_birth
         $this->date_of_birth->RowCssClass = "row";
 
+        // age
+        $this->age->RowCssClass = "row";
+
         // gender
         $this->gender->RowCssClass = "row";
 
@@ -859,11 +876,14 @@ class IpdPatientsEdit extends IpdPatients
 
             // national_id
             $this->national_id->ViewValue = $this->national_id->CurrentValue;
-            $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
             // date_of_birth
             $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
             $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+            // age
+            $this->age->ViewValue = $this->age->CurrentValue;
+            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -881,12 +901,23 @@ class IpdPatientsEdit extends IpdPatients
             // id
             $this->id->HrefValue = "";
 
+            // age
+            $this->age->HrefValue = "";
+
             // is_ipd
             $this->is_ipd->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
+
+            // age
+            $this->age->setupEditAttributes();
+            $this->age->EditValue = $this->age->CurrentValue;
+            $this->age->PlaceHolder = RemoveHtml($this->age->caption());
+            if (strval($this->age->EditValue) != "" && is_numeric($this->age->EditValue)) {
+                $this->age->EditValue = FormatNumber($this->age->EditValue, null);
+            }
 
             // is_ipd
             $this->is_ipd->EditValue = $this->is_ipd->options(false);
@@ -896,6 +927,9 @@ class IpdPatientsEdit extends IpdPatients
 
             // id
             $this->id->HrefValue = "";
+
+            // age
+            $this->age->HrefValue = "";
 
             // is_ipd
             $this->is_ipd->HrefValue = "";
@@ -924,6 +958,14 @@ class IpdPatientsEdit extends IpdPatients
                 if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
+            }
+            if ($this->age->Visible && $this->age->Required) {
+                if (!$this->age->IsDetailKey && EmptyValue($this->age->FormValue)) {
+                    $this->age->addErrorMessage(str_replace("%s", $this->age->caption(), $this->age->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->age->FormValue)) {
+                $this->age->addErrorMessage($this->age->getErrorMessage(false));
             }
             if ($this->is_ipd->Visible && $this->is_ipd->Required) {
                 if ($this->is_ipd->FormValue == "") {
@@ -1019,6 +1061,9 @@ class IpdPatientsEdit extends IpdPatients
         global $Security;
         $rsnew = [];
 
+        // age
+        $this->age->setDbValueDef($rsnew, $this->age->CurrentValue, $this->age->ReadOnly);
+
         // is_ipd
         $tmpBool = $this->is_ipd->CurrentValue;
         if ($tmpBool != "1" && $tmpBool != "0") {
@@ -1034,6 +1079,9 @@ class IpdPatientsEdit extends IpdPatients
      */
     protected function restoreEditFormFromRow($row)
     {
+        if (isset($row['age'])) { // age
+            $this->age->CurrentValue = $row['age'];
+        }
         if (isset($row['is_ipd'])) { // is_ipd
             $this->is_ipd->CurrentValue = $row['is_ipd'];
         }

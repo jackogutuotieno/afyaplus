@@ -2959,19 +2959,22 @@
         <phrase id="fldcaption" value="UHID" />
       </field>
       <field id="patient_name">
-        <phrase id="fldcaption" value="patient name" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="national_id">
-        <phrase id="fldcaption" value="national id" />
+        <phrase id="fldcaption" value="National ID" />
       </field>
       <field id="date_of_birth">
-        <phrase id="fldcaption" value="date of birth" />
+        <phrase id="fldcaption" value="DoB" />
+      </field>
+      <field id="age">
+        <phrase id="fldcaption" value="Age" />
       </field>
       <field id="gender">
-        <phrase id="fldcaption" value="gender" />
+        <phrase id="fldcaption" value="Gender" />
       </field>
       <field id="phone">
-        <phrase id="fldcaption" value="phone" />
+        <phrase id="fldcaption" value="Phone" />
       </field>
       <field id="is_ipd">
         <phrase id="fldcaption" value="is ipd" />

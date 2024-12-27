@@ -773,7 +773,7 @@ class Patients extends DbTable
     public function getSqlWhere()
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "";
+        $this->DefaultFilter = "`is_ipd`=0";
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }

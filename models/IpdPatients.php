@@ -50,6 +50,7 @@ class IpdPatients extends DbTable
     public $patient_name;
     public $national_id;
     public $date_of_birth;
+    public $age;
     public $gender;
     public $phone;
     public $is_ipd;
@@ -178,10 +179,10 @@ class IpdPatients extends DbTable
             'x_date_of_birth', // Variable name
             'date_of_birth', // Name
             '`date_of_birth`', // Expression
-            CastDateFieldForLike("`date_of_birth`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_of_birth`", 7, "DB"), // Basic search expression
             133, // Type
             40, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`date_of_birth`', // Virtual expression
             false, // Is virtual
@@ -194,9 +195,33 @@ class IpdPatients extends DbTable
         $this->date_of_birth->Raw = true;
         $this->date_of_birth->Nullable = false; // NOT NULL field
         $this->date_of_birth->Required = true; // Required field
-        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_of_birth->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_of_birth->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_of_birth'] = &$this->date_of_birth;
+
+        // age
+        $this->age = new DbField(
+            $this, // Table
+            'x_age', // Variable name
+            'age', // Name
+            '`age`', // Expression
+            '`age`', // Basic search expression
+            20, // Type
+            21, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`age`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->age->InputTextType = "text";
+        $this->age->Raw = true;
+        $this->age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['age'] = &$this->age;
 
         // gender
         $this->gender = new DbField(
@@ -798,6 +823,7 @@ class IpdPatients extends DbTable
         $this->patient_name->DbValue = $row['patient_name'];
         $this->national_id->DbValue = $row['national_id'];
         $this->date_of_birth->DbValue = $row['date_of_birth'];
+        $this->age->DbValue = $row['age'];
         $this->gender->DbValue = $row['gender'];
         $this->phone->DbValue = $row['phone'];
         $this->is_ipd->DbValue = $row['is_ipd'];
@@ -1157,6 +1183,7 @@ class IpdPatients extends DbTable
         $this->patient_name->setDbValue($row['patient_name']);
         $this->national_id->setDbValue($row['national_id']);
         $this->date_of_birth->setDbValue($row['date_of_birth']);
+        $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->is_ipd->setDbValue($row['is_ipd']);
@@ -1198,6 +1225,8 @@ class IpdPatients extends DbTable
 
         // date_of_birth
 
+        // age
+
         // gender
 
         // phone
@@ -1212,11 +1241,14 @@ class IpdPatients extends DbTable
 
         // national_id
         $this->national_id->ViewValue = $this->national_id->CurrentValue;
-        $this->national_id->ViewValue = FormatNumber($this->national_id->ViewValue, $this->national_id->formatPattern());
 
         // date_of_birth
         $this->date_of_birth->ViewValue = $this->date_of_birth->CurrentValue;
         $this->date_of_birth->ViewValue = FormatDateTime($this->date_of_birth->ViewValue, $this->date_of_birth->formatPattern());
+
+        // age
+        $this->age->ViewValue = $this->age->CurrentValue;
+        $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
@@ -1246,6 +1278,10 @@ class IpdPatients extends DbTable
         // date_of_birth
         $this->date_of_birth->HrefValue = "";
         $this->date_of_birth->TooltipValue = "";
+
+        // age
+        $this->age->HrefValue = "";
+        $this->age->TooltipValue = "";
 
         // gender
         $this->gender->HrefValue = "";
@@ -1291,13 +1327,21 @@ class IpdPatients extends DbTable
         $this->national_id->EditValue = $this->national_id->CurrentValue;
         $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
         if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
-            $this->national_id->EditValue = FormatNumber($this->national_id->EditValue, null);
+            $this->national_id->EditValue = $this->national_id->EditValue;
         }
 
         // date_of_birth
         $this->date_of_birth->setupEditAttributes();
         $this->date_of_birth->EditValue = FormatDateTime($this->date_of_birth->CurrentValue, $this->date_of_birth->formatPattern());
         $this->date_of_birth->PlaceHolder = RemoveHtml($this->date_of_birth->caption());
+
+        // age
+        $this->age->setupEditAttributes();
+        $this->age->EditValue = $this->age->CurrentValue;
+        $this->age->PlaceHolder = RemoveHtml($this->age->caption());
+        if (strval($this->age->EditValue) != "" && is_numeric($this->age->EditValue)) {
+            $this->age->EditValue = FormatNumber($this->age->EditValue, null);
+        }
 
         // gender
         $this->gender->setupEditAttributes();
@@ -1351,6 +1395,7 @@ class IpdPatients extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->is_ipd);
@@ -1359,6 +1404,7 @@ class IpdPatients extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->national_id);
                     $doc->exportCaption($this->date_of_birth);
+                    $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->is_ipd);
@@ -1392,6 +1438,7 @@ class IpdPatients extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
                         $doc->exportField($this->is_ipd);
@@ -1400,6 +1447,7 @@ class IpdPatients extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->national_id);
                         $doc->exportField($this->date_of_birth);
+                        $doc->exportField($this->age);
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
                         $doc->exportField($this->is_ipd);

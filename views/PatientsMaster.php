@@ -119,21 +119,6 @@ $patients->TableClass = "table table-bordered table-hover table-sm ew-table ew-m
 </td>
         </tr>
 <?php } ?>
-<?php if ($patients->is_ipd->Visible) { // is_ipd ?>
-        <tr id="r_is_ipd"<?= $patients->is_ipd->rowAttributes() ?>>
-            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->is_ipd->caption() ?></td>
-            <td<?= $patients->is_ipd->cellAttributes() ?>>
-<span id="el_patients_is_ipd">
-<span<?= $patients->is_ipd->viewAttributes() ?>>
-<div class="form-check form-switch d-inline-block">
-    <input type="checkbox" id="x_is_ipd_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $patients->is_ipd->getViewValue() ?>" disabled<?php if (ConvertToBool($patients->is_ipd->CurrentValue)) { ?> checked<?php } ?>>
-    <label class="form-check-label" for="x_is_ipd_<?= $Page->RowCount ?>"></label>
-</div>
-</span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>

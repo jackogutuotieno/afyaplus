@@ -148,7 +148,7 @@ class PatientsDelete extends Patients
         $this->next_of_kin_phone->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
-        $this->is_ipd->setVisibility();
+        $this->is_ipd->Visible = false;
     }
 
     // Constructor
@@ -866,10 +866,6 @@ class PatientsDelete extends Patients
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // is_ipd
-            $this->is_ipd->HrefValue = "";
-            $this->is_ipd->TooltipValue = "";
         }
 
         // Call Row Rendered event

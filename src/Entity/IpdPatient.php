@@ -42,6 +42,9 @@ class IpdPatient extends AbstractEntity
     #[Column(name: "date_of_birth", type: "date")]
     private DateTime $dateOfBirth;
 
+    #[Column(type: "bigint", nullable: true)]
+    private ?string $age;
+
     #[Column(type: "string")]
     private string $gender;
 
@@ -97,6 +100,17 @@ class IpdPatient extends AbstractEntity
     public function setDateOfBirth(DateTime $value): static
     {
         $this->dateOfBirth = $value;
+        return $this;
+    }
+
+    public function getAge(): ?string
+    {
+        return $this->age;
+    }
+
+    public function setAge(?string $value): static
+    {
+        $this->age = $value;
         return $this;
     }
 
