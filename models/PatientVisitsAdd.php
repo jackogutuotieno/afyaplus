@@ -2121,7 +2121,7 @@ class PatientVisitsAdd extends PatientVisits
     public function messageShowing(&$msg, $type)
     {
         if ($type == "success") {
-            //$msg = "your success message";
+            //$msg = "Patient successfully checked in";
         } elseif ($type == "failure") {
             //$msg = "your failure message";
         } elseif ($type == "warning") {

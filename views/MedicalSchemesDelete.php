@@ -59,9 +59,6 @@ $Page->showMessage();
 <?php if ($Page->email_address->Visible) { // email_address ?>
         <th class="<?= $Page->email_address->headerCellClass() ?>"><span id="elh_medical_schemes_email_address" class="medical_schemes_email_address"><?= $Page->email_address->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_medical_schemes_physical_address" class="medical_schemes_physical_address"><?= $Page->physical_address->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_medical_schemes_date_created" class="medical_schemes_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -120,14 +117,6 @@ while ($Page->fetch()) {
 <?= $Page->email_address->getViewValue() ?>
 <?php } ?>
 </span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <td<?= $Page->physical_address->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->physical_address->viewAttributes() ?>>
-<?= $Page->physical_address->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

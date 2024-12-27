@@ -157,7 +157,7 @@ class MedicalSchemesList extends MedicalSchemes
         $this->company->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
+        $this->physical_address->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -1288,7 +1288,6 @@ class MedicalSchemesList extends MedicalSchemes
             $this->updateSort($this->company); // company
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
-            $this->updateSort($this->physical_address); // physical_address
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1552,7 +1551,6 @@ class MedicalSchemesList extends MedicalSchemes
             $this->createColumnOption($option, "company");
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
-            $this->createColumnOption($option, "physical_address");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2119,10 +2117,6 @@ class MedicalSchemesList extends MedicalSchemes
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

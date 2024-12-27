@@ -133,7 +133,7 @@ class MedicalSchemesDelete extends MedicalSchemes
         $this->company->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
+        $this->physical_address->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -707,10 +707,6 @@ class MedicalSchemesDelete extends MedicalSchemes
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

@@ -1067,8 +1067,6 @@ class VisitTypesList extends VisitTypes
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->visit_type->AdvancedSearch->toJson(), ","); // Field visit_type
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1131,22 +1129,6 @@ class VisitTypesList extends VisitTypes
         $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
         $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
         $this->created_by_user_id->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }

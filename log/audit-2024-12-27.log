@@ -1,2 +1,11 @@
 date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-27 11:49:09",/afyaplus/login,2,login,::1,,,,
+"2024-12-27 19:09:30",/afyaplus/visittypesadd,2,A,visit_types,visit_type,5,,"Surgery Review"
+"2024-12-27 19:09:30",/afyaplus/visittypesadd,2,A,visit_types,created_by_user_id,5,,2
+"2024-12-27 19:09:30",/afyaplus/visittypesadd,2,A,visit_types,id,5,,5
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,13,,6
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,13,,5
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,13,,2
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,13,,2
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,13,,1
+"2024-12-27 19:13:06",/afyaplus/patientvisitsadd,2,A,patient_visits,id,13,,13

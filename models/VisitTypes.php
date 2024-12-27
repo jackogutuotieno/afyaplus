@@ -1281,8 +1281,6 @@ class VisitTypes extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->visit_type);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->visit_type);
@@ -1316,8 +1314,6 @@ class VisitTypes extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->visit_type);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->visit_type);

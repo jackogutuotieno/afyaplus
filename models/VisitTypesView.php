@@ -885,14 +885,6 @@ class VisitTypesView extends VisitTypes
             // visit_type
             $this->visit_type->HrefValue = "";
             $this->visit_type->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

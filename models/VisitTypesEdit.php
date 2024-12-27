@@ -132,8 +132,8 @@ class VisitTypesEdit extends VisitTypes
         $this->id->setVisibility();
         $this->visit_type->setVisibility();
         $this->created_by_user_id->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -729,28 +729,6 @@ class VisitTypesEdit extends VisitTypes
                 $this->visit_type->setFormValue($val);
             }
         }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
     }
 
     // Restore form values
@@ -759,10 +737,6 @@ class VisitTypesEdit extends VisitTypes
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->visit_type->CurrentValue = $this->visit_type->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -898,12 +872,6 @@ class VisitTypesEdit extends VisitTypes
 
             // visit_type
             $this->visit_type->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -917,16 +885,6 @@ class VisitTypesEdit extends VisitTypes
             $this->visit_type->EditValue = HtmlEncode($this->visit_type->CurrentValue);
             $this->visit_type->PlaceHolder = RemoveHtml($this->visit_type->caption());
 
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Edit refer script
 
             // id
@@ -934,12 +892,6 @@ class VisitTypesEdit extends VisitTypes
 
             // visit_type
             $this->visit_type->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -970,22 +922,6 @@ class VisitTypesEdit extends VisitTypes
                 if (!$this->visit_type->IsDetailKey && EmptyValue($this->visit_type->FormValue)) {
                     $this->visit_type->addErrorMessage(str_replace("%s", $this->visit_type->caption(), $this->visit_type->RequiredErrorMessage));
                 }
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1083,12 +1019,6 @@ class VisitTypesEdit extends VisitTypes
 
         // visit_type
         $this->visit_type->setDbValueDef($rsnew, $this->visit_type->CurrentValue, $this->visit_type->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -1100,12 +1030,6 @@ class VisitTypesEdit extends VisitTypes
     {
         if (isset($row['visit_type'])) { // visit_type
             $this->visit_type->CurrentValue = $row['visit_type'];
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
         }
     }
 
