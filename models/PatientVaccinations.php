@@ -189,6 +189,7 @@ class PatientVaccinations extends DbTable
         $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
+        $this->visit_id->Sortable = false; // Allow sort
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
@@ -1631,7 +1632,6 @@ class PatientVaccinations extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->service_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1639,7 +1639,6 @@ class PatientVaccinations extends DbTable
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_id);
-                    $doc->exportCaption($this->visit_id);
                     $doc->exportCaption($this->service_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1672,7 +1671,6 @@ class PatientVaccinations extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->service_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
@@ -1680,7 +1678,6 @@ class PatientVaccinations extends DbTable
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_id);
-                        $doc->exportField($this->visit_id);
                         $doc->exportField($this->service_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->created_by_user_id);
@@ -1997,7 +1994,8 @@ class PatientVaccinations extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Vaccination details successfully submitted.");
     }
 
     // Row Updating event

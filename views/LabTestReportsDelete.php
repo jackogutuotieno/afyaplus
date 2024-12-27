@@ -53,14 +53,8 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><span id="elh_lab_test_reports_lab_test_request_id" class="lab_test_reports_lab_test_request_id"><?= $Page->lab_test_request_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
         <th class="<?= $Page->details->headerCellClass() ?>"><span id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->details->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->report_template->Visible) { // report_template ?>
-        <th class="<?= $Page->report_template->headerCellClass() ?>"><span id="elh_lab_test_reports_report_template" class="lab_test_reports_report_template"><?= $Page->report_template->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_lab_test_reports_created_by_user_id" class="lab_test_reports_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
@@ -97,28 +91,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
         <td<?= $Page->details->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->details->viewAttributes() ?>>
 <?= $Page->details->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->report_template->Visible) { // report_template ?>
-        <td<?= $Page->report_template->cellAttributes() ?>>
-<span id="">
-<span>
-<?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
-</span>
 </span>
 </td>
 <?php } ?>

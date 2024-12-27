@@ -10,17 +10,6 @@ $radiology_requests->TableClass = "table table-bordered table-hover table-sm ew-
 <div class="ew-master-div">
 <table id="tbl_radiology_requestsmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($radiology_requests->id->Visible) { // id ?>
-        <tr id="r_id"<?= $radiology_requests->id->rowAttributes() ?>>
-            <td class="<?= $radiology_requests->TableLeftColumnClass ?>"><?= $radiology_requests->id->caption() ?></td>
-            <td<?= $radiology_requests->id->cellAttributes() ?>>
-<span id="el_radiology_requests_id">
-<span<?= $radiology_requests->id->viewAttributes() ?>>
-<?= $radiology_requests->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($radiology_requests->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $radiology_requests->patient_id->rowAttributes() ?>>
             <td class="<?= $radiology_requests->TableLeftColumnClass ?>"><?= $radiology_requests->patient_id->caption() ?></td>

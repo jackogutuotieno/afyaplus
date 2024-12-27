@@ -174,9 +174,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_patient_id" class="patient_vaccinations_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Page->visit_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_visit_id" class="patient_vaccinations_visit_id"><?= $Page->renderFieldHeader($Page->visit_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Page->service_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_service_id" class="patient_vaccinations_service_id"><?= $Page->renderFieldHeader($Page->service_id) ?></div></th>
 <?php } ?>
@@ -222,14 +219,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vaccinations_patient_id" class="el_patient_vaccinations_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Page->visit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<span<?= $Page->visit_id->viewAttributes() ?>>
-<?= $Page->visit_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

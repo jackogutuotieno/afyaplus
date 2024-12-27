@@ -1969,7 +1969,8 @@ class CashPayments extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Cash payment successfully submitted.");
     }
 
     // Row Updating event

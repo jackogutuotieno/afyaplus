@@ -1,4 +1,4 @@
-<ew-language date="2024/12/27" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/28" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -623,7 +623,7 @@
         <phrase id="fldcaption" value="Submitted By" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Report Date/Time" />
+        <phrase id="fldcaption" value="Report Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -647,7 +647,7 @@
         <phrase id="fldcaption" value="Status" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Time" />
+        <phrase id="fldcaption" value="Request Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1249,7 +1249,7 @@
         <phrase id="fldcaption" value="Status" />
       </field>
       <field id="date_created">
-        <phrase id="fldcaption" value="Time" />
+        <phrase id="fldcaption" value="Prescription Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1258,10 +1258,11 @@
     <table id="radiology_reports">
       <phrase id="tblcaption" value="Radiology Reports" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Report ID" />
       </field>
       <field id="radiology_requests_id">
         <phrase id="fldcaption" value="Request ID" />
+        <phrase id="custommsg" value="Enter the unique request ID" />
       </field>
       <field id="findings">
         <phrase id="fldcaption" value="Findings" />

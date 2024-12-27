@@ -1542,7 +1542,8 @@ class PaymentMethods extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Payment method successfully added.");
     }
 
     // Row Updating event

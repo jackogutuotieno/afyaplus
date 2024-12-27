@@ -2053,7 +2053,8 @@ class PrescriptionDetails extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Patient prescription successfully submitted.");
     }
 
     // Row Updating event

@@ -130,12 +130,12 @@ class RadiologyReportsDelete extends RadiologyReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->radiology_requests_id->setVisibility();
-        $this->findings->setVisibility();
+        $this->radiology_requests_id->Visible = false;
+        $this->findings->Visible = false;
         $this->attachment->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -680,6 +680,7 @@ class RadiologyReportsDelete extends RadiologyReports
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -687,7 +688,6 @@ class RadiologyReportsDelete extends RadiologyReports
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // radiology_requests_id
-            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
             $curVal = strval($this->radiology_requests_id->CurrentValue);
             if ($curVal != "") {
                 $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
@@ -748,14 +748,6 @@ class RadiologyReportsDelete extends RadiologyReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // radiology_requests_id
-            $this->radiology_requests_id->HrefValue = "";
-            $this->radiology_requests_id->TooltipValue = "";
-
-            // findings
-            $this->findings->HrefValue = "";
-            $this->findings->TooltipValue = "";
-
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";
             $this->created_by_user_id->TooltipValue = "";
@@ -763,10 +755,6 @@ class RadiologyReportsDelete extends RadiologyReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

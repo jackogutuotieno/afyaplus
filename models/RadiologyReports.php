@@ -150,15 +150,19 @@ class RadiologyReports extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->radiology_requests_id->InputTextType = "text";
         $this->radiology_requests_id->Raw = true;
         $this->radiology_requests_id->Nullable = false; // NOT NULL field
         $this->radiology_requests_id->Required = true; // Required field
+        $this->radiology_requests_id->setSelectMultiple(false); // Select one
+        $this->radiology_requests_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->radiology_requests_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->radiology_requests_id->Lookup = new Lookup($this->radiology_requests_id, 'radiology_requests', false, 'id', ["id","","",""], '', '', [], [], [], [], [], [], false, '', '', "`id`");
         $this->radiology_requests_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->radiology_requests_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->radiology_requests_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->radiology_requests_id->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->radiology_requests_id->Param, "CustomMsg");
         $this->Fields['radiology_requests_id'] = &$this->radiology_requests_id;
 
         // findings
@@ -289,6 +293,7 @@ class RadiologyReports extends DbTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_updated'] = &$this->date_updated;
@@ -1239,12 +1244,12 @@ class RadiologyReports extends DbTable
         // date_created
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // radiology_requests_id
-        $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
         $curVal = strval($this->radiology_requests_id->CurrentValue);
         if ($curVal != "") {
             $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
@@ -1370,7 +1375,6 @@ class RadiologyReports extends DbTable
 
         // radiology_requests_id
         $this->radiology_requests_id->setupEditAttributes();
-        $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
         $this->radiology_requests_id->PlaceHolder = RemoveHtml($this->radiology_requests_id->caption());
 
         // findings
@@ -1433,7 +1437,6 @@ class RadiologyReports extends DbTable
                     $doc->exportCaption($this->attachment);
                     $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->radiology_requests_id);
@@ -1473,7 +1476,6 @@ class RadiologyReports extends DbTable
                         $doc->exportField($this->attachment);
                         $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->radiology_requests_id);
@@ -1909,11 +1911,11 @@ class RadiologyReports extends DbTable
         }
         return true;
     }
-
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Report successfully submitted.");
     }
 
     // Row Updating event

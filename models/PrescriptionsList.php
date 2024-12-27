@@ -153,7 +153,7 @@ class PrescriptionsList extends Prescriptions
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
         $this->created_by_user_id->setVisibility();
@@ -1314,7 +1314,6 @@ class PrescriptionsList extends Prescriptions
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->status); // status
@@ -1709,7 +1708,6 @@ class PrescriptionsList extends Prescriptions
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "status");
@@ -2284,10 +2282,6 @@ class PrescriptionsList extends Prescriptions
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";

@@ -1816,7 +1816,8 @@ class Income extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Income item successfully submitted.");
     }
 
     // Row Updating event

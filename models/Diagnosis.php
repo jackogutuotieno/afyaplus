@@ -1776,7 +1776,8 @@ class Diagnosis extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Diagnosis successfully submitted.");
     }
 
     // Row Updating event

@@ -131,7 +131,7 @@ class PatientVaccinationsEdit extends PatientVaccinations
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->service_id->setVisibility();
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
@@ -742,16 +742,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
             }
         }
 
-        // Check field name 'visit_id' first before field var 'x_visit_id'
-        $val = $CurrentForm->hasValue("visit_id") ? $CurrentForm->getValue("visit_id") : $CurrentForm->getValue("x_visit_id");
-        if (!$this->visit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->visit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->visit_id->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'service_id' first before field var 'x_service_id'
         $val = $CurrentForm->hasValue("service_id") ? $CurrentForm->getValue("service_id") : $CurrentForm->getValue("x_service_id");
         if (!$this->service_id->IsDetailKey) {
@@ -789,7 +779,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->visit_id->CurrentValue = $this->visit_id->FormValue;
         $this->service_id->CurrentValue = $this->service_id->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
@@ -950,10 +939,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
             if ($curVal != "") {
@@ -1017,9 +1002,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
 
             // patient_id
             $this->patient_id->HrefValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";
@@ -1086,20 +1068,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
-            // visit_id
-            $this->visit_id->setupEditAttributes();
-            if ($this->visit_id->getSessionValue() != "") {
-                $this->visit_id->CurrentValue = GetForeignKeyValue($this->visit_id->getSessionValue());
-                $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-                $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-            } else {
-                $this->visit_id->EditValue = $this->visit_id->CurrentValue;
-                $this->visit_id->PlaceHolder = RemoveHtml($this->visit_id->caption());
-                if (strval($this->visit_id->EditValue) != "" && is_numeric($this->visit_id->EditValue)) {
-                    $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
-                }
-            }
-
             // service_id
             $this->service_id->setupEditAttributes();
             $curVal = trim(strval($this->service_id->CurrentValue));
@@ -1143,9 +1111,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
             // patient_id
             $this->patient_id->HrefValue = "";
 
-            // visit_id
-            $this->visit_id->HrefValue = "";
-
             // service_id
             $this->service_id->HrefValue = "";
 
@@ -1184,14 +1149,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
-            }
-            if ($this->visit_id->Visible && $this->visit_id->Required) {
-                if (!$this->visit_id->IsDetailKey && EmptyValue($this->visit_id->FormValue)) {
-                    $this->visit_id->addErrorMessage(str_replace("%s", $this->visit_id->caption(), $this->visit_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->visit_id->FormValue)) {
-                $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
             }
             if ($this->service_id->Visible && $this->service_id->Required) {
                 if (!$this->service_id->IsDetailKey && EmptyValue($this->service_id->FormValue)) {
@@ -1308,12 +1265,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
         }
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
 
-        // visit_id
-        if ($this->visit_id->getSessionValue() != "") {
-            $this->visit_id->ReadOnly = true;
-        }
-        $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
-
         // service_id
         $this->service_id->setDbValueDef($rsnew, $this->service_id->CurrentValue, $this->service_id->ReadOnly);
 
@@ -1334,9 +1285,6 @@ class PatientVaccinationsEdit extends PatientVaccinations
     {
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
-        }
-        if (isset($row['visit_id'])) { // visit_id
-            $this->visit_id->CurrentValue = $row['visit_id'];
         }
         if (isset($row['service_id'])) { // service_id
             $this->service_id->CurrentValue = $row['service_id'];

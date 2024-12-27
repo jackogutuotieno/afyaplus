@@ -914,10 +914,6 @@ class PatientVaccinationsView extends PatientVaccinations
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
             if ($curVal != "") {
@@ -983,10 +979,6 @@ class PatientVaccinationsView extends PatientVaccinations
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";

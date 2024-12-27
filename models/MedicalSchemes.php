@@ -1701,7 +1701,8 @@ class MedicalSchemes extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Medical scheme successfully added.");
     }
 
     // Row Updating event

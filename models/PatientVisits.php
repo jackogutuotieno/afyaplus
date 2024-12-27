@@ -2061,11 +2061,11 @@ class PatientVisits extends DbTable
         }
         return true;
     }
-
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Patient successfully checked-in.");
     }
 
     // Row Updating event

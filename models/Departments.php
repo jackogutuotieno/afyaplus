@@ -1635,7 +1635,8 @@ class Departments extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Department successfully added.");
     }
 
     // Row Updating event

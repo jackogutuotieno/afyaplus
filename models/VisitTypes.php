@@ -1631,7 +1631,8 @@ class VisitTypes extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Visit type successfully created.");
     }
 
     // Row Updating event

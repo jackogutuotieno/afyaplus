@@ -2154,11 +2154,11 @@ class PatientVitals extends DbTable
         }
         return true;
     }
-
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Patient vitals successfully submitted.");
     }
 
     // Row Updating event

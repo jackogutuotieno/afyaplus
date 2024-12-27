@@ -1733,7 +1733,8 @@ class LabTestRequestsDetails extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Request successfully submitted.");
     }
 
     // Row Updating event

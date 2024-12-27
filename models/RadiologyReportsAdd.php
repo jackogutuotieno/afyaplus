@@ -700,7 +700,7 @@ class RadiologyReportsAdd extends RadiologyReports
             if (IsApi() && $val === null) {
                 $this->radiology_requests_id->Visible = false; // Disable update for API request
             } else {
-                $this->radiology_requests_id->setFormValue($val, true, $validate);
+                $this->radiology_requests_id->setFormValue($val);
             }
         }
 
@@ -869,7 +869,6 @@ class RadiologyReportsAdd extends RadiologyReports
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // radiology_requests_id
-            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
             $curVal = strval($this->radiology_requests_id->CurrentValue);
             if ($curVal != "") {
                 $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
@@ -960,27 +959,28 @@ class RadiologyReportsAdd extends RadiologyReports
         } elseif ($this->RowType == RowType::ADD) {
             // radiology_requests_id
             $this->radiology_requests_id->setupEditAttributes();
-            $this->radiology_requests_id->EditValue = $this->radiology_requests_id->CurrentValue;
-            $curVal = strval($this->radiology_requests_id->CurrentValue);
+            $curVal = trim(strval($this->radiology_requests_id->CurrentValue));
             if ($curVal != "") {
-                $this->radiology_requests_id->EditValue = $this->radiology_requests_id->lookupCacheOption($curVal);
-                if ($this->radiology_requests_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->radiology_requests_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->radiology_requests_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->radiology_requests_id->EditValue = $this->radiology_requests_id->displayValue($arwrk);
-                    } else {
-                        $this->radiology_requests_id->EditValue = HtmlEncode(FormatNumber($this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->formatPattern()));
-                    }
-                }
+                $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
             } else {
-                $this->radiology_requests_id->EditValue = null;
+                $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->Lookup !== null && is_array($this->radiology_requests_id->lookupOptions()) && count($this->radiology_requests_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->radiology_requests_id->ViewValue !== null) { // Load from cache
+                $this->radiology_requests_id->EditValue = array_values($this->radiology_requests_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->radiology_requests_id->CurrentValue, $this->radiology_requests_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->radiology_requests_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->radiology_requests_id->EditValue = $arwrk;
             }
             $this->radiology_requests_id->PlaceHolder = RemoveHtml($this->radiology_requests_id->caption());
 
@@ -1056,9 +1056,6 @@ class RadiologyReportsAdd extends RadiologyReports
                 if (!$this->radiology_requests_id->IsDetailKey && EmptyValue($this->radiology_requests_id->FormValue)) {
                     $this->radiology_requests_id->addErrorMessage(str_replace("%s", $this->radiology_requests_id->caption(), $this->radiology_requests_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->radiology_requests_id->FormValue)) {
-                $this->radiology_requests_id->addErrorMessage($this->radiology_requests_id->getErrorMessage(false));
             }
             if ($this->findings->Visible && $this->findings->Required) {
                 if (!$this->findings->IsDetailKey && EmptyValue($this->findings->FormValue)) {

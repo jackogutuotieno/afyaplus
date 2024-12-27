@@ -24,7 +24,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
             ["service_id", [fields.service_id.visible && fields.service_id.required ? ew.Validators.required(fields.service_id.caption) : null], fields.service_id.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
@@ -35,7 +34,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["patient_id",false],["visit_id",false],["service_id",false],["status",false],["date_created",false]];
+                    fields = [["patient_id",false],["service_id",false],["status",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -95,9 +94,6 @@ $Grid->ListOptions->render("header", "left");
 ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_patient_id" class="patient_vaccinations_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->visit_id->Visible) { // visit_id ?>
-        <th data-name="visit_id" class="<?= $Grid->visit_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_visit_id" class="patient_vaccinations_visit_id"><?= $Grid->renderFieldHeader($Grid->visit_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->service_id->Visible) { // service_id ?>
         <th data-name="service_id" class="<?= $Grid->service_id->headerCellClass() ?>"><div id="elh_patient_vaccinations_service_id" class="patient_vaccinations_service_id"><?= $Grid->renderFieldHeader($Grid->service_id) ?></div></th>
@@ -254,49 +250,6 @@ loadjs.ready("fpatient_vaccinationsgrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patient_vaccinations" data-field="x_patient_id" data-hidden="1" name="fpatient_vaccinationsgrid$x<?= $Grid->RowIndex ?>_patient_id" id="fpatient_vaccinationsgrid$x<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->FormValue) ?>">
 <input type="hidden" data-table="patient_vaccinations" data-field="x_patient_id" data-hidden="1" data-old name="fpatient_vaccinationsgrid$o<?= $Grid->RowIndex ?>_patient_id" id="fpatient_vaccinationsgrid$o<?= $Grid->RowIndex ?>_patient_id" value="<?= HtmlEncode($Grid->patient_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->visit_id->Visible) { // visit_id ?>
-        <td data-name="visit_id"<?= $Grid->visit_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->visit_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<span<?= $Grid->visit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="patient_vaccinations" data-field="x_visit_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_visit_id" id="o<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->visit_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<span<?= $Grid->visit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visit_id->getDisplayValue($Grid->visit_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_visit_id" name="x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<input type="<?= $Grid->visit_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_visit_id" id="x<?= $Grid->RowIndex ?>_visit_id" data-table="patient_vaccinations" data-field="x_visit_id" value="<?= $Grid->visit_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->visit_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->visit_id->formatPattern()) ?>"<?= $Grid->visit_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->visit_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_vaccinations_visit_id" class="el_patient_vaccinations_visit_id">
-<span<?= $Grid->visit_id->viewAttributes() ?>>
-<?= $Grid->visit_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="patient_vaccinations" data-field="x_visit_id" data-hidden="1" name="fpatient_vaccinationsgrid$x<?= $Grid->RowIndex ?>_visit_id" id="fpatient_vaccinationsgrid$x<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->FormValue) ?>">
-<input type="hidden" data-table="patient_vaccinations" data-field="x_visit_id" data-hidden="1" data-old name="fpatient_vaccinationsgrid$o<?= $Grid->RowIndex ?>_visit_id" id="fpatient_vaccinationsgrid$o<?= $Grid->RowIndex ?>_visit_id" value="<?= HtmlEncode($Grid->visit_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

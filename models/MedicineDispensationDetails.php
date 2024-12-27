@@ -1786,7 +1786,8 @@ class MedicineDispensationDetails extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Medidine successfully dispensed.");
     }
 
     // Row Updating event

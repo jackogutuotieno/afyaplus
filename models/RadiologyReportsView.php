@@ -885,7 +885,6 @@ class RadiologyReportsView extends RadiologyReports
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // radiology_requests_id
-            $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->CurrentValue;
             $curVal = strval($this->radiology_requests_id->CurrentValue);
             if ($curVal != "") {
                 $this->radiology_requests_id->ViewValue = $this->radiology_requests_id->lookupCacheOption($curVal);
@@ -985,10 +984,6 @@ class RadiologyReportsView extends RadiologyReports
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

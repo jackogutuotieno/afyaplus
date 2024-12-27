@@ -42,75 +42,9 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
-<?php if ($Page->SearchOptions->visible()) { ?>
-<?php $Page->SearchOptions->render("body") ?>
-<?php } ?>
-<?php if ($Page->FilterOptions->visible()) { ?>
-<?php $Page->FilterOptions->render("body") ?>
-<?php } ?>
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fradiology_reportssrch" id="fradiology_reportssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fradiology_reportssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
-<script>
-var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { radiology_reports: currentTable } });
-var currentForm;
-var fradiology_reportssrch, currentSearchForm, currentAdvancedSearchForm;
-loadjs.ready(["wrapper", "head"], function () {
-    let $ = jQuery,
-        fields = currentTable.fields;
-
-    // Form object for search
-    let form = new ew.FormBuilder()
-        .setId("fradiology_reportssrch")
-        .setPageId("list")
-<?php if ($Page->UseAjaxActions) { ?>
-        .setSubmitWithFetch(true)
-<?php } ?>
-
-        // Dynamic selection lists
-        .setLists({
-        })
-
-        // Filters
-        .setFilterList(<?= $Page->getFilterList() ?>)
-        .build();
-    window[form.id] = form;
-    currentSearchForm = form;
-    loadjs.done(form.id);
-});
-</script>
-<input type="hidden" name="cmd" value="search">
-<?php if ($Security->canSearch()) { ?>
-<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
-<div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0">
-    <div class="col-sm-auto px-0 pe-sm-2">
-        <div class="ew-basic-search input-group">
-            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
-            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
-            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
-                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fradiology_reportssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fradiology_reportssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fradiology_reportssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fradiology_reportssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-auto mb-3">
-        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-    </div>
-</div>
-</div><!-- /.ew-extended-search -->
-<?php } ?>
-<?php } ?>
-</div><!-- /.ew-search-panel -->
-</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -160,20 +94,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <th data-name="radiology_requests_id" class="<?= $Page->radiology_requests_id->headerCellClass() ?>"><div id="elh_radiology_reports_radiology_requests_id" class="radiology_reports_radiology_requests_id"><?= $Page->renderFieldHeader($Page->radiology_requests_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->findings->Visible) { // findings ?>
-        <th data-name="findings" class="<?= $Page->findings->headerCellClass() ?>"><div id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->renderFieldHeader($Page->findings) ?></div></th>
-<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_radiology_reports_created_by_user_id" class="radiology_reports_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_radiology_reports_date_created" class="radiology_reports_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_radiology_reports_date_updated" class="radiology_reports_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -211,22 +136,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <td data-name="radiology_requests_id"<?= $Page->radiology_requests_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_radiology_requests_id" class="el_radiology_reports_radiology_requests_id">
-<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->findings->Visible) { // findings ?>
-        <td data-name="findings"<?= $Page->findings->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_findings" class="el_radiology_reports_findings">
-<span<?= $Page->findings->viewAttributes() ?>>
-<?= $Page->findings->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_created_by_user_id" class="el_radiology_reports_created_by_user_id">
@@ -240,14 +149,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_date_created" class="el_radiology_reports_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_radiology_reports_date_updated" class="el_radiology_reports_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

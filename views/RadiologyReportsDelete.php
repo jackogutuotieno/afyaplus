@@ -53,20 +53,11 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_radiology_reports_id" class="radiology_reports_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <th class="<?= $Page->radiology_requests_id->headerCellClass() ?>"><span id="elh_radiology_reports_radiology_requests_id" class="radiology_reports_radiology_requests_id"><?= $Page->radiology_requests_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->findings->Visible) { // findings ?>
-        <th class="<?= $Page->findings->headerCellClass() ?>"><span id="elh_radiology_reports_findings" class="radiology_reports_findings"><?= $Page->findings->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th class="<?= $Page->created_by_user_id->headerCellClass() ?>"><span id="elh_radiology_reports_created_by_user_id" class="radiology_reports_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_radiology_reports_date_created" class="radiology_reports_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_radiology_reports_date_updated" class="radiology_reports_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -97,22 +88,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->radiology_requests_id->Visible) { // radiology_requests_id ?>
-        <td<?= $Page->radiology_requests_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->radiology_requests_id->viewAttributes() ?>>
-<?= $Page->radiology_requests_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->findings->Visible) { // findings ?>
-        <td<?= $Page->findings->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->findings->viewAttributes() ?>>
-<?= $Page->findings->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <td<?= $Page->created_by_user_id->cellAttributes() ?>>
 <span id="">
@@ -126,14 +101,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -160,14 +160,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_lab_test_reports_id" class="lab_test_reports_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <th data-name="lab_test_request_id" class="<?= $Page->lab_test_request_id->headerCellClass() ?>"><div id="elh_lab_test_reports_lab_test_request_id" class="lab_test_reports_lab_test_request_id"><?= $Page->renderFieldHeader($Page->lab_test_request_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->details->Visible) { // details ?>
         <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_lab_test_reports_details" class="lab_test_reports_details"><?= $Page->renderFieldHeader($Page->details) ?></div></th>
-<?php } ?>
-<?php if ($Page->report_template->Visible) { // report_template ?>
-        <th data-name="report_template" class="<?= $Page->report_template->headerCellClass() ?>"><div id="elh_lab_test_reports_report_template" class="lab_test_reports_report_template"><?= $Page->renderFieldHeader($Page->report_template) ?></div></th>
 <?php } ?>
 <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
         <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_lab_test_reports_created_by_user_id" class="lab_test_reports_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
@@ -211,28 +205,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->lab_test_request_id->Visible) { // lab_test_request_id ?>
-        <td data-name="lab_test_request_id"<?= $Page->lab_test_request_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_lab_test_request_id" class="el_lab_test_reports_lab_test_request_id">
-<span<?= $Page->lab_test_request_id->viewAttributes() ?>>
-<?= $Page->lab_test_request_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->details->Visible) { // details ?>
         <td data-name="details"<?= $Page->details->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_details" class="el_lab_test_reports_details">
 <span<?= $Page->details->viewAttributes() ?>>
 <?= $Page->details->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->report_template->Visible) { // report_template ?>
-        <td data-name="report_template"<?= $Page->report_template->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_lab_test_reports_report_template" class="el_lab_test_reports_report_template">
-<span>
-<?= GetFileViewTag($Page->report_template, $Page->report_template->getViewValue(), false) ?>
-</span>
 </span>
 </td>
     <?php } ?>

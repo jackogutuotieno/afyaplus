@@ -154,9 +154,9 @@ class LabTestReportsList extends LabTestReports
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->lab_test_request_id->setVisibility();
+        $this->lab_test_request_id->Visible = false;
         $this->details->setVisibility();
-        $this->report_template->setVisibility();
+        $this->report_template->Visible = false;
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
@@ -1282,7 +1282,6 @@ class LabTestReportsList extends LabTestReports
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->lab_test_request_id); // lab_test_request_id
             $this->updateSort($this->details); // details
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
@@ -1532,9 +1531,7 @@ class LabTestReportsList extends LabTestReports
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "lab_test_request_id");
             $this->createColumnOption($option, "details");
-            $this->createColumnOption($option, "report_template");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
         }
@@ -2084,16 +2081,6 @@ class LabTestReportsList extends LabTestReports
             // details
             $this->details->ViewValue = $this->details->CurrentValue;
 
-            // report_template
-            if (!EmptyValue($this->report_template->Upload->DbValue)) {
-                $this->report_template->ImageAlt = $this->report_template->alt();
-                $this->report_template->ImageCssClass = "ew-image";
-                $this->report_template->ViewValue = $this->id->CurrentValue;
-                $this->report_template->IsBlobImage = IsImageFile(ContentExtension($this->report_template->Upload->DbValue));
-            } else {
-                $this->report_template->ViewValue = "";
-            }
-
             // created_by_user_id
             $curVal = strval($this->created_by_user_id->CurrentValue);
             if ($curVal != "") {
@@ -2125,36 +2112,9 @@ class LabTestReportsList extends LabTestReports
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // lab_test_request_id
-            $this->lab_test_request_id->HrefValue = "";
-            $this->lab_test_request_id->TooltipValue = "";
-
             // details
             $this->details->HrefValue = "";
             $this->details->TooltipValue = "";
-
-            // report_template
-            if (!empty($this->report_template->Upload->DbValue)) {
-                $this->report_template->HrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
-                $this->report_template->LinkAttrs["target"] = "";
-                if ($this->report_template->IsBlobImage && empty($this->report_template->LinkAttrs["target"])) {
-                    $this->report_template->LinkAttrs["target"] = "_blank";
-                }
-                if ($this->isExport()) {
-                    $this->report_template->HrefValue = FullUrl($this->report_template->HrefValue, "href");
-                }
-            } else {
-                $this->report_template->HrefValue = "";
-            }
-            $this->report_template->ExportHrefValue = GetFileUploadUrl($this->report_template, $this->id->CurrentValue);
-            $this->report_template->TooltipValue = "";
-            if ($this->report_template->UseColorbox) {
-                if (EmptyValue($this->report_template->TooltipValue)) {
-                    $this->report_template->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
-                }
-                $this->report_template->LinkAttrs["data-rel"] = "lab_test_reports_x" . $this->RowCount . "_report_template";
-                $this->report_template->LinkAttrs->appendClass("ew-lightbox");
-            }
 
             // created_by_user_id
             $this->created_by_user_id->HrefValue = "";

@@ -155,7 +155,7 @@ class PatientVaccinationsList extends PatientVaccinations
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
-        $this->visit_id->setVisibility();
+        $this->visit_id->Visible = false;
         $this->service_id->setVisibility();
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
@@ -1325,7 +1325,6 @@ class PatientVaccinationsList extends PatientVaccinations
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->visit_id); // visit_id
             $this->updateSort($this->service_id); // service_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->created_by_user_id); // created_by_user_id
@@ -1599,7 +1598,6 @@ class PatientVaccinationsList extends PatientVaccinations
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "visit_id");
             $this->createColumnOption($option, "service_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "created_by_user_id");
@@ -2149,10 +2147,6 @@ class PatientVaccinationsList extends PatientVaccinations
                 $this->patient_id->ViewValue = null;
             }
 
-            // visit_id
-            $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
-            $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
             // service_id
             $curVal = strval($this->service_id->CurrentValue);
             if ($curVal != "") {
@@ -2214,10 +2208,6 @@ class PatientVaccinationsList extends PatientVaccinations
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
-
-            // visit_id
-            $this->visit_id->HrefValue = "";
-            $this->visit_id->TooltipValue = "";
 
             // service_id
             $this->service_id->HrefValue = "";

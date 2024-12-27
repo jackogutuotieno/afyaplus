@@ -2474,7 +2474,8 @@ class Patients extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Patient successfully registered.");
     }
 
     // Row Updating event

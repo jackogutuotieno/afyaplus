@@ -1699,7 +1699,8 @@ class MedicineSuppliers extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Medicine supplier successfully added.");
     }
 
     // Row Updating event

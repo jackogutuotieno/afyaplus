@@ -2096,11 +2096,11 @@ class DoctorNotes extends DbTable
         }
         return true;
     }
-
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Medical notes successfully submitted.");
     }
 
     // Row Updating event

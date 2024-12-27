@@ -1618,7 +1618,8 @@ class PatientsDependants extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Dependant successfully added.");
     }
 
     // Row Updating event

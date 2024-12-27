@@ -1938,7 +1938,8 @@ class RadiologyRequests extends DbTable
     // Row Inserted event
     public function rowInserted($rsold, $rsnew)
     {
-        //Log("Row Inserted");
+        // Message after successful submission
+        $this->setSuccessMessage("Request successfully submitted.");
     }
 
     // Row Updating event
@@ -2036,6 +2037,7 @@ class RadiologyRequests extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Request"; 
         } 
+        $this->patient_id->ViewValue = '<a href="radiologyrequestsview/' . $this->id->ViewValue . '?showdetail=radiology_requests_details" target="_blank"> ' . $this->patient_id->ViewValue . ' </a>';
     }
 
     // User ID Filtering event
