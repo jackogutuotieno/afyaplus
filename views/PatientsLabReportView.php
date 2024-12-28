@@ -176,25 +176,33 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_patients_lab_reportview" class="ew-custom-template"></div>
 <template id="tpm_patients_lab_reportview">
-<div id="ct_PatientsLabReportView"><table class="tbl-group" style="width: 100%">
-    <tr style="border-top: 2px solid #000;border-right: 1px solid #000">
+<div id="ct_PatientsLabReportView"><h2 style="text-align:center">Laboratory Test Results</h2>
+<table class="tbl-group" style="width: 100%">
+    <tr style="border-top: 1px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_id"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_patient_name"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_patient_name"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000">
+    <tr style="border-top: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_gender"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_gender"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_patient_age"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_patient_age"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_Group_Concat_service_name"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_Group_Concat_service_name"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000;border-bottom: 2px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
-        <td><p><slot class="ew-slot" name="tpc_patients_lab_report_details"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_details"></slot></p></td>
-        <td><p><slot class="ew-slot" name="tpc_patients_lab_report_laboratorist"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_laboratorist"></slot></p></td>
+    <tr style="border-top: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
+        <td style="border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_patients_lab_report_laboratorist"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_laboratorist"></slot></p></td>
         <td><p><slot class="ew-slot" name="tpc_patients_lab_report_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_date_created"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000;border-bottom: 2px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
-        <td><p><slot class="ew-slot" name="tpc_patients_lab_report_report_template"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_report_template"></slot></p></td>
+</table>
+<table style="width: 100%;">
+    <tr style="border-top: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
+        <td><p><slot class="ew-slot" name="tpc_patients_lab_report_details"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_details"></slot></p></td>
     </tr>
-</table></div>
+</table>
+<table style="width:100%;">
+    <tr style="border-top: 1px solid #000;border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
+        <td style="width:100%;"><slot class="ew-slot" name="tpc_patients_lab_report_report_template"></slot>&nbsp;<slot class="ew-slot" name="tpx_patients_lab_report_report_template"></slot></td>
+    </tr>
+</table>
+</div>
 </template>
 </form>
 <script class="ew-apply-template">

@@ -907,6 +907,8 @@ class PatientsLabReportView extends PatientsLabReport
 
             // report_template
             if (!EmptyValue($this->report_template->Upload->DbValue)) {
+                $this->report_template->ImageWidth = 800;
+                $this->report_template->ImageHeight = 800;
                 $this->report_template->ImageAlt = $this->report_template->alt();
                 $this->report_template->ImageCssClass = "ew-image";
                 $this->report_template->ViewValue = $this->id->CurrentValue;

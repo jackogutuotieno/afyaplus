@@ -120,16 +120,17 @@ loadjs.ready("head", function () {
 </table>
 <div id="tpd_prescriptionsview" class="ew-custom-template"></div>
 <template id="tpm_prescriptionsview">
-<div id="ct_PrescriptionsView"><table class="tbl-group" style="width: 100%">
-    <tr style="border-top: 2px solid #000;border-right: 1px solid #000">
+<div id="ct_PrescriptionsView"><h2 style="text-align:center">Prescription</h2>
+<table class="tbl-group" style="width: 100%">
+    <tr style="border-top: 1px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_prescriptions_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_prescriptions_id"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_prescriptions_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_prescriptions_patient_id"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000">
+    <tr style="border-top: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_prescriptions_status"></slot>&nbsp;<slot class="ew-slot" name="tpx_prescriptions_status"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_prescriptions_created_by_user_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_prescriptions_created_by_user_id"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000;border-bottom: 2px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
+    <tr style="border-top: 1px solid #000;border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
         <td><p><slot class="ew-slot" name="tpc_prescriptions_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_prescriptions_date_created"></slot></p></td>
     </tr>
 </table></div>

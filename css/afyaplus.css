@@ -20208,6 +20208,10 @@ body, .chart-content .card-header h4 {
   font-family: "Montserrat", sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Montserrat", sans-serif !important;
+}
+
 .chart-content .card-header h4 {
   font-weight: 700;
 }
@@ -20665,6 +20669,7 @@ td[data-name=detail_patients_dependants] {
 
 .tbl-group p {
   font-weight: 700;
+  margin: 0;
 }
 
 .tbl-group span {

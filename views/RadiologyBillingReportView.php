@@ -110,15 +110,15 @@ loadjs.ready("head", function () {
 <div id="tpd_radiology_billing_reportview" class="ew-custom-template"></div>
 <template id="tpm_radiology_billing_reportview">
 <div id="ct_RadiologyBillingReportView"><table class="tbl-group" style="width: 100%">
-    <tr style="border-top: 2px solid #000;border-right: 1px solid #000">
+    <tr style="border-top: 1px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_radiology_billing_report_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_radiology_billing_report_id"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_radiology_billing_report_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_radiology_billing_report_patient_id"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000">
+    <tr style="border-top: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_radiology_billing_report_status"></slot>&nbsp;<slot class="ew-slot" name="tpx_radiology_billing_report_status"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_radiology_billing_report_created_by_user_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_radiology_billing_report_created_by_user_id"></slot></p></td>
     </tr>
-    <tr style="border-top: 2px solid #000;border-bottom: 2px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
+    <tr style="border-top: 1px solid #000;border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000">
         <td><p><slot class="ew-slot" name="tpc_radiology_billing_report_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_radiology_billing_report_date_created"></slot></p></td>
     </tr>
 </table></div>

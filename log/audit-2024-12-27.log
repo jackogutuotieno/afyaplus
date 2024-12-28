@@ -155,3 +155,69 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2024-12-27 22:02:03",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,5,,5
 "2024-12-27 22:02:03",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
 "2024-12-27 22:07:18",/afyaplus/logout,6,logout,::1,,,,
+"2024-12-27 22:08:30",/afyaplus/login,4,login,::1,,,,
+"2024-12-27 22:12:28",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-27 22:32:00",/afyaplus/login,4,login,::1,,,,
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,patient_id,5,,2
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,created_by_user_id,5,,4
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,visit_id,5,,14
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,id,5,,5
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,"*** Batch insert begin ***",radiology_requests_details,,,,
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,service_id,6,,43
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,comments,6,,fghjhj
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,radiology_request_id,6,,5
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,id,6,,6
+"2024-12-27 22:33:04",/afyaplus/radiologyrequestsadd,4,"*** Batch insert successful ***",radiology_requests_details,,,,
+"2024-12-27 22:33:15",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-27 22:33:37",/afyaplus/login,9,login,::1,,,,
+"2024-12-27 22:35:14",/afyaplus/radiologyreportsadd,9,A,radiology_reports,radiology_requests_id,4,,5
+"2024-12-27 22:35:14",/afyaplus/radiologyreportsadd,9,A,radiology_reports,findings,4,,"<p>fghj vnhm,kl looo</p>"
+"2024-12-27 22:35:14",/afyaplus/radiologyreportsadd,9,A,radiology_reports,created_by_user_id,4,,9
+"2024-12-27 22:35:14",/afyaplus/radiologyreportsadd,9,A,radiology_reports,id,4,,4
+"2024-12-27 22:40:50",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-27 22:41:01",/afyaplus/login,4,login,::1,,,,
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,patient_id,1,,6
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,created_by_user_id,1,,4
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,visit_id,1,,13
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,id,1,,1
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,"*** Batch insert begin ***",radiology_requests_details,,,,
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,service_id,1,,43
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,comments,1,,dfgg
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,radiology_request_id,1,,1
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,id,1,,1
+"2024-12-27 22:41:52",/afyaplus/radiologyrequestsadd,4,"*** Batch insert successful ***",radiology_requests_details,,,,
+"2024-12-27 22:42:03",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-27 22:42:14",/afyaplus/login,5,login,::1,,,,
+"2024-12-27 22:43:15",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-27 22:43:25",/afyaplus/login,9,login,::1,,,,
+"2024-12-27 22:44:22",/afyaplus/radiologyreportsadd,9,A,radiology_reports,radiology_requests_id,1,,1
+"2024-12-27 22:44:22",/afyaplus/radiologyreportsadd,9,A,radiology_reports,findings,1,,<p>cvfbnb</p>
+"2024-12-27 22:44:22",/afyaplus/radiologyreportsadd,9,A,radiology_reports,created_by_user_id,1,,9
+"2024-12-27 22:44:22",/afyaplus/radiologyreportsadd,9,A,radiology_reports,id,1,,1
+"2024-12-27 22:45:12",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-27 22:45:23",/afyaplus/login,4,login,::1,,,,
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,patient_id,2,,2
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,created_by_user_id,2,,4
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,visit_id,2,,14
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests,id,2,,2
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,"*** Batch insert begin ***",radiology_requests_details,,,,
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,service_id,2,,42
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,comments,2,,vbkllkhyui
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,radiology_request_id,2,,2
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,A,radiology_requests_details,id,2,,2
+"2024-12-27 22:46:37",/afyaplus/radiologyrequestsadd,4,"*** Batch insert successful ***",radiology_requests_details,,,,
+"2024-12-27 22:47:31",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-27 22:47:45",/afyaplus/login,9,login,::1,,,,
+"2024-12-27 22:49:00",/afyaplus/radiologyreportsadd,9,A,radiology_reports,radiology_requests_id,2,,2
+"2024-12-27 22:49:00",/afyaplus/radiologyreportsadd,9,A,radiology_reports,findings,2,,"<p>polkiubnm mnbvv</p>"
+"2024-12-27 22:49:00",/afyaplus/radiologyreportsadd,9,A,radiology_reports,created_by_user_id,2,,9
+"2024-12-27 22:49:00",/afyaplus/radiologyreportsadd,9,A,radiology_reports,id,2,,2
+"2024-12-27 22:49:26",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-27 22:50:01",/afyaplus/login,9,login,::1,,,,
+"2024-12-27 22:51:00",/afyaplus/logout,9,logout,::1,,,,
+"2024-12-27 22:51:24",/afyaplus/login,2,login,::1,,,,
+"2024-12-27 22:54:23",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-27 22:54:37",/afyaplus/login,4,login,::1,,,,
+"2024-12-27 22:55:15",/afyaplus/logout,4,logout,::1,,,,
+"2024-12-27 22:55:25",/afyaplus/login,6,login,::1,,,,
+"2024-12-27 22:57:35",/afyaplus/logout,6,logout,::1,,,,
