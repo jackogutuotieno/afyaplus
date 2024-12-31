@@ -1,4 +1,4 @@
-<ew-language date="2024/12/28" id="en-US" author="e.World Technology Limited">
+<ew-language date="2024/12/31" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Healthcare Management Information System" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -40,6 +40,9 @@
     </menu>
     <menu id="543">
       <phrase id="menutext" value="Branding" />
+    </menu>
+    <menu id="747">
+      <phrase id="menutext" value="Module Manager" />
     </menu>
     <menu id="108">
       <phrase id="menutext" value="Notifications" />
@@ -2983,6 +2986,28 @@
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
+      </field>
+    </table>
+    <table id="modules">
+      <phrase id="tblcaption" value="Modules" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="module">
+        <phrase id="fldcaption" value="Module" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="Activated?" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
       </field>
     </table>
   </project>

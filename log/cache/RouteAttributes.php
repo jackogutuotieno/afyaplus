@@ -162,6 +162,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -308,6 +309,11 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1903,6 +1909,7 @@
                 '/medicinesuppliersview[/{id}]',
                 '/medicinesuppliersedit[/{id}]',
                 '/medicinesuppliersdelete[/{id}]',
+                '/moduleslist[/{id}]',
                 '/moh204areportlist[/{id}]',
                 '/moh204breportlist[/{id}]',
                 '/personaldata',
@@ -2196,6 +2203,7 @@
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:view',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:edit',
                 'PHPMaker2024\\afyaplus\\MedicineSuppliersController:delete',
+                'PHPMaker2024\\afyaplus\\ModulesController:list',
                 'PHPMaker2024\\afyaplus\\Moh204aReportController:list',
                 'PHPMaker2024\\afyaplus\\Moh204bReportController:list',
                 'PHPMaker2024\\afyaplus\\OthersController:personaldata',
@@ -2334,6 +2342,9 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3362,6 +3373,7 @@
                 'view.medicine_suppliers',
                 'edit.medicine_suppliers',
                 'delete.medicine_suppliers',
+                'list.modules',
                 'list.moh204a_report',
                 'list.moh204b_report',
                 'personaldata',
@@ -3500,6 +3512,7 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -4086,6 +4099,7 @@
         $o[288],
         $o[289],
         $o[290],
+        $o[291],
     ],
     []
 );

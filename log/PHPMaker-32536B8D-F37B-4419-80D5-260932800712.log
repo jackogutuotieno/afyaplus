@@ -52,6 +52,7 @@ C:\wamp64\www\afyaplus\controllers\MedicineStockDataController.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\MedicineStockReportController.php
 C:\wamp64\www\afyaplus\controllers\MedicineSuppliersController.php
+C:\wamp64\www\afyaplus\controllers\ModulesController.php
 C:\wamp64\www\afyaplus\controllers\Moh204aReportController.php
 C:\wamp64\www\afyaplus\controllers\Moh204bReportController.php
 C:\wamp64\www\afyaplus\controllers\OthersController.php
@@ -308,6 +309,12 @@ C:\wamp64\www\afyaplus\models\MedicineSuppliersDelete.php
 C:\wamp64\www\afyaplus\models\MedicineSuppliersEdit.php
 C:\wamp64\www\afyaplus\models\MedicineSuppliersList.php
 C:\wamp64\www\afyaplus\models\MedicineSuppliersView.php
+C:\wamp64\www\afyaplus\models\Modules.php
+C:\wamp64\www\afyaplus\models\ModulesAdd.php
+C:\wamp64\www\afyaplus\models\ModulesDelete.php
+C:\wamp64\www\afyaplus\models\ModulesEdit.php
+C:\wamp64\www\afyaplus\models\ModulesList.php
+C:\wamp64\www\afyaplus\models\ModulesView.php
 C:\wamp64\www\afyaplus\models\Moh204aReport.php
 C:\wamp64\www\afyaplus\models\Moh204aReportList.php
 C:\wamp64\www\afyaplus\models\Moh204bReport.php
@@ -574,6 +581,7 @@ C:\wamp64\www\afyaplus\src\Entity\MedicineStock.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineStockDatum.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineStockReport.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineSupplier.php
+C:\wamp64\www\afyaplus\src\Entity\Module.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204AReport.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204BReport.php
 C:\wamp64\www\afyaplus\src\Entity\Patient.php
@@ -862,6 +870,11 @@ C:\wamp64\www\afyaplus\views\MedicineSuppliersDelete.php
 C:\wamp64\www\afyaplus\views\MedicineSuppliersEdit.php
 C:\wamp64\www\afyaplus\views\MedicineSuppliersList.php
 C:\wamp64\www\afyaplus\views\MedicineSuppliersView.php
+C:\wamp64\www\afyaplus\views\ModulesAdd.php
+C:\wamp64\www\afyaplus\views\ModulesDelete.php
+C:\wamp64\www\afyaplus\views\ModulesEdit.php
+C:\wamp64\www\afyaplus\views\ModulesList.php
+C:\wamp64\www\afyaplus\views\ModulesView.php
 C:\wamp64\www\afyaplus\views\Moh204aReportList.php
 C:\wamp64\www\afyaplus\views\Moh204bReportList.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsAdd.php

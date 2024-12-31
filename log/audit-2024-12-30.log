@@ -1,0 +1,10 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2024-12-30 19:39:25",/afyaplus/login,5,login,::1,,,,
+"2024-12-30 19:40:20",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,6,,1
+"2024-12-30 19:40:20",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,6,,
+"2024-12-30 19:40:20",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,6,,5
+"2024-12-30 19:40:20",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,6,,6
+"2024-12-30 19:47:13",/afyaplus/logout,5,logout,::1,,,,
+"2024-12-30 19:49:13",/afyaplus/login,2,login,::1,,,,
+"2024-12-30 19:50:14",/afyaplus/logout,2,logout,::1,,,,
+"2024-12-30 19:54:16",/afyaplus/login,2,login,::1,,,,

@@ -1020,7 +1020,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_patients","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}modules","9","0"]];
 
 /**
  * Tables
@@ -1122,4 +1133,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["branding","branding","Header",true,"{32536B8D-F37B-4419-80D5-260932800712}","brandinglist"],
     ["invoice_report","invoice_report","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportlist"],
     ["invoice_report_details","invoice_report_details","Invoice Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportdetailslist"],
-    ["ipd_patients","ipd_patients","IPD Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdpatientslist"]];
+    ["ipd_patients","ipd_patients","IPD Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdpatientslist"],
+    ["modules","modules","Modules",true,"{32536B8D-F37B-4419-80D5-260932800712}","moduleslist"]];

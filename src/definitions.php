@@ -187,6 +187,7 @@ return [
     "invoice_report" => \DI\create(InvoiceReport::class),
     "invoice_report_details" => \DI\create(InvoiceReportDetails::class),
     "ipd_patients" => \DI\create(IpdPatients::class),
+    "modules" => \DI\create(Modules::class),
 
     // User table
     "usertable" => \DI\get("users"),

@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "ipdpatientsedit";
+    public $CurrentPageName = "moduleslist";
 
     // Page headings
     public $Heading = "";
