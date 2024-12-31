@@ -65,15 +65,17 @@ function Language_Load()
 
 function MenuItem_Adding($item)
 {
-    //var_dump($item);
-    //$item->Allowed = false; // Set to false if menu item not allowed
+    // Reception valus
+    /* $reception = ExecuteScalar("SELECT is FROM MyTable WHERE XXX");
+    if ()  {
+        // Remove apply button
+        if ($item->Text == "Apply") { $item->Allowed = FALSE; }
+    } */
 }
-
 function Menu_Rendering()
 {
     // Change menu items here
 }
-
 function Menu_Rendered()
 {
     // Clean up here
