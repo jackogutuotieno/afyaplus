@@ -426,6 +426,22 @@ loadjs.done("wrapper");
 <div id="ew-filter-dropdown-footer" class="d-none"><div class="dropdown-divider my-0"></div><div class="dropdown-footer text-start p-2"><button type="button" class="btn btn-link ew-btn ew-filter-clear"><?= $Language->phrase("Clear") ?></button><button type="button" class="btn btn-default ew-btn ew-filter-btn ms-2 float-end" data-value="false"><?= $Language->phrase("CancelBtn") ?></button><button type="button" class="btn btn-primary ew-btn ew-filter-btn ms-1 float-end" data-value="true"><?= $Language->phrase("OKBtn") ?></button></div></div>
 <?php include_once "views/email.php"; ?>
 <?php include_once "views/pushnotification.php"; ?>
+<!-- import dialog -->
+<div id="ew-import-dialog" class="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="ew-import-dialog-title" aria-hidden="true"><div class="modal-dialog modal-lg modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 id="ew-import-dialog-title" class="modal-title"></h5></div>
+<div class="modal-body">
+    <div class="fileinput-button ew-file-drop-zone w-100">
+        <input type="file" class="form-control ew-file-input" title="" id="importfiles" name="importfiles[]" multiple lang="<?= CurrentLanguageID() ?>">
+        <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    </div>
+    <div class="message d-none mt-3"></div>
+    <div class="progress d-none mt-3" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width: 0%">0%</div></div>
+    <div class="result mt-3"></div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary ew-import-btn d-none"><?= $Language->phrase("SaveBtn") ?></button>
+    <button type="button" class="btn btn-default ew-close-btn" data-bs-dismiss="modal"><?= $Language->phrase("CloseBtn") ?></button>
+</div>
+</div></div></div>
 <!-- image cropper dialog -->
 <div id="ew-cropper-dialog" class="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="ew-cropper-dialog-title" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-fullscreen-sm-down">

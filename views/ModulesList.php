@@ -52,6 +52,12 @@ loadjs.ready(["wrapper", "head"], function () {
 });
 </script>
 <script>
+window.Tabulator || loadjs([
+    ew.PATH_BASE + "js/tabulator.min.js?v=24.16.6",
+    ew.PATH_BASE + "css/<?= CssFile("tabulator_bootstrap5.css", false) ?>?v=24.16.6"
+], "import");
+</script>
+<script>
 loadjs.ready("head", function () {
     // Write your table-specific client script here, no need to add script tags.
 });
