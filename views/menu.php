@@ -19,8 +19,6 @@ $sideMenu->addMenuItem(330, "mi_Pharmacy_Overview", $Language->menuPhrase("330",
 $sideMenu->addMenuItem(331, "mi_Financials_Overview", $Language->menuPhrase("331", "MenuText"), "financialsoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Financials Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "fa-users", "", false, true);
-$sideMenu->addMenuItem(105, "mi_exportlog", $Language->menuPhrase("105", "MenuText"), "exportloglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}exportlog'), false, false, "fa-cog", "", false, true);
-$sideMenu->addMenuItem(543, "mi_branding", $Language->menuPhrase("543", "MenuText"), "brandinglist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}branding'), false, false, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(747, "mi_modules", $Language->menuPhrase("747", "MenuText"), "moduleslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}modules'), false, false, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(108, "mi_subscriptions", $Language->menuPhrase("108", "MenuText"), "subscriptionslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}subscriptions'), false, false, "fa-bell", "", false, true);
 $sideMenu->addMenuItem(51, "mci_OPD_Patients", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
