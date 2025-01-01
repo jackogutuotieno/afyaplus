@@ -65,17 +65,42 @@ function Language_Load()
 
 function MenuItem_Adding($item)
 {
-    // Reception valus
-    /* $reception = ExecuteScalar("SELECT is FROM MyTable WHERE XXX");
-    if ()  {
-        // Remove apply button
-        if ($item->Text == "Apply") { $item->Allowed = FALSE; }
-    } */
+    // Get all inactive modules
+    $opd = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='IPD'");
+    $doctor_panel = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Doctor Panel'");
+    $laboratory = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Laboratory'");
+    $radiology = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Radiology'");
+    $pharmacy = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Pharmacy'");
+    $hr = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Human Resources'");
+    $financials = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Financials'");
+    $reports = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Reports'");
+
+    // Check wether enabled or disabled
+    if ($opd == TRUE)  {
+        if ($item->Text == "Patients List") { $item->Allowed = FALSE; }
+    } else if ($doctor_panel == TRUE)  {
+        if ($item->Text == "Diseases") { $item->Allowed = FALSE; }
+        if ($item->Text == "Charges") { $item->Allowed = FALSE; }
+    } else if ($laboratory == TRUE)  {
+        if ($item->Text == "Laboratory") { $item->Allowed = FALSE; }
+    } else if ($radiology == TRUE)  {
+        if ($item->Text == "Radiology") { $item->Allowed = FALSE; }
+    } else if ($pharmacy == TRUE)  {
+        if ($item->Text == "Pharmacy") { $item->Allowed = FALSE; }
+    } else if ($hr == TRUE)  {
+        if ($item->Text == "Human Resources") { $item->Allowed = FALSE; }
+    } else if ($financials == TRUE)  {
+        if ($item->Text == "Financials") { $item->Allowed = FALSE; }
+    } else if ($reports == TRUE)  {
+        if ($item->Text == "Reports") { $item->Allowed = FALSE; }
+    }
 }
+
 function Menu_Rendering()
 {
     // Change menu items here
 }
+
 function Menu_Rendered()
 {
     // Clean up here

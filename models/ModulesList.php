@@ -146,7 +146,7 @@ class ModulesList extends Modules
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->module->setVisibility();
         $this->is_active->setVisibility();
         $this->date_created->Visible = false;
@@ -545,12 +545,12 @@ class ModulesList extends Modules
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
-    public $DisplayRecords = 5;
+    public $DisplayRecords = 20;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -679,9 +679,6 @@ class ModulesList extends Modules
 
         // Set up list options
         $this->setupListOptions();
-
-        // Setup export options
-        $this->setupExportOptions();
         $this->setVisibility();
 
         // Set lookup cache
@@ -840,7 +837,7 @@ class ModulesList extends Modules
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 5; // Load default
+            $this->DisplayRecords = 20; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -1033,7 +1030,7 @@ class ModulesList extends Modules
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 5; // Non-numeric, load default
+                    $this->DisplayRecords = 20; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1359,9 +1356,6 @@ class ModulesList extends Modules
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->module); // module
-            $this->updateSort($this->is_active); // is_active
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1386,11 +1380,6 @@ class ModulesList extends Modules
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->id->setSort("");
-                $this->module->setSort("");
-                $this->is_active->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
             }
 
             // Reset start position
@@ -1432,6 +1421,14 @@ class ModulesList extends Modules
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1490,6 +1487,10 @@ class ModulesList extends Modules
                 $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
 
         // "edit"
@@ -1607,7 +1608,6 @@ class ModulesList extends Modules
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "module");
             $this->createColumnOption($option, "is_active");
         }
@@ -1620,7 +1620,7 @@ class ModulesList extends Modules
         // Set up options default
         foreach ($options as $name => $option) {
             if ($name != "column") { // Always use dropdown for column
-                $option->UseDropDownButton = false;
+                $option->UseDropDownButton = true;
                 $option->UseButtonGroup = true;
             }
             //$option->ButtonClass = ""; // Class for button group
@@ -1997,12 +1997,6 @@ class ModulesList extends Modules
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'module' first before field var 'x_module'
         $val = $CurrentForm->hasValue("module") ? $CurrentForm->getValue("module") : $CurrentForm->getValue("x_module");
         if (!$this->module->IsDetailKey) {
@@ -2021,6 +2015,12 @@ class ModulesList extends Modules
             } else {
                 $this->is_active->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -2222,10 +2222,6 @@ class ModulesList extends Modules
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // module
             $this->module->HrefValue = "";
             $this->module->TooltipValue = "";
@@ -2234,8 +2230,6 @@ class ModulesList extends Modules
             $this->is_active->HrefValue = "";
             $this->is_active->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
             // module
             $this->module->setupEditAttributes();
             if (!$this->module->Raw) {
@@ -2250,19 +2244,12 @@ class ModulesList extends Modules
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // module
             $this->module->HrefValue = "";
 
             // is_active
             $this->is_active->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
             // module
             $this->module->setupEditAttributes();
             $this->module->EditValue = $this->module->CurrentValue;
@@ -2272,9 +2259,6 @@ class ModulesList extends Modules
             $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
 
             // module
             $this->module->HrefValue = "";
@@ -2303,11 +2287,6 @@ class ModulesList extends Modules
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
             if ($this->module->Visible && $this->module->Required) {
                 if (!$this->module->IsDetailKey && EmptyValue($this->module->FormValue)) {
                     $this->module->addErrorMessage(str_replace("%s", $this->module->caption(), $this->module->RequiredErrorMessage));
@@ -2521,110 +2500,6 @@ class ModulesList extends Modules
         }
     }
 
-    // Get export HTML tag
-    protected function getExportTag($type, $custom = false)
-    {
-        global $Language;
-        if ($type == "print" || $custom) { // Printer friendly / custom export
-            $pageUrl = $this->pageUrl(false);
-            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
-        } else { // Export API URL
-            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
-        }
-        if (SameText($type, "excel")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fmoduleslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
-            }
-        } elseif (SameText($type, "word")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fmoduleslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
-            }
-        } elseif (SameText($type, "pdf")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fmoduleslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
-            }
-        } elseif (SameText($type, "html")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
-        } elseif (SameText($type, "xml")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
-        } elseif (SameText($type, "csv")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
-        } elseif (SameText($type, "email")) {
-            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fmoduleslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
-        } elseif (SameText($type, "print")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
-        }
-    }
-
-    // Set up export options
-    protected function setupExportOptions()
-    {
-        global $Language, $Security;
-
-        // Printer friendly
-        $item = &$this->ExportOptions->add("print");
-        $item->Body = $this->getExportTag("print");
-        $item->Visible = true;
-
-        // Export to Excel
-        $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
-        $item->Visible = true;
-
-        // Export to Word
-        $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
-        $item->Visible = true;
-
-        // Export to HTML
-        $item = &$this->ExportOptions->add("html");
-        $item->Body = $this->getExportTag("html");
-        $item->Visible = false;
-
-        // Export to XML
-        $item = &$this->ExportOptions->add("xml");
-        $item->Body = $this->getExportTag("xml");
-        $item->Visible = false;
-
-        // Export to CSV
-        $item = &$this->ExportOptions->add("csv");
-        $item->Body = $this->getExportTag("csv");
-        $item->Visible = true;
-
-        // Export to PDF
-        $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
-        $item->Visible = false;
-
-        // Export to Email
-        $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
-        $item->Visible = true;
-
-        // Drop down button for export
-        $this->ExportOptions->UseButtonGroup = true;
-        $this->ExportOptions->UseDropDownButton = false;
-        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
-            $this->ExportOptions->UseDropDownButton = true;
-        }
-        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
-
-        // Add group option item
-        $item = &$this->ExportOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        if (!$Security->canExport()) { // Export not allowed
-            $this->ExportOptions->hideAllOptions();
-        }
-    }
-
     // Set up search options
     protected function setupSearchOptions()
     {
@@ -2679,66 +2554,6 @@ class ModulesList extends Modules
         if (!$this->hasSearchFields() && $this->SearchOptions["searchtoggle"]) {
             $this->SearchOptions["searchtoggle"]->Visible = false;
         }
-    }
-
-    /**
-    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
-    *
-    * @param bool $return Return the data rather than output it
-    * @return mixed
-    */
-    public function exportData($doc)
-    {
-        global $Language;
-        $rs = null;
-        $this->TotalRecords = $this->listRecordCount();
-
-        // Export all
-        if ($this->ExportAll) {
-            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
-                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
-            }
-            $this->DisplayRecords = $this->TotalRecords;
-            $this->StopRecord = $this->TotalRecords;
-        } else { // Export one page only
-            $this->setupStartRecord(); // Set up start record position
-            // Set the last record to display
-            if ($this->DisplayRecords <= 0) {
-                $this->StopRecord = $this->TotalRecords;
-            } else {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
-            }
-        }
-        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
-        if (!$rs || !$doc) {
-            RemoveHeader("Content-Type"); // Remove header
-            RemoveHeader("Content-Disposition");
-            $this->showMessage();
-            return;
-        }
-        $this->StartRecord = 1;
-        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
-
-        // Call Page Exporting server event
-        $doc->ExportCustom = !$this->pageExporting($doc);
-
-        // Page header
-        $header = $this->PageHeader;
-        $this->pageDataRendering($header);
-        $doc->Text .= $header;
-        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
-        $rs->free();
-
-        // Page footer
-        $footer = $this->PageFooter;
-        $this->pageDataRendered($footer);
-        $doc->Text .= $footer;
-
-        // Export header and footer
-        $doc->exportHeaderAndFooter();
-
-        // Call Page Exported server event
-        $this->pageExported($doc);
     }
 
     // Set up Breadcrumb

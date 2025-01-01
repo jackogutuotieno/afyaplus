@@ -2989,7 +2989,7 @@
       </field>
     </table>
     <table id="modules">
-      <phrase id="tblcaption" value="Modules" />
+      <phrase id="tblcaption" value="Module Manager" />
       <field id="id">
         <phrase id="fldcaption" value="ID" />
       </field>

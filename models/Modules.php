@@ -73,7 +73,7 @@ class Modules extends DbTable
         // Update Table
         $this->UpdateTable = "modules";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -251,22 +251,6 @@ class Modules extends DbTable
             $this->RightColumnClass = "col-" . $match[1] . "-" . strval(12 - (int)$match[2]);
             $this->OffsetColumnClass = $this->RightColumnClass . " " . str_replace("col-", "offset-", $class);
             $this->TableLeftColumnClass = preg_replace('/^col-\w+-(\d+)$/', "w-col-$1", $class); // Change to w-col-*
-        }
-    }
-
-    // Single column sort
-    public function updateSort(&$fld)
-    {
-        if ($this->CurrentOrder == $fld->Name) {
-            $sortField = $fld->Expression;
-            $lastSort = $fld->getSort();
-            if (in_array($this->CurrentOrderType, ["ASC", "DESC", "NO"])) {
-                $curSort = $this->CurrentOrderType;
-            } else {
-                $curSort = $lastSort;
-            }
-            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            $this->setSessionOrderBy($orderBy); // Save to Session
         }
     }
 
@@ -979,13 +963,6 @@ class Modules extends DbTable
         global $Security, $Language;
         $sortUrl = "";
         $attrs = "";
-        if ($this->PageID != "grid" && $fld->Sortable) {
-            $sortUrl = $this->sortUrl($fld);
-            $attrs = ' role="button" data-ew-action="sort" data-ajax="' . ($this->UseAjaxActions ? "true" : "false") . '" data-sort-url="' . $sortUrl . '" data-sort-type="1"';
-            if ($this->ContextClass) { // Add context
-                $attrs .= ' data-context="' . HtmlEncode($this->ContextClass) . '"';
-            }
-        }
         $html = '<div class="ew-table-header-caption"' . $attrs . '>' . $fld->caption() . '</div>';
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
@@ -1008,20 +985,7 @@ class Modules extends DbTable
     public function sortUrl($fld)
     {
         global $DashboardReport;
-        if (
-            $this->CurrentAction || $this->isExport() ||
-            in_array($fld->Type, [128, 204, 205])
-        ) { // Unsortable data type
-                return "";
-        } elseif ($fld->Sortable) {
-            $urlParm = "order=" . urlencode($fld->Name) . "&amp;ordertype=" . $fld->getNextSort();
-            if ($DashboardReport) {
-                $urlParm .= "&amp;" . Config("PAGE_DASHBOARD") . "=" . $DashboardReport;
-            }
-            return $this->addMasterUrl($this->CurrentPageName . "?" . $urlParm);
-        } else {
-            return "";
-        }
+        return "";
     }
 
     // Get record keys from Post/Get/Session

@@ -1134,4 +1134,4 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["invoice_report","invoice_report","Invoices",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportlist"],
     ["invoice_report_details","invoice_report_details","Invoice Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","invoicereportdetailslist"],
     ["ipd_patients","ipd_patients","IPD Patients",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdpatientslist"],
-    ["modules","modules","Modules",true,"{32536B8D-F37B-4419-80D5-260932800712}","moduleslist"]];
+    ["modules","modules","Module Manager",true,"{32536B8D-F37B-4419-80D5-260932800712}","moduleslist"]];

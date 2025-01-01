@@ -25,7 +25,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["module", [fields.module.visible && fields.module.required ? ew.Validators.required(fields.module.caption) : null], fields.module.isInvalid],
             ["is_active", [fields.is_active.visible && fields.is_active.required ? ew.Validators.required(fields.is_active.caption) : null], fields.is_active.isInvalid]
         ])
@@ -152,16 +151,6 @@ $Page->showMessage();
 <div id="ew-list">
 <?php if ($Page->TotalRecords > 0 || $Page->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Page->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Page->TableGridClass ?>">
-<?php if (!$Page->isExport()) { ?>
-<div class="card-header ew-grid-upper-panel">
-<?php if (!$Page->isGridAdd() && !($Page->isGridEdit() && $Page->ModalGridEdit) && !$Page->isMultiEdit()) { ?>
-<?= $Page->Pager->render() ?>
-<?php } ?>
-<div class="ew-list-other-options">
-<?php $Page->OtherOptions->render("body") ?>
-</div>
-</div>
-<?php } ?>
 <form name="<?= $Page->FormName ?>" id="<?= $Page->FormName ?>" class="ew-form ew-list-form" action="<?= $Page->PageAction ?>" method="post" novalidate autocomplete="off">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
@@ -186,9 +175,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_modules_id" class="modules_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->module->Visible) { // module ?>
         <th data-name="module" class="<?= $Page->module->headerCellClass() ?>"><div id="elh_modules_module" class="modules_module"><?= $Page->renderFieldHeader($Page->module) ?></div></th>
 <?php } ?>
@@ -223,25 +209,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<?php if ($Page->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_modules_id" class="el_modules_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-<input type="hidden" data-table="modules" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-<?php } ?>
-<?php if ($Page->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_modules_id" class="el_modules_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="modules" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Page->module->Visible) { // module ?>
         <td data-name="module"<?= $Page->module->cellAttributes() ?>>
 <?php if ($Page->RowType == RowType::EDIT) { // Edit record ?>
