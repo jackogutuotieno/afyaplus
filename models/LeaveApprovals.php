@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for leave_applications
+ * Table class for leave_approvals
  */
-class LeaveApplications extends DbTable
+class LeaveApprovals extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -66,9 +66,9 @@ class LeaveApplications extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "leave_applications";
-        $this->TableName = 'leave_applications';
-        $this->TableType = "TABLE";
+        $this->TableVar = "leave_approvals";
+        $this->TableName = 'leave_approvals';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
@@ -143,18 +143,15 @@ class LeaveApplications extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->user_id->InputTextType = "text";
         $this->user_id->Raw = true;
         $this->user_id->Nullable = false; // NOT NULL field
-        $this->user_id->setSelectMultiple(false); // Select one
-        $this->user_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->user_id->Required = true; // Required field
         $this->user_id->Lookup = new Lookup($this->user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_id'] = &$this->user_id;
 
         // leave_category_id
@@ -173,18 +170,15 @@ class LeaveApplications extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->leave_category_id->InputTextType = "text";
         $this->leave_category_id->Raw = true;
         $this->leave_category_id->Nullable = false; // NOT NULL field
         $this->leave_category_id->Required = true; // Required field
-        $this->leave_category_id->setSelectMultiple(false); // Select one
-        $this->leave_category_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->leave_category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->leave_category_id->Lookup = new Lookup($this->leave_category_id, 'leave_categories', false, 'id', ["leave_category","","",""], '', '', [], [], [], [], [], [], false, '', '', "`leave_category`");
         $this->leave_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->leave_category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->leave_category_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['leave_category_id'] = &$this->leave_category_id;
 
         // days_applied
@@ -229,13 +223,18 @@ class LeaveApplications extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->status->addMethod("getDefault", fn() => "Pending");
         $this->status->InputTextType = "text";
         $this->status->Nullable = false; // NOT NULL field
         $this->status->Required = true; // Required field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->status->setSelectMultiple(false); // Select one
+        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status->Lookup = new Lookup($this->status, 'leave_approvals', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->status->OptionCount = 2;
+        $this->status->SearchOperators = ["=", "<>"];
         $this->Fields['status'] = &$this->status;
 
         // date_created
@@ -246,7 +245,7 @@ class LeaveApplications extends DbTable
             '`date_created`', // Expression
             CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
             135, // Type
-            19, // Size
+            76, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
@@ -272,7 +271,7 @@ class LeaveApplications extends DbTable
             '`date_updated`', // Expression
             CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
             135, // Type
-            19, // Size
+            76, // Size
             11, // Date/Time format
             false, // Is upload field
             '`date_updated`', // Virtual expression
@@ -357,7 +356,7 @@ class LeaveApplications extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "leave_applications";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "leave_approvals";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -888,7 +887,7 @@ class LeaveApplications extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("leaveapplicationslist");
+        return $_SESSION[$name] ?? GetUrl("leaveapprovalslist");
     }
 
     // Set return page URL
@@ -902,9 +901,9 @@ class LeaveApplications extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "leaveapplicationsview" => $Language->phrase("View"),
-            "leaveapplicationsedit" => $Language->phrase("Edit"),
-            "leaveapplicationsadd" => $Language->phrase("Add"),
+            "leaveapprovalsview" => $Language->phrase("View"),
+            "leaveapprovalsedit" => $Language->phrase("Edit"),
+            "leaveapprovalsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -912,18 +911,18 @@ class LeaveApplications extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "leaveapplicationslist";
+        return "leaveapprovalslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "LeaveApplicationsView",
-            Config("API_ADD_ACTION") => "LeaveApplicationsAdd",
-            Config("API_EDIT_ACTION") => "LeaveApplicationsEdit",
-            Config("API_DELETE_ACTION") => "LeaveApplicationsDelete",
-            Config("API_LIST_ACTION") => "LeaveApplicationsList",
+            Config("API_VIEW_ACTION") => "LeaveApprovalsView",
+            Config("API_ADD_ACTION") => "LeaveApprovalsAdd",
+            Config("API_EDIT_ACTION") => "LeaveApprovalsEdit",
+            Config("API_DELETE_ACTION") => "LeaveApprovalsDelete",
+            Config("API_LIST_ACTION") => "LeaveApprovalsList",
             default => ""
         };
     }
@@ -943,16 +942,16 @@ class LeaveApplications extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "leaveapplicationslist";
+        return "leaveapprovalslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("leaveapplicationsview", $parm);
+            $url = $this->keyUrl("leaveapprovalsview", $parm);
         } else {
-            $url = $this->keyUrl("leaveapplicationsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("leaveapprovalsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -961,9 +960,9 @@ class LeaveApplications extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "leaveapplicationsadd?" . $parm;
+            $url = "leaveapprovalsadd?" . $parm;
         } else {
-            $url = "leaveapplicationsadd";
+            $url = "leaveapprovalsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -971,28 +970,28 @@ class LeaveApplications extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapplicationsedit", $parm);
+        $url = $this->keyUrl("leaveapprovalsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("leaveapplicationslist", "action=edit");
+        $url = $this->keyUrl("leaveapprovalslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapplicationsadd", $parm);
+        $url = $this->keyUrl("leaveapprovalsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("leaveapplicationslist", "action=copy");
+        $url = $this->keyUrl("leaveapprovalslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1002,7 +1001,7 @@ class LeaveApplications extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("leaveapplicationsdelete", $parm);
+            return $this->keyUrl("leaveapprovalsdelete", $parm);
         }
     }
 
@@ -1180,7 +1179,7 @@ class LeaveApplications extends DbTable
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "LeaveApplicationsList";
+        $listPage = "LeaveApprovalsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1222,6 +1221,7 @@ class LeaveApplications extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // user_id
+        $this->user_id->ViewValue = $this->user_id->CurrentValue;
         $curVal = strval($this->user_id->CurrentValue);
         if ($curVal != "") {
             $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
@@ -1245,6 +1245,7 @@ class LeaveApplications extends DbTable
         }
 
         // leave_category_id
+        $this->leave_category_id->ViewValue = $this->leave_category_id->CurrentValue;
         $curVal = strval($this->leave_category_id->CurrentValue);
         if ($curVal != "") {
             $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
@@ -1272,7 +1273,11 @@ class LeaveApplications extends DbTable
         $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
 
         // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1330,9 +1335,13 @@ class LeaveApplications extends DbTable
         $this->id->EditValue = $this->id->CurrentValue;
 
         // user_id
+        $this->user_id->setupEditAttributes();
+        $this->user_id->EditValue = $this->user_id->CurrentValue;
+        $this->user_id->PlaceHolder = RemoveHtml($this->user_id->caption());
 
         // leave_category_id
         $this->leave_category_id->setupEditAttributes();
+        $this->leave_category_id->EditValue = $this->leave_category_id->CurrentValue;
         $this->leave_category_id->PlaceHolder = RemoveHtml($this->leave_category_id->caption());
 
         // days_applied
@@ -1345,10 +1354,7 @@ class LeaveApplications extends DbTable
 
         // status
         $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->EditValue = $this->status->options(true);
         $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // date_created

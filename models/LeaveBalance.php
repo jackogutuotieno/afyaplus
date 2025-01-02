@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for leave_applications
+ * Table class for leave_balance
  */
-class LeaveApplications extends DbTable
+class LeaveBalance extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,12 +48,11 @@ class LeaveApplications extends DbTable
 
     // Fields
     public $id;
+    public $leave_category;
+    public $maximum_days;
+    public $days_balance;
     public $user_id;
     public $leave_category_id;
-    public $days_applied;
-    public $status;
-    public $date_created;
-    public $date_updated;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -66,14 +65,14 @@ class LeaveApplications extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "leave_applications";
-        $this->TableName = 'leave_applications';
-        $this->TableType = "TABLE";
+        $this->TableVar = "leave_balance";
+        $this->TableName = 'leave_balance';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "leave_applications";
+        $this->UpdateTable = "leave_balance";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -127,6 +126,81 @@ class LeaveApplications extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
+        // leave_category
+        $this->leave_category = new DbField(
+            $this, // Table
+            'x_leave_category', // Variable name
+            'leave_category', // Name
+            '`leave_category`', // Expression
+            '`leave_category`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`leave_category`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->leave_category->InputTextType = "text";
+        $this->leave_category->Nullable = false; // NOT NULL field
+        $this->leave_category->Required = true; // Required field
+        $this->leave_category->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['leave_category'] = &$this->leave_category;
+
+        // maximum_days
+        $this->maximum_days = new DbField(
+            $this, // Table
+            'x_maximum_days', // Variable name
+            'maximum_days', // Name
+            '`maximum_days`', // Expression
+            '`maximum_days`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`maximum_days`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->maximum_days->InputTextType = "text";
+        $this->maximum_days->Raw = true;
+        $this->maximum_days->Nullable = false; // NOT NULL field
+        $this->maximum_days->Required = true; // Required field
+        $this->maximum_days->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->maximum_days->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['maximum_days'] = &$this->maximum_days;
+
+        // days_balance
+        $this->days_balance = new DbField(
+            $this, // Table
+            'x_days_balance', // Variable name
+            'days_balance', // Name
+            'maximum_days- (SELECT SUM(days_applied) FROM leave_applications WHERE leave_category_id = id AND user_id = id)', // Expression
+            'maximum_days- (SELECT SUM(days_applied) FROM leave_applications WHERE leave_category_id = id AND user_id = id)', // Basic search expression
+            131, // Type
+            34, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'maximum_days- (SELECT SUM(days_applied) FROM leave_applications WHERE leave_category_id = id AND user_id = id)', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->days_balance->InputTextType = "text";
+        $this->days_balance->Raw = true;
+        $this->days_balance->IsCustom = true; // Custom field
+        $this->days_balance->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->days_balance->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['days_balance'] = &$this->days_balance;
+
         // user_id
         $this->user_id = new DbField(
             $this, // Table
@@ -143,18 +217,14 @@ class LeaveApplications extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
         $this->user_id->InputTextType = "text";
         $this->user_id->Raw = true;
         $this->user_id->Nullable = false; // NOT NULL field
-        $this->user_id->setSelectMultiple(false); // Select one
-        $this->user_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->user_id->Lookup = new Lookup($this->user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->user_id->Required = true; // Required field
         $this->user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['user_id'] = &$this->user_id;
 
         // leave_category_id
@@ -173,122 +243,15 @@ class LeaveApplications extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
         $this->leave_category_id->InputTextType = "text";
         $this->leave_category_id->Raw = true;
         $this->leave_category_id->Nullable = false; // NOT NULL field
         $this->leave_category_id->Required = true; // Required field
-        $this->leave_category_id->setSelectMultiple(false); // Select one
-        $this->leave_category_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->leave_category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->leave_category_id->Lookup = new Lookup($this->leave_category_id, 'leave_categories', false, 'id', ["leave_category","","",""], '', '', [], [], [], [], [], [], false, '', '', "`leave_category`");
         $this->leave_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->leave_category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->leave_category_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['leave_category_id'] = &$this->leave_category_id;
-
-        // days_applied
-        $this->days_applied = new DbField(
-            $this, // Table
-            'x_days_applied', // Variable name
-            'days_applied', // Name
-            '`days_applied`', // Expression
-            '`days_applied`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`days_applied`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->days_applied->InputTextType = "text";
-        $this->days_applied->Raw = true;
-        $this->days_applied->Nullable = false; // NOT NULL field
-        $this->days_applied->Required = true; // Required field
-        $this->days_applied->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->days_applied->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['days_applied'] = &$this->days_applied;
-
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '`status`', // Expression
-            '`status`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`status`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->status->addMethod("getDefault", fn() => "Pending");
-        $this->status->InputTextType = "text";
-        $this->status->Nullable = false; // NOT NULL field
-        $this->status->Required = true; // Required field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['status'] = &$this->status;
-
-        // date_created
-        $this->date_created = new DbField(
-            $this, // Table
-            'x_date_created', // Variable name
-            'date_created', // Name
-            '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_created`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_created->InputTextType = "text";
-        $this->date_created->Raw = true;
-        $this->date_created->Nullable = false; // NOT NULL field
-        $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -357,7 +320,7 @@ class LeaveApplications extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "leave_applications";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "leave_balance";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -381,20 +344,7 @@ class LeaveApplications extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, maximum_days- (SELECT SUM(days_applied) FROM leave_applications WHERE leave_category_id = id AND user_id = id) AS `days_balance`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -809,12 +759,11 @@ class LeaveApplications extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
+        $this->leave_category->DbValue = $row['leave_category'];
+        $this->maximum_days->DbValue = $row['maximum_days'];
+        $this->days_balance->DbValue = $row['days_balance'];
         $this->user_id->DbValue = $row['user_id'];
         $this->leave_category_id->DbValue = $row['leave_category_id'];
-        $this->days_applied->DbValue = $row['days_applied'];
-        $this->status->DbValue = $row['status'];
-        $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
     }
 
     // Delete uploaded files
@@ -888,7 +837,7 @@ class LeaveApplications extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("leaveapplicationslist");
+        return $_SESSION[$name] ?? GetUrl("leavebalancelist");
     }
 
     // Set return page URL
@@ -902,9 +851,9 @@ class LeaveApplications extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "leaveapplicationsview" => $Language->phrase("View"),
-            "leaveapplicationsedit" => $Language->phrase("Edit"),
-            "leaveapplicationsadd" => $Language->phrase("Add"),
+            "leavebalanceview" => $Language->phrase("View"),
+            "leavebalanceedit" => $Language->phrase("Edit"),
+            "leavebalanceadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -912,18 +861,18 @@ class LeaveApplications extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "leaveapplicationslist";
+        return "leavebalancelist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "LeaveApplicationsView",
-            Config("API_ADD_ACTION") => "LeaveApplicationsAdd",
-            Config("API_EDIT_ACTION") => "LeaveApplicationsEdit",
-            Config("API_DELETE_ACTION") => "LeaveApplicationsDelete",
-            Config("API_LIST_ACTION") => "LeaveApplicationsList",
+            Config("API_VIEW_ACTION") => "LeaveBalanceView",
+            Config("API_ADD_ACTION") => "LeaveBalanceAdd",
+            Config("API_EDIT_ACTION") => "LeaveBalanceEdit",
+            Config("API_DELETE_ACTION") => "LeaveBalanceDelete",
+            Config("API_LIST_ACTION") => "LeaveBalanceList",
             default => ""
         };
     }
@@ -943,16 +892,16 @@ class LeaveApplications extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "leaveapplicationslist";
+        return "leavebalancelist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("leaveapplicationsview", $parm);
+            $url = $this->keyUrl("leavebalanceview", $parm);
         } else {
-            $url = $this->keyUrl("leaveapplicationsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("leavebalanceview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -961,9 +910,9 @@ class LeaveApplications extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "leaveapplicationsadd?" . $parm;
+            $url = "leavebalanceadd?" . $parm;
         } else {
-            $url = "leaveapplicationsadd";
+            $url = "leavebalanceadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -971,28 +920,28 @@ class LeaveApplications extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapplicationsedit", $parm);
+        $url = $this->keyUrl("leavebalanceedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("leaveapplicationslist", "action=edit");
+        $url = $this->keyUrl("leavebalancelist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapplicationsadd", $parm);
+        $url = $this->keyUrl("leavebalanceadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("leaveapplicationslist", "action=copy");
+        $url = $this->keyUrl("leavebalancelist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1002,7 +951,7 @@ class LeaveApplications extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("leaveapplicationsdelete", $parm);
+            return $this->keyUrl("leavebalancedelete", $parm);
         }
     }
 
@@ -1168,19 +1117,18 @@ class LeaveApplications extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->leave_category->setDbValue($row['leave_category']);
+        $this->maximum_days->setDbValue($row['maximum_days']);
+        $this->days_balance->setDbValue($row['days_balance']);
         $this->user_id->setDbValue($row['user_id']);
         $this->leave_category_id->setDbValue($row['leave_category_id']);
-        $this->days_applied->setDbValue($row['days_applied']);
-        $this->status->setDbValue($row['status']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "LeaveApplicationsList";
+        $listPage = "LeaveBalanceList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1206,85 +1154,53 @@ class LeaveApplications extends DbTable
 
         // id
 
+        // leave_category
+
+        // maximum_days
+
+        // days_balance
+
         // user_id
 
         // leave_category_id
-
-        // days_applied
-
-        // status
-
-        // date_created
-
-        // date_updated
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
+        // leave_category
+        $this->leave_category->ViewValue = $this->leave_category->CurrentValue;
+
+        // maximum_days
+        $this->maximum_days->ViewValue = $this->maximum_days->CurrentValue;
+        $this->maximum_days->ViewValue = FormatNumber($this->maximum_days->ViewValue, $this->maximum_days->formatPattern());
+
+        // days_balance
+        $this->days_balance->ViewValue = $this->days_balance->CurrentValue;
+        $this->days_balance->ViewValue = FormatNumber($this->days_balance->ViewValue, $this->days_balance->formatPattern());
+
         // user_id
-        $curVal = strval($this->user_id->CurrentValue);
-        if ($curVal != "") {
-            $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
-            if ($this->user_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
-                } else {
-                    $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
-                }
-            }
-        } else {
-            $this->user_id->ViewValue = null;
-        }
+        $this->user_id->ViewValue = $this->user_id->CurrentValue;
+        $this->user_id->ViewValue = FormatNumber($this->user_id->ViewValue, $this->user_id->formatPattern());
 
         // leave_category_id
-        $curVal = strval($this->leave_category_id->CurrentValue);
-        if ($curVal != "") {
-            $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
-            if ($this->leave_category_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->leave_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->leave_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->leave_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->leave_category_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->leave_category_id->ViewValue = $this->leave_category_id->displayValue($arwrk);
-                } else {
-                    $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->CurrentValue, $this->leave_category_id->formatPattern());
-                }
-            }
-        } else {
-            $this->leave_category_id->ViewValue = null;
-        }
-
-        // days_applied
-        $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
-        $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
-
-        // status
-        $this->status->ViewValue = $this->status->CurrentValue;
-
-        // date_created
-        $this->date_created->ViewValue = $this->date_created->CurrentValue;
-        $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+        $this->leave_category_id->ViewValue = $this->leave_category_id->CurrentValue;
+        $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->ViewValue, $this->leave_category_id->formatPattern());
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
+
+        // leave_category
+        $this->leave_category->HrefValue = "";
+        $this->leave_category->TooltipValue = "";
+
+        // maximum_days
+        $this->maximum_days->HrefValue = "";
+        $this->maximum_days->TooltipValue = "";
+
+        // days_balance
+        $this->days_balance->HrefValue = "";
+        $this->days_balance->TooltipValue = "";
 
         // user_id
         $this->user_id->HrefValue = "";
@@ -1293,22 +1209,6 @@ class LeaveApplications extends DbTable
         // leave_category_id
         $this->leave_category_id->HrefValue = "";
         $this->leave_category_id->TooltipValue = "";
-
-        // days_applied
-        $this->days_applied->HrefValue = "";
-        $this->days_applied->TooltipValue = "";
-
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
-
-        // date_created
-        $this->date_created->HrefValue = "";
-        $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1329,37 +1229,45 @@ class LeaveApplications extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
+        // leave_category
+        $this->leave_category->setupEditAttributes();
+        if (!$this->leave_category->Raw) {
+            $this->leave_category->CurrentValue = HtmlDecode($this->leave_category->CurrentValue);
+        }
+        $this->leave_category->EditValue = $this->leave_category->CurrentValue;
+        $this->leave_category->PlaceHolder = RemoveHtml($this->leave_category->caption());
+
+        // maximum_days
+        $this->maximum_days->setupEditAttributes();
+        $this->maximum_days->EditValue = $this->maximum_days->CurrentValue;
+        $this->maximum_days->PlaceHolder = RemoveHtml($this->maximum_days->caption());
+        if (strval($this->maximum_days->EditValue) != "" && is_numeric($this->maximum_days->EditValue)) {
+            $this->maximum_days->EditValue = FormatNumber($this->maximum_days->EditValue, null);
+        }
+
+        // days_balance
+        $this->days_balance->setupEditAttributes();
+        $this->days_balance->EditValue = $this->days_balance->CurrentValue;
+        $this->days_balance->PlaceHolder = RemoveHtml($this->days_balance->caption());
+        if (strval($this->days_balance->EditValue) != "" && is_numeric($this->days_balance->EditValue)) {
+            $this->days_balance->EditValue = FormatNumber($this->days_balance->EditValue, null);
+        }
+
         // user_id
+        $this->user_id->setupEditAttributes();
+        $this->user_id->EditValue = $this->user_id->CurrentValue;
+        $this->user_id->PlaceHolder = RemoveHtml($this->user_id->caption());
+        if (strval($this->user_id->EditValue) != "" && is_numeric($this->user_id->EditValue)) {
+            $this->user_id->EditValue = FormatNumber($this->user_id->EditValue, null);
+        }
 
         // leave_category_id
         $this->leave_category_id->setupEditAttributes();
+        $this->leave_category_id->EditValue = $this->leave_category_id->CurrentValue;
         $this->leave_category_id->PlaceHolder = RemoveHtml($this->leave_category_id->caption());
-
-        // days_applied
-        $this->days_applied->setupEditAttributes();
-        $this->days_applied->EditValue = $this->days_applied->CurrentValue;
-        $this->days_applied->PlaceHolder = RemoveHtml($this->days_applied->caption());
-        if (strval($this->days_applied->EditValue) != "" && is_numeric($this->days_applied->EditValue)) {
-            $this->days_applied->EditValue = FormatNumber($this->days_applied->EditValue, null);
+        if (strval($this->leave_category_id->EditValue) != "" && is_numeric($this->leave_category_id->EditValue)) {
+            $this->leave_category_id->EditValue = FormatNumber($this->leave_category_id->EditValue, null);
         }
-
-        // status
-        $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
-        // date_created
-        $this->date_created->setupEditAttributes();
-        $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1390,20 +1298,18 @@ class LeaveApplications extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->leave_category);
+                    $doc->exportCaption($this->maximum_days);
+                    $doc->exportCaption($this->days_balance);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->leave_category_id);
-                    $doc->exportCaption($this->days_applied);
-                    $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->leave_category);
+                    $doc->exportCaption($this->maximum_days);
+                    $doc->exportCaption($this->days_balance);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->leave_category_id);
-                    $doc->exportCaption($this->days_applied);
-                    $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1431,20 +1337,18 @@ class LeaveApplications extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->leave_category);
+                        $doc->exportField($this->maximum_days);
+                        $doc->exportField($this->days_balance);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->leave_category_id);
-                        $doc->exportField($this->days_applied);
-                        $doc->exportField($this->status);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->leave_category);
+                        $doc->exportField($this->maximum_days);
+                        $doc->exportField($this->days_balance);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->leave_category_id);
-                        $doc->exportField($this->days_applied);
-                        $doc->exportField($this->status);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1480,11 +1384,7 @@ class LeaveApplications extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        // Get current user id
-        $user_id = CurrentUserID();
-        if (IsLoggedIn()) {
-            AddFilter($filter, "user_id= '" . $user_id . "'");
-        } 
+        // Enter your code here
     }
 
     // Recordset Selected event
@@ -1619,13 +1519,16 @@ class LeaveApplications extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        if ($this->status->CurrentValue == 'Pending') {
-            $this->status->CellAttrs["style"] = "background-color: orange; color: white";
-        } else if ($this->status->CurrentValue == 'Approved') {
-            $this->status->CellAttrs["style"] = "background-color: green; color: white";
-        } else if ($this->status->CurrentValue == 'Rejected') {
-            $this->status->CellAttrs["style"] = "background-color: red; color: white";
-        }
+        // Get the current user ID
+        $user_id = CurrentUserID();
+        // Get the maximum days applicable for a leave category
+        $maximum_days = $this->maximum_days->ViewValue;
+        // Get the leave category id
+        $id = $this->id->ViewValue;
+        // Get the sum total of applied days and approved
+        $applied_days = ExecuteScalar("(SELECT SUM(days_applied) FROM leave_applications WHERE leave_category_id = '" . $id . "' AND user_id = '" . $user_id . "' AND status='Approved')");
+        // Get the difference
+        $this->days_balance->ViewValue = $maximum_days - $applied_days;
     }
 
     // User ID Filtering event

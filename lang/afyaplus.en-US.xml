@@ -1,4 +1,4 @@
-<ew-language date="2025/1/2" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/1/3" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -226,6 +226,12 @@
     </menu>
     <menu id="750">
       <phrase id="menutext" value="Leave Applications" />
+    </menu>
+    <menu id="751">
+      <phrase id="menutext" value="Leave Balance" />
+    </menu>
+    <menu id="752">
+      <phrase id="menutext" value="Leave Approvals" />
     </menu>
     <menu id="104">
       <phrase id="menutext" value="Reports" />
@@ -3074,6 +3080,55 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="leave_balance">
+      <phrase id="tblcaption" value="Leave Balance" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="leave_category">
+        <phrase id="fldcaption" value="leave category" />
+      </field>
+      <field id="maximum_days">
+        <phrase id="fldcaption" value="maximum days" />
+      </field>
+      <field id="days_balance">
+        <phrase id="fldcaption" value="Balance" />
+      </field>
+      <field id="user_id">
+        <phrase id="fldcaption" value="user id" />
+      </field>
+      <field id="leave_category_id">
+        <phrase id="fldcaption" value="leave category id" />
+      </field>
+    </table>
+    <table id="leave_approvals">
+      <phrase id="tblcaption" value="Leave Approvals" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="user_id">
+        <phrase id="fldcaption" value="Employee Name" />
+      </field>
+      <field id="leave_category_id">
+        <phrase id="fldcaption" value="Leave Category" />
+      </field>
+      <field id="days_applied">
+        <phrase id="fldcaption" value="Days Applied" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Approved" />
+        <phrase id="fldtagcaption1" value="Approved" />
+        <phrase id="fldtagvalue2" value="Rejected" />
+        <phrase id="fldtagcaption2" value="Rejected" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Application Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

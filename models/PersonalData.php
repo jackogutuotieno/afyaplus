@@ -45,7 +45,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "leaveapplicationsdelete";
+    public $CurrentPageName = "leaveapprovalsedit";
 
     // Page headings
     public $Heading = "";

@@ -44,6 +44,8 @@ C:\wamp64\www\afyaplus\controllers\LaboratoryOverviewController.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryReports2Controller.php
 C:\wamp64\www\afyaplus\controllers\LaboratoryReportsController.php
 C:\wamp64\www\afyaplus\controllers\LeaveApplicationsController.php
+C:\wamp64\www\afyaplus\controllers\LeaveApprovalsController.php
+C:\wamp64\www\afyaplus\controllers\LeaveBalanceController.php
 C:\wamp64\www\afyaplus\controllers\LeaveCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\MedicalSchemesController.php
 C:\wamp64\www\afyaplus\controllers\MedicineBrandsController.php
@@ -272,6 +274,11 @@ C:\wamp64\www\afyaplus\models\LeaveApplicationsDelete.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsEdit.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsList.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsView.php
+C:\wamp64\www\afyaplus\models\LeaveApprovals.php
+C:\wamp64\www\afyaplus\models\LeaveApprovalsEdit.php
+C:\wamp64\www\afyaplus\models\LeaveApprovalsList.php
+C:\wamp64\www\afyaplus\models\LeaveBalance.php
+C:\wamp64\www\afyaplus\models\LeaveBalanceList.php
 C:\wamp64\www\afyaplus\models\LeaveCategories.php
 C:\wamp64\www\afyaplus\models\LeaveCategoriesAdd.php
 C:\wamp64\www\afyaplus\models\LeaveCategoriesDelete.php
@@ -595,6 +602,8 @@ C:\wamp64\www\afyaplus\src\Entity\LaboratoryBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryMinorReport.php
 C:\wamp64\www\afyaplus\src\Entity\LaboratoryReport.php
 C:\wamp64\www\afyaplus\src\Entity\LeaveApplication.php
+C:\wamp64\www\afyaplus\src\Entity\LeaveApproval.php
+C:\wamp64\www\afyaplus\src\Entity\LeaveBalance.php
 C:\wamp64\www\afyaplus\src\Entity\LeaveCategory.php
 C:\wamp64\www\afyaplus\src\Entity\MedicalScheme.php
 C:\wamp64\www\afyaplus\src\Entity\MedicineBrand.php
@@ -862,6 +871,9 @@ C:\wamp64\www\afyaplus\views\LeaveApplicationsDelete.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsEdit.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsList.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsView.php
+C:\wamp64\www\afyaplus\views\LeaveApprovalsEdit.php
+C:\wamp64\www\afyaplus\views\LeaveApprovalsList.php
+C:\wamp64\www\afyaplus\views\LeaveBalanceList.php
 C:\wamp64\www\afyaplus\views\LeaveCategoriesAdd.php
 C:\wamp64\www\afyaplus\views\LeaveCategoriesDelete.php
 C:\wamp64\www\afyaplus\views\LeaveCategoriesEdit.php

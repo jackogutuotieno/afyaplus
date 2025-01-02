@@ -191,6 +191,8 @@ return [
     "holidays" => \DI\create(Holidays::class),
     "leave_categories" => \DI\create(LeaveCategories::class),
     "leave_applications" => \DI\create(LeaveApplications::class),
+    "leave_balance" => \DI\create(LeaveBalance::class),
+    "leave_approvals" => \DI\create(LeaveApprovals::class),
 
     // User table
     "usertable" => \DI\get("users"),

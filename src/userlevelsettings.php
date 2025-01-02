@@ -1064,7 +1064,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_applications","6","1865"],
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_applications","7","877"],
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_applications","8","1903"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}leave_applications","9","1901"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_applications","9","1901"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","1","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","2","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","3","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","4","1898"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","5","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","6","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","7","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","8","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_balance","9","1896"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","9","0"]];
 
 /**
  * Tables
@@ -1170,4 +1192,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["modules","modules","Module Manager",true,"{32536B8D-F37B-4419-80D5-260932800712}","moduleslist"],
     ["holidays","holidays","Holidays",true,"{32536B8D-F37B-4419-80D5-260932800712}","holidayslist"],
     ["leave_categories","leave_categories","Leave Categories",true,"{32536B8D-F37B-4419-80D5-260932800712}","leavecategorieslist"],
-    ["leave_applications","leave_applications","Leave Applications",true,"{32536B8D-F37B-4419-80D5-260932800712}","leaveapplicationslist"]];
+    ["leave_applications","leave_applications","Leave Applications",true,"{32536B8D-F37B-4419-80D5-260932800712}","leaveapplicationslist"],
+    ["leave_balance","leave_balance","Leave Balance",true,"{32536B8D-F37B-4419-80D5-260932800712}","leavebalancelist"],
+    ["leave_approvals","leave_approvals","Leave Approvals",true,"{32536B8D-F37B-4419-80D5-260932800712}","leaveapprovalslist"]];

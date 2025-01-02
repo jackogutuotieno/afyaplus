@@ -176,6 +176,9 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -322,6 +325,21 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1954,6 +1972,9 @@
                 '/leaveapplicationsview[/{id}]',
                 '/leaveapplicationsedit[/{id}]',
                 '/leaveapplicationsdelete[/{id}]',
+                '/leaveapprovalslist[/{id}]',
+                '/leaveapprovalsedit[/{id}]',
+                '/leavebalancelist[/{id}]',
                 '/leavecategorieslist[/{id}]',
                 '/leavecategoriesadd[/{id}]',
                 '/leavecategoriesedit[/{id}]',
@@ -2261,6 +2282,9 @@
                 'PHPMaker2024\\afyaplus\\LeaveApplicationsController:view',
                 'PHPMaker2024\\afyaplus\\LeaveApplicationsController:edit',
                 'PHPMaker2024\\afyaplus\\LeaveApplicationsController:delete',
+                'PHPMaker2024\\afyaplus\\LeaveApprovalsController:list',
+                'PHPMaker2024\\afyaplus\\LeaveApprovalsController:edit',
+                'PHPMaker2024\\afyaplus\\LeaveBalanceController:list',
                 'PHPMaker2024\\afyaplus\\LeaveCategoriesController:list',
                 'PHPMaker2024\\afyaplus\\LeaveCategoriesController:add',
                 'PHPMaker2024\\afyaplus\\LeaveCategoriesController:edit',
@@ -2446,6 +2470,15 @@
                 'PHPMaker2024\\afyaplus\\VitalsreportController:list',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3483,6 +3516,9 @@
                 'view.leave_applications',
                 'edit.leave_applications',
                 'delete.leave_applications',
+                'list.leave_approvals',
+                'edit.leave_approvals',
+                'list.leave_balance',
                 'list.leave_categories',
                 'add.leave_categories',
                 'edit.leave_categories',
@@ -3668,6 +3704,9 @@
                 'list.vitalsreport',
             ],
             'options' => [
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4282,6 +4321,9 @@
         $o[302],
         $o[303],
         $o[304],
+        $o[305],
+        $o[306],
+        $o[307],
     ],
     []
 );
