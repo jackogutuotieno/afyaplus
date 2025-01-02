@@ -163,26 +163,11 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_service_subcategories_id" class="service_subcategories_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->service_category_id->Visible) { // service_category_id ?>
         <th data-name="service_category_id" class="<?= $Page->service_category_id->headerCellClass() ?>"><div id="elh_service_subcategories_service_category_id" class="service_subcategories_service_category_id"><?= $Page->renderFieldHeader($Page->service_category_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->subcategory->Visible) { // subcategory ?>
         <th data-name="subcategory" class="<?= $Page->subcategory->headerCellClass() ?>"><div id="elh_service_subcategories_subcategory" class="service_subcategories_subcategory"><?= $Page->renderFieldHeader($Page->subcategory) ?></div></th>
-<?php } ?>
-<?php if ($Page->description->Visible) { // description ?>
-        <th data-name="description" class="<?= $Page->description->headerCellClass() ?>"><div id="elh_service_subcategories_description" class="service_subcategories_description"><?= $Page->renderFieldHeader($Page->description) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_service_subcategories_created_by_user_id" class="service_subcategories_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_service_subcategories_date_created" class="service_subcategories_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_service_subcategories_date_updated" class="service_subcategories_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -212,14 +197,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_id" class="el_service_subcategories_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->service_category_id->Visible) { // service_category_id ?>
         <td data-name="service_category_id"<?= $Page->service_category_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_service_category_id" class="el_service_subcategories_service_category_id">
@@ -233,38 +210,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_subcategory" class="el_service_subcategories_subcategory">
 <span<?= $Page->subcategory->viewAttributes() ?>>
 <?= $Page->subcategory->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->description->Visible) { // description ?>
-        <td data-name="description"<?= $Page->description->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_description" class="el_service_subcategories_description">
-<span<?= $Page->description->viewAttributes() ?>>
-<?= $Page->description->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_created_by_user_id" class="el_service_subcategories_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_date_created" class="el_service_subcategories_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_subcategories_date_updated" class="el_service_subcategories_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -45,9 +45,6 @@ class ServiceCharge extends AbstractEntity
     #[Column(type: "float")]
     private float $cost;
 
-    #[Column(name: "created_by_user_id", type: "integer")]
-    private int $createdByUserId;
-
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -106,17 +103,6 @@ class ServiceCharge extends AbstractEntity
     public function setCost(float $value): static
     {
         $this->cost = $value;
-        return $this;
-    }
-
-    public function getCreatedByUserId(): int
-    {
-        return $this->createdByUserId;
-    }
-
-    public function setCreatedByUserId(int $value): static
-    {
-        $this->createdByUserId = $value;
         return $this;
     }
 

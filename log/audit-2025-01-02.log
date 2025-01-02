@@ -133,3 +133,15 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-02 21:54:39",/afyaplus/login,2,login,::1,,,,
 "2025-01-02 21:55:13",/afyaplus/logout,2,logout,::1,,,,
 "2025-01-02 22:00:50",/afyaplus/login,1,login,::1,,,,
+"2025-01-02 22:42:26",/afyaplus/servicecategoriesadd,1,A,service_categories,category_name,6,,Test
+"2025-01-02 22:42:26",/afyaplus/servicecategoriesadd,1,A,service_categories,description,6,,"Test category"
+"2025-01-02 22:42:26",/afyaplus/servicecategoriesadd,1,A,service_categories,id,6,,6
+"2025-01-02 22:44:51",/afyaplus/servicesubcategoriesadd,1,A,service_subcategories,service_category_id,15,,6
+"2025-01-02 22:44:51",/afyaplus/servicesubcategoriesadd,1,A,service_subcategories,subcategory,15,,"Test subcategory"
+"2025-01-02 22:44:51",/afyaplus/servicesubcategoriesadd,1,A,service_subcategories,description,15,,"This is a test"
+"2025-01-02 22:44:51",/afyaplus/servicesubcategoriesadd,1,A,service_subcategories,id,15,,15
+"2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,service_category_id,48,,6
+"2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,service_subcategory_id,48,,15
+"2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,service_name,48,,"Test service"
+"2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,cost,48,,90
+"2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,id,48,,48

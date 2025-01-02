@@ -153,7 +153,6 @@ class ServiceChargesView extends ServiceCharges
         $this->service_subcategory_id->setVisibility();
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -706,7 +705,7 @@ class ServiceChargesView extends ServiceCharges
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Copy
         $item = &$option->add("copy");
@@ -716,7 +715,7 @@ class ServiceChargesView extends ServiceCharges
         } else {
             $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
         }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd() && $this->showOptionLink("add");
+        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
 
         // Delete
         $item = &$option->add("delete");
@@ -725,7 +724,7 @@ class ServiceChargesView extends ServiceCharges
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete");
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
 
         // Set up action default
         $option = $options["action"];
@@ -838,7 +837,6 @@ class ServiceChargesView extends ServiceCharges
         $this->service_subcategory_id->setDbValue($row['service_subcategory_id']);
         $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -852,7 +850,6 @@ class ServiceChargesView extends ServiceCharges
         $row['service_subcategory_id'] = $this->service_subcategory_id->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -885,8 +882,6 @@ class ServiceChargesView extends ServiceCharges
         // service_name
 
         // cost
-
-        // created_by_user_id
 
         // date_created
 
@@ -950,10 +945,6 @@ class ServiceChargesView extends ServiceCharges
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -981,10 +972,6 @@ class ServiceChargesView extends ServiceCharges
             // cost
             $this->cost->HrefValue = "";
             $this->cost->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1159,16 +1146,6 @@ class ServiceChargesView extends ServiceCharges
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

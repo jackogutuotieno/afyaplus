@@ -135,9 +135,8 @@ class ServiceChargesAdd extends ServiceCharges
         $this->service_subcategory_id->setVisibility();
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
-        $this->created_by_user_id->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -734,28 +733,6 @@ class ServiceChargesAdd extends ServiceCharges
             }
         }
 
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -768,10 +745,6 @@ class ServiceChargesAdd extends ServiceCharges
         $this->service_subcategory_id->CurrentValue = $this->service_subcategory_id->FormValue;
         $this->service_name->CurrentValue = $this->service_name->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -797,15 +770,6 @@ class ServiceChargesAdd extends ServiceCharges
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("add");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -826,7 +790,6 @@ class ServiceChargesAdd extends ServiceCharges
         $this->service_subcategory_id->setDbValue($row['service_subcategory_id']);
         $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -840,7 +803,6 @@ class ServiceChargesAdd extends ServiceCharges
         $row['service_subcategory_id'] = $this->service_subcategory_id->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -891,9 +853,6 @@ class ServiceChargesAdd extends ServiceCharges
 
         // cost
         $this->cost->RowCssClass = "row";
-
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -978,12 +937,6 @@ class ServiceChargesAdd extends ServiceCharges
 
             // cost
             $this->cost->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // service_category_id
             $this->service_category_id->setupEditAttributes();
@@ -1055,16 +1008,6 @@ class ServiceChargesAdd extends ServiceCharges
                 $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Add refer script
 
             // service_category_id
@@ -1078,12 +1021,6 @@ class ServiceChargesAdd extends ServiceCharges
 
             // cost
             $this->cost->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1127,22 +1064,6 @@ class ServiceChargesAdd extends ServiceCharges
             }
             if (!CheckNumber($this->cost->FormValue)) {
                 $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1229,17 +1150,6 @@ class ServiceChargesAdd extends ServiceCharges
 
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
-
-        // created_by_user_id
-        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            $rsnew['created_by_user_id'] = CurrentUserID();
-        }
         return $rsnew;
     }
 
@@ -1261,25 +1171,6 @@ class ServiceChargesAdd extends ServiceCharges
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);
         }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->setFormValue($row['date_created']);
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
-        }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->setFormValue($row['created_by_user_id']);
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

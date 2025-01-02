@@ -163,9 +163,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_service_charges_id" class="service_charges_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->service_category_id->Visible) { // service_category_id ?>
         <th data-name="service_category_id" class="<?= $Page->service_category_id->headerCellClass() ?>"><div id="elh_service_charges_service_category_id" class="service_charges_service_category_id"><?= $Page->renderFieldHeader($Page->service_category_id) ?></div></th>
 <?php } ?>
@@ -212,14 +209,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_id" class="el_service_charges_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->service_category_id->Visible) { // service_category_id ?>
         <td data-name="service_category_id"<?= $Page->service_category_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_service_charges_service_category_id" class="el_service_charges_service_category_id">

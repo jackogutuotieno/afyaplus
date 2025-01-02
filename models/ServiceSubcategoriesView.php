@@ -152,7 +152,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         $this->service_category_id->setVisibility();
         $this->subcategory->setVisibility();
         $this->description->setVisibility();
-        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -569,6 +568,9 @@ class ServiceSubcategoriesView extends ServiceSubcategories
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_category_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -701,7 +703,7 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit");
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Copy
         $item = &$option->add("copy");
@@ -711,7 +713,7 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         } else {
             $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
         }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd() && $this->showOptionLink("add");
+        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
 
         // Delete
         $item = &$option->add("delete");
@@ -720,7 +722,7 @@ class ServiceSubcategoriesView extends ServiceSubcategories
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete");
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
 
         // Set up action default
         $option = $options["action"];
@@ -832,7 +834,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         $this->service_category_id->setDbValue($row['service_category_id']);
         $this->subcategory->setDbValue($row['subcategory']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -845,7 +846,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         $row['service_category_id'] = $this->service_category_id->DefaultValue;
         $row['subcategory'] = $this->subcategory->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -877,8 +877,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
 
         // description
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -889,18 +887,33 @@ class ServiceSubcategoriesView extends ServiceSubcategories
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // service_category_id
-            $this->service_category_id->ViewValue = $this->service_category_id->CurrentValue;
-            $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->ViewValue, $this->service_category_id->formatPattern());
+            $curVal = strval($this->service_category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_category_id->ViewValue = $this->service_category_id->lookupCacheOption($curVal);
+                if ($this->service_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_category_id->ViewValue = $this->service_category_id->displayValue($arwrk);
+                    } else {
+                        $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->CurrentValue, $this->service_category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_category_id->ViewValue = null;
+            }
 
             // subcategory
             $this->subcategory->ViewValue = $this->subcategory->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -925,18 +938,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
             // description
             $this->description->HrefValue = "";
             $this->description->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1105,16 +1106,6 @@ class ServiceSubcategoriesView extends ServiceSubcategories
         $this->pageExported($doc);
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1139,6 +1130,8 @@ class ServiceSubcategoriesView extends ServiceSubcategories
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -130,12 +130,11 @@ class ServiceChargesDelete extends ServiceCharges
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->service_category_id->setVisibility();
         $this->service_subcategory_id->setVisibility();
         $this->service_name->setVisibility();
         $this->cost->setVisibility();
-        $this->created_by_user_id->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -444,25 +443,6 @@ class ServiceChargesDelete extends ServiceCharges
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
 
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("servicechargeslist"); // Return to list
-            return;
-        }
-
         // Get action
         if (IsApi()) {
             $this->CurrentAction = "delete"; // Delete record directly
@@ -636,7 +616,6 @@ class ServiceChargesDelete extends ServiceCharges
         $this->service_subcategory_id->setDbValue($row['service_subcategory_id']);
         $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -650,7 +629,6 @@ class ServiceChargesDelete extends ServiceCharges
         $row['service_subcategory_id'] = $this->service_subcategory_id->DefaultValue;
         $row['service_name'] = $this->service_name->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -677,9 +655,6 @@ class ServiceChargesDelete extends ServiceCharges
         // service_name
 
         // cost
-
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -750,10 +725,6 @@ class ServiceChargesDelete extends ServiceCharges
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // service_category_id
             $this->service_category_id->HrefValue = "";
@@ -912,16 +883,6 @@ class ServiceChargesDelete extends ServiceCharges
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

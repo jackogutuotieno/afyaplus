@@ -73,7 +73,7 @@ class LeaveApprovals extends DbTable
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "leave_applications";
+        $this->UpdateTable = "leave_approvals";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)

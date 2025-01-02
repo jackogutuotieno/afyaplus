@@ -60,7 +60,6 @@ class ServiceCharges extends DbTable
     public $service_subcategory_id;
     public $service_name;
     public $cost;
-    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -161,7 +160,7 @@ class ServiceCharges extends DbTable
         $this->service_category_id->setSelectMultiple(false); // Select one
         $this->service_category_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->service_category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->service_category_id->Lookup = new Lookup($this->service_category_id, 'service_categories', false, 'id', ["category_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`category_name`");
+        $this->service_category_id->Lookup = new Lookup($this->service_category_id, 'service_categories', false, 'id', ["category_name","","",""], '', '', [], ["x_service_subcategory_id"], [], [], [], [], false, '', '', "`category_name`");
         $this->service_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->service_category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_category_id'] = &$this->service_category_id;
@@ -191,7 +190,7 @@ class ServiceCharges extends DbTable
         $this->service_subcategory_id->setSelectMultiple(false); // Select one
         $this->service_subcategory_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->service_subcategory_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->service_subcategory_id->Lookup = new Lookup($this->service_subcategory_id, 'service_subcategories', false, 'id', ["subcategory","","",""], '', '', [], [], [], [], [], [], false, '', '', "`subcategory`");
+        $this->service_subcategory_id->Lookup = new Lookup($this->service_subcategory_id, 'service_subcategories', false, 'id', ["subcategory","","",""], '', '', ["x_service_category_id"], [], ["service_category_id"], ["x_service_category_id"], [], [], false, '', '', "`subcategory`");
         $this->service_subcategory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->service_subcategory_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_subcategory_id'] = &$this->service_subcategory_id;
@@ -245,33 +244,6 @@ class ServiceCharges extends DbTable
         $this->cost->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->cost->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['cost'] = &$this->cost;
-
-        // created_by_user_id
-        $this->created_by_user_id = new DbField(
-            $this, // Table
-            'x_created_by_user_id', // Variable name
-            'created_by_user_id', // Name
-            '`created_by_user_id`', // Expression
-            '`created_by_user_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`created_by_user_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'HIDDEN' // Edit Tag
-        );
-        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
-        $this->created_by_user_id->InputTextType = "text";
-        $this->created_by_user_id->Raw = true;
-        $this->created_by_user_id->Nullable = false; // NOT NULL field
-        $this->created_by_user_id->Sortable = false; // Allow sort
-        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->created_by_user_id->SearchOperators = ["=", "<>"];
-        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -522,11 +494,6 @@ class ServiceCharges extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter, $id = "")
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            $filter = $this->addUserIDFilter($filter, $id);
-        }
         return $filter;
     }
 
@@ -867,7 +834,6 @@ class ServiceCharges extends DbTable
         $this->service_subcategory_id->DbValue = $row['service_subcategory_id'];
         $this->service_name->DbValue = $row['service_name'];
         $this->cost->DbValue = $row['cost'];
-        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1227,7 +1193,6 @@ class ServiceCharges extends DbTable
         $this->service_subcategory_id->setDbValue($row['service_subcategory_id']);
         $this->service_name->setDbValue($row['service_name']);
         $this->cost->setDbValue($row['cost']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1269,9 +1234,6 @@ class ServiceCharges extends DbTable
         // service_name
 
         // cost
-
-        // created_by_user_id
-        $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
 
@@ -1333,10 +1295,6 @@ class ServiceCharges extends DbTable
         $this->cost->ViewValue = $this->cost->CurrentValue;
         $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-        // created_by_user_id
-        $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
-
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1364,10 +1322,6 @@ class ServiceCharges extends DbTable
         // cost
         $this->cost->HrefValue = "";
         $this->cost->TooltipValue = "";
-
-        // created_by_user_id
-        $this->created_by_user_id->HrefValue = "";
-        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1420,8 +1374,6 @@ class ServiceCharges extends DbTable
             $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
         }
 
-        // created_by_user_id
-
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1465,7 +1417,6 @@ class ServiceCharges extends DbTable
                     $doc->exportCaption($this->service_subcategory_id);
                     $doc->exportCaption($this->service_name);
                     $doc->exportCaption($this->cost);
-                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
@@ -1507,7 +1458,6 @@ class ServiceCharges extends DbTable
                         $doc->exportField($this->service_subcategory_id);
                         $doc->exportField($this->service_name);
                         $doc->exportField($this->cost);
-                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
@@ -1531,52 +1481,6 @@ class ServiceCharges extends DbTable
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add User ID filter
-    public function addUserIDFilter($filter = "", $id = "")
-    {
-        global $Security;
-        $filterWrk = "";
-        if ($id == "") {
-            $id = CurrentPageID() == "list" ? $this->CurrentAction : CurrentPageID();
-        }
-        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
-            $filterWrk = $Security->userIdList();
-            if ($filterWrk != "") {
-                $filterWrk = '`created_by_user_id` IN (' . $filterWrk . ')';
-            }
-        }
-
-        // Call User ID Filtering event
-        $this->userIdFiltering($filterWrk);
-        AddFilter($filter, $filterWrk);
-        return $filter;
-    }
-
-    // User ID subquery
-    public function getUserIDSubquery(&$fld, &$masterfld)
-    {
-        $wrk = "";
-        $sql = "SELECT " . $masterfld->Expression . " FROM service_charges";
-        $filter = $this->addUserIDFilter("");
-        if ($filter != "") {
-            $sql .= " WHERE " . $filter;
-        }
-
-        // List all values
-        $conn = Conn($this->Dbid);
-        $config = $conn->getConfiguration();
-        $config->setResultCache($this->Cache);
-        if ($rows = $conn->executeCacheQuery($sql, [], [], $this->CacheProfile)->fetchAllNumeric()) {
-            $wrk = implode(",", array_map(fn($row) => QuotedValue($row[0], $masterfld->DataType, $this->Dbid), $rows));
-        }
-        if ($wrk != "") {
-            $wrk = $fld->Expression . " IN (" . $wrk . ")";
-        } else { // No User ID value found
-            $wrk = "0=1";
-        }
-        return $wrk;
     }
 
     // Get file data
@@ -1831,7 +1735,7 @@ class ServiceCharges extends DbTable
     public function rowInserted($rsold, $rsnew)
     {
         // Message after successful submission
-        $this->setSuccessMessage("Facility charge successfully created.");
+        $this->setSuccessMessage("Charge item successfully created.");
     }
 
     // Row Updating event

@@ -134,9 +134,8 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         $this->service_category_id->setVisibility();
         $this->subcategory->setVisibility();
         $this->description->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -536,6 +535,9 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_category_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -729,7 +731,7 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
             if (IsApi() && $val === null) {
                 $this->service_category_id->Visible = false; // Disable update for API request
             } else {
-                $this->service_category_id->setFormValue($val, true, $validate);
+                $this->service_category_id->setFormValue($val);
             }
         }
 
@@ -752,38 +754,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
                 $this->description->setFormValue($val);
             }
         }
-
-        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
-        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
-        if (!$this->created_by_user_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->created_by_user_id->Visible = false; // Disable update for API request
-            } else {
-                $this->created_by_user_id->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'date_created' first before field var 'x_date_created'
-        $val = $CurrentForm->hasValue("date_created") ? $CurrentForm->getValue("date_created") : $CurrentForm->getValue("x_date_created");
-        if (!$this->date_created->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_created->Visible = false; // Disable update for API request
-            } else {
-                $this->date_created->setFormValue($val, true, $validate);
-            }
-            $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        }
-
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
     }
 
     // Restore form values
@@ -794,11 +764,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         $this->service_category_id->CurrentValue = $this->service_category_id->FormValue;
         $this->subcategory->CurrentValue = $this->subcategory->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
-        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
-        $this->date_created->CurrentValue = $this->date_created->FormValue;
-        $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -824,15 +789,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -852,7 +808,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         $this->service_category_id->setDbValue($row['service_category_id']);
         $this->subcategory->setDbValue($row['subcategory']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -865,7 +820,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         $row['service_category_id'] = $this->service_category_id->DefaultValue;
         $row['subcategory'] = $this->subcategory->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -914,9 +868,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         // description
         $this->description->RowCssClass = "row";
 
-        // created_by_user_id
-        $this->created_by_user_id->RowCssClass = "row";
-
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -929,18 +880,33 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // service_category_id
-            $this->service_category_id->ViewValue = $this->service_category_id->CurrentValue;
-            $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->ViewValue, $this->service_category_id->formatPattern());
+            $curVal = strval($this->service_category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_category_id->ViewValue = $this->service_category_id->lookupCacheOption($curVal);
+                if ($this->service_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_category_id->ViewValue = $this->service_category_id->displayValue($arwrk);
+                    } else {
+                        $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->CurrentValue, $this->service_category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_category_id->ViewValue = null;
+            }
 
             // subcategory
             $this->subcategory->ViewValue = $this->subcategory->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -961,15 +927,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
             // description
             $this->description->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -977,11 +934,30 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
             // service_category_id
             $this->service_category_id->setupEditAttributes();
-            $this->service_category_id->EditValue = $this->service_category_id->CurrentValue;
-            $this->service_category_id->PlaceHolder = RemoveHtml($this->service_category_id->caption());
-            if (strval($this->service_category_id->EditValue) != "" && is_numeric($this->service_category_id->EditValue)) {
-                $this->service_category_id->EditValue = FormatNumber($this->service_category_id->EditValue, null);
+            $curVal = trim(strval($this->service_category_id->CurrentValue));
+            if ($curVal != "") {
+                $this->service_category_id->ViewValue = $this->service_category_id->lookupCacheOption($curVal);
+            } else {
+                $this->service_category_id->ViewValue = $this->service_category_id->Lookup !== null && is_array($this->service_category_id->lookupOptions()) && count($this->service_category_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->service_category_id->ViewValue !== null) { // Load from cache
+                $this->service_category_id->EditValue = array_values($this->service_category_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->service_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->service_category_id->CurrentValue, $this->service_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->service_category_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->service_category_id->EditValue = $arwrk;
+            }
+            $this->service_category_id->PlaceHolder = RemoveHtml($this->service_category_id->caption());
 
             // subcategory
             $this->subcategory->setupEditAttributes();
@@ -993,35 +969,8 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
             // description
             $this->description->setupEditAttributes();
-            if (!$this->description->Raw) {
-                $this->description->CurrentValue = HtmlDecode($this->description->CurrentValue);
-            }
             $this->description->EditValue = HtmlEncode($this->description->CurrentValue);
             $this->description->PlaceHolder = RemoveHtml($this->description->caption());
-
-            // created_by_user_id
-            $this->created_by_user_id->setupEditAttributes();
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                $this->created_by_user_id->CurrentValue = CurrentUserID();
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, $this->created_by_user_id->formatPattern());
-            } else {
-                $this->created_by_user_id->EditValue = $this->created_by_user_id->CurrentValue;
-                $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
-                if (strval($this->created_by_user_id->EditValue) != "" && is_numeric($this->created_by_user_id->EditValue)) {
-                    $this->created_by_user_id->EditValue = FormatNumber($this->created_by_user_id->EditValue, null);
-                }
-            }
-
-            // date_created
-            $this->date_created->setupEditAttributes();
-            $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
-            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
 
@@ -1036,15 +985,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
             // description
             $this->description->HrefValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1076,9 +1016,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
                     $this->service_category_id->addErrorMessage(str_replace("%s", $this->service_category_id->caption(), $this->service_category_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->service_category_id->FormValue)) {
-                $this->service_category_id->addErrorMessage($this->service_category_id->getErrorMessage(false));
-            }
             if ($this->subcategory->Visible && $this->subcategory->Required) {
                 if (!$this->subcategory->IsDetailKey && EmptyValue($this->subcategory->FormValue)) {
                     $this->subcategory->addErrorMessage(str_replace("%s", $this->subcategory->caption(), $this->subcategory->RequiredErrorMessage));
@@ -1088,30 +1025,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
                 if (!$this->description->IsDetailKey && EmptyValue($this->description->FormValue)) {
                     $this->description->addErrorMessage(str_replace("%s", $this->description->caption(), $this->description->RequiredErrorMessage));
                 }
-            }
-            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
-                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
-                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->created_by_user_id->FormValue)) {
-                $this->created_by_user_id->addErrorMessage($this->created_by_user_id->getErrorMessage(false));
-            }
-            if ($this->date_created->Visible && $this->date_created->Required) {
-                if (!$this->date_created->IsDetailKey && EmptyValue($this->date_created->FormValue)) {
-                    $this->date_created->addErrorMessage(str_replace("%s", $this->date_created->caption(), $this->date_created->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
-                $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1215,15 +1128,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
         // description
         $this->description->setDbValueDef($rsnew, $this->description->CurrentValue, $this->description->ReadOnly);
-
-        // created_by_user_id
-        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
-
-        // date_created
-        $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -1242,25 +1146,6 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
         if (isset($row['description'])) { // description
             $this->description->CurrentValue = $row['description'];
         }
-        if (isset($row['created_by_user_id'])) { // created_by_user_id
-            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
-        }
-        if (isset($row['date_created'])) { // date_created
-            $this->date_created->CurrentValue = $row['date_created'];
-        }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
-        }
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb
@@ -1287,6 +1172,8 @@ class ServiceSubcategoriesEdit extends ServiceSubcategories
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

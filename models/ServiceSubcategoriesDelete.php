@@ -130,13 +130,12 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->service_category_id->setVisibility();
         $this->subcategory->setVisibility();
-        $this->description->setVisibility();
-        $this->created_by_user_id->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->description->Visible = false;
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -425,6 +424,9 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->service_category_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -438,25 +440,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
-
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("servicesubcategorieslist"); // Return to list
-            return;
-        }
 
         // Get action
         if (IsApi()) {
@@ -630,7 +613,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
         $this->service_category_id->setDbValue($row['service_category_id']);
         $this->subcategory->setDbValue($row['subcategory']);
         $this->description->setDbValue($row['description']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -643,7 +625,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
         $row['service_category_id'] = $this->service_category_id->DefaultValue;
         $row['subcategory'] = $this->subcategory->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -669,8 +650,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
 
         // description
 
-        // created_by_user_id
-
         // date_created
 
         // date_updated
@@ -681,18 +660,33 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // service_category_id
-            $this->service_category_id->ViewValue = $this->service_category_id->CurrentValue;
-            $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->ViewValue, $this->service_category_id->formatPattern());
+            $curVal = strval($this->service_category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->service_category_id->ViewValue = $this->service_category_id->lookupCacheOption($curVal);
+                if ($this->service_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->service_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->service_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->service_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->service_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->service_category_id->ViewValue = $this->service_category_id->displayValue($arwrk);
+                    } else {
+                        $this->service_category_id->ViewValue = FormatNumber($this->service_category_id->CurrentValue, $this->service_category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->service_category_id->ViewValue = null;
+            }
 
             // subcategory
             $this->subcategory->ViewValue = $this->subcategory->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
-
-            // created_by_user_id
-            $this->created_by_user_id->ViewValue = $this->created_by_user_id->CurrentValue;
-            $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->ViewValue, $this->created_by_user_id->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -702,10 +696,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // service_category_id
             $this->service_category_id->HrefValue = "";
             $this->service_category_id->TooltipValue = "";
@@ -713,22 +703,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
             // subcategory
             $this->subcategory->HrefValue = "";
             $this->subcategory->TooltipValue = "";
-
-            // description
-            $this->description->HrefValue = "";
-            $this->description->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -865,16 +839,6 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
         return $deleteRows;
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -899,6 +863,8 @@ class ServiceSubcategoriesDelete extends ServiceSubcategories
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_service_category_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
