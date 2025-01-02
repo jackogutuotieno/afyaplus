@@ -45,7 +45,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "moduleslist";
+    public $CurrentPageName = "leaveapplicationsdelete";
 
     // Page headings
     public $Heading = "";

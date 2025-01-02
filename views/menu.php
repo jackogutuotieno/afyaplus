@@ -65,6 +65,9 @@ $sideMenu->addMenuItem(35, "mi_service_charges", $Language->menuPhrase("35", "Me
 $sideMenu->addMenuItem(49, "mci_Human_Resources", $Language->menuPhrase("49", "MenuText"), "", -1, "", true, false, true, "fa-building", "", false, true);
 $sideMenu->addMenuItem(2, "mi_departments", $Language->menuPhrase("2", "MenuText"), "departmentslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}departments'), false, false, "fa-building", "", false, true);
 $sideMenu->addMenuItem(3, "mi_designations", $Language->menuPhrase("3", "MenuText"), "designationslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}designations'), false, false, "fa-briefcase", "", false, true);
+$sideMenu->addMenuItem(748, "mi_holidays", $Language->menuPhrase("748", "MenuText"), "holidayslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}holidays'), false, false, "fa-list", "", false, true);
+$sideMenu->addMenuItem(749, "mi_leave_categories", $Language->menuPhrase("749", "MenuText"), "leavecategorieslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}leave_categories'), false, false, "fa-list", "", false, true);
+$sideMenu->addMenuItem(750, "mi_leave_applications", $Language->menuPhrase("750", "MenuText"), "leaveapplicationslist", 49, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}leave_applications'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(104, "mci_Reports", $Language->menuPhrase("104", "MenuText"), "", -1, "", true, false, true, "fa-file", "", false, true);
 $sideMenu->addMenuItem(312, "mci_Internal", $Language->menuPhrase("312", "MenuText"), "", 104, "", true, false, true, "fa-file", "", false, true);
 $sideMenu->addMenuItem(244, "mi_Registered_Patients", $Language->menuPhrase("244", "MenuText"), "registeredpatients", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Registered Patients'), false, false, "fa-file", "", false, true);

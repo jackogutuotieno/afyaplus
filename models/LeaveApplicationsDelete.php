@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class DoctorNotesDelete extends DoctorNotes
+class LeaveApplicationsDelete extends LeaveApplications
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class DoctorNotesDelete extends DoctorNotes
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "DoctorNotesDelete";
+    public $PageObjName = "LeaveApplicationsDelete";
 
     // View file path
     public $View = null;
@@ -39,15 +39,7 @@ class DoctorNotesDelete extends DoctorNotes
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "doctornotesdelete";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "leaveapplicationsdelete";
 
     // Page headings
     public $Heading = "";
@@ -131,16 +123,12 @@ class DoctorNotesDelete extends DoctorNotes
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->patient_id->setVisibility();
-        $this->visit_id->Visible = false;
-        $this->chief_complaint->setVisibility();
-        $this->history_of_presenting_illness->setVisibility();
-        $this->past_medical_history->setVisibility();
-        $this->family_history->setVisibility();
-        $this->allergies->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->user_id->setVisibility();
+        $this->leave_category_id->setVisibility();
+        $this->days_applied->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->Visible = false;
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -148,8 +136,8 @@ class DoctorNotesDelete extends DoctorNotes
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'doctor_notes';
-        $this->TableName = 'doctor_notes';
+        $this->TableVar = 'leave_applications';
+        $this->TableName = 'leave_applications';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -160,14 +148,14 @@ class DoctorNotesDelete extends DoctorNotes
         // Language object
         $Language = Container("app.language");
 
-        // Table object (doctor_notes)
-        if (!isset($GLOBALS["doctor_notes"]) || $GLOBALS["doctor_notes"]::class == PROJECT_NAMESPACE . "doctor_notes") {
-            $GLOBALS["doctor_notes"] = &$this;
+        // Table object (leave_applications)
+        if (!isset($GLOBALS["leave_applications"]) || $GLOBALS["leave_applications"]::class == PROJECT_NAMESPACE . "leave_applications") {
+            $GLOBALS["leave_applications"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'doctor_notes');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'leave_applications');
         }
 
         // Start timer
@@ -430,11 +418,8 @@ class DoctorNotesDelete extends DoctorNotes
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->created_by_user_id);
-
-        // Set up master/detail parameters
-        $this->setupMasterParms();
+        $this->setupLookupOptions($this->user_id);
+        $this->setupLookupOptions($this->leave_category_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -443,31 +428,12 @@ class DoctorNotesDelete extends DoctorNotes
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("doctornoteslist"); // Prevent SQL injection, return to list
+            $this->terminate("leaveapplicationslist"); // Prevent SQL injection, return to list
             return;
         }
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
-
-        // Check if valid User ID
-        $conn = $this->getConnection();
-        $sql = $this->getSql($this->CurrentFilter);
-        $rows = $conn->fetchAllAssociative($sql);
-        $res = true;
-        foreach ($rows as $row) {
-            $this->loadRowValues($row);
-            if (!$this->showOptionLink("delete")) {
-                $userIdMsg = $Language->phrase("NoDeletePermission");
-                $this->setFailureMessage($userIdMsg);
-                $res = false;
-                break;
-            }
-        }
-        if (!$res) {
-            $this->terminate("doctornoteslist"); // Return to list
-            return;
-        }
 
         // Get action
         if (IsApi()) {
@@ -516,7 +482,7 @@ class DoctorNotesDelete extends DoctorNotes
             $this->Recordset = $this->loadRecordset();
             if ($this->TotalRecords <= 0) { // No record found, exit
                 $this->Recordset?->free();
-                $this->terminate("doctornoteslist"); // Return to list
+                $this->terminate("leaveapplicationslist"); // Return to list
                 return;
             }
         }
@@ -638,14 +604,10 @@ class DoctorNotesDelete extends DoctorNotes
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->chief_complaint->setDbValue($row['chief_complaint']);
-        $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
-        $this->past_medical_history->setDbValue($row['past_medical_history']);
-        $this->family_history->setDbValue($row['family_history']);
-        $this->allergies->setDbValue($row['allergies']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->user_id->setDbValue($row['user_id']);
+        $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->days_applied->setDbValue($row['days_applied']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -655,14 +617,10 @@ class DoctorNotesDelete extends DoctorNotes
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['chief_complaint'] = $this->chief_complaint->DefaultValue;
-        $row['history_of_presenting_illness'] = $this->history_of_presenting_illness->DefaultValue;
-        $row['past_medical_history'] = $this->past_medical_history->DefaultValue;
-        $row['family_history'] = $this->family_history->DefaultValue;
-        $row['allergies'] = $this->allergies->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['user_id'] = $this->user_id->DefaultValue;
+        $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
+        $row['days_applied'] = $this->days_applied->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -682,129 +640,107 @@ class DoctorNotesDelete extends DoctorNotes
 
         // id
 
-        // patient_id
+        // user_id
 
-        // visit_id
-        $this->visit_id->CellCssStyle = "white-space: nowrap;";
+        // leave_category_id
 
-        // chief_complaint
+        // days_applied
 
-        // history_of_presenting_illness
-
-        // past_medical_history
-
-        // family_history
-
-        // allergies
-
-        // created_by_user_id
+        // status
 
         // date_created
 
         // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
+            // user_id
+            $curVal = strval($this->user_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
+                if ($this->user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->user_id->ViewValue = null;
             }
 
-            // chief_complaint
-            $this->chief_complaint->ViewValue = $this->chief_complaint->CurrentValue;
-
-            // history_of_presenting_illness
-            $this->history_of_presenting_illness->ViewValue = $this->history_of_presenting_illness->CurrentValue;
-
-            // past_medical_history
-            $this->past_medical_history->ViewValue = $this->past_medical_history->CurrentValue;
-
-            // family_history
-            $this->family_history->ViewValue = $this->family_history->CurrentValue;
-
-            // allergies
-            $this->allergies->ViewValue = $this->allergies->CurrentValue;
-
-            // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
+            // leave_category_id
+            $curVal = strval($this->leave_category_id->CurrentValue);
             if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
+                if ($this->leave_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->leave_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->leave_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->leave_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                        $arwrk = $this->leave_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->leave_category_id->ViewValue = $this->leave_category_id->displayValue($arwrk);
                     } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                        $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->CurrentValue, $this->leave_category_id->formatPattern());
                     }
                 }
             } else {
-                $this->created_by_user_id->ViewValue = null;
+                $this->leave_category_id->ViewValue = null;
             }
+
+            // days_applied
+            $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
+            $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // chief_complaint
-            $this->chief_complaint->HrefValue = "";
-            $this->chief_complaint->TooltipValue = "";
+            // user_id
+            $this->user_id->HrefValue = "";
+            $this->user_id->TooltipValue = "";
 
-            // history_of_presenting_illness
-            $this->history_of_presenting_illness->HrefValue = "";
-            $this->history_of_presenting_illness->TooltipValue = "";
+            // leave_category_id
+            $this->leave_category_id->HrefValue = "";
+            $this->leave_category_id->TooltipValue = "";
 
-            // past_medical_history
-            $this->past_medical_history->HrefValue = "";
-            $this->past_medical_history->TooltipValue = "";
+            // days_applied
+            $this->days_applied->HrefValue = "";
+            $this->days_applied->TooltipValue = "";
 
-            // family_history
-            $this->family_history->HrefValue = "";
-            $this->family_history->TooltipValue = "";
-
-            // allergies
-            $this->allergies->HrefValue = "";
-            $this->allergies->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -830,9 +766,6 @@ class DoctorNotesDelete extends DoctorNotes
         }
         if ($this->UseTransaction) {
             $conn->beginTransaction();
-        }
-        if ($this->AuditTrailOnDelete) {
-            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
         }
 
         // Clone old rows
@@ -895,37 +828,11 @@ class DoctorNotesDelete extends DoctorNotes
             if (count($failKeys) > 0) {
                 $this->setWarningMessage(str_replace("%k", explode(", ", $failKeys), $Language->phrase("DeleteRecordsFailed")));
             }
-            if ($this->AuditTrailOnDelete) {
-                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteSuccess")); // Batch delete success
-            }
-            $table = 'doctor_notes';
-            $subject = $table . " " . $Language->phrase("RecordDeleted");
-            $action = $Language->phrase("ActionDeleted");
-            $email = new Email();
-            $email->load(Config("EMAIL_NOTIFY_TEMPLATE"), data: [
-                "From" => Config("SENDER_EMAIL"), // Replace Sender
-                "To" => Config("RECIPIENT_EMAIL"), // Replace Recipient
-                "Subject" => $subject,  // Replace Subject
-                "Table" => $table,
-                "Key" => implode(", ", $successKeys),
-                "Action" => $action
-            ]);
-            $args = ["rs" => $rsold];
-            $emailSent = false;
-            if ($this->emailSending($email, $args)) {
-                $emailSent = $email->send();
-            }
-            if (!$emailSent) {
-                $this->setFailureMessage($email->SendErrDescription);
-            }
         } else {
             if ($this->UseTransaction) { // Rollback transaction
                 if ($conn->isTransactionActive()) {
                     $conn->rollback();
                 }
-            }
-            if ($this->AuditTrailOnDelete) {
-                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteRollback")); // Batch delete rollback
             }
         }
 
@@ -941,121 +848,13 @@ class DoctorNotesDelete extends DoctorNotes
         return $deleteRows;
     }
 
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
-                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-            $this->setSessionWhere($this->getDetailFilterFromSession());
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
-                    $this->visit_id->setSessionValue("");
-                }
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("doctornoteslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("leaveapplicationslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }
@@ -1073,9 +872,9 @@ class DoctorNotesDelete extends DoctorNotes
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
+                case "x_user_id":
                     break;
-                case "x_created_by_user_id":
+                case "x_leave_category_id":
                     break;
                 default:
                     $lookupFilter = "";

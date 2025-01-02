@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$DoctorNotesList = &$Page;
+$LeaveApplicationsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { doctor_notes: currentTable } });
+ew.deepAssign(ew.vars, { tables: { leave_applications: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -56,30 +56,21 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_visits") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/PatientVisitsMaster.php";
-    }
-}
-?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fdoctor_notessrch" id="fdoctor_notessrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fdoctor_notessrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fleave_applicationssrch" id="fleave_applicationssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fleave_applicationssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { doctor_notes: currentTable } });
+ew.deepAssign(ew.vars, { tables: { leave_applications: currentTable } });
 var currentForm;
-var fdoctor_notessrch, currentSearchForm, currentAdvancedSearchForm;
+var fleave_applicationssrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fdoctor_notessrch")
+        .setId("fleave_applicationssrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -110,10 +101,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fdoctor_notessrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fdoctor_notessrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fdoctor_notessrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fdoctor_notessrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fleave_applicationssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fleave_applicationssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fleave_applicationssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fleave_applicationssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -153,18 +144,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="doctor_notes">
+<input type="hidden" name="t" value="leave_applications">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "patient_visits" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_visits">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->visit_id->getSessionValue()) ?>">
-<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
-<?php } ?>
-<div id="gmp_doctor_notes" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_leave_applications" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_doctor_noteslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_leave_applicationslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -177,29 +163,23 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_doctor_notes_patient_id" class="doctor_notes_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
+<?php if ($Page->user_id->Visible) { // user_id ?>
+        <th data-name="user_id" class="<?= $Page->user_id->headerCellClass() ?>"><div id="elh_leave_applications_user_id" class="leave_applications_user_id"><?= $Page->renderFieldHeader($Page->user_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->chief_complaint->Visible) { // chief_complaint ?>
-        <th data-name="chief_complaint" class="<?= $Page->chief_complaint->headerCellClass() ?>"><div id="elh_doctor_notes_chief_complaint" class="doctor_notes_chief_complaint"><?= $Page->renderFieldHeader($Page->chief_complaint) ?></div></th>
+<?php if ($Page->leave_category_id->Visible) { // leave_category_id ?>
+        <th data-name="leave_category_id" class="<?= $Page->leave_category_id->headerCellClass() ?>"><div id="elh_leave_applications_leave_category_id" class="leave_applications_leave_category_id"><?= $Page->renderFieldHeader($Page->leave_category_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->history_of_presenting_illness->Visible) { // history_of_presenting_illness ?>
-        <th data-name="history_of_presenting_illness" class="<?= $Page->history_of_presenting_illness->headerCellClass() ?>"><div id="elh_doctor_notes_history_of_presenting_illness" class="doctor_notes_history_of_presenting_illness"><?= $Page->renderFieldHeader($Page->history_of_presenting_illness) ?></div></th>
+<?php if ($Page->days_applied->Visible) { // days_applied ?>
+        <th data-name="days_applied" class="<?= $Page->days_applied->headerCellClass() ?>"><div id="elh_leave_applications_days_applied" class="leave_applications_days_applied"><?= $Page->renderFieldHeader($Page->days_applied) ?></div></th>
 <?php } ?>
-<?php if ($Page->past_medical_history->Visible) { // past_medical_history ?>
-        <th data-name="past_medical_history" class="<?= $Page->past_medical_history->headerCellClass() ?>"><div id="elh_doctor_notes_past_medical_history" class="doctor_notes_past_medical_history"><?= $Page->renderFieldHeader($Page->past_medical_history) ?></div></th>
-<?php } ?>
-<?php if ($Page->family_history->Visible) { // family_history ?>
-        <th data-name="family_history" class="<?= $Page->family_history->headerCellClass() ?>"><div id="elh_doctor_notes_family_history" class="doctor_notes_family_history"><?= $Page->renderFieldHeader($Page->family_history) ?></div></th>
-<?php } ?>
-<?php if ($Page->allergies->Visible) { // allergies ?>
-        <th data-name="allergies" class="<?= $Page->allergies->headerCellClass() ?>"><div id="elh_doctor_notes_allergies" class="doctor_notes_allergies"><?= $Page->renderFieldHeader($Page->allergies) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_doctor_notes_created_by_user_id" class="doctor_notes_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
+<?php if ($Page->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_leave_applications_status" class="leave_applications_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_doctor_notes_date_created" class="doctor_notes_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_leave_applications_date_created" class="leave_applications_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_leave_applications_date_updated" class="leave_applications_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -229,67 +209,51 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_patient_id" class="el_doctor_notes_patient_id">
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<?= $Page->patient_id->getViewValue() ?></span>
+    <?php if ($Page->user_id->Visible) { // user_id ?>
+        <td data-name="user_id"<?= $Page->user_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_user_id" class="el_leave_applications_user_id">
+<span<?= $Page->user_id->viewAttributes() ?>>
+<?= $Page->user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->chief_complaint->Visible) { // chief_complaint ?>
-        <td data-name="chief_complaint"<?= $Page->chief_complaint->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_chief_complaint" class="el_doctor_notes_chief_complaint">
-<span<?= $Page->chief_complaint->viewAttributes() ?>>
-<?= $Page->chief_complaint->getViewValue() ?></span>
+    <?php if ($Page->leave_category_id->Visible) { // leave_category_id ?>
+        <td data-name="leave_category_id"<?= $Page->leave_category_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_leave_category_id" class="el_leave_applications_leave_category_id">
+<span<?= $Page->leave_category_id->viewAttributes() ?>>
+<?= $Page->leave_category_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->history_of_presenting_illness->Visible) { // history_of_presenting_illness ?>
-        <td data-name="history_of_presenting_illness"<?= $Page->history_of_presenting_illness->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_history_of_presenting_illness" class="el_doctor_notes_history_of_presenting_illness">
-<span<?= $Page->history_of_presenting_illness->viewAttributes() ?>>
-<?= $Page->history_of_presenting_illness->getViewValue() ?></span>
+    <?php if ($Page->days_applied->Visible) { // days_applied ?>
+        <td data-name="days_applied"<?= $Page->days_applied->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_days_applied" class="el_leave_applications_days_applied">
+<span<?= $Page->days_applied->viewAttributes() ?>>
+<?= $Page->days_applied->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->past_medical_history->Visible) { // past_medical_history ?>
-        <td data-name="past_medical_history"<?= $Page->past_medical_history->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_past_medical_history" class="el_doctor_notes_past_medical_history">
-<span<?= $Page->past_medical_history->viewAttributes() ?>>
-<?= $Page->past_medical_history->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->family_history->Visible) { // family_history ?>
-        <td data-name="family_history"<?= $Page->family_history->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_family_history" class="el_doctor_notes_family_history">
-<span<?= $Page->family_history->viewAttributes() ?>>
-<?= $Page->family_history->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->allergies->Visible) { // allergies ?>
-        <td data-name="allergies"<?= $Page->allergies->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_allergies" class="el_doctor_notes_allergies">
-<span<?= $Page->allergies->viewAttributes() ?>>
-<?= $Page->allergies->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
-        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_created_by_user_id" class="el_doctor_notes_created_by_user_id">
-<span<?= $Page->created_by_user_id->viewAttributes() ?>>
-<?= $Page->created_by_user_id->getViewValue() ?></span>
+    <?php if ($Page->status->Visible) { // status ?>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_status" class="el_leave_applications_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_doctor_notes_date_created" class="el_doctor_notes_date_created">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_date_created" class="el_leave_applications_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_date_updated" class="el_leave_applications_date_updated">
+<span<?= $Page->date_updated->viewAttributes() ?>>
+<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -352,7 +316,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("doctor_notes");
+    ew.addEventHandlers("leave_applications");
 });
 </script>
 <script>

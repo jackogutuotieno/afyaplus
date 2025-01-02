@@ -188,6 +188,9 @@ return [
     "invoice_report_details" => \DI\create(InvoiceReportDetails::class),
     "ipd_patients" => \DI\create(IpdPatients::class),
     "modules" => \DI\create(Modules::class),
+    "holidays" => \DI\create(Holidays::class),
+    "leave_categories" => \DI\create(LeaveCategories::class),
+    "leave_applications" => \DI\create(LeaveApplications::class),
 
     // User table
     "usertable" => \DI\get("users"),

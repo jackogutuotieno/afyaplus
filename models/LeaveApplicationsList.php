@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class DoctorNotesList extends DoctorNotes
+class LeaveApplicationsList extends LeaveApplications
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class DoctorNotesList extends DoctorNotes
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "DoctorNotesList";
+    public $PageObjName = "LeaveApplicationsList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class DoctorNotesList extends DoctorNotes
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fdoctor_noteslist";
+    public $FormName = "fleave_applicationslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "doctornoteslist";
+    public $CurrentPageName = "leaveapplicationslist";
 
     // Page URLs
     public $AddUrl;
@@ -64,14 +64,6 @@ class DoctorNotesList extends DoctorNotes
     public $MultiEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -155,16 +147,12 @@ class DoctorNotesList extends DoctorNotes
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->patient_id->setVisibility();
-        $this->visit_id->Visible = false;
-        $this->chief_complaint->setVisibility();
-        $this->history_of_presenting_illness->setVisibility();
-        $this->past_medical_history->setVisibility();
-        $this->family_history->setVisibility();
-        $this->allergies->setVisibility();
-        $this->created_by_user_id->setVisibility();
+        $this->user_id->setVisibility();
+        $this->leave_category_id->setVisibility();
+        $this->days_applied->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->Visible = false;
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -175,8 +163,8 @@ class DoctorNotesList extends DoctorNotes
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'doctor_notes';
-        $this->TableName = 'doctor_notes';
+        $this->TableVar = 'leave_applications';
+        $this->TableName = 'leave_applications';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -196,26 +184,26 @@ class DoctorNotesList extends DoctorNotes
         // Language object
         $Language = Container("app.language");
 
-        // Table object (doctor_notes)
-        if (!isset($GLOBALS["doctor_notes"]) || $GLOBALS["doctor_notes"]::class == PROJECT_NAMESPACE . "doctor_notes") {
-            $GLOBALS["doctor_notes"] = &$this;
+        // Table object (leave_applications)
+        if (!isset($GLOBALS["leave_applications"]) || $GLOBALS["leave_applications"]::class == PROJECT_NAMESPACE . "leave_applications") {
+            $GLOBALS["leave_applications"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "doctornotesadd";
+        $this->AddUrl = "leaveapplicationsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "doctornotesdelete";
-        $this->MultiUpdateUrl = "doctornotesupdate";
+        $this->MultiDeleteUrl = "leaveapplicationsdelete";
+        $this->MultiUpdateUrl = "leaveapplicationsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'doctor_notes');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'leave_applications');
         }
 
         // Start timer
@@ -366,7 +354,7 @@ class DoctorNotesList extends DoctorNotes
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "doctornotesview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "leaveapplicationsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -473,7 +461,7 @@ class DoctorNotesList extends DoctorNotes
             $this->id->Visible = false;
         }
         if ($this->isAddOrEdit()) {
-            $this->created_by_user_id->Visible = false;
+            $this->user_id->Visible = false;
         }
     }
 
@@ -696,9 +684,6 @@ class DoctorNotesList extends DoctorNotes
 
         // Setup export options
         $this->setupExportOptions();
-
-        // Setup import options
-        $this->setupImportOptions();
         $this->setVisibility();
 
         // Set lookup cache
@@ -723,19 +708,16 @@ class DoctorNotesList extends DoctorNotes
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->created_by_user_id);
+        $this->setupLookupOptions($this->user_id);
+        $this->setupLookupOptions($this->leave_category_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fdoctor_notesgrid";
+            $this->FormName = "fleave_applicationsgrid";
         }
 
         // Set up page action
@@ -772,13 +754,6 @@ class DoctorNotesList extends DoctorNotes
         // Set up Breadcrumb
         if (!$this->isExport()) {
             $this->setupBreadcrumb();
-        }
-
-        // Process import
-        if ($this->isImport()) {
-            $this->import(Param(Config("API_FILE_TOKEN_NAME")), ConvertToBool(Param("rollback")));
-            $this->terminate();
-            return;
         }
 
         // Hide list options
@@ -873,28 +848,8 @@ class DoctorNotesList extends DoctorNotes
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $masterTbl = Container("patient_visits");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientvisitslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -949,13 +904,6 @@ class DoctorNotesList extends DoctorNotes
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
-            }
-
-            // Audit trail on search
-            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
-                $searchParm = ServerVar("QUERY_STRING");
-                $searchSql = $this->getSessionWhere();
-                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -1106,17 +1054,13 @@ class DoctorNotesList extends DoctorNotes
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fdoctor_notessrch");
+            $savedFilterList = Profile()->getSearchFilters("fleave_applicationssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
-        $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
-        $filterList = Concat($filterList, $this->chief_complaint->AdvancedSearch->toJson(), ","); // Field chief_complaint
-        $filterList = Concat($filterList, $this->history_of_presenting_illness->AdvancedSearch->toJson(), ","); // Field history_of_presenting_illness
-        $filterList = Concat($filterList, $this->past_medical_history->AdvancedSearch->toJson(), ","); // Field past_medical_history
-        $filterList = Concat($filterList, $this->family_history->AdvancedSearch->toJson(), ","); // Field family_history
-        $filterList = Concat($filterList, $this->allergies->AdvancedSearch->toJson(), ","); // Field allergies
-        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
+        $filterList = Concat($filterList, $this->user_id->AdvancedSearch->toJson(), ","); // Field user_id
+        $filterList = Concat($filterList, $this->leave_category_id->AdvancedSearch->toJson(), ","); // Field leave_category_id
+        $filterList = Concat($filterList, $this->days_applied->AdvancedSearch->toJson(), ","); // Field days_applied
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1139,7 +1083,7 @@ class DoctorNotesList extends DoctorNotes
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fdoctor_notessrch", $filters);
+            Profile()->setSearchFilters("fleave_applicationssrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1166,69 +1110,37 @@ class DoctorNotesList extends DoctorNotes
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field patient_id
-        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
-        $this->patient_id->AdvancedSearch->save();
+        // Field user_id
+        $this->user_id->AdvancedSearch->SearchValue = @$filter["x_user_id"];
+        $this->user_id->AdvancedSearch->SearchOperator = @$filter["z_user_id"];
+        $this->user_id->AdvancedSearch->SearchCondition = @$filter["v_user_id"];
+        $this->user_id->AdvancedSearch->SearchValue2 = @$filter["y_user_id"];
+        $this->user_id->AdvancedSearch->SearchOperator2 = @$filter["w_user_id"];
+        $this->user_id->AdvancedSearch->save();
 
-        // Field visit_id
-        $this->visit_id->AdvancedSearch->SearchValue = @$filter["x_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator = @$filter["z_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchCondition = @$filter["v_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchValue2 = @$filter["y_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator2 = @$filter["w_visit_id"];
-        $this->visit_id->AdvancedSearch->save();
+        // Field leave_category_id
+        $this->leave_category_id->AdvancedSearch->SearchValue = @$filter["x_leave_category_id"];
+        $this->leave_category_id->AdvancedSearch->SearchOperator = @$filter["z_leave_category_id"];
+        $this->leave_category_id->AdvancedSearch->SearchCondition = @$filter["v_leave_category_id"];
+        $this->leave_category_id->AdvancedSearch->SearchValue2 = @$filter["y_leave_category_id"];
+        $this->leave_category_id->AdvancedSearch->SearchOperator2 = @$filter["w_leave_category_id"];
+        $this->leave_category_id->AdvancedSearch->save();
 
-        // Field chief_complaint
-        $this->chief_complaint->AdvancedSearch->SearchValue = @$filter["x_chief_complaint"];
-        $this->chief_complaint->AdvancedSearch->SearchOperator = @$filter["z_chief_complaint"];
-        $this->chief_complaint->AdvancedSearch->SearchCondition = @$filter["v_chief_complaint"];
-        $this->chief_complaint->AdvancedSearch->SearchValue2 = @$filter["y_chief_complaint"];
-        $this->chief_complaint->AdvancedSearch->SearchOperator2 = @$filter["w_chief_complaint"];
-        $this->chief_complaint->AdvancedSearch->save();
+        // Field days_applied
+        $this->days_applied->AdvancedSearch->SearchValue = @$filter["x_days_applied"];
+        $this->days_applied->AdvancedSearch->SearchOperator = @$filter["z_days_applied"];
+        $this->days_applied->AdvancedSearch->SearchCondition = @$filter["v_days_applied"];
+        $this->days_applied->AdvancedSearch->SearchValue2 = @$filter["y_days_applied"];
+        $this->days_applied->AdvancedSearch->SearchOperator2 = @$filter["w_days_applied"];
+        $this->days_applied->AdvancedSearch->save();
 
-        // Field history_of_presenting_illness
-        $this->history_of_presenting_illness->AdvancedSearch->SearchValue = @$filter["x_history_of_presenting_illness"];
-        $this->history_of_presenting_illness->AdvancedSearch->SearchOperator = @$filter["z_history_of_presenting_illness"];
-        $this->history_of_presenting_illness->AdvancedSearch->SearchCondition = @$filter["v_history_of_presenting_illness"];
-        $this->history_of_presenting_illness->AdvancedSearch->SearchValue2 = @$filter["y_history_of_presenting_illness"];
-        $this->history_of_presenting_illness->AdvancedSearch->SearchOperator2 = @$filter["w_history_of_presenting_illness"];
-        $this->history_of_presenting_illness->AdvancedSearch->save();
-
-        // Field past_medical_history
-        $this->past_medical_history->AdvancedSearch->SearchValue = @$filter["x_past_medical_history"];
-        $this->past_medical_history->AdvancedSearch->SearchOperator = @$filter["z_past_medical_history"];
-        $this->past_medical_history->AdvancedSearch->SearchCondition = @$filter["v_past_medical_history"];
-        $this->past_medical_history->AdvancedSearch->SearchValue2 = @$filter["y_past_medical_history"];
-        $this->past_medical_history->AdvancedSearch->SearchOperator2 = @$filter["w_past_medical_history"];
-        $this->past_medical_history->AdvancedSearch->save();
-
-        // Field family_history
-        $this->family_history->AdvancedSearch->SearchValue = @$filter["x_family_history"];
-        $this->family_history->AdvancedSearch->SearchOperator = @$filter["z_family_history"];
-        $this->family_history->AdvancedSearch->SearchCondition = @$filter["v_family_history"];
-        $this->family_history->AdvancedSearch->SearchValue2 = @$filter["y_family_history"];
-        $this->family_history->AdvancedSearch->SearchOperator2 = @$filter["w_family_history"];
-        $this->family_history->AdvancedSearch->save();
-
-        // Field allergies
-        $this->allergies->AdvancedSearch->SearchValue = @$filter["x_allergies"];
-        $this->allergies->AdvancedSearch->SearchOperator = @$filter["z_allergies"];
-        $this->allergies->AdvancedSearch->SearchCondition = @$filter["v_allergies"];
-        $this->allergies->AdvancedSearch->SearchValue2 = @$filter["y_allergies"];
-        $this->allergies->AdvancedSearch->SearchOperator2 = @$filter["w_allergies"];
-        $this->allergies->AdvancedSearch->save();
-
-        // Field created_by_user_id
-        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
-        $this->created_by_user_id->AdvancedSearch->save();
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1284,11 +1196,7 @@ class DoctorNotesList extends DoctorNotes
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->chief_complaint;
-        $searchFlds[] = &$this->history_of_presenting_illness;
-        $searchFlds[] = &$this->past_medical_history;
-        $searchFlds[] = &$this->family_history;
-        $searchFlds[] = &$this->allergies;
+        $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1367,14 +1275,12 @@ class DoctorNotesList extends DoctorNotes
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->chief_complaint); // chief_complaint
-            $this->updateSort($this->history_of_presenting_illness); // history_of_presenting_illness
-            $this->updateSort($this->past_medical_history); // past_medical_history
-            $this->updateSort($this->family_history); // family_history
-            $this->updateSort($this->allergies); // allergies
-            $this->updateSort($this->created_by_user_id); // created_by_user_id
+            $this->updateSort($this->user_id); // user_id
+            $this->updateSort($this->leave_category_id); // leave_category_id
+            $this->updateSort($this->days_applied); // days_applied
+            $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
+            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1395,28 +1301,15 @@ class DoctorNotesList extends DoctorNotes
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->visit_id->setSessionValue("");
-                        $this->patient_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->patient_id->setSort("");
-                $this->visit_id->setSort("");
-                $this->chief_complaint->setSort("");
-                $this->history_of_presenting_illness->setSort("");
-                $this->past_medical_history->setSort("");
-                $this->family_history->setSort("");
-                $this->allergies->setSort("");
-                $this->created_by_user_id->setSort("");
+                $this->user_id->setSort("");
+                $this->leave_category_id->setSort("");
+                $this->days_applied->setSort("");
+                $this->status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1529,9 +1422,9 @@ class DoctorNotesList extends DoctorNotes
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView() && $this->showOptionLink("view")) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"leave_applications\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1542,9 +1435,9 @@ class DoctorNotesList extends DoctorNotes
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"leave_applications\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 }
@@ -1554,7 +1447,7 @@ class DoctorNotesList extends DoctorNotes
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1585,12 +1478,12 @@ class DoctorNotesList extends DoctorNotes
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fdoctor_noteslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fleave_applicationslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fdoctor_noteslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fleave_applicationslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1633,7 +1526,7 @@ class DoctorNotesList extends DoctorNotes
         $item = &$option->add("add");
         $addcaption = HtmlTitle($Language->phrase("AddLink"));
         if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"doctor_notes\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"leave_applications\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
@@ -1646,14 +1539,12 @@ class DoctorNotesList extends DoctorNotes
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "chief_complaint");
-            $this->createColumnOption($option, "history_of_presenting_illness");
-            $this->createColumnOption($option, "past_medical_history");
-            $this->createColumnOption($option, "family_history");
-            $this->createColumnOption($option, "allergies");
-            $this->createColumnOption($option, "created_by_user_id");
+            $this->createColumnOption($option, "user_id");
+            $this->createColumnOption($option, "leave_category_id");
+            $this->createColumnOption($option, "days_applied");
+            $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
+            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1678,10 +1569,10 @@ class DoctorNotesList extends DoctorNotes
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fdoctor_notessrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fleave_applicationssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fdoctor_notessrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fleave_applicationssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1741,7 +1632,7 @@ class DoctorNotesList extends DoctorNotes
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fdoctor_noteslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fleave_applicationslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1912,7 +1803,7 @@ class DoctorNotesList extends DoctorNotes
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_doctor_notes", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_leave_applications", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1973,7 +1864,7 @@ class DoctorNotesList extends DoctorNotes
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_doctor_notes",
+            "id" => "r" . $this->RowCount . "_leave_applications",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2093,14 +1984,10 @@ class DoctorNotesList extends DoctorNotes
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->visit_id->setDbValue($row['visit_id']);
-        $this->chief_complaint->setDbValue($row['chief_complaint']);
-        $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
-        $this->past_medical_history->setDbValue($row['past_medical_history']);
-        $this->family_history->setDbValue($row['family_history']);
-        $this->allergies->setDbValue($row['allergies']);
-        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
+        $this->user_id->setDbValue($row['user_id']);
+        $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->days_applied->setDbValue($row['days_applied']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2110,14 +1997,10 @@ class DoctorNotesList extends DoctorNotes
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['chief_complaint'] = $this->chief_complaint->DefaultValue;
-        $row['history_of_presenting_illness'] = $this->history_of_presenting_illness->DefaultValue;
-        $row['past_medical_history'] = $this->past_medical_history->DefaultValue;
-        $row['family_history'] = $this->family_history->DefaultValue;
-        $row['allergies'] = $this->allergies->DefaultValue;
-        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
+        $row['user_id'] = $this->user_id->DefaultValue;
+        $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
+        $row['days_applied'] = $this->days_applied->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2162,445 +2045,113 @@ class DoctorNotesList extends DoctorNotes
 
         // id
 
-        // patient_id
+        // user_id
 
-        // visit_id
-        $this->visit_id->CellCssStyle = "white-space: nowrap;";
+        // leave_category_id
 
-        // chief_complaint
+        // days_applied
 
-        // history_of_presenting_illness
-
-        // past_medical_history
-
-        // family_history
-
-        // allergies
-
-        // created_by_user_id
+        // status
 
         // date_created
 
         // date_updated
-        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $curVal = strval($this->patient_id->CurrentValue);
+            // user_id
+            $curVal = strval($this->user_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
+                if ($this->user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->user_id->ViewValue = null;
             }
 
-            // chief_complaint
-            $this->chief_complaint->ViewValue = $this->chief_complaint->CurrentValue;
-
-            // history_of_presenting_illness
-            $this->history_of_presenting_illness->ViewValue = $this->history_of_presenting_illness->CurrentValue;
-
-            // past_medical_history
-            $this->past_medical_history->ViewValue = $this->past_medical_history->CurrentValue;
-
-            // family_history
-            $this->family_history->ViewValue = $this->family_history->CurrentValue;
-
-            // allergies
-            $this->allergies->ViewValue = $this->allergies->CurrentValue;
-
-            // created_by_user_id
-            $curVal = strval($this->created_by_user_id->CurrentValue);
+            // leave_category_id
+            $curVal = strval($this->leave_category_id->CurrentValue);
             if ($curVal != "") {
-                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
-                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
+                if ($this->leave_category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->leave_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->leave_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->leave_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                        $arwrk = $this->leave_category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->leave_category_id->ViewValue = $this->leave_category_id->displayValue($arwrk);
                     } else {
-                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                        $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->CurrentValue, $this->leave_category_id->formatPattern());
                     }
                 }
             } else {
-                $this->created_by_user_id->ViewValue = null;
+                $this->leave_category_id->ViewValue = null;
             }
+
+            // days_applied
+            $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
+            $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // chief_complaint
-            $this->chief_complaint->HrefValue = "";
-            $this->chief_complaint->TooltipValue = "";
+            // user_id
+            $this->user_id->HrefValue = "";
+            $this->user_id->TooltipValue = "";
 
-            // history_of_presenting_illness
-            $this->history_of_presenting_illness->HrefValue = "";
-            $this->history_of_presenting_illness->TooltipValue = "";
+            // leave_category_id
+            $this->leave_category_id->HrefValue = "";
+            $this->leave_category_id->TooltipValue = "";
 
-            // past_medical_history
-            $this->past_medical_history->HrefValue = "";
-            $this->past_medical_history->TooltipValue = "";
+            // days_applied
+            $this->days_applied->HrefValue = "";
+            $this->days_applied->TooltipValue = "";
 
-            // family_history
-            $this->family_history->HrefValue = "";
-            $this->family_history->TooltipValue = "";
-
-            // allergies
-            $this->allergies->HrefValue = "";
-            $this->allergies->TooltipValue = "";
-
-            // created_by_user_id
-            $this->created_by_user_id->HrefValue = "";
-            $this->created_by_user_id->TooltipValue = "";
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    /**
-     * Import file
-     *
-     * @param string $filetoken File token to locate the uploaded import file
-     * @param bool $rollback Try import and then rollback
-     * @return bool
-     */
-    public function import($filetoken, $rollback = false)
-    {
-        global $Security, $Language;
-        if (!$Security->canImport()) {
-            return false; // Import not allowed
-        }
-
-        // Check if valid token
-        if (EmptyValue($filetoken)) {
-            return false;
-        }
-
-        // Get uploaded files by token
-        $files = GetUploadedFileNames($filetoken);
-        $exts = explode(",", Config("IMPORT_FILE_ALLOWED_EXTENSIONS"));
-        $result = [Config("API_FILE_TOKEN_NAME") => $filetoken, "files" => []];
-
-        // Set header
-        if (ob_get_length()) {
-            ob_clean();
-        }
-        header("Cache-Control: no-store");
-        header("Content-Type: text/event-stream");
-
-        // Import records
-        try {
-            foreach ($files as $file) {
-                $res = ["file" => basename($file)];
-                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-
-                // Ignore log file
-                if ($ext == "txt") {
-                    continue;
-                }
-
-                // Check file extension
-                if (!in_array($ext, $exts)) {
-                    $res = array_merge($res, ["error" => str_replace("%e", $ext, $Language->phrase("ImportInvalidFileExtension"))]);
-                    SendEvent($res, "error");
-                    return false;
-                }
-
-                // Set up options
-                $options = [
-                    "file" => $file,
-                    "inputEncoding" => "", // For CSV only
-                    "delimiter" => ",", // For CSV only
-                    "enclosure" => "\"", // For CSV only
-                    "escape" => "\\", // For CSV only
-                    "activeSheet" => null, // For PhpSpreadsheet only
-                    "readOnly" => true, // For PhpSpreadsheet only
-                    "maxRows" => null, // For PhpSpreadsheet only
-                    "headerRowNumber" => 0,
-                    "headers" => [],
-                    "offset" => 0,
-                    "limit" => null,
-                ];
-                foreach ($_GET as $key => $value) {
-                    if (!in_array($key, [Config("API_ACTION_NAME"), Config("API_FILE_TOKEN_NAME")])) {
-                        $options[$key] = $value;
-                    }
-                }
-
-                // Workflow builder
-                $builder = fn($workflow) => $workflow;
-
-                // Call Page Importing server event
-                if (!$this->pageImporting($builder, $options)) {
-                    SendEvent($res, "error");
-                    return false;
-                }
-
-                // Set max execution time
-                if (Config("IMPORT_MAX_EXECUTION_TIME") > 0) {
-                    ini_set("max_execution_time", Config("IMPORT_MAX_EXECUTION_TIME"));
-                }
-
-                // Reader
-                try {
-                    if ($ext == "csv") {
-                        $csv = file_get_contents($file);
-                        if ($csv !== false) {
-                            if (StartsString("\xEF\xBB\xBF", $csv)) { // UTF-8 BOM
-                                $csv = substr($csv, 3);
-                            } elseif ($options["inputEncoding"] != "" && !SameText($options["inputEncoding"], "UTF-8")) {
-                                $csv = Convert($options["inputEncoding"], "UTF-8", $csv);
-                            }
-                            file_put_contents($file, $csv);
-                        }
-                        $reader = new \Port\Csv\CsvReader(new \SplFileObject($file), $options["delimiter"], $options["enclosure"], $options["escape"]);
-                    } else {
-                        $reader = new \Port\Spreadsheet\SpreadsheetReader(new \SplFileObject($file), $options["headerRowNumber"], $options["activeSheet"], $options["readOnly"], $options["maxRows"]);
-                    }
-                    if (is_array($options["headers"]) && count($options["headers"]) > 0) {
-                        $reader->setColumnHeaders($options["headers"]);
-                    } elseif (is_int($options["headerRowNumber"])) {
-                        $reader->setHeaderRowNumber($options["headerRowNumber"]);
-                    }
-                } catch (\Exception $e) {
-                    $res = array_merge($res, ["error" => $e->getMessage()]);
-                    SendEvent($res, "error");
-                    return false;
-                }
-
-                // Column headers
-                $headers = $reader->getColumnHeaders();
-                if (count($headers) == 0) { // Missing headers
-                    $res["error"] = $Language->phrase("ImportNoHeaderRow");
-                    SendEvent($res, "error");
-                    return false;
-                }
-
-                // Counts
-                $recordCnt = $reader->count();
-                if ($options["offset"] > 0) {
-                    $recordCnt -= $options["offset"];
-                    if ($options["limit"] > 0) {
-                        $recordCnt = min($recordCnt, $options["limit"]);
-                    }
-                    if ($recordCnt < 0) {
-                        $recordCnt = 0;
-                    }
-                }
-                $cnt = 0;
-                $successCnt = 0;
-                $failCnt = 0;
-                $res = array_merge($res, ["totalCount" => $recordCnt, "count" => $cnt, "successCount" => 0, "failCount" => 0]);
-
-                // Writer
-                $writer = new \Port\Writer\CallbackWriter(function ($row) use (&$res, &$cnt, &$successCnt, &$failCnt) {
-                    try {
-                        $row = array_filter($row, fn($k) => $k !== "", ARRAY_FILTER_USE_KEY); // Remove fields without field name
-                        $success = $this->importRow($row, ++$cnt); // Import row
-                        $err = "";
-                        if ($success) {
-                            $successCnt++;
-                        } else {
-                            if (!EmptyValue($this->DbErrorMessage)) {
-                                $err = $this->DbErrorMessage;
-                                Log("import error for record " . $cnt . ": " . $err); // Log error to log file
-                            }
-                            $failCnt++;
-                        }
-                    } catch (\Port\Exception $e) { // Catch exception so the workflow continues
-                        $failCnt++;
-                        $err = $e->getMessage();
-                        Log("import error for record " . $cnt . ": " . $err); // Log error to log file
-                        if ($failCnt > $this->ImportMaxFailures) {
-                            throw $e; // Throw \Port\Exception to terminate the workflow
-                        }
-                    } finally {
-                        $res = array_merge($res, [
-                            "row" => $row, // Current row
-                            "success" => $success, // For current row
-                            "error" => $err, // For current row
-                            "count" => $cnt,
-                            "successCount" => $successCnt,
-                            "failCount" => $failCnt
-                        ]);
-                        $this->clearMessages();
-                        SendEvent($res);
-                    }
-                });
-
-                // Connection
-                $conn = $this->getConnection();
-
-                // Begin transaction
-                if ($this->ImportUseTransaction) {
-                    $conn->beginTransaction();
-                }
-
-                // Workflow
-                $workflow = new \Port\Steps\StepAggregator($reader);
-                $workflow->setLogger(Logger());
-                $workflow->setSkipItemOnFailure(false); // Stop on exception
-                $workflow = $builder($workflow);
-
-                // Filter step
-                $step = new \Port\Steps\Step\FilterStep();
-                $step->add(new \Port\Filter\OffsetFilter($options["offset"], $options["limit"]));
-                try {
-                    $info = @$workflow->addWriter($writer)->addStep($step)->process();
-                } finally {
-                    // Rollback transaction
-                    if ($this->ImportUseTransaction) {
-                        if ($rollback || $failCnt > $this->ImportMaxFailures) {
-                            if ($conn->isTransactionActive()) {
-                                try {
-                                    $conn->rollback();
-                                    $res["rollbacked"] = true;
-                                } catch (\Exception $e) {
-                                    $res["rollbacked"] = false;
-                                }
-                            }
-                        } else {
-                            if ($conn->isTransactionActive()) {
-                                $conn->commit();
-                            }
-                        }
-                    }
-                    unset($res["row"], $res["error"]); // Remove current row info
-                    $res["success"] = $cnt > 0 && $failCnt <= $this->ImportMaxFailures; // Set success status of current file
-                    SendEvent($res); // Current file imported
-                    $result["files"][] = $res;
-
-                    // Call Page Imported server event
-                    if (($res["rollbacked"] ?? false) === false) { // Not rollbacked
-                        $this->pageImported($info, $res);
-                    }
-                }
-            }
-        } finally {
-            $result["failCount"] = array_reduce($result["files"], fn($carry, $item) => $carry + $item["failCount"], 0); // For client side
-            $result["success"] = array_reduce($result["files"], fn($carry, $item) => $carry && $item["success"], true); // All files successful
-            $result["rollbacked"] = array_reduce($result["files"], fn($carry, $item) => $carry && $item["success"] && ($item["rollbacked"] ?? false), true); // All file rollbacked successfully
-            if ($result["success"] && !$result["rollbacked"]) {
-                CleanUploadTempPaths($filetoken);
-            }
-            SendEvent($result, "complete"); // All files imported
-            return $result["success"];
-        }
-    }
-
-    /**
-     * Import a row
-     *
-     * @param array $row Row to be imported
-     * @param int $cnt Index of the row (1-based)
-     * @return bool
-     */
-    protected function importRow(&$row, $cnt)
-    {
-        global $Language;
-
-        // Call Row Import server event
-        if (!$this->rowImport($row, $cnt)) {
-            return false;
-        }
-
-        // Check field names and values
-        foreach ($row as $name => $value) {
-            $fld = $this->Fields[$name];
-            if (!$fld) {
-                throw new \Port\Exception\UnexpectedValueException(str_replace("%f", $name, $Language->phrase("ImportInvalidFieldName")));
-            }
-            if (!$this->checkValue($fld, $value)) {
-                throw new \Port\Exception\UnexpectedValueException(str_replace(["%f", "%v"], [$name, $value], $Language->phrase("ImportInvalidFieldValue")));
-            }
-        }
-
-        // Insert/Update to database
-        $res = false;
-        if (!$this->ImportInsertOnly && $oldrow = $this->load($row)) {
-            if (!method_exists($this, "rowUpdating") || $this->rowUpdating($oldrow, $row)) {
-                if ($res = $this->update($row, "", $oldrow)) {
-                    if (method_exists($this, "rowUpdated")) {
-                        $this->rowUpdated($oldrow, $row);
-                    }
-                }
-            }
-        } else {
-            if (!method_exists($this, "rowInserting") || $this->rowInserting(null, $row)) {
-                if ($res = $this->insert($row)) {
-                    if (method_exists($this, "rowInserted")) {
-                        $this->rowInserted(null, $row);
-                    }
-                }
-            }
-        }
-        return $res;
-    }
-
-    /**
-     * Check field value
-     *
-     * @param object $fld Field object
-     * @param object $value
-     * @return bool
-     */
-    protected function checkValue($fld, $value)
-    {
-        if ($fld->DataType == DataType::NUMBER && !is_numeric($value)) {
-            return false;
-        } elseif ($fld->DataType == DataType::DATE && !CheckDate($value, $fld->formatPattern())) {
-            return false;
-        }
-        return true;
-    }
-
-    // Load row
-    protected function load($row)
-    {
-        $filter = $this->getRecordFilter($row);
-        if (!$filter) {
-            return null;
-        }
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        return $conn->fetchAssociative($sql);
     }
 
     // Get export HTML tag
@@ -2615,19 +2166,19 @@ class DoctorNotesList extends DoctorNotes
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fleave_applicationslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fleave_applicationslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fdoctor_noteslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fleave_applicationslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2639,7 +2190,7 @@ class DoctorNotesList extends DoctorNotes
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fdoctor_noteslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fleave_applicationslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2717,7 +2268,7 @@ class DoctorNotesList extends DoctorNotes
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fdoctor_notessrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fleave_applicationssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2763,25 +2314,6 @@ class DoctorNotesList extends DoctorNotes
         }
     }
 
-    // Set up import options
-    protected function setupImportOptions()
-    {
-        global $Security, $Language;
-
-        // Import
-        $item = &$this->ImportOptions->add("import");
-        $item->Body = "<a class=\"ew-import-link ew-import\" role=\"button\" title=\"" . $Language->phrase("Import", true) . "\" data-caption=\"" . $Language->phrase("Import", true) . "\" data-ew-action=\"import\" data-hdr=\"" . $Language->phrase("Import", true) . "\">" . $Language->phrase("Import") . "</a>";
-        $item->Visible = $Security->canImport();
-        $this->ImportOptions->UseButtonGroup = true;
-        $this->ImportOptions->UseDropDownButton = false;
-        $this->ImportOptions->DropDownButtonPhrase = $Language->phrase("Import");
-
-        // Add group option item
-        $item = &$this->ImportOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-    }
-
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
@@ -2823,23 +2355,6 @@ class DoctorNotesList extends DoctorNotes
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_visits") {
-            $patient_visits = new PatientVisitsList();
-            $rsmaster = $patient_visits->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($patient_visits);
-                    $patient_visits->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2857,125 +2372,6 @@ class DoctorNotesList extends DoctorNotes
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->created_by_user_id->CurrentValue);
-        }
-        return true;
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_visits") {
-                $validMaster = true;
-                $masterTbl = Container("patient_visits");
-                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
-                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_visits") {
-                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
-                    $this->visit_id->setSessionValue("");
-                }
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -3001,9 +2397,9 @@ class DoctorNotesList extends DoctorNotes
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
+                case "x_user_id":
                     break;
-                case "x_created_by_user_id":
+                case "x_leave_category_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -3180,7 +2576,7 @@ class DoctorNotesList extends DoctorNotes
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add notes");
+        $Language->setPhrase("addlink", "apply leave");
     }
 
     // Page Unload event
