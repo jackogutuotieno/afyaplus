@@ -1085,7 +1085,7 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","7","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","8","1900"],
     ["{32536B8D-F37B-4419-80D5-260932800712}leave_approvals","9","0"]];
 
 /**

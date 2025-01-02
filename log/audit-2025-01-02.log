@@ -145,3 +145,20 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,service_name,48,,"Test service"
 "2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,cost,48,,90
 "2025-01-02 22:49:33",/afyaplus/servicechargesadd,1,A,service_charges,id,48,,48
+"2025-01-02 22:57:09",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-02 22:57:19",/afyaplus/login,2,login,::1,,,,
+"2025-01-02 22:58:00",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-02 22:58:06",/afyaplus/login,2,login,::1,,,,
+"2025-01-02 23:00:24",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-02 23:00:41",/afyaplus/login,8,login,::1,,,,
+"2025-01-02 23:01:03",/afyaplus/logout,8,logout,::1,,,,
+"2025-01-02 23:01:13",/afyaplus/login,1,login,::1,,,,
+"2025-01-02 23:02:11",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-02 23:02:21",/afyaplus/login,2,login,::1,,,,
+"2025-01-02 23:02:56",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-02 23:04:47",/afyaplus/login,2,login,::1,,,,
+"2025-01-02 23:04:58",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-02 23:05:10",/afyaplus/login,8,login,::1,,,,
+"2025-01-02 23:05:51",/afyaplus/logout,8,logout,::1,,,,
+"2025-01-02 23:06:02",/afyaplus/login,2,login,::1,,,,
+"2025-01-02 23:06:50",/afyaplus/logout,2,logout,::1,,,,

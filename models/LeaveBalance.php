@@ -1384,7 +1384,11 @@ class LeaveBalance extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        // Enter your code here
+        // Get current user id
+        $user_id = CurrentUserID();
+        if (IsLoggedIn()) {
+            AddFilter($filter, "user_id= '" . $user_id . "'");
+        } 
     }
 
     // Recordset Selected event

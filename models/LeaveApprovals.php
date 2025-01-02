@@ -1486,11 +1486,6 @@ class LeaveApprovals extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
-        // Get current user id
-        $user_id = CurrentUserID();
-        if (IsLoggedIn()) {
-            AddFilter($filter, "user_id= '" . $user_id . "'");
-        } 
     }
 
     // Recordset Selected event
