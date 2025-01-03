@@ -1,4 +1,4 @@
-<ew-language date="2025/1/3" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/1/4" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -3058,7 +3058,7 @@
         <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="user_id">
-        <phrase id="fldcaption" value="Leave Category" />
+        <phrase id="fldcaption" value="Employee Name" />
       </field>
       <field id="leave_category_id">
         <phrase id="fldcaption" value="Leave Category" />
