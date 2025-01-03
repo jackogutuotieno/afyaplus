@@ -193,6 +193,10 @@ return [
     "leave_applications" => \DI\create(LeaveApplications::class),
     "leave_balance" => \DI\create(LeaveBalance::class),
     "leave_approvals" => \DI\create(LeaveApprovals::class),
+    "beds" => \DI\create(Beds::class),
+    "floors" => \DI\create(Floors::class),
+    "ward_type" => \DI\create(WardType::class),
+    "wards" => \DI\create(Wards::class),
 
     // User table
     "usertable" => \DI\get("users"),

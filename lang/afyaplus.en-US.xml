@@ -44,6 +44,21 @@
     <menu id="747">
       <phrase id="menutext" value="Module Manager" />
     </menu>
+    <menu id="855">
+      <phrase id="menutext" value="Operations" />
+    </menu>
+    <menu id="754">
+      <phrase id="menutext" value="Floors" />
+    </menu>
+    <menu id="755">
+      <phrase id="menutext" value="Ward Type" />
+    </menu>
+    <menu id="756">
+      <phrase id="menutext" value="Wards" />
+    </menu>
+    <menu id="753">
+      <phrase id="menutext" value="Beds" />
+    </menu>
     <menu id="108">
       <phrase id="menutext" value="Notifications" />
     </menu>
@@ -3123,6 +3138,79 @@
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="beds">
+      <phrase id="tblcaption" value="Beds" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="ward_id">
+        <phrase id="fldcaption" value="Ward" />
+      </field>
+      <field id="bed_name">
+        <phrase id="fldcaption" value="Bed Name" />
+      </field>
+      <field id="bed_charges">
+        <phrase id="fldcaption" value="Bed Charges" />
+        <phrase id="custommsg" value="Enter the daily rates (in Kshs)" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="floors">
+      <phrase id="tblcaption" value="Floors" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="floor_name">
+        <phrase id="fldcaption" value="Floor Name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="ward_type">
+      <phrase id="tblcaption" value="Ward Type" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/No" />
+      </field>
+      <field id="floor_id">
+        <phrase id="fldcaption" value="Floor" />
+      </field>
+      <field id="ward_type">
+        <phrase id="fldcaption" value="Ward Type" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="wards">
+      <phrase id="tblcaption" value="Wards" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="ward_type_id">
+        <phrase id="fldcaption" value="Ward Type" />
+      </field>
+      <field id="ward_name">
+        <phrase id="fldcaption" value="Ward Name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="date updated" />
       </field>
     </table>
   </project>

@@ -20,6 +20,11 @@ $sideMenu->addMenuItem(331, "mi_Financials_Overview", $Language->menuPhrase("331
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "fa-users", "", false, true);
 $sideMenu->addMenuItem(747, "mi_modules", $Language->menuPhrase("747", "MenuText"), "moduleslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}modules'), false, false, "fa-cog", "", false, true);
+$sideMenu->addMenuItem(855, "mci_Operations", $Language->menuPhrase("855", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
+$sideMenu->addMenuItem(754, "mi_floors", $Language->menuPhrase("754", "MenuText"), "floorslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}floors'), false, false, "fa-building", "", false, true);
+$sideMenu->addMenuItem(755, "mi_ward_type", $Language->menuPhrase("755", "MenuText"), "wardtypelist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ward_type'), false, false, "fa-building", "", false, true);
+$sideMenu->addMenuItem(756, "mi_wards", $Language->menuPhrase("756", "MenuText"), "wardslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}wards'), false, false, "fa-building", "", false, true);
+$sideMenu->addMenuItem(753, "mi_beds", $Language->menuPhrase("753", "MenuText"), "bedslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}beds'), false, false, "fa-bed", "", false, true);
 $sideMenu->addMenuItem(108, "mi_subscriptions", $Language->menuPhrase("108", "MenuText"), "subscriptionslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}subscriptions'), false, false, "fa-bell", "", false, true);
 $sideMenu->addMenuItem(51, "mci_OPD_Patients", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(48, "mi_patients", $Language->menuPhrase("48", "MenuText"), "patientslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients'), false, false, "fa-hospital-user", "", false, true);
