@@ -63,6 +63,7 @@ C:\wamp64\www\afyaplus\controllers\ModulesController.php
 C:\wamp64\www\afyaplus\controllers\Moh204aReportController.php
 C:\wamp64\www\afyaplus\controllers\Moh204bReportController.php
 C:\wamp64\www\afyaplus\controllers\OthersController.php
+C:\wamp64\www\afyaplus\controllers\PatientAdmissionsController.php
 C:\wamp64\www\afyaplus\controllers\PatientAppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\PatientQueueController.php
 C:\wamp64\www\afyaplus\controllers\PatientVaccinationsController.php
@@ -130,6 +131,7 @@ C:\wamp64\www\afyaplus\models\Beds.php
 C:\wamp64\www\afyaplus\models\BedsAdd.php
 C:\wamp64\www\afyaplus\models\BedsDelete.php
 C:\wamp64\www\afyaplus\models\BedsEdit.php
+C:\wamp64\www\afyaplus\models\BedsGrid.php
 C:\wamp64\www\afyaplus\models\BedsList.php
 C:\wamp64\www\afyaplus\models\Branding.php
 C:\wamp64\www\afyaplus\models\BrandingDelete.php
@@ -361,6 +363,13 @@ C:\wamp64\www\afyaplus\models\Moh204aReport.php
 C:\wamp64\www\afyaplus\models\Moh204aReportList.php
 C:\wamp64\www\afyaplus\models\Moh204bReport.php
 C:\wamp64\www\afyaplus\models\Moh204bReportList.php
+C:\wamp64\www\afyaplus\models\PatientAdmissions.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsAdd.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsDelete.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsEdit.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsGrid.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsList.php
+C:\wamp64\www\afyaplus\models\PatientAdmissionsView.php
 C:\wamp64\www\afyaplus\models\PatientAppointments.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsAdd.php
 C:\wamp64\www\afyaplus\models\PatientAppointmentsDelete.php
@@ -646,6 +655,7 @@ C:\wamp64\www\afyaplus\src\Entity\Module.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204AReport.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204BReport.php
 C:\wamp64\www\afyaplus\src\Entity\Patient.php
+C:\wamp64\www\afyaplus\src\Entity\PatientAdmission.php
 C:\wamp64\www\afyaplus\src\Entity\PatientAppointment.php
 C:\wamp64\www\afyaplus\src\Entity\PatientQueue.php
 C:\wamp64\www\afyaplus\src\Entity\PatientVaccination.php
@@ -779,6 +789,7 @@ C:\wamp64\www\afyaplus\views\AppointmentsView.php
 C:\wamp64\www\afyaplus\views\BedsAdd.php
 C:\wamp64\www\afyaplus\views\BedsDelete.php
 C:\wamp64\www\afyaplus\views\BedsEdit.php
+C:\wamp64\www\afyaplus\views\BedsGrid.php
 C:\wamp64\www\afyaplus\views\BedsList.php
 C:\wamp64\www\afyaplus\views\BrandingDelete.php
 C:\wamp64\www\afyaplus\views\BrandingEdit.php
@@ -875,6 +886,7 @@ C:\wamp64\www\afyaplus\views\InvoicesMaster.php
 C:\wamp64\www\afyaplus\views\InvoicesView.php
 C:\wamp64\www\afyaplus\views\IpdPatientsEdit.php
 C:\wamp64\www\afyaplus\views\IpdPatientsList.php
+C:\wamp64\www\afyaplus\views\IpdPatientsMaster.php
 C:\wamp64\www\afyaplus\views\LabTestReportsAdd.php
 C:\wamp64\www\afyaplus\views\LabTestReportsDelete.php
 C:\wamp64\www\afyaplus\views\LabTestReportsEdit.php
@@ -966,6 +978,12 @@ C:\wamp64\www\afyaplus\views\ModulesList.php
 C:\wamp64\www\afyaplus\views\ModulesView.php
 C:\wamp64\www\afyaplus\views\Moh204aReportList.php
 C:\wamp64\www\afyaplus\views\Moh204bReportList.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsAdd.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsDelete.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsEdit.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsGrid.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsList.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsView.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsAdd.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsDelete.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsEdit.php
@@ -1123,6 +1141,7 @@ C:\wamp64\www\afyaplus\views\WardsAdd.php
 C:\wamp64\www\afyaplus\views\WardsDelete.php
 C:\wamp64\www\afyaplus\views\WardsEdit.php
 C:\wamp64\www\afyaplus\views\WardsList.php
+C:\wamp64\www\afyaplus\views\WardsMaster.php
 C:\wamp64\www\afyaplus\views\WardsView.php
 C:\wamp64\www\afyaplus\views\email.php
 C:\wamp64\www\afyaplus\views\layout.php

@@ -123,6 +123,7 @@ class IpdPatients extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -358,6 +359,32 @@ class IpdPatients extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "patient_admissions") {
+            $detailUrl = Container("patient_admissions")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "ipdpatientslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -984,7 +1011,11 @@ class IpdPatients extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ipdpatientsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("ipdpatientsedit", $parm);
+        } else {
+            $url = $this->keyUrl("ipdpatientsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -998,7 +1029,11 @@ class IpdPatients extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ipdpatientsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("ipdpatientsadd", $parm);
+        } else {
+            $url = $this->keyUrl("ipdpatientsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 

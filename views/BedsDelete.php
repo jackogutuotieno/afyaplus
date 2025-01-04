@@ -59,12 +59,6 @@ $Page->showMessage();
 <?php if ($Page->bed_charges->Visible) { // bed_charges ?>
         <th class="<?= $Page->bed_charges->headerCellClass() ?>"><span id="elh_beds_bed_charges" class="beds_bed_charges"><?= $Page->bed_charges->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_beds_date_created" class="beds_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_beds_date_updated" class="beds_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -107,22 +101,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->bed_charges->viewAttributes() ?>>
 <?= $Page->bed_charges->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

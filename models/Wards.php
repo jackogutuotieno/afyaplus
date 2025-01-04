@@ -48,6 +48,7 @@ class Wards extends DbTable
 
     // Fields
     public $id;
+    public $floor_id;
     public $ward_type_id;
     public $ward_name;
     public $date_created;
@@ -73,7 +74,7 @@ class Wards extends DbTable
         // Update Table
         $this->UpdateTable = "wards";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -120,10 +121,41 @@ class Wards extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
+
+        // floor_id
+        $this->floor_id = new DbField(
+            $this, // Table
+            'x_floor_id', // Variable name
+            'floor_id', // Name
+            '`floor_id`', // Expression
+            '`floor_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`floor_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->floor_id->InputTextType = "text";
+        $this->floor_id->Raw = true;
+        $this->floor_id->Nullable = false; // NOT NULL field
+        $this->floor_id->Required = true; // Required field
+        $this->floor_id->setSelectMultiple(false); // Select one
+        $this->floor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->floor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->floor_id->Lookup = new Lookup($this->floor_id, 'floors', false, 'id', ["floor_name","","",""], '', '', [], ["x_ward_type_id"], [], [], [], [], false, '', '', "`floor_name`");
+        $this->floor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->floor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['floor_id'] = &$this->floor_id;
 
         // ward_type_id
         $this->ward_type_id = new DbField(
@@ -150,7 +182,7 @@ class Wards extends DbTable
         $this->ward_type_id->setSelectMultiple(false); // Select one
         $this->ward_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->ward_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->ward_type_id->Lookup = new Lookup($this->ward_type_id, 'ward_type', false, 'id', ["ward_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "`ward_type`");
+        $this->ward_type_id->Lookup = new Lookup($this->ward_type_id, 'ward_type', false, 'id', ["ward_type","","",""], '', '', ["x_floor_id"], [], ["floor_id"], ["x_floor_id"], [], [], false, '', '', "`ward_type`");
         $this->ward_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->ward_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['ward_type_id'] = &$this->ward_type_id;
@@ -162,8 +194,8 @@ class Wards extends DbTable
             'ward_name', // Name
             '`ward_name`', // Expression
             '`ward_name`', // Basic search expression
-            3, // Type
-            11, // Size
+            200, // Type
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
             '`ward_name`', // Virtual expression
@@ -174,11 +206,10 @@ class Wards extends DbTable
             'TEXT' // Edit Tag
         );
         $this->ward_name->InputTextType = "text";
-        $this->ward_name->Raw = true;
         $this->ward_name->Nullable = false; // NOT NULL field
         $this->ward_name->Required = true; // Required field
         $this->ward_name->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->ward_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->ward_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['ward_name'] = &$this->ward_name;
 
         // date_created
@@ -259,22 +290,6 @@ class Wards extends DbTable
         }
     }
 
-    // Single column sort
-    public function updateSort(&$fld)
-    {
-        if ($this->CurrentOrder == $fld->Name) {
-            $sortField = $fld->Expression;
-            $lastSort = $fld->getSort();
-            if (in_array($this->CurrentOrderType, ["ASC", "DESC", "NO"])) {
-                $curSort = $this->CurrentOrderType;
-            } else {
-                $curSort = $lastSort;
-            }
-            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            $this->setSessionOrderBy($orderBy); // Save to Session
-        }
-    }
-
     // Update field sort
     public function updateFieldSort()
     {
@@ -289,6 +304,32 @@ class Wards extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "beds") {
+            $detailUrl = Container("beds")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "wardslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -752,6 +793,7 @@ class Wards extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
+        $this->floor_id->DbValue = $row['floor_id'];
         $this->ward_type_id->DbValue = $row['ward_type_id'];
         $this->ward_name->DbValue = $row['ward_name'];
         $this->date_created->DbValue = $row['date_created'];
@@ -912,7 +954,11 @@ class Wards extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("wardsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("wardsedit", $parm);
+        } else {
+            $url = $this->keyUrl("wardsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -926,7 +972,11 @@ class Wards extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("wardsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("wardsadd", $parm);
+        } else {
+            $url = $this->keyUrl("wardsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -984,13 +1034,6 @@ class Wards extends DbTable
         global $Security, $Language;
         $sortUrl = "";
         $attrs = "";
-        if ($this->PageID != "grid" && $fld->Sortable) {
-            $sortUrl = $this->sortUrl($fld);
-            $attrs = ' role="button" data-ew-action="sort" data-ajax="' . ($this->UseAjaxActions ? "true" : "false") . '" data-sort-url="' . $sortUrl . '" data-sort-type="1"';
-            if ($this->ContextClass) { // Add context
-                $attrs .= ' data-context="' . HtmlEncode($this->ContextClass) . '"';
-            }
-        }
         $html = '<div class="ew-table-header-caption"' . $attrs . '>' . $fld->caption() . '</div>';
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
@@ -1013,20 +1056,7 @@ class Wards extends DbTable
     public function sortUrl($fld)
     {
         global $DashboardReport;
-        if (
-            $this->CurrentAction || $this->isExport() ||
-            in_array($fld->Type, [128, 204, 205])
-        ) { // Unsortable data type
-                return "";
-        } elseif ($fld->Sortable) {
-            $urlParm = "order=" . urlencode($fld->Name) . "&amp;ordertype=" . $fld->getNextSort();
-            if ($DashboardReport) {
-                $urlParm .= "&amp;" . Config("PAGE_DASHBOARD") . "=" . $DashboardReport;
-            }
-            return $this->addMasterUrl($this->CurrentPageName . "?" . $urlParm);
-        } else {
-            return "";
-        }
+        return "";
     }
 
     // Get record keys from Post/Get/Session
@@ -1109,6 +1139,7 @@ class Wards extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
         $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_name->setDbValue($row['ward_name']);
         $this->date_created->setDbValue($row['date_created']);
@@ -1145,6 +1176,8 @@ class Wards extends DbTable
 
         // id
 
+        // floor_id
+
         // ward_type_id
 
         // ward_name
@@ -1155,6 +1188,29 @@ class Wards extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+
+        // floor_id
+        $curVal = strval($this->floor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+            if ($this->floor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                } else {
+                    $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                }
+            }
+        } else {
+            $this->floor_id->ViewValue = null;
+        }
 
         // ward_type_id
         $curVal = strval($this->ward_type_id->CurrentValue);
@@ -1181,7 +1237,6 @@ class Wards extends DbTable
 
         // ward_name
         $this->ward_name->ViewValue = $this->ward_name->CurrentValue;
-        $this->ward_name->ViewValue = FormatNumber($this->ward_name->ViewValue, $this->ward_name->formatPattern());
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1194,6 +1249,10 @@ class Wards extends DbTable
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
+
+        // floor_id
+        $this->floor_id->HrefValue = "";
+        $this->floor_id->TooltipValue = "";
 
         // ward_type_id
         $this->ward_type_id->HrefValue = "";
@@ -1230,17 +1289,21 @@ class Wards extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
+        // floor_id
+        $this->floor_id->setupEditAttributes();
+        $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
+
         // ward_type_id
         $this->ward_type_id->setupEditAttributes();
         $this->ward_type_id->PlaceHolder = RemoveHtml($this->ward_type_id->caption());
 
         // ward_name
         $this->ward_name->setupEditAttributes();
+        if (!$this->ward_name->Raw) {
+            $this->ward_name->CurrentValue = HtmlDecode($this->ward_name->CurrentValue);
+        }
         $this->ward_name->EditValue = $this->ward_name->CurrentValue;
         $this->ward_name->PlaceHolder = RemoveHtml($this->ward_name->caption());
-        if (strval($this->ward_name->EditValue) != "" && is_numeric($this->ward_name->EditValue)) {
-            $this->ward_name->EditValue = FormatNumber($this->ward_name->EditValue, null);
-        }
 
         // date_created
         $this->date_created->setupEditAttributes();
@@ -1281,12 +1344,12 @@ class Wards extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->floor_id);
                     $doc->exportCaption($this->ward_type_id);
                     $doc->exportCaption($this->ward_name);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->floor_id);
                     $doc->exportCaption($this->ward_type_id);
                     $doc->exportCaption($this->ward_name);
                     $doc->exportCaption($this->date_created);
@@ -1318,12 +1381,12 @@ class Wards extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->floor_id);
                         $doc->exportField($this->ward_type_id);
                         $doc->exportField($this->ward_name);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->floor_id);
                         $doc->exportField($this->ward_type_id);
                         $doc->exportField($this->ward_name);
                         $doc->exportField($this->date_created);

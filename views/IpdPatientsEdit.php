@@ -110,6 +110,14 @@ loadjs.ready("head", function () {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("patient_admissions", explode(",", $Page->getCurrentDetailTable())) && $patient_admissions->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_admissions", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientAdmissionsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fipd_patientsedit"><?= $Language->phrase("SaveBtn") ?></button>

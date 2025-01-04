@@ -39,6 +39,9 @@ class LeaveApplication extends AbstractEntity
     #[Column(name: "leave_category_id", type: "integer")]
     private int $leaveCategoryId;
 
+    #[Column(name: "start_from_date", type: "date", nullable: true)]
+    private ?DateTime $startFromDate;
+
     #[Column(name: "days_applied", type: "integer")]
     private int $daysApplied;
 
@@ -86,6 +89,17 @@ class LeaveApplication extends AbstractEntity
     public function setLeaveCategoryId(int $value): static
     {
         $this->leaveCategoryId = $value;
+        return $this;
+    }
+
+    public function getStartFromDate(): ?DateTime
+    {
+        return $this->startFromDate;
+    }
+
+    public function setStartFromDate(?DateTime $value): static
+    {
+        $this->startFromDate = $value;
         return $this;
     }
 

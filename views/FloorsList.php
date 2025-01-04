@@ -166,12 +166,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->floor_name->Visible) { // floor_name ?>
         <th data-name="floor_name" class="<?= $Page->floor_name->headerCellClass() ?>"><div id="elh_floors_floor_name" class="floors_floor_name"><?= $Page->renderFieldHeader($Page->floor_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_floors_date_created" class="floors_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_floors_date_updated" class="floors_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -205,22 +199,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_floors_floor_name" class="el_floors_floor_name">
 <span<?= $Page->floor_name->viewAttributes() ?>>
 <?= $Page->floor_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_floors_date_created" class="el_floors_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_floors_date_updated" class="el_floors_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

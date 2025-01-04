@@ -62,6 +62,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+    <tr id="r_floor_id"<?= $Page->floor_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_wards_floor_id"><?= $Page->floor_id->caption() ?></span></td>
+        <td data-name="floor_id"<?= $Page->floor_id->cellAttributes() ?>>
+<span id="el_wards_floor_id">
+<span<?= $Page->floor_id->viewAttributes() ?>>
+<?= $Page->floor_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
     <tr id="r_ward_type_id"<?= $Page->ward_type_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_wards_ward_type_id"><?= $Page->ward_type_id->caption() ?></span></td>
@@ -84,29 +95,15 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_wards_date_created"><?= $Page->date_created->caption() ?></span></td>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_wards_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-    <tr id="r_date_updated"<?= $Page->date_updated->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_wards_date_updated"><?= $Page->date_updated->caption() ?></span></td>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el_wards_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
+<?php
+    if (in_array("beds", explode(",", $Page->getCurrentDetailTable())) && $beds->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("beds", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("beds")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "BedsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

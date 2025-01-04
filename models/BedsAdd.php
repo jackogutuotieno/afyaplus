@@ -560,6 +560,10 @@ class BedsAdd extends Beds
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -604,7 +608,7 @@ class BedsAdd extends Beds
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "bedslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -888,33 +892,55 @@ class BedsAdd extends Beds
         } elseif ($this->RowType == RowType::ADD) {
             // ward_id
             $this->ward_id->setupEditAttributes();
-            $curVal = trim(strval($this->ward_id->CurrentValue));
-            if ($curVal != "") {
-                $this->ward_id->ViewValue = $this->ward_id->lookupCacheOption($curVal);
-            } else {
-                $this->ward_id->ViewValue = $this->ward_id->Lookup !== null && is_array($this->ward_id->lookupOptions()) && count($this->ward_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->ward_id->ViewValue !== null) { // Load from cache
-                $this->ward_id->EditValue = array_values($this->ward_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->ward_id->getSessionValue() != "") {
+                $this->ward_id->CurrentValue = GetForeignKeyValue($this->ward_id->getSessionValue());
+                $curVal = strval($this->ward_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->ward_id->ViewValue = $this->ward_id->lookupCacheOption($curVal);
+                    if ($this->ward_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->ward_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->ward_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->ward_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->ward_id->ViewValue = $this->ward_id->displayValue($arwrk);
+                        } else {
+                            $this->ward_id->ViewValue = FormatNumber($this->ward_id->CurrentValue, $this->ward_id->formatPattern());
+                        }
+                    }
                 } else {
-                    $filterWrk = SearchFilter($this->ward_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->ward_id->CurrentValue, $this->ward_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $this->ward_id->ViewValue = null;
                 }
-                $sqlWrk = $this->ward_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                foreach ($arwrk as &$row) {
-                    $row = $this->ward_id->Lookup->renderViewRow($row);
+            } else {
+                $curVal = trim(strval($this->ward_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->ward_id->ViewValue = $this->ward_id->lookupCacheOption($curVal);
+                } else {
+                    $this->ward_id->ViewValue = $this->ward_id->Lookup !== null && is_array($this->ward_id->lookupOptions()) && count($this->ward_id->lookupOptions()) > 0 ? $curVal : null;
                 }
-                $this->ward_id->EditValue = $arwrk;
+                if ($this->ward_id->ViewValue !== null) { // Load from cache
+                    $this->ward_id->EditValue = array_values($this->ward_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->ward_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->ward_id->CurrentValue, $this->ward_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->ward_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->ward_id->EditValue = $arwrk;
+                }
+                $this->ward_id->PlaceHolder = RemoveHtml($this->ward_id->caption());
             }
-            $this->ward_id->PlaceHolder = RemoveHtml($this->ward_id->caption());
 
             // bed_name
             $this->bed_name->setupEditAttributes();
@@ -1078,6 +1104,78 @@ class BedsAdd extends Beds
         if (isset($row['bed_charges'])) { // bed_charges
             $this->bed_charges->setFormValue($row['bed_charges']);
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "wards") {
+                $validMaster = true;
+                $masterTbl = Container("wards");
+                if (($parm = Get("fk_id", Get("ward_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->ward_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->ward_id->setSessionValue($this->ward_id->QueryStringValue);
+                    $foreignKeys["ward_id"] = $this->ward_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "wards") {
+                $validMaster = true;
+                $masterTbl = Container("wards");
+                if (($parm = Post("fk_id", Post("ward_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->ward_id->FormValue = $masterTbl->id->FormValue;
+                    $this->ward_id->setSessionValue($this->ward_id->FormValue);
+                    $foreignKeys["ward_id"] = $this->ward_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "wards") {
+                if (!array_key_exists("ward_id", $foreignKeys)) { // Not current foreign key
+                    $this->ward_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

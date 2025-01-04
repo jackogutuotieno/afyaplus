@@ -1130,7 +1130,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}wards","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}wards","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}wards","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}wards","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}wards","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","9","0"]];
 
 /**
  * Tables
@@ -1242,4 +1253,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["beds","beds","Beds",true,"{32536B8D-F37B-4419-80D5-260932800712}","bedslist"],
     ["floors","floors","Floors",true,"{32536B8D-F37B-4419-80D5-260932800712}","floorslist"],
     ["ward_type","ward_type","Ward Type",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardtypelist"],
-    ["wards","wards","Wards",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardslist"]];
+    ["wards","wards","Wards",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardslist"],
+    ["patient_admissions","patient_admissions","Admissions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientadmissionslist"]];

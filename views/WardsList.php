@@ -63,16 +63,6 @@ $Page->showMessage();
 <div id="ew-list">
 <?php if ($Page->TotalRecords > 0 || $Page->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Page->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Page->TableGridClass ?>">
-<?php if (!$Page->isExport()) { ?>
-<div class="card-header ew-grid-upper-panel">
-<?php if (!$Page->isGridAdd() && !($Page->isGridEdit() && $Page->ModalGridEdit) && !$Page->isMultiEdit()) { ?>
-<?= $Page->Pager->render() ?>
-<?php } ?>
-<div class="ew-list-other-options">
-<?php $Page->OtherOptions->render("body") ?>
-</div>
-</div>
-<?php } ?>
 <form name="<?= $Page->FormName ?>" id="<?= $Page->FormName ?>" class="ew-form ew-list-form" action="<?= $Page->PageAction ?>" method="post" novalidate autocomplete="off">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
@@ -97,20 +87,14 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_wards_id" class="wards_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <th data-name="floor_id" class="<?= $Page->floor_id->headerCellClass() ?>"><div id="elh_wards_floor_id" class="wards_floor_id"><?= $Page->renderFieldHeader($Page->floor_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
         <th data-name="ward_type_id" class="<?= $Page->ward_type_id->headerCellClass() ?>"><div id="elh_wards_ward_type_id" class="wards_ward_type_id"><?= $Page->renderFieldHeader($Page->ward_type_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->ward_name->Visible) { // ward_name ?>
         <th data-name="ward_name" class="<?= $Page->ward_name->headerCellClass() ?>"><div id="elh_wards_ward_name" class="wards_ward_name"><?= $Page->renderFieldHeader($Page->ward_name) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_wards_date_created" class="wards_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_wards_date_updated" class="wards_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -140,11 +124,11 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_wards_id" class="el_wards_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
+    <?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <td data-name="floor_id"<?= $Page->floor_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_wards_floor_id" class="el_wards_floor_id">
+<span<?= $Page->floor_id->viewAttributes() ?>>
+<?= $Page->floor_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -161,22 +145,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_wards_ward_name" class="el_wards_ward_name">
 <span<?= $Page->ward_name->viewAttributes() ?>>
 <?= $Page->ward_name->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_created->Visible) { // date_created ?>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_wards_date_created" class="el_wards_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_wards_date_updated" class="el_wards_date_updated">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

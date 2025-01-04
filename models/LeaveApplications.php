@@ -50,6 +50,7 @@ class LeaveApplications extends DbTable
     public $id;
     public $user_id;
     public $leave_category_id;
+    public $start_from_date;
     public $days_applied;
     public $status;
     public $date_created;
@@ -186,6 +187,30 @@ class LeaveApplications extends DbTable
         $this->leave_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->leave_category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['leave_category_id'] = &$this->leave_category_id;
+
+        // start_from_date
+        $this->start_from_date = new DbField(
+            $this, // Table
+            'x_start_from_date', // Variable name
+            'start_from_date', // Name
+            '`start_from_date`', // Expression
+            CastDateFieldForLike("`start_from_date`", 7, "DB"), // Basic search expression
+            133, // Type
+            10, // Size
+            7, // Date/Time format
+            false, // Is upload field
+            '`start_from_date`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->start_from_date->InputTextType = "text";
+        $this->start_from_date->Raw = true;
+        $this->start_from_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
+        $this->start_from_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['start_from_date'] = &$this->start_from_date;
 
         // days_applied
         $this->days_applied = new DbField(
@@ -811,6 +836,7 @@ class LeaveApplications extends DbTable
         $this->id->DbValue = $row['id'];
         $this->user_id->DbValue = $row['user_id'];
         $this->leave_category_id->DbValue = $row['leave_category_id'];
+        $this->start_from_date->DbValue = $row['start_from_date'];
         $this->days_applied->DbValue = $row['days_applied'];
         $this->status->DbValue = $row['status'];
         $this->date_created->DbValue = $row['date_created'];
@@ -1170,6 +1196,7 @@ class LeaveApplications extends DbTable
         $this->id->setDbValue($row['id']);
         $this->user_id->setDbValue($row['user_id']);
         $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
@@ -1209,6 +1236,8 @@ class LeaveApplications extends DbTable
         // user_id
 
         // leave_category_id
+
+        // start_from_date
 
         // days_applied
 
@@ -1267,6 +1296,10 @@ class LeaveApplications extends DbTable
             $this->leave_category_id->ViewValue = null;
         }
 
+        // start_from_date
+        $this->start_from_date->ViewValue = $this->start_from_date->CurrentValue;
+        $this->start_from_date->ViewValue = FormatDateTime($this->start_from_date->ViewValue, $this->start_from_date->formatPattern());
+
         // days_applied
         $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
         $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
@@ -1293,6 +1326,10 @@ class LeaveApplications extends DbTable
         // leave_category_id
         $this->leave_category_id->HrefValue = "";
         $this->leave_category_id->TooltipValue = "";
+
+        // start_from_date
+        $this->start_from_date->HrefValue = "";
+        $this->start_from_date->TooltipValue = "";
 
         // days_applied
         $this->days_applied->HrefValue = "";
@@ -1334,6 +1371,11 @@ class LeaveApplications extends DbTable
         // leave_category_id
         $this->leave_category_id->setupEditAttributes();
         $this->leave_category_id->PlaceHolder = RemoveHtml($this->leave_category_id->caption());
+
+        // start_from_date
+        $this->start_from_date->setupEditAttributes();
+        $this->start_from_date->EditValue = FormatDateTime($this->start_from_date->CurrentValue, $this->start_from_date->formatPattern());
+        $this->start_from_date->PlaceHolder = RemoveHtml($this->start_from_date->caption());
 
         // days_applied
         $this->days_applied->setupEditAttributes();
@@ -1392,6 +1434,7 @@ class LeaveApplications extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->leave_category_id);
+                    $doc->exportCaption($this->start_from_date);
                     $doc->exportCaption($this->days_applied);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
@@ -1400,6 +1443,7 @@ class LeaveApplications extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->leave_category_id);
+                    $doc->exportCaption($this->start_from_date);
                     $doc->exportCaption($this->days_applied);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
@@ -1433,6 +1477,7 @@ class LeaveApplications extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->leave_category_id);
+                        $doc->exportField($this->start_from_date);
                         $doc->exportField($this->days_applied);
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
@@ -1441,6 +1486,7 @@ class LeaveApplications extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->leave_category_id);
+                        $doc->exportField($this->start_from_date);
                         $doc->exportField($this->days_applied);
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);

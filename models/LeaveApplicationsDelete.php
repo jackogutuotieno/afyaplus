@@ -125,6 +125,7 @@ class LeaveApplicationsDelete extends LeaveApplications
         $this->id->Visible = false;
         $this->user_id->setVisibility();
         $this->leave_category_id->setVisibility();
+        $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
@@ -606,6 +607,7 @@ class LeaveApplicationsDelete extends LeaveApplications
         $this->id->setDbValue($row['id']);
         $this->user_id->setDbValue($row['user_id']);
         $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
@@ -619,6 +621,7 @@ class LeaveApplicationsDelete extends LeaveApplications
         $row['id'] = $this->id->DefaultValue;
         $row['user_id'] = $this->user_id->DefaultValue;
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
+        $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -643,6 +646,8 @@ class LeaveApplicationsDelete extends LeaveApplications
         // user_id
 
         // leave_category_id
+
+        // start_from_date
 
         // days_applied
 
@@ -703,6 +708,10 @@ class LeaveApplicationsDelete extends LeaveApplications
                 $this->leave_category_id->ViewValue = null;
             }
 
+            // start_from_date
+            $this->start_from_date->ViewValue = $this->start_from_date->CurrentValue;
+            $this->start_from_date->ViewValue = FormatDateTime($this->start_from_date->ViewValue, $this->start_from_date->formatPattern());
+
             // days_applied
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
@@ -725,6 +734,10 @@ class LeaveApplicationsDelete extends LeaveApplications
             // leave_category_id
             $this->leave_category_id->HrefValue = "";
             $this->leave_category_id->TooltipValue = "";
+
+            // start_from_date
+            $this->start_from_date->HrefValue = "";
+            $this->start_from_date->TooltipValue = "";
 
             // days_applied
             $this->days_applied->HrefValue = "";

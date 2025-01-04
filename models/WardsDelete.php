@@ -122,11 +122,12 @@ class WardsDelete extends Wards
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
+        $this->floor_id->setVisibility();
         $this->ward_type_id->setVisibility();
         $this->ward_name->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -416,6 +417,7 @@ class WardsDelete extends Wards
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
         $this->setupLookupOptions($this->ward_type_id);
 
         // Set up Breadcrumb
@@ -601,6 +603,7 @@ class WardsDelete extends Wards
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
         $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_name->setDbValue($row['ward_name']);
         $this->date_created->setDbValue($row['date_created']);
@@ -612,6 +615,7 @@ class WardsDelete extends Wards
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
         $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_name'] = $this->ward_name->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -633,6 +637,8 @@ class WardsDelete extends Wards
 
         // id
 
+        // floor_id
+
         // ward_type_id
 
         // ward_name
@@ -645,6 +651,29 @@ class WardsDelete extends Wards
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
 
             // ward_type_id
             $curVal = strval($this->ward_type_id->CurrentValue);
@@ -671,7 +700,6 @@ class WardsDelete extends Wards
 
             // ward_name
             $this->ward_name->ViewValue = $this->ward_name->CurrentValue;
-            $this->ward_name->ViewValue = FormatNumber($this->ward_name->ViewValue, $this->ward_name->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -681,9 +709,9 @@ class WardsDelete extends Wards
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // floor_id
+            $this->floor_id->HrefValue = "";
+            $this->floor_id->TooltipValue = "";
 
             // ward_type_id
             $this->ward_type_id->HrefValue = "";
@@ -692,14 +720,6 @@ class WardsDelete extends Wards
             // ward_name
             $this->ward_name->HrefValue = "";
             $this->ward_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -831,6 +851,8 @@ class WardsDelete extends Wards
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
                 case "x_ward_type_id":
                     break;
                 default:

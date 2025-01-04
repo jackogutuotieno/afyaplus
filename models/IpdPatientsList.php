@@ -194,7 +194,7 @@ class IpdPatientsList extends IpdPatients
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "ipdpatientsadd";
+        $this->AddUrl = "ipdpatientsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -1347,6 +1347,28 @@ class IpdPatientsList extends IpdPatients
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
+        // "detail_patient_admissions"
+        $item = &$this->ListOptions->add("detail_patient_admissions");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_admissions');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("patient_admissions");
+        $this->DetailPages = $pages;
+
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -1454,6 +1476,59 @@ class IpdPatientsList extends IpdPatients
             if (count($links) > 0) {
                 $opt->Body = $body;
             }
+        }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_patient_admissions"
+        $opt = $this->ListOptions["detail_patient_admissions"];
+        if ($Security->allowList(CurrentProjectID() . 'patient_admissions')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_admissions", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientadmissionslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_patients&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientAdmissionsGrid");
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'ipd_patients')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_admissions");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "patient_admissions";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
         }
 
         // "checkbox"

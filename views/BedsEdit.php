@@ -71,6 +71,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "wards") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="wards">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->ward_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -88,6 +92,13 @@ loadjs.ready("head", function () {
     <div id="r_ward_id"<?= $Page->ward_id->rowAttributes() ?>>
         <label id="elh_beds_ward_id" for="x_ward_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->ward_id->caption() ?><?= $Page->ward_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->ward_id->cellAttributes() ?>>
+<?php if ($Page->ward_id->getSessionValue() != "") { ?>
+<span id="el_beds_ward_id">
+<span<?= $Page->ward_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->ward_id->getDisplayValue($Page->ward_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_ward_id" name="x_ward_id" value="<?= HtmlEncode($Page->ward_id->CurrentValue) ?>" data-hidden="1">
+</span>
+<?php } else { ?>
 <span id="el_beds_ward_id">
     <select
         id="x_ward_id"
@@ -127,6 +138,7 @@ loadjs.ready("fbedsedit", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

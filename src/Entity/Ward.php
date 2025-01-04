@@ -33,11 +33,14 @@ class Ward extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "floor_id", type: "integer")]
+    private int $floorId;
+
     #[Column(name: "ward_type_id", type: "integer")]
     private int $wardTypeId;
 
-    #[Column(name: "ward_name", type: "integer")]
-    private int $wardName;
+    #[Column(name: "ward_name", type: "string")]
+    private string $wardName;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -56,6 +59,17 @@ class Ward extends AbstractEntity
         return $this;
     }
 
+    public function getFloorId(): int
+    {
+        return $this->floorId;
+    }
+
+    public function setFloorId(int $value): static
+    {
+        $this->floorId = $value;
+        return $this;
+    }
+
     public function getWardTypeId(): int
     {
         return $this->wardTypeId;
@@ -67,14 +81,14 @@ class Ward extends AbstractEntity
         return $this;
     }
 
-    public function getWardName(): int
+    public function getWardName(): string
     {
-        return $this->wardName;
+        return HtmlDecode($this->wardName);
     }
 
-    public function setWardName(int $value): static
+    public function setWardName(string $value): static
     {
-        $this->wardName = $value;
+        $this->wardName = RemoveXss($value);
         return $this;
     }
 

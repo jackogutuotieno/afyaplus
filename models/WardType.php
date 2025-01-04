@@ -141,15 +141,18 @@ class WardType extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->floor_id->InputTextType = "text";
         $this->floor_id->Raw = true;
         $this->floor_id->Nullable = false; // NOT NULL field
         $this->floor_id->Required = true; // Required field
+        $this->floor_id->setSelectMultiple(false); // Select one
+        $this->floor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->floor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->floor_id->Lookup = new Lookup($this->floor_id, 'floors', false, 'id', ["floor_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`floor_name`");
         $this->floor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->floor_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->floor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['floor_id'] = &$this->floor_id;
 
         // ward_type
@@ -1152,7 +1155,6 @@ class WardType extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // floor_id
-        $this->floor_id->ViewValue = $this->floor_id->CurrentValue;
         $curVal = strval($this->floor_id->CurrentValue);
         if ($curVal != "") {
             $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
@@ -1227,7 +1229,6 @@ class WardType extends DbTable
 
         // floor_id
         $this->floor_id->setupEditAttributes();
-        $this->floor_id->EditValue = $this->floor_id->CurrentValue;
         $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
 
         // ward_type
@@ -1279,8 +1280,6 @@ class WardType extends DbTable
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->floor_id);
                     $doc->exportCaption($this->ward_type);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->floor_id);
@@ -1316,8 +1315,6 @@ class WardType extends DbTable
                         $doc->exportField($this->id);
                         $doc->exportField($this->floor_id);
                         $doc->exportField($this->ward_type);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->floor_id);

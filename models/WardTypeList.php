@@ -149,8 +149,8 @@ class WardTypeList extends WardType
         $this->id->Visible = false;
         $this->floor_id->setVisibility();
         $this->ward_type->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -1253,8 +1253,6 @@ class WardTypeList extends WardType
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->floor_id); // floor_id
             $this->updateSort($this->ward_type); // ward_type
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1513,8 +1511,6 @@ class WardTypeList extends WardType
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "floor_id");
             $this->createColumnOption($option, "ward_type");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2025,7 +2021,6 @@ class WardTypeList extends WardType
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // floor_id
-            $this->floor_id->ViewValue = $this->floor_id->CurrentValue;
             $curVal = strval($this->floor_id->CurrentValue);
             if ($curVal != "") {
                 $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
@@ -2066,14 +2061,6 @@ class WardTypeList extends WardType
             // ward_type
             $this->ward_type->HrefValue = "";
             $this->ward_type->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

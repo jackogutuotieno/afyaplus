@@ -124,8 +124,8 @@ class FloorsDelete extends Floors
     {
         $this->id->Visible = false;
         $this->floor_name->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -652,14 +652,6 @@ class FloorsDelete extends Floors
             // floor_name
             $this->floor_name->HrefValue = "";
             $this->floor_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -326,6 +326,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -1956,6 +1961,31 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -2147,6 +2177,11 @@
                 '/logout',
                 '/swagger/swagger',
                 '/[index]',
+                '/patientadmissionslist[/{id}]',
+                '/patientadmissionsadd[/{id}]',
+                '/patientadmissionsview[/{id}]',
+                '/patientadmissionsedit[/{id}]',
+                '/patientadmissionsdelete[/{id}]',
                 '/patientappointmentslist[/{id}]',
                 '/patientappointmentsadd[/{id}]',
                 '/patientappointmentsview[/{id}]',
@@ -2475,6 +2510,11 @@
                 'PHPMaker2024\\afyaplus\\OthersController:logout',
                 'PHPMaker2024\\afyaplus\\OthersController:swagger',
                 'PHPMaker2024\\afyaplus\\OthersController:index',
+                'PHPMaker2024\\afyaplus\\PatientAdmissionsController:list',
+                'PHPMaker2024\\afyaplus\\PatientAdmissionsController:add',
+                'PHPMaker2024\\afyaplus\\PatientAdmissionsController:view',
+                'PHPMaker2024\\afyaplus\\PatientAdmissionsController:edit',
+                'PHPMaker2024\\afyaplus\\PatientAdmissionsController:delete',
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:list',
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:add',
                 'PHPMaker2024\\afyaplus\\PatientAppointmentsController:view',
@@ -3590,6 +3630,21 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -3781,6 +3836,11 @@
                 'logout',
                 'swagger',
                 'index',
+                'list.patient_admissions',
+                'add.patient_admissions',
+                'view.patient_admissions',
+                'edit.patient_admissions',
+                'delete.patient_admissions',
                 'list.patient_appointments',
                 'add.patient_appointments',
                 'view.patient_appointments',
@@ -3920,6 +3980,11 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4576,6 +4641,11 @@
         $o[323],
         $o[324],
         $o[325],
+        $o[326],
+        $o[327],
+        $o[328],
+        $o[329],
+        $o[330],
     ],
     []
 );

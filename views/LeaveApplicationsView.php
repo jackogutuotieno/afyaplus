@@ -84,6 +84,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+    <tr id="r_start_from_date"<?= $Page->start_from_date->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_leave_applications_start_from_date"><?= $Page->start_from_date->caption() ?></span></td>
+        <td data-name="start_from_date"<?= $Page->start_from_date->cellAttributes() ?>>
+<span id="el_leave_applications_start_from_date">
+<span<?= $Page->start_from_date->viewAttributes() ?>>
+<?= $Page->start_from_date->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->days_applied->Visible) { // days_applied ?>
     <tr id="r_days_applied"<?= $Page->days_applied->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_leave_applications_days_applied"><?= $Page->days_applied->caption() ?></span></td>

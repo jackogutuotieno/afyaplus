@@ -125,6 +125,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $this->id->setVisibility();
         $this->user_id->setVisibility();
         $this->leave_category_id->setVisibility();
+        $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
         $this->status->Visible = false;
         $this->date_created->Visible = false;
@@ -739,6 +740,17 @@ class LeaveApplicationsEdit extends LeaveApplications
             }
         }
 
+        // Check field name 'start_from_date' first before field var 'x_start_from_date'
+        $val = $CurrentForm->hasValue("start_from_date") ? $CurrentForm->getValue("start_from_date") : $CurrentForm->getValue("x_start_from_date");
+        if (!$this->start_from_date->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->start_from_date->Visible = false; // Disable update for API request
+            } else {
+                $this->start_from_date->setFormValue($val, true, $validate);
+            }
+            $this->start_from_date->CurrentValue = UnFormatDateTime($this->start_from_date->CurrentValue, $this->start_from_date->formatPattern());
+        }
+
         // Check field name 'days_applied' first before field var 'x_days_applied'
         $val = $CurrentForm->hasValue("days_applied") ? $CurrentForm->getValue("days_applied") : $CurrentForm->getValue("x_days_applied");
         if (!$this->days_applied->IsDetailKey) {
@@ -757,6 +769,8 @@ class LeaveApplicationsEdit extends LeaveApplications
         $this->id->CurrentValue = $this->id->FormValue;
         $this->user_id->CurrentValue = $this->user_id->FormValue;
         $this->leave_category_id->CurrentValue = $this->leave_category_id->FormValue;
+        $this->start_from_date->CurrentValue = $this->start_from_date->FormValue;
+        $this->start_from_date->CurrentValue = UnFormatDateTime($this->start_from_date->CurrentValue, $this->start_from_date->formatPattern());
         $this->days_applied->CurrentValue = $this->days_applied->FormValue;
     }
 
@@ -801,6 +815,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $this->id->setDbValue($row['id']);
         $this->user_id->setDbValue($row['user_id']);
         $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
@@ -814,6 +829,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $row['id'] = $this->id->DefaultValue;
         $row['user_id'] = $this->user_id->DefaultValue;
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
+        $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -860,6 +876,9 @@ class LeaveApplicationsEdit extends LeaveApplications
 
         // leave_category_id
         $this->leave_category_id->RowCssClass = "row";
+
+        // start_from_date
+        $this->start_from_date->RowCssClass = "row";
 
         // days_applied
         $this->days_applied->RowCssClass = "row";
@@ -924,6 +943,10 @@ class LeaveApplicationsEdit extends LeaveApplications
                 $this->leave_category_id->ViewValue = null;
             }
 
+            // start_from_date
+            $this->start_from_date->ViewValue = $this->start_from_date->CurrentValue;
+            $this->start_from_date->ViewValue = FormatDateTime($this->start_from_date->ViewValue, $this->start_from_date->formatPattern());
+
             // days_applied
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
@@ -947,6 +970,9 @@ class LeaveApplicationsEdit extends LeaveApplications
 
             // leave_category_id
             $this->leave_category_id->HrefValue = "";
+
+            // start_from_date
+            $this->start_from_date->HrefValue = "";
 
             // days_applied
             $this->days_applied->HrefValue = "";
@@ -984,6 +1010,11 @@ class LeaveApplicationsEdit extends LeaveApplications
             }
             $this->leave_category_id->PlaceHolder = RemoveHtml($this->leave_category_id->caption());
 
+            // start_from_date
+            $this->start_from_date->setupEditAttributes();
+            $this->start_from_date->EditValue = HtmlEncode(FormatDateTime($this->start_from_date->CurrentValue, $this->start_from_date->formatPattern()));
+            $this->start_from_date->PlaceHolder = RemoveHtml($this->start_from_date->caption());
+
             // days_applied
             $this->days_applied->setupEditAttributes();
             $this->days_applied->EditValue = $this->days_applied->CurrentValue;
@@ -1002,6 +1033,9 @@ class LeaveApplicationsEdit extends LeaveApplications
 
             // leave_category_id
             $this->leave_category_id->HrefValue = "";
+
+            // start_from_date
+            $this->start_from_date->HrefValue = "";
 
             // days_applied
             $this->days_applied->HrefValue = "";
@@ -1040,6 +1074,14 @@ class LeaveApplicationsEdit extends LeaveApplications
                 if (!$this->leave_category_id->IsDetailKey && EmptyValue($this->leave_category_id->FormValue)) {
                     $this->leave_category_id->addErrorMessage(str_replace("%s", $this->leave_category_id->caption(), $this->leave_category_id->RequiredErrorMessage));
                 }
+            }
+            if ($this->start_from_date->Visible && $this->start_from_date->Required) {
+                if (!$this->start_from_date->IsDetailKey && EmptyValue($this->start_from_date->FormValue)) {
+                    $this->start_from_date->addErrorMessage(str_replace("%s", $this->start_from_date->caption(), $this->start_from_date->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->start_from_date->FormValue, $this->start_from_date->formatPattern())) {
+                $this->start_from_date->addErrorMessage($this->start_from_date->getErrorMessage(false));
             }
             if ($this->days_applied->Visible && $this->days_applied->Required) {
                 if (!$this->days_applied->IsDetailKey && EmptyValue($this->days_applied->FormValue)) {
@@ -1145,6 +1187,9 @@ class LeaveApplicationsEdit extends LeaveApplications
         // leave_category_id
         $this->leave_category_id->setDbValueDef($rsnew, $this->leave_category_id->CurrentValue, $this->leave_category_id->ReadOnly);
 
+        // start_from_date
+        $this->start_from_date->setDbValueDef($rsnew, UnFormatDateTime($this->start_from_date->CurrentValue, $this->start_from_date->formatPattern()), $this->start_from_date->ReadOnly);
+
         // days_applied
         $this->days_applied->setDbValueDef($rsnew, $this->days_applied->CurrentValue, $this->days_applied->ReadOnly);
         return $rsnew;
@@ -1161,6 +1206,9 @@ class LeaveApplicationsEdit extends LeaveApplications
         }
         if (isset($row['leave_category_id'])) { // leave_category_id
             $this->leave_category_id->CurrentValue = $row['leave_category_id'];
+        }
+        if (isset($row['start_from_date'])) { // start_from_date
+            $this->start_from_date->CurrentValue = $row['start_from_date'];
         }
         if (isset($row['days_applied'])) { // days_applied
             $this->days_applied->CurrentValue = $row['days_applied'];

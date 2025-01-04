@@ -123,6 +123,7 @@ class WardsAdd extends Wards
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->floor_id->setVisibility();
         $this->ward_type_id->setVisibility();
         $this->ward_name->setVisibility();
         $this->date_created->Visible = false;
@@ -521,6 +522,7 @@ class WardsAdd extends Wards
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
         $this->setupLookupOptions($this->ward_type_id);
 
         // Load default values for add
@@ -564,6 +566,9 @@ class WardsAdd extends Wards
             $this->loadFormValues(); // Load form values
         }
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -588,6 +593,9 @@ class WardsAdd extends Wards
                     $this->terminate("wardslist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -595,7 +603,11 @@ class WardsAdd extends Wards
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "wardslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "wardsview") {
@@ -628,6 +640,9 @@ class WardsAdd extends Wards
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -682,6 +697,16 @@ class WardsAdd extends Wards
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'floor_id' first before field var 'x_floor_id'
+        $val = $CurrentForm->hasValue("floor_id") ? $CurrentForm->getValue("floor_id") : $CurrentForm->getValue("x_floor_id");
+        if (!$this->floor_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->floor_id->Visible = false; // Disable update for API request
+            } else {
+                $this->floor_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'ward_type_id' first before field var 'x_ward_type_id'
         $val = $CurrentForm->hasValue("ward_type_id") ? $CurrentForm->getValue("ward_type_id") : $CurrentForm->getValue("x_ward_type_id");
         if (!$this->ward_type_id->IsDetailKey) {
@@ -710,6 +735,7 @@ class WardsAdd extends Wards
     public function restoreFormValues()
     {
         global $CurrentForm;
+        $this->floor_id->CurrentValue = $this->floor_id->FormValue;
         $this->ward_type_id->CurrentValue = $this->ward_type_id->FormValue;
         $this->ward_name->CurrentValue = $this->ward_name->FormValue;
     }
@@ -753,6 +779,7 @@ class WardsAdd extends Wards
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
         $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_name->setDbValue($row['ward_name']);
         $this->date_created->setDbValue($row['date_created']);
@@ -764,6 +791,7 @@ class WardsAdd extends Wards
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
         $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_name'] = $this->ward_name->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -805,6 +833,9 @@ class WardsAdd extends Wards
         // id
         $this->id->RowCssClass = "row";
 
+        // floor_id
+        $this->floor_id->RowCssClass = "row";
+
         // ward_type_id
         $this->ward_type_id->RowCssClass = "row";
 
@@ -821,6 +852,29 @@ class WardsAdd extends Wards
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
 
             // ward_type_id
             $curVal = strval($this->ward_type_id->CurrentValue);
@@ -847,7 +901,6 @@ class WardsAdd extends Wards
 
             // ward_name
             $this->ward_name->ViewValue = $this->ward_name->CurrentValue;
-            $this->ward_name->ViewValue = FormatNumber($this->ward_name->ViewValue, $this->ward_name->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -857,12 +910,42 @@ class WardsAdd extends Wards
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // floor_id
+            $this->floor_id->HrefValue = "";
+
             // ward_type_id
             $this->ward_type_id->HrefValue = "";
 
             // ward_name
             $this->ward_name->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // floor_id
+            $this->floor_id->setupEditAttributes();
+            $curVal = trim(strval($this->floor_id->CurrentValue));
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+            } else {
+                $this->floor_id->ViewValue = $this->floor_id->Lookup !== null && is_array($this->floor_id->lookupOptions()) && count($this->floor_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->floor_id->ViewValue !== null) { // Load from cache
+                $this->floor_id->EditValue = array_values($this->floor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->floor_id->CurrentValue, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->floor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->floor_id->EditValue = $arwrk;
+            }
+            $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
+
             // ward_type_id
             $this->ward_type_id->setupEditAttributes();
             $curVal = trim(strval($this->ward_type_id->CurrentValue));
@@ -892,13 +975,16 @@ class WardsAdd extends Wards
 
             // ward_name
             $this->ward_name->setupEditAttributes();
-            $this->ward_name->EditValue = $this->ward_name->CurrentValue;
-            $this->ward_name->PlaceHolder = RemoveHtml($this->ward_name->caption());
-            if (strval($this->ward_name->EditValue) != "" && is_numeric($this->ward_name->EditValue)) {
-                $this->ward_name->EditValue = FormatNumber($this->ward_name->EditValue, null);
+            if (!$this->ward_name->Raw) {
+                $this->ward_name->CurrentValue = HtmlDecode($this->ward_name->CurrentValue);
             }
+            $this->ward_name->EditValue = HtmlEncode($this->ward_name->CurrentValue);
+            $this->ward_name->PlaceHolder = RemoveHtml($this->ward_name->caption());
 
             // Add refer script
+
+            // floor_id
+            $this->floor_id->HrefValue = "";
 
             // ward_type_id
             $this->ward_type_id->HrefValue = "";
@@ -926,6 +1012,11 @@ class WardsAdd extends Wards
             return true;
         }
         $validateForm = true;
+            if ($this->floor_id->Visible && $this->floor_id->Required) {
+                if (!$this->floor_id->IsDetailKey && EmptyValue($this->floor_id->FormValue)) {
+                    $this->floor_id->addErrorMessage(str_replace("%s", $this->floor_id->caption(), $this->floor_id->RequiredErrorMessage));
+                }
+            }
             if ($this->ward_type_id->Visible && $this->ward_type_id->Required) {
                 if (!$this->ward_type_id->IsDetailKey && EmptyValue($this->ward_type_id->FormValue)) {
                     $this->ward_type_id->addErrorMessage(str_replace("%s", $this->ward_type_id->caption(), $this->ward_type_id->RequiredErrorMessage));
@@ -939,6 +1030,14 @@ class WardsAdd extends Wards
             if (!CheckInteger($this->ward_name->FormValue)) {
                 $this->ward_name->addErrorMessage($this->ward_name->getErrorMessage(false));
             }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("BedsGrid");
+        if (in_array("beds", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -964,6 +1063,11 @@ class WardsAdd extends Wards
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -985,6 +1089,38 @@ class WardsAdd extends Wards
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("BedsGrid");
+            if (in_array("beds", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->ward_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "beds"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->ward_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                if ($this->UseTransaction) { // Commit transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->commit();
+                    }
+                }
+            } else {
+                if ($this->UseTransaction) { // Rollback transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->rollback();
+                    }
+                }
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1010,6 +1146,9 @@ class WardsAdd extends Wards
         global $Security;
         $rsnew = [];
 
+        // floor_id
+        $this->floor_id->setDbValueDef($rsnew, $this->floor_id->CurrentValue, false);
+
         // ward_type_id
         $this->ward_type_id->setDbValueDef($rsnew, $this->ward_type_id->CurrentValue, false);
 
@@ -1024,11 +1163,48 @@ class WardsAdd extends Wards
      */
     protected function restoreAddFormFromRow($row)
     {
+        if (isset($row['floor_id'])) { // floor_id
+            $this->floor_id->setFormValue($row['floor_id']);
+        }
         if (isset($row['ward_type_id'])) { // ward_type_id
             $this->ward_type_id->setFormValue($row['ward_type_id']);
         }
         if (isset($row['ward_name'])) { // ward_name
             $this->ward_name->setFormValue($row['ward_name']);
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("beds", $detailTblVar)) {
+                $detailPageObj = Container("BedsGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->ward_id->IsDetailKey = true;
+                    $detailPageObj->ward_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->ward_id->setSessionValue($detailPageObj->ward_id->CurrentValue);
+                }
+            }
         }
     }
 
@@ -1056,6 +1232,8 @@ class WardsAdd extends Wards
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
                 case "x_ward_type_id":
                     break;
                 default:

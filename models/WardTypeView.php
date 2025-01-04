@@ -861,7 +861,6 @@ class WardTypeView extends WardType
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // floor_id
-            $this->floor_id->ViewValue = $this->floor_id->CurrentValue;
             $curVal = strval($this->floor_id->CurrentValue);
             if ($curVal != "") {
                 $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
@@ -906,14 +905,6 @@ class WardTypeView extends WardType
             // ward_type
             $this->ward_type->HrefValue = "";
             $this->ward_type->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

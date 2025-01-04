@@ -29,7 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["floor_id", [fields.floor_id.visible && fields.floor_id.required ? ew.Validators.required(fields.floor_id.caption) : null, ew.Validators.integer], fields.floor_id.isInvalid],
+            ["floor_id", [fields.floor_id.visible && fields.floor_id.required ? ew.Validators.required(fields.floor_id.caption) : null], fields.floor_id.isInvalid],
             ["ward_type", [fields.ward_type.visible && fields.ward_type.required ? ew.Validators.required(fields.ward_type.caption) : null], fields.ward_type.isInvalid]
         ])
 
@@ -85,26 +85,46 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->floor_id->Visible) { // floor_id ?>
     <div id="r_floor_id"<?= $Page->floor_id->rowAttributes() ?>>
-        <label id="elh_ward_type_floor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->floor_id->caption() ?><?= $Page->floor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_ward_type_floor_id" for="x_floor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->floor_id->caption() ?><?= $Page->floor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->floor_id->cellAttributes() ?>>
 <span id="el_ward_type_floor_id">
-<?php
-if (IsRTL()) {
-    $Page->floor_id->EditAttrs["dir"] = "rtl";
-}
-?>
-<span id="as_x_floor_id" class="ew-auto-suggest">
-    <input type="<?= $Page->floor_id->getInputTextType() ?>" class="form-control" name="sv_x_floor_id" id="sv_x_floor_id" value="<?= RemoveHtml($Page->floor_id->EditValue) ?>" autocomplete="off" size="30" placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->floor_id->formatPattern()) ?>"<?= $Page->floor_id->editAttributes() ?> aria-describedby="x_floor_id_help">
-</span>
-<selection-list hidden class="form-control" data-table="ward_type" data-field="x_floor_id" data-input="sv_x_floor_id" data-value-separator="<?= $Page->floor_id->displayValueSeparatorAttribute() ?>" name="x_floor_id" id="x_floor_id" value="<?= HtmlEncode($Page->floor_id->CurrentValue) ?>"></selection-list>
-<?= $Page->floor_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->floor_id->getErrorMessage() ?></div>
+    <select
+        id="x_floor_id"
+        name="x_floor_id"
+        class="form-select ew-select<?= $Page->floor_id->isInvalidClass() ?>"
+        <?php if (!$Page->floor_id->IsNativeSelect) { ?>
+        data-select2-id="fward_typeedit_x_floor_id"
+        <?php } ?>
+        data-table="ward_type"
+        data-field="x_floor_id"
+        data-value-separator="<?= $Page->floor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>"
+        <?= $Page->floor_id->editAttributes() ?>>
+        <?= $Page->floor_id->selectOptionListHtml("x_floor_id") ?>
+    </select>
+    <?= $Page->floor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->floor_id->getErrorMessage() ?></div>
+<?= $Page->floor_id->Lookup->getParamTag($Page, "p_x_floor_id") ?>
+<?php if (!$Page->floor_id->IsNativeSelect) { ?>
 <script>
 loadjs.ready("fward_typeedit", function() {
-    fward_typeedit.createAutoSuggest(Object.assign({"id":"x_floor_id","forceSelect":false}, { lookupAllDisplayFields: <?= $Page->floor_id->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.ward_type.fields.floor_id.autoSuggestOptions));
+    var options = { name: "x_floor_id", selectId: "fward_typeedit_x_floor_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fward_typeedit.lists.floor_id?.lookupOptions.length) {
+        options.data = { id: "x_floor_id", form: "fward_typeedit" };
+    } else {
+        options.ajax = { id: "x_floor_id", form: "fward_typeedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.ward_type.fields.floor_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
-<?= $Page->floor_id->Lookup->getParamTag($Page, "p_x_floor_id") ?>
+<?php } ?>
 </span>
 </div></div>
     </div>

@@ -146,11 +146,12 @@ class WardsList extends Wards
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
+        $this->floor_id->setVisibility();
         $this->ward_type_id->setVisibility();
         $this->ward_name->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -191,7 +192,7 @@ class WardsList extends Wards
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "wardsadd";
+        $this->AddUrl = "wardsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -545,12 +546,12 @@ class WardsList extends Wards
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
-    public $DisplayRecords = 5;
+    public $DisplayRecords = 20;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -676,9 +677,6 @@ class WardsList extends Wards
 
         // Set up list options
         $this->setupListOptions();
-
-        // Setup export options
-        $this->setupExportOptions();
         $this->setVisibility();
 
         // Set lookup cache
@@ -707,6 +705,7 @@ class WardsList extends Wards
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
         $this->setupLookupOptions($this->ward_type_id);
 
         // Update form name to avoid conflict
@@ -780,7 +779,7 @@ class WardsList extends Wards
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 5; // Load default
+            $this->DisplayRecords = 20; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -944,7 +943,7 @@ class WardsList extends Wards
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 5; // Non-numeric, load default
+                    $this->DisplayRecords = 20; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1000,11 +999,6 @@ class WardsList extends Wards
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->ward_type_id); // ward_type_id
-            $this->updateSort($this->ward_name); // ward_name
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1024,11 +1018,6 @@ class WardsList extends Wards
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->id->setSort("");
-                $this->ward_type_id->setSort("");
-                $this->ward_name->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
             }
 
             // Reset start position
@@ -1060,17 +1049,33 @@ class WardsList extends Wards
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "detail_beds"
+        $item = &$this->ListOptions->add("detail_beds");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'beds');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("beds");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1091,10 +1096,18 @@ class WardsList extends Wards
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
-        $this->ListOptions->UseDropDownButton = true;
+        $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
-        $this->ListOptions->UseButtonGroup = true;
+        $this->ListOptions->UseButtonGroup = false;
         if ($this->ListOptions->UseButtonGroup && IsMobile()) {
             $this->ListOptions->UseDropDownButton = true;
         }
@@ -1128,6 +1141,10 @@ class WardsList extends Wards
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1151,19 +1168,6 @@ class WardsList extends Wards
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"wards\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"wards\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1222,6 +1226,76 @@ class WardsList extends Wards
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_beds"
+        $opt = $this->ListOptions["detail_beds"];
+        if ($Security->allowList(CurrentProjectID() . 'beds')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("beds", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("beds");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("beds")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("bedslist?" . Config("TABLE_SHOW_MASTER") . "=wards&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("BedsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'wards')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=beds");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "beds";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'wards')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=beds");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "beds";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1255,6 +1329,37 @@ class WardsList extends Wards
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $item = &$option->add("detailadd_beds");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=beds");
+        $detailPage = Container("BedsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'wards') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "beds";
+        }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1263,11 +1368,9 @@ class WardsList extends Wards
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "floor_id");
             $this->createColumnOption($option, "ward_type_id");
             $this->createColumnOption($option, "ward_name");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1697,6 +1800,7 @@ class WardsList extends Wards
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
         $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_name->setDbValue($row['ward_name']);
         $this->date_created->setDbValue($row['date_created']);
@@ -1708,6 +1812,7 @@ class WardsList extends Wards
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
         $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_name'] = $this->ward_name->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -1754,6 +1859,8 @@ class WardsList extends Wards
 
         // id
 
+        // floor_id
+
         // ward_type_id
 
         // ward_name
@@ -1766,6 +1873,29 @@ class WardsList extends Wards
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
 
             // ward_type_id
             $curVal = strval($this->ward_type_id->CurrentValue);
@@ -1792,7 +1922,6 @@ class WardsList extends Wards
 
             // ward_name
             $this->ward_name->ViewValue = $this->ward_name->CurrentValue;
-            $this->ward_name->ViewValue = FormatNumber($this->ward_name->ViewValue, $this->ward_name->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1802,9 +1931,9 @@ class WardsList extends Wards
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // floor_id
+            $this->floor_id->HrefValue = "";
+            $this->floor_id->TooltipValue = "";
 
             // ward_type_id
             $this->ward_type_id->HrefValue = "";
@@ -1813,123 +1942,11 @@ class WardsList extends Wards
             // ward_name
             $this->ward_name->HrefValue = "";
             $this->ward_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
-        }
-    }
-
-    // Get export HTML tag
-    protected function getExportTag($type, $custom = false)
-    {
-        global $Language;
-        if ($type == "print" || $custom) { // Printer friendly / custom export
-            $pageUrl = $this->pageUrl(false);
-            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
-        } else { // Export API URL
-            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
-        }
-        if (SameText($type, "excel")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fwardslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
-            }
-        } elseif (SameText($type, "word")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fwardslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
-            }
-        } elseif (SameText($type, "pdf")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fwardslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
-            }
-        } elseif (SameText($type, "html")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
-        } elseif (SameText($type, "xml")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
-        } elseif (SameText($type, "csv")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
-        } elseif (SameText($type, "email")) {
-            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fwardslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
-        } elseif (SameText($type, "print")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
-        }
-    }
-
-    // Set up export options
-    protected function setupExportOptions()
-    {
-        global $Language, $Security;
-
-        // Printer friendly
-        $item = &$this->ExportOptions->add("print");
-        $item->Body = $this->getExportTag("print");
-        $item->Visible = true;
-
-        // Export to Excel
-        $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
-        $item->Visible = true;
-
-        // Export to Word
-        $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
-        $item->Visible = true;
-
-        // Export to HTML
-        $item = &$this->ExportOptions->add("html");
-        $item->Body = $this->getExportTag("html");
-        $item->Visible = false;
-
-        // Export to XML
-        $item = &$this->ExportOptions->add("xml");
-        $item->Body = $this->getExportTag("xml");
-        $item->Visible = false;
-
-        // Export to CSV
-        $item = &$this->ExportOptions->add("csv");
-        $item->Body = $this->getExportTag("csv");
-        $item->Visible = true;
-
-        // Export to PDF
-        $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
-        $item->Visible = false;
-
-        // Export to Email
-        $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
-        $item->Visible = true;
-
-        // Drop down button for export
-        $this->ExportOptions->UseButtonGroup = true;
-        $this->ExportOptions->UseDropDownButton = false;
-        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
-            $this->ExportOptions->UseDropDownButton = true;
-        }
-        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
-
-        // Add group option item
-        $item = &$this->ExportOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        if (!$Security->canExport()) { // Export not allowed
-            $this->ExportOptions->hideAllOptions();
         }
     }
 
@@ -1974,66 +1991,6 @@ class WardsList extends Wards
         }
     }
 
-    /**
-    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
-    *
-    * @param bool $return Return the data rather than output it
-    * @return mixed
-    */
-    public function exportData($doc)
-    {
-        global $Language;
-        $rs = null;
-        $this->TotalRecords = $this->listRecordCount();
-
-        // Export all
-        if ($this->ExportAll) {
-            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
-                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
-            }
-            $this->DisplayRecords = $this->TotalRecords;
-            $this->StopRecord = $this->TotalRecords;
-        } else { // Export one page only
-            $this->setupStartRecord(); // Set up start record position
-            // Set the last record to display
-            if ($this->DisplayRecords <= 0) {
-                $this->StopRecord = $this->TotalRecords;
-            } else {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
-            }
-        }
-        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
-        if (!$rs || !$doc) {
-            RemoveHeader("Content-Type"); // Remove header
-            RemoveHeader("Content-Disposition");
-            $this->showMessage();
-            return;
-        }
-        $this->StartRecord = 1;
-        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
-
-        // Call Page Exporting server event
-        $doc->ExportCustom = !$this->pageExporting($doc);
-
-        // Page header
-        $header = $this->PageHeader;
-        $this->pageDataRendering($header);
-        $doc->Text .= $header;
-        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
-        $rs->free();
-
-        // Page footer
-        $footer = $this->PageFooter;
-        $this->pageDataRendered($footer);
-        $doc->Text .= $footer;
-
-        // Export header and footer
-        $doc->exportHeaderAndFooter();
-
-        // Call Page Exported server event
-        $this->pageExported($doc);
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2057,6 +2014,8 @@ class WardsList extends Wards
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
                 case "x_ward_type_id":
                     break;
                 default:

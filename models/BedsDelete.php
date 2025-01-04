@@ -126,8 +126,8 @@ class BedsDelete extends Beds
         $this->ward_id->setVisibility();
         $this->bed_name->setVisibility();
         $this->bed_charges->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -419,6 +419,9 @@ class BedsDelete extends Beds
         // Set up lookup cache
         $this->setupLookupOptions($this->ward_id);
 
+        // Set up master/detail parameters
+        $this->setupMasterParms();
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -700,14 +703,6 @@ class BedsDelete extends Beds
             // bed_charges
             $this->bed_charges->HrefValue = "";
             $this->bed_charges->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -813,6 +808,79 @@ class BedsDelete extends Beds
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "wards") {
+                $validMaster = true;
+                $masterTbl = Container("wards");
+                if (($parm = Get("fk_id", Get("ward_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->ward_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->ward_id->setSessionValue($this->ward_id->QueryStringValue);
+                    $foreignKeys["ward_id"] = $this->ward_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "wards") {
+                $validMaster = true;
+                $masterTbl = Container("wards");
+                if (($parm = Post("fk_id", Post("ward_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->ward_id->FormValue = $masterTbl->id->FormValue;
+                    $this->ward_id->setSessionValue($this->ward_id->FormValue);
+                    $foreignKeys["ward_id"] = $this->ward_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "wards") {
+                if (!array_key_exists("ward_id", $foreignKeys)) { // Not current foreign key
+                    $this->ward_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

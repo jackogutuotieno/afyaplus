@@ -31,6 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["user_id", [fields.user_id.visible && fields.user_id.required ? ew.Validators.required(fields.user_id.caption) : null], fields.user_id.isInvalid],
             ["leave_category_id", [fields.leave_category_id.visible && fields.leave_category_id.required ? ew.Validators.required(fields.leave_category_id.caption) : null], fields.leave_category_id.isInvalid],
+            ["start_from_date", [fields.start_from_date.visible && fields.start_from_date.required ? ew.Validators.required(fields.start_from_date.caption) : null, ew.Validators.datetime(fields.start_from_date.clientFormatPattern)], fields.start_from_date.isInvalid],
             ["days_applied", [fields.days_applied.visible && fields.days_applied.required ? ew.Validators.required(fields.days_applied.caption) : null, ew.Validators.integer], fields.days_applied.isInvalid]
         ])
 
@@ -124,6 +125,47 @@ loadjs.ready("fleave_applicationsedit", function() {
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.leave_applications.fields.leave_category_id.selectOptions);
     ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+    <div id="r_start_from_date"<?= $Page->start_from_date->rowAttributes() ?>>
+        <label id="elh_leave_applications_start_from_date" for="x_start_from_date" class="<?= $Page->LeftColumnClass ?>"><?= $Page->start_from_date->caption() ?><?= $Page->start_from_date->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->start_from_date->cellAttributes() ?>>
+<span id="el_leave_applications_start_from_date">
+<input type="<?= $Page->start_from_date->getInputTextType() ?>" name="x_start_from_date" id="x_start_from_date" data-table="leave_applications" data-field="x_start_from_date" value="<?= $Page->start_from_date->EditValue ?>" placeholder="<?= HtmlEncode($Page->start_from_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->start_from_date->formatPattern()) ?>"<?= $Page->start_from_date->editAttributes() ?> aria-describedby="x_start_from_date_help">
+<?= $Page->start_from_date->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->start_from_date->getErrorMessage() ?></div>
+<?php if (!$Page->start_from_date->ReadOnly && !$Page->start_from_date->Disabled && !isset($Page->start_from_date->EditAttrs["readonly"]) && !isset($Page->start_from_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fleave_applicationsedit", "datetimepicker"], function () {
+    let format = "<?= DateFormat(7) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fleave_applicationsedit", "x_start_from_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
 });
 </script>
 <?php } ?>

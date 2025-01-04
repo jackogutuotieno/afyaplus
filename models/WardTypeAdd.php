@@ -688,7 +688,7 @@ class WardTypeAdd extends WardType
             if (IsApi() && $val === null) {
                 $this->floor_id->Visible = false; // Disable update for API request
             } else {
-                $this->floor_id->setFormValue($val, true, $validate);
+                $this->floor_id->setFormValue($val);
             }
         }
 
@@ -823,7 +823,6 @@ class WardTypeAdd extends WardType
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // floor_id
-            $this->floor_id->ViewValue = $this->floor_id->CurrentValue;
             $curVal = strval($this->floor_id->CurrentValue);
             if ($curVal != "") {
                 $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
@@ -865,27 +864,28 @@ class WardTypeAdd extends WardType
         } elseif ($this->RowType == RowType::ADD) {
             // floor_id
             $this->floor_id->setupEditAttributes();
-            $this->floor_id->EditValue = $this->floor_id->CurrentValue;
-            $curVal = strval($this->floor_id->CurrentValue);
+            $curVal = trim(strval($this->floor_id->CurrentValue));
             if ($curVal != "") {
-                $this->floor_id->EditValue = $this->floor_id->lookupCacheOption($curVal);
-                if ($this->floor_id->EditValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->floor_id->EditValue = $this->floor_id->displayValue($arwrk);
-                    } else {
-                        $this->floor_id->EditValue = HtmlEncode(FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern()));
-                    }
-                }
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
             } else {
-                $this->floor_id->EditValue = null;
+                $this->floor_id->ViewValue = $this->floor_id->Lookup !== null && is_array($this->floor_id->lookupOptions()) && count($this->floor_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->floor_id->ViewValue !== null) { // Load from cache
+                $this->floor_id->EditValue = array_values($this->floor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->floor_id->CurrentValue, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->floor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->floor_id->EditValue = $arwrk;
             }
             $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
 
@@ -929,9 +929,6 @@ class WardTypeAdd extends WardType
                 if (!$this->floor_id->IsDetailKey && EmptyValue($this->floor_id->FormValue)) {
                     $this->floor_id->addErrorMessage(str_replace("%s", $this->floor_id->caption(), $this->floor_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->floor_id->FormValue)) {
-                $this->floor_id->addErrorMessage($this->floor_id->getErrorMessage(false));
             }
             if ($this->ward_type->Visible && $this->ward_type->Required) {
                 if (!$this->ward_type->IsDetailKey && EmptyValue($this->ward_type->FormValue)) {

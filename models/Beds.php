@@ -89,9 +89,9 @@ class Beds extends DbTable
         $this->ExportWordPageOrientation = ""; // Page orientation (PHPWord only)
         $this->ExportWordPageSize = ""; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailAdd = true; // Allow detail add
+        $this->DetailEdit = true; // Allow detail edit
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -146,6 +146,7 @@ class Beds extends DbTable
         );
         $this->ward_id->InputTextType = "text";
         $this->ward_id->Raw = true;
+        $this->ward_id->IsForeignKey = true; // Foreign key field
         $this->ward_id->Nullable = false; // NOT NULL field
         $this->ward_id->Required = true; // Required field
         $this->ward_id->setSelectMultiple(false); // Select one
@@ -315,6 +316,88 @@ class Beds extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "wards") {
+            $masterTable = Container("wards");
+            if ($this->ward_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->ward_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "wards") {
+            $masterTable = Container("wards");
+            if ($this->ward_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->ward_id, $this->ward_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "wards":
+                $key = $keys["ward_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["ward_id"], $this->ward_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "wards":
+                return GetKeyFilter($this->ward_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -977,6 +1060,10 @@ class Beds extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "wards" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->ward_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1269,7 +1356,32 @@ class Beds extends DbTable
 
         // ward_id
         $this->ward_id->setupEditAttributes();
-        $this->ward_id->PlaceHolder = RemoveHtml($this->ward_id->caption());
+        if ($this->ward_id->getSessionValue() != "") {
+            $this->ward_id->CurrentValue = GetForeignKeyValue($this->ward_id->getSessionValue());
+            $curVal = strval($this->ward_id->CurrentValue);
+            if ($curVal != "") {
+                $this->ward_id->ViewValue = $this->ward_id->lookupCacheOption($curVal);
+                if ($this->ward_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->ward_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->ward_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->ward_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->ward_id->ViewValue = $this->ward_id->displayValue($arwrk);
+                    } else {
+                        $this->ward_id->ViewValue = FormatNumber($this->ward_id->CurrentValue, $this->ward_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->ward_id->ViewValue = null;
+            }
+        } else {
+            $this->ward_id->PlaceHolder = RemoveHtml($this->ward_id->caption());
+        }
 
         // bed_name
         $this->bed_name->setupEditAttributes();

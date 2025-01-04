@@ -169,6 +169,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->leave_category_id->Visible) { // leave_category_id ?>
         <th data-name="leave_category_id" class="<?= $Page->leave_category_id->headerCellClass() ?>"><div id="elh_leave_applications_leave_category_id" class="leave_applications_leave_category_id"><?= $Page->renderFieldHeader($Page->leave_category_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+        <th data-name="start_from_date" class="<?= $Page->start_from_date->headerCellClass() ?>"><div id="elh_leave_applications_start_from_date" class="leave_applications_start_from_date"><?= $Page->renderFieldHeader($Page->start_from_date) ?></div></th>
+<?php } ?>
 <?php if ($Page->days_applied->Visible) { // days_applied ?>
         <th data-name="days_applied" class="<?= $Page->days_applied->headerCellClass() ?>"><div id="elh_leave_applications_days_applied" class="leave_applications_days_applied"><?= $Page->renderFieldHeader($Page->days_applied) ?></div></th>
 <?php } ?>
@@ -222,6 +225,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_leave_category_id" class="el_leave_applications_leave_category_id">
 <span<?= $Page->leave_category_id->viewAttributes() ?>>
 <?= $Page->leave_category_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+        <td data-name="start_from_date"<?= $Page->start_from_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_start_from_date" class="el_leave_applications_start_from_date">
+<span<?= $Page->start_from_date->viewAttributes() ?>>
+<?= $Page->start_from_date->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

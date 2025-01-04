@@ -149,6 +149,7 @@ class LeaveApplicationsList extends LeaveApplications
         $this->id->Visible = false;
         $this->user_id->setVisibility();
         $this->leave_category_id->setVisibility();
+        $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
@@ -1059,6 +1060,7 @@ class LeaveApplicationsList extends LeaveApplications
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->user_id->AdvancedSearch->toJson(), ","); // Field user_id
         $filterList = Concat($filterList, $this->leave_category_id->AdvancedSearch->toJson(), ","); // Field leave_category_id
+        $filterList = Concat($filterList, $this->start_from_date->AdvancedSearch->toJson(), ","); // Field start_from_date
         $filterList = Concat($filterList, $this->days_applied->AdvancedSearch->toJson(), ","); // Field days_applied
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
@@ -1125,6 +1127,14 @@ class LeaveApplicationsList extends LeaveApplications
         $this->leave_category_id->AdvancedSearch->SearchValue2 = @$filter["y_leave_category_id"];
         $this->leave_category_id->AdvancedSearch->SearchOperator2 = @$filter["w_leave_category_id"];
         $this->leave_category_id->AdvancedSearch->save();
+
+        // Field start_from_date
+        $this->start_from_date->AdvancedSearch->SearchValue = @$filter["x_start_from_date"];
+        $this->start_from_date->AdvancedSearch->SearchOperator = @$filter["z_start_from_date"];
+        $this->start_from_date->AdvancedSearch->SearchCondition = @$filter["v_start_from_date"];
+        $this->start_from_date->AdvancedSearch->SearchValue2 = @$filter["y_start_from_date"];
+        $this->start_from_date->AdvancedSearch->SearchOperator2 = @$filter["w_start_from_date"];
+        $this->start_from_date->AdvancedSearch->save();
 
         // Field days_applied
         $this->days_applied->AdvancedSearch->SearchValue = @$filter["x_days_applied"];
@@ -1277,6 +1287,7 @@ class LeaveApplicationsList extends LeaveApplications
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->user_id); // user_id
             $this->updateSort($this->leave_category_id); // leave_category_id
+            $this->updateSort($this->start_from_date); // start_from_date
             $this->updateSort($this->days_applied); // days_applied
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
@@ -1308,6 +1319,7 @@ class LeaveApplicationsList extends LeaveApplications
                 $this->id->setSort("");
                 $this->user_id->setSort("");
                 $this->leave_category_id->setSort("");
+                $this->start_from_date->setSort("");
                 $this->days_applied->setSort("");
                 $this->status->setSort("");
                 $this->date_created->setSort("");
@@ -1541,6 +1553,7 @@ class LeaveApplicationsList extends LeaveApplications
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "user_id");
             $this->createColumnOption($option, "leave_category_id");
+            $this->createColumnOption($option, "start_from_date");
             $this->createColumnOption($option, "days_applied");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
@@ -1986,6 +1999,7 @@ class LeaveApplicationsList extends LeaveApplications
         $this->id->setDbValue($row['id']);
         $this->user_id->setDbValue($row['user_id']);
         $this->leave_category_id->setDbValue($row['leave_category_id']);
+        $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
@@ -1999,6 +2013,7 @@ class LeaveApplicationsList extends LeaveApplications
         $row['id'] = $this->id->DefaultValue;
         $row['user_id'] = $this->user_id->DefaultValue;
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
+        $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
@@ -2048,6 +2063,8 @@ class LeaveApplicationsList extends LeaveApplications
         // user_id
 
         // leave_category_id
+
+        // start_from_date
 
         // days_applied
 
@@ -2108,6 +2125,10 @@ class LeaveApplicationsList extends LeaveApplications
                 $this->leave_category_id->ViewValue = null;
             }
 
+            // start_from_date
+            $this->start_from_date->ViewValue = $this->start_from_date->CurrentValue;
+            $this->start_from_date->ViewValue = FormatDateTime($this->start_from_date->ViewValue, $this->start_from_date->formatPattern());
+
             // days_applied
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
@@ -2130,6 +2151,10 @@ class LeaveApplicationsList extends LeaveApplications
             // leave_category_id
             $this->leave_category_id->HrefValue = "";
             $this->leave_category_id->TooltipValue = "";
+
+            // start_from_date
+            $this->start_from_date->HrefValue = "";
+            $this->start_from_date->TooltipValue = "";
 
             // days_applied
             $this->days_applied->HrefValue = "";

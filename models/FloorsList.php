@@ -148,8 +148,8 @@ class FloorsList extends Floors
     {
         $this->id->Visible = false;
         $this->floor_name->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -1239,8 +1239,6 @@ class FloorsList extends Floors
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->floor_name); // floor_name
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1478,8 +1476,6 @@ class FloorsList extends Floors
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "floor_name");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1999,14 +1995,6 @@ class FloorsList extends Floors
             // floor_name
             $this->floor_name->HrefValue = "";
             $this->floor_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

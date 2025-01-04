@@ -50,20 +50,14 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_wards_id" class="wards_id"><?= $Page->id->caption() ?></span></th>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <th class="<?= $Page->floor_id->headerCellClass() ?>"><span id="elh_wards_floor_id" class="wards_floor_id"><?= $Page->floor_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
         <th class="<?= $Page->ward_type_id->headerCellClass() ?>"><span id="elh_wards_ward_type_id" class="wards_ward_type_id"><?= $Page->ward_type_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->ward_name->Visible) { // ward_name ?>
         <th class="<?= $Page->ward_name->headerCellClass() ?>"><span id="elh_wards_ward_name" class="wards_ward_name"><?= $Page->ward_name->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_wards_date_created" class="wards_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_wards_date_updated" class="wards_date_updated"><?= $Page->date_updated->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -86,11 +80,11 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <td<?= $Page->floor_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
+<span<?= $Page->floor_id->viewAttributes() ?>>
+<?= $Page->floor_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -107,22 +101,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->ward_name->viewAttributes() ?>>
 <?= $Page->ward_name->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

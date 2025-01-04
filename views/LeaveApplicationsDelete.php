@@ -56,6 +56,9 @@ $Page->showMessage();
 <?php if ($Page->leave_category_id->Visible) { // leave_category_id ?>
         <th class="<?= $Page->leave_category_id->headerCellClass() ?>"><span id="elh_leave_applications_leave_category_id" class="leave_applications_leave_category_id"><?= $Page->leave_category_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+        <th class="<?= $Page->start_from_date->headerCellClass() ?>"><span id="elh_leave_applications_start_from_date" class="leave_applications_start_from_date"><?= $Page->start_from_date->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->days_applied->Visible) { // days_applied ?>
         <th class="<?= $Page->days_applied->headerCellClass() ?>"><span id="elh_leave_applications_days_applied" class="leave_applications_days_applied"><?= $Page->days_applied->caption() ?></span></th>
 <?php } ?>
@@ -102,6 +105,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->leave_category_id->viewAttributes() ?>>
 <?= $Page->leave_category_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->start_from_date->Visible) { // start_from_date ?>
+        <td<?= $Page->start_from_date->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->start_from_date->viewAttributes() ?>>
+<?= $Page->start_from_date->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

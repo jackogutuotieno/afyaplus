@@ -53,12 +53,6 @@ $Page->showMessage();
 <?php if ($Page->floor_name->Visible) { // floor_name ?>
         <th class="<?= $Page->floor_name->headerCellClass() ?>"><span id="elh_floors_floor_name" class="floors_floor_name"><?= $Page->floor_name->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_floors_date_created" class="floors_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_floors_date_updated" class="floors_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -85,22 +79,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->floor_name->viewAttributes() ?>>
 <?= $Page->floor_name->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -29,6 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["floor_id", [fields.floor_id.visible && fields.floor_id.required ? ew.Validators.required(fields.floor_id.caption) : null], fields.floor_id.isInvalid],
             ["ward_type_id", [fields.ward_type_id.visible && fields.ward_type_id.required ? ew.Validators.required(fields.ward_type_id.caption) : null], fields.ward_type_id.isInvalid],
             ["ward_name", [fields.ward_name.visible && fields.ward_name.required ? ew.Validators.required(fields.ward_name.caption) : null, ew.Validators.integer], fields.ward_name.isInvalid]
         ])
@@ -46,6 +47,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "floor_id": <?= $Page->floor_id->toClientList($Page) ?>,
             "ward_type_id": <?= $Page->ward_type_id->toClientList($Page) ?>,
         })
         .build();
@@ -79,6 +81,53 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="wards" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+    <div id="r_floor_id"<?= $Page->floor_id->rowAttributes() ?>>
+        <label id="elh_wards_floor_id" for="x_floor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->floor_id->caption() ?><?= $Page->floor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->floor_id->cellAttributes() ?>>
+<span id="el_wards_floor_id">
+    <select
+        id="x_floor_id"
+        name="x_floor_id"
+        class="form-select ew-select<?= $Page->floor_id->isInvalidClass() ?>"
+        <?php if (!$Page->floor_id->IsNativeSelect) { ?>
+        data-select2-id="fwardsedit_x_floor_id"
+        <?php } ?>
+        data-table="wards"
+        data-field="x_floor_id"
+        data-value-separator="<?= $Page->floor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Page->floor_id->editAttributes() ?>>
+        <?= $Page->floor_id->selectOptionListHtml("x_floor_id") ?>
+    </select>
+    <?= $Page->floor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->floor_id->getErrorMessage() ?></div>
+<?= $Page->floor_id->Lookup->getParamTag($Page, "p_x_floor_id") ?>
+<?php if (!$Page->floor_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fwardsedit", function() {
+    var options = { name: "x_floor_id", selectId: "fwardsedit_x_floor_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fwardsedit.lists.floor_id?.lookupOptions.length) {
+        options.data = { id: "x_floor_id", form: "fwardsedit" };
+    } else {
+        options.ajax = { id: "x_floor_id", form: "fwardsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.wards.fields.floor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -134,7 +183,7 @@ loadjs.ready("fwardsedit", function() {
         <label id="elh_wards_ward_name" for="x_ward_name" class="<?= $Page->LeftColumnClass ?>"><?= $Page->ward_name->caption() ?><?= $Page->ward_name->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->ward_name->cellAttributes() ?>>
 <span id="el_wards_ward_name">
-<input type="<?= $Page->ward_name->getInputTextType() ?>" name="x_ward_name" id="x_ward_name" data-table="wards" data-field="x_ward_name" value="<?= $Page->ward_name->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->ward_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->ward_name->formatPattern()) ?>"<?= $Page->ward_name->editAttributes() ?> aria-describedby="x_ward_name_help">
+<input type="<?= $Page->ward_name->getInputTextType() ?>" name="x_ward_name" id="x_ward_name" data-table="wards" data-field="x_ward_name" value="<?= $Page->ward_name->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->ward_name->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->ward_name->formatPattern()) ?>"<?= $Page->ward_name->editAttributes() ?> aria-describedby="x_ward_name_help">
 <?= $Page->ward_name->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->ward_name->getErrorMessage() ?></div>
 </span>
@@ -142,6 +191,14 @@ loadjs.ready("fwardsedit", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("beds", explode(",", $Page->getCurrentDetailTable())) && $beds->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("beds", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "BedsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fwardsedit"><?= $Language->phrase("SaveBtn") ?></button>

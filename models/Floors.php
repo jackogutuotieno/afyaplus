@@ -1213,8 +1213,6 @@ class Floors extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->floor_name);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->floor_name);
@@ -1248,8 +1246,6 @@ class Floors extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->floor_name);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->floor_name);
