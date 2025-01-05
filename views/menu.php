@@ -8,6 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(857, "mi_bed_assignment", $Language->menuPhrase("857", "MenuText"), "bedassignmentlist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}bed_assignment'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);

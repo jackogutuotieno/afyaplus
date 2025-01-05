@@ -187,6 +187,11 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -348,6 +353,31 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -1996,6 +2026,11 @@
                 '/appointmentsreport2list[/{id}]',
                 '/appointmentsreport',
                 '/appointmentsreport/AppointmentsSubmittedbyMonth',
+                '/bedassignmentlist[/{id}]',
+                '/bedassignmentadd[/{id}]',
+                '/bedassignmentview[/{id}]',
+                '/bedassignmentedit[/{id}]',
+                '/bedassignmentdelete[/{id}]',
                 '/bedslist[/{id}]',
                 '/bedsadd[/{id}]',
                 '/bedsedit[/{id}]',
@@ -2329,6 +2364,11 @@
                 'PHPMaker2024\\afyaplus\\AppointmentsReport2Controller:list',
                 'PHPMaker2024\\afyaplus\\AppointmentsReportController:summary',
                 'PHPMaker2024\\afyaplus\\AppointmentsReportController:AppointmentsSubmittedbyMonth',
+                'PHPMaker2024\\afyaplus\\BedAssignmentController:list',
+                'PHPMaker2024\\afyaplus\\BedAssignmentController:add',
+                'PHPMaker2024\\afyaplus\\BedAssignmentController:view',
+                'PHPMaker2024\\afyaplus\\BedAssignmentController:edit',
+                'PHPMaker2024\\afyaplus\\BedAssignmentController:delete',
                 'PHPMaker2024\\afyaplus\\BedsController:list',
                 'PHPMaker2024\\afyaplus\\BedsController:add',
                 'PHPMaker2024\\afyaplus\\BedsController:edit',
@@ -2654,6 +2694,21 @@
                 'PHPMaker2024\\afyaplus\\WardTypeController:delete',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -3655,6 +3710,11 @@
                 'list.appointments_report2',
                 'summary.Appointments_Report',
                 'summary.Appointments_Report.AppointmentsSubmittedbyMonth',
+                'list.bed_assignment',
+                'add.bed_assignment',
+                'view.bed_assignment',
+                'edit.bed_assignment',
+                'delete.bed_assignment',
                 'list.beds',
                 'add.beds',
                 'edit.beds',
@@ -3980,6 +4040,11 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
+                [],
+                [],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4646,6 +4711,11 @@
         $o[328],
         $o[329],
         $o[330],
+        $o[331],
+        $o[332],
+        $o[333],
+        $o[334],
+        $o[335],
     ],
     []
 );

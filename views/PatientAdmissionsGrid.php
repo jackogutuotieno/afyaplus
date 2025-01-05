@@ -66,11 +66,6 @@ loadjs.ready(["wrapper", "head"], function () {
 <div id="ew-list">
 <?php if ($Grid->TotalRecords > 0 || $Grid->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Grid->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Grid->TableGridClass ?>">
-<?php if ($Grid->ShowOtherOptions) { ?>
-<div class="card-header ew-grid-upper-panel">
-<?php $Grid->OtherOptions->render("body") ?>
-</div>
-<?php } ?>
 <div id="fpatient_admissionsgrid" class="ew-form ew-list-form">
 <div id="gmp_patient_admissions" class="card-body ew-grid-middle-panel <?= $Grid->TableContainerClass ?>" style="<?= $Grid->TableContainerStyle ?>">
 <table id="tbl_patient_admissionsgrid" class="<?= $Grid->TableClass ?>"><!-- .ew-table -->

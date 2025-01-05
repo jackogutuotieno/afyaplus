@@ -6,6 +6,7 @@ C:\wamp64\www\afyaplus\controllers\ApiController.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsController.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReportController.php
+C:\wamp64\www\afyaplus\controllers\BedAssignmentController.php
 C:\wamp64\www\afyaplus\controllers\BedsController.php
 C:\wamp64\www\afyaplus\controllers\BrandingController.php
 C:\wamp64\www\afyaplus\controllers\CashPaymentsController.php
@@ -127,6 +128,13 @@ C:\wamp64\www\afyaplus\models\AppointmentsReport2.php
 C:\wamp64\www\afyaplus\models\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\models\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\models\AppointmentsView.php
+C:\wamp64\www\afyaplus\models\BedAssignment.php
+C:\wamp64\www\afyaplus\models\BedAssignmentAdd.php
+C:\wamp64\www\afyaplus\models\BedAssignmentDelete.php
+C:\wamp64\www\afyaplus\models\BedAssignmentEdit.php
+C:\wamp64\www\afyaplus\models\BedAssignmentGrid.php
+C:\wamp64\www\afyaplus\models\BedAssignmentList.php
+C:\wamp64\www\afyaplus\models\BedAssignmentView.php
 C:\wamp64\www\afyaplus\models\Beds.php
 C:\wamp64\www\afyaplus\models\BedsAdd.php
 C:\wamp64\www\afyaplus\models\BedsDelete.php
@@ -610,6 +618,7 @@ C:\wamp64\www\afyaplus\src\EmailTwoFactorAuthentication.php
 C:\wamp64\www\afyaplus\src\EntityDescriptor.php
 C:\wamp64\www\afyaplus\src\Entity\AppointmentsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Bed.php
+C:\wamp64\www\afyaplus\src\Entity\BedAssignment.php
 C:\wamp64\www\afyaplus\src\Entity\Branding.php
 C:\wamp64\www\afyaplus\src\Entity\CashPayment.php
 C:\wamp64\www\afyaplus\src\Entity\CashPaymentsReport.php
@@ -786,6 +795,12 @@ C:\wamp64\www\afyaplus\views\AppointmentsEdit.php
 C:\wamp64\www\afyaplus\views\AppointmentsReport2List.php
 C:\wamp64\www\afyaplus\views\AppointmentsReportSummary.php
 C:\wamp64\www\afyaplus\views\AppointmentsView.php
+C:\wamp64\www\afyaplus\views\BedAssignmentAdd.php
+C:\wamp64\www\afyaplus\views\BedAssignmentDelete.php
+C:\wamp64\www\afyaplus\views\BedAssignmentEdit.php
+C:\wamp64\www\afyaplus\views\BedAssignmentGrid.php
+C:\wamp64\www\afyaplus\views\BedAssignmentList.php
+C:\wamp64\www\afyaplus\views\BedAssignmentView.php
 C:\wamp64\www\afyaplus\views\BedsAdd.php
 C:\wamp64\www\afyaplus\views\BedsDelete.php
 C:\wamp64\www\afyaplus\views\BedsEdit.php
@@ -983,6 +998,7 @@ C:\wamp64\www\afyaplus\views\PatientAdmissionsDelete.php
 C:\wamp64\www\afyaplus\views\PatientAdmissionsEdit.php
 C:\wamp64\www\afyaplus\views\PatientAdmissionsGrid.php
 C:\wamp64\www\afyaplus\views\PatientAdmissionsList.php
+C:\wamp64\www\afyaplus\views\PatientAdmissionsMaster.php
 C:\wamp64\www\afyaplus\views\PatientAdmissionsView.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsAdd.php
 C:\wamp64\www\afyaplus\views\PatientAppointmentsDelete.php

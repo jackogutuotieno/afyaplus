@@ -71,7 +71,7 @@ class PatientAdmissions extends DbTable
         // Update Table
         $this->UpdateTable = "patient_admissions";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -118,6 +118,7 @@ class PatientAdmissions extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -200,22 +201,6 @@ class PatientAdmissions extends DbTable
             $this->RightColumnClass = "col-" . $match[1] . "-" . strval(12 - (int)$match[2]);
             $this->OffsetColumnClass = $this->RightColumnClass . " " . str_replace("col-", "offset-", $class);
             $this->TableLeftColumnClass = preg_replace('/^col-\w+-(\d+)$/', "w-col-$1", $class); // Change to w-col-*
-        }
-    }
-
-    // Single column sort
-    public function updateSort(&$fld)
-    {
-        if ($this->CurrentOrder == $fld->Name) {
-            $sortField = $fld->Expression;
-            $lastSort = $fld->getSort();
-            if (in_array($this->CurrentOrderType, ["ASC", "DESC", "NO"])) {
-                $curSort = $this->CurrentOrderType;
-            } else {
-                $curSort = $lastSort;
-            }
-            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            $this->setSessionOrderBy($orderBy); // Save to Session
         }
     }
 
@@ -315,6 +300,33 @@ class PatientAdmissions extends DbTable
                 return GetKeyFilter($this->patient_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
         }
         return "";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "bed_assignment") {
+            $detailUrl = Container("bed_assignment")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "patientadmissionslist";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -936,7 +948,11 @@ class PatientAdmissions extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("patientadmissionsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientadmissionsedit", $parm);
+        } else {
+            $url = $this->keyUrl("patientadmissionsedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -950,7 +966,11 @@ class PatientAdmissions extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("patientadmissionsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientadmissionsadd", $parm);
+        } else {
+            $url = $this->keyUrl("patientadmissionsadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1012,13 +1032,6 @@ class PatientAdmissions extends DbTable
         global $Security, $Language;
         $sortUrl = "";
         $attrs = "";
-        if ($this->PageID != "grid" && $fld->Sortable) {
-            $sortUrl = $this->sortUrl($fld);
-            $attrs = ' role="button" data-ew-action="sort" data-ajax="' . ($this->UseAjaxActions ? "true" : "false") . '" data-sort-url="' . $sortUrl . '" data-sort-type="1"';
-            if ($this->ContextClass) { // Add context
-                $attrs .= ' data-context="' . HtmlEncode($this->ContextClass) . '"';
-            }
-        }
         $html = '<div class="ew-table-header-caption"' . $attrs . '>' . $fld->caption() . '</div>';
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
@@ -1041,20 +1054,7 @@ class PatientAdmissions extends DbTable
     public function sortUrl($fld)
     {
         global $DashboardReport;
-        if (
-            $this->CurrentAction || $this->isExport() ||
-            in_array($fld->Type, [128, 204, 205])
-        ) { // Unsortable data type
-                return "";
-        } elseif ($fld->Sortable) {
-            $urlParm = "order=" . urlencode($fld->Name) . "&amp;ordertype=" . $fld->getNextSort();
-            if ($DashboardReport) {
-                $urlParm .= "&amp;" . Config("PAGE_DASHBOARD") . "=" . $DashboardReport;
-            }
-            return $this->addMasterUrl($this->CurrentPageName . "?" . $urlParm);
-        } else {
-            return "";
-        }
+        return "";
     }
 
     // Get record keys from Post/Get/Session

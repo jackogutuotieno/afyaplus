@@ -1141,7 +1141,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_admissions","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}bed_assignment","9","0"]];
 
 /**
  * Tables
@@ -1254,4 +1265,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["floors","floors","Floors",true,"{32536B8D-F37B-4419-80D5-260932800712}","floorslist"],
     ["ward_type","ward_type","Ward Type",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardtypelist"],
     ["wards","wards","Wards",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardslist"],
-    ["patient_admissions","patient_admissions","Admissions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientadmissionslist"]];
+    ["patient_admissions","patient_admissions","Admissions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientadmissionslist"],
+    ["bed_assignment","bed_assignment","Bed Assign",true,"{32536B8D-F37B-4419-80D5-260932800712}","bedassignmentlist"]];

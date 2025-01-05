@@ -30,7 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
 </script>
 <script>
 window.Tabulator || loadjs([
-    ew.PATH_BASE + "js/tabulator.js?v=24.16.6",
+    ew.PATH_BASE + "js/tabulator.min.js?v=24.16.6",
     ew.PATH_BASE + "css/<?= CssFile("tabulator_bootstrap5.css", false) ?>?v=24.16.6"
 ], "import");
 </script>
@@ -72,16 +72,6 @@ $Page->showMessage();
 <div id="ew-list">
 <?php if ($Page->TotalRecords > 0 || $Page->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Page->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Page->TableGridClass ?>">
-<?php if (!$Page->isExport()) { ?>
-<div class="card-header ew-grid-upper-panel">
-<?php if (!$Page->isGridAdd() && !($Page->isGridEdit() && $Page->ModalGridEdit) && !$Page->isMultiEdit()) { ?>
-<?= $Page->Pager->render() ?>
-<?php } ?>
-<div class="ew-list-other-options">
-<?php $Page->OtherOptions->render("body") ?>
-</div>
-</div>
-<?php } ?>
 <form name="<?= $Page->FormName ?>" id="<?= $Page->FormName ?>" class="ew-form ew-list-form" action="<?= $Page->PageAction ?>" method="post" novalidate autocomplete="off">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->

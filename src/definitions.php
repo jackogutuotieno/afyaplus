@@ -198,6 +198,7 @@ return [
     "ward_type" => \DI\create(WardType::class),
     "wards" => \DI\create(Wards::class),
     "patient_admissions" => \DI\create(PatientAdmissions::class),
+    "bed_assignment" => \DI\create(BedAssignment::class),
 
     // User table
     "usertable" => \DI\get("users"),

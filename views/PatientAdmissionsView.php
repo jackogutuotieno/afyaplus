@@ -85,6 +85,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("bed_assignment", explode(",", $Page->getCurrentDetailTable())) && $bed_assignment->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("bed_assignment", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "BedAssignmentGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php
