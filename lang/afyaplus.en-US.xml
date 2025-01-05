@@ -2,9 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="857">
-      <phrase id="menutext" value="Bed Assign" />
-    </menu>
     <menu id="642">
       <phrase id="menutext" value="Dashboard" />
     </menu>
@@ -116,6 +113,9 @@
     <menu id="856">
       <phrase id="menutext" value="Admissions" />
     </menu>
+    <menu id="857">
+      <phrase id="menutext" value="Bed Assign" />
+    </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />
     </menu>
@@ -196,6 +196,21 @@
     </menu>
     <menu id="239">
       <phrase id="menutext" value="Pharmacy" />
+    </menu>
+    <menu id="959">
+      <phrase id="menutext" value="Procurement" />
+    </menu>
+    <menu id="961">
+      <phrase id="menutext" value="Categories" />
+    </menu>
+    <menu id="962">
+      <phrase id="menutext" value="Subcategories" />
+    </menu>
+    <menu id="960">
+      <phrase id="menutext" value="Suppliers" />
+    </menu>
+    <menu id="963">
+      <phrase id="menutext" value="Purchases" />
     </menu>
     <menu id="53">
       <phrase id="menutext" value="Financials" />
@@ -3274,6 +3289,110 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Assigned Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="suppliers">
+      <phrase id="tblcaption" value="Suppliers" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="supplier_name">
+        <phrase id="fldcaption" value="Supplier" />
+      </field>
+      <field id="phone">
+        <phrase id="fldcaption" value="Phone" />
+      </field>
+      <field id="email_address">
+        <phrase id="fldcaption" value="Email" />
+      </field>
+      <field id="physical_address">
+        <phrase id="fldcaption" value="Physical Address" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submssion Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="item_categories">
+      <phrase id="tblcaption" value="Item Categories" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="category_name">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Date Added" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="item_subcategories">
+      <phrase id="tblcaption" value="Item Subcategories" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="subcategory_name">
+        <phrase id="fldcaption" value="Subcategory Name" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Date Added" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="item_purchases">
+      <phrase id="tblcaption" value="item purchases" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="supplier_id">
+        <phrase id="fldcaption" value="Supplier" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="subcategory_id">
+        <phrase id="fldcaption" value="Subcategory" />
+      </field>
+      <field id="item_title">
+        <phrase id="fldcaption" value="Item Title" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Qauntity" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+        <phrase id="fldtagvalue1" value="Kg" />
+        <phrase id="fldtagcaption1" value="Kg" />
+        <phrase id="fldtagvalue2" value="Litres" />
+        <phrase id="fldtagcaption2" value="Litres" />
+        <phrase id="fldtagvalue3" value="Pieces" />
+        <phrase id="fldtagcaption3" value="Pieces" />
+        <phrase id="fldtagvalue4" value="Units" />
+        <phrase id="fldtagcaption4" value="Units" />
+        <phrase id="fldtagvalue5" value="Service" />
+        <phrase id="fldtagcaption5" value="Service" />
+        <phrase id="fldtagvalue6" value="Packets" />
+        <phrase id="fldtagcaption6" value="Packets" />
+        <phrase id="fldtagvalue7" value="Boxes" />
+        <phrase id="fldtagcaption7" value="Boxes" />
+      </field>
+      <field id="unit_price">
+        <phrase id="fldcaption" value="Unit Price (Kshs)" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Purchase Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

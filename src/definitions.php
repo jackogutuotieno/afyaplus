@@ -199,6 +199,10 @@ return [
     "wards" => \DI\create(Wards::class),
     "patient_admissions" => \DI\create(PatientAdmissions::class),
     "bed_assignment" => \DI\create(BedAssignment::class),
+    "suppliers" => \DI\create(Suppliers::class),
+    "item_categories" => \DI\create(ItemCategories::class),
+    "item_subcategories" => \DI\create(ItemSubcategories::class),
+    "item_purchases" => \DI\create(ItemPurchases::class),
 
     // User table
     "usertable" => \DI\get("users"),

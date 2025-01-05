@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(857, "mi_bed_assignment", $Language->menuPhrase("857", "MenuText"), "bedassignmentlist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}bed_assignment'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
@@ -39,6 +38,7 @@ $sideMenu->addMenuItem(4, "mi_diagnosis", $Language->menuPhrase("4", "MenuText")
 $sideMenu->addMenuItem(746, "mci_IPD_Patients", $Language->menuPhrase("746", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(645, "mi_ipd_patients", $Language->menuPhrase("645", "MenuText"), "ipdpatientslist", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ipd_patients'), false, false, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(856, "mi_patient_admissions", $Language->menuPhrase("856", "MenuText"), "patientadmissionslist?cmd=resetall", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_admissions'), false, false, "fa-bed", "", false, true);
+$sideMenu->addMenuItem(857, "mi_bed_assignment", $Language->menuPhrase("857", "MenuText"), "bedassignmentlist?cmd=resetall", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}bed_assignment'), false, false, "fa-bed", "", false, true);
 $sideMenu->addMenuItem(50, "mci_Doctor_Panel", $Language->menuPhrase("50", "MenuText"), "", -1, "", true, false, true, "fa-user-doctor", "", false, true);
 $sideMenu->addMenuItem(5, "mi_diseases", $Language->menuPhrase("5", "MenuText"), "diseaseslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diseases'), false, false, "fa-viruses", "", false, true);
 $sideMenu->addMenuItem(6, "mi_doctor_charges", $Language->menuPhrase("6", "MenuText"), "doctorchargeslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_charges'), false, false, "fa-money-bill", "", false, true);
@@ -60,6 +60,11 @@ $sideMenu->addMenuItem(236, "mci_Billing", $Language->menuPhrase("236", "MenuTex
 $sideMenu->addMenuItem(174, "mi_laboratory_billing_report", $Language->menuPhrase("174", "MenuText"), "laboratorybillingreportlist?cmd=resetall", 236, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(237, "mi_radiology_billing_report", $Language->menuPhrase("237", "MenuText"), "radiologybillingreportlist?cmd=resetall", 236, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(239, "mi_pharmacy_billing_report", $Language->menuPhrase("239", "MenuText"), "pharmacybillingreportlist?cmd=resetall", 236, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report'), false, false, "fa-money-bill", "", false, true);
+$sideMenu->addMenuItem(959, "mci_Procurement", $Language->menuPhrase("959", "MenuText"), "", -1, "", true, false, true, "fa-boxes", "", false, true);
+$sideMenu->addMenuItem(961, "mi_item_categories", $Language->menuPhrase("961", "MenuText"), "itemcategorieslist", 959, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}item_categories'), false, false, "fa-boxes", "", false, true);
+$sideMenu->addMenuItem(962, "mi_item_subcategories", $Language->menuPhrase("962", "MenuText"), "itemsubcategorieslist", 959, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}item_subcategories'), false, false, "fa-boxes", "", false, true);
+$sideMenu->addMenuItem(960, "mi_suppliers", $Language->menuPhrase("960", "MenuText"), "supplierslist", 959, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}suppliers'), false, false, "fa-boxes", "", false, true);
+$sideMenu->addMenuItem(963, "mi_item_purchases", $Language->menuPhrase("963", "MenuText"), "itempurchaseslist", 959, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}item_purchases'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(53, "mci_Financials", $Language->menuPhrase("53", "MenuText"), "", -1, "", true, false, true, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(34, "mi_service_categories", $Language->menuPhrase("34", "MenuText"), "servicecategorieslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}service_categories'), false, false, "fa-list", "", false, true);
 $sideMenu->addMenuItem(36, "mi_service_subcategories", $Language->menuPhrase("36", "MenuText"), "servicesubcategorieslist", 53, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}service_subcategories'), false, false, "fa-list", "", false, true);

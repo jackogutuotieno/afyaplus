@@ -41,6 +41,14 @@ class HolidaysAdd extends Holidays
     // CSS class/style
     public $CurrentPageName = "holidaysadd";
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -946,6 +954,9 @@ class HolidaysAdd extends Holidays
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
+            if ($this->SendEmail) {
+                $this->sendEmailOnAdd($rsnew);
+            }
         }
 
         // Write JSON response

@@ -41,6 +41,14 @@ class LeaveCategoriesAdd extends LeaveCategories
     // CSS class/style
     public $CurrentPageName = "leavecategoriesadd";
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -947,6 +955,9 @@ class LeaveCategoriesAdd extends LeaveCategories
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
+            if ($this->SendEmail) {
+                $this->sendEmailOnAdd($rsnew);
+            }
         }
 
         // Write JSON response
