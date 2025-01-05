@@ -30,7 +30,7 @@ loadjs.ready(["wrapper", "head"], function () {
 </script>
 <script>
 window.Tabulator || loadjs([
-    ew.PATH_BASE + "js/tabulator.min.js?v=24.16.6",
+    ew.PATH_BASE + "js/tabulator.js?v=24.16.6",
     ew.PATH_BASE + "css/<?= CssFile("tabulator_bootstrap5.css", false) ?>?v=24.16.6"
 ], "import");
 </script>
@@ -175,6 +175,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->days_applied->Visible) { // days_applied ?>
         <th data-name="days_applied" class="<?= $Page->days_applied->headerCellClass() ?>"><div id="elh_leave_applications_days_applied" class="leave_applications_days_applied"><?= $Page->renderFieldHeader($Page->days_applied) ?></div></th>
 <?php } ?>
+<?php if ($Page->reporting_date->Visible) { // reporting_date ?>
+        <th data-name="reporting_date" class="<?= $Page->reporting_date->headerCellClass() ?>"><div id="elh_leave_applications_reporting_date" class="leave_applications_reporting_date"><?= $Page->renderFieldHeader($Page->reporting_date) ?></div></th>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_leave_applications_status" class="leave_applications_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
@@ -241,6 +244,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_days_applied" class="el_leave_applications_days_applied">
 <span<?= $Page->days_applied->viewAttributes() ?>>
 <?= $Page->days_applied->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->reporting_date->Visible) { // reporting_date ?>
+        <td data-name="reporting_date"<?= $Page->reporting_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_leave_applications_reporting_date" class="el_leave_applications_reporting_date">
+<span<?= $Page->reporting_date->viewAttributes() ?>>
+<?= $Page->reporting_date->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

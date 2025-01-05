@@ -145,6 +145,7 @@ class LeaveApplicationsView extends LeaveApplications
         $this->leave_category_id->setVisibility();
         $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
+        $this->reporting_date->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -817,6 +818,7 @@ class LeaveApplicationsView extends LeaveApplications
         $this->leave_category_id->setDbValue($row['leave_category_id']);
         $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
+        $this->reporting_date->setDbValue($row['reporting_date']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -831,6 +833,7 @@ class LeaveApplicationsView extends LeaveApplications
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
         $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
+        $row['reporting_date'] = $this->reporting_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -864,6 +867,8 @@ class LeaveApplicationsView extends LeaveApplications
         // start_from_date
 
         // days_applied
+
+        // reporting_date
 
         // status
 
@@ -930,6 +935,9 @@ class LeaveApplicationsView extends LeaveApplications
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
 
+            // reporting_date
+            $this->reporting_date->ViewValue = $this->reporting_date->CurrentValue;
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -960,6 +968,10 @@ class LeaveApplicationsView extends LeaveApplications
             // days_applied
             $this->days_applied->HrefValue = "";
             $this->days_applied->TooltipValue = "";
+
+            // reporting_date
+            $this->reporting_date->HrefValue = "";
+            $this->reporting_date->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

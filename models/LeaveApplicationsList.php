@@ -151,6 +151,7 @@ class LeaveApplicationsList extends LeaveApplications
         $this->leave_category_id->setVisibility();
         $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
+        $this->reporting_date->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
@@ -1062,6 +1063,7 @@ class LeaveApplicationsList extends LeaveApplications
         $filterList = Concat($filterList, $this->leave_category_id->AdvancedSearch->toJson(), ","); // Field leave_category_id
         $filterList = Concat($filterList, $this->start_from_date->AdvancedSearch->toJson(), ","); // Field start_from_date
         $filterList = Concat($filterList, $this->days_applied->AdvancedSearch->toJson(), ","); // Field days_applied
+        $filterList = Concat($filterList, $this->reporting_date->AdvancedSearch->toJson(), ","); // Field reporting_date
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
@@ -1144,6 +1146,14 @@ class LeaveApplicationsList extends LeaveApplications
         $this->days_applied->AdvancedSearch->SearchOperator2 = @$filter["w_days_applied"];
         $this->days_applied->AdvancedSearch->save();
 
+        // Field reporting_date
+        $this->reporting_date->AdvancedSearch->SearchValue = @$filter["x_reporting_date"];
+        $this->reporting_date->AdvancedSearch->SearchOperator = @$filter["z_reporting_date"];
+        $this->reporting_date->AdvancedSearch->SearchCondition = @$filter["v_reporting_date"];
+        $this->reporting_date->AdvancedSearch->SearchValue2 = @$filter["y_reporting_date"];
+        $this->reporting_date->AdvancedSearch->SearchOperator2 = @$filter["w_reporting_date"];
+        $this->reporting_date->AdvancedSearch->save();
+
         // Field status
         $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
         $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
@@ -1206,6 +1216,7 @@ class LeaveApplicationsList extends LeaveApplications
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->reporting_date;
         $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
@@ -1289,6 +1300,7 @@ class LeaveApplicationsList extends LeaveApplications
             $this->updateSort($this->leave_category_id); // leave_category_id
             $this->updateSort($this->start_from_date); // start_from_date
             $this->updateSort($this->days_applied); // days_applied
+            $this->updateSort($this->reporting_date); // reporting_date
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
@@ -1321,6 +1333,7 @@ class LeaveApplicationsList extends LeaveApplications
                 $this->leave_category_id->setSort("");
                 $this->start_from_date->setSort("");
                 $this->days_applied->setSort("");
+                $this->reporting_date->setSort("");
                 $this->status->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
@@ -1555,6 +1568,7 @@ class LeaveApplicationsList extends LeaveApplications
             $this->createColumnOption($option, "leave_category_id");
             $this->createColumnOption($option, "start_from_date");
             $this->createColumnOption($option, "days_applied");
+            $this->createColumnOption($option, "reporting_date");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
@@ -2001,6 +2015,7 @@ class LeaveApplicationsList extends LeaveApplications
         $this->leave_category_id->setDbValue($row['leave_category_id']);
         $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
+        $this->reporting_date->setDbValue($row['reporting_date']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -2015,6 +2030,7 @@ class LeaveApplicationsList extends LeaveApplications
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
         $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
+        $row['reporting_date'] = $this->reporting_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -2067,6 +2083,8 @@ class LeaveApplicationsList extends LeaveApplications
         // start_from_date
 
         // days_applied
+
+        // reporting_date
 
         // status
 
@@ -2133,6 +2151,9 @@ class LeaveApplicationsList extends LeaveApplications
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
 
+            // reporting_date
+            $this->reporting_date->ViewValue = $this->reporting_date->CurrentValue;
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -2159,6 +2180,10 @@ class LeaveApplicationsList extends LeaveApplications
             // days_applied
             $this->days_applied->HrefValue = "";
             $this->days_applied->TooltipValue = "";
+
+            // reporting_date
+            $this->reporting_date->HrefValue = "";
+            $this->reporting_date->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";

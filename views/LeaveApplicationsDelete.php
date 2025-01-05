@@ -62,6 +62,9 @@ $Page->showMessage();
 <?php if ($Page->days_applied->Visible) { // days_applied ?>
         <th class="<?= $Page->days_applied->headerCellClass() ?>"><span id="elh_leave_applications_days_applied" class="leave_applications_days_applied"><?= $Page->days_applied->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->reporting_date->Visible) { // reporting_date ?>
+        <th class="<?= $Page->reporting_date->headerCellClass() ?>"><span id="elh_leave_applications_reporting_date" class="leave_applications_reporting_date"><?= $Page->reporting_date->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_leave_applications_status" class="leave_applications_status"><?= $Page->status->caption() ?></span></th>
 <?php } ?>
@@ -121,6 +124,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->days_applied->viewAttributes() ?>>
 <?= $Page->days_applied->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->reporting_date->Visible) { // reporting_date ?>
+        <td<?= $Page->reporting_date->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->reporting_date->viewAttributes() ?>>
+<?= $Page->reporting_date->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

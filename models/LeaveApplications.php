@@ -52,6 +52,7 @@ class LeaveApplications extends DbTable
     public $leave_category_id;
     public $start_from_date;
     public $days_applied;
+    public $reporting_date;
     public $status;
     public $date_created;
     public $date_updated;
@@ -238,6 +239,29 @@ class LeaveApplications extends DbTable
         $this->days_applied->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['days_applied'] = &$this->days_applied;
 
+        // reporting_date
+        $this->reporting_date = new DbField(
+            $this, // Table
+            'x_reporting_date', // Variable name
+            'reporting_date', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            7, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->reporting_date->InputTextType = "text";
+        $this->reporting_date->IsCustom = true; // Custom field
+        $this->reporting_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['reporting_date'] = &$this->reporting_date;
+
         // status
         $this->status = new DbField(
             $this, // Table
@@ -406,20 +430,7 @@ class LeaveApplications extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, '' AS `reporting_date`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -838,6 +849,7 @@ class LeaveApplications extends DbTable
         $this->leave_category_id->DbValue = $row['leave_category_id'];
         $this->start_from_date->DbValue = $row['start_from_date'];
         $this->days_applied->DbValue = $row['days_applied'];
+        $this->reporting_date->DbValue = $row['reporting_date'];
         $this->status->DbValue = $row['status'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
@@ -1198,6 +1210,7 @@ class LeaveApplications extends DbTable
         $this->leave_category_id->setDbValue($row['leave_category_id']);
         $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
+        $this->reporting_date->setDbValue($row['reporting_date']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -1240,6 +1253,8 @@ class LeaveApplications extends DbTable
         // start_from_date
 
         // days_applied
+
+        // reporting_date
 
         // status
 
@@ -1304,6 +1319,9 @@ class LeaveApplications extends DbTable
         $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
         $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
 
+        // reporting_date
+        $this->reporting_date->ViewValue = $this->reporting_date->CurrentValue;
+
         // status
         $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -1334,6 +1352,10 @@ class LeaveApplications extends DbTable
         // days_applied
         $this->days_applied->HrefValue = "";
         $this->days_applied->TooltipValue = "";
+
+        // reporting_date
+        $this->reporting_date->HrefValue = "";
+        $this->reporting_date->TooltipValue = "";
 
         // status
         $this->status->HrefValue = "";
@@ -1384,6 +1406,14 @@ class LeaveApplications extends DbTable
         if (strval($this->days_applied->EditValue) != "" && is_numeric($this->days_applied->EditValue)) {
             $this->days_applied->EditValue = FormatNumber($this->days_applied->EditValue, null);
         }
+
+        // reporting_date
+        $this->reporting_date->setupEditAttributes();
+        if (!$this->reporting_date->Raw) {
+            $this->reporting_date->CurrentValue = HtmlDecode($this->reporting_date->CurrentValue);
+        }
+        $this->reporting_date->EditValue = $this->reporting_date->CurrentValue;
+        $this->reporting_date->PlaceHolder = RemoveHtml($this->reporting_date->caption());
 
         // status
         $this->status->setupEditAttributes();
@@ -1436,6 +1466,7 @@ class LeaveApplications extends DbTable
                     $doc->exportCaption($this->leave_category_id);
                     $doc->exportCaption($this->start_from_date);
                     $doc->exportCaption($this->days_applied);
+                    $doc->exportCaption($this->reporting_date);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1445,6 +1476,7 @@ class LeaveApplications extends DbTable
                     $doc->exportCaption($this->leave_category_id);
                     $doc->exportCaption($this->start_from_date);
                     $doc->exportCaption($this->days_applied);
+                    $doc->exportCaption($this->reporting_date);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
@@ -1479,6 +1511,7 @@ class LeaveApplications extends DbTable
                         $doc->exportField($this->leave_category_id);
                         $doc->exportField($this->start_from_date);
                         $doc->exportField($this->days_applied);
+                        $doc->exportField($this->reporting_date);
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
@@ -1488,6 +1521,7 @@ class LeaveApplications extends DbTable
                         $doc->exportField($this->leave_category_id);
                         $doc->exportField($this->start_from_date);
                         $doc->exportField($this->days_applied);
+                        $doc->exportField($this->reporting_date);
                         $doc->exportField($this->status);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
@@ -1672,6 +1706,18 @@ class LeaveApplications extends DbTable
         } else if ($this->status->CurrentValue == 'Rejected') {
             $this->status->CellAttrs["style"] = "background-color: red; color: white";
         }
+
+        // Get selected reporting date
+        $selReportingDate = ExecuteScalar("SELECT start_from_date FROM leave_applications");
+
+        // Get days input
+        $days = $this->days_applied->CurrentValue;
+
+        //Get the actual reporting date
+        $reporting_date = ExecuteScalar("SELECT DATE_ADD('" . $selReportingDate . "', INTERVAL '" . $days . "' DAY)");
+
+        // Display reporting date
+        $this->reporting_date->ViewValue = $reporting_date;
     }
 
     // User ID Filtering event

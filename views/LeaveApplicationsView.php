@@ -106,6 +106,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->reporting_date->Visible) { // reporting_date ?>
+    <tr id="r_reporting_date"<?= $Page->reporting_date->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_leave_applications_reporting_date"><?= $Page->reporting_date->caption() ?></span></td>
+        <td data-name="reporting_date"<?= $Page->reporting_date->cellAttributes() ?>>
+<span id="el_leave_applications_reporting_date">
+<span<?= $Page->reporting_date->viewAttributes() ?>>
+<?= $Page->reporting_date->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
     <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_leave_applications_status"><?= $Page->status->caption() ?></span></td>

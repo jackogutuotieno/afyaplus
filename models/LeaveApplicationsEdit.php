@@ -127,6 +127,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $this->leave_category_id->setVisibility();
         $this->start_from_date->setVisibility();
         $this->days_applied->setVisibility();
+        $this->reporting_date->Visible = false;
         $this->status->Visible = false;
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -817,6 +818,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $this->leave_category_id->setDbValue($row['leave_category_id']);
         $this->start_from_date->setDbValue($row['start_from_date']);
         $this->days_applied->setDbValue($row['days_applied']);
+        $this->reporting_date->setDbValue($row['reporting_date']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
@@ -831,6 +833,7 @@ class LeaveApplicationsEdit extends LeaveApplications
         $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
         $row['start_from_date'] = $this->start_from_date->DefaultValue;
         $row['days_applied'] = $this->days_applied->DefaultValue;
+        $row['reporting_date'] = $this->reporting_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
@@ -882,6 +885,9 @@ class LeaveApplicationsEdit extends LeaveApplications
 
         // days_applied
         $this->days_applied->RowCssClass = "row";
+
+        // reporting_date
+        $this->reporting_date->RowCssClass = "row";
 
         // status
         $this->status->RowCssClass = "row";
@@ -950,6 +956,9 @@ class LeaveApplicationsEdit extends LeaveApplications
             // days_applied
             $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
             $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
+
+            // reporting_date
+            $this->reporting_date->ViewValue = $this->reporting_date->CurrentValue;
 
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
