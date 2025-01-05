@@ -1543,8 +1543,6 @@ class ItemPurchases extends DbTable
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->measuring_unit);
                     $doc->exportCaption($this->unit_price);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->supplier_id);
@@ -1590,8 +1588,6 @@ class ItemPurchases extends DbTable
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->measuring_unit);
                         $doc->exportField($this->unit_price);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->supplier_id);

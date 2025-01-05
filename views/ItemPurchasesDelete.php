@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_item_purchases_id" class="item_purchases_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->supplier_id->Visible) { // supplier_id ?>
-        <th class="<?= $Page->supplier_id->headerCellClass() ?>"><span id="elh_item_purchases_supplier_id" class="item_purchases_supplier_id"><?= $Page->supplier_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th class="<?= $Page->category_id->headerCellClass() ?>"><span id="elh_item_purchases_category_id" class="item_purchases_category_id"><?= $Page->category_id->caption() ?></span></th>
 <?php } ?>
@@ -106,14 +103,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->supplier_id->Visible) { // supplier_id ?>
-        <td<?= $Page->supplier_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->supplier_id->viewAttributes() ?>>
-<?= $Page->supplier_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

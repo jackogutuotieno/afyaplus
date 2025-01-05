@@ -123,7 +123,7 @@ class ItemPurchasesDelete extends ItemPurchases
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->supplier_id->setVisibility();
+        $this->supplier_id->Visible = false;
         $this->category_id->setVisibility();
         $this->subcategory_id->setVisibility();
         $this->item_title->setVisibility();
@@ -751,10 +751,6 @@ class ItemPurchasesDelete extends ItemPurchases
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // supplier_id
-            $this->supplier_id->HrefValue = "";
-            $this->supplier_id->TooltipValue = "";
 
             // category_id
             $this->category_id->HrefValue = "";

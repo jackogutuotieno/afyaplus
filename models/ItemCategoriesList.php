@@ -154,7 +154,7 @@ class ItemCategoriesList extends ItemCategories
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->category_name->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -1253,7 +1253,6 @@ class ItemCategoriesList extends ItemCategories
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->category_name); // category_name
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1510,7 +1509,6 @@ class ItemCategoriesList extends ItemCategories
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "category_name");
         }
 
@@ -2027,10 +2025,6 @@ class ItemCategoriesList extends ItemCategories
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // category_name
             $this->category_name->HrefValue = "";

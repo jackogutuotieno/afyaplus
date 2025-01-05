@@ -130,7 +130,7 @@ class ItemCategoriesDelete extends ItemCategories
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->category_name->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
@@ -656,10 +656,6 @@ class ItemCategoriesDelete extends ItemCategories
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // category_name
             $this->category_name->HrefValue = "";

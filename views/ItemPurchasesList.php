@@ -166,9 +166,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_item_purchases_id" class="item_purchases_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->supplier_id->Visible) { // supplier_id ?>
-        <th data-name="supplier_id" class="<?= $Page->supplier_id->headerCellClass() ?>"><div id="elh_item_purchases_supplier_id" class="item_purchases_supplier_id"><?= $Page->renderFieldHeader($Page->supplier_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th data-name="category_id" class="<?= $Page->category_id->headerCellClass() ?>"><div id="elh_item_purchases_category_id" class="item_purchases_category_id"><?= $Page->renderFieldHeader($Page->category_id) ?></div></th>
 <?php } ?>
@@ -226,14 +223,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_id" class="el_item_purchases_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->supplier_id->Visible) { // supplier_id ?>
-        <td data-name="supplier_id"<?= $Page->supplier_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_supplier_id" class="el_item_purchases_supplier_id">
-<span<?= $Page->supplier_id->viewAttributes() ?>>
-<?= $Page->supplier_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

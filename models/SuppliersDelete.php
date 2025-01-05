@@ -122,7 +122,7 @@ class SuppliersDelete extends Suppliers
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_name->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
@@ -672,10 +672,6 @@ class SuppliersDelete extends Suppliers
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // supplier_name
             $this->supplier_name->HrefValue = "";

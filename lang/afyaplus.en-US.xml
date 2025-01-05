@@ -3352,7 +3352,7 @@
       </field>
     </table>
     <table id="item_purchases">
-      <phrase id="tblcaption" value="item purchases" />
+      <phrase id="tblcaption" value="Item Purchases" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>

@@ -146,7 +146,7 @@ class SuppliersList extends Suppliers
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_name->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
@@ -1271,7 +1271,6 @@ class SuppliersList extends Suppliers
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->supplier_name); // supplier_name
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
@@ -1524,7 +1523,6 @@ class SuppliersList extends Suppliers
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "supplier_name");
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
@@ -2067,10 +2065,6 @@ class SuppliersList extends Suppliers
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // supplier_name
             $this->supplier_name->HrefValue = "";

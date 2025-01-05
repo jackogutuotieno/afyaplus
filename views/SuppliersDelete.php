@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_suppliers_id" class="suppliers_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->supplier_name->Visible) { // supplier_name ?>
         <th class="<?= $Page->supplier_name->headerCellClass() ?>"><span id="elh_suppliers_supplier_name" class="suppliers_supplier_name"><?= $Page->supplier_name->caption() ?></span></th>
 <?php } ?>
@@ -92,14 +89,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->supplier_name->Visible) { // supplier_name ?>
         <td<?= $Page->supplier_name->cellAttributes() ?>>
 <span id="">

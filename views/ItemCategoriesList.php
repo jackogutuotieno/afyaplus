@@ -163,9 +163,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_item_categories_id" class="item_categories_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->category_name->Visible) { // category_name ?>
         <th data-name="category_name" class="<?= $Page->category_name->headerCellClass() ?>"><div id="elh_item_categories_category_name" class="item_categories_category_name"><?= $Page->renderFieldHeader($Page->category_name) ?></div></th>
 <?php } ?>
@@ -197,14 +194,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_categories_id" class="el_item_categories_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->category_name->Visible) { // category_name ?>
         <td data-name="category_name"<?= $Page->category_name->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_categories_category_name" class="el_item_categories_category_name">

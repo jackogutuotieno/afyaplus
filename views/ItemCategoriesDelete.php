@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_item_categories_id" class="item_categories_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->category_name->Visible) { // category_name ?>
         <th class="<?= $Page->category_name->headerCellClass() ?>"><span id="elh_item_categories_category_name" class="item_categories_category_name"><?= $Page->category_name->caption() ?></span></th>
 <?php } ?>
@@ -77,14 +74,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->category_name->Visible) { // category_name ?>
         <td<?= $Page->category_name->cellAttributes() ?>>
 <span id="">

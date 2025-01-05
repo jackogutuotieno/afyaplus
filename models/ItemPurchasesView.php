@@ -1003,14 +1003,6 @@ class ItemPurchasesView extends ItemPurchases
             // unit_price
             $this->unit_price->HrefValue = "";
             $this->unit_price->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

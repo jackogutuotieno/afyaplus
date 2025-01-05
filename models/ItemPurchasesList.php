@@ -147,7 +147,7 @@ class ItemPurchasesList extends ItemPurchases
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->supplier_id->setVisibility();
+        $this->supplier_id->Visible = false;
         $this->category_id->setVisibility();
         $this->subcategory_id->setVisibility();
         $this->item_title->setVisibility();
@@ -1305,7 +1305,6 @@ class ItemPurchasesList extends ItemPurchases
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->supplier_id); // supplier_id
             $this->updateSort($this->category_id); // category_id
             $this->updateSort($this->subcategory_id); // subcategory_id
             $this->updateSort($this->item_title); // item_title
@@ -1410,6 +1409,14 @@ class ItemPurchasesList extends ItemPurchases
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1447,6 +1454,10 @@ class ItemPurchasesList extends ItemPurchases
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1583,7 +1594,6 @@ class ItemPurchasesList extends ItemPurchases
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "supplier_id");
             $this->createColumnOption($option, "category_id");
             $this->createColumnOption($option, "subcategory_id");
             $this->createColumnOption($option, "item_title");
@@ -2200,10 +2210,6 @@ class ItemPurchasesList extends ItemPurchases
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // supplier_id
-            $this->supplier_id->HrefValue = "";
-            $this->supplier_id->TooltipValue = "";
-
             // category_id
             $this->category_id->HrefValue = "";
             $this->category_id->TooltipValue = "";
@@ -2664,7 +2670,10 @@ class ItemPurchasesList extends ItemPurchases
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add purchase");
     }
 
     // Page Unload event

@@ -1344,8 +1344,6 @@ class Suppliers extends DbTable
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->email_address);
                     $doc->exportCaption($this->physical_address);
-                    $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->supplier_name);
@@ -1385,8 +1383,6 @@ class Suppliers extends DbTable
                         $doc->exportField($this->phone);
                         $doc->exportField($this->email_address);
                         $doc->exportField($this->physical_address);
-                        $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->supplier_name);

@@ -906,14 +906,6 @@ class SuppliersView extends Suppliers
             // physical_address
             $this->physical_address->HrefValue = "";
             $this->physical_address->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
