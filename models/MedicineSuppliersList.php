@@ -154,11 +154,11 @@ class MedicineSuppliersList extends MedicineSuppliers
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_name->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
+        $this->physical_address->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -1296,11 +1296,9 @@ class MedicineSuppliersList extends MedicineSuppliers
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->supplier_name); // supplier_name
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
-            $this->updateSort($this->physical_address); // physical_address
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1390,6 +1388,14 @@ class MedicineSuppliersList extends MedicineSuppliers
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1427,6 +1433,10 @@ class MedicineSuppliersList extends MedicineSuppliers
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1549,11 +1559,9 @@ class MedicineSuppliersList extends MedicineSuppliers
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "supplier_name");
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
-            $this->createColumnOption($option, "physical_address");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2093,10 +2101,6 @@ class MedicineSuppliersList extends MedicineSuppliers
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // supplier_name
             $this->supplier_name->HrefValue = "";
             $this->supplier_name->TooltipValue = "";
@@ -2124,10 +2128,6 @@ class MedicineSuppliersList extends MedicineSuppliers
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

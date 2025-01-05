@@ -31,6 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["status", [], fields.status.isInvalid],
             ["created_by_user_id", [], fields.created_by_user_id.isInvalid],
             ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
+            ["y_date_created", [ew.Validators.between], false],
             ["date_updated", [ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
         ])
         // Validate form
@@ -271,14 +272,14 @@ loadjs.ready("flaboratory_billing_reportsearch", function() {
     <div id="r_date_created" class="row"<?= $Page->date_created->rowAttributes() ?>>
         <label for="x_date_created" class="<?= $Page->LeftColumnClass ?>"><span id="elh_laboratory_billing_report_date_created"><?= $Page->date_created->caption() ?></span>
         <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_date_created" id="z_date_created" value="=">
+<?= $Language->phrase("BETWEEN") ?>
+<input type="hidden" name="z_date_created" id="z_date_created" value="BETWEEN">
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>">
             <div<?= $Page->date_created->cellAttributes() ?>>
                 <div class="d-flex align-items-start">
-                <span id="el_laboratory_billing_report_date_created" class="ew-search-field ew-search-field-single">
+                <span id="el_laboratory_billing_report_date_created" class="ew-search-field">
 <input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="laboratory_billing_report" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->date_created->getErrorMessage(false) ?></div>
 <?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
@@ -307,6 +308,40 @@ loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function ()
             }
         };
     ew.createDateTimePicker("flaboratory_billing_reportsearch", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+                    <span class="ew-search-and"><label><?= $Language->phrase("AND") ?></label></span>
+                    <span id="el2_laboratory_billing_report_date_created" class="ew-search-field2">
+<input type="<?= $Page->date_created->getInputTextType() ?>" name="y_date_created" id="y_date_created" data-table="laboratory_billing_report" data-field="x_date_created" value="<?= $Page->date_created->EditValue2 ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage(false) ?></div>
+<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flaboratory_billing_reportsearch", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flaboratory_billing_reportsearch", "y_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
 });
 </script>
 <?php } ?>

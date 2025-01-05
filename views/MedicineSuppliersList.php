@@ -163,9 +163,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_medicine_suppliers_id" class="medicine_suppliers_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->supplier_name->Visible) { // supplier_name ?>
         <th data-name="supplier_name" class="<?= $Page->supplier_name->headerCellClass() ?>"><div id="elh_medicine_suppliers_supplier_name" class="medicine_suppliers_supplier_name"><?= $Page->renderFieldHeader($Page->supplier_name) ?></div></th>
 <?php } ?>
@@ -174,9 +171,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->email_address->Visible) { // email_address ?>
         <th data-name="email_address" class="<?= $Page->email_address->headerCellClass() ?>"><div id="elh_medicine_suppliers_email_address" class="medicine_suppliers_email_address"><?= $Page->renderFieldHeader($Page->email_address) ?></div></th>
-<?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <th data-name="physical_address" class="<?= $Page->physical_address->headerCellClass() ?>"><div id="elh_medicine_suppliers_physical_address" class="medicine_suppliers_physical_address"><?= $Page->renderFieldHeader($Page->physical_address) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_medicine_suppliers_date_created" class="medicine_suppliers_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -212,14 +206,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_id" class="el_medicine_suppliers_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->supplier_name->Visible) { // supplier_name ?>
         <td data-name="supplier_name"<?= $Page->supplier_name->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_supplier_name" class="el_medicine_suppliers_supplier_name">
@@ -251,14 +237,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <?= $Page->email_address->getViewValue() ?>
 <?php } ?>
 </span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <td data-name="physical_address"<?= $Page->physical_address->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_medicine_suppliers_physical_address" class="el_medicine_suppliers_physical_address">
-<span<?= $Page->physical_address->viewAttributes() ?>>
-<?= $Page->physical_address->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

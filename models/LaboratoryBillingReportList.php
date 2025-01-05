@@ -1217,7 +1217,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             return "";
         }
         $this->buildSearchSql($where, $this->id, $default, false); // id
-        $this->buildSearchSql($where, $this->patient_id, $default, false); // patient_id
+        $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
         $this->buildSearchSql($where, $this->visit_id, $default, false); // visit_id
         $this->buildSearchSql($where, $this->status, $default, false); // status
         $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
@@ -1332,7 +1332,7 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         // Field patient_id
         $filter = $this->queryBuilderWhere("patient_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->patient_id, false, false);
+            $this->buildSearchSql($filter, $this->patient_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -2475,6 +2475,37 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_id
+            if ($this->patient_id->UseFilter && !EmptyValue($this->patient_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_id->AdvancedSearch->SearchValue)) {
+                    $this->patient_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+                }
+                $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+            }
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue2 = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue2, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+        }
+        if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
@@ -2489,6 +2520,12 @@ class LaboratoryBillingReportList extends LaboratoryBillingReport
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
+        }
+        if (!CheckDate($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern())) {
+            $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+        }
+        if (!CheckDate($this->date_created->AdvancedSearch->SearchValue2, $this->date_created->formatPattern())) {
+            $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
         }
 
         // Return validate result

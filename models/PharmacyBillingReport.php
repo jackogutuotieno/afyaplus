@@ -155,7 +155,8 @@ class PharmacyBillingReport extends DbTable
         $this->patient_id->setSelectMultiple(false); // Select one
         $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->UseFilter = true; // Table header filter
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', true, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
@@ -206,6 +207,8 @@ class PharmacyBillingReport extends DbTable
         $this->dispensation_type->InputTextType = "text";
         $this->dispensation_type->Nullable = false; // NOT NULL field
         $this->dispensation_type->Required = true; // Required field
+        $this->dispensation_type->UseFilter = true; // Table header filter
+        $this->dispensation_type->Lookup = new Lookup($this->dispensation_type, 'pharmacy_billing_report', true, 'dispensation_type', ["dispensation_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->dispensation_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['dispensation_type'] = &$this->dispensation_type;
 

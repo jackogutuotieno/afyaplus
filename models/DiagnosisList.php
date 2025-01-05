@@ -154,7 +154,7 @@ class DiagnosisList extends Diagnosis
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->lab_test_report_id->setVisibility();
         $this->disease_id->setVisibility();
         $this->created_by_user_id->setVisibility();
@@ -794,8 +794,41 @@ class DiagnosisList extends Diagnosis
             $this->OtherOptions->hideAllOptions();
         }
 
+        // Get default search criteria
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
+
+        // Process filter list
+        if ($this->processFilterList()) {
+            $this->terminate();
+            return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
+        }
+
+        // Restore search parms from Session if not searching / reset / export
+        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+            $this->restoreSearchParms();
+        }
+
+        // Call Recordset SearchValidated event
+        $this->recordsetSearchValidated();
+
         // Set up sorting order
         $this->setupSortOrder();
+
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -803,6 +836,39 @@ class DiagnosisList extends Diagnosis
         } else {
             $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms() && !$query) {
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
+        }
+
+        // Build search criteria
+        if ($query) {
+            AddFilter($this->SearchWhere, $query);
+        } else {
+            AddFilter($this->SearchWhere, $srchAdvanced);
+            AddFilter($this->SearchWhere, $srchBasic);
+        }
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json" && !$query) {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -865,6 +931,13 @@ class DiagnosisList extends Diagnosis
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
+            }
+
+            // Audit trail on search
+            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
+                $searchParm = ServerVar("QUERY_STRING");
+                $searchSql = $this->getSessionWhere();
+                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -1006,6 +1079,350 @@ class DiagnosisList extends Diagnosis
         return $wrkFilter;
     }
 
+    // Get list of filters
+    public function getFilterList()
+    {
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fdiagnosissrch");
+        }
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->lab_test_report_id->AdvancedSearch->toJson(), ","); // Field lab_test_report_id
+        $filterList = Concat($filterList, $this->disease_id->AdvancedSearch->toJson(), ","); // Field disease_id
+        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
+        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
+        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            Profile()->setSearchFilters("fdiagnosissrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
+
+        // Field lab_test_report_id
+        $this->lab_test_report_id->AdvancedSearch->SearchValue = @$filter["x_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchOperator = @$filter["z_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchCondition = @$filter["v_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchValue2 = @$filter["y_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->SearchOperator2 = @$filter["w_lab_test_report_id"];
+        $this->lab_test_report_id->AdvancedSearch->save();
+
+        // Field disease_id
+        $this->disease_id->AdvancedSearch->SearchValue = @$filter["x_disease_id"];
+        $this->disease_id->AdvancedSearch->SearchOperator = @$filter["z_disease_id"];
+        $this->disease_id->AdvancedSearch->SearchCondition = @$filter["v_disease_id"];
+        $this->disease_id->AdvancedSearch->SearchValue2 = @$filter["y_disease_id"];
+        $this->disease_id->AdvancedSearch->SearchOperator2 = @$filter["w_disease_id"];
+        $this->disease_id->AdvancedSearch->save();
+
+        // Field created_by_user_id
+        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->save();
+
+        // Field date_created
+        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
+        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
+        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
+        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
+        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
+        $this->date_created->AdvancedSearch->save();
+
+        // Field date_updated
+        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
+        $this->date_updated->AdvancedSearch->save();
+    }
+
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->lab_test_report_id, $default, true); // lab_test_report_id
+        $this->buildSearchSql($where, $this->disease_id, $default, true); // disease_id
+        $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
+        $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
+        $this->buildSearchSql($where, $this->date_updated, $default, false); // date_updated
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->lab_test_report_id->AdvancedSearch->save(); // lab_test_report_id
+            $this->disease_id->AdvancedSearch->save(); // disease_id
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->date_updated->AdvancedSearch->save(); // date_updated
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->lab_test_report_id->AdvancedSearch->save(); // lab_test_report_id
+            $this->disease_id->AdvancedSearch->save(); // disease_id
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->date_updated->AdvancedSearch->save(); // date_updated
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
+    // Show list of filters
+    public function showFilterList()
+    {
+        global $Language;
+
+        // Initialize
+        $filterList = "";
+        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
+        $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field lab_test_report_id
+        $filter = $this->queryBuilderWhere("lab_test_report_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->lab_test_report_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->lab_test_report_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field disease_id
+        $filter = $this->queryBuilderWhere("disease_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->disease_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->disease_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field created_by_user_id
+        $filter = $this->queryBuilderWhere("created_by_user_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->created_by_user_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->created_by_user_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field date_created
+        $filter = $this->queryBuilderWhere("date_created");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->date_created, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field date_updated
+        $filter = $this->queryBuilderWhere("date_updated");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->date_updated, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_updated->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Show Filters
+        if ($filterList != "") {
+            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
+                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
+            $this->messageShowing($message, "");
+            Write($message);
+        } else { // Output empty tag
+            Write("<div id=\"ew-filter-list\"></div>");
+        }
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->lab_test_report_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->disease_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->created_by_user_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_updated->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->lab_test_report_id->AdvancedSearch->unsetSession();
+        $this->disease_id->AdvancedSearch->unsetSession();
+        $this->created_by_user_id->AdvancedSearch->unsetSession();
+        $this->date_created->AdvancedSearch->unsetSession();
+        $this->date_updated->AdvancedSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->lab_test_report_id->AdvancedSearch->load();
+        $this->disease_id->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
+        $this->date_updated->AdvancedSearch->load();
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1021,7 +1438,6 @@ class DiagnosisList extends Diagnosis
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->lab_test_report_id); // lab_test_report_id
             $this->updateSort($this->disease_id); // disease_id
             $this->updateSort($this->created_by_user_id); // created_by_user_id
@@ -1042,6 +1458,11 @@ class DiagnosisList extends Diagnosis
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -1108,6 +1529,14 @@ class DiagnosisList extends Diagnosis
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1145,6 +1574,10 @@ class DiagnosisList extends Diagnosis
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1267,7 +1700,6 @@ class DiagnosisList extends Diagnosis
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "lab_test_report_id");
             $this->createColumnOption($option, "disease_id");
             $this->createColumnOption($option, "created_by_user_id");
@@ -1298,10 +1730,10 @@ class DiagnosisList extends Diagnosis
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fdiagnosissrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fdiagnosissrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1608,6 +2040,69 @@ class DiagnosisList extends Diagnosis
         $this->renderListOptions();
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // lab_test_report_id
+        if ($this->lab_test_report_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->lab_test_report_id->AdvancedSearch->SearchValue != "" || $this->lab_test_report_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // disease_id
+        if ($this->disease_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->disease_id->AdvancedSearch->SearchValue != "" || $this->disease_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // created_by_user_id
+        if ($this->created_by_user_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->created_by_user_id->AdvancedSearch->SearchValue != "" || $this->created_by_user_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_created
+        if ($this->date_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_created->AdvancedSearch->SearchValue != "" || $this->date_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_updated
+        if ($this->date_updated->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_updated->AdvancedSearch->SearchValue != "" || $this->date_updated->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -1853,10 +2348,6 @@ class DiagnosisList extends Diagnosis
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";
             $this->lab_test_report_id->TooltipValue = "";
@@ -1876,12 +2367,68 @@ class DiagnosisList extends Diagnosis
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // lab_test_report_id
+            if ($this->lab_test_report_id->UseFilter && !EmptyValue($this->lab_test_report_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->lab_test_report_id->AdvancedSearch->SearchValue)) {
+                    $this->lab_test_report_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->lab_test_report_id->AdvancedSearch->SearchValue);
+                }
+                $this->lab_test_report_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->lab_test_report_id->AdvancedSearch->SearchValue);
+            }
+
+            // disease_id
+            if ($this->disease_id->UseFilter && !EmptyValue($this->disease_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->disease_id->AdvancedSearch->SearchValue)) {
+                    $this->disease_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->disease_id->AdvancedSearch->SearchValue);
+                }
+                $this->disease_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->disease_id->AdvancedSearch->SearchValue);
+            }
+
+            // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern()), $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
+        }
+        if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+        if (!CheckDate($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern())) {
+            $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
     }
 
     /**
@@ -2194,6 +2741,17 @@ class DiagnosisList extends Diagnosis
         return $conn->fetchAssociative($sql);
     }
 
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->lab_test_report_id->AdvancedSearch->load();
+        $this->disease_id->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
+        $this->date_updated->AdvancedSearch->load();
+    }
+
     // Get export HTML tag
     protected function getExportTag($type, $custom = false)
     {
@@ -2305,6 +2863,21 @@ class DiagnosisList extends Diagnosis
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fdiagnosissrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        } else {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        }
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
+
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -2328,7 +2901,7 @@ class DiagnosisList extends Diagnosis
     // Check if any search fields
     public function hasSearchFields()
     {
-        return false;
+        return $this->lab_test_report_id->Visible || $this->disease_id->Visible || $this->date_created->Visible;
     }
 
     // Render search options

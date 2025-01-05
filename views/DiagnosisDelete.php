@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_diagnosis_id" class="diagnosis_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
         <th class="<?= $Page->lab_test_report_id->headerCellClass() ?>"><span id="elh_diagnosis_lab_test_report_id" class="diagnosis_lab_test_report_id"><?= $Page->lab_test_report_id->caption() ?></span></th>
 <?php } ?>
@@ -89,14 +86,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->lab_test_report_id->Visible) { // lab_test_report_id ?>
         <td<?= $Page->lab_test_report_id->cellAttributes() ?>>
 <span id="">

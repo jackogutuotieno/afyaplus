@@ -130,7 +130,7 @@ class DiagnosisDelete extends Diagnosis
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->lab_test_report_id->setVisibility();
         $this->disease_id->setVisibility();
         $this->created_by_user_id->setVisibility();
@@ -756,10 +756,6 @@ class DiagnosisDelete extends Diagnosis
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // lab_test_report_id
             $this->lab_test_report_id->HrefValue = "";

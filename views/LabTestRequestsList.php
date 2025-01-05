@@ -22,6 +22,12 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -65,6 +71,9 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_vi
 }
 ?>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="flab_test_requestssrch" id="flab_test_requestssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="flab_test_requestssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -85,8 +94,46 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+            ["date_created", [ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
+            ["y_date_created", [ew.Validators.between], false]
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
 
         // Filters
@@ -101,6 +148,175 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+<?php
+if (!$Page->patient_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_patient_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_patient_id"
+            name="x_patient_id[]"
+            class="form-control ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+            data-select2-id="flab_test_requestssrch_x_patient_id"
+            data-table="lab_test_requests"
+            data-field="x_patient_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->patient_id->editAttributes() ?>>
+            <?= $Page->patient_id->selectOptionListHtml("x_patient_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("flab_test_requestssrch", function() {
+            var options = {
+                name: "x_patient_id",
+                selectId: "flab_test_requestssrch_x_patient_id",
+                ajax: { id: "x_patient_id", form: "flab_test_requestssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.lab_test_requests.fields.patient_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+<?php
+if (!$Page->created_by_user_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_created_by_user_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->created_by_user_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_created_by_user_id"
+            name="x_created_by_user_id[]"
+            class="form-control ew-select<?= $Page->created_by_user_id->isInvalidClass() ?>"
+            data-select2-id="flab_test_requestssrch_x_created_by_user_id"
+            data-table="lab_test_requests"
+            data-field="x_created_by_user_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->created_by_user_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->created_by_user_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->created_by_user_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->created_by_user_id->editAttributes() ?>>
+            <?= $Page->created_by_user_id->selectOptionListHtml("x_created_by_user_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->created_by_user_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("flab_test_requestssrch", function() {
+            var options = {
+                name: "x_created_by_user_id",
+                selectId: "flab_test_requestssrch_x_created_by_user_id",
+                ajax: { id: "x_created_by_user_id", form: "flab_test_requestssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.lab_test_requests.fields.created_by_user_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->date_created->Visible) { // date_created ?>
+<?php
+if (!$Page->date_created->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_date_created" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->date_created->UseFilter ? " ew-filter-field" : "" ?>">
+        <div class="d-flex my-1 my-sm-0">
+            <label for="x_date_created" class="ew-search-caption ew-label"><?= $Page->date_created->caption() ?></label>
+            <div class="ew-search-operator">
+<?= $Language->phrase("BETWEEN") ?>
+<input type="hidden" name="z_date_created" id="z_date_created" value="BETWEEN">
+</div>
+        </div>
+        <div id="el_lab_test_requests_date_created" class="ew-search-field">
+<input type="<?= $Page->date_created->getInputTextType() ?>" name="x_date_created" id="x_date_created" data-table="lab_test_requests" data-field="x_date_created" value="<?= $Page->date_created->EditValue ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage(false) ?></div>
+<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flab_test_requestssrch", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flab_test_requestssrch", "x_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</div>
+        <div class="d-flex my-1 my-sm-0">
+            <div class="ew-search-and"><label><?= $Language->phrase("AND") ?></label></div>
+        </div><!-- /.ew-search-field -->
+        <div id="el2_lab_test_requests_date_created" class="ew-search-field2">
+<input type="<?= $Page->date_created->getInputTextType() ?>" name="y_date_created" id="y_date_created" data-table="lab_test_requests" data-field="x_date_created" value="<?= $Page->date_created->EditValue2 ?>" placeholder="<?= HtmlEncode($Page->date_created->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->date_created->formatPattern()) ?>"<?= $Page->date_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->date_created->getErrorMessage(false) ?></div>
+<?php if (!$Page->date_created->ReadOnly && !$Page->date_created->Disabled && !isset($Page->date_created->EditAttrs["readonly"]) && !isset($Page->date_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["flab_test_requestssrch", "datetimepicker"], function () {
+    let format = "<?= DateFormat(11) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("flab_test_requestssrch", "y_date_created", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</div>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">

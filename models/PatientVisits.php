@@ -164,7 +164,8 @@ class PatientVisits extends DbTable
         $this->patient_id->setSelectMultiple(false); // Select one
         $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->UseFilter = true; // Table header filter
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', true, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
@@ -194,7 +195,8 @@ class PatientVisits extends DbTable
         $this->visit_type_id->setSelectMultiple(false); // Select one
         $this->visit_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->visit_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->visit_type_id->Lookup = new Lookup($this->visit_type_id, 'visit_types', false, 'id', ["visit_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "`visit_type`");
+        $this->visit_type_id->UseFilter = true; // Table header filter
+        $this->visit_type_id->Lookup = new Lookup($this->visit_type_id, 'visit_types', true, 'id', ["visit_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "`visit_type`");
         $this->visit_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_type_id'] = &$this->visit_type_id;
@@ -224,7 +226,8 @@ class PatientVisits extends DbTable
         $this->payment_method_id->setSelectMultiple(false); // Select one
         $this->payment_method_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->payment_method_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', false, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
+        $this->payment_method_id->UseFilter = true; // Table header filter
+        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', true, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
         $this->payment_method_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->payment_method_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['payment_method_id'] = &$this->payment_method_id;
@@ -252,7 +255,8 @@ class PatientVisits extends DbTable
         $this->medical_scheme_id->setSelectMultiple(false); // Select one
         $this->medical_scheme_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->medical_scheme_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', false, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
+        $this->medical_scheme_id->UseFilter = true; // Table header filter
+        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', true, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
         $this->medical_scheme_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->medical_scheme_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['medical_scheme_id'] = &$this->medical_scheme_id;

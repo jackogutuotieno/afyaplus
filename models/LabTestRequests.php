@@ -162,7 +162,8 @@ class LabTestRequests extends DbTable
         $this->patient_id->setSelectMultiple(false); // Select one
         $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], ["x_visit_id"], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->UseFilter = true; // Table header filter
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', true, 'id', ["patient_name","","",""], '', '', [], ["x_visit_id"], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
@@ -220,7 +221,8 @@ class LabTestRequests extends DbTable
         $this->created_by_user_id->setSelectMultiple(false); // Select one
         $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->created_by_user_id->UseFilter = true; // Table header filter
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', true, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['created_by_user_id'] = &$this->created_by_user_id;

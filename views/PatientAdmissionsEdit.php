@@ -137,6 +137,14 @@ loadjs.ready("fpatient_admissionsedit", function() {
 <?php } ?>
 <?php include_once "IssueItemsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patients_discharge", explode(",", $Page->getCurrentDetailTable())) && $patients_discharge->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_discharge", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientsDischargeGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatient_admissionsedit"><?= $Language->phrase("SaveBtn") ?></button>

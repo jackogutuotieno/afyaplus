@@ -160,7 +160,8 @@ class ServiceCharges extends DbTable
         $this->service_category_id->setSelectMultiple(false); // Select one
         $this->service_category_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->service_category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->service_category_id->Lookup = new Lookup($this->service_category_id, 'service_categories', false, 'id', ["category_name","","",""], '', '', [], ["x_service_subcategory_id"], [], [], [], [], false, '', '', "`category_name`");
+        $this->service_category_id->UseFilter = true; // Table header filter
+        $this->service_category_id->Lookup = new Lookup($this->service_category_id, 'service_categories', true, 'id', ["category_name","","",""], '', '', [], ["x_service_subcategory_id"], [], [], [], [], false, '', '', "`category_name`");
         $this->service_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->service_category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_category_id'] = &$this->service_category_id;
@@ -190,7 +191,8 @@ class ServiceCharges extends DbTable
         $this->service_subcategory_id->setSelectMultiple(false); // Select one
         $this->service_subcategory_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->service_subcategory_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->service_subcategory_id->Lookup = new Lookup($this->service_subcategory_id, 'service_subcategories', false, 'id', ["subcategory","","",""], '', '', ["x_service_category_id"], [], ["service_category_id"], ["x_service_category_id"], [], [], false, '', '', "`subcategory`");
+        $this->service_subcategory_id->UseFilter = true; // Table header filter
+        $this->service_subcategory_id->Lookup = new Lookup($this->service_subcategory_id, 'service_subcategories', true, 'id', ["subcategory","","",""], '', '', ["x_service_category_id"], [], ["service_category_id"], ["x_service_category_id"], [], [], false, '', '', "`subcategory`");
         $this->service_subcategory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->service_subcategory_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['service_subcategory_id'] = &$this->service_subcategory_id;
@@ -216,6 +218,8 @@ class ServiceCharges extends DbTable
         $this->service_name->InputTextType = "text";
         $this->service_name->Nullable = false; // NOT NULL field
         $this->service_name->Required = true; // Required field
+        $this->service_name->UseFilter = true; // Table header filter
+        $this->service_name->Lookup = new Lookup($this->service_name, 'service_charges', true, 'service_name', ["service_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->service_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['service_name'] = &$this->service_name;
 

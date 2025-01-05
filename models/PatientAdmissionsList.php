@@ -1448,6 +1448,13 @@ class PatientAdmissionsList extends PatientAdmissions
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
+        // "detail_patients_discharge"
+        $item = &$this->ListOptions->add("detail_patients_discharge");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patients_discharge');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $item = &$this->ListOptions->add("details");
@@ -1462,6 +1469,7 @@ class PatientAdmissionsList extends PatientAdmissions
         $pages = new SubPages();
         $pages->add("bed_assignment");
         $pages->add("issue_items");
+        $pages->add("patients_discharge");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1692,6 +1700,44 @@ class PatientAdmissionsList extends PatientAdmissions
                 $opt->Visible = false;
             }
         }
+
+        // "detail_patients_discharge"
+        $opt = $this->ListOptions["detail_patients_discharge"];
+        if ($Security->allowList(CurrentProjectID() . 'patients_discharge')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patients_discharge", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientsdischargelist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientsDischargeGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_admissions')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patients_discharge");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patients_discharge";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_admissions')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patients_discharge");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "patients_discharge";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
             $links = "";
@@ -1771,6 +1817,18 @@ class PatientAdmissionsList extends PatientAdmissions
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "issue_items";
+        }
+        $item = &$option->add("detailadd_patients_discharge");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=patients_discharge");
+        $detailPage = Container("PatientsDischargeGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'patient_admissions') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "patients_discharge";
         }
 
         // Add multiple details

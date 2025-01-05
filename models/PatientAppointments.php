@@ -165,7 +165,8 @@ class PatientAppointments extends DbTable
         $this->patient_id->setSelectMultiple(false); // Select one
         $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->UseFilter = true; // Table header filter
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', true, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
@@ -242,7 +243,8 @@ class PatientAppointments extends DbTable
         $this->doctor_id->setSelectMultiple(false); // Select one
         $this->doctor_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->doctor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->doctor_id->Lookup = new Lookup($this->doctor_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->doctor_id->UseFilter = true; // Table header filter
+        $this->doctor_id->Lookup = new Lookup($this->doctor_id, 'users', true, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->doctor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->doctor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['doctor_id'] = &$this->doctor_id;
@@ -253,10 +255,10 @@ class PatientAppointments extends DbTable
             'x_start_date', // Variable name
             'start_date', // Name
             '`start_date`', // Expression
-            CastDateFieldForLike("`start_date`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`start_date`", 7, "DB"), // Basic search expression
             133, // Type
             10, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`start_date`', // Virtual expression
             false, // Is virtual
@@ -269,7 +271,7 @@ class PatientAppointments extends DbTable
         $this->start_date->Raw = true;
         $this->start_date->Nullable = false; // NOT NULL field
         $this->start_date->Required = true; // Required field
-        $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->start_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->start_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['start_date'] = &$this->start_date;
 
@@ -279,10 +281,10 @@ class PatientAppointments extends DbTable
             'x_end_date', // Variable name
             'end_date', // Name
             '`end_date`', // Expression
-            CastDateFieldForLike("`end_date`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`end_date`", 7, "DB"), // Basic search expression
             133, // Type
             10, // Size
-            0, // Date/Time format
+            7, // Date/Time format
             false, // Is upload field
             '`end_date`', // Virtual expression
             false, // Is virtual
@@ -295,7 +297,7 @@ class PatientAppointments extends DbTable
         $this->end_date->Raw = true;
         $this->end_date->Nullable = false; // NOT NULL field
         $this->end_date->Required = true; // Required field
-        $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->end_date->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['end_date'] = &$this->end_date;
 

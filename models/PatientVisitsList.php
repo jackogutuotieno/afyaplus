@@ -1211,10 +1211,10 @@ class PatientVisitsList extends PatientVisits
         if (!$Security->canSearch()) {
             return "";
         }
-        $this->buildSearchSql($where, $this->patient_id, $default, false); // patient_id
-        $this->buildSearchSql($where, $this->visit_type_id, $default, false); // visit_type_id
-        $this->buildSearchSql($where, $this->payment_method_id, $default, false); // payment_method_id
-        $this->buildSearchSql($where, $this->medical_scheme_id, $default, false); // medical_scheme_id
+        $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
+        $this->buildSearchSql($where, $this->visit_type_id, $default, true); // visit_type_id
+        $this->buildSearchSql($where, $this->payment_method_id, $default, true); // payment_method_id
+        $this->buildSearchSql($where, $this->medical_scheme_id, $default, true); // medical_scheme_id
 
         // Set up search command
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1318,7 +1318,7 @@ class PatientVisitsList extends PatientVisits
         // Field patient_id
         $filter = $this->queryBuilderWhere("patient_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->patient_id, false, false);
+            $this->buildSearchSql($filter, $this->patient_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -1327,7 +1327,7 @@ class PatientVisitsList extends PatientVisits
         // Field visit_type_id
         $filter = $this->queryBuilderWhere("visit_type_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->visit_type_id, false, false);
+            $this->buildSearchSql($filter, $this->visit_type_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->visit_type_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -1336,7 +1336,7 @@ class PatientVisitsList extends PatientVisits
         // Field payment_method_id
         $filter = $this->queryBuilderWhere("payment_method_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->payment_method_id, false, false);
+            $this->buildSearchSql($filter, $this->payment_method_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->payment_method_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -1345,7 +1345,7 @@ class PatientVisitsList extends PatientVisits
         // Field medical_scheme_id
         $filter = $this->queryBuilderWhere("medical_scheme_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->medical_scheme_id, false, false);
+            $this->buildSearchSql($filter, $this->medical_scheme_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->medical_scheme_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -3514,6 +3514,51 @@ class PatientVisitsList extends PatientVisits
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_id
+            if ($this->patient_id->UseFilter && !EmptyValue($this->patient_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_id->AdvancedSearch->SearchValue)) {
+                    $this->patient_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+                }
+                $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+            }
+
+            // visit_type_id
+            if ($this->visit_type_id->UseFilter && !EmptyValue($this->visit_type_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->visit_type_id->AdvancedSearch->SearchValue)) {
+                    $this->visit_type_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->visit_type_id->AdvancedSearch->SearchValue);
+                }
+                $this->visit_type_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->visit_type_id->AdvancedSearch->SearchValue);
+            }
+
+            // payment_method_id
+            if ($this->payment_method_id->UseFilter && !EmptyValue($this->payment_method_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->payment_method_id->AdvancedSearch->SearchValue)) {
+                    $this->payment_method_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method_id->AdvancedSearch->SearchValue);
+                }
+                $this->payment_method_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method_id->AdvancedSearch->SearchValue);
+            }
+
+            // medical_scheme_id
+            if ($this->medical_scheme_id->UseFilter && !EmptyValue($this->medical_scheme_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->medical_scheme_id->AdvancedSearch->SearchValue)) {
+                    $this->medical_scheme_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->medical_scheme_id->AdvancedSearch->SearchValue);
+                }
+                $this->medical_scheme_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->medical_scheme_id->AdvancedSearch->SearchValue);
+            }
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
         }
 
         // Call Row Rendered event

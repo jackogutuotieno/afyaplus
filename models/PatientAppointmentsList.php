@@ -797,14 +797,23 @@ class PatientAppointmentsList extends PatientAppointments
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -823,6 +832,14 @@ class PatientAppointmentsList extends PatientAppointments
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
@@ -838,6 +855,16 @@ class PatientAppointmentsList extends PatientAppointments
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1222,6 +1249,123 @@ class PatientAppointmentsList extends PatientAppointments
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
+        $this->buildSearchSql($where, $this->_title, $default, false); // title
+        $this->buildSearchSql($where, $this->description, $default, false); // description
+        $this->buildSearchSql($where, $this->doctor_id, $default, true); // doctor_id
+        $this->buildSearchSql($where, $this->start_date, $default, false); // start_date
+        $this->buildSearchSql($where, $this->end_date, $default, false); // end_date
+        $this->buildSearchSql($where, $this->is_all_day, $default, false); // is_all_day
+        $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->_title->AdvancedSearch->save(); // title
+            $this->description->AdvancedSearch->save(); // description
+            $this->doctor_id->AdvancedSearch->save(); // doctor_id
+            $this->start_date->AdvancedSearch->save(); // start_date
+            $this->end_date->AdvancedSearch->save(); // end_date
+            $this->is_all_day->AdvancedSearch->save(); // is_all_day
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->_title->AdvancedSearch->save(); // title
+            $this->description->AdvancedSearch->save(); // description
+            $this->doctor_id->AdvancedSearch->save(); // doctor_id
+            $this->start_date->AdvancedSearch->save(); // start_date
+            $this->end_date->AdvancedSearch->save(); // end_date
+            $this->is_all_day->AdvancedSearch->save(); // is_all_day
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
     // Show list of filters
     public function showFilterList()
     {
@@ -1231,6 +1375,69 @@ class PatientAppointmentsList extends PatientAppointments
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field patient_id
+        $filter = $this->queryBuilderWhere("patient_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->patient_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field title
+        $filter = $this->queryBuilderWhere("title");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->_title, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->_title->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field description
+        $filter = $this->queryBuilderWhere("description");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->description, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->description->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field doctor_id
+        $filter = $this->queryBuilderWhere("doctor_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->doctor_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->doctor_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field start_date
+        $filter = $this->queryBuilderWhere("start_date");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->start_date, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->start_date->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field end_date
+        $filter = $this->queryBuilderWhere("end_date");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->end_date, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->end_date->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field is_all_day
+        $filter = $this->queryBuilderWhere("is_all_day");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->is_all_day, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->is_all_day->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1287,6 +1494,33 @@ class PatientAppointmentsList extends PatientAppointments
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->patient_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->_title->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->description->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->doctor_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->start_date->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->end_date->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->is_all_day->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->created_by_user_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1299,6 +1533,12 @@ class PatientAppointmentsList extends PatientAppointments
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1313,6 +1553,20 @@ class PatientAppointmentsList extends PatientAppointments
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->patient_id->AdvancedSearch->unsetSession();
+        $this->_title->AdvancedSearch->unsetSession();
+        $this->description->AdvancedSearch->unsetSession();
+        $this->doctor_id->AdvancedSearch->unsetSession();
+        $this->start_date->AdvancedSearch->unsetSession();
+        $this->end_date->AdvancedSearch->unsetSession();
+        $this->is_all_day->AdvancedSearch->unsetSession();
+        $this->created_by_user_id->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1320,6 +1574,17 @@ class PatientAppointmentsList extends PatientAppointments
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->_title->AdvancedSearch->load();
+        $this->description->AdvancedSearch->load();
+        $this->doctor_id->AdvancedSearch->load();
+        $this->start_date->AdvancedSearch->load();
+        $this->end_date->AdvancedSearch->load();
+        $this->is_all_day->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1970,6 +2235,99 @@ class PatientAppointmentsList extends PatientAppointments
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // patient_id
+        if ($this->patient_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->patient_id->AdvancedSearch->SearchValue != "" || $this->patient_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // title
+        if ($this->_title->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->_title->AdvancedSearch->SearchValue != "" || $this->_title->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // description
+        if ($this->description->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->description->AdvancedSearch->SearchValue != "" || $this->description->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // doctor_id
+        if ($this->doctor_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->doctor_id->AdvancedSearch->SearchValue != "" || $this->doctor_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // start_date
+        if ($this->start_date->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->start_date->AdvancedSearch->SearchValue != "" || $this->start_date->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // end_date
+        if ($this->end_date->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->end_date->AdvancedSearch->SearchValue != "" || $this->end_date->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // is_all_day
+        if ($this->is_all_day->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->is_all_day->AdvancedSearch->SearchValue != "" || $this->is_all_day->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        if (is_array($this->is_all_day->AdvancedSearch->SearchValue)) {
+            $this->is_all_day->AdvancedSearch->SearchValue = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $this->is_all_day->AdvancedSearch->SearchValue);
+        }
+        if (is_array($this->is_all_day->AdvancedSearch->SearchValue2)) {
+            $this->is_all_day->AdvancedSearch->SearchValue2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $this->is_all_day->AdvancedSearch->SearchValue2);
+        }
+
+        // created_by_user_id
+        if ($this->created_by_user_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->created_by_user_id->AdvancedSearch->SearchValue != "" || $this->created_by_user_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -2270,12 +2628,100 @@ class PatientAppointmentsList extends PatientAppointments
             // date_updated
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_id
+            if ($this->patient_id->UseFilter && !EmptyValue($this->patient_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_id->AdvancedSearch->SearchValue)) {
+                    $this->patient_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+                }
+                $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+            }
+
+            // title
+            $this->_title->setupEditAttributes();
+            if (!$this->_title->Raw) {
+                $this->_title->AdvancedSearch->SearchValue = HtmlDecode($this->_title->AdvancedSearch->SearchValue);
+            }
+            $this->_title->EditValue = HtmlEncode($this->_title->AdvancedSearch->SearchValue);
+            $this->_title->PlaceHolder = RemoveHtml($this->_title->caption());
+
+            // description
+            $this->description->setupEditAttributes();
+            $this->description->EditValue = HtmlEncode($this->description->AdvancedSearch->SearchValue);
+            $this->description->PlaceHolder = RemoveHtml($this->description->caption());
+
+            // doctor_id
+            if ($this->doctor_id->UseFilter && !EmptyValue($this->doctor_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->doctor_id->AdvancedSearch->SearchValue)) {
+                    $this->doctor_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->doctor_id->AdvancedSearch->SearchValue);
+                }
+                $this->doctor_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->doctor_id->AdvancedSearch->SearchValue);
+            }
+            $this->doctor_id->Lookup->LookupFilter = $this->doctor_id->getSelectFilter($this); // PHP
+
+            // start_date
+            $this->start_date->setupEditAttributes();
+            $this->start_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->start_date->AdvancedSearch->SearchValue, $this->start_date->formatPattern()), $this->start_date->formatPattern()));
+            $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+
+            // end_date
+            $this->end_date->setupEditAttributes();
+            $this->end_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->end_date->AdvancedSearch->SearchValue, $this->end_date->formatPattern()), $this->end_date->formatPattern()));
+            $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
+
+            // is_all_day
+            $this->is_all_day->EditValue = $this->is_all_day->options(false);
+            $this->is_all_day->PlaceHolder = RemoveHtml($this->is_all_day->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+
+            // date_updated
+            $this->date_updated->setupEditAttributes();
+            $this->date_updated->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern()), $this->date_updated->formatPattern()));
+            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->_title->AdvancedSearch->load();
+        $this->description->AdvancedSearch->load();
+        $this->doctor_id->AdvancedSearch->load();
+        $this->start_date->AdvancedSearch->load();
+        $this->end_date->AdvancedSearch->load();
+        $this->is_all_day->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
     }
 
     // Get export HTML tag

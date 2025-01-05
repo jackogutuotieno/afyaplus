@@ -22,6 +22,14 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "visit_type_id": <?= $Page->visit_type_id->toClientList($Page) ?>,
+            "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
+            "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -65,6 +73,9 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patients")
 }
 ?>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fpatient_visitssrch" id="fpatient_visitssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fpatient_visitssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -85,8 +96,46 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "visit_type_id": <?= $Page->visit_type_id->toClientList($Page) ?>,
+            "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
+            "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
         })
 
         // Filters
@@ -101,6 +150,166 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+<?php
+if (!$Page->patient_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_patient_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_patient_id"
+            name="x_patient_id[]"
+            class="form-control ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_visitssrch_x_patient_id"
+            data-table="patient_visits"
+            data-field="x_patient_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->patient_id->editAttributes() ?>>
+            <?= $Page->patient_id->selectOptionListHtml("x_patient_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_visitssrch", function() {
+            var options = {
+                name: "x_patient_id",
+                selectId: "fpatient_visitssrch_x_patient_id",
+                ajax: { id: "x_patient_id", form: "fpatient_visitssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_visits.fields.patient_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->visit_type_id->Visible) { // visit_type_id ?>
+<?php
+if (!$Page->visit_type_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_visit_type_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->visit_type_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_visit_type_id"
+            name="x_visit_type_id[]"
+            class="form-control ew-select<?= $Page->visit_type_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_visitssrch_x_visit_type_id"
+            data-table="patient_visits"
+            data-field="x_visit_type_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->visit_type_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->visit_type_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->visit_type_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->visit_type_id->editAttributes() ?>>
+            <?= $Page->visit_type_id->selectOptionListHtml("x_visit_type_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->visit_type_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_visitssrch", function() {
+            var options = {
+                name: "x_visit_type_id",
+                selectId: "fpatient_visitssrch_x_visit_type_id",
+                ajax: { id: "x_visit_type_id", form: "fpatient_visitssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_visits.fields.visit_type_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+<?php
+if (!$Page->payment_method_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_payment_method_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->payment_method_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_payment_method_id"
+            name="x_payment_method_id[]"
+            class="form-control ew-select<?= $Page->payment_method_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_visitssrch_x_payment_method_id"
+            data-table="patient_visits"
+            data-field="x_payment_method_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->payment_method_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->payment_method_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->payment_method_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->payment_method_id->editAttributes() ?>>
+            <?= $Page->payment_method_id->selectOptionListHtml("x_payment_method_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->payment_method_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_visitssrch", function() {
+            var options = {
+                name: "x_payment_method_id",
+                selectId: "fpatient_visitssrch_x_payment_method_id",
+                ajax: { id: "x_payment_method_id", form: "fpatient_visitssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_visits.fields.payment_method_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+<?php
+if (!$Page->medical_scheme_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_medical_scheme_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->medical_scheme_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_medical_scheme_id"
+            name="x_medical_scheme_id[]"
+            class="form-control ew-select<?= $Page->medical_scheme_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_visitssrch_x_medical_scheme_id"
+            data-table="patient_visits"
+            data-field="x_medical_scheme_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->medical_scheme_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->medical_scheme_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->medical_scheme_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->medical_scheme_id->editAttributes() ?>>
+            <?= $Page->medical_scheme_id->selectOptionListHtml("x_medical_scheme_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->medical_scheme_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_visitssrch", function() {
+            var options = {
+                name: "x_medical_scheme_id",
+                selectId: "fpatient_visitssrch_x_medical_scheme_id",
+                ajax: { id: "x_medical_scheme_id", form: "fpatient_visitssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_visits.fields.medical_scheme_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">

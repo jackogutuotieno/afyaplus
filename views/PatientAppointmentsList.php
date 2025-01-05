@@ -22,6 +22,13 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "doctor_id": <?= $Page->doctor_id->toClientList($Page) ?>,
+            "is_all_day": <?= $Page->is_all_day->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -65,6 +72,9 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patients")
 }
 ?>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fpatient_appointmentssrch" id="fpatient_appointmentssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fpatient_appointmentssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -85,8 +95,44 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "doctor_id": <?= $Page->doctor_id->toClientList($Page) ?>,
         })
 
         // Filters
@@ -101,6 +147,90 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+<?php
+if (!$Page->patient_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_patient_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_patient_id"
+            name="x_patient_id[]"
+            class="form-control ew-select<?= $Page->patient_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_appointmentssrch_x_patient_id"
+            data-table="patient_appointments"
+            data-field="x_patient_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->patient_id->editAttributes() ?>>
+            <?= $Page->patient_id->selectOptionListHtml("x_patient_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_appointmentssrch", function() {
+            var options = {
+                name: "x_patient_id",
+                selectId: "fpatient_appointmentssrch_x_patient_id",
+                ajax: { id: "x_patient_id", form: "fpatient_appointmentssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_appointments.fields.patient_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->doctor_id->Visible) { // doctor_id ?>
+<?php
+if (!$Page->doctor_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_doctor_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->doctor_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_doctor_id"
+            name="x_doctor_id[]"
+            class="form-control ew-select<?= $Page->doctor_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_appointmentssrch_x_doctor_id"
+            data-table="patient_appointments"
+            data-field="x_doctor_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->doctor_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->doctor_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->doctor_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->doctor_id->editAttributes() ?>>
+            <?= $Page->doctor_id->selectOptionListHtml("x_doctor_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->doctor_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_appointmentssrch", function() {
+            var options = {
+                name: "x_doctor_id",
+                selectId: "fpatient_appointmentssrch_x_doctor_id",
+                ajax: { id: "x_doctor_id", form: "fpatient_appointmentssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_appointments.fields.doctor_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">

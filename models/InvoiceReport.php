@@ -152,7 +152,8 @@ class InvoiceReport extends DbTable
         $this->patient_id->setSelectMultiple(false); // Select one
         $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->UseFilter = true; // Table header filter
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', true, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
         $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_id'] = &$this->patient_id;
@@ -200,6 +201,8 @@ class InvoiceReport extends DbTable
         $this->payment_status->InputTextType = "text";
         $this->payment_status->Nullable = false; // NOT NULL field
         $this->payment_status->Required = true; // Required field
+        $this->payment_status->UseFilter = true; // Table header filter
+        $this->payment_status->Lookup = new Lookup($this->payment_status, 'invoice_report', true, 'payment_status', ["payment_status","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->payment_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['payment_status'] = &$this->payment_status;
 

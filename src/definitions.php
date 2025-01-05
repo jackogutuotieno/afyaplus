@@ -205,6 +205,7 @@ return [
     "item_purchases" => \DI\create(ItemPurchases::class),
     "receive_items" => \DI\create(ReceiveItems::class),
     "issue_items" => \DI\create(IssueItems::class),
+    "patients_discharge" => \DI\create(PatientsDischarge::class),
 
     // User table
     "usertable" => \DI\get("users"),

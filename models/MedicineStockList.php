@@ -154,7 +154,7 @@ class MedicineStockList extends MedicineStock
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_id->setVisibility();
         $this->brand_id->setVisibility();
         $this->batch_number->setVisibility();
@@ -1372,7 +1372,6 @@ class MedicineStockList extends MedicineStock
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->supplier_id); // supplier_id
             $this->updateSort($this->brand_id); // brand_id
             $this->updateSort($this->batch_number); // batch_number
@@ -1480,6 +1479,14 @@ class MedicineStockList extends MedicineStock
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1517,6 +1524,10 @@ class MedicineStockList extends MedicineStock
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1639,7 +1650,6 @@ class MedicineStockList extends MedicineStock
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "supplier_id");
             $this->createColumnOption($option, "brand_id");
             $this->createColumnOption($option, "batch_number");
@@ -2284,10 +2294,6 @@ class MedicineStockList extends MedicineStock
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // supplier_id
             $this->supplier_id->HrefValue = "";

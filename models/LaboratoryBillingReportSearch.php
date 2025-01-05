@@ -892,6 +892,9 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue2 = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue2, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
             // date_updated
             $this->date_updated->setupEditAttributes();
@@ -922,6 +925,9 @@ class LaboratoryBillingReportSearch extends LaboratoryBillingReport
             $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
         }
         if (!CheckDate($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern())) {
+            $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
+        }
+        if (!CheckDate($this->date_created->AdvancedSearch->SearchValue2, $this->date_created->formatPattern())) {
             $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
         }
         if (!CheckDate($this->date_updated->AdvancedSearch->SearchValue, $this->date_updated->formatPattern())) {

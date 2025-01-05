@@ -207,6 +207,8 @@ class PatientsLabReport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->patient_name->InputTextType = "text";
+        $this->patient_name->UseFilter = true; // Table header filter
+        $this->patient_name->Lookup = new Lookup($this->patient_name, 'patients_lab_report', true, 'patient_name', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['patient_name'] = &$this->patient_name;
 

@@ -777,14 +777,23 @@ class InvoiceReportList extends InvoiceReport
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -803,6 +812,14 @@ class InvoiceReportList extends InvoiceReport
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
@@ -818,6 +835,16 @@ class InvoiceReportList extends InvoiceReport
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1148,6 +1175,114 @@ class InvoiceReportList extends InvoiceReport
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
+        $this->buildSearchSql($where, $this->description, $default, false); // description
+        $this->buildSearchSql($where, $this->payment_status, $default, true); // payment_status
+        $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
+        $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->description->AdvancedSearch->save(); // description
+            $this->payment_status->AdvancedSearch->save(); // payment_status
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->date_created->AdvancedSearch->save(); // date_created
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->description->AdvancedSearch->save(); // description
+            $this->payment_status->AdvancedSearch->save(); // payment_status
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
     // Show list of filters
     public function showFilterList()
     {
@@ -1157,6 +1292,42 @@ class InvoiceReportList extends InvoiceReport
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field patient_id
+        $filter = $this->queryBuilderWhere("patient_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->patient_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field payment_status
+        $filter = $this->queryBuilderWhere("payment_status");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->payment_status, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->payment_status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field created_by_user_id
+        $filter = $this->queryBuilderWhere("created_by_user_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->created_by_user_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->created_by_user_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field date_created
+        $filter = $this->queryBuilderWhere("date_created");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->date_created, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1213,6 +1384,24 @@ class InvoiceReportList extends InvoiceReport
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->patient_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->description->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->payment_status->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->created_by_user_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1225,6 +1414,12 @@ class InvoiceReportList extends InvoiceReport
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1239,6 +1434,17 @@ class InvoiceReportList extends InvoiceReport
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->patient_id->AdvancedSearch->unsetSession();
+        $this->description->AdvancedSearch->unsetSession();
+        $this->payment_status->AdvancedSearch->unsetSession();
+        $this->created_by_user_id->AdvancedSearch->unsetSession();
+        $this->date_created->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1246,6 +1452,14 @@ class InvoiceReportList extends InvoiceReport
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->description->AdvancedSearch->load();
+        $this->payment_status->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1896,6 +2110,69 @@ class InvoiceReportList extends InvoiceReport
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // patient_id
+        if ($this->patient_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->patient_id->AdvancedSearch->SearchValue != "" || $this->patient_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // description
+        if ($this->description->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->description->AdvancedSearch->SearchValue != "" || $this->description->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // payment_status
+        if ($this->payment_status->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->payment_status->AdvancedSearch->SearchValue != "" || $this->payment_status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // created_by_user_id
+        if ($this->created_by_user_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->created_by_user_id->AdvancedSearch->SearchValue != "" || $this->created_by_user_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_created
+        if ($this->date_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_created->AdvancedSearch->SearchValue != "" || $this->date_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -2136,12 +2413,68 @@ class InvoiceReportList extends InvoiceReport
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_id
+            if ($this->patient_id->UseFilter && !EmptyValue($this->patient_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_id->AdvancedSearch->SearchValue)) {
+                    $this->patient_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+                }
+                $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
+            }
+
+            // payment_status
+            if ($this->payment_status->UseFilter && !EmptyValue($this->payment_status->AdvancedSearch->SearchValue)) {
+                if (is_array($this->payment_status->AdvancedSearch->SearchValue)) {
+                    $this->payment_status->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_status->AdvancedSearch->SearchValue);
+                }
+                $this->payment_status->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_status->AdvancedSearch->SearchValue);
+            }
+
+            // created_by_user_id
+            $this->created_by_user_id->setupEditAttributes();
+            $this->created_by_user_id->PlaceHolder = RemoveHtml($this->created_by_user_id->caption());
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->description->AdvancedSearch->load();
+        $this->payment_status->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
     }
 
     // Get export HTML tag

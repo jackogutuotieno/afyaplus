@@ -1218,7 +1218,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","9","0"]];
 
 /**
  * Tables
@@ -1338,4 +1349,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["item_subcategories","item_subcategories","Item Subcategories",true,"{32536B8D-F37B-4419-80D5-260932800712}","itemsubcategorieslist"],
     ["item_purchases","item_purchases","Item Purchases",true,"{32536B8D-F37B-4419-80D5-260932800712}","itempurchaseslist"],
     ["receive_items","receive_items","Received Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveitemslist"],
-    ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"]];
+    ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"],
+    ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"]];

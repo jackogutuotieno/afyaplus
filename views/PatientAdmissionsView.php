@@ -101,6 +101,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "IssueItemsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patients_discharge", explode(",", $Page->getCurrentDetailTable())) && $patients_discharge->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_discharge", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientsDischargeGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

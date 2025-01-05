@@ -130,7 +130,7 @@ class MedicineStockDelete extends MedicineStock
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_id->setVisibility();
         $this->brand_id->setVisibility();
         $this->batch_number->setVisibility();
@@ -787,10 +787,6 @@ class MedicineStockDelete extends MedicineStock
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // supplier_id
             $this->supplier_id->HrefValue = "";

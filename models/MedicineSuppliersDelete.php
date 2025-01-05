@@ -130,11 +130,11 @@ class MedicineSuppliersDelete extends MedicineSuppliers
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->supplier_name->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
+        $this->physical_address->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -681,10 +681,6 @@ class MedicineSuppliersDelete extends MedicineSuppliers
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // supplier_name
             $this->supplier_name->HrefValue = "";
             $this->supplier_name->TooltipValue = "";
@@ -712,10 +708,6 @@ class MedicineSuppliersDelete extends MedicineSuppliers
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

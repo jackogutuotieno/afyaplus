@@ -116,6 +116,9 @@
     <menu id="857">
       <phrase id="menutext" value="Bed Assign" />
     </menu>
+    <menu id="1021">
+      <phrase id="menutext" value="Discharge" />
+    </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />
     </menu>
@@ -837,7 +840,7 @@
     <table id="medicine_stock">
       <phrase id="tblcaption" value="Medicine Stock" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="supplier_id">
         <phrase id="fldcaption" value="Supplier" />
@@ -946,10 +949,10 @@
     <table id="medicine_suppliers">
       <phrase id="tblcaption" value="Suppliers" />
       <field id="id">
-        <phrase id="fldcaption" value="Suier ID" />
+        <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="supplier_name">
-        <phrase id="fldcaption" value="Suppier" />
+        <phrase id="fldcaption" value="Supplier" />
       </field>
       <field id="phone">
         <phrase id="fldcaption" value="Phone" />
@@ -3461,6 +3464,31 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Issue Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="patients_discharge">
+      <phrase id="tblcaption" value="Discharge" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="admission_id">
+        <phrase id="fldcaption" value="Admission No." />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="discharge">
+        <phrase id="fldcaption" value="Discharge?" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Discharge Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

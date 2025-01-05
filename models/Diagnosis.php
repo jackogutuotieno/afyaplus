@@ -159,7 +159,8 @@ class Diagnosis extends DbTable
         $this->lab_test_report_id->setSelectMultiple(false); // Select one
         $this->lab_test_report_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->lab_test_report_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->lab_test_report_id->Lookup = new Lookup($this->lab_test_report_id, 'laboratory_minor_report', false, 'id', ["id","service_name","details",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`id`, ''),'" . ValueSeparator(1, $this->lab_test_report_id) . "',COALESCE(`service_name`,''),'" . ValueSeparator(2, $this->lab_test_report_id) . "',COALESCE(`details`,''))");
+        $this->lab_test_report_id->UseFilter = true; // Table header filter
+        $this->lab_test_report_id->Lookup = new Lookup($this->lab_test_report_id, 'laboratory_minor_report', true, 'id', ["id","service_name","details",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`id`, ''),'" . ValueSeparator(1, $this->lab_test_report_id) . "',COALESCE(`service_name`,''),'" . ValueSeparator(2, $this->lab_test_report_id) . "',COALESCE(`details`,''))");
         $this->lab_test_report_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->lab_test_report_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['lab_test_report_id'] = &$this->lab_test_report_id;
@@ -189,7 +190,8 @@ class Diagnosis extends DbTable
         $this->disease_id->setSelectMultiple(false); // Select one
         $this->disease_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->disease_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->disease_id->Lookup = new Lookup($this->disease_id, 'diseases', false, 'id', ["disease_name","icd10_code","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`disease_name`, ''),'" . ValueSeparator(1, $this->disease_id) . "',COALESCE(`icd10_code`,''))");
+        $this->disease_id->UseFilter = true; // Table header filter
+        $this->disease_id->Lookup = new Lookup($this->disease_id, 'diseases', true, 'id', ["disease_name","icd10_code","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`disease_name`, ''),'" . ValueSeparator(1, $this->disease_id) . "',COALESCE(`icd10_code`,''))");
         $this->disease_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->disease_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['disease_id'] = &$this->disease_id;
