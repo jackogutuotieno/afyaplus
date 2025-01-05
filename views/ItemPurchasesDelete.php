@@ -71,6 +71,12 @@ $Page->showMessage();
 <?php if ($Page->unit_price->Visible) { // unit_price ?>
         <th class="<?= $Page->unit_price->headerCellClass() ?>"><span id="elh_item_purchases_unit_price" class="item_purchases_unit_price"><?= $Page->unit_price->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <th class="<?= $Page->selling_price->headerCellClass() ?>"><span id="elh_item_purchases_selling_price" class="item_purchases_selling_price"><?= $Page->selling_price->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <th class="<?= $Page->amount_paid->headerCellClass() ?>"><span id="elh_item_purchases_amount_paid" class="item_purchases_amount_paid"><?= $Page->amount_paid->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_item_purchases_date_created" class="item_purchases_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -151,6 +157,22 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->unit_price->viewAttributes() ?>>
 <?= $Page->unit_price->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <td<?= $Page->selling_price->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->selling_price->viewAttributes() ?>>
+<?= $Page->selling_price->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <td<?= $Page->amount_paid->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->amount_paid->viewAttributes() ?>>
+<?= $Page->amount_paid->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

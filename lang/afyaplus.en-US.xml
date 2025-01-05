@@ -210,7 +210,7 @@
       <phrase id="menutext" value="Suppliers" />
     </menu>
     <menu id="963">
-      <phrase id="menutext" value="Purchases" />
+      <phrase id="menutext" value="Items" />
     </menu>
     <menu id="53">
       <phrase id="menutext" value="Financials" />
@@ -3369,7 +3369,7 @@
         <phrase id="fldcaption" value="Item Title" />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="Qauntity" />
+        <phrase id="fldcaption" value="Qty" />
       </field>
       <field id="measuring_unit">
         <phrase id="fldcaption" value="Measuring Unit" />
@@ -3390,6 +3390,16 @@
       </field>
       <field id="unit_price">
         <phrase id="fldcaption" value="Unit Price (Kshs)" />
+      </field>
+      <field id="selling_price">
+        <phrase id="fldcaption" value="SP (Kshs)" />
+      </field>
+      <field id="amount_paid">
+        <phrase id="fldcaption" value="Amount Paid (Kshs)" />
+      </field>
+      <field id="invoice_attachment">
+        <phrase id="fldcaption" value="Invoice Attachment" />
+        <phrase id="custommsg" value="Attach photo/ copy of invoice in pdf or jpg format" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Purchase Date" />

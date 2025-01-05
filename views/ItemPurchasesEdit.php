@@ -35,7 +35,10 @@ loadjs.ready(["wrapper", "head"], function () {
             ["item_title", [fields.item_title.visible && fields.item_title.required ? ew.Validators.required(fields.item_title.caption) : null], fields.item_title.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
             ["measuring_unit", [fields.measuring_unit.visible && fields.measuring_unit.required ? ew.Validators.required(fields.measuring_unit.caption) : null], fields.measuring_unit.isInvalid],
-            ["unit_price", [fields.unit_price.visible && fields.unit_price.required ? ew.Validators.required(fields.unit_price.caption) : null, ew.Validators.float], fields.unit_price.isInvalid]
+            ["unit_price", [fields.unit_price.visible && fields.unit_price.required ? ew.Validators.required(fields.unit_price.caption) : null, ew.Validators.float], fields.unit_price.isInvalid],
+            ["selling_price", [fields.selling_price.visible && fields.selling_price.required ? ew.Validators.required(fields.selling_price.caption) : null, ew.Validators.float], fields.selling_price.isInvalid],
+            ["amount_paid", [fields.amount_paid.visible && fields.amount_paid.required ? ew.Validators.required(fields.amount_paid.caption) : null, ew.Validators.float], fields.amount_paid.isInvalid],
+            ["invoice_attachment", [fields.invoice_attachment.visible && fields.invoice_attachment.required ? ew.Validators.fileRequired(fields.invoice_attachment.caption) : null], fields.invoice_attachment.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -51,6 +54,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "supplier_id": <?= $Page->supplier_id->toClientList($Page) ?>,
             "category_id": <?= $Page->category_id->toClientList($Page) ?>,
             "subcategory_id": <?= $Page->subcategory_id->toClientList($Page) ?>,
             "measuring_unit": <?= $Page->measuring_unit->toClientList($Page) ?>,
@@ -111,6 +115,7 @@ loadjs.ready("head", function () {
     </select>
     <?= $Page->supplier_id->getCustomMessage() ?>
     <div class="invalid-feedback"><?= $Page->supplier_id->getErrorMessage() ?></div>
+<?= $Page->supplier_id->Lookup->getParamTag($Page, "p_x_supplier_id") ?>
 <?php if (!$Page->supplier_id->IsNativeSelect) { ?>
 <script>
 loadjs.ready("fitem_purchasesedit", function() {
@@ -305,6 +310,65 @@ loadjs.ready("fitem_purchasesedit", function() {
 <input type="<?= $Page->unit_price->getInputTextType() ?>" name="x_unit_price" id="x_unit_price" data-table="item_purchases" data-field="x_unit_price" value="<?= $Page->unit_price->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->unit_price->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->unit_price->formatPattern()) ?>"<?= $Page->unit_price->editAttributes() ?> aria-describedby="x_unit_price_help">
 <?= $Page->unit_price->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->unit_price->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+    <div id="r_selling_price"<?= $Page->selling_price->rowAttributes() ?>>
+        <label id="elh_item_purchases_selling_price" for="x_selling_price" class="<?= $Page->LeftColumnClass ?>"><?= $Page->selling_price->caption() ?><?= $Page->selling_price->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->selling_price->cellAttributes() ?>>
+<span id="el_item_purchases_selling_price">
+<input type="<?= $Page->selling_price->getInputTextType() ?>" name="x_selling_price" id="x_selling_price" data-table="item_purchases" data-field="x_selling_price" value="<?= $Page->selling_price->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->selling_price->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->selling_price->formatPattern()) ?>"<?= $Page->selling_price->editAttributes() ?> aria-describedby="x_selling_price_help">
+<?= $Page->selling_price->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->selling_price->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+    <div id="r_amount_paid"<?= $Page->amount_paid->rowAttributes() ?>>
+        <label id="elh_item_purchases_amount_paid" for="x_amount_paid" class="<?= $Page->LeftColumnClass ?>"><?= $Page->amount_paid->caption() ?><?= $Page->amount_paid->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->amount_paid->cellAttributes() ?>>
+<span id="el_item_purchases_amount_paid">
+<input type="<?= $Page->amount_paid->getInputTextType() ?>" name="x_amount_paid" id="x_amount_paid" data-table="item_purchases" data-field="x_amount_paid" value="<?= $Page->amount_paid->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->amount_paid->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->amount_paid->formatPattern()) ?>"<?= $Page->amount_paid->editAttributes() ?> aria-describedby="x_amount_paid_help">
+<?= $Page->amount_paid->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->amount_paid->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->invoice_attachment->Visible) { // invoice_attachment ?>
+    <div id="r_invoice_attachment"<?= $Page->invoice_attachment->rowAttributes() ?>>
+        <label id="elh_item_purchases_invoice_attachment" class="<?= $Page->LeftColumnClass ?>"><?= $Page->invoice_attachment->caption() ?><?= $Page->invoice_attachment->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->invoice_attachment->cellAttributes() ?>>
+<span id="el_item_purchases_invoice_attachment">
+<div id="fd_x_invoice_attachment" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_invoice_attachment"
+        name="x_invoice_attachment"
+        class="form-control ew-file-input"
+        title="<?= $Page->invoice_attachment->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="item_purchases"
+        data-field="x_invoice_attachment"
+        data-size="2147483647"
+        data-accept-file-types="<?= $Page->invoice_attachment->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->invoice_attachment->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->invoice_attachment->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_invoice_attachment_help"
+        <?= ($Page->invoice_attachment->ReadOnly || $Page->invoice_attachment->Disabled) ? " disabled" : "" ?>
+        <?= $Page->invoice_attachment->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->invoice_attachment->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->invoice_attachment->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_invoice_attachment" id= "fn_x_invoice_attachment" value="<?= $Page->invoice_attachment->Upload->FileName ?>">
+<input type="hidden" name="fa_x_invoice_attachment" id= "fa_x_invoice_attachment" value="<?= (Post("fa_x_invoice_attachment") == "0") ? "0" : "1" ?>">
+<table id="ft_x_invoice_attachment" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>

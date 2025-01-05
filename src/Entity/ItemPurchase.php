@@ -54,6 +54,15 @@ class ItemPurchase extends AbstractEntity
     #[Column(name: "unit_price", type: "float")]
     private float $unitPrice;
 
+    #[Column(name: "selling_price", type: "float")]
+    private float $sellingPrice;
+
+    #[Column(name: "amount_paid", type: "float")]
+    private float $amountPaid;
+
+    #[Column(name: "invoice_attachment", type: "blob")]
+    private mixed $invoiceAttachment;
+
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -145,6 +154,39 @@ class ItemPurchase extends AbstractEntity
     public function setUnitPrice(float $value): static
     {
         $this->unitPrice = $value;
+        return $this;
+    }
+
+    public function getSellingPrice(): float
+    {
+        return $this->sellingPrice;
+    }
+
+    public function setSellingPrice(float $value): static
+    {
+        $this->sellingPrice = $value;
+        return $this;
+    }
+
+    public function getAmountPaid(): float
+    {
+        return $this->amountPaid;
+    }
+
+    public function setAmountPaid(float $value): static
+    {
+        $this->amountPaid = $value;
+        return $this;
+    }
+
+    public function getInvoiceAttachment(): mixed
+    {
+        return $this->invoiceAttachment;
+    }
+
+    public function setInvoiceAttachment(mixed $value): static
+    {
+        $this->invoiceAttachment = $value;
         return $this;
     }
 

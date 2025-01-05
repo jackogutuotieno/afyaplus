@@ -184,6 +184,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->unit_price->Visible) { // unit_price ?>
         <th data-name="unit_price" class="<?= $Page->unit_price->headerCellClass() ?>"><div id="elh_item_purchases_unit_price" class="item_purchases_unit_price"><?= $Page->renderFieldHeader($Page->unit_price) ?></div></th>
 <?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <th data-name="selling_price" class="<?= $Page->selling_price->headerCellClass() ?>"><div id="elh_item_purchases_selling_price" class="item_purchases_selling_price"><?= $Page->renderFieldHeader($Page->selling_price) ?></div></th>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <th data-name="amount_paid" class="<?= $Page->amount_paid->headerCellClass() ?>"><div id="elh_item_purchases_amount_paid" class="item_purchases_amount_paid"><?= $Page->renderFieldHeader($Page->amount_paid) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_item_purchases_date_created" class="item_purchases_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -271,6 +277,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_unit_price" class="el_item_purchases_unit_price">
 <span<?= $Page->unit_price->viewAttributes() ?>>
 <?= $Page->unit_price->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <td data-name="selling_price"<?= $Page->selling_price->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_selling_price" class="el_item_purchases_selling_price">
+<span<?= $Page->selling_price->viewAttributes() ?>>
+<?= $Page->selling_price->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <td data-name="amount_paid"<?= $Page->amount_paid->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_amount_paid" class="el_item_purchases_amount_paid">
+<span<?= $Page->amount_paid->viewAttributes() ?>>
+<?= $Page->amount_paid->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

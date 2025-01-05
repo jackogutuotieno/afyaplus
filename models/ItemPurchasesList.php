@@ -154,6 +154,9 @@ class ItemPurchasesList extends ItemPurchases
         $this->quantity->setVisibility();
         $this->measuring_unit->setVisibility();
         $this->unit_price->setVisibility();
+        $this->selling_price->setVisibility();
+        $this->amount_paid->setVisibility();
+        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -712,6 +715,7 @@ class ItemPurchasesList extends ItemPurchases
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->supplier_id);
         $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->subcategory_id);
         $this->setupLookupOptions($this->measuring_unit);
@@ -1065,6 +1069,8 @@ class ItemPurchasesList extends ItemPurchases
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
         $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
         $filterList = Concat($filterList, $this->unit_price->AdvancedSearch->toJson(), ","); // Field unit_price
+        $filterList = Concat($filterList, $this->selling_price->AdvancedSearch->toJson(), ","); // Field selling_price
+        $filterList = Concat($filterList, $this->amount_paid->AdvancedSearch->toJson(), ","); // Field amount_paid
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1170,6 +1176,22 @@ class ItemPurchasesList extends ItemPurchases
         $this->unit_price->AdvancedSearch->SearchOperator2 = @$filter["w_unit_price"];
         $this->unit_price->AdvancedSearch->save();
 
+        // Field selling_price
+        $this->selling_price->AdvancedSearch->SearchValue = @$filter["x_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchOperator = @$filter["z_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchCondition = @$filter["v_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchValue2 = @$filter["y_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchOperator2 = @$filter["w_selling_price"];
+        $this->selling_price->AdvancedSearch->save();
+
+        // Field amount_paid
+        $this->amount_paid->AdvancedSearch->SearchValue = @$filter["x_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchOperator = @$filter["z_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchCondition = @$filter["v_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchValue2 = @$filter["y_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchOperator2 = @$filter["w_amount_paid"];
+        $this->amount_paid->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1224,6 +1246,7 @@ class ItemPurchasesList extends ItemPurchases
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->subcategory_id;
         $searchFlds[] = &$this->item_title;
         $searchFlds[] = &$this->measuring_unit;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
@@ -1311,6 +1334,8 @@ class ItemPurchasesList extends ItemPurchases
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->measuring_unit); // measuring_unit
             $this->updateSort($this->unit_price); // unit_price
+            $this->updateSort($this->selling_price); // selling_price
+            $this->updateSort($this->amount_paid); // amount_paid
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1345,6 +1370,8 @@ class ItemPurchasesList extends ItemPurchases
                 $this->quantity->setSort("");
                 $this->measuring_unit->setSort("");
                 $this->unit_price->setSort("");
+                $this->selling_price->setSort("");
+                $this->amount_paid->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1600,6 +1627,8 @@ class ItemPurchasesList extends ItemPurchases
             $this->createColumnOption($option, "quantity");
             $this->createColumnOption($option, "measuring_unit");
             $this->createColumnOption($option, "unit_price");
+            $this->createColumnOption($option, "selling_price");
+            $this->createColumnOption($option, "amount_paid");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -2048,6 +2077,12 @@ class ItemPurchasesList extends ItemPurchases
         $this->quantity->setDbValue($row['quantity']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->unit_price->setDbValue($row['unit_price']);
+        $this->selling_price->setDbValue($row['selling_price']);
+        $this->amount_paid->setDbValue($row['amount_paid']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
+        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2064,6 +2099,9 @@ class ItemPurchasesList extends ItemPurchases
         $row['quantity'] = $this->quantity->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['unit_price'] = $this->unit_price->DefaultValue;
+        $row['selling_price'] = $this->selling_price->DefaultValue;
+        $row['amount_paid'] = $this->amount_paid->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2122,6 +2160,12 @@ class ItemPurchasesList extends ItemPurchases
 
         // unit_price
 
+        // selling_price
+
+        // amount_paid
+
+        // invoice_attachment
+
         // date_created
 
         // date_updated
@@ -2132,7 +2176,27 @@ class ItemPurchasesList extends ItemPurchases
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // supplier_id
-            $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+            $curVal = strval($this->supplier_id->CurrentValue);
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    } else {
+                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->supplier_id->ViewValue = null;
+            }
 
             // category_id
             $curVal = strval($this->category_id->CurrentValue);
@@ -2198,6 +2262,14 @@ class ItemPurchasesList extends ItemPurchases
             $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
             $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
 
+            // selling_price
+            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
+
+            // amount_paid
+            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2233,6 +2305,14 @@ class ItemPurchasesList extends ItemPurchases
             // unit_price
             $this->unit_price->HrefValue = "";
             $this->unit_price->TooltipValue = "";
+
+            // selling_price
+            $this->selling_price->HrefValue = "";
+            $this->selling_price->TooltipValue = "";
+
+            // amount_paid
+            $this->amount_paid->HrefValue = "";
+            $this->amount_paid->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2492,6 +2572,8 @@ class ItemPurchasesList extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_supplier_id":
+                    break;
                 case "x_category_id":
                     break;
                 case "x_subcategory_id":

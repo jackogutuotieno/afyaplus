@@ -130,6 +130,9 @@ class ItemPurchasesAdd extends ItemPurchases
         $this->quantity->setVisibility();
         $this->measuring_unit->setVisibility();
         $this->unit_price->setVisibility();
+        $this->selling_price->setVisibility();
+        $this->amount_paid->setVisibility();
+        $this->invoice_attachment->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -526,6 +529,7 @@ class ItemPurchasesAdd extends ItemPurchases
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->supplier_id);
         $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->subcategory_id);
         $this->setupLookupOptions($this->measuring_unit);
@@ -675,6 +679,8 @@ class ItemPurchasesAdd extends ItemPurchases
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->invoice_attachment->Upload->Index = $CurrentForm->Index;
+        $this->invoice_attachment->Upload->uploadFile();
     }
 
     // Load default values
@@ -759,8 +765,29 @@ class ItemPurchasesAdd extends ItemPurchases
             }
         }
 
+        // Check field name 'selling_price' first before field var 'x_selling_price'
+        $val = $CurrentForm->hasValue("selling_price") ? $CurrentForm->getValue("selling_price") : $CurrentForm->getValue("x_selling_price");
+        if (!$this->selling_price->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->selling_price->Visible = false; // Disable update for API request
+            } else {
+                $this->selling_price->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'amount_paid' first before field var 'x_amount_paid'
+        $val = $CurrentForm->hasValue("amount_paid") ? $CurrentForm->getValue("amount_paid") : $CurrentForm->getValue("x_amount_paid");
+        if (!$this->amount_paid->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->amount_paid->Visible = false; // Disable update for API request
+            } else {
+                $this->amount_paid->setFormValue($val, true, $validate);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -774,6 +801,8 @@ class ItemPurchasesAdd extends ItemPurchases
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->measuring_unit->CurrentValue = $this->measuring_unit->FormValue;
         $this->unit_price->CurrentValue = $this->unit_price->FormValue;
+        $this->selling_price->CurrentValue = $this->selling_price->FormValue;
+        $this->amount_paid->CurrentValue = $this->amount_paid->FormValue;
     }
 
     /**
@@ -822,6 +851,12 @@ class ItemPurchasesAdd extends ItemPurchases
         $this->quantity->setDbValue($row['quantity']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->unit_price->setDbValue($row['unit_price']);
+        $this->selling_price->setDbValue($row['selling_price']);
+        $this->amount_paid->setDbValue($row['amount_paid']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
+        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -838,6 +873,9 @@ class ItemPurchasesAdd extends ItemPurchases
         $row['quantity'] = $this->quantity->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['unit_price'] = $this->unit_price->DefaultValue;
+        $row['selling_price'] = $this->selling_price->DefaultValue;
+        $row['amount_paid'] = $this->amount_paid->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -898,6 +936,15 @@ class ItemPurchasesAdd extends ItemPurchases
         // unit_price
         $this->unit_price->RowCssClass = "row";
 
+        // selling_price
+        $this->selling_price->RowCssClass = "row";
+
+        // amount_paid
+        $this->amount_paid->RowCssClass = "row";
+
+        // invoice_attachment
+        $this->invoice_attachment->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -910,7 +957,27 @@ class ItemPurchasesAdd extends ItemPurchases
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // supplier_id
-            $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+            $curVal = strval($this->supplier_id->CurrentValue);
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    } else {
+                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->supplier_id->ViewValue = null;
+            }
 
             // category_id
             $curVal = strval($this->category_id->CurrentValue);
@@ -976,6 +1043,22 @@ class ItemPurchasesAdd extends ItemPurchases
             $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
             $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
 
+            // selling_price
+            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
+
+            // amount_paid
+            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
+
+            // invoice_attachment
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+            } else {
+                $this->invoice_attachment->ViewValue = "";
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1004,13 +1087,54 @@ class ItemPurchasesAdd extends ItemPurchases
 
             // unit_price
             $this->unit_price->HrefValue = "";
+
+            // selling_price
+            $this->selling_price->HrefValue = "";
+
+            // amount_paid
+            $this->amount_paid->HrefValue = "";
+
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+                }
+            } else {
+                $this->invoice_attachment->HrefValue = "";
+            }
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         } elseif ($this->RowType == RowType::ADD) {
             // supplier_id
             $this->supplier_id->setupEditAttributes();
-            $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
-            if (strval($this->supplier_id->EditValue) != "" && is_numeric($this->supplier_id->EditValue)) {
-                $this->supplier_id->EditValue = FormatNumber($this->supplier_id->EditValue, null);
+            $curVal = trim(strval($this->supplier_id->CurrentValue));
+            if ($curVal != "") {
+                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+            } else {
+                $this->supplier_id->ViewValue = $this->supplier_id->Lookup !== null && is_array($this->supplier_id->lookupOptions()) && count($this->supplier_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->supplier_id->ViewValue !== null) { // Load from cache
+                $this->supplier_id->EditValue = array_values($this->supplier_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->supplier_id->CurrentValue, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->supplier_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->supplier_id->EditValue = $arwrk;
+            }
+            $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
 
             // category_id
             $this->category_id->setupEditAttributes();
@@ -1095,6 +1219,37 @@ class ItemPurchasesAdd extends ItemPurchases
                 $this->unit_price->EditValue = FormatNumber($this->unit_price->EditValue, null);
             }
 
+            // selling_price
+            $this->selling_price->setupEditAttributes();
+            $this->selling_price->EditValue = $this->selling_price->CurrentValue;
+            $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
+            if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
+                $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
+            }
+
+            // amount_paid
+            $this->amount_paid->setupEditAttributes();
+            $this->amount_paid->EditValue = $this->amount_paid->CurrentValue;
+            $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
+            if (strval($this->amount_paid->EditValue) != "" && is_numeric($this->amount_paid->EditValue)) {
+                $this->amount_paid->EditValue = FormatNumber($this->amount_paid->EditValue, null);
+            }
+
+            // invoice_attachment
+            $this->invoice_attachment->setupEditAttributes();
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->EditValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+            } else {
+                $this->invoice_attachment->EditValue = "";
+            }
+            if (!Config("CREATE_UPLOAD_FILE_ON_COPY")) {
+                $this->invoice_attachment->Upload->DbValue = null;
+            }
+            if ($this->isShow() || $this->isCopy()) {
+                RenderUploadField($this->invoice_attachment);
+            }
+
             // Add refer script
 
             // supplier_id
@@ -1117,6 +1272,27 @@ class ItemPurchasesAdd extends ItemPurchases
 
             // unit_price
             $this->unit_price->HrefValue = "";
+
+            // selling_price
+            $this->selling_price->HrefValue = "";
+
+            // amount_paid
+            $this->amount_paid->HrefValue = "";
+
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+                }
+            } else {
+                $this->invoice_attachment->HrefValue = "";
+            }
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1178,6 +1354,27 @@ class ItemPurchasesAdd extends ItemPurchases
             }
             if (!CheckNumber($this->unit_price->FormValue)) {
                 $this->unit_price->addErrorMessage($this->unit_price->getErrorMessage(false));
+            }
+            if ($this->selling_price->Visible && $this->selling_price->Required) {
+                if (!$this->selling_price->IsDetailKey && EmptyValue($this->selling_price->FormValue)) {
+                    $this->selling_price->addErrorMessage(str_replace("%s", $this->selling_price->caption(), $this->selling_price->RequiredErrorMessage));
+                }
+            }
+            if (!CheckNumber($this->selling_price->FormValue)) {
+                $this->selling_price->addErrorMessage($this->selling_price->getErrorMessage(false));
+            }
+            if ($this->amount_paid->Visible && $this->amount_paid->Required) {
+                if (!$this->amount_paid->IsDetailKey && EmptyValue($this->amount_paid->FormValue)) {
+                    $this->amount_paid->addErrorMessage(str_replace("%s", $this->amount_paid->caption(), $this->amount_paid->RequiredErrorMessage));
+                }
+            }
+            if (!CheckNumber($this->amount_paid->FormValue)) {
+                $this->amount_paid->addErrorMessage($this->amount_paid->getErrorMessage(false));
+            }
+            if ($this->invoice_attachment->Visible && $this->invoice_attachment->Required) {
+                if ($this->invoice_attachment->Upload->FileName == "" && !$this->invoice_attachment->Upload->KeepFile) {
+                    $this->invoice_attachment->addErrorMessage(str_replace("%s", $this->invoice_attachment->caption(), $this->invoice_attachment->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1270,6 +1467,21 @@ class ItemPurchasesAdd extends ItemPurchases
 
         // unit_price
         $this->unit_price->setDbValueDef($rsnew, $this->unit_price->CurrentValue, false);
+
+        // selling_price
+        $this->selling_price->setDbValueDef($rsnew, $this->selling_price->CurrentValue, false);
+
+        // amount_paid
+        $this->amount_paid->setDbValueDef($rsnew, $this->amount_paid->CurrentValue, false);
+
+        // invoice_attachment
+        if ($this->invoice_attachment->Visible && !$this->invoice_attachment->Upload->KeepFile) {
+            if ($this->invoice_attachment->Upload->Value === null) {
+                $rsnew['invoice_attachment'] = null;
+            } else {
+                $rsnew['invoice_attachment'] = $this->invoice_attachment->Upload->Value;
+            }
+        }
         return $rsnew;
     }
 
@@ -1300,6 +1512,15 @@ class ItemPurchasesAdd extends ItemPurchases
         if (isset($row['unit_price'])) { // unit_price
             $this->unit_price->setFormValue($row['unit_price']);
         }
+        if (isset($row['selling_price'])) { // selling_price
+            $this->selling_price->setFormValue($row['selling_price']);
+        }
+        if (isset($row['amount_paid'])) { // amount_paid
+            $this->amount_paid->setFormValue($row['amount_paid']);
+        }
+        if (isset($row['invoice_attachment'])) { // invoice_attachment
+            $this->invoice_attachment->setFormValue($row['invoice_attachment']);
+        }
     }
 
     // Set up Breadcrumb
@@ -1326,6 +1547,8 @@ class ItemPurchasesAdd extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_supplier_id":
+                    break;
                 case "x_category_id":
                     break;
                 case "x_subcategory_id":

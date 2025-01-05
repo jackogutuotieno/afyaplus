@@ -139,6 +139,40 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+    <tr id="r_selling_price"<?= $Page->selling_price->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_item_purchases_selling_price"><?= $Page->selling_price->caption() ?></span></td>
+        <td data-name="selling_price"<?= $Page->selling_price->cellAttributes() ?>>
+<span id="el_item_purchases_selling_price">
+<span<?= $Page->selling_price->viewAttributes() ?>>
+<?= $Page->selling_price->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+    <tr id="r_amount_paid"<?= $Page->amount_paid->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_item_purchases_amount_paid"><?= $Page->amount_paid->caption() ?></span></td>
+        <td data-name="amount_paid"<?= $Page->amount_paid->cellAttributes() ?>>
+<span id="el_item_purchases_amount_paid">
+<span<?= $Page->amount_paid->viewAttributes() ?>>
+<?= $Page->amount_paid->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->invoice_attachment->Visible) { // invoice_attachment ?>
+    <tr id="r_invoice_attachment"<?= $Page->invoice_attachment->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_item_purchases_invoice_attachment"><?= $Page->invoice_attachment->caption() ?></span></td>
+        <td data-name="invoice_attachment"<?= $Page->invoice_attachment->cellAttributes() ?>>
+<span id="el_item_purchases_invoice_attachment">
+<span<?= $Page->invoice_attachment->viewAttributes() ?>>
+<?= GetFileViewTag($Page->invoice_attachment, $Page->invoice_attachment->getViewValue(), false) ?>
+</span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

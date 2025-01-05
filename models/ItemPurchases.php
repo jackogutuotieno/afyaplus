@@ -55,6 +55,9 @@ class ItemPurchases extends DbTable
     public $quantity;
     public $measuring_unit;
     public $unit_price;
+    public $selling_price;
+    public $amount_paid;
+    public $invoice_attachment;
     public $date_created;
     public $date_updated;
 
@@ -155,6 +158,7 @@ class ItemPurchases extends DbTable
         $this->supplier_id->setSelectMultiple(false); // Select one
         $this->supplier_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->supplier_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->supplier_id->Lookup = new Lookup($this->supplier_id, 'suppliers', false, 'id', ["supplier_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`supplier_name`");
         $this->supplier_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->supplier_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['supplier_id'] = &$this->supplier_id;
@@ -323,6 +327,86 @@ class ItemPurchases extends DbTable
         $this->unit_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
         $this->unit_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['unit_price'] = &$this->unit_price;
+
+        // selling_price
+        $this->selling_price = new DbField(
+            $this, // Table
+            'x_selling_price', // Variable name
+            'selling_price', // Name
+            '`selling_price`', // Expression
+            '`selling_price`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`selling_price`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->selling_price->InputTextType = "text";
+        $this->selling_price->Raw = true;
+        $this->selling_price->Nullable = false; // NOT NULL field
+        $this->selling_price->Required = true; // Required field
+        $this->selling_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->selling_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['selling_price'] = &$this->selling_price;
+
+        // amount_paid
+        $this->amount_paid = new DbField(
+            $this, // Table
+            'x_amount_paid', // Variable name
+            'amount_paid', // Name
+            '`amount_paid`', // Expression
+            '`amount_paid`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`amount_paid`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->amount_paid->InputTextType = "text";
+        $this->amount_paid->Raw = true;
+        $this->amount_paid->Nullable = false; // NOT NULL field
+        $this->amount_paid->Required = true; // Required field
+        $this->amount_paid->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->amount_paid->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['amount_paid'] = &$this->amount_paid;
+
+        // invoice_attachment
+        $this->invoice_attachment = new DbField(
+            $this, // Table
+            'x_invoice_attachment', // Variable name
+            'invoice_attachment', // Name
+            '`invoice_attachment`', // Expression
+            '`invoice_attachment`', // Basic search expression
+            205, // Type
+            2147483647, // Size
+            -1, // Date/Time format
+            true, // Is upload field
+            '`invoice_attachment`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'FILE' // Edit Tag
+        );
+        $this->invoice_attachment->InputTextType = "text";
+        $this->invoice_attachment->Raw = true;
+        $this->invoice_attachment->Nullable = false; // NOT NULL field
+        $this->invoice_attachment->Required = true; // Required field
+        $this->invoice_attachment->Sortable = false; // Allow sort
+        $this->invoice_attachment->UploadAllowedFileExt = "pdf,jpg";
+        $this->invoice_attachment->SearchOperators = ["=", "<>"];
+        $this->invoice_attachment->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->invoice_attachment->Param, "CustomMsg");
+        $this->Fields['invoice_attachment'] = &$this->invoice_attachment;
 
         // date_created
         $this->date_created = new DbField(
@@ -902,6 +986,9 @@ class ItemPurchases extends DbTable
         $this->quantity->DbValue = $row['quantity'];
         $this->measuring_unit->DbValue = $row['measuring_unit'];
         $this->unit_price->DbValue = $row['unit_price'];
+        $this->selling_price->DbValue = $row['selling_price'];
+        $this->amount_paid->DbValue = $row['amount_paid'];
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1264,6 +1351,9 @@ class ItemPurchases extends DbTable
         $this->quantity->setDbValue($row['quantity']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->unit_price->setDbValue($row['unit_price']);
+        $this->selling_price->setDbValue($row['selling_price']);
+        $this->amount_paid->setDbValue($row['amount_paid']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1312,6 +1402,12 @@ class ItemPurchases extends DbTable
 
         // unit_price
 
+        // selling_price
+
+        // amount_paid
+
+        // invoice_attachment
+
         // date_created
 
         // date_updated
@@ -1320,7 +1416,27 @@ class ItemPurchases extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // supplier_id
-        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->ViewValue, $this->supplier_id->formatPattern());
+        $curVal = strval($this->supplier_id->CurrentValue);
+        if ($curVal != "") {
+            $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+            if ($this->supplier_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                } else {
+                    $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                }
+            }
+        } else {
+            $this->supplier_id->ViewValue = null;
+        }
 
         // category_id
         $curVal = strval($this->category_id->CurrentValue);
@@ -1386,6 +1502,22 @@ class ItemPurchases extends DbTable
         $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
         $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
 
+        // selling_price
+        $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+        $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
+
+        // amount_paid
+        $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+        $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
+
+        // invoice_attachment
+        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+        } else {
+            $this->invoice_attachment->ViewValue = "";
+        }
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1426,6 +1558,30 @@ class ItemPurchases extends DbTable
         $this->unit_price->HrefValue = "";
         $this->unit_price->TooltipValue = "";
 
+        // selling_price
+        $this->selling_price->HrefValue = "";
+        $this->selling_price->TooltipValue = "";
+
+        // amount_paid
+        $this->amount_paid->HrefValue = "";
+        $this->amount_paid->TooltipValue = "";
+
+        // invoice_attachment
+        if (!empty($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->LinkAttrs["target"] = "";
+            if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+            }
+            if ($this->isExport()) {
+                $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+            }
+        } else {
+            $this->invoice_attachment->HrefValue = "";
+        }
+        $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+        $this->invoice_attachment->TooltipValue = "";
+
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
@@ -1456,9 +1612,6 @@ class ItemPurchases extends DbTable
         // supplier_id
         $this->supplier_id->setupEditAttributes();
         $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
-        if (strval($this->supplier_id->EditValue) != "" && is_numeric($this->supplier_id->EditValue)) {
-            $this->supplier_id->EditValue = FormatNumber($this->supplier_id->EditValue, null);
-        }
 
         // category_id
         $this->category_id->setupEditAttributes();
@@ -1495,6 +1648,31 @@ class ItemPurchases extends DbTable
         $this->unit_price->PlaceHolder = RemoveHtml($this->unit_price->caption());
         if (strval($this->unit_price->EditValue) != "" && is_numeric($this->unit_price->EditValue)) {
             $this->unit_price->EditValue = FormatNumber($this->unit_price->EditValue, null);
+        }
+
+        // selling_price
+        $this->selling_price->setupEditAttributes();
+        $this->selling_price->EditValue = $this->selling_price->CurrentValue;
+        $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
+        if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
+            $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
+        }
+
+        // amount_paid
+        $this->amount_paid->setupEditAttributes();
+        $this->amount_paid->EditValue = $this->amount_paid->CurrentValue;
+        $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
+        if (strval($this->amount_paid->EditValue) != "" && is_numeric($this->amount_paid->EditValue)) {
+            $this->amount_paid->EditValue = FormatNumber($this->amount_paid->EditValue, null);
+        }
+
+        // invoice_attachment
+        $this->invoice_attachment->setupEditAttributes();
+        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->EditValue = $this->id->CurrentValue;
+            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+        } else {
+            $this->invoice_attachment->EditValue = "";
         }
 
         // date_created
@@ -1543,6 +1721,9 @@ class ItemPurchases extends DbTable
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->measuring_unit);
                     $doc->exportCaption($this->unit_price);
+                    $doc->exportCaption($this->selling_price);
+                    $doc->exportCaption($this->amount_paid);
+                    $doc->exportCaption($this->invoice_attachment);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->supplier_id);
@@ -1552,6 +1733,8 @@ class ItemPurchases extends DbTable
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->measuring_unit);
                     $doc->exportCaption($this->unit_price);
+                    $doc->exportCaption($this->selling_price);
+                    $doc->exportCaption($this->amount_paid);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1588,6 +1771,9 @@ class ItemPurchases extends DbTable
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->measuring_unit);
                         $doc->exportField($this->unit_price);
+                        $doc->exportField($this->selling_price);
+                        $doc->exportField($this->amount_paid);
+                        $doc->exportField($this->invoice_attachment);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->supplier_id);
@@ -1597,6 +1783,8 @@ class ItemPurchases extends DbTable
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->measuring_unit);
                         $doc->exportField($this->unit_price);
+                        $doc->exportField($this->selling_price);
+                        $doc->exportField($this->amount_paid);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1618,8 +1806,122 @@ class ItemPurchases extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'invoice_attachment') {
+            $fldName = "invoice_attachment";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 
