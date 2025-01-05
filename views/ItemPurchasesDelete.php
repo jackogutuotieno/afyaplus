@@ -53,6 +53,9 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_item_purchases_id" class="item_purchases_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <th class="<?= $Page->batch_number->headerCellClass() ?>"><span id="elh_item_purchases_batch_number" class="item_purchases_batch_number"><?= $Page->batch_number->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th class="<?= $Page->category_id->headerCellClass() ?>"><span id="elh_item_purchases_category_id" class="item_purchases_category_id"><?= $Page->category_id->caption() ?></span></th>
 <?php } ?>
@@ -109,6 +112,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <td<?= $Page->batch_number->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->batch_number->viewAttributes() ?>>
+<?= $Page->batch_number->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

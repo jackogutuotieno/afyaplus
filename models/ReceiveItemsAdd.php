@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientAdmissionsAdd extends PatientAdmissions
+class ReceiveItemsAdd extends ReceiveItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientAdmissionsAdd";
+    public $PageObjName = "ReceiveItemsAdd";
 
     // View file path
     public $View = null;
@@ -39,15 +39,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "patientadmissionsadd";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "receiveitemsadd";
 
     // Page headings
     public $Heading = "";
@@ -131,8 +123,11 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->patient_id->setVisibility();
+        $this->item_id->setVisibility();
+        $this->total_items_received->setVisibility();
+        $this->measuring_unit->setVisibility();
         $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -140,8 +135,8 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'patient_admissions';
-        $this->TableName = 'patient_admissions';
+        $this->TableVar = 'receive_items';
+        $this->TableName = 'receive_items';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-add-table";
@@ -152,14 +147,14 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_admissions)
-        if (!isset($GLOBALS["patient_admissions"]) || $GLOBALS["patient_admissions"]::class == PROJECT_NAMESPACE . "patient_admissions") {
-            $GLOBALS["patient_admissions"] = &$this;
+        // Table object (receive_items)
+        if (!isset($GLOBALS["receive_items"]) || $GLOBALS["receive_items"]::class == PROJECT_NAMESPACE . "receive_items") {
+            $GLOBALS["receive_items"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_admissions');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'receive_items');
         }
 
         // Start timer
@@ -273,7 +268,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "patientadmissionsview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "receiveitemsview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -527,7 +522,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -565,17 +560,10 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
-        // Set up master/detail parameters
-        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
-        $this->setupMasterParms();
-
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
         }
-
-        // Set up detail parameters
-        $this->setupDetailParms();
 
         // Validate form if post back
         if ($postBack) {
@@ -598,12 +586,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("patientadmissionslist"); // No matching record, return to list
+                    $this->terminate("receiveitemslist"); // No matching record, return to list
                     return;
                 }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -611,23 +596,19 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
-                        $returnUrl = $this->getDetailUrl();
-                    } else {
-                        $returnUrl = $this->getReturnUrl();
-                    }
-                    if (GetPageName($returnUrl) == "patientadmissionslist") {
+                    $returnUrl = $this->getReturnUrl();
+                    if (GetPageName($returnUrl) == "receiveitemslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "patientadmissionsview") {
+                    } elseif (GetPageName($returnUrl) == "receiveitemsview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
+                    if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "patientadmissionslist") {
+                        if (GetPageName($returnUrl) != "receiveitemslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "patientadmissionslist"; // Return list page content
+                            $returnUrl = "receiveitemslist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) { // Return to caller
@@ -648,9 +629,6 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -705,13 +683,33 @@ class PatientAdmissionsAdd extends PatientAdmissions
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'patient_id' first before field var 'x_patient_id'
-        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
-        if (!$this->patient_id->IsDetailKey) {
+        // Check field name 'item_id' first before field var 'x_item_id'
+        $val = $CurrentForm->hasValue("item_id") ? $CurrentForm->getValue("item_id") : $CurrentForm->getValue("x_item_id");
+        if (!$this->item_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->patient_id->Visible = false; // Disable update for API request
+                $this->item_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val, true, $validate);
+                $this->item_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'total_items_received' first before field var 'x_total_items_received'
+        $val = $CurrentForm->hasValue("total_items_received") ? $CurrentForm->getValue("total_items_received") : $CurrentForm->getValue("x_total_items_received");
+        if (!$this->total_items_received->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->total_items_received->Visible = false; // Disable update for API request
+            } else {
+                $this->total_items_received->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'measuring_unit' first before field var 'x_measuring_unit'
+        $val = $CurrentForm->hasValue("measuring_unit") ? $CurrentForm->getValue("measuring_unit") : $CurrentForm->getValue("x_measuring_unit");
+        if (!$this->measuring_unit->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->measuring_unit->Visible = false; // Disable update for API request
+            } else {
+                $this->measuring_unit->setFormValue($val);
             }
         }
 
@@ -723,7 +721,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->item_id->CurrentValue = $this->item_id->FormValue;
+        $this->total_items_received->CurrentValue = $this->total_items_received->FormValue;
+        $this->measuring_unit->CurrentValue = $this->measuring_unit->FormValue;
     }
 
     /**
@@ -765,8 +765,11 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
+        $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->date_created->setDbValue($row['date_created']);
+        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -774,8 +777,11 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
+        $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
+        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -813,104 +819,126 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // id
         $this->id->RowCssClass = "row";
 
-        // patient_id
-        $this->patient_id->RowCssClass = "row";
+        // item_id
+        $this->item_id->RowCssClass = "row";
+
+        // total_items_received
+        $this->total_items_received->RowCssClass = "row";
+
+        // measuring_unit
+        $this->measuring_unit->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
+
+        // date_updated
+        $this->date_updated->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $curVal = strval($this->patient_id->CurrentValue);
+            // item_id
+            $curVal = strval($this->item_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->item_id->ViewValue = null;
             }
+
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
+
+            // measuring_unit
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+            // item_id
+            $this->item_id->HrefValue = "";
+
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->patient_id->ViewValue = null;
-                }
+            // item_id
+            $this->item_id->setupEditAttributes();
+            $curVal = trim(strval($this->item_id->CurrentValue));
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
             } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->EditValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->EditValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->EditValue = HtmlEncode(FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern()));
-                        }
-                    }
-                } else {
-                    $this->patient_id->EditValue = null;
-                }
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+                $this->item_id->ViewValue = $this->item_id->Lookup !== null && is_array($this->item_id->lookupOptions()) && count($this->item_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->item_id->ViewValue !== null) { // Load from cache
+                $this->item_id->EditValue = array_values($this->item_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->item_id->CurrentValue, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->item_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->item_id->EditValue = $arwrk;
+            }
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
+
+            // total_items_received
+            $this->total_items_received->setupEditAttributes();
+            $this->total_items_received->EditValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->PlaceHolder = RemoveHtml($this->total_items_received->caption());
+            if (strval($this->total_items_received->EditValue) != "" && is_numeric($this->total_items_received->EditValue)) {
+                $this->total_items_received->EditValue = FormatNumber($this->total_items_received->EditValue, null);
+            }
+
+            // measuring_unit
+            $this->measuring_unit->setupEditAttributes();
+            if (!$this->measuring_unit->Raw) {
+                $this->measuring_unit->CurrentValue = HtmlDecode($this->measuring_unit->CurrentValue);
+            }
+            $this->measuring_unit->EditValue = HtmlEncode($this->measuring_unit->CurrentValue);
+            $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
 
             // Add refer script
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -932,27 +960,24 @@ class PatientAdmissionsAdd extends PatientAdmissions
             return true;
         }
         $validateForm = true;
-            if ($this->patient_id->Visible && $this->patient_id->Required) {
-                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
-                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
+            if ($this->item_id->Visible && $this->item_id->Required) {
+                if (!$this->item_id->IsDetailKey && EmptyValue($this->item_id->FormValue)) {
+                    $this->item_id->addErrorMessage(str_replace("%s", $this->item_id->caption(), $this->item_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
+            if ($this->total_items_received->Visible && $this->total_items_received->Required) {
+                if (!$this->total_items_received->IsDetailKey && EmptyValue($this->total_items_received->FormValue)) {
+                    $this->total_items_received->addErrorMessage(str_replace("%s", $this->total_items_received->caption(), $this->total_items_received->RequiredErrorMessage));
+                }
             }
-
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("BedAssignmentGrid");
-        if (in_array("bed_assignment", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("IssueItemsGrid");
-        if (in_array("issue_items", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
+            if (!CheckInteger($this->total_items_received->FormValue)) {
+                $this->total_items_received->addErrorMessage($this->total_items_received->getErrorMessage(false));
+            }
+            if ($this->measuring_unit->Visible && $this->measuring_unit->Required) {
+                if (!$this->measuring_unit->IsDetailKey && EmptyValue($this->measuring_unit->FormValue)) {
+                    $this->measuring_unit->addErrorMessage(str_replace("%s", $this->measuring_unit->caption(), $this->measuring_unit->RequiredErrorMessage));
+                }
+            }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -978,11 +1003,6 @@ class PatientAdmissionsAdd extends PatientAdmissions
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
-            $conn->beginTransaction();
-        }
-
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -1005,58 +1025,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
             }
             $addRow = false;
         }
-
-        // Add detail records
-        if ($addRow) {
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("BedAssignmentGrid");
-            if (in_array("bed_assignment", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
-                $detailPage->admission_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "bed_assignment"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->admission_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-            $detailPage = Container("IssueItemsGrid");
-            if (in_array("issue_items", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
-                $detailPage->admission_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "issue_items"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->admission_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-        }
-
-        // Commit/Rollback transaction
-        if ($this->getCurrentDetailTable() != "") {
-            if ($addRow) {
-                if ($this->UseTransaction) { // Commit transaction
-                    if ($conn->isTransactionActive()) {
-                        $conn->commit();
-                    }
-                }
-            } else {
-                if ($this->UseTransaction) { // Rollback transaction
-                    if ($conn->isTransactionActive()) {
-                        $conn->rollback();
-                    }
-                }
-            }
-        }
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
-            if ($this->SendEmail) {
-                $this->sendEmailOnAdd($rsnew);
-            }
         }
 
         // Write JSON response
@@ -1078,8 +1049,14 @@ class PatientAdmissionsAdd extends PatientAdmissions
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
+        // item_id
+        $this->item_id->setDbValueDef($rsnew, $this->item_id->CurrentValue, false);
+
+        // total_items_received
+        $this->total_items_received->setDbValueDef($rsnew, $this->total_items_received->CurrentValue, false);
+
+        // measuring_unit
+        $this->measuring_unit->setDbValueDef($rsnew, $this->measuring_unit->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1089,139 +1066,14 @@ class PatientAdmissionsAdd extends PatientAdmissions
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
+        if (isset($row['item_id'])) { // item_id
+            $this->item_id->setFormValue($row['item_id']);
         }
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "ipd_patients") {
-                $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Get("fk_id", Get("patient_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "ipd_patients") {
-                $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Post("fk_id", Post("patient_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
+        if (isset($row['total_items_received'])) { // total_items_received
+            $this->total_items_received->setFormValue($row['total_items_received']);
         }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "ipd_patients") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("bed_assignment", $detailTblVar)) {
-                $detailPageObj = Container("BedAssignmentGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
-            if (in_array("issue_items", $detailTblVar)) {
-                $detailPageObj = Container("IssueItemsGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
+        if (isset($row['measuring_unit'])) { // measuring_unit
+            $this->measuring_unit->setFormValue($row['measuring_unit']);
         }
     }
 
@@ -1231,7 +1083,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("patientadmissionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("receiveitemslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }
@@ -1249,7 +1101,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

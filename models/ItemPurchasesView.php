@@ -141,6 +141,7 @@ class ItemPurchasesView extends ItemPurchases
     public function setVisibility()
     {
         $this->id->setVisibility();
+        $this->batch_number->setVisibility();
         $this->supplier_id->setVisibility();
         $this->category_id->setVisibility();
         $this->subcategory_id->setVisibility();
@@ -830,6 +831,7 @@ class ItemPurchasesView extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->batch_number->setDbValue($row['batch_number']);
         $this->supplier_id->setDbValue($row['supplier_id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->subcategory_id->setDbValue($row['subcategory_id']);
@@ -852,6 +854,7 @@ class ItemPurchasesView extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['batch_number'] = $this->batch_number->DefaultValue;
         $row['supplier_id'] = $this->supplier_id->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
         $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
@@ -887,6 +890,8 @@ class ItemPurchasesView extends ItemPurchases
 
         // id
 
+        // batch_number
+
         // supplier_id
 
         // category_id
@@ -915,6 +920,9 @@ class ItemPurchasesView extends ItemPurchases
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // batch_number
+            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
 
             // supplier_id
             $curVal = strval($this->supplier_id->CurrentValue);
@@ -1030,6 +1038,10 @@ class ItemPurchasesView extends ItemPurchases
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
+
+            // batch_number
+            $this->batch_number->HrefValue = "";
+            $this->batch_number->TooltipValue = "";
 
             // supplier_id
             $this->supplier_id->HrefValue = "";

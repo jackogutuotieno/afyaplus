@@ -129,6 +129,14 @@ loadjs.ready("fpatient_admissionsedit", function() {
 <?php } ?>
 <?php include_once "BedAssignmentGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("issue_items", explode(",", $Page->getCurrentDetailTable())) && $issue_items->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("issue_items", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IssueItemsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatient_admissionsedit"><?= $Language->phrase("SaveBtn") ?></button>

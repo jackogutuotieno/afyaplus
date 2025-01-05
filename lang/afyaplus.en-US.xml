@@ -269,6 +269,15 @@
     <menu id="752">
       <phrase id="menutext" value="Leave Approvals" />
     </menu>
+    <menu id="1019">
+      <phrase id="menutext" value="Stores" />
+    </menu>
+    <menu id="964">
+      <phrase id="menutext" value="Received Items" />
+    </menu>
+    <menu id="1020">
+      <phrase id="menutext" value="Issued Items" />
+    </menu>
     <menu id="104">
       <phrase id="menutext" value="Reports" />
     </menu>
@@ -3028,6 +3037,7 @@
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
+        <phrase id="custommsg" value="Move patient back to outpatient?" />
       </field>
     </table>
     <table id="modules">
@@ -3249,7 +3259,7 @@
         <phrase id="fldcaption" value="S/NO" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="Patient Name" />
+        <phrase id="fldcaption" value="Patient Name(UHID)" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Admission Date" />
@@ -3356,6 +3366,9 @@
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No." />
+      </field>
       <field id="supplier_id">
         <phrase id="fldcaption" value="Supplier" />
       </field>
@@ -3403,6 +3416,51 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Purchase Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="receive_items">
+      <phrase id="tblcaption" value="Received Items" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item (Batch No)" />
+      </field>
+      <field id="total_items_received">
+        <phrase id="fldcaption" value="Total Items Received" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Receipt Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="issue_items">
+      <phrase id="tblcaption" value="Issued Items" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="admission_id">
+        <phrase id="fldcaption" value="Admission ID" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="item_id">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Issue Date" />
       </field>
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Updated" />

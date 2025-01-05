@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class ItemPurchasesDelete extends ItemPurchases
+class IssueItemsDelete extends IssueItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class ItemPurchasesDelete extends ItemPurchases
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ItemPurchasesDelete";
+    public $PageObjName = "IssueItemsDelete";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class ItemPurchasesDelete extends ItemPurchases
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "itempurchasesdelete";
+    public $CurrentPageName = "issueitemsdelete";
 
     // Page headings
     public $Heading = "";
@@ -122,18 +122,11 @@ class ItemPurchasesDelete extends ItemPurchases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->batch_number->setVisibility();
-        $this->supplier_id->Visible = false;
-        $this->category_id->setVisibility();
-        $this->subcategory_id->setVisibility();
-        $this->item_title->setVisibility();
+        $this->id->Visible = false;
+        $this->admission_id->setVisibility();
+        $this->patient_id->setVisibility();
+        $this->item_id->setVisibility();
         $this->quantity->setVisibility();
-        $this->measuring_unit->setVisibility();
-        $this->unit_price->setVisibility();
-        $this->selling_price->setVisibility();
-        $this->amount_paid->setVisibility();
-        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -143,8 +136,8 @@ class ItemPurchasesDelete extends ItemPurchases
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'item_purchases';
-        $this->TableName = 'item_purchases';
+        $this->TableVar = 'issue_items';
+        $this->TableName = 'issue_items';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -155,14 +148,14 @@ class ItemPurchasesDelete extends ItemPurchases
         // Language object
         $Language = Container("app.language");
 
-        // Table object (item_purchases)
-        if (!isset($GLOBALS["item_purchases"]) || $GLOBALS["item_purchases"]::class == PROJECT_NAMESPACE . "item_purchases") {
-            $GLOBALS["item_purchases"] = &$this;
+        // Table object (issue_items)
+        if (!isset($GLOBALS["issue_items"]) || $GLOBALS["issue_items"]::class == PROJECT_NAMESPACE . "issue_items") {
+            $GLOBALS["issue_items"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'item_purchases');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'issue_items');
         }
 
         // Start timer
@@ -425,10 +418,10 @@ class ItemPurchasesDelete extends ItemPurchases
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->supplier_id);
-        $this->setupLookupOptions($this->category_id);
-        $this->setupLookupOptions($this->subcategory_id);
-        $this->setupLookupOptions($this->measuring_unit);
+        $this->setupLookupOptions($this->patient_id);
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -437,7 +430,7 @@ class ItemPurchasesDelete extends ItemPurchases
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("itempurchaseslist"); // Prevent SQL injection, return to list
+            $this->terminate("issueitemslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -491,7 +484,7 @@ class ItemPurchasesDelete extends ItemPurchases
             $this->Recordset = $this->loadRecordset();
             if ($this->TotalRecords <= 0) { // No record found, exit
                 $this->Recordset?->free();
-                $this->terminate("itempurchaseslist"); // Return to list
+                $this->terminate("issueitemslist"); // Return to list
                 return;
             }
         }
@@ -613,20 +606,10 @@ class ItemPurchasesDelete extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
+        $this->admission_id->setDbValue($row['admission_id']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
         $this->quantity->setDbValue($row['quantity']);
-        $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
-        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
-        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -636,17 +619,10 @@ class ItemPurchasesDelete extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['batch_number'] = $this->batch_number->DefaultValue;
-        $row['supplier_id'] = $this->supplier_id->DefaultValue;
-        $row['category_id'] = $this->category_id->DefaultValue;
-        $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
+        $row['admission_id'] = $this->admission_id->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
-        $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
-        $row['unit_price'] = $this->unit_price->DefaultValue;
-        $row['selling_price'] = $this->selling_price->DefaultValue;
-        $row['amount_paid'] = $this->amount_paid->DefaultValue;
-        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -666,27 +642,13 @@ class ItemPurchasesDelete extends ItemPurchases
 
         // id
 
-        // batch_number
+        // admission_id
 
-        // supplier_id
+        // patient_id
 
-        // category_id
-
-        // subcategory_id
-
-        // item_title
+        // item_id
 
         // quantity
-
-        // measuring_unit
-
-        // unit_price
-
-        // selling_price
-
-        // amount_paid
-
-        // invoice_attachment
 
         // date_created
 
@@ -697,103 +659,40 @@ class ItemPurchasesDelete extends ItemPurchases
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+            // admission_id
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
 
-            // supplier_id
-            $curVal = strval($this->supplier_id->CurrentValue);
+            // patient_id
+            $curVal = strval($this->patient_id->CurrentValue);
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-                if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
                     } else {
-                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                     }
                 }
             } else {
-                $this->supplier_id->ViewValue = null;
+                $this->patient_id->ViewValue = null;
             }
 
-            // category_id
-            $curVal = strval($this->category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-                if ($this->category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                    } else {
-                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->category_id->ViewValue = null;
-            }
-
-            // subcategory_id
-            $curVal = strval($this->subcategory_id->CurrentValue);
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-                if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                    } else {
-                        $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->subcategory_id->ViewValue = null;
-            }
-
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
+            // item_id
+            $this->item_id->ViewValue = $this->item_id->CurrentValue;
+            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
-
-            // measuring_unit
-            if (strval($this->measuring_unit->CurrentValue) != "") {
-                $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-            } else {
-                $this->measuring_unit->ViewValue = null;
-            }
-
-            // unit_price
-            $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-            $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-            // selling_price
-            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-            // amount_paid
-            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -803,45 +702,21 @@ class ItemPurchasesDelete extends ItemPurchases
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // admission_id
+            $this->admission_id->HrefValue = "";
+            $this->admission_id->TooltipValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
-            $this->batch_number->TooltipValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // category_id
-            $this->category_id->HrefValue = "";
-            $this->category_id->TooltipValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-            $this->subcategory_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+            $this->item_id->TooltipValue = "";
 
             // quantity
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
-
-            // measuring_unit
-            $this->measuring_unit->HrefValue = "";
-            $this->measuring_unit->TooltipValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-            $this->unit_price->TooltipValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-            $this->selling_price->TooltipValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-            $this->amount_paid->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -957,13 +832,111 @@ class ItemPurchasesDelete extends ItemPurchases
         return $deleteRows;
     }
 
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_admissions") {
+                $validMaster = true;
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_admissions") {
+                $validMaster = true;
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
+    }
+
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("itempurchaseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("issueitemslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }
@@ -981,13 +954,7 @@ class ItemPurchasesDelete extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_supplier_id":
-                    break;
-                case "x_category_id":
-                    break;
-                case "x_subcategory_id":
-                    break;
-                case "x_measuring_unit":
+                case "x_patient_id":
                     break;
                 default:
                     $lookupFilter = "";

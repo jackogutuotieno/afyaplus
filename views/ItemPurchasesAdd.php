@@ -22,6 +22,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
+            ["batch_number", [fields.batch_number.visible && fields.batch_number.required ? ew.Validators.required(fields.batch_number.caption) : null], fields.batch_number.isInvalid],
             ["supplier_id", [fields.supplier_id.visible && fields.supplier_id.required ? ew.Validators.required(fields.supplier_id.caption) : null], fields.supplier_id.isInvalid],
             ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null], fields.category_id.isInvalid],
             ["subcategory_id", [fields.subcategory_id.visible && fields.subcategory_id.required ? ew.Validators.required(fields.subcategory_id.caption) : null], fields.subcategory_id.isInvalid],
@@ -80,6 +81,18 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-add-div"><!-- page* -->
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+    <div id="r_batch_number"<?= $Page->batch_number->rowAttributes() ?>>
+        <label id="elh_item_purchases_batch_number" for="x_batch_number" class="<?= $Page->LeftColumnClass ?>"><?= $Page->batch_number->caption() ?><?= $Page->batch_number->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->batch_number->cellAttributes() ?>>
+<span id="el_item_purchases_batch_number">
+<input type="<?= $Page->batch_number->getInputTextType() ?>" name="x_batch_number" id="x_batch_number" data-table="item_purchases" data-field="x_batch_number" value="<?= $Page->batch_number->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->batch_number->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->batch_number->formatPattern()) ?>"<?= $Page->batch_number->editAttributes() ?> aria-describedby="x_batch_number_help">
+<?= $Page->batch_number->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->batch_number->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->supplier_id->Visible) { // supplier_id ?>
     <div id="r_supplier_id"<?= $Page->supplier_id->rowAttributes() ?>>
         <label id="elh_item_purchases_supplier_id" for="x_supplier_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->supplier_id->caption() ?><?= $Page->supplier_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>

@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$PatientAdmissionsList = &$Page;
+$ReceiveItemsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { patient_admissions: currentTable } });
+ew.deepAssign(ew.vars, { tables: { receive_items: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -22,11 +22,6 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
-
-        // Dynamic selection lists
-        .setLists({
-            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
-        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -61,75 +56,28 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
-<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
-<?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "ipd_patients") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/IpdPatientsMaster.php";
-    }
-}
-?>
-<?php } ?>
-<?php if ($Page->ShowCurrentFilter) { ?>
-<?php $Page->showFilterList() ?>
-<?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fpatient_admissionssrch" id="fpatient_admissionssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fpatient_admissionssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="freceive_itemssrch" id="freceive_itemssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="freceive_itemssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { patient_admissions: currentTable } });
+ew.deepAssign(ew.vars, { tables: { receive_items: currentTable } });
 var currentForm;
-var fpatient_admissionssrch, currentSearchForm, currentAdvancedSearchForm;
+var freceive_itemssrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fpatient_admissionssrch")
+        .setId("freceive_itemssrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
 <?php } ?>
 
-        // Add fields
-        .addFields([
-        ])
-        // Validate form
-        .setValidate(
-            async function () {
-                if (!this.validateRequired)
-                    return true; // Ignore validation
-                let fobj = this.getForm();
-
-                // Validate fields
-                if (!this.validateFields())
-                    return false;
-
-                // Call Form_CustomValidate event
-                if (!(await this.customValidate?.(fobj) ?? true)) {
-                    this.focus();
-                    return false;
-                }
-                return true;
-            }
-        )
-
-        // Form_CustomValidate
-        .setCustomValidate(
-            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
-                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
-                    return true;
-                }
-        )
-
-        // Use JavaScript validation or not
-        .setValidateRequired(ew.CLIENT_VALIDATE)
-
         // Dynamic selection lists
         .setLists({
-            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
         })
 
         // Filters
@@ -144,57 +92,26 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
-<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
-<?php
-// Render search row
-$Page->RowType = RowType::SEARCH;
-$Page->resetAttributes();
-$Page->renderRow();
-?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-<?php
-if (!$Page->patient_id->UseFilter) {
-    $Page->SearchColumnCount++;
-}
-?>
-    <div id="xs_patient_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_id->UseFilter ? " ew-filter-field" : "" ?>">
-        <select
-            id="x_patient_id"
-            name="x_patient_id[]"
-            class="form-control ew-select<?= $Page->patient_id->isInvalidClass() ?>"
-            data-select2-id="fpatient_admissionssrch_x_patient_id"
-            data-table="patient_admissions"
-            data-field="x_patient_id"
-            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_id->caption())) ?>"
-            data-filter="true"
-            multiple
-            size="1"
-            data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>"
-            data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>"
-            data-ew-action="update-options"
-            <?= $Page->patient_id->editAttributes() ?>>
-            <?= $Page->patient_id->selectOptionListHtml("x_patient_id", true) ?>
-        </select>
-        <div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage(false) ?></div>
-        <script>
-        loadjs.ready("fpatient_admissionssrch", function() {
-            var options = {
-                name: "x_patient_id",
-                selectId: "fpatient_admissionssrch_x_patient_id",
-                ajax: { id: "x_patient_id", form: "fpatient_admissionssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
-            };
-            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_admissions.fields.patient_id.filterOptions);
-            ew.createFilter(options);
-        });
-        </script>
-    </div><!-- /.col-sm-auto -->
-<?php } ?>
-<?php if ($Page->SearchColumnCount > 0) { ?>
-   <div class="col-sm-auto mb-3">
-       <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
-   </div>
-<?php } ?>
-</div><!-- /.row -->
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
+            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="freceive_itemssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="freceive_itemssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="freceive_itemssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="freceive_itemssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+    </div>
+</div>
 </div><!-- /.ew-extended-search -->
 <?php } ?>
 <?php } ?>
@@ -212,22 +129,28 @@ $Page->showMessage();
 <div id="ew-list">
 <?php if ($Page->TotalRecords > 0 || $Page->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Page->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Page->TableGridClass ?>">
+<?php if (!$Page->isExport()) { ?>
+<div class="card-header ew-grid-upper-panel">
+<?php if (!$Page->isGridAdd() && !($Page->isGridEdit() && $Page->ModalGridEdit) && !$Page->isMultiEdit()) { ?>
+<?= $Page->Pager->render() ?>
+<?php } ?>
+<div class="ew-list-other-options">
+<?php $Page->OtherOptions->render("body") ?>
+</div>
+</div>
+<?php } ?>
 <form name="<?= $Page->FormName ?>" id="<?= $Page->FormName ?>" class="ew-form ew-list-form" action="<?= $Page->PageAction ?>" method="post" novalidate autocomplete="off">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="patient_admissions">
+<input type="hidden" name="t" value="receive_items">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "ipd_patients" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="ipd_patients">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
-<?php } ?>
-<div id="gmp_patient_admissions" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_receive_items" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_patient_admissionslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_receive_itemslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -240,11 +163,20 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_admissions_patient_id" class="patient_admissions_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
+<?php if ($Page->item_id->Visible) { // item_id ?>
+        <th data-name="item_id" class="<?= $Page->item_id->headerCellClass() ?>"><div id="elh_receive_items_item_id" class="receive_items_item_id"><?= $Page->renderFieldHeader($Page->item_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->total_items_received->Visible) { // total_items_received ?>
+        <th data-name="total_items_received" class="<?= $Page->total_items_received->headerCellClass() ?>"><div id="elh_receive_items_total_items_received" class="receive_items_total_items_received"><?= $Page->renderFieldHeader($Page->total_items_received) ?></div></th>
+<?php } ?>
+<?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
+        <th data-name="measuring_unit" class="<?= $Page->measuring_unit->headerCellClass() ?>"><div id="elh_receive_items_measuring_unit" class="receive_items_measuring_unit"><?= $Page->renderFieldHeader($Page->measuring_unit) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
-        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patient_admissions_date_created" class="patient_admissions_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_receive_items_date_created" class="receive_items_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div id="elh_receive_items_date_updated" class="receive_items_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -274,19 +206,43 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->patient_id->Visible) { // patient_id ?>
-        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_admissions_patient_id" class="el_patient_admissions_patient_id">
-<span<?= $Page->patient_id->viewAttributes() ?>>
-<?= $Page->patient_id->getViewValue() ?></span>
+    <?php if ($Page->item_id->Visible) { // item_id ?>
+        <td data-name="item_id"<?= $Page->item_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_receive_items_item_id" class="el_receive_items_item_id">
+<span<?= $Page->item_id->viewAttributes() ?>>
+<?= $Page->item_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->total_items_received->Visible) { // total_items_received ?>
+        <td data-name="total_items_received"<?= $Page->total_items_received->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_receive_items_total_items_received" class="el_receive_items_total_items_received">
+<span<?= $Page->total_items_received->viewAttributes() ?>>
+<?= $Page->total_items_received->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
+        <td data-name="measuring_unit"<?= $Page->measuring_unit->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_receive_items_measuring_unit" class="el_receive_items_measuring_unit">
+<span<?= $Page->measuring_unit->viewAttributes() ?>>
+<?= $Page->measuring_unit->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
     <?php if ($Page->date_created->Visible) { // date_created ?>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_admissions_date_created" class="el_patient_admissions_date_created">
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_receive_items_date_created" class="el_receive_items_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_updated->Visible) { // date_updated ?>
+        <td data-name="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_receive_items_date_updated" class="el_receive_items_date_updated">
+<span<?= $Page->date_updated->viewAttributes() ?>>
+<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -349,7 +305,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("patient_admissions");
+    ew.addEventHandlers("receive_items");
 });
 </script>
 <script>

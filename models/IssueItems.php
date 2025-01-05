@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for item_purchases
+ * Table class for issue_items
  */
-class ItemPurchases extends DbTable
+class IssueItems extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,17 +48,10 @@ class ItemPurchases extends DbTable
 
     // Fields
     public $id;
-    public $batch_number;
-    public $supplier_id;
-    public $category_id;
-    public $subcategory_id;
-    public $item_title;
+    public $admission_id;
+    public $patient_id;
+    public $item_id;
     public $quantity;
-    public $measuring_unit;
-    public $unit_price;
-    public $selling_price;
-    public $amount_paid;
-    public $invoice_attachment;
     public $date_created;
     public $date_updated;
 
@@ -73,14 +66,14 @@ class ItemPurchases extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "item_purchases";
-        $this->TableName = 'item_purchases';
+        $this->TableVar = "issue_items";
+        $this->TableName = 'issue_items';
         $this->TableType = "TABLE";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "item_purchases";
+        $this->UpdateTable = "issue_items";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -134,143 +127,89 @@ class ItemPurchases extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // batch_number
-        $this->batch_number = new DbField(
+        // admission_id
+        $this->admission_id = new DbField(
             $this, // Table
-            'x_batch_number', // Variable name
-            'batch_number', // Name
-            '`batch_number`', // Expression
-            '`batch_number`', // Basic search expression
-            200, // Type
-            100, // Size
+            'x_admission_id', // Variable name
+            'admission_id', // Name
+            '`admission_id`', // Expression
+            '`admission_id`', // Basic search expression
+            3, // Type
+            11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`batch_number`', // Virtual expression
+            '`admission_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->batch_number->InputTextType = "text";
-        $this->batch_number->Nullable = false; // NOT NULL field
-        $this->batch_number->Required = true; // Required field
-        $this->batch_number->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['batch_number'] = &$this->batch_number;
+        $this->admission_id->InputTextType = "text";
+        $this->admission_id->Raw = true;
+        $this->admission_id->IsForeignKey = true; // Foreign key field
+        $this->admission_id->Nullable = false; // NOT NULL field
+        $this->admission_id->Required = true; // Required field
+        $this->admission_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->admission_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['admission_id'] = &$this->admission_id;
 
-        // supplier_id
-        $this->supplier_id = new DbField(
+        // patient_id
+        $this->patient_id = new DbField(
             $this, // Table
-            'x_supplier_id', // Variable name
-            'supplier_id', // Name
-            '`supplier_id`', // Expression
-            '`supplier_id`', // Basic search expression
+            'x_patient_id', // Variable name
+            'patient_id', // Name
+            '`patient_id`', // Expression
+            '`patient_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`supplier_id`', // Virtual expression
+            '`patient_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'SELECT' // Edit Tag
         );
-        $this->supplier_id->InputTextType = "text";
-        $this->supplier_id->Raw = true;
-        $this->supplier_id->Nullable = false; // NOT NULL field
-        $this->supplier_id->Required = true; // Required field
-        $this->supplier_id->setSelectMultiple(false); // Select one
-        $this->supplier_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->supplier_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->supplier_id->Lookup = new Lookup($this->supplier_id, 'suppliers', false, 'id', ["supplier_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`supplier_name`");
-        $this->supplier_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->supplier_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['supplier_id'] = &$this->supplier_id;
+        $this->patient_id->InputTextType = "text";
+        $this->patient_id->Raw = true;
+        $this->patient_id->IsForeignKey = true; // Foreign key field
+        $this->patient_id->Nullable = false; // NOT NULL field
+        $this->patient_id->Required = true; // Required field
+        $this->patient_id->setSelectMultiple(false); // Select one
+        $this->patient_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->patient_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->patient_id->Lookup = new Lookup($this->patient_id, 'patients', false, 'id', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->patient_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['patient_id'] = &$this->patient_id;
 
-        // category_id
-        $this->category_id = new DbField(
+        // item_id
+        $this->item_id = new DbField(
             $this, // Table
-            'x_category_id', // Variable name
-            'category_id', // Name
-            '`category_id`', // Expression
-            '`category_id`', // Basic search expression
+            'x_item_id', // Variable name
+            'item_id', // Name
+            '`item_id`', // Expression
+            '`item_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`category_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->category_id->InputTextType = "text";
-        $this->category_id->Raw = true;
-        $this->category_id->Nullable = false; // NOT NULL field
-        $this->category_id->Required = true; // Required field
-        $this->category_id->setSelectMultiple(false); // Select one
-        $this->category_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->category_id->Lookup = new Lookup($this->category_id, 'item_categories', false, 'id', ["category_name","","",""], '', '', [], ["x_subcategory_id"], [], [], [], [], false, '', '', "`category_name`");
-        $this->category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['category_id'] = &$this->category_id;
-
-        // subcategory_id
-        $this->subcategory_id = new DbField(
-            $this, // Table
-            'x_subcategory_id', // Variable name
-            'subcategory_id', // Name
-            '`subcategory_id`', // Expression
-            '`subcategory_id`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`subcategory_id`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->subcategory_id->InputTextType = "text";
-        $this->subcategory_id->Raw = true;
-        $this->subcategory_id->Nullable = false; // NOT NULL field
-        $this->subcategory_id->Required = true; // Required field
-        $this->subcategory_id->setSelectMultiple(false); // Select one
-        $this->subcategory_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->subcategory_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->subcategory_id->Lookup = new Lookup($this->subcategory_id, 'item_subcategories', false, 'id', ["subcategory_name","","",""], '', '', ["x_category_id"], [], ["category_id"], ["x_category_id"], [], [], false, '', '', "`subcategory_name`");
-        $this->subcategory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->subcategory_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['subcategory_id'] = &$this->subcategory_id;
-
-        // item_title
-        $this->item_title = new DbField(
-            $this, // Table
-            'x_item_title', // Variable name
-            'item_title', // Name
-            '`item_title`', // Expression
-            '`item_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`item_title`', // Virtual expression
+            '`item_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->item_title->InputTextType = "text";
-        $this->item_title->Nullable = false; // NOT NULL field
-        $this->item_title->Required = true; // Required field
-        $this->item_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['item_title'] = &$this->item_title;
+        $this->item_id->InputTextType = "text";
+        $this->item_id->Raw = true;
+        $this->item_id->Nullable = false; // NOT NULL field
+        $this->item_id->Required = true; // Required field
+        $this->item_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->item_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['item_id'] = &$this->item_id;
 
         // quantity
         $this->quantity = new DbField(
@@ -297,141 +236,6 @@ class ItemPurchases extends DbTable
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['quantity'] = &$this->quantity;
-
-        // measuring_unit
-        $this->measuring_unit = new DbField(
-            $this, // Table
-            'x_measuring_unit', // Variable name
-            'measuring_unit', // Name
-            '`measuring_unit`', // Expression
-            '`measuring_unit`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`measuring_unit`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
-        );
-        $this->measuring_unit->InputTextType = "text";
-        $this->measuring_unit->Nullable = false; // NOT NULL field
-        $this->measuring_unit->Required = true; // Required field
-        $this->measuring_unit->setSelectMultiple(false); // Select one
-        $this->measuring_unit->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->measuring_unit->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->measuring_unit->Lookup = new Lookup($this->measuring_unit, 'item_purchases', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->measuring_unit->OptionCount = 7;
-        $this->measuring_unit->SearchOperators = ["=", "<>"];
-        $this->Fields['measuring_unit'] = &$this->measuring_unit;
-
-        // unit_price
-        $this->unit_price = new DbField(
-            $this, // Table
-            'x_unit_price', // Variable name
-            'unit_price', // Name
-            '`unit_price`', // Expression
-            '`unit_price`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`unit_price`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->unit_price->InputTextType = "text";
-        $this->unit_price->Raw = true;
-        $this->unit_price->Nullable = false; // NOT NULL field
-        $this->unit_price->Required = true; // Required field
-        $this->unit_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->unit_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['unit_price'] = &$this->unit_price;
-
-        // selling_price
-        $this->selling_price = new DbField(
-            $this, // Table
-            'x_selling_price', // Variable name
-            'selling_price', // Name
-            '`selling_price`', // Expression
-            '`selling_price`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`selling_price`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->selling_price->InputTextType = "text";
-        $this->selling_price->Raw = true;
-        $this->selling_price->Nullable = false; // NOT NULL field
-        $this->selling_price->Required = true; // Required field
-        $this->selling_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->selling_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['selling_price'] = &$this->selling_price;
-
-        // amount_paid
-        $this->amount_paid = new DbField(
-            $this, // Table
-            'x_amount_paid', // Variable name
-            'amount_paid', // Name
-            '`amount_paid`', // Expression
-            '`amount_paid`', // Basic search expression
-            5, // Type
-            22, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`amount_paid`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->amount_paid->InputTextType = "text";
-        $this->amount_paid->Raw = true;
-        $this->amount_paid->Nullable = false; // NOT NULL field
-        $this->amount_paid->Required = true; // Required field
-        $this->amount_paid->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->amount_paid->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['amount_paid'] = &$this->amount_paid;
-
-        // invoice_attachment
-        $this->invoice_attachment = new DbField(
-            $this, // Table
-            'x_invoice_attachment', // Variable name
-            'invoice_attachment', // Name
-            '`invoice_attachment`', // Expression
-            '`invoice_attachment`', // Basic search expression
-            205, // Type
-            2147483647, // Size
-            -1, // Date/Time format
-            true, // Is upload field
-            '`invoice_attachment`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'FILE' // Edit Tag
-        );
-        $this->invoice_attachment->InputTextType = "text";
-        $this->invoice_attachment->Raw = true;
-        $this->invoice_attachment->Nullable = false; // NOT NULL field
-        $this->invoice_attachment->Required = true; // Required field
-        $this->invoice_attachment->Sortable = false; // Allow sort
-        $this->invoice_attachment->UploadAllowedFileExt = "pdf,jpg";
-        $this->invoice_attachment->SearchOperators = ["=", "<>"];
-        $this->invoice_attachment->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->invoice_attachment->Param, "CustomMsg");
-        $this->Fields['invoice_attachment'] = &$this->invoice_attachment;
 
         // date_created
         $this->date_created = new DbField(
@@ -543,6 +347,107 @@ class ItemPurchases extends DbTable
         }
     }
 
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_admissions") {
+            $masterTable = Container("patient_admissions");
+            if ($this->admission_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->admission_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $masterFilter .= " AND " . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "patient_admissions") {
+            $masterTable = Container("patient_admissions");
+            if ($this->admission_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->admission_id, $this->admission_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $detailFilter .= " AND " . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "patient_admissions":
+                $key = $keys["admission_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                $key = $keys["patient_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["admission_id"], $this->admission_id->DataType, $this->Dbid) . " AND " . GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "patient_admissions":
+                return GetKeyFilter($this->admission_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+        }
+        return "";
+    }
+
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -552,7 +457,7 @@ class ItemPurchases extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "item_purchases";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "issue_items";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -1004,17 +909,10 @@ class ItemPurchases extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->batch_number->DbValue = $row['batch_number'];
-        $this->supplier_id->DbValue = $row['supplier_id'];
-        $this->category_id->DbValue = $row['category_id'];
-        $this->subcategory_id->DbValue = $row['subcategory_id'];
-        $this->item_title->DbValue = $row['item_title'];
+        $this->admission_id->DbValue = $row['admission_id'];
+        $this->patient_id->DbValue = $row['patient_id'];
+        $this->item_id->DbValue = $row['item_id'];
         $this->quantity->DbValue = $row['quantity'];
-        $this->measuring_unit->DbValue = $row['measuring_unit'];
-        $this->unit_price->DbValue = $row['unit_price'];
-        $this->selling_price->DbValue = $row['selling_price'];
-        $this->amount_paid->DbValue = $row['amount_paid'];
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1090,7 +988,7 @@ class ItemPurchases extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("itempurchaseslist");
+        return $_SESSION[$name] ?? GetUrl("issueitemslist");
     }
 
     // Set return page URL
@@ -1104,9 +1002,9 @@ class ItemPurchases extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "itempurchasesview" => $Language->phrase("View"),
-            "itempurchasesedit" => $Language->phrase("Edit"),
-            "itempurchasesadd" => $Language->phrase("Add"),
+            "issueitemsview" => $Language->phrase("View"),
+            "issueitemsedit" => $Language->phrase("Edit"),
+            "issueitemsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1114,18 +1012,18 @@ class ItemPurchases extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "itempurchaseslist";
+        return "issueitemslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "ItemPurchasesView",
-            Config("API_ADD_ACTION") => "ItemPurchasesAdd",
-            Config("API_EDIT_ACTION") => "ItemPurchasesEdit",
-            Config("API_DELETE_ACTION") => "ItemPurchasesDelete",
-            Config("API_LIST_ACTION") => "ItemPurchasesList",
+            Config("API_VIEW_ACTION") => "IssueItemsView",
+            Config("API_ADD_ACTION") => "IssueItemsAdd",
+            Config("API_EDIT_ACTION") => "IssueItemsEdit",
+            Config("API_DELETE_ACTION") => "IssueItemsDelete",
+            Config("API_LIST_ACTION") => "IssueItemsList",
             default => ""
         };
     }
@@ -1145,16 +1043,16 @@ class ItemPurchases extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "itempurchaseslist";
+        return "issueitemslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("itempurchasesview", $parm);
+            $url = $this->keyUrl("issueitemsview", $parm);
         } else {
-            $url = $this->keyUrl("itempurchasesview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("issueitemsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1163,9 +1061,9 @@ class ItemPurchases extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "itempurchasesadd?" . $parm;
+            $url = "issueitemsadd?" . $parm;
         } else {
-            $url = "itempurchasesadd";
+            $url = "issueitemsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1173,28 +1071,28 @@ class ItemPurchases extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("itempurchasesedit", $parm);
+        $url = $this->keyUrl("issueitemsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("itempurchaseslist", "action=edit");
+        $url = $this->keyUrl("issueitemslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("itempurchasesadd", $parm);
+        $url = $this->keyUrl("issueitemsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("itempurchaseslist", "action=copy");
+        $url = $this->keyUrl("issueitemslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1204,13 +1102,18 @@ class ItemPurchases extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("itempurchasesdelete", $parm);
+            return $this->keyUrl("issueitemsdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "patient_admissions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->admission_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1370,17 +1273,10 @@ class ItemPurchases extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
+        $this->admission_id->setDbValue($row['admission_id']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
         $this->quantity->setDbValue($row['quantity']);
-        $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1389,7 +1285,7 @@ class ItemPurchases extends DbTable
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "ItemPurchasesList";
+        $listPage = "IssueItemsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1415,27 +1311,13 @@ class ItemPurchases extends DbTable
 
         // id
 
-        // batch_number
+        // admission_id
 
-        // supplier_id
+        // patient_id
 
-        // category_id
-
-        // subcategory_id
-
-        // item_title
+        // item_id
 
         // quantity
-
-        // measuring_unit
-
-        // unit_price
-
-        // selling_price
-
-        // amount_paid
-
-        // invoice_attachment
 
         // date_created
 
@@ -1444,111 +1326,40 @@ class ItemPurchases extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // batch_number
-        $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+        // admission_id
+        $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+        $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
 
-        // supplier_id
-        $curVal = strval($this->supplier_id->CurrentValue);
+        // patient_id
+        $curVal = strval($this->patient_id->CurrentValue);
         if ($curVal != "") {
-            $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-            if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+            $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+            if ($this->patient_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $conn = Conn();
                 $config = $conn->getConfiguration();
                 $config->setResultCache($this->Cache);
                 $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                    $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
                 } else {
-                    $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                    $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                 }
             }
         } else {
-            $this->supplier_id->ViewValue = null;
+            $this->patient_id->ViewValue = null;
         }
 
-        // category_id
-        $curVal = strval($this->category_id->CurrentValue);
-        if ($curVal != "") {
-            $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-            if ($this->category_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                } else {
-                    $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                }
-            }
-        } else {
-            $this->category_id->ViewValue = null;
-        }
-
-        // subcategory_id
-        $curVal = strval($this->subcategory_id->CurrentValue);
-        if ($curVal != "") {
-            $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-            if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                } else {
-                    $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                }
-            }
-        } else {
-            $this->subcategory_id->ViewValue = null;
-        }
-
-        // item_title
-        $this->item_title->ViewValue = $this->item_title->CurrentValue;
+        // item_id
+        $this->item_id->ViewValue = $this->item_id->CurrentValue;
+        $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
 
         // quantity
         $this->quantity->ViewValue = $this->quantity->CurrentValue;
         $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
-
-        // measuring_unit
-        if (strval($this->measuring_unit->CurrentValue) != "") {
-            $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-        } else {
-            $this->measuring_unit->ViewValue = null;
-        }
-
-        // unit_price
-        $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-        $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-        // selling_price
-        $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-        $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-        // amount_paid
-        $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-        $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
-
-        // invoice_attachment
-        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
-            $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
-            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
-        } else {
-            $this->invoice_attachment->ViewValue = "";
-        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1562,61 +1373,21 @@ class ItemPurchases extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // batch_number
-        $this->batch_number->HrefValue = "";
-        $this->batch_number->TooltipValue = "";
+        // admission_id
+        $this->admission_id->HrefValue = "";
+        $this->admission_id->TooltipValue = "";
 
-        // supplier_id
-        $this->supplier_id->HrefValue = "";
-        $this->supplier_id->TooltipValue = "";
+        // patient_id
+        $this->patient_id->HrefValue = "";
+        $this->patient_id->TooltipValue = "";
 
-        // category_id
-        $this->category_id->HrefValue = "";
-        $this->category_id->TooltipValue = "";
-
-        // subcategory_id
-        $this->subcategory_id->HrefValue = "";
-        $this->subcategory_id->TooltipValue = "";
-
-        // item_title
-        $this->item_title->HrefValue = "";
-        $this->item_title->TooltipValue = "";
+        // item_id
+        $this->item_id->HrefValue = "";
+        $this->item_id->TooltipValue = "";
 
         // quantity
         $this->quantity->HrefValue = "";
         $this->quantity->TooltipValue = "";
-
-        // measuring_unit
-        $this->measuring_unit->HrefValue = "";
-        $this->measuring_unit->TooltipValue = "";
-
-        // unit_price
-        $this->unit_price->HrefValue = "";
-        $this->unit_price->TooltipValue = "";
-
-        // selling_price
-        $this->selling_price->HrefValue = "";
-        $this->selling_price->TooltipValue = "";
-
-        // amount_paid
-        $this->amount_paid->HrefValue = "";
-        $this->amount_paid->TooltipValue = "";
-
-        // invoice_attachment
-        if (!empty($this->invoice_attachment->Upload->DbValue)) {
-            $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
-            $this->invoice_attachment->LinkAttrs["target"] = "";
-            if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
-                $this->invoice_attachment->LinkAttrs["target"] = "_blank";
-            }
-            if ($this->isExport()) {
-                $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
-            }
-        } else {
-            $this->invoice_attachment->HrefValue = "";
-        }
-        $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
-        $this->invoice_attachment->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1645,33 +1416,56 @@ class ItemPurchases extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // batch_number
-        $this->batch_number->setupEditAttributes();
-        if (!$this->batch_number->Raw) {
-            $this->batch_number->CurrentValue = HtmlDecode($this->batch_number->CurrentValue);
+        // admission_id
+        $this->admission_id->setupEditAttributes();
+        if ($this->admission_id->getSessionValue() != "") {
+            $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
+        } else {
+            $this->admission_id->EditValue = $this->admission_id->CurrentValue;
+            $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
+            if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
+                $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
+            }
         }
-        $this->batch_number->EditValue = $this->batch_number->CurrentValue;
-        $this->batch_number->PlaceHolder = RemoveHtml($this->batch_number->caption());
 
-        // supplier_id
-        $this->supplier_id->setupEditAttributes();
-        $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
-
-        // category_id
-        $this->category_id->setupEditAttributes();
-        $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-
-        // subcategory_id
-        $this->subcategory_id->setupEditAttributes();
-        $this->subcategory_id->PlaceHolder = RemoveHtml($this->subcategory_id->caption());
-
-        // item_title
-        $this->item_title->setupEditAttributes();
-        if (!$this->item_title->Raw) {
-            $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
+        // patient_id
+        $this->patient_id->setupEditAttributes();
+        if ($this->patient_id->getSessionValue() != "") {
+            $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
+        } else {
+            $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
         }
-        $this->item_title->EditValue = $this->item_title->CurrentValue;
-        $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
+
+        // item_id
+        $this->item_id->setupEditAttributes();
+        $this->item_id->EditValue = $this->item_id->CurrentValue;
+        $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
+        if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
+            $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
+        }
 
         // quantity
         $this->quantity->setupEditAttributes();
@@ -1679,44 +1473,6 @@ class ItemPurchases extends DbTable
         $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
         if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
             $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
-        }
-
-        // measuring_unit
-        $this->measuring_unit->setupEditAttributes();
-        $this->measuring_unit->EditValue = $this->measuring_unit->options(true);
-        $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
-
-        // unit_price
-        $this->unit_price->setupEditAttributes();
-        $this->unit_price->EditValue = $this->unit_price->CurrentValue;
-        $this->unit_price->PlaceHolder = RemoveHtml($this->unit_price->caption());
-        if (strval($this->unit_price->EditValue) != "" && is_numeric($this->unit_price->EditValue)) {
-            $this->unit_price->EditValue = FormatNumber($this->unit_price->EditValue, null);
-        }
-
-        // selling_price
-        $this->selling_price->setupEditAttributes();
-        $this->selling_price->EditValue = $this->selling_price->CurrentValue;
-        $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
-        if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
-            $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
-        }
-
-        // amount_paid
-        $this->amount_paid->setupEditAttributes();
-        $this->amount_paid->EditValue = $this->amount_paid->CurrentValue;
-        $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
-        if (strval($this->amount_paid->EditValue) != "" && is_numeric($this->amount_paid->EditValue)) {
-            $this->amount_paid->EditValue = FormatNumber($this->amount_paid->EditValue, null);
-        }
-
-        // invoice_attachment
-        $this->invoice_attachment->setupEditAttributes();
-        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
-            $this->invoice_attachment->EditValue = $this->id->CurrentValue;
-            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
-        } else {
-            $this->invoice_attachment->EditValue = "";
         }
 
         // date_created
@@ -1758,29 +1514,16 @@ class ItemPurchases extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->batch_number);
-                    $doc->exportCaption($this->supplier_id);
-                    $doc->exportCaption($this->category_id);
-                    $doc->exportCaption($this->subcategory_id);
-                    $doc->exportCaption($this->item_title);
+                    $doc->exportCaption($this->admission_id);
+                    $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->item_id);
                     $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->unit_price);
-                    $doc->exportCaption($this->selling_price);
-                    $doc->exportCaption($this->amount_paid);
-                    $doc->exportCaption($this->invoice_attachment);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->batch_number);
-                    $doc->exportCaption($this->supplier_id);
-                    $doc->exportCaption($this->category_id);
-                    $doc->exportCaption($this->subcategory_id);
-                    $doc->exportCaption($this->item_title);
+                    $doc->exportCaption($this->admission_id);
+                    $doc->exportCaption($this->patient_id);
+                    $doc->exportCaption($this->item_id);
                     $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->measuring_unit);
-                    $doc->exportCaption($this->unit_price);
-                    $doc->exportCaption($this->selling_price);
-                    $doc->exportCaption($this->amount_paid);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 }
@@ -1810,29 +1553,16 @@ class ItemPurchases extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->batch_number);
-                        $doc->exportField($this->supplier_id);
-                        $doc->exportField($this->category_id);
-                        $doc->exportField($this->subcategory_id);
-                        $doc->exportField($this->item_title);
+                        $doc->exportField($this->admission_id);
+                        $doc->exportField($this->patient_id);
+                        $doc->exportField($this->item_id);
                         $doc->exportField($this->quantity);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->unit_price);
-                        $doc->exportField($this->selling_price);
-                        $doc->exportField($this->amount_paid);
-                        $doc->exportField($this->invoice_attachment);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->batch_number);
-                        $doc->exportField($this->supplier_id);
-                        $doc->exportField($this->category_id);
-                        $doc->exportField($this->subcategory_id);
-                        $doc->exportField($this->item_title);
+                        $doc->exportField($this->admission_id);
+                        $doc->exportField($this->patient_id);
+                        $doc->exportField($this->item_id);
                         $doc->exportField($this->quantity);
-                        $doc->exportField($this->measuring_unit);
-                        $doc->exportField($this->unit_price);
-                        $doc->exportField($this->selling_price);
-                        $doc->exportField($this->amount_paid);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     }
@@ -1854,122 +1584,8 @@ class ItemPurchases extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
-        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
-        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // Set up field name / file name field / file type field
-        $fldName = "";
-        $fileNameFld = "";
-        $fileTypeFld = "";
-        if ($fldparm == 'invoice_attachment') {
-            $fldName = "invoice_attachment";
-        } else {
-            return false; // Incorrect field
-        }
-
-        // Set up key values
-        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
-        if (count($ar) == 1) {
-            $this->id->CurrentValue = $ar[0];
-        } else {
-            return false; // Incorrect key
-        }
-
-        // Set up filter (WHERE Clause)
-        $filter = $this->getRecordFilter();
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        $dbtype = GetConnectionType($this->Dbid);
-        if ($row = $conn->fetchAssociative($sql)) {
-            $val = $row[$fldName];
-            if (!EmptyValue($val)) {
-                $fld = $this->Fields[$fldName];
-
-                // Binary data
-                if ($fld->DataType == DataType::BLOB) {
-                    if ($dbtype != "MYSQL") {
-                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
-                            $val = stream_get_contents($val);
-                        }
-                    }
-                    if ($resize) {
-                        ResizeBinary($val, $width, $height, $plugins);
-                    }
-
-                    // Write file type
-                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
-                        AddHeader("Content-type", $row[$fileTypeFld]);
-                    } else {
-                        AddHeader("Content-type", ContentType($val));
-                    }
-
-                    // Write file name
-                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
-                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
-                        $fileName = $row[$fileNameFld];
-                        $pathinfo = pathinfo($fileName);
-                        $ext = strtolower($pathinfo["extension"] ?? "");
-                        $isPdf = SameText($ext, "pdf");
-                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
-                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
-                        }
-                    } else {
-                        $ext = ContentExtension($val);
-                        $isPdf = SameText($ext, ".pdf");
-                        if ($isPdf && $downloadPdf) { // Add header if download PDF
-                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
-                        }
-                    }
-
-                    // Write file data
-                    if (
-                        StartsString("PK", $val) &&
-                        ContainsString($val, "[Content_Types].xml") &&
-                        ContainsString($val, "_rels") &&
-                        ContainsString($val, "docProps")
-                    ) { // Fix Office 2007 documents
-                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
-                            $val .= "\0\0\0\0";
-                        }
-                    }
-
-                    // Clear any debug message
-                    if (ob_get_length()) {
-                        ob_end_clean();
-                    }
-
-                    // Write binary data
-                    Write($val);
-
-                // Upload to folder
-                } else {
-                    if ($fld->UploadMultiple) {
-                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
-                    } else {
-                        $files = [$val];
-                    }
-                    $data = [];
-                    $ar = [];
-                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
-                        $fld->UploadPath = $fld->getUploadPath();
-                    }
-                    foreach ($files as $file) {
-                        if (!EmptyValue($file)) {
-                            if (Config("ENCRYPT_FILE_PATH")) {
-                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
-                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
-                            } else {
-                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
-                            }
-                        }
-                    }
-                    $data[$fld->Param] = $ar;
-                    WriteJson($data);
-                }
-            }
-            return true;
-        }
+        // No binary fields
         return false;
     }
 

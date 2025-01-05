@@ -203,6 +203,8 @@ return [
     "item_categories" => \DI\create(ItemCategories::class),
     "item_subcategories" => \DI\create(ItemSubcategories::class),
     "item_purchases" => \DI\create(ItemPurchases::class),
+    "receive_items" => \DI\create(ReceiveItems::class),
+    "issue_items" => \DI\create(IssueItems::class),
 
     // User table
     "usertable" => \DI\get("users"),

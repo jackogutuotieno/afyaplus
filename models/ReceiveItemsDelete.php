@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class ItemPurchasesDelete extends ItemPurchases
+class ReceiveItemsDelete extends ReceiveItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class ItemPurchasesDelete extends ItemPurchases
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ItemPurchasesDelete";
+    public $PageObjName = "ReceiveItemsDelete";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class ItemPurchasesDelete extends ItemPurchases
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "itempurchasesdelete";
+    public $CurrentPageName = "receiveitemsdelete";
 
     // Page headings
     public $Heading = "";
@@ -122,18 +122,10 @@ class ItemPurchasesDelete extends ItemPurchases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->batch_number->setVisibility();
-        $this->supplier_id->Visible = false;
-        $this->category_id->setVisibility();
-        $this->subcategory_id->setVisibility();
-        $this->item_title->setVisibility();
-        $this->quantity->setVisibility();
+        $this->id->Visible = false;
+        $this->item_id->setVisibility();
+        $this->total_items_received->setVisibility();
         $this->measuring_unit->setVisibility();
-        $this->unit_price->setVisibility();
-        $this->selling_price->setVisibility();
-        $this->amount_paid->setVisibility();
-        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -143,8 +135,8 @@ class ItemPurchasesDelete extends ItemPurchases
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'item_purchases';
-        $this->TableName = 'item_purchases';
+        $this->TableVar = 'receive_items';
+        $this->TableName = 'receive_items';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -155,14 +147,14 @@ class ItemPurchasesDelete extends ItemPurchases
         // Language object
         $Language = Container("app.language");
 
-        // Table object (item_purchases)
-        if (!isset($GLOBALS["item_purchases"]) || $GLOBALS["item_purchases"]::class == PROJECT_NAMESPACE . "item_purchases") {
-            $GLOBALS["item_purchases"] = &$this;
+        // Table object (receive_items)
+        if (!isset($GLOBALS["receive_items"]) || $GLOBALS["receive_items"]::class == PROJECT_NAMESPACE . "receive_items") {
+            $GLOBALS["receive_items"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'item_purchases');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'receive_items');
         }
 
         // Start timer
@@ -425,10 +417,7 @@ class ItemPurchasesDelete extends ItemPurchases
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->supplier_id);
-        $this->setupLookupOptions($this->category_id);
-        $this->setupLookupOptions($this->subcategory_id);
-        $this->setupLookupOptions($this->measuring_unit);
+        $this->setupLookupOptions($this->item_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -437,7 +426,7 @@ class ItemPurchasesDelete extends ItemPurchases
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("itempurchaseslist"); // Prevent SQL injection, return to list
+            $this->terminate("receiveitemslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -491,7 +480,7 @@ class ItemPurchasesDelete extends ItemPurchases
             $this->Recordset = $this->loadRecordset();
             if ($this->TotalRecords <= 0) { // No record found, exit
                 $this->Recordset?->free();
-                $this->terminate("itempurchaseslist"); // Return to list
+                $this->terminate("receiveitemslist"); // Return to list
                 return;
             }
         }
@@ -613,20 +602,9 @@ class ItemPurchasesDelete extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
-        $this->quantity->setDbValue($row['quantity']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
-        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
-        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -636,17 +614,9 @@ class ItemPurchasesDelete extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['batch_number'] = $this->batch_number->DefaultValue;
-        $row['supplier_id'] = $this->supplier_id->DefaultValue;
-        $row['category_id'] = $this->category_id->DefaultValue;
-        $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
-        $row['quantity'] = $this->quantity->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
-        $row['unit_price'] = $this->unit_price->DefaultValue;
-        $row['selling_price'] = $this->selling_price->DefaultValue;
-        $row['amount_paid'] = $this->amount_paid->DefaultValue;
-        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -666,27 +636,11 @@ class ItemPurchasesDelete extends ItemPurchases
 
         // id
 
-        // batch_number
+        // item_id
 
-        // supplier_id
-
-        // category_id
-
-        // subcategory_id
-
-        // item_title
-
-        // quantity
+        // total_items_received
 
         // measuring_unit
-
-        // unit_price
-
-        // selling_price
-
-        // amount_paid
-
-        // invoice_attachment
 
         // date_created
 
@@ -697,103 +651,35 @@ class ItemPurchasesDelete extends ItemPurchases
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
-
-            // supplier_id
-            $curVal = strval($this->supplier_id->CurrentValue);
+            // item_id
+            $curVal = strval($this->item_id->CurrentValue);
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-                if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
                     } else {
-                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
                     }
                 }
             } else {
-                $this->supplier_id->ViewValue = null;
+                $this->item_id->ViewValue = null;
             }
 
-            // category_id
-            $curVal = strval($this->category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-                if ($this->category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                    } else {
-                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->category_id->ViewValue = null;
-            }
-
-            // subcategory_id
-            $curVal = strval($this->subcategory_id->CurrentValue);
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-                if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                    } else {
-                        $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->subcategory_id->ViewValue = null;
-            }
-
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
-
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
 
             // measuring_unit
-            if (strval($this->measuring_unit->CurrentValue) != "") {
-                $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-            } else {
-                $this->measuring_unit->ViewValue = null;
-            }
-
-            // unit_price
-            $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-            $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-            // selling_price
-            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-            // amount_paid
-            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -803,45 +689,17 @@ class ItemPurchasesDelete extends ItemPurchases
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+            $this->item_id->TooltipValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
-            $this->batch_number->TooltipValue = "";
-
-            // category_id
-            $this->category_id->HrefValue = "";
-            $this->category_id->TooltipValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-            $this->subcategory_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
-
-            // quantity
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+            $this->total_items_received->TooltipValue = "";
 
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
             $this->measuring_unit->TooltipValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-            $this->unit_price->TooltipValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-            $this->selling_price->TooltipValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-            $this->amount_paid->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -963,7 +821,7 @@ class ItemPurchasesDelete extends ItemPurchases
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("itempurchaseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("receiveitemslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }
@@ -981,13 +839,7 @@ class ItemPurchasesDelete extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_supplier_id":
-                    break;
-                case "x_category_id":
-                    break;
-                case "x_subcategory_id":
-                    break;
-                case "x_measuring_unit":
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

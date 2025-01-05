@@ -301,6 +301,7 @@ class IpdPatients extends DbTable
         $this->is_ipd->OptionCount = 2;
         $this->is_ipd->DefaultErrorMessage = $Language->phrase("IncorrectField");
         $this->is_ipd->SearchOperators = ["=", "<>"];
+        $this->is_ipd->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->is_ipd->Param, "CustomMsg");
         $this->Fields['is_ipd'] = &$this->is_ipd;
 
         // Add Doctrine Cache

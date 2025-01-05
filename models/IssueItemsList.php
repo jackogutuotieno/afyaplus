@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class ItemPurchasesList extends ItemPurchases
+class IssueItemsList extends IssueItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class ItemPurchasesList extends ItemPurchases
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ItemPurchasesList";
+    public $PageObjName = "IssueItemsList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class ItemPurchasesList extends ItemPurchases
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fitem_purchaseslist";
+    public $FormName = "fissue_itemslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "itempurchaseslist";
+    public $CurrentPageName = "issueitemslist";
 
     // Page URLs
     public $AddUrl;
@@ -146,18 +146,11 @@ class ItemPurchasesList extends ItemPurchases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->batch_number->setVisibility();
-        $this->supplier_id->Visible = false;
-        $this->category_id->setVisibility();
-        $this->subcategory_id->setVisibility();
-        $this->item_title->setVisibility();
+        $this->id->Visible = false;
+        $this->admission_id->setVisibility();
+        $this->patient_id->setVisibility();
+        $this->item_id->setVisibility();
         $this->quantity->setVisibility();
-        $this->measuring_unit->setVisibility();
-        $this->unit_price->setVisibility();
-        $this->selling_price->setVisibility();
-        $this->amount_paid->setVisibility();
-        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -170,8 +163,8 @@ class ItemPurchasesList extends ItemPurchases
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'item_purchases';
-        $this->TableName = 'item_purchases';
+        $this->TableVar = 'issue_items';
+        $this->TableName = 'issue_items';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -191,26 +184,26 @@ class ItemPurchasesList extends ItemPurchases
         // Language object
         $Language = Container("app.language");
 
-        // Table object (item_purchases)
-        if (!isset($GLOBALS["item_purchases"]) || $GLOBALS["item_purchases"]::class == PROJECT_NAMESPACE . "item_purchases") {
-            $GLOBALS["item_purchases"] = &$this;
+        // Table object (issue_items)
+        if (!isset($GLOBALS["issue_items"]) || $GLOBALS["issue_items"]::class == PROJECT_NAMESPACE . "issue_items") {
+            $GLOBALS["issue_items"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "itempurchasesadd";
+        $this->AddUrl = "issueitemsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "itempurchasesdelete";
-        $this->MultiUpdateUrl = "itempurchasesupdate";
+        $this->MultiDeleteUrl = "issueitemsdelete";
+        $this->MultiUpdateUrl = "issueitemsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'item_purchases');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'issue_items');
         }
 
         // Start timer
@@ -361,7 +354,7 @@ class ItemPurchasesList extends ItemPurchases
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "itempurchasesview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "issueitemsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -712,18 +705,18 @@ class ItemPurchasesList extends ItemPurchases
             $this->InlineDelete = true;
         }
 
+        // Set up master detail parameters
+        $this->setupMasterParms();
+
         // Setup other options
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->supplier_id);
-        $this->setupLookupOptions($this->category_id);
-        $this->setupLookupOptions($this->subcategory_id);
-        $this->setupLookupOptions($this->measuring_unit);
+        $this->setupLookupOptions($this->patient_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fitem_purchasesgrid";
+            $this->FormName = "fissue_itemsgrid";
         }
 
         // Set up page action
@@ -785,33 +778,8 @@ class ItemPurchasesList extends ItemPurchases
             $this->OtherOptions->hideAllOptions();
         }
 
-        // Get default search criteria
-        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
-
-        // Get basic search values
-        $this->loadBasicSearchValues();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
-
-        // Restore search parms from Session if not searching / reset / export
-        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-            $this->restoreSearchParms();
-        }
-
-        // Call Recordset SearchValidated event
-        $this->recordsetSearchValidated();
-
         // Set up sorting order
         $this->setupSortOrder();
-
-        // Get basic search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchBasic = $this->basicSearchWhere();
-        }
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -821,41 +789,32 @@ class ItemPurchasesList extends ItemPurchases
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms() && !$query) {
-            // Load basic search from default
-            $this->BasicSearch->loadDefault();
-            if ($this->BasicSearch->Keyword != "") {
-                $srchBasic = $this->basicSearchWhere(); // Save to session
-            }
-        }
-
-        // Build search criteria
-        if ($query) {
-            AddFilter($this->SearchWhere, $query);
-        } else {
-            AddFilter($this->SearchWhere, $srchAdvanced);
-            AddFilter($this->SearchWhere, $srchBasic);
-        }
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json" && !$query) {
-            $this->SearchWhere = $this->getSearchWhere();
-        }
-
         // Build filter
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
+
+        // Restore master/detail filter from session
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
+            $masterTbl = Container("patient_admissions");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("patientadmissionslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1051,278 +1010,6 @@ class ItemPurchasesList extends ItemPurchases
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fitem_purchasessrch");
-        }
-        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->batch_number->AdvancedSearch->toJson(), ","); // Field batch_number
-        $filterList = Concat($filterList, $this->supplier_id->AdvancedSearch->toJson(), ","); // Field supplier_id
-        $filterList = Concat($filterList, $this->category_id->AdvancedSearch->toJson(), ","); // Field category_id
-        $filterList = Concat($filterList, $this->subcategory_id->AdvancedSearch->toJson(), ","); // Field subcategory_id
-        $filterList = Concat($filterList, $this->item_title->AdvancedSearch->toJson(), ","); // Field item_title
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
-        $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
-        $filterList = Concat($filterList, $this->unit_price->AdvancedSearch->toJson(), ","); // Field unit_price
-        $filterList = Concat($filterList, $this->selling_price->AdvancedSearch->toJson(), ","); // Field selling_price
-        $filterList = Concat($filterList, $this->amount_paid->AdvancedSearch->toJson(), ","); // Field amount_paid
-        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
-        if ($this->BasicSearch->Keyword != "") {
-            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
-            $filterList = Concat($filterList, $wrk, ",");
-        }
-
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("fitem_purchasessrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
-
-        // Field id
-        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-        $this->id->AdvancedSearch->save();
-
-        // Field batch_number
-        $this->batch_number->AdvancedSearch->SearchValue = @$filter["x_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchOperator = @$filter["z_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchCondition = @$filter["v_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchValue2 = @$filter["y_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchOperator2 = @$filter["w_batch_number"];
-        $this->batch_number->AdvancedSearch->save();
-
-        // Field supplier_id
-        $this->supplier_id->AdvancedSearch->SearchValue = @$filter["x_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchOperator = @$filter["z_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchCondition = @$filter["v_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchValue2 = @$filter["y_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchOperator2 = @$filter["w_supplier_id"];
-        $this->supplier_id->AdvancedSearch->save();
-
-        // Field category_id
-        $this->category_id->AdvancedSearch->SearchValue = @$filter["x_category_id"];
-        $this->category_id->AdvancedSearch->SearchOperator = @$filter["z_category_id"];
-        $this->category_id->AdvancedSearch->SearchCondition = @$filter["v_category_id"];
-        $this->category_id->AdvancedSearch->SearchValue2 = @$filter["y_category_id"];
-        $this->category_id->AdvancedSearch->SearchOperator2 = @$filter["w_category_id"];
-        $this->category_id->AdvancedSearch->save();
-
-        // Field subcategory_id
-        $this->subcategory_id->AdvancedSearch->SearchValue = @$filter["x_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchOperator = @$filter["z_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchCondition = @$filter["v_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchValue2 = @$filter["y_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchOperator2 = @$filter["w_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->save();
-
-        // Field item_title
-        $this->item_title->AdvancedSearch->SearchValue = @$filter["x_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator = @$filter["z_item_title"];
-        $this->item_title->AdvancedSearch->SearchCondition = @$filter["v_item_title"];
-        $this->item_title->AdvancedSearch->SearchValue2 = @$filter["y_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator2 = @$filter["w_item_title"];
-        $this->item_title->AdvancedSearch->save();
-
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
-
-        // Field measuring_unit
-        $this->measuring_unit->AdvancedSearch->SearchValue = @$filter["x_measuring_unit"];
-        $this->measuring_unit->AdvancedSearch->SearchOperator = @$filter["z_measuring_unit"];
-        $this->measuring_unit->AdvancedSearch->SearchCondition = @$filter["v_measuring_unit"];
-        $this->measuring_unit->AdvancedSearch->SearchValue2 = @$filter["y_measuring_unit"];
-        $this->measuring_unit->AdvancedSearch->SearchOperator2 = @$filter["w_measuring_unit"];
-        $this->measuring_unit->AdvancedSearch->save();
-
-        // Field unit_price
-        $this->unit_price->AdvancedSearch->SearchValue = @$filter["x_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchOperator = @$filter["z_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchCondition = @$filter["v_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchValue2 = @$filter["y_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchOperator2 = @$filter["w_unit_price"];
-        $this->unit_price->AdvancedSearch->save();
-
-        // Field selling_price
-        $this->selling_price->AdvancedSearch->SearchValue = @$filter["x_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchOperator = @$filter["z_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchCondition = @$filter["v_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchValue2 = @$filter["y_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchOperator2 = @$filter["w_selling_price"];
-        $this->selling_price->AdvancedSearch->save();
-
-        // Field amount_paid
-        $this->amount_paid->AdvancedSearch->SearchValue = @$filter["x_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchOperator = @$filter["z_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchCondition = @$filter["v_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchValue2 = @$filter["y_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchOperator2 = @$filter["w_amount_paid"];
-        $this->amount_paid->AdvancedSearch->save();
-
-        // Field date_created
-        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
-        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
-        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
-        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
-        $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
-        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
-        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-        if ($this->BasicSearch->Keyword != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
-        }
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Return basic search WHERE clause based on search keyword and type
-    public function basicSearchWhere($default = false)
-    {
-        global $Security;
-        $searchStr = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Fields to search
-        $searchFlds = [];
-        $searchFlds[] = &$this->batch_number;
-        $searchFlds[] = &$this->subcategory_id;
-        $searchFlds[] = &$this->item_title;
-        $searchFlds[] = &$this->measuring_unit;
-        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-        // Get search SQL
-        if ($searchKeyword != "") {
-            $ar = $this->BasicSearch->keywordList($default);
-            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
-            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
-                $this->Command = "search";
-            }
-        }
-        if (!$default && $this->Command == "search") {
-            $this->BasicSearch->setKeyword($searchKeyword);
-            $this->BasicSearch->setType($searchType);
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $searchStr;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        // Check basic search
-        if ($this->BasicSearch->issetSession()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Clear all search parameters
-    protected function resetSearchParms()
-    {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear basic search parameters
-        $this->resetBasicSearchParms();
-    }
-
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
-    {
-        return false;
-    }
-
-    // Clear all basic search parameters
-    protected function resetBasicSearchParms()
-    {
-        $this->BasicSearch->unsetSession();
-    }
-
-    // Restore all search parameters
-    protected function restoreSearchParms()
-    {
-        $this->RestoreSearch = true;
-
-        // Restore basic search values
-        $this->BasicSearch->load();
-    }
-
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1338,16 +1025,10 @@ class ItemPurchasesList extends ItemPurchases
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->batch_number); // batch_number
-            $this->updateSort($this->category_id); // category_id
-            $this->updateSort($this->subcategory_id); // subcategory_id
-            $this->updateSort($this->item_title); // item_title
+            $this->updateSort($this->admission_id); // admission_id
+            $this->updateSort($this->patient_id); // patient_id
+            $this->updateSort($this->item_id); // item_id
             $this->updateSort($this->quantity); // quantity
-            $this->updateSort($this->measuring_unit); // measuring_unit
-            $this->updateSort($this->unit_price); // unit_price
-            $this->updateSort($this->selling_price); // selling_price
-            $this->updateSort($this->amount_paid); // amount_paid
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1365,9 +1046,13 @@ class ItemPurchasesList extends ItemPurchases
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
+            // Reset master/detail keys
+            if ($this->Command == "resetall") {
+                $this->setCurrentMasterTable(""); // Clear master table
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1375,16 +1060,10 @@ class ItemPurchasesList extends ItemPurchases
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->batch_number->setSort("");
-                $this->supplier_id->setSort("");
-                $this->category_id->setSort("");
-                $this->subcategory_id->setSort("");
-                $this->item_title->setSort("");
+                $this->admission_id->setSort("");
+                $this->patient_id->setSort("");
+                $this->item_id->setSort("");
                 $this->quantity->setSort("");
-                $this->measuring_unit->setSort("");
-                $this->unit_price->setSort("");
-                $this->selling_price->setSort("");
-                $this->amount_paid->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1416,12 +1095,6 @@ class ItemPurchasesList extends ItemPurchases
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1505,7 +1178,7 @@ class ItemPurchasesList extends ItemPurchases
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"issue_items\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1518,22 +1191,9 @@ class ItemPurchasesList extends ItemPurchases
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"issue_items\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"item_purchases\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1572,12 +1232,12 @@ class ItemPurchasesList extends ItemPurchases
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fitem_purchaseslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fissue_itemslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fitem_purchaseslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fissue_itemslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1620,7 +1280,7 @@ class ItemPurchasesList extends ItemPurchases
         $item = &$option->add("add");
         $addcaption = HtmlTitle($Language->phrase("AddLink"));
         if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"issue_items\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
@@ -1633,16 +1293,10 @@ class ItemPurchasesList extends ItemPurchases
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "batch_number");
-            $this->createColumnOption($option, "category_id");
-            $this->createColumnOption($option, "subcategory_id");
-            $this->createColumnOption($option, "item_title");
+            $this->createColumnOption($option, "admission_id");
+            $this->createColumnOption($option, "patient_id");
+            $this->createColumnOption($option, "item_id");
             $this->createColumnOption($option, "quantity");
-            $this->createColumnOption($option, "measuring_unit");
-            $this->createColumnOption($option, "unit_price");
-            $this->createColumnOption($option, "selling_price");
-            $this->createColumnOption($option, "amount_paid");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -1669,11 +1323,11 @@ class ItemPurchasesList extends ItemPurchases
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fitem_purchasessrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fissue_itemssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fitem_purchasessrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fissue_itemssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1732,7 +1386,7 @@ class ItemPurchasesList extends ItemPurchases
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fitem_purchaseslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fissue_itemslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1903,7 +1557,7 @@ class ItemPurchasesList extends ItemPurchases
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_item_purchases", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_issue_items", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1964,7 +1618,7 @@ class ItemPurchasesList extends ItemPurchases
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_item_purchases",
+            "id" => "r" . $this->RowCount . "_issue_items",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1978,16 +1632,6 @@ class ItemPurchasesList extends ItemPurchases
 
         // Render list options
         $this->renderListOptions();
-    }
-
-    // Load basic search values
-    protected function loadBasicSearchValues()
-    {
-        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
-        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
-            $this->Command = "search";
-        }
-        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
     /**
@@ -2084,20 +1728,10 @@ class ItemPurchasesList extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
+        $this->admission_id->setDbValue($row['admission_id']);
+        $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
         $this->quantity->setDbValue($row['quantity']);
-        $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
-        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
-        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2107,17 +1741,10 @@ class ItemPurchasesList extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['batch_number'] = $this->batch_number->DefaultValue;
-        $row['supplier_id'] = $this->supplier_id->DefaultValue;
-        $row['category_id'] = $this->category_id->DefaultValue;
-        $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
+        $row['admission_id'] = $this->admission_id->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
         $row['quantity'] = $this->quantity->DefaultValue;
-        $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
-        $row['unit_price'] = $this->unit_price->DefaultValue;
-        $row['selling_price'] = $this->selling_price->DefaultValue;
-        $row['amount_paid'] = $this->amount_paid->DefaultValue;
-        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2162,27 +1789,13 @@ class ItemPurchasesList extends ItemPurchases
 
         // id
 
-        // batch_number
+        // admission_id
 
-        // supplier_id
+        // patient_id
 
-        // category_id
-
-        // subcategory_id
-
-        // item_title
+        // item_id
 
         // quantity
-
-        // measuring_unit
-
-        // unit_price
-
-        // selling_price
-
-        // amount_paid
-
-        // invoice_attachment
 
         // date_created
 
@@ -2193,103 +1806,40 @@ class ItemPurchasesList extends ItemPurchases
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+            // admission_id
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
 
-            // supplier_id
-            $curVal = strval($this->supplier_id->CurrentValue);
+            // patient_id
+            $curVal = strval($this->patient_id->CurrentValue);
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-                if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
                     } else {
-                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                     }
                 }
             } else {
-                $this->supplier_id->ViewValue = null;
+                $this->patient_id->ViewValue = null;
             }
 
-            // category_id
-            $curVal = strval($this->category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-                if ($this->category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                    } else {
-                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->category_id->ViewValue = null;
-            }
-
-            // subcategory_id
-            $curVal = strval($this->subcategory_id->CurrentValue);
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-                if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                    } else {
-                        $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->subcategory_id->ViewValue = null;
-            }
-
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
+            // item_id
+            $this->item_id->ViewValue = $this->item_id->CurrentValue;
+            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
-
-            // measuring_unit
-            if (strval($this->measuring_unit->CurrentValue) != "") {
-                $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-            } else {
-                $this->measuring_unit->ViewValue = null;
-            }
-
-            // unit_price
-            $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-            $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-            // selling_price
-            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-            // amount_paid
-            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2299,45 +1849,21 @@ class ItemPurchasesList extends ItemPurchases
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // admission_id
+            $this->admission_id->HrefValue = "";
+            $this->admission_id->TooltipValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
-            $this->batch_number->TooltipValue = "";
+            // patient_id
+            $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // category_id
-            $this->category_id->HrefValue = "";
-            $this->category_id->TooltipValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-            $this->subcategory_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+            $this->item_id->TooltipValue = "";
 
             // quantity
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
-
-            // measuring_unit
-            $this->measuring_unit->HrefValue = "";
-            $this->measuring_unit->TooltipValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-            $this->unit_price->TooltipValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-            $this->selling_price->TooltipValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-            $this->amount_paid->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2366,19 +1892,19 @@ class ItemPurchasesList extends ItemPurchases
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fissue_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fissue_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fissue_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2390,7 +1916,7 @@ class ItemPurchasesList extends ItemPurchases
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fitem_purchaseslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fissue_itemslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2465,21 +1991,6 @@ class ItemPurchasesList extends ItemPurchases
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fitem_purchasessrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
-
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -2503,7 +2014,7 @@ class ItemPurchasesList extends ItemPurchases
     // Check if any search fields
     public function hasSearchFields()
     {
-        return true;
+        return false;
     }
 
     // Render search options
@@ -2555,6 +2066,23 @@ class ItemPurchasesList extends ItemPurchases
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
+            $patient_admissions = new PatientAdmissionsList();
+            $rsmaster = $patient_admissions->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($patient_admissions);
+                    $patient_admissions->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2572,6 +2100,115 @@ class ItemPurchasesList extends ItemPurchases
 
         // Call Page Exported server event
         $this->pageExported($doc);
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_admissions") {
+                $validMaster = true;
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "patient_admissions") {
+                $validMaster = true;
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Update URL
+            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
+            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
+            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
+            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
+            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
+
+            // Set up Breadcrumb
+            if (!$this->isExport()) {
+                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
+            }
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -2597,13 +2234,7 @@ class ItemPurchasesList extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_supplier_id":
-                    break;
-                case "x_category_id":
-                    break;
-                case "x_subcategory_id":
-                    break;
-                case "x_measuring_unit":
+                case "x_patient_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2780,7 +2411,7 @@ class ItemPurchasesList extends ItemPurchases
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add purchase");
+        $Language->setPhrase("addlink", "Issue Item");
     }
 
     // Page Unload event

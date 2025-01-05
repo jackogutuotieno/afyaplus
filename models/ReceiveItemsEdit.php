@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class ItemPurchasesEdit extends ItemPurchases
+class ReceiveItemsEdit extends ReceiveItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class ItemPurchasesEdit extends ItemPurchases
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ItemPurchasesEdit";
+    public $PageObjName = "ReceiveItemsEdit";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class ItemPurchasesEdit extends ItemPurchases
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "itempurchasesedit";
+    public $CurrentPageName = "receiveitemsedit";
 
     // Page headings
     public $Heading = "";
@@ -123,17 +123,9 @@ class ItemPurchasesEdit extends ItemPurchases
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->batch_number->setVisibility();
-        $this->supplier_id->setVisibility();
-        $this->category_id->setVisibility();
-        $this->subcategory_id->setVisibility();
-        $this->item_title->setVisibility();
-        $this->quantity->setVisibility();
+        $this->item_id->setVisibility();
+        $this->total_items_received->setVisibility();
         $this->measuring_unit->setVisibility();
-        $this->unit_price->setVisibility();
-        $this->selling_price->setVisibility();
-        $this->amount_paid->setVisibility();
-        $this->invoice_attachment->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -143,8 +135,8 @@ class ItemPurchasesEdit extends ItemPurchases
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'item_purchases';
-        $this->TableName = 'item_purchases';
+        $this->TableVar = 'receive_items';
+        $this->TableName = 'receive_items';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-edit-table";
@@ -155,14 +147,14 @@ class ItemPurchasesEdit extends ItemPurchases
         // Language object
         $Language = Container("app.language");
 
-        // Table object (item_purchases)
-        if (!isset($GLOBALS["item_purchases"]) || $GLOBALS["item_purchases"]::class == PROJECT_NAMESPACE . "item_purchases") {
-            $GLOBALS["item_purchases"] = &$this;
+        // Table object (receive_items)
+        if (!isset($GLOBALS["receive_items"]) || $GLOBALS["receive_items"]::class == PROJECT_NAMESPACE . "receive_items") {
+            $GLOBALS["receive_items"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'item_purchases');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'receive_items');
         }
 
         // Start timer
@@ -276,7 +268,7 @@ class ItemPurchasesEdit extends ItemPurchases
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "itempurchasesview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "receiveitemsview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -536,10 +528,7 @@ class ItemPurchasesEdit extends ItemPurchases
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->supplier_id);
-        $this->setupLookupOptions($this->category_id);
-        $this->setupLookupOptions($this->subcategory_id);
-        $this->setupLookupOptions($this->measuring_unit);
+        $this->setupLookupOptions($this->item_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -631,13 +620,13 @@ class ItemPurchasesEdit extends ItemPurchases
                         if ($this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                         }
-                        $this->terminate("itempurchaseslist"); // No matching record, return to list
+                        $this->terminate("receiveitemslist"); // No matching record, return to list
                         return;
                     }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "itempurchaseslist") {
+                if (GetPageName($returnUrl) == "receiveitemslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -649,9 +638,9 @@ class ItemPurchasesEdit extends ItemPurchases
                     // Handle UseAjaxActions with return page
                     if ($this->IsModal && $this->UseAjaxActions) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "itempurchaseslist") {
+                        if (GetPageName($returnUrl) != "receiveitemslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "itempurchaseslist"; // Return list page content
+                            $returnUrl = "receiveitemslist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) {
@@ -713,8 +702,6 @@ class ItemPurchasesEdit extends ItemPurchases
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
-        $this->invoice_attachment->Upload->Index = $CurrentForm->Index;
-        $this->invoice_attachment->Upload->uploadFile();
     }
 
     // Load form values
@@ -730,63 +717,23 @@ class ItemPurchasesEdit extends ItemPurchases
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'batch_number' first before field var 'x_batch_number'
-        $val = $CurrentForm->hasValue("batch_number") ? $CurrentForm->getValue("batch_number") : $CurrentForm->getValue("x_batch_number");
-        if (!$this->batch_number->IsDetailKey) {
+        // Check field name 'item_id' first before field var 'x_item_id'
+        $val = $CurrentForm->hasValue("item_id") ? $CurrentForm->getValue("item_id") : $CurrentForm->getValue("x_item_id");
+        if (!$this->item_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->batch_number->Visible = false; // Disable update for API request
+                $this->item_id->Visible = false; // Disable update for API request
             } else {
-                $this->batch_number->setFormValue($val);
+                $this->item_id->setFormValue($val);
             }
         }
 
-        // Check field name 'supplier_id' first before field var 'x_supplier_id'
-        $val = $CurrentForm->hasValue("supplier_id") ? $CurrentForm->getValue("supplier_id") : $CurrentForm->getValue("x_supplier_id");
-        if (!$this->supplier_id->IsDetailKey) {
+        // Check field name 'total_items_received' first before field var 'x_total_items_received'
+        $val = $CurrentForm->hasValue("total_items_received") ? $CurrentForm->getValue("total_items_received") : $CurrentForm->getValue("x_total_items_received");
+        if (!$this->total_items_received->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->supplier_id->Visible = false; // Disable update for API request
+                $this->total_items_received->Visible = false; // Disable update for API request
             } else {
-                $this->supplier_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'category_id' first before field var 'x_category_id'
-        $val = $CurrentForm->hasValue("category_id") ? $CurrentForm->getValue("category_id") : $CurrentForm->getValue("x_category_id");
-        if (!$this->category_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->category_id->Visible = false; // Disable update for API request
-            } else {
-                $this->category_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'subcategory_id' first before field var 'x_subcategory_id'
-        $val = $CurrentForm->hasValue("subcategory_id") ? $CurrentForm->getValue("subcategory_id") : $CurrentForm->getValue("x_subcategory_id");
-        if (!$this->subcategory_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->subcategory_id->Visible = false; // Disable update for API request
-            } else {
-                $this->subcategory_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'item_title' first before field var 'x_item_title'
-        $val = $CurrentForm->hasValue("item_title") ? $CurrentForm->getValue("item_title") : $CurrentForm->getValue("x_item_title");
-        if (!$this->item_title->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->item_title->Visible = false; // Disable update for API request
-            } else {
-                $this->item_title->setFormValue($val);
-            }
-        }
-
-        // Check field name 'quantity' first before field var 'x_quantity'
-        $val = $CurrentForm->hasValue("quantity") ? $CurrentForm->getValue("quantity") : $CurrentForm->getValue("x_quantity");
-        if (!$this->quantity->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->quantity->Visible = false; // Disable update for API request
-            } else {
-                $this->quantity->setFormValue($val, true, $validate);
+                $this->total_items_received->setFormValue($val, true, $validate);
             }
         }
 
@@ -799,37 +746,6 @@ class ItemPurchasesEdit extends ItemPurchases
                 $this->measuring_unit->setFormValue($val);
             }
         }
-
-        // Check field name 'unit_price' first before field var 'x_unit_price'
-        $val = $CurrentForm->hasValue("unit_price") ? $CurrentForm->getValue("unit_price") : $CurrentForm->getValue("x_unit_price");
-        if (!$this->unit_price->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->unit_price->Visible = false; // Disable update for API request
-            } else {
-                $this->unit_price->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'selling_price' first before field var 'x_selling_price'
-        $val = $CurrentForm->hasValue("selling_price") ? $CurrentForm->getValue("selling_price") : $CurrentForm->getValue("x_selling_price");
-        if (!$this->selling_price->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->selling_price->Visible = false; // Disable update for API request
-            } else {
-                $this->selling_price->setFormValue($val, true, $validate);
-            }
-        }
-
-        // Check field name 'amount_paid' first before field var 'x_amount_paid'
-        $val = $CurrentForm->hasValue("amount_paid") ? $CurrentForm->getValue("amount_paid") : $CurrentForm->getValue("x_amount_paid");
-        if (!$this->amount_paid->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->amount_paid->Visible = false; // Disable update for API request
-            } else {
-                $this->amount_paid->setFormValue($val, true, $validate);
-            }
-        }
-        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -837,16 +753,9 @@ class ItemPurchasesEdit extends ItemPurchases
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
-        $this->batch_number->CurrentValue = $this->batch_number->FormValue;
-        $this->supplier_id->CurrentValue = $this->supplier_id->FormValue;
-        $this->category_id->CurrentValue = $this->category_id->FormValue;
-        $this->subcategory_id->CurrentValue = $this->subcategory_id->FormValue;
-        $this->item_title->CurrentValue = $this->item_title->FormValue;
-        $this->quantity->CurrentValue = $this->quantity->FormValue;
+        $this->item_id->CurrentValue = $this->item_id->FormValue;
+        $this->total_items_received->CurrentValue = $this->total_items_received->FormValue;
         $this->measuring_unit->CurrentValue = $this->measuring_unit->FormValue;
-        $this->unit_price->CurrentValue = $this->unit_price->FormValue;
-        $this->selling_price->CurrentValue = $this->selling_price->FormValue;
-        $this->amount_paid->CurrentValue = $this->amount_paid->FormValue;
     }
 
     /**
@@ -888,20 +797,9 @@ class ItemPurchasesEdit extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
-        $this->quantity->setDbValue($row['quantity']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
-        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
-        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -911,17 +809,9 @@ class ItemPurchasesEdit extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['batch_number'] = $this->batch_number->DefaultValue;
-        $row['supplier_id'] = $this->supplier_id->DefaultValue;
-        $row['category_id'] = $this->category_id->DefaultValue;
-        $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
-        $row['quantity'] = $this->quantity->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
-        $row['unit_price'] = $this->unit_price->DefaultValue;
-        $row['selling_price'] = $this->selling_price->DefaultValue;
-        $row['amount_paid'] = $this->amount_paid->DefaultValue;
-        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -961,38 +851,14 @@ class ItemPurchasesEdit extends ItemPurchases
         // id
         $this->id->RowCssClass = "row";
 
-        // batch_number
-        $this->batch_number->RowCssClass = "row";
+        // item_id
+        $this->item_id->RowCssClass = "row";
 
-        // supplier_id
-        $this->supplier_id->RowCssClass = "row";
-
-        // category_id
-        $this->category_id->RowCssClass = "row";
-
-        // subcategory_id
-        $this->subcategory_id->RowCssClass = "row";
-
-        // item_title
-        $this->item_title->RowCssClass = "row";
-
-        // quantity
-        $this->quantity->RowCssClass = "row";
+        // total_items_received
+        $this->total_items_received->RowCssClass = "row";
 
         // measuring_unit
         $this->measuring_unit->RowCssClass = "row";
-
-        // unit_price
-        $this->unit_price->RowCssClass = "row";
-
-        // selling_price
-        $this->selling_price->RowCssClass = "row";
-
-        // amount_paid
-        $this->amount_paid->RowCssClass = "row";
-
-        // invoice_attachment
-        $this->invoice_attachment->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -1005,111 +871,35 @@ class ItemPurchasesEdit extends ItemPurchases
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
-
-            // supplier_id
-            $curVal = strval($this->supplier_id->CurrentValue);
+            // item_id
+            $curVal = strval($this->item_id->CurrentValue);
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-                if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
                     } else {
-                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
                     }
                 }
             } else {
-                $this->supplier_id->ViewValue = null;
+                $this->item_id->ViewValue = null;
             }
 
-            // category_id
-            $curVal = strval($this->category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-                if ($this->category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                    } else {
-                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->category_id->ViewValue = null;
-            }
-
-            // subcategory_id
-            $curVal = strval($this->subcategory_id->CurrentValue);
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-                if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                    } else {
-                        $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->subcategory_id->ViewValue = null;
-            }
-
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
-
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
 
             // measuring_unit
-            if (strval($this->measuring_unit->CurrentValue) != "") {
-                $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-            } else {
-                $this->measuring_unit->ViewValue = null;
-            }
-
-            // unit_price
-            $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-            $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-            // selling_price
-            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-            // amount_paid
-            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
-
-            // invoice_attachment
-            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
-                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
-                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
-            } else {
-                $this->invoice_attachment->ViewValue = "";
-            }
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1122,250 +912,75 @@ class ItemPurchasesEdit extends ItemPurchases
             // id
             $this->id->HrefValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
 
-            // supplier_id
-            $this->supplier_id->HrefValue = "";
-
-            // category_id
-            $this->category_id->HrefValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-
-            // quantity
-            $this->quantity->HrefValue = "";
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
 
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-
-            // invoice_attachment
-            if (!empty($this->invoice_attachment->Upload->DbValue)) {
-                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
-                $this->invoice_attachment->LinkAttrs["target"] = "";
-                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
-                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
-                }
-                if ($this->isExport()) {
-                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
-                }
-            } else {
-                $this->invoice_attachment->HrefValue = "";
-            }
-            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->setupEditAttributes();
-            if (!$this->batch_number->Raw) {
-                $this->batch_number->CurrentValue = HtmlDecode($this->batch_number->CurrentValue);
-            }
-            $this->batch_number->EditValue = HtmlEncode($this->batch_number->CurrentValue);
-            $this->batch_number->PlaceHolder = RemoveHtml($this->batch_number->caption());
-
-            // supplier_id
-            $this->supplier_id->setupEditAttributes();
-            $curVal = trim(strval($this->supplier_id->CurrentValue));
+            // item_id
+            $this->item_id->setupEditAttributes();
+            $curVal = trim(strval($this->item_id->CurrentValue));
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
             } else {
-                $this->supplier_id->ViewValue = $this->supplier_id->Lookup !== null && is_array($this->supplier_id->lookupOptions()) && count($this->supplier_id->lookupOptions()) > 0 ? $curVal : null;
+                $this->item_id->ViewValue = $this->item_id->Lookup !== null && is_array($this->item_id->lookupOptions()) && count($this->item_id->lookupOptions()) > 0 ? $curVal : null;
             }
-            if ($this->supplier_id->ViewValue !== null) { // Load from cache
-                $this->supplier_id->EditValue = array_values($this->supplier_id->lookupOptions());
+            if ($this->item_id->ViewValue !== null) { // Load from cache
+                $this->item_id->EditValue = array_values($this->item_id->lookupOptions());
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
                 } else {
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->supplier_id->CurrentValue, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->item_id->CurrentValue, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
                 }
-                $sqlWrk = $this->supplier_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $sqlWrk = $this->item_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $conn = Conn();
                 $config = $conn->getConfiguration();
                 $config->setResultCache($this->Cache);
                 $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
-                $this->supplier_id->EditValue = $arwrk;
+                $this->item_id->EditValue = $arwrk;
             }
-            $this->supplier_id->PlaceHolder = RemoveHtml($this->supplier_id->caption());
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
 
-            // category_id
-            $this->category_id->setupEditAttributes();
-            $curVal = trim(strval($this->category_id->CurrentValue));
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-            } else {
-                $this->category_id->ViewValue = $this->category_id->Lookup !== null && is_array($this->category_id->lookupOptions()) && count($this->category_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->category_id->ViewValue !== null) { // Load from cache
-                $this->category_id->EditValue = array_values($this->category_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->category_id->CurrentValue, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->category_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->category_id->EditValue = $arwrk;
-            }
-            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-
-            // subcategory_id
-            $this->subcategory_id->setupEditAttributes();
-            $curVal = trim(strval($this->subcategory_id->CurrentValue));
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-            } else {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->Lookup !== null && is_array($this->subcategory_id->lookupOptions()) && count($this->subcategory_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->subcategory_id->ViewValue !== null) { // Load from cache
-                $this->subcategory_id->EditValue = array_values($this->subcategory_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->subcategory_id->CurrentValue, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->subcategory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->subcategory_id->EditValue = $arwrk;
-            }
-            $this->subcategory_id->PlaceHolder = RemoveHtml($this->subcategory_id->caption());
-
-            // item_title
-            $this->item_title->setupEditAttributes();
-            if (!$this->item_title->Raw) {
-                $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
-            }
-            $this->item_title->EditValue = HtmlEncode($this->item_title->CurrentValue);
-            $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
-
-            // quantity
-            $this->quantity->setupEditAttributes();
-            $this->quantity->EditValue = $this->quantity->CurrentValue;
-            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-            if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
-                $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
+            // total_items_received
+            $this->total_items_received->setupEditAttributes();
+            $this->total_items_received->EditValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->PlaceHolder = RemoveHtml($this->total_items_received->caption());
+            if (strval($this->total_items_received->EditValue) != "" && is_numeric($this->total_items_received->EditValue)) {
+                $this->total_items_received->EditValue = FormatNumber($this->total_items_received->EditValue, null);
             }
 
             // measuring_unit
             $this->measuring_unit->setupEditAttributes();
-            $this->measuring_unit->EditValue = $this->measuring_unit->options(true);
+            if (!$this->measuring_unit->Raw) {
+                $this->measuring_unit->CurrentValue = HtmlDecode($this->measuring_unit->CurrentValue);
+            }
+            $this->measuring_unit->EditValue = HtmlEncode($this->measuring_unit->CurrentValue);
             $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
-
-            // unit_price
-            $this->unit_price->setupEditAttributes();
-            $this->unit_price->EditValue = $this->unit_price->CurrentValue;
-            $this->unit_price->PlaceHolder = RemoveHtml($this->unit_price->caption());
-            if (strval($this->unit_price->EditValue) != "" && is_numeric($this->unit_price->EditValue)) {
-                $this->unit_price->EditValue = FormatNumber($this->unit_price->EditValue, null);
-            }
-
-            // selling_price
-            $this->selling_price->setupEditAttributes();
-            $this->selling_price->EditValue = $this->selling_price->CurrentValue;
-            $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
-            if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
-                $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
-            }
-
-            // amount_paid
-            $this->amount_paid->setupEditAttributes();
-            $this->amount_paid->EditValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
-            if (strval($this->amount_paid->EditValue) != "" && is_numeric($this->amount_paid->EditValue)) {
-                $this->amount_paid->EditValue = FormatNumber($this->amount_paid->EditValue, null);
-            }
-
-            // invoice_attachment
-            $this->invoice_attachment->setupEditAttributes();
-            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
-                $this->invoice_attachment->EditValue = $this->id->CurrentValue;
-                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
-            } else {
-                $this->invoice_attachment->EditValue = "";
-            }
-            if ($this->isShow()) {
-                RenderUploadField($this->invoice_attachment);
-            }
 
             // Edit refer script
 
             // id
             $this->id->HrefValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
 
-            // supplier_id
-            $this->supplier_id->HrefValue = "";
-
-            // category_id
-            $this->category_id->HrefValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-
-            // quantity
-            $this->quantity->HrefValue = "";
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
 
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-
-            // invoice_attachment
-            if (!empty($this->invoice_attachment->Upload->DbValue)) {
-                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
-                $this->invoice_attachment->LinkAttrs["target"] = "";
-                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
-                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
-                }
-                if ($this->isExport()) {
-                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
-                }
-            } else {
-                $this->invoice_attachment->HrefValue = "";
-            }
-            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1392,71 +1007,22 @@ class ItemPurchasesEdit extends ItemPurchases
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
                 }
             }
-            if ($this->batch_number->Visible && $this->batch_number->Required) {
-                if (!$this->batch_number->IsDetailKey && EmptyValue($this->batch_number->FormValue)) {
-                    $this->batch_number->addErrorMessage(str_replace("%s", $this->batch_number->caption(), $this->batch_number->RequiredErrorMessage));
+            if ($this->item_id->Visible && $this->item_id->Required) {
+                if (!$this->item_id->IsDetailKey && EmptyValue($this->item_id->FormValue)) {
+                    $this->item_id->addErrorMessage(str_replace("%s", $this->item_id->caption(), $this->item_id->RequiredErrorMessage));
                 }
             }
-            if ($this->supplier_id->Visible && $this->supplier_id->Required) {
-                if (!$this->supplier_id->IsDetailKey && EmptyValue($this->supplier_id->FormValue)) {
-                    $this->supplier_id->addErrorMessage(str_replace("%s", $this->supplier_id->caption(), $this->supplier_id->RequiredErrorMessage));
+            if ($this->total_items_received->Visible && $this->total_items_received->Required) {
+                if (!$this->total_items_received->IsDetailKey && EmptyValue($this->total_items_received->FormValue)) {
+                    $this->total_items_received->addErrorMessage(str_replace("%s", $this->total_items_received->caption(), $this->total_items_received->RequiredErrorMessage));
                 }
             }
-            if ($this->category_id->Visible && $this->category_id->Required) {
-                if (!$this->category_id->IsDetailKey && EmptyValue($this->category_id->FormValue)) {
-                    $this->category_id->addErrorMessage(str_replace("%s", $this->category_id->caption(), $this->category_id->RequiredErrorMessage));
-                }
-            }
-            if ($this->subcategory_id->Visible && $this->subcategory_id->Required) {
-                if (!$this->subcategory_id->IsDetailKey && EmptyValue($this->subcategory_id->FormValue)) {
-                    $this->subcategory_id->addErrorMessage(str_replace("%s", $this->subcategory_id->caption(), $this->subcategory_id->RequiredErrorMessage));
-                }
-            }
-            if ($this->item_title->Visible && $this->item_title->Required) {
-                if (!$this->item_title->IsDetailKey && EmptyValue($this->item_title->FormValue)) {
-                    $this->item_title->addErrorMessage(str_replace("%s", $this->item_title->caption(), $this->item_title->RequiredErrorMessage));
-                }
-            }
-            if ($this->quantity->Visible && $this->quantity->Required) {
-                if (!$this->quantity->IsDetailKey && EmptyValue($this->quantity->FormValue)) {
-                    $this->quantity->addErrorMessage(str_replace("%s", $this->quantity->caption(), $this->quantity->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->quantity->FormValue)) {
-                $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
+            if (!CheckInteger($this->total_items_received->FormValue)) {
+                $this->total_items_received->addErrorMessage($this->total_items_received->getErrorMessage(false));
             }
             if ($this->measuring_unit->Visible && $this->measuring_unit->Required) {
                 if (!$this->measuring_unit->IsDetailKey && EmptyValue($this->measuring_unit->FormValue)) {
                     $this->measuring_unit->addErrorMessage(str_replace("%s", $this->measuring_unit->caption(), $this->measuring_unit->RequiredErrorMessage));
-                }
-            }
-            if ($this->unit_price->Visible && $this->unit_price->Required) {
-                if (!$this->unit_price->IsDetailKey && EmptyValue($this->unit_price->FormValue)) {
-                    $this->unit_price->addErrorMessage(str_replace("%s", $this->unit_price->caption(), $this->unit_price->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->unit_price->FormValue)) {
-                $this->unit_price->addErrorMessage($this->unit_price->getErrorMessage(false));
-            }
-            if ($this->selling_price->Visible && $this->selling_price->Required) {
-                if (!$this->selling_price->IsDetailKey && EmptyValue($this->selling_price->FormValue)) {
-                    $this->selling_price->addErrorMessage(str_replace("%s", $this->selling_price->caption(), $this->selling_price->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->selling_price->FormValue)) {
-                $this->selling_price->addErrorMessage($this->selling_price->getErrorMessage(false));
-            }
-            if ($this->amount_paid->Visible && $this->amount_paid->Required) {
-                if (!$this->amount_paid->IsDetailKey && EmptyValue($this->amount_paid->FormValue)) {
-                    $this->amount_paid->addErrorMessage(str_replace("%s", $this->amount_paid->caption(), $this->amount_paid->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->amount_paid->FormValue)) {
-                $this->amount_paid->addErrorMessage($this->amount_paid->getErrorMessage(false));
-            }
-            if ($this->invoice_attachment->Visible && $this->invoice_attachment->Required) {
-                if ($this->invoice_attachment->Upload->FileName == "" && !$this->invoice_attachment->Upload->KeepFile) {
-                    $this->invoice_attachment->addErrorMessage(str_replace("%s", $this->invoice_attachment->caption(), $this->invoice_attachment->RequiredErrorMessage));
                 }
             }
 
@@ -1548,44 +1114,14 @@ class ItemPurchasesEdit extends ItemPurchases
         global $Security;
         $rsnew = [];
 
-        // batch_number
-        $this->batch_number->setDbValueDef($rsnew, $this->batch_number->CurrentValue, $this->batch_number->ReadOnly);
+        // item_id
+        $this->item_id->setDbValueDef($rsnew, $this->item_id->CurrentValue, $this->item_id->ReadOnly);
 
-        // supplier_id
-        $this->supplier_id->setDbValueDef($rsnew, $this->supplier_id->CurrentValue, $this->supplier_id->ReadOnly);
-
-        // category_id
-        $this->category_id->setDbValueDef($rsnew, $this->category_id->CurrentValue, $this->category_id->ReadOnly);
-
-        // subcategory_id
-        $this->subcategory_id->setDbValueDef($rsnew, $this->subcategory_id->CurrentValue, $this->subcategory_id->ReadOnly);
-
-        // item_title
-        $this->item_title->setDbValueDef($rsnew, $this->item_title->CurrentValue, $this->item_title->ReadOnly);
-
-        // quantity
-        $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, $this->quantity->ReadOnly);
+        // total_items_received
+        $this->total_items_received->setDbValueDef($rsnew, $this->total_items_received->CurrentValue, $this->total_items_received->ReadOnly);
 
         // measuring_unit
         $this->measuring_unit->setDbValueDef($rsnew, $this->measuring_unit->CurrentValue, $this->measuring_unit->ReadOnly);
-
-        // unit_price
-        $this->unit_price->setDbValueDef($rsnew, $this->unit_price->CurrentValue, $this->unit_price->ReadOnly);
-
-        // selling_price
-        $this->selling_price->setDbValueDef($rsnew, $this->selling_price->CurrentValue, $this->selling_price->ReadOnly);
-
-        // amount_paid
-        $this->amount_paid->setDbValueDef($rsnew, $this->amount_paid->CurrentValue, $this->amount_paid->ReadOnly);
-
-        // invoice_attachment
-        if ($this->invoice_attachment->Visible && !$this->invoice_attachment->ReadOnly && !$this->invoice_attachment->Upload->KeepFile) {
-            if ($this->invoice_attachment->Upload->Value === null) {
-                $rsnew['invoice_attachment'] = null;
-            } else {
-                $rsnew['invoice_attachment'] = $this->invoice_attachment->Upload->Value;
-            }
-        }
         return $rsnew;
     }
 
@@ -1595,38 +1131,14 @@ class ItemPurchasesEdit extends ItemPurchases
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['batch_number'])) { // batch_number
-            $this->batch_number->CurrentValue = $row['batch_number'];
+        if (isset($row['item_id'])) { // item_id
+            $this->item_id->CurrentValue = $row['item_id'];
         }
-        if (isset($row['supplier_id'])) { // supplier_id
-            $this->supplier_id->CurrentValue = $row['supplier_id'];
-        }
-        if (isset($row['category_id'])) { // category_id
-            $this->category_id->CurrentValue = $row['category_id'];
-        }
-        if (isset($row['subcategory_id'])) { // subcategory_id
-            $this->subcategory_id->CurrentValue = $row['subcategory_id'];
-        }
-        if (isset($row['item_title'])) { // item_title
-            $this->item_title->CurrentValue = $row['item_title'];
-        }
-        if (isset($row['quantity'])) { // quantity
-            $this->quantity->CurrentValue = $row['quantity'];
+        if (isset($row['total_items_received'])) { // total_items_received
+            $this->total_items_received->CurrentValue = $row['total_items_received'];
         }
         if (isset($row['measuring_unit'])) { // measuring_unit
             $this->measuring_unit->CurrentValue = $row['measuring_unit'];
-        }
-        if (isset($row['unit_price'])) { // unit_price
-            $this->unit_price->CurrentValue = $row['unit_price'];
-        }
-        if (isset($row['selling_price'])) { // selling_price
-            $this->selling_price->CurrentValue = $row['selling_price'];
-        }
-        if (isset($row['amount_paid'])) { // amount_paid
-            $this->amount_paid->CurrentValue = $row['amount_paid'];
-        }
-        if (isset($row['invoice_attachment'])) { // invoice_attachment
-            $this->invoice_attachment->CurrentValue = $row['invoice_attachment'];
         }
     }
 
@@ -1636,7 +1148,7 @@ class ItemPurchasesEdit extends ItemPurchases
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("itempurchaseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("receiveitemslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }
@@ -1654,13 +1166,7 @@ class ItemPurchasesEdit extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_supplier_id":
-                    break;
-                case "x_category_id":
-                    break;
-                case "x_subcategory_id":
-                    break;
-                case "x_measuring_unit":
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

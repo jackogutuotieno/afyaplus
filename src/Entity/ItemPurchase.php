@@ -33,6 +33,9 @@ class ItemPurchase extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "batch_number", type: "string")]
+    private string $batchNumber;
+
     #[Column(name: "supplier_id", type: "integer")]
     private int $supplierId;
 
@@ -77,6 +80,17 @@ class ItemPurchase extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
+        return $this;
+    }
+
+    public function getBatchNumber(): string
+    {
+        return HtmlDecode($this->batchNumber);
+    }
+
+    public function setBatchNumber(string $value): static
+    {
+        $this->batchNumber = RemoveXss($value);
         return $this;
     }
 

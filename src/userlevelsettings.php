@@ -1196,7 +1196,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}item_purchases","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}item_purchases","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}item_purchases","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}item_purchases","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}item_purchases","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}receive_items","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}issue_items","9","0"]];
 
 /**
  * Tables
@@ -1314,4 +1336,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["suppliers","suppliers","Suppliers",true,"{32536B8D-F37B-4419-80D5-260932800712}","supplierslist"],
     ["item_categories","item_categories","Item Categories",true,"{32536B8D-F37B-4419-80D5-260932800712}","itemcategorieslist"],
     ["item_subcategories","item_subcategories","Item Subcategories",true,"{32536B8D-F37B-4419-80D5-260932800712}","itemsubcategorieslist"],
-    ["item_purchases","item_purchases","Item Purchases",true,"{32536B8D-F37B-4419-80D5-260932800712}","itempurchaseslist"]];
+    ["item_purchases","item_purchases","Item Purchases",true,"{32536B8D-F37B-4419-80D5-260932800712}","itempurchaseslist"],
+    ["receive_items","receive_items","Received Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveitemslist"],
+    ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"]];

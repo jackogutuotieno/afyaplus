@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class ItemPurchasesList extends ItemPurchases
+class ReceiveItemsList extends ReceiveItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class ItemPurchasesList extends ItemPurchases
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "ItemPurchasesList";
+    public $PageObjName = "ReceiveItemsList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class ItemPurchasesList extends ItemPurchases
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fitem_purchaseslist";
+    public $FormName = "freceive_itemslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "itempurchaseslist";
+    public $CurrentPageName = "receiveitemslist";
 
     // Page URLs
     public $AddUrl;
@@ -146,18 +146,10 @@ class ItemPurchasesList extends ItemPurchases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->batch_number->setVisibility();
-        $this->supplier_id->Visible = false;
-        $this->category_id->setVisibility();
-        $this->subcategory_id->setVisibility();
-        $this->item_title->setVisibility();
-        $this->quantity->setVisibility();
+        $this->id->Visible = false;
+        $this->item_id->setVisibility();
+        $this->total_items_received->setVisibility();
         $this->measuring_unit->setVisibility();
-        $this->unit_price->setVisibility();
-        $this->selling_price->setVisibility();
-        $this->amount_paid->setVisibility();
-        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -170,8 +162,8 @@ class ItemPurchasesList extends ItemPurchases
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'item_purchases';
-        $this->TableName = 'item_purchases';
+        $this->TableVar = 'receive_items';
+        $this->TableName = 'receive_items';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -191,26 +183,26 @@ class ItemPurchasesList extends ItemPurchases
         // Language object
         $Language = Container("app.language");
 
-        // Table object (item_purchases)
-        if (!isset($GLOBALS["item_purchases"]) || $GLOBALS["item_purchases"]::class == PROJECT_NAMESPACE . "item_purchases") {
-            $GLOBALS["item_purchases"] = &$this;
+        // Table object (receive_items)
+        if (!isset($GLOBALS["receive_items"]) || $GLOBALS["receive_items"]::class == PROJECT_NAMESPACE . "receive_items") {
+            $GLOBALS["receive_items"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "itempurchasesadd";
+        $this->AddUrl = "receiveitemsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "itempurchasesdelete";
-        $this->MultiUpdateUrl = "itempurchasesupdate";
+        $this->MultiDeleteUrl = "receiveitemsdelete";
+        $this->MultiUpdateUrl = "receiveitemsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'item_purchases');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'receive_items');
         }
 
         // Start timer
@@ -361,7 +353,7 @@ class ItemPurchasesList extends ItemPurchases
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "itempurchasesview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "receiveitemsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -716,14 +708,11 @@ class ItemPurchasesList extends ItemPurchases
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->supplier_id);
-        $this->setupLookupOptions($this->category_id);
-        $this->setupLookupOptions($this->subcategory_id);
-        $this->setupLookupOptions($this->measuring_unit);
+        $this->setupLookupOptions($this->item_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fitem_purchasesgrid";
+            $this->FormName = "freceive_itemsgrid";
         }
 
         // Set up page action
@@ -1060,19 +1049,12 @@ class ItemPurchasesList extends ItemPurchases
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fitem_purchasessrch");
+            $savedFilterList = Profile()->getSearchFilters("freceive_itemssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->batch_number->AdvancedSearch->toJson(), ","); // Field batch_number
-        $filterList = Concat($filterList, $this->supplier_id->AdvancedSearch->toJson(), ","); // Field supplier_id
-        $filterList = Concat($filterList, $this->category_id->AdvancedSearch->toJson(), ","); // Field category_id
-        $filterList = Concat($filterList, $this->subcategory_id->AdvancedSearch->toJson(), ","); // Field subcategory_id
-        $filterList = Concat($filterList, $this->item_title->AdvancedSearch->toJson(), ","); // Field item_title
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
+        $filterList = Concat($filterList, $this->item_id->AdvancedSearch->toJson(), ","); // Field item_id
+        $filterList = Concat($filterList, $this->total_items_received->AdvancedSearch->toJson(), ","); // Field total_items_received
         $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
-        $filterList = Concat($filterList, $this->unit_price->AdvancedSearch->toJson(), ","); // Field unit_price
-        $filterList = Concat($filterList, $this->selling_price->AdvancedSearch->toJson(), ","); // Field selling_price
-        $filterList = Concat($filterList, $this->amount_paid->AdvancedSearch->toJson(), ","); // Field amount_paid
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
@@ -1095,7 +1077,7 @@ class ItemPurchasesList extends ItemPurchases
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fitem_purchasessrch", $filters);
+            Profile()->setSearchFilters("freceive_itemssrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1122,53 +1104,21 @@ class ItemPurchasesList extends ItemPurchases
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field batch_number
-        $this->batch_number->AdvancedSearch->SearchValue = @$filter["x_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchOperator = @$filter["z_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchCondition = @$filter["v_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchValue2 = @$filter["y_batch_number"];
-        $this->batch_number->AdvancedSearch->SearchOperator2 = @$filter["w_batch_number"];
-        $this->batch_number->AdvancedSearch->save();
+        // Field item_id
+        $this->item_id->AdvancedSearch->SearchValue = @$filter["x_item_id"];
+        $this->item_id->AdvancedSearch->SearchOperator = @$filter["z_item_id"];
+        $this->item_id->AdvancedSearch->SearchCondition = @$filter["v_item_id"];
+        $this->item_id->AdvancedSearch->SearchValue2 = @$filter["y_item_id"];
+        $this->item_id->AdvancedSearch->SearchOperator2 = @$filter["w_item_id"];
+        $this->item_id->AdvancedSearch->save();
 
-        // Field supplier_id
-        $this->supplier_id->AdvancedSearch->SearchValue = @$filter["x_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchOperator = @$filter["z_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchCondition = @$filter["v_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchValue2 = @$filter["y_supplier_id"];
-        $this->supplier_id->AdvancedSearch->SearchOperator2 = @$filter["w_supplier_id"];
-        $this->supplier_id->AdvancedSearch->save();
-
-        // Field category_id
-        $this->category_id->AdvancedSearch->SearchValue = @$filter["x_category_id"];
-        $this->category_id->AdvancedSearch->SearchOperator = @$filter["z_category_id"];
-        $this->category_id->AdvancedSearch->SearchCondition = @$filter["v_category_id"];
-        $this->category_id->AdvancedSearch->SearchValue2 = @$filter["y_category_id"];
-        $this->category_id->AdvancedSearch->SearchOperator2 = @$filter["w_category_id"];
-        $this->category_id->AdvancedSearch->save();
-
-        // Field subcategory_id
-        $this->subcategory_id->AdvancedSearch->SearchValue = @$filter["x_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchOperator = @$filter["z_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchCondition = @$filter["v_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchValue2 = @$filter["y_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->SearchOperator2 = @$filter["w_subcategory_id"];
-        $this->subcategory_id->AdvancedSearch->save();
-
-        // Field item_title
-        $this->item_title->AdvancedSearch->SearchValue = @$filter["x_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator = @$filter["z_item_title"];
-        $this->item_title->AdvancedSearch->SearchCondition = @$filter["v_item_title"];
-        $this->item_title->AdvancedSearch->SearchValue2 = @$filter["y_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator2 = @$filter["w_item_title"];
-        $this->item_title->AdvancedSearch->save();
-
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
+        // Field total_items_received
+        $this->total_items_received->AdvancedSearch->SearchValue = @$filter["x_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchOperator = @$filter["z_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchCondition = @$filter["v_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchValue2 = @$filter["y_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchOperator2 = @$filter["w_total_items_received"];
+        $this->total_items_received->AdvancedSearch->save();
 
         // Field measuring_unit
         $this->measuring_unit->AdvancedSearch->SearchValue = @$filter["x_measuring_unit"];
@@ -1177,30 +1127,6 @@ class ItemPurchasesList extends ItemPurchases
         $this->measuring_unit->AdvancedSearch->SearchValue2 = @$filter["y_measuring_unit"];
         $this->measuring_unit->AdvancedSearch->SearchOperator2 = @$filter["w_measuring_unit"];
         $this->measuring_unit->AdvancedSearch->save();
-
-        // Field unit_price
-        $this->unit_price->AdvancedSearch->SearchValue = @$filter["x_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchOperator = @$filter["z_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchCondition = @$filter["v_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchValue2 = @$filter["y_unit_price"];
-        $this->unit_price->AdvancedSearch->SearchOperator2 = @$filter["w_unit_price"];
-        $this->unit_price->AdvancedSearch->save();
-
-        // Field selling_price
-        $this->selling_price->AdvancedSearch->SearchValue = @$filter["x_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchOperator = @$filter["z_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchCondition = @$filter["v_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchValue2 = @$filter["y_selling_price"];
-        $this->selling_price->AdvancedSearch->SearchOperator2 = @$filter["w_selling_price"];
-        $this->selling_price->AdvancedSearch->save();
-
-        // Field amount_paid
-        $this->amount_paid->AdvancedSearch->SearchValue = @$filter["x_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchOperator = @$filter["z_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchCondition = @$filter["v_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchValue2 = @$filter["y_amount_paid"];
-        $this->amount_paid->AdvancedSearch->SearchOperator2 = @$filter["w_amount_paid"];
-        $this->amount_paid->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1256,9 +1182,6 @@ class ItemPurchasesList extends ItemPurchases
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->batch_number;
-        $searchFlds[] = &$this->subcategory_id;
-        $searchFlds[] = &$this->item_title;
         $searchFlds[] = &$this->measuring_unit;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
@@ -1338,16 +1261,9 @@ class ItemPurchasesList extends ItemPurchases
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->batch_number); // batch_number
-            $this->updateSort($this->category_id); // category_id
-            $this->updateSort($this->subcategory_id); // subcategory_id
-            $this->updateSort($this->item_title); // item_title
-            $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->item_id); // item_id
+            $this->updateSort($this->total_items_received); // total_items_received
             $this->updateSort($this->measuring_unit); // measuring_unit
-            $this->updateSort($this->unit_price); // unit_price
-            $this->updateSort($this->selling_price); // selling_price
-            $this->updateSort($this->amount_paid); // amount_paid
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
@@ -1375,16 +1291,9 @@ class ItemPurchasesList extends ItemPurchases
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->batch_number->setSort("");
-                $this->supplier_id->setSort("");
-                $this->category_id->setSort("");
-                $this->subcategory_id->setSort("");
-                $this->item_title->setSort("");
-                $this->quantity->setSort("");
+                $this->item_id->setSort("");
+                $this->total_items_received->setSort("");
                 $this->measuring_unit->setSort("");
-                $this->unit_price->setSort("");
-                $this->selling_price->setSort("");
-                $this->amount_paid->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1449,14 +1358,6 @@ class ItemPurchasesList extends ItemPurchases
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
-        // "sequence"
-        $item = &$this->ListOptions->add("sequence");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = true; // Always on left
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
-
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1494,10 +1395,6 @@ class ItemPurchasesList extends ItemPurchases
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
-
-        // "sequence"
-        $opt = $this->ListOptions["sequence"];
-        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1505,7 +1402,7 @@ class ItemPurchasesList extends ItemPurchases
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"receive_items\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
                 }
@@ -1518,7 +1415,7 @@ class ItemPurchasesList extends ItemPurchases
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"receive_items\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 }
@@ -1531,7 +1428,7 @@ class ItemPurchasesList extends ItemPurchases
             $copycaption = HtmlTitle($Language->phrase("CopyLink"));
             if ($Security->canAdd()) {
                 if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"item_purchases\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"receive_items\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
                 }
@@ -1572,12 +1469,12 @@ class ItemPurchasesList extends ItemPurchases
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fitem_purchaseslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"freceive_itemslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fitem_purchaseslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"freceive_itemslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1620,7 +1517,7 @@ class ItemPurchasesList extends ItemPurchases
         $item = &$option->add("add");
         $addcaption = HtmlTitle($Language->phrase("AddLink"));
         if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"item_purchases\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"receive_items\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
@@ -1633,16 +1530,9 @@ class ItemPurchasesList extends ItemPurchases
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "batch_number");
-            $this->createColumnOption($option, "category_id");
-            $this->createColumnOption($option, "subcategory_id");
-            $this->createColumnOption($option, "item_title");
-            $this->createColumnOption($option, "quantity");
+            $this->createColumnOption($option, "item_id");
+            $this->createColumnOption($option, "total_items_received");
             $this->createColumnOption($option, "measuring_unit");
-            $this->createColumnOption($option, "unit_price");
-            $this->createColumnOption($option, "selling_price");
-            $this->createColumnOption($option, "amount_paid");
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "date_updated");
         }
@@ -1669,10 +1559,10 @@ class ItemPurchasesList extends ItemPurchases
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fitem_purchasessrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"freceive_itemssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fitem_purchasessrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"freceive_itemssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1732,7 +1622,7 @@ class ItemPurchasesList extends ItemPurchases
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fitem_purchaseslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="freceive_itemslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1903,7 +1793,7 @@ class ItemPurchasesList extends ItemPurchases
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_item_purchases", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_receive_items", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1964,7 +1854,7 @@ class ItemPurchasesList extends ItemPurchases
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_item_purchases",
+            "id" => "r" . $this->RowCount . "_receive_items",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2084,20 +1974,9 @@ class ItemPurchasesList extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->batch_number->setDbValue($row['batch_number']);
-        $this->supplier_id->setDbValue($row['supplier_id']);
-        $this->category_id->setDbValue($row['category_id']);
-        $this->subcategory_id->setDbValue($row['subcategory_id']);
-        $this->item_title->setDbValue($row['item_title']);
-        $this->quantity->setDbValue($row['quantity']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
-        $this->unit_price->setDbValue($row['unit_price']);
-        $this->selling_price->setDbValue($row['selling_price']);
-        $this->amount_paid->setDbValue($row['amount_paid']);
-        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
-        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
-            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
-        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2107,17 +1986,9 @@ class ItemPurchasesList extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['batch_number'] = $this->batch_number->DefaultValue;
-        $row['supplier_id'] = $this->supplier_id->DefaultValue;
-        $row['category_id'] = $this->category_id->DefaultValue;
-        $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
-        $row['quantity'] = $this->quantity->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
         $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
-        $row['unit_price'] = $this->unit_price->DefaultValue;
-        $row['selling_price'] = $this->selling_price->DefaultValue;
-        $row['amount_paid'] = $this->amount_paid->DefaultValue;
-        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2162,27 +2033,11 @@ class ItemPurchasesList extends ItemPurchases
 
         // id
 
-        // batch_number
+        // item_id
 
-        // supplier_id
-
-        // category_id
-
-        // subcategory_id
-
-        // item_title
-
-        // quantity
+        // total_items_received
 
         // measuring_unit
-
-        // unit_price
-
-        // selling_price
-
-        // amount_paid
-
-        // invoice_attachment
 
         // date_created
 
@@ -2193,103 +2048,35 @@ class ItemPurchasesList extends ItemPurchases
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // batch_number
-            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
-
-            // supplier_id
-            $curVal = strval($this->supplier_id->CurrentValue);
+            // item_id
+            $curVal = strval($this->item_id->CurrentValue);
             if ($curVal != "") {
-                $this->supplier_id->ViewValue = $this->supplier_id->lookupCacheOption($curVal);
-                if ($this->supplier_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->supplier_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->supplier_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->supplier_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->supplier_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->supplier_id->ViewValue = $this->supplier_id->displayValue($arwrk);
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
                     } else {
-                        $this->supplier_id->ViewValue = FormatNumber($this->supplier_id->CurrentValue, $this->supplier_id->formatPattern());
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
                     }
                 }
             } else {
-                $this->supplier_id->ViewValue = null;
+                $this->item_id->ViewValue = null;
             }
 
-            // category_id
-            $curVal = strval($this->category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
-                if ($this->category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
-                    } else {
-                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->category_id->ViewValue = null;
-            }
-
-            // subcategory_id
-            $curVal = strval($this->subcategory_id->CurrentValue);
-            if ($curVal != "") {
-                $this->subcategory_id->ViewValue = $this->subcategory_id->lookupCacheOption($curVal);
-                if ($this->subcategory_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->subcategory_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcategory_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->subcategory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->subcategory_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->subcategory_id->ViewValue = $this->subcategory_id->displayValue($arwrk);
-                    } else {
-                        $this->subcategory_id->ViewValue = FormatNumber($this->subcategory_id->CurrentValue, $this->subcategory_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->subcategory_id->ViewValue = null;
-            }
-
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
-
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
 
             // measuring_unit
-            if (strval($this->measuring_unit->CurrentValue) != "") {
-                $this->measuring_unit->ViewValue = $this->measuring_unit->optionCaption($this->measuring_unit->CurrentValue);
-            } else {
-                $this->measuring_unit->ViewValue = null;
-            }
-
-            // unit_price
-            $this->unit_price->ViewValue = $this->unit_price->CurrentValue;
-            $this->unit_price->ViewValue = FormatNumber($this->unit_price->ViewValue, $this->unit_price->formatPattern());
-
-            // selling_price
-            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
-            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
-
-            // amount_paid
-            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
-            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, $this->amount_paid->formatPattern());
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2299,45 +2086,17 @@ class ItemPurchasesList extends ItemPurchases
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+            $this->item_id->TooltipValue = "";
 
-            // batch_number
-            $this->batch_number->HrefValue = "";
-            $this->batch_number->TooltipValue = "";
-
-            // category_id
-            $this->category_id->HrefValue = "";
-            $this->category_id->TooltipValue = "";
-
-            // subcategory_id
-            $this->subcategory_id->HrefValue = "";
-            $this->subcategory_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
-
-            // quantity
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+            $this->total_items_received->TooltipValue = "";
 
             // measuring_unit
             $this->measuring_unit->HrefValue = "";
             $this->measuring_unit->TooltipValue = "";
-
-            // unit_price
-            $this->unit_price->HrefValue = "";
-            $this->unit_price->TooltipValue = "";
-
-            // selling_price
-            $this->selling_price->HrefValue = "";
-            $this->selling_price->TooltipValue = "";
-
-            // amount_paid
-            $this->amount_paid->HrefValue = "";
-            $this->amount_paid->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2366,19 +2125,19 @@ class ItemPurchasesList extends ItemPurchases
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"freceive_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"freceive_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fitem_purchaseslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"freceive_itemslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2390,7 +2149,7 @@ class ItemPurchasesList extends ItemPurchases
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fitem_purchaseslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="freceive_itemslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2468,7 +2227,7 @@ class ItemPurchasesList extends ItemPurchases
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fitem_purchasessrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"freceive_itemssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2597,13 +2356,7 @@ class ItemPurchasesList extends ItemPurchases
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_supplier_id":
-                    break;
-                case "x_category_id":
-                    break;
-                case "x_subcategory_id":
-                    break;
-                case "x_measuring_unit":
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2780,7 +2533,7 @@ class ItemPurchasesList extends ItemPurchases
         global $Language;
         $var = $Language->PhraseClass("addlink");
         $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add purchase");
+        $Language->setPhrase("addlink", "receive items");
     }
 
     // Page Unload event

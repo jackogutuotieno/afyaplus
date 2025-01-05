@@ -3,7 +3,7 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$PatientAdmissionsView = &$Page;
+$IssueItemsView = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <div class="btn-toolbar ew-toolbar">
@@ -16,21 +16,21 @@ $PatientAdmissionsView = &$Page;
 $Page->showMessage();
 ?>
 <main class="view">
-<form name="fpatient_admissionsview" id="fpatient_admissionsview" class="ew-form ew-view-form overlay-wrapper" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
+<form name="fissue_itemsview" id="fissue_itemsview" class="ew-form ew-view-form overlay-wrapper" action="<?= CurrentPageUrl(false) ?>" method="post" novalidate autocomplete="off">
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { patient_admissions: currentTable } });
+ew.deepAssign(ew.vars, { tables: { issue_items: currentTable } });
 var currentPageID = ew.PAGE_ID = "view";
 var currentForm;
-var fpatient_admissionsview;
+var fissue_itemsview;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery;
     let fields = currentTable.fields;
 
     // Form object
     let form = new ew.FormBuilder()
-        .setId("fpatient_admissionsview")
+        .setId("fissue_itemsview")
         .setPageId("view")
         .build();
     window[form.id] = form;
@@ -48,59 +48,65 @@ loadjs.ready("head", function () {
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="patient_admissions">
+<input type="hidden" name="t" value="issue_items">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <table class="<?= $Page->TableClass ?>">
 <?php if ($Page->id->Visible) { // id ?>
     <tr id="r_id"<?= $Page->id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_id"><?= $Page->id->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_issue_items_id"><?= $Page->id->caption() ?></span></td>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el_patient_admissions_id">
+<span id="el_issue_items_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->admission_id->Visible) { // admission_id ?>
+    <tr id="r_admission_id"<?= $Page->admission_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_issue_items_admission_id"><?= $Page->admission_id->caption() ?></span></td>
+        <td data-name="admission_id"<?= $Page->admission_id->cellAttributes() ?>>
+<span id="el_issue_items_admission_id">
+<span<?= $Page->admission_id->viewAttributes() ?>>
+<?= $Page->admission_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <tr id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_patient_id"><?= $Page->patient_id->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_issue_items_patient_id"><?= $Page->patient_id->caption() ?></span></td>
         <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
-<span id="el_patient_admissions_patient_id">
+<span id="el_issue_items_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-    <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_date_created"><?= $Page->date_created->caption() ?></span></td>
-        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_patient_admissions_date_created">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
+<?php if ($Page->item_id->Visible) { // item_id ?>
+    <tr id="r_item_id"<?= $Page->item_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_issue_items_item_id"><?= $Page->item_id->caption() ?></span></td>
+        <td data-name="item_id"<?= $Page->item_id->cellAttributes() ?>>
+<span id="el_issue_items_item_id">
+<span<?= $Page->item_id->viewAttributes() ?>>
+<?= $Page->item_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->quantity->Visible) { // quantity ?>
+    <tr id="r_quantity"<?= $Page->quantity->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_issue_items_quantity"><?= $Page->quantity->caption() ?></span></td>
+        <td data-name="quantity"<?= $Page->quantity->cellAttributes() ?>>
+<span id="el_issue_items_quantity">
+<span<?= $Page->quantity->viewAttributes() ?>>
+<?= $Page->quantity->getViewValue() ?></span>
 </span>
 </td>
     </tr>
 <?php } ?>
 </table>
-<?php
-    if (in_array("bed_assignment", explode(",", $Page->getCurrentDetailTable())) && $bed_assignment->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("bed_assignment", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "BedAssignmentGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("issue_items", explode(",", $Page->getCurrentDetailTable())) && $issue_items->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("issue_items", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "IssueItemsGrid.php" ?>
-<?php } ?>
 </form>
 </main>
 <?php

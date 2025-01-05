@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientAdmissionsView extends PatientAdmissions
+class ReceiveItemsView extends ReceiveItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class PatientAdmissionsView extends PatientAdmissions
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientAdmissionsView";
+    public $PageObjName = "ReceiveItemsView";
 
     // View file path
     public $View = null;
@@ -39,7 +39,7 @@ class PatientAdmissionsView extends PatientAdmissions
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "patientadmissionsview";
+    public $CurrentPageName = "receiveitemsview";
 
     // Page URLs
     public $AddUrl;
@@ -58,14 +58,6 @@ class PatientAdmissionsView extends PatientAdmissions
     public $MultiEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -149,8 +141,11 @@ class PatientAdmissionsView extends PatientAdmissions
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->patient_id->setVisibility();
+        $this->item_id->setVisibility();
+        $this->total_items_received->setVisibility();
+        $this->measuring_unit->setVisibility();
         $this->date_created->setVisibility();
+        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -158,8 +153,8 @@ class PatientAdmissionsView extends PatientAdmissions
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'patient_admissions';
-        $this->TableName = 'patient_admissions';
+        $this->TableVar = 'receive_items';
+        $this->TableName = 'receive_items';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
@@ -170,9 +165,9 @@ class PatientAdmissionsView extends PatientAdmissions
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_admissions)
-        if (!isset($GLOBALS["patient_admissions"]) || $GLOBALS["patient_admissions"]::class == PROJECT_NAMESPACE . "patient_admissions") {
-            $GLOBALS["patient_admissions"] = &$this;
+        // Table object (receive_items)
+        if (!isset($GLOBALS["receive_items"]) || $GLOBALS["receive_items"]::class == PROJECT_NAMESPACE . "receive_items") {
+            $GLOBALS["receive_items"] = &$this;
         }
 
         // Set up record key
@@ -182,7 +177,7 @@ class PatientAdmissionsView extends PatientAdmissions
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_admissions');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'receive_items');
         }
 
         // Start timer
@@ -302,7 +297,7 @@ class PatientAdmissionsView extends PatientAdmissions
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "patientadmissionsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "receiveitemsview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -526,6 +521,20 @@ class PatientAdmissionsView extends PatientAdmissions
                 return;
             }
         }
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportType = $this->Export; // Get export parameter, used in header
+        if ($ExportType != "") {
+            global $SkipHeaderFooter;
+            $SkipHeaderFooter = true;
+        }
         $this->CurrentAction = Param("action"); // Set up current action
         $this->setVisibility();
 
@@ -552,7 +561,7 @@ class PatientAdmissionsView extends PatientAdmissions
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -563,9 +572,6 @@ class PatientAdmissionsView extends PatientAdmissions
         $loadCurrentRecord = false;
         $returnUrl = "";
         $matchRecord = false;
-
-        // Set up master/detail parameters
-        $this->setupMasterParms();
         if (($keyValue = Get("id") ?? Route("id")) !== null) {
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
@@ -576,7 +582,7 @@ class PatientAdmissionsView extends PatientAdmissions
             $this->id->setQueryStringValue($keyValue);
             $this->RecKey["id"] = $this->id->QueryStringValue;
         } elseif (!$loadCurrentRecord) {
-            $returnUrl = "patientadmissionslist"; // Return to list
+            $returnUrl = "receiveitemslist"; // Return to list
         }
 
         // Get action
@@ -598,10 +604,13 @@ class PatientAdmissionsView extends PatientAdmissions
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "patientadmissionslist"; // No matching record, return to list
+                        $returnUrl = "receiveitemslist"; // No matching record, return to list
                     }
                 break;
         }
+
+        // Setup export options
+        $this->setupExportOptions();
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
             return;
@@ -616,9 +625,6 @@ class PatientAdmissionsView extends PatientAdmissions
         $this->RowType = RowType::VIEW;
         $this->resetAttributes();
         $this->renderRow();
-
-        // Set up detail parameters
-        $this->setupDetailParms();
 
         // Normal return
         if (IsApi()) {
@@ -691,6 +697,16 @@ class PatientAdmissionsView extends PatientAdmissions
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
+        // Copy
+        $item = &$option->add("copy");
+        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
+        }
+        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
+
         // Delete
         $item = &$option->add("delete");
         $url = GetUrl($this->DeleteUrl);
@@ -699,132 +715,70 @@ class PatientAdmissionsView extends PatientAdmissions
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
         $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
-        $option = $options["detail"];
-        $detailTableLink = "";
-        $detailViewTblVar = "";
-        $detailCopyTblVar = "";
-        $detailEditTblVar = "";
-
-        // "detail_bed_assignment"
-        $item = &$option->add("detail_bed_assignment");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("bed_assignment", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("bedassignmentlist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("BedAssignmentGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_admissions')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=bed_assignment"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "bed_assignment";
-        }
-        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_admissions')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=bed_assignment"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            if ($detailEditTblVar != "") {
-                $detailEditTblVar .= ",";
-            }
-            $detailEditTblVar .= "bed_assignment";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'bed_assignment');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "bed_assignment";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
-        // "detail_issue_items"
-        $item = &$option->add("detail_issue_items");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("issue_items", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("issueitemslist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("IssueItemsGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_admissions')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=issue_items"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "issue_items";
-        }
-        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_admissions')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=issue_items"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            if ($detailEditTblVar != "") {
-                $detailEditTblVar .= ",";
-            }
-            $detailEditTblVar .= "issue_items";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'issue_items');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "issue_items";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
-        // Multiple details
-        if ($this->ShowMultipleDetails) {
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
-            $links = "";
-            if ($detailViewTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            }
-            if ($detailEditTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            }
-            if ($detailCopyTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar))) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
-                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
-            }
-            $body .= "</div>";
-            // Multiple details
-            $item = &$option->add("details");
-            $item->Body = $body;
-        }
-
-        // Set up detail default
-        $option = $options["detail"];
-        $options["detail"]->DropDownButtonPhrase = $Language->phrase("ButtonDetails");
-        $ar = explode(",", $detailTableLink);
-        $cnt = count($ar);
-        $option->UseDropDownButton = ($cnt > 1);
-        $option->UseButtonGroup = true;
-        $item = &$option->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
 
         // Set up action default
         $option = $options["action"];
         $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
-        $option->UseDropDownButton = !IsJsonResponse() && false;
+        $option->UseDropDownButton = !IsJsonResponse() && true;
         $option->UseButtonGroup = true;
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+    }
+
+    /**
+     * Load result set
+     *
+     * @param int $offset Offset
+     * @param int $rowcnt Maximum number of rows
+     * @return Doctrine\DBAL\Result Result
+     */
+    public function loadRecordset($offset = -1, $rowcnt = -1)
+    {
+        // Load List page SQL (QueryBuilder)
+        $sql = $this->getListSql();
+
+        // Load result set
+        if ($offset > -1) {
+            $sql->setFirstResult($offset);
+        }
+        if ($rowcnt > 0) {
+            $sql->setMaxResults($rowcnt);
+        }
+        $result = $sql->executeQuery();
+        if (property_exists($this, "TotalRecords") && $rowcnt < 0) {
+            $this->TotalRecords = $result->rowCount();
+            if ($this->TotalRecords <= 0) { // Handle database drivers that does not return rowCount()
+                $this->TotalRecords = $this->getRecordCount($this->getListSql());
+            }
+        }
+
+        // Call Recordset Selected event
+        $this->recordsetSelected($result);
+        return $result;
+    }
+
+    /**
+     * Load records as associative array
+     *
+     * @param int $offset Offset
+     * @param int $rowcnt Maximum number of rows
+     * @return void
+     */
+    public function loadRows($offset = -1, $rowcnt = -1)
+    {
+        // Load List page SQL (QueryBuilder)
+        $sql = $this->getListSql();
+
+        // Load result set
+        if ($offset > -1) {
+            $sql->setFirstResult($offset);
+        }
+        if ($rowcnt > 0) {
+            $sql->setMaxResults($rowcnt);
+        }
+        $result = $sql->executeQuery();
+        return $result->fetchAllAssociative();
     }
 
     /**
@@ -865,12 +819,12 @@ class PatientAdmissionsView extends PatientAdmissions
 
         // Call Row Selected event
         $this->rowSelected($row);
-        if ($this->AuditTrailOnView) {
-            $this->writeAuditTrailOnView($row);
-        }
         $this->id->setDbValue($row['id']);
-        $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
+        $this->measuring_unit->setDbValue($row['measuring_unit']);
         $this->date_created->setDbValue($row['date_created']);
+        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -878,8 +832,11 @@ class PatientAdmissionsView extends PatientAdmissions
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
+        $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
+        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -903,54 +860,82 @@ class PatientAdmissionsView extends PatientAdmissions
 
         // id
 
-        // patient_id
+        // item_id
+
+        // total_items_received
+
+        // measuring_unit
 
         // date_created
+
+        // date_updated
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $curVal = strval($this->patient_id->CurrentValue);
+            // item_id
+            $curVal = strval($this->item_id->CurrentValue);
             if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCache($this->Cache);
                     $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
                     } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
                     }
                 }
             } else {
-                $this->patient_id->ViewValue = null;
+                $this->item_id->ViewValue = null;
             }
+
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
+
+            // measuring_unit
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // item_id
+            $this->item_id->HrefValue = "";
+            $this->item_id->TooltipValue = "";
+
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+            $this->total_items_received->TooltipValue = "";
+
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
+            $this->measuring_unit->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+
+            // date_updated
+            $this->date_updated->HrefValue = "";
+            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -959,126 +944,164 @@ class PatientAdmissionsView extends PatientAdmissions
         }
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
     {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "ipd_patients") {
-                $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Get("fk_id", Get("patient_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "ipd_patients") {
-                $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Post("fk_id", Post("patient_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
+        global $Language;
+        if ($type == "print" || $custom) { // Printer friendly / custom export
+            $pageUrl = $this->pageUrl(true);
+            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
+        } else { // Export API URL
+            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
+            $exportUrl .= "/" . $this->getKey(true, "/");
         }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-            $this->setSessionWhere($this->getDetailFilterFromSession());
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"freceive_itemsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "ipd_patients") {
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"freceive_itemsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"freceive_itemsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="freceive_itemsview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
+    // Set up export options
+    protected function setupExportOptions()
     {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("bed_assignment", $detailTblVar)) {
-                $detailPageObj = Container("BedAssignmentGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "view";
+        global $Language, $Security;
 
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
-            if (in_array("issue_items", $detailTblVar)) {
-                $detailPageObj = Container("IssueItemsGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "view";
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
 
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to HTML
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = false;
+
+        // Export to XML
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to CSV
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to PDF
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = true;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = true;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = false;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
         }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
+
+        // Hide options for export
+        if ($this->isExport()) {
+            $this->ExportOptions->hideAllOptions();
+        }
+
+        // Hide options if json response
+        if (IsJsonResponse()) {
+            $this->ExportOptions->hideAllOptions();
+        }
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param bool $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($doc, $keys)
+    {
+        global $Language;
+        $rs = null;
+        if (count($keys) >= 1) {
+            $this->id->OldValue = $keys[0];
+            $rs = $this->loadRs($this->getRecordFilter());
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $doc->ExportCustom = !$this->pageExporting($doc);
+
+        // Page header
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "view");
+        $rs->free();
+
+        // Page footer
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Call Page Exported server event
+        $this->pageExported($doc);
     }
 
     // Set up Breadcrumb
@@ -1087,7 +1110,7 @@ class PatientAdmissionsView extends PatientAdmissions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("patientadmissionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("receiveitemslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }
@@ -1105,7 +1128,7 @@ class PatientAdmissionsView extends PatientAdmissions
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

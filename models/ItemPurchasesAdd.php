@@ -123,6 +123,7 @@ class ItemPurchasesAdd extends ItemPurchases
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->batch_number->setVisibility();
         $this->supplier_id->setVisibility();
         $this->category_id->setVisibility();
         $this->subcategory_id->setVisibility();
@@ -695,6 +696,16 @@ class ItemPurchasesAdd extends ItemPurchases
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'batch_number' first before field var 'x_batch_number'
+        $val = $CurrentForm->hasValue("batch_number") ? $CurrentForm->getValue("batch_number") : $CurrentForm->getValue("x_batch_number");
+        if (!$this->batch_number->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->batch_number->Visible = false; // Disable update for API request
+            } else {
+                $this->batch_number->setFormValue($val);
+            }
+        }
+
         // Check field name 'supplier_id' first before field var 'x_supplier_id'
         $val = $CurrentForm->hasValue("supplier_id") ? $CurrentForm->getValue("supplier_id") : $CurrentForm->getValue("x_supplier_id");
         if (!$this->supplier_id->IsDetailKey) {
@@ -794,6 +805,7 @@ class ItemPurchasesAdd extends ItemPurchases
     public function restoreFormValues()
     {
         global $CurrentForm;
+        $this->batch_number->CurrentValue = $this->batch_number->FormValue;
         $this->supplier_id->CurrentValue = $this->supplier_id->FormValue;
         $this->category_id->CurrentValue = $this->category_id->FormValue;
         $this->subcategory_id->CurrentValue = $this->subcategory_id->FormValue;
@@ -844,6 +856,7 @@ class ItemPurchasesAdd extends ItemPurchases
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->batch_number->setDbValue($row['batch_number']);
         $this->supplier_id->setDbValue($row['supplier_id']);
         $this->category_id->setDbValue($row['category_id']);
         $this->subcategory_id->setDbValue($row['subcategory_id']);
@@ -866,6 +879,7 @@ class ItemPurchasesAdd extends ItemPurchases
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['batch_number'] = $this->batch_number->DefaultValue;
         $row['supplier_id'] = $this->supplier_id->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
         $row['subcategory_id'] = $this->subcategory_id->DefaultValue;
@@ -915,6 +929,9 @@ class ItemPurchasesAdd extends ItemPurchases
         // id
         $this->id->RowCssClass = "row";
 
+        // batch_number
+        $this->batch_number->RowCssClass = "row";
+
         // supplier_id
         $this->supplier_id->RowCssClass = "row";
 
@@ -955,6 +972,9 @@ class ItemPurchasesAdd extends ItemPurchases
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // batch_number
+            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
 
             // supplier_id
             $curVal = strval($this->supplier_id->CurrentValue);
@@ -1067,6 +1087,9 @@ class ItemPurchasesAdd extends ItemPurchases
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // batch_number
+            $this->batch_number->HrefValue = "";
+
             // supplier_id
             $this->supplier_id->HrefValue = "";
 
@@ -1109,6 +1132,14 @@ class ItemPurchasesAdd extends ItemPurchases
             }
             $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         } elseif ($this->RowType == RowType::ADD) {
+            // batch_number
+            $this->batch_number->setupEditAttributes();
+            if (!$this->batch_number->Raw) {
+                $this->batch_number->CurrentValue = HtmlDecode($this->batch_number->CurrentValue);
+            }
+            $this->batch_number->EditValue = HtmlEncode($this->batch_number->CurrentValue);
+            $this->batch_number->PlaceHolder = RemoveHtml($this->batch_number->caption());
+
             // supplier_id
             $this->supplier_id->setupEditAttributes();
             $curVal = trim(strval($this->supplier_id->CurrentValue));
@@ -1252,6 +1283,9 @@ class ItemPurchasesAdd extends ItemPurchases
 
             // Add refer script
 
+            // batch_number
+            $this->batch_number->HrefValue = "";
+
             // supplier_id
             $this->supplier_id->HrefValue = "";
 
@@ -1314,6 +1348,11 @@ class ItemPurchasesAdd extends ItemPurchases
             return true;
         }
         $validateForm = true;
+            if ($this->batch_number->Visible && $this->batch_number->Required) {
+                if (!$this->batch_number->IsDetailKey && EmptyValue($this->batch_number->FormValue)) {
+                    $this->batch_number->addErrorMessage(str_replace("%s", $this->batch_number->caption(), $this->batch_number->RequiredErrorMessage));
+                }
+            }
             if ($this->supplier_id->Visible && $this->supplier_id->Required) {
                 if (!$this->supplier_id->IsDetailKey && EmptyValue($this->supplier_id->FormValue)) {
                     $this->supplier_id->addErrorMessage(str_replace("%s", $this->supplier_id->caption(), $this->supplier_id->RequiredErrorMessage));
@@ -1447,6 +1486,9 @@ class ItemPurchasesAdd extends ItemPurchases
         global $Security;
         $rsnew = [];
 
+        // batch_number
+        $this->batch_number->setDbValueDef($rsnew, $this->batch_number->CurrentValue, false);
+
         // supplier_id
         $this->supplier_id->setDbValueDef($rsnew, $this->supplier_id->CurrentValue, false);
 
@@ -1491,6 +1533,9 @@ class ItemPurchasesAdd extends ItemPurchases
      */
     protected function restoreAddFormFromRow($row)
     {
+        if (isset($row['batch_number'])) { // batch_number
+            $this->batch_number->setFormValue($row['batch_number']);
+        }
         if (isset($row['supplier_id'])) { // supplier_id
             $this->supplier_id->setFormValue($row['supplier_id']);
         }

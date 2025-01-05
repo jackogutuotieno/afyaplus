@@ -166,6 +166,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_item_purchases_id" class="item_purchases_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <th data-name="batch_number" class="<?= $Page->batch_number->headerCellClass() ?>"><div id="elh_item_purchases_batch_number" class="item_purchases_batch_number"><?= $Page->renderFieldHeader($Page->batch_number) ?></div></th>
+<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th data-name="category_id" class="<?= $Page->category_id->headerCellClass() ?>"><div id="elh_item_purchases_category_id" class="item_purchases_category_id"><?= $Page->renderFieldHeader($Page->category_id) ?></div></th>
 <?php } ?>
@@ -229,6 +232,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_id" class="el_item_purchases_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <td data-name="batch_number"<?= $Page->batch_number->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_item_purchases_batch_number" class="el_item_purchases_batch_number">
+<span<?= $Page->batch_number->viewAttributes() ?>>
+<?= $Page->batch_number->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

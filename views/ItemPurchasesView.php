@@ -62,6 +62,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+    <tr id="r_batch_number"<?= $Page->batch_number->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_item_purchases_batch_number"><?= $Page->batch_number->caption() ?></span></td>
+        <td data-name="batch_number"<?= $Page->batch_number->cellAttributes() ?>>
+<span id="el_item_purchases_batch_number">
+<span<?= $Page->batch_number->viewAttributes() ?>>
+<?= $Page->batch_number->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->supplier_id->Visible) { // supplier_id ?>
     <tr id="r_supplier_id"<?= $Page->supplier_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_item_purchases_supplier_id"><?= $Page->supplier_id->caption() ?></span></td>

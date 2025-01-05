@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientAdmissionsAdd extends PatientAdmissions
+class IssueItemsAdd extends IssueItems
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientAdmissionsAdd";
+    public $PageObjName = "IssueItemsAdd";
 
     // View file path
     public $View = null;
@@ -39,15 +39,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "patientadmissionsadd";
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
+    public $CurrentPageName = "issueitemsadd";
 
     // Page headings
     public $Heading = "";
@@ -131,8 +123,12 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->item_id->setVisibility();
+        $this->quantity->setVisibility();
         $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -140,8 +136,8 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         parent::__construct();
         global $Language, $DashboardReport, $DebugTimer, $UserTable;
-        $this->TableVar = 'patient_admissions';
-        $this->TableName = 'patient_admissions';
+        $this->TableVar = 'issue_items';
+        $this->TableName = 'issue_items';
 
         // Table CSS class
         $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-desktop-table ew-add-table";
@@ -152,14 +148,14 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_admissions)
-        if (!isset($GLOBALS["patient_admissions"]) || $GLOBALS["patient_admissions"]::class == PROJECT_NAMESPACE . "patient_admissions") {
-            $GLOBALS["patient_admissions"] = &$this;
+        // Table object (issue_items)
+        if (!isset($GLOBALS["issue_items"]) || $GLOBALS["issue_items"]::class == PROJECT_NAMESPACE . "issue_items") {
+            $GLOBALS["issue_items"] = &$this;
         }
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_admissions');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'issue_items');
         }
 
         // Start timer
@@ -273,7 +269,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 ) { // List / View / Master View page
                     if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                         $result["caption"] = $this->getModalCaption($pageName);
-                        $result["view"] = SameString($pageName, "patientadmissionsview"); // If View page, no primary button
+                        $result["view"] = SameString($pageName, "issueitemsview"); // If View page, no primary button
                     } else { // List page
                         $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                         $this->clearFailureMessage();
@@ -574,9 +570,6 @@ class PatientAdmissionsAdd extends PatientAdmissions
             $this->loadFormValues(); // Load form values
         }
 
-        // Set up detail parameters
-        $this->setupDetailParms();
-
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -598,12 +591,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("patientadmissionslist"); // No matching record, return to list
+                    $this->terminate("issueitemslist"); // No matching record, return to list
                     return;
                 }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -611,23 +601,19 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
-                        $returnUrl = $this->getDetailUrl();
-                    } else {
-                        $returnUrl = $this->getReturnUrl();
-                    }
-                    if (GetPageName($returnUrl) == "patientadmissionslist") {
+                    $returnUrl = $this->getReturnUrl();
+                    if (GetPageName($returnUrl) == "issueitemslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "patientadmissionsview") {
+                    } elseif (GetPageName($returnUrl) == "issueitemsview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
 
                     // Handle UseAjaxActions with return page
                     if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
-                        if (GetPageName($returnUrl) != "patientadmissionslist") {
+                        if (GetPageName($returnUrl) != "issueitemslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
-                            $returnUrl = "patientadmissionslist"; // Return list page content
+                            $returnUrl = "issueitemslist"; // Return list page content
                         }
                     }
                     if (IsJsonResponse()) { // Return to caller
@@ -648,9 +634,6 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -705,13 +688,43 @@ class PatientAdmissionsAdd extends PatientAdmissions
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'admission_id' first before field var 'x_admission_id'
+        $val = $CurrentForm->hasValue("admission_id") ? $CurrentForm->getValue("admission_id") : $CurrentForm->getValue("x_admission_id");
+        if (!$this->admission_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->admission_id->Visible = false; // Disable update for API request
+            } else {
+                $this->admission_id->setFormValue($val, true, $validate);
+            }
+        }
+
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
             if (IsApi() && $val === null) {
                 $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val, true, $validate);
+                $this->patient_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'item_id' first before field var 'x_item_id'
+        $val = $CurrentForm->hasValue("item_id") ? $CurrentForm->getValue("item_id") : $CurrentForm->getValue("x_item_id");
+        if (!$this->item_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->item_id->Visible = false; // Disable update for API request
+            } else {
+                $this->item_id->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'quantity' first before field var 'x_quantity'
+        $val = $CurrentForm->hasValue("quantity") ? $CurrentForm->getValue("quantity") : $CurrentForm->getValue("x_quantity");
+        if (!$this->quantity->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->quantity->Visible = false; // Disable update for API request
+            } else {
+                $this->quantity->setFormValue($val, true, $validate);
             }
         }
 
@@ -723,7 +736,10 @@ class PatientAdmissionsAdd extends PatientAdmissions
     public function restoreFormValues()
     {
         global $CurrentForm;
+        $this->admission_id->CurrentValue = $this->admission_id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->item_id->CurrentValue = $this->item_id->FormValue;
+        $this->quantity->CurrentValue = $this->quantity->FormValue;
     }
 
     /**
@@ -765,8 +781,12 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->item_id->setDbValue($row['item_id']);
+        $this->quantity->setDbValue($row['quantity']);
         $this->date_created->setDbValue($row['date_created']);
+        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -774,8 +794,12 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['admission_id'] = $this->admission_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['item_id'] = $this->item_id->DefaultValue;
+        $row['quantity'] = $this->quantity->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
+        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -813,19 +837,34 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // id
         $this->id->RowCssClass = "row";
 
+        // admission_id
+        $this->admission_id->RowCssClass = "row";
+
         // patient_id
         $this->patient_id->RowCssClass = "row";
 
+        // item_id
+        $this->item_id->RowCssClass = "row";
+
+        // quantity
+        $this->quantity->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
+
+        // date_updated
+        $this->date_updated->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
+            // admission_id
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
+
             // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
             $curVal = strval($this->patient_id->CurrentValue);
             if ($curVal != "") {
                 $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
@@ -848,18 +887,52 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // item_id
+            $this->item_id->ViewValue = $this->item_id->CurrentValue;
+            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
+            // date_updated
+            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
+            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+            // admission_id
+            $this->admission_id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
+
+            // item_id
+            $this->item_id->HrefValue = "";
+
+            // quantity
+            $this->quantity->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // admission_id
+            $this->admission_id->setupEditAttributes();
+            if ($this->admission_id->getSessionValue() != "") {
+                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
+                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
+            } else {
+                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
+                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
+                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
+                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
+                }
+            }
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
                 $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
                 $curVal = strval($this->patient_id->CurrentValue);
                 if ($curVal != "") {
                     $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
@@ -882,35 +955,61 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     $this->patient_id->ViewValue = null;
                 }
             } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
+                $curVal = trim(strval($this->patient_id->CurrentValue));
                 if ($curVal != "") {
-                    $this->patient_id->EditValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->EditValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->EditValue = HtmlEncode(FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern()));
-                        }
-                    }
+                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
                 } else {
-                    $this->patient_id->EditValue = null;
+                    $this->patient_id->ViewValue = $this->patient_id->Lookup !== null && is_array($this->patient_id->lookupOptions()) && count($this->patient_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->patient_id->ViewValue !== null) { // Load from cache
+                    $this->patient_id->EditValue = array_values($this->patient_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->patient_id->CurrentValue, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->patient_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->patient_id->EditValue = $arwrk;
                 }
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
+            // item_id
+            $this->item_id->setupEditAttributes();
+            $this->item_id->EditValue = $this->item_id->CurrentValue;
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
+            if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
+                $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
+            }
+
+            // quantity
+            $this->quantity->setupEditAttributes();
+            $this->quantity->EditValue = $this->quantity->CurrentValue;
+            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+            if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
+                $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
+            }
+
             // Add refer script
+
+            // admission_id
+            $this->admission_id->HrefValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
+
+            // item_id
+            $this->item_id->HrefValue = "";
+
+            // quantity
+            $this->quantity->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -932,27 +1031,35 @@ class PatientAdmissionsAdd extends PatientAdmissions
             return true;
         }
         $validateForm = true;
+            if ($this->admission_id->Visible && $this->admission_id->Required) {
+                if (!$this->admission_id->IsDetailKey && EmptyValue($this->admission_id->FormValue)) {
+                    $this->admission_id->addErrorMessage(str_replace("%s", $this->admission_id->caption(), $this->admission_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->admission_id->FormValue)) {
+                $this->admission_id->addErrorMessage($this->admission_id->getErrorMessage(false));
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
+            if ($this->item_id->Visible && $this->item_id->Required) {
+                if (!$this->item_id->IsDetailKey && EmptyValue($this->item_id->FormValue)) {
+                    $this->item_id->addErrorMessage(str_replace("%s", $this->item_id->caption(), $this->item_id->RequiredErrorMessage));
+                }
             }
-
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("BedAssignmentGrid");
-        if (in_array("bed_assignment", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
-        $detailPage = Container("IssueItemsGrid");
-        if (in_array("issue_items", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->run();
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
+            if (!CheckInteger($this->item_id->FormValue)) {
+                $this->item_id->addErrorMessage($this->item_id->getErrorMessage(false));
+            }
+            if ($this->quantity->Visible && $this->quantity->Required) {
+                if (!$this->quantity->IsDetailKey && EmptyValue($this->quantity->FormValue)) {
+                    $this->quantity->addErrorMessage(str_replace("%s", $this->quantity->caption(), $this->quantity->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->quantity->FormValue)) {
+                $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
+            }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -978,11 +1085,6 @@ class PatientAdmissionsAdd extends PatientAdmissions
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
-            $conn->beginTransaction();
-        }
-
         // Load db values from old row
         $this->loadDbValues($rsold);
 
@@ -1005,58 +1107,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
             }
             $addRow = false;
         }
-
-        // Add detail records
-        if ($addRow) {
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("BedAssignmentGrid");
-            if (in_array("bed_assignment", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
-                $detailPage->admission_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "bed_assignment"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->admission_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-            $detailPage = Container("IssueItemsGrid");
-            if (in_array("issue_items", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
-                $detailPage->admission_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->patient_id->setSessionValue($this->patient_id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "issue_items"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->admission_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->patient_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-        }
-
-        // Commit/Rollback transaction
-        if ($this->getCurrentDetailTable() != "") {
-            if ($addRow) {
-                if ($this->UseTransaction) { // Commit transaction
-                    if ($conn->isTransactionActive()) {
-                        $conn->commit();
-                    }
-                }
-            } else {
-                if ($this->UseTransaction) { // Rollback transaction
-                    if ($conn->isTransactionActive()) {
-                        $conn->rollback();
-                    }
-                }
-            }
-        }
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
-            if ($this->SendEmail) {
-                $this->sendEmailOnAdd($rsnew);
-            }
         }
 
         // Write JSON response
@@ -1078,8 +1131,17 @@ class PatientAdmissionsAdd extends PatientAdmissions
         global $Security;
         $rsnew = [];
 
+        // admission_id
+        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, false);
+
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
+
+        // item_id
+        $this->item_id->setDbValueDef($rsnew, $this->item_id->CurrentValue, false);
+
+        // quantity
+        $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1089,8 +1151,17 @@ class PatientAdmissionsAdd extends PatientAdmissions
      */
     protected function restoreAddFormFromRow($row)
     {
+        if (isset($row['admission_id'])) { // admission_id
+            $this->admission_id->setFormValue($row['admission_id']);
+        }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
+        }
+        if (isset($row['item_id'])) { // item_id
+            $this->item_id->setFormValue($row['item_id']);
+        }
+        if (isset($row['quantity'])) { // quantity
+            $this->quantity->setFormValue($row['quantity']);
         }
     }
 
@@ -1107,15 +1178,26 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "ipd_patients") {
+            if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Get("fk_id", Get("patient_id"))) !== null) {
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
                     $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
                     $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1129,15 +1211,26 @@ class PatientAdmissionsAdd extends PatientAdmissions
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "ipd_patients") {
+            if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
-                $masterTbl = Container("ipd_patients");
-                if (($parm = Post("fk_id", Post("patient_id"))) !== null) {
+                $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
                     $this->patient_id->setSessionValue($this->patient_id->FormValue);
                     $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1156,7 +1249,10 @@ class PatientAdmissionsAdd extends PatientAdmissions
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "ipd_patients") {
+            if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
                 if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
                     $this->patient_id->setSessionValue("");
                 }
@@ -1166,72 +1262,13 @@ class PatientAdmissionsAdd extends PatientAdmissions
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("bed_assignment", $detailTblVar)) {
-                $detailPageObj = Container("BedAssignmentGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
-            if (in_array("issue_items", $detailTblVar)) {
-                $detailPageObj = Container("IssueItemsGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->admission_id->IsDetailKey = true;
-                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
-                    $detailPageObj->patient_id->IsDetailKey = true;
-                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
-                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
-                }
-            }
-        }
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("patientadmissionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("issueitemslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

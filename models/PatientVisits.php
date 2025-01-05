@@ -2164,7 +2164,7 @@ class PatientVisits extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Past Check-In"; 
         }
-        if (CurrentUserlevel() == 1 || CurrentUserlevel() == -1 || CurrentUserlevel() == 7) {
+        if (CurrentUserlevel() == 1 || CurrentUserlevel() == -1 || CurrentUserlevel() == 7 && CurrentPageID() =='list') {
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,cash_payments,patient_vitals,laboratory_billing_report,radiology_billing_report,pharmacy_billing_report,invoices" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         } else if (CurrentUserlevel() == 2) {
             $this->patient_id->ViewValue = '<a href="patientvisitsview/' . $this->id->ViewValue . '?showdetail=patient_queue,patient_vitals,doctor_notes,lab_test_requests,patients_lab_report,radiology_requests,patients_radiology_reports,prescriptions" target="_blank">' . $this->patient_id->ViewValue . '</a>';
