@@ -173,7 +173,7 @@ $Page->showMessage();
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-12 col-md-12">
                 <div class="card">
                     <div class="card-header content-header">
                         <h4>Employees by Designation</h4>

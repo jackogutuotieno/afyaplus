@@ -73,6 +73,8 @@ function MenuItem_Adding($item)
     $pharmacy = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Pharmacy'");
     $hr = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Human Resources'");
     $financials = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Financials'");
+    $procurement = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Procurement'");
+    $stores = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Stores'");
     $reports = ExecuteScalar("SELECT * FROM modules WHERE is_active=0 AND module='Reports'");
 
     // Check wether enabled or disabled
@@ -92,6 +94,10 @@ function MenuItem_Adding($item)
         if ($item->Text == "Human Resources") { $item->Allowed = FALSE; }
     } else if ($financials == TRUE)  {
         if ($item->Text == "Financials") { $item->Allowed = FALSE; }
+    } else if ($procurement == TRUE)  {
+        if ($item->Text == "Procurement") { $item->Allowed = FALSE; }
+    } else if ($stores == TRUE)  {
+        if ($item->Text == "Stores") { $item->Allowed = FALSE; }
     } else if ($reports == TRUE)  {
         if ($item->Text == "Reports") { $item->Allowed = FALSE; }
     }
