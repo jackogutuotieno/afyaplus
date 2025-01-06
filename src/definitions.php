@@ -207,6 +207,10 @@ return [
     "issue_items" => \DI\create(IssueItems::class),
     "patients_discharge" => \DI\create(PatientsDischarge::class),
     "employees_view" => \DI\create(EmployeesView::class),
+    "Employees_Report" => \DI\create(EmployeesReport::class),
+    "employees_report" => \DI\create(EmployeesReport::class),
+    "Human_Resources_Overview" => \DI\create(HumanResourcesOverview::class),
+    "human_resources_overview" => \DI\create(HumanResourcesOverview::class),
 
     // User table
     "usertable" => \DI\get("users"),

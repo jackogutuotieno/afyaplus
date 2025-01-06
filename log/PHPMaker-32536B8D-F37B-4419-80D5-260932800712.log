@@ -19,6 +19,7 @@ C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorOverviewController.php
+C:\wamp64\www\afyaplus\controllers\EmployeesReportController.php
 C:\wamp64\www\afyaplus\controllers\EmployeesViewController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReport2Controller.php
@@ -29,6 +30,7 @@ C:\wamp64\www\afyaplus\controllers\FinancialsOverviewController.php
 C:\wamp64\www\afyaplus\controllers\FloorsController.php
 C:\wamp64\www\afyaplus\controllers\FrontOfficeOverviewController.php
 C:\wamp64\www\afyaplus\controllers\HolidaysController.php
+C:\wamp64\www\afyaplus\controllers\HumanResourcesOverviewController.php
 C:\wamp64\www\afyaplus\controllers\IncomeController.php
 C:\wamp64\www\afyaplus\controllers\IncomeReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\IncomeReportController.php
@@ -201,6 +203,8 @@ C:\wamp64\www\afyaplus\models\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\models\DoctorNotesList.php
 C:\wamp64\www\afyaplus\models\DoctorNotesView.php
 C:\wamp64\www\afyaplus\models\DoctorOverview.php
+C:\wamp64\www\afyaplus\models\EmployeesReport.php
+C:\wamp64\www\afyaplus\models\EmployeesReportSummary.php
 C:\wamp64\www\afyaplus\models\EmployeesView.php
 C:\wamp64\www\afyaplus\models\EmployeesViewList.php
 C:\wamp64\www\afyaplus\models\Expenses.php
@@ -232,6 +236,7 @@ C:\wamp64\www\afyaplus\models\HolidaysDelete.php
 C:\wamp64\www\afyaplus\models\HolidaysEdit.php
 C:\wamp64\www\afyaplus\models\HolidaysList.php
 C:\wamp64\www\afyaplus\models\HolidaysView.php
+C:\wamp64\www\afyaplus\models\HumanResourcesOverview.php
 C:\wamp64\www\afyaplus\models\Income.php
 C:\wamp64\www\afyaplus\models\IncomeAdd.php
 C:\wamp64\www\afyaplus\models\IncomeDelete.php
@@ -914,6 +919,7 @@ C:\wamp64\www\afyaplus\views\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\views\DoctorNotesList.php
 C:\wamp64\www\afyaplus\views\DoctorNotesView.php
 C:\wamp64\www\afyaplus\views\DoctorOverview.php
+C:\wamp64\www\afyaplus\views\EmployeesReportSummary.php
 C:\wamp64\www\afyaplus\views\EmployeesViewList.php
 C:\wamp64\www\afyaplus\views\EmployeesViewMaster.php
 C:\wamp64\www\afyaplus\views\Error.php
@@ -940,6 +946,7 @@ C:\wamp64\www\afyaplus\views\HolidaysDelete.php
 C:\wamp64\www\afyaplus\views\HolidaysEdit.php
 C:\wamp64\www\afyaplus\views\HolidaysList.php
 C:\wamp64\www\afyaplus\views\HolidaysView.php
+C:\wamp64\www\afyaplus\views\HumanResourcesOverview.php
 C:\wamp64\www\afyaplus\views\IncomeAdd.php
 C:\wamp64\www\afyaplus\views\IncomeDelete.php
 C:\wamp64\www\afyaplus\views\IncomeEdit.php

@@ -1239,8 +1239,30 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","5","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","7","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","8","1864"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Employees Report","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","8","1096"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","9","0"]];
 
 /**
  * Tables
@@ -1362,4 +1384,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["receive_items","receive_items","Received Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveitemslist"],
     ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"],
     ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"],
-    ["employees_view","employees_view","Employees Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesviewlist"]];
+    ["employees_view","employees_view","Employees Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesviewlist"],
+    ["Employees Report","Employees_Report","Employees Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesreport"],
+    ["Human Resources Overview","Human_Resources_Overview","Human Resources Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","humanresourcesoverview"]];

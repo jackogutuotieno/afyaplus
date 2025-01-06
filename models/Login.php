@@ -600,6 +600,8 @@ class Login extends Users
                 $url= "financialsoverview";
             }  else if (CurrentUserlevel() == 6) {
                 $url= "radiologyoverview";
+            } else if (CurrentUserlevel() == 8) {
+                $url= "humanresourcesoverview";
             }
         }
     }
