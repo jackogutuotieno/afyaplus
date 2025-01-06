@@ -572,6 +572,10 @@ class LeaveApplicationsAdd extends LeaveApplications
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -616,7 +620,7 @@ class LeaveApplicationsAdd extends LeaveApplications
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "leaveapplicationslist") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -1170,6 +1174,78 @@ class LeaveApplicationsAdd extends LeaveApplications
         if (isset($row['days_applied'])) { // days_applied
             $this->days_applied->setFormValue($row['days_applied']);
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "employees_view") {
+                $validMaster = true;
+                $masterTbl = Container("employees_view");
+                if (($parm = Get("fk_id", Get("user_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->user_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->user_id->setSessionValue($this->user_id->QueryStringValue);
+                    $foreignKeys["user_id"] = $this->user_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "employees_view") {
+                $validMaster = true;
+                $masterTbl = Container("employees_view");
+                if (($parm = Post("fk_id", Post("user_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->user_id->FormValue = $masterTbl->id->FormValue;
+                    $this->user_id->setSessionValue($this->user_id->FormValue);
+                    $foreignKeys["user_id"] = $this->user_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "employees_view") {
+                if (!array_key_exists("user_id", $foreignKeys)) { // Not current foreign key
+                    $this->user_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

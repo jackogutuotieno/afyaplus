@@ -91,7 +91,7 @@ class LeaveBalance extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -221,6 +221,7 @@ class LeaveBalance extends DbTable
         );
         $this->user_id->InputTextType = "text";
         $this->user_id->Raw = true;
+        $this->user_id->IsForeignKey = true; // Foreign key field
         $this->user_id->Nullable = false; // NOT NULL field
         $this->user_id->Required = true; // Required field
         $this->user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -309,6 +310,88 @@ class LeaveBalance extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "employees_view") {
+            $masterTable = Container("employees_view");
+            if ($this->user_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->user_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "employees_view") {
+            $masterTable = Container("employees_view");
+            if ($this->user_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->user_id, $this->user_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "employees_view":
+                $key = $keys["user_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["user_id"], $this->user_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "employees_view":
+                return GetKeyFilter($this->user_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -958,6 +1041,10 @@ class LeaveBalance extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "employees_view" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->user_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1255,10 +1342,16 @@ class LeaveBalance extends DbTable
 
         // user_id
         $this->user_id->setupEditAttributes();
-        $this->user_id->EditValue = $this->user_id->CurrentValue;
-        $this->user_id->PlaceHolder = RemoveHtml($this->user_id->caption());
-        if (strval($this->user_id->EditValue) != "" && is_numeric($this->user_id->EditValue)) {
-            $this->user_id->EditValue = FormatNumber($this->user_id->EditValue, null);
+        if ($this->user_id->getSessionValue() != "") {
+            $this->user_id->CurrentValue = GetForeignKeyValue($this->user_id->getSessionValue());
+            $this->user_id->ViewValue = $this->user_id->CurrentValue;
+            $this->user_id->ViewValue = FormatNumber($this->user_id->ViewValue, $this->user_id->formatPattern());
+        } else {
+            $this->user_id->EditValue = $this->user_id->CurrentValue;
+            $this->user_id->PlaceHolder = RemoveHtml($this->user_id->caption());
+            if (strval($this->user_id->EditValue) != "" && is_numeric($this->user_id->EditValue)) {
+                $this->user_id->EditValue = FormatNumber($this->user_id->EditValue, null);
+            }
         }
 
         // leave_category_id

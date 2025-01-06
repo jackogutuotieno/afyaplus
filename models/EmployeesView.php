@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for leave_approvals
+ * Table class for employees_view
  */
-class LeaveApprovals extends DbTable
+class EmployeesView extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,12 +48,14 @@ class LeaveApprovals extends DbTable
 
     // Fields
     public $id;
-    public $user_id;
-    public $leave_category_id;
-    public $days_applied;
-    public $status;
+    public $employee_name;
+    public $national_id;
+    public $gender;
+    public $phone;
+    public $_email;
+    public $department_name;
+    public $designation;
     public $date_created;
-    public $date_updated;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -66,16 +68,16 @@ class LeaveApprovals extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "leave_approvals";
-        $this->TableName = 'leave_approvals';
+        $this->TableVar = "employees_view";
+        $this->TableName = 'employees_view';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "leave_approvals";
+        $this->UpdateTable = "employees_view";
         $this->Dbid = 'DB';
-        $this->ExportAll = true;
+        $this->ExportAll = false;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -92,7 +94,7 @@ class LeaveApprovals extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
+        $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -122,121 +124,189 @@ class LeaveApprovals extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // user_id
-        $this->user_id = new DbField(
+        // employee_name
+        $this->employee_name = new DbField(
             $this, // Table
-            'x_user_id', // Variable name
-            'user_id', // Name
-            '`user_id`', // Expression
-            '`user_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_employee_name', // Variable name
+            'employee_name', // Name
+            '`employee_name`', // Expression
+            '`employee_name`', // Basic search expression
+            200, // Type
+            101, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`user_id`', // Virtual expression
+            '`employee_name`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->user_id->InputTextType = "text";
-        $this->user_id->Raw = true;
-        $this->user_id->IsForeignKey = true; // Foreign key field
-        $this->user_id->Nullable = false; // NOT NULL field
-        $this->user_id->Required = true; // Required field
-        $this->user_id->Lookup = new Lookup($this->user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
-        $this->user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->user_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['user_id'] = &$this->user_id;
+        $this->employee_name->InputTextType = "text";
+        $this->employee_name->UseFilter = true; // Table header filter
+        $this->employee_name->Lookup = new Lookup($this->employee_name, 'employees_view', true, 'employee_name', ["employee_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->employee_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['employee_name'] = &$this->employee_name;
 
-        // leave_category_id
-        $this->leave_category_id = new DbField(
+        // national_id
+        $this->national_id = new DbField(
             $this, // Table
-            'x_leave_category_id', // Variable name
-            'leave_category_id', // Name
-            '`leave_category_id`', // Expression
-            '`leave_category_id`', // Basic search expression
+            'x_national_id', // Variable name
+            'national_id', // Name
+            '`national_id`', // Expression
+            '`national_id`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`leave_category_id`', // Virtual expression
+            '`national_id`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->leave_category_id->InputTextType = "text";
-        $this->leave_category_id->Raw = true;
-        $this->leave_category_id->Nullable = false; // NOT NULL field
-        $this->leave_category_id->Required = true; // Required field
-        $this->leave_category_id->Lookup = new Lookup($this->leave_category_id, 'leave_categories', false, 'id', ["leave_category","","",""], '', '', [], [], [], [], [], [], false, '', '', "`leave_category`");
-        $this->leave_category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->leave_category_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['leave_category_id'] = &$this->leave_category_id;
+        $this->national_id->InputTextType = "text";
+        $this->national_id->Raw = true;
+        $this->national_id->Nullable = false; // NOT NULL field
+        $this->national_id->Required = true; // Required field
+        $this->national_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->national_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['national_id'] = &$this->national_id;
 
-        // days_applied
-        $this->days_applied = new DbField(
+        // gender
+        $this->gender = new DbField(
             $this, // Table
-            'x_days_applied', // Variable name
-            'days_applied', // Name
-            '`days_applied`', // Expression
-            '`days_applied`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_gender', // Variable name
+            'gender', // Name
+            '`gender`', // Expression
+            '`gender`', // Basic search expression
+            200, // Type
+            20, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`days_applied`', // Virtual expression
+            '`gender`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->days_applied->InputTextType = "text";
-        $this->days_applied->Raw = true;
-        $this->days_applied->Nullable = false; // NOT NULL field
-        $this->days_applied->Required = true; // Required field
-        $this->days_applied->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->days_applied->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['days_applied'] = &$this->days_applied;
+        $this->gender->InputTextType = "text";
+        $this->gender->Nullable = false; // NOT NULL field
+        $this->gender->Required = true; // Required field
+        $this->gender->UseFilter = true; // Table header filter
+        $this->gender->Lookup = new Lookup($this->gender, 'employees_view', true, 'gender', ["gender","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['gender'] = &$this->gender;
 
-        // status
-        $this->status = new DbField(
+        // phone
+        $this->phone = new DbField(
             $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '`status`', // Expression
-            '`status`', // Basic search expression
+            'x_phone', // Variable name
+            'phone', // Name
+            '`phone`', // Expression
+            '`phone`', // Basic search expression
+            129, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`phone`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->phone->addMethod("getLinkPrefix", fn() => "mailto:");
+        $this->phone->InputTextType = "text";
+        $this->phone->Nullable = false; // NOT NULL field
+        $this->phone->Required = true; // Required field
+        $this->phone->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['phone'] = &$this->phone;
+
+        // email
+        $this->_email = new DbField(
+            $this, // Table
+            'x__email', // Variable name
+            'email', // Name
+            '`email`', // Expression
+            '`email`', // Basic search expression
             200, // Type
             50, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`status`', // Virtual expression
+            '`email`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->status->addMethod("getDefault", fn() => "Pending");
-        $this->status->InputTextType = "text";
-        $this->status->Nullable = false; // NOT NULL field
-        $this->status->Required = true; // Required field
-        $this->status->setSelectMultiple(false); // Select one
-        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->status->Lookup = new Lookup($this->status, 'leave_approvals', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
-        $this->status->OptionCount = 2;
-        $this->status->SearchOperators = ["=", "<>"];
-        $this->Fields['status'] = &$this->status;
+        $this->_email->addMethod("getLinkPrefix", fn() => "mailto:");
+        $this->_email->InputTextType = "text";
+        $this->_email->Nullable = false; // NOT NULL field
+        $this->_email->Required = true; // Required field
+        $this->_email->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['email'] = &$this->_email;
+
+        // department_name
+        $this->department_name = new DbField(
+            $this, // Table
+            'x_department_name', // Variable name
+            'department_name', // Name
+            '`department_name`', // Expression
+            '`department_name`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`department_name`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->department_name->InputTextType = "text";
+        $this->department_name->Nullable = false; // NOT NULL field
+        $this->department_name->Required = true; // Required field
+        $this->department_name->UseFilter = true; // Table header filter
+        $this->department_name->Lookup = new Lookup($this->department_name, 'employees_view', true, 'department_name', ["department_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->department_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['department_name'] = &$this->department_name;
+
+        // designation
+        $this->designation = new DbField(
+            $this, // Table
+            'x_designation', // Variable name
+            'designation', // Name
+            '`designation`', // Expression
+            '`designation`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`designation`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->designation->InputTextType = "text";
+        $this->designation->Nullable = false; // NOT NULL field
+        $this->designation->Required = true; // Required field
+        $this->designation->UseFilter = true; // Table header filter
+        $this->designation->Lookup = new Lookup($this->designation, 'employees_view', true, 'designation', ["designation","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->designation->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['designation'] = &$this->designation;
 
         // date_created
         $this->date_created = new DbField(
@@ -264,32 +334,6 @@ class LeaveApprovals extends DbTable
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
 
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
-
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
         $this->CacheProfile = new \Doctrine\DBAL\Cache\QueryCacheProfile(0, $this->TableVar);
@@ -316,22 +360,6 @@ class LeaveApprovals extends DbTable
         }
     }
 
-    // Single column sort
-    public function updateSort(&$fld)
-    {
-        if ($this->CurrentOrder == $fld->Name) {
-            $sortField = $fld->Expression;
-            $lastSort = $fld->getSort();
-            if (in_array($this->CurrentOrderType, ["ASC", "DESC", "NO"])) {
-                $curSort = $this->CurrentOrderType;
-            } else {
-                $curSort = $lastSort;
-            }
-            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
-            $this->setSessionOrderBy($orderBy); // Save to Session
-        }
-    }
-
     // Update field sort
     public function updateFieldSort()
     {
@@ -348,86 +376,38 @@ class LeaveApprovals extends DbTable
         }
     }
 
-    // Current master table name
-    public function getCurrentMasterTable()
+    // Current detail table name
+    public function getCurrentDetailTable()
     {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
     }
 
-    public function setCurrentMasterTable($v)
+    public function setCurrentDetailTable($v)
     {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
     }
 
-    // Get master WHERE clause from session values
-    public function getMasterFilterFromSession()
+    // Get detail url
+    public function getDetailUrl()
     {
-        // Master filter
-        $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "employees_view") {
-            $masterTable = Container("employees_view");
-            if ($this->user_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->user_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
-            } else {
-                return "";
-            }
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "leave_applications") {
+            $detailUrl = Container("leave_applications")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        return $masterFilter;
-    }
-
-    // Get detail WHERE clause from session values
-    public function getDetailFilterFromSession()
-    {
-        // Detail filter
-        $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "employees_view") {
-            $masterTable = Container("employees_view");
-            if ($this->user_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->user_id, $this->user_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
-            } else {
-                return "";
-            }
+        if ($this->getCurrentDetailTable() == "leave_balance") {
+            $detailUrl = Container("leave_balance")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        return $detailFilter;
-    }
-
-    /**
-     * Get master filter
-     *
-     * @param object $masterTable Master Table
-     * @param array $keys Detail Keys
-     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
-     */
-    public function getMasterFilter($masterTable, $keys)
-    {
-        $validKeys = true;
-        switch ($masterTable->TableVar) {
-            case "employees_view":
-                $key = $keys["user_id"] ?? "";
-                if (EmptyValue($key)) {
-                    if ($masterTable->id->Required) { // Required field and empty value
-                        return ""; // Return empty filter
-                    }
-                    $validKeys = false;
-                } elseif (!$validKeys) { // Already has empty key
-                    return ""; // Return empty filter
-                }
-                if ($validKeys) {
-                    return GetKeyFilter($masterTable->id, $keys["user_id"], $this->user_id->DataType, $this->Dbid);
-                }
-                break;
+        if ($this->getCurrentDetailTable() == "leave_approvals") {
+            $detailUrl = Container("leave_approvals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        return null; // All null values and no required fields
-    }
-
-    // Get detail filter
-    public function getDetailFilter($masterTable)
-    {
-        switch ($masterTable->TableVar) {
-            case "employees_view":
-                return GetKeyFilter($this->user_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        if ($detailUrl == "") {
+            $detailUrl = "employeesviewlist";
         }
-        return "";
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -439,7 +419,7 @@ class LeaveApprovals extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "leave_approvals";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "employees_view";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -891,12 +871,14 @@ class LeaveApprovals extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->user_id->DbValue = $row['user_id'];
-        $this->leave_category_id->DbValue = $row['leave_category_id'];
-        $this->days_applied->DbValue = $row['days_applied'];
-        $this->status->DbValue = $row['status'];
+        $this->employee_name->DbValue = $row['employee_name'];
+        $this->national_id->DbValue = $row['national_id'];
+        $this->gender->DbValue = $row['gender'];
+        $this->phone->DbValue = $row['phone'];
+        $this->_email->DbValue = $row['email'];
+        $this->department_name->DbValue = $row['department_name'];
+        $this->designation->DbValue = $row['designation'];
         $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
     }
 
     // Delete uploaded files
@@ -970,7 +952,7 @@ class LeaveApprovals extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("leaveapprovalslist");
+        return $_SESSION[$name] ?? GetUrl("employeesviewlist");
     }
 
     // Set return page URL
@@ -984,9 +966,9 @@ class LeaveApprovals extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "leaveapprovalsview" => $Language->phrase("View"),
-            "leaveapprovalsedit" => $Language->phrase("Edit"),
-            "leaveapprovalsadd" => $Language->phrase("Add"),
+            "employeesviewview" => $Language->phrase("View"),
+            "employeesviewedit" => $Language->phrase("Edit"),
+            "employeesviewadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -994,18 +976,18 @@ class LeaveApprovals extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "leaveapprovalslist";
+        return "employeesviewlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "LeaveApprovalsView",
-            Config("API_ADD_ACTION") => "LeaveApprovalsAdd",
-            Config("API_EDIT_ACTION") => "LeaveApprovalsEdit",
-            Config("API_DELETE_ACTION") => "LeaveApprovalsDelete",
-            Config("API_LIST_ACTION") => "LeaveApprovalsList",
+            Config("API_VIEW_ACTION") => "EmployeesViewView",
+            Config("API_ADD_ACTION") => "EmployeesViewAdd",
+            Config("API_EDIT_ACTION") => "EmployeesViewEdit",
+            Config("API_DELETE_ACTION") => "EmployeesViewDelete",
+            Config("API_LIST_ACTION") => "EmployeesViewList",
             default => ""
         };
     }
@@ -1025,16 +1007,16 @@ class LeaveApprovals extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "leaveapprovalslist";
+        return "employeesviewlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("leaveapprovalsview", $parm);
+            $url = $this->keyUrl("employeesviewview", $parm);
         } else {
-            $url = $this->keyUrl("leaveapprovalsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("employeesviewview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1043,9 +1025,9 @@ class LeaveApprovals extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "leaveapprovalsadd?" . $parm;
+            $url = "employeesviewadd?" . $parm;
         } else {
-            $url = "leaveapprovalsadd";
+            $url = "employeesviewadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1053,28 +1035,36 @@ class LeaveApprovals extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapprovalsedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("employeesviewedit", $parm);
+        } else {
+            $url = $this->keyUrl("employeesviewedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("leaveapprovalslist", "action=edit");
+        $url = $this->keyUrl("employeesviewlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("leaveapprovalsadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("employeesviewadd", $parm);
+        } else {
+            $url = $this->keyUrl("employeesviewadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("leaveapprovalslist", "action=copy");
+        $url = $this->keyUrl("employeesviewlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1084,17 +1074,13 @@ class LeaveApprovals extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("leaveapprovalsdelete", $parm);
+            return $this->keyUrl("employeesviewdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "employees_view" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->user_id->getSessionValue()); // Use Session Value
-        }
         return $url;
     }
 
@@ -1129,13 +1115,6 @@ class LeaveApprovals extends DbTable
         global $Security, $Language;
         $sortUrl = "";
         $attrs = "";
-        if ($this->PageID != "grid" && $fld->Sortable) {
-            $sortUrl = $this->sortUrl($fld);
-            $attrs = ' role="button" data-ew-action="sort" data-ajax="' . ($this->UseAjaxActions ? "true" : "false") . '" data-sort-url="' . $sortUrl . '" data-sort-type="1"';
-            if ($this->ContextClass) { // Add context
-                $attrs .= ' data-context="' . HtmlEncode($this->ContextClass) . '"';
-            }
-        }
         $html = '<div class="ew-table-header-caption"' . $attrs . '>' . $fld->caption() . '</div>';
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
@@ -1158,20 +1137,7 @@ class LeaveApprovals extends DbTable
     public function sortUrl($fld)
     {
         global $DashboardReport;
-        if (
-            $this->CurrentAction || $this->isExport() ||
-            in_array($fld->Type, [128, 204, 205])
-        ) { // Unsortable data type
-                return "";
-        } elseif ($fld->Sortable) {
-            $urlParm = "order=" . urlencode($fld->Name) . "&amp;ordertype=" . $fld->getNextSort();
-            if ($DashboardReport) {
-                $urlParm .= "&amp;" . Config("PAGE_DASHBOARD") . "=" . $DashboardReport;
-            }
-            return $this->addMasterUrl($this->CurrentPageName . "?" . $urlParm);
-        } else {
-            return "";
-        }
+        return "";
     }
 
     // Get record keys from Post/Get/Session
@@ -1254,19 +1220,21 @@ class LeaveApprovals extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->user_id->setDbValue($row['user_id']);
-        $this->leave_category_id->setDbValue($row['leave_category_id']);
-        $this->days_applied->setDbValue($row['days_applied']);
-        $this->status->setDbValue($row['status']);
+        $this->employee_name->setDbValue($row['employee_name']);
+        $this->national_id->setDbValue($row['national_id']);
+        $this->gender->setDbValue($row['gender']);
+        $this->phone->setDbValue($row['phone']);
+        $this->_email->setDbValue($row['email']);
+        $this->department_name->setDbValue($row['department_name']);
+        $this->designation->setDbValue($row['designation']);
         $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "LeaveApprovalsList";
+        $listPage = "EmployeesViewList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1292,115 +1260,101 @@ class LeaveApprovals extends DbTable
 
         // id
 
-        // user_id
+        // employee_name
 
-        // leave_category_id
+        // national_id
 
-        // days_applied
+        // gender
 
-        // status
+        // phone
+
+        // email
+
+        // department_name
+
+        // designation
 
         // date_created
-
-        // date_updated
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // user_id
-        $this->user_id->ViewValue = $this->user_id->CurrentValue;
-        $curVal = strval($this->user_id->CurrentValue);
-        if ($curVal != "") {
-            $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
-            if ($this->user_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
-                } else {
-                    $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
-                }
-            }
-        } else {
-            $this->user_id->ViewValue = null;
-        }
+        // employee_name
+        $this->employee_name->ViewValue = $this->employee_name->CurrentValue;
 
-        // leave_category_id
-        $this->leave_category_id->ViewValue = $this->leave_category_id->CurrentValue;
-        $curVal = strval($this->leave_category_id->CurrentValue);
-        if ($curVal != "") {
-            $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
-            if ($this->leave_category_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->leave_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->leave_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->leave_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->leave_category_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->leave_category_id->ViewValue = $this->leave_category_id->displayValue($arwrk);
-                } else {
-                    $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->CurrentValue, $this->leave_category_id->formatPattern());
-                }
-            }
-        } else {
-            $this->leave_category_id->ViewValue = null;
-        }
+        // national_id
+        $this->national_id->ViewValue = $this->national_id->CurrentValue;
 
-        // days_applied
-        $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
-        $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
+        // gender
+        $this->gender->ViewValue = $this->gender->CurrentValue;
 
-        // status
-        if (strval($this->status->CurrentValue) != "") {
-            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-        } else {
-            $this->status->ViewValue = null;
-        }
+        // phone
+        $this->phone->ViewValue = $this->phone->CurrentValue;
+
+        // email
+        $this->_email->ViewValue = $this->_email->CurrentValue;
+
+        // department_name
+        $this->department_name->ViewValue = $this->department_name->CurrentValue;
+
+        // designation
+        $this->designation->ViewValue = $this->designation->CurrentValue;
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // user_id
-        $this->user_id->HrefValue = "";
-        $this->user_id->TooltipValue = "";
+        // employee_name
+        $this->employee_name->HrefValue = "";
+        $this->employee_name->TooltipValue = "";
 
-        // leave_category_id
-        $this->leave_category_id->HrefValue = "";
-        $this->leave_category_id->TooltipValue = "";
+        // national_id
+        $this->national_id->HrefValue = "";
+        $this->national_id->TooltipValue = "";
 
-        // days_applied
-        $this->days_applied->HrefValue = "";
-        $this->days_applied->TooltipValue = "";
+        // gender
+        $this->gender->HrefValue = "";
+        $this->gender->TooltipValue = "";
 
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
+        // phone
+        if (!EmptyValue($this->_email->CurrentValue)) {
+            $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+            $this->phone->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+            }
+        } else {
+            $this->phone->HrefValue = "";
+        }
+        $this->phone->TooltipValue = "";
+
+        // email
+        if (!EmptyValue($this->_email->CurrentValue)) {
+            $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+            $this->_email->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
+            }
+        } else {
+            $this->_email->HrefValue = "";
+        }
+        $this->_email->TooltipValue = "";
+
+        // department_name
+        $this->department_name->HrefValue = "";
+        $this->department_name->TooltipValue = "";
+
+        // designation
+        $this->designation->HrefValue = "";
+        $this->designation->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1421,64 +1375,66 @@ class LeaveApprovals extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // user_id
-        $this->user_id->setupEditAttributes();
-        if ($this->user_id->getSessionValue() != "") {
-            $this->user_id->CurrentValue = GetForeignKeyValue($this->user_id->getSessionValue());
-            $this->user_id->ViewValue = $this->user_id->CurrentValue;
-            $curVal = strval($this->user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
-                if ($this->user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
-                    } else {
-                        $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->user_id->ViewValue = null;
-            }
-        } else {
-            $this->user_id->EditValue = $this->user_id->CurrentValue;
-            $this->user_id->PlaceHolder = RemoveHtml($this->user_id->caption());
+        // employee_name
+        $this->employee_name->setupEditAttributes();
+        if (!$this->employee_name->Raw) {
+            $this->employee_name->CurrentValue = HtmlDecode($this->employee_name->CurrentValue);
+        }
+        $this->employee_name->EditValue = $this->employee_name->CurrentValue;
+        $this->employee_name->PlaceHolder = RemoveHtml($this->employee_name->caption());
+
+        // national_id
+        $this->national_id->setupEditAttributes();
+        $this->national_id->EditValue = $this->national_id->CurrentValue;
+        $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
+        if (strval($this->national_id->EditValue) != "" && is_numeric($this->national_id->EditValue)) {
+            $this->national_id->EditValue = $this->national_id->EditValue;
         }
 
-        // leave_category_id
-        $this->leave_category_id->setupEditAttributes();
-        $this->leave_category_id->EditValue = $this->leave_category_id->CurrentValue;
-        $this->leave_category_id->PlaceHolder = RemoveHtml($this->leave_category_id->caption());
-
-        // days_applied
-        $this->days_applied->setupEditAttributes();
-        $this->days_applied->EditValue = $this->days_applied->CurrentValue;
-        $this->days_applied->PlaceHolder = RemoveHtml($this->days_applied->caption());
-        if (strval($this->days_applied->EditValue) != "" && is_numeric($this->days_applied->EditValue)) {
-            $this->days_applied->EditValue = FormatNumber($this->days_applied->EditValue, null);
+        // gender
+        $this->gender->setupEditAttributes();
+        if (!$this->gender->Raw) {
+            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
         }
+        $this->gender->EditValue = $this->gender->CurrentValue;
+        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
-        // status
-        $this->status->setupEditAttributes();
-        $this->status->EditValue = $this->status->options(true);
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+        // phone
+        $this->phone->setupEditAttributes();
+        if (!$this->phone->Raw) {
+            $this->phone->CurrentValue = HtmlDecode($this->phone->CurrentValue);
+        }
+        $this->phone->EditValue = $this->phone->CurrentValue;
+        $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
+
+        // email
+        $this->_email->setupEditAttributes();
+        if (!$this->_email->Raw) {
+            $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+        }
+        $this->_email->EditValue = $this->_email->CurrentValue;
+        $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+        // department_name
+        $this->department_name->setupEditAttributes();
+        if (!$this->department_name->Raw) {
+            $this->department_name->CurrentValue = HtmlDecode($this->department_name->CurrentValue);
+        }
+        $this->department_name->EditValue = $this->department_name->CurrentValue;
+        $this->department_name->PlaceHolder = RemoveHtml($this->department_name->caption());
+
+        // designation
+        $this->designation->setupEditAttributes();
+        if (!$this->designation->Raw) {
+            $this->designation->CurrentValue = HtmlDecode($this->designation->CurrentValue);
+        }
+        $this->designation->EditValue = $this->designation->CurrentValue;
+        $this->designation->PlaceHolder = RemoveHtml($this->designation->caption());
 
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1509,20 +1465,24 @@ class LeaveApprovals extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->user_id);
-                    $doc->exportCaption($this->leave_category_id);
-                    $doc->exportCaption($this->days_applied);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->employee_name);
+                    $doc->exportCaption($this->national_id);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->phone);
+                    $doc->exportCaption($this->_email);
+                    $doc->exportCaption($this->department_name);
+                    $doc->exportCaption($this->designation);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->user_id);
-                    $doc->exportCaption($this->leave_category_id);
-                    $doc->exportCaption($this->days_applied);
-                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->employee_name);
+                    $doc->exportCaption($this->national_id);
+                    $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->phone);
+                    $doc->exportCaption($this->_email);
+                    $doc->exportCaption($this->department_name);
+                    $doc->exportCaption($this->designation);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1550,20 +1510,24 @@ class LeaveApprovals extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->user_id);
-                        $doc->exportField($this->leave_category_id);
-                        $doc->exportField($this->days_applied);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->employee_name);
+                        $doc->exportField($this->national_id);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->phone);
+                        $doc->exportField($this->_email);
+                        $doc->exportField($this->department_name);
+                        $doc->exportField($this->designation);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->user_id);
-                        $doc->exportField($this->leave_category_id);
-                        $doc->exportField($this->days_applied);
-                        $doc->exportField($this->status);
+                        $doc->exportField($this->employee_name);
+                        $doc->exportField($this->national_id);
+                        $doc->exportField($this->gender);
+                        $doc->exportField($this->phone);
+                        $doc->exportField($this->_email);
+                        $doc->exportField($this->department_name);
+                        $doc->exportField($this->designation);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1599,6 +1563,7 @@ class LeaveApprovals extends DbTable
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
+        // Enter your code here
     }
 
     // Recordset Selected event
@@ -1733,13 +1698,8 @@ class LeaveApprovals extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        if ($this->status->CurrentValue == 'Pending') {
-            $this->status->CellAttrs["style"] = "background-color: orange; color: white";
-        } else if ($this->status->CurrentValue == 'Approved') {
-            $this->status->CellAttrs["style"] = "background-color: green; color: white";
-        } else if ($this->status->CurrentValue == 'Rejected') {
-            $this->status->CellAttrs["style"] = "background-color: red; color: white";
-        }
+        // To view properties of field class, use:
+        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

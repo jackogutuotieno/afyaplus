@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class LeaveApprovalsList extends LeaveApprovals
+class EmployeesViewList extends EmployeesView
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class LeaveApprovalsList extends LeaveApprovals
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "LeaveApprovalsList";
+    public $PageObjName = "EmployeesViewList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class LeaveApprovalsList extends LeaveApprovals
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fleave_approvalslist";
+    public $FormName = "femployees_viewlist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "leaveapprovalslist";
+    public $CurrentPageName = "employeesviewlist";
 
     // Page URLs
     public $AddUrl;
@@ -147,12 +147,14 @@ class LeaveApprovalsList extends LeaveApprovals
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->user_id->setVisibility();
-        $this->leave_category_id->setVisibility();
-        $this->days_applied->setVisibility();
-        $this->status->setVisibility();
+        $this->employee_name->setVisibility();
+        $this->national_id->setVisibility();
+        $this->gender->setVisibility();
+        $this->phone->setVisibility();
+        $this->_email->setVisibility();
+        $this->department_name->setVisibility();
+        $this->designation->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -163,8 +165,8 @@ class LeaveApprovalsList extends LeaveApprovals
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'leave_approvals';
-        $this->TableName = 'leave_approvals';
+        $this->TableVar = 'employees_view';
+        $this->TableName = 'employees_view';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -184,26 +186,26 @@ class LeaveApprovalsList extends LeaveApprovals
         // Language object
         $Language = Container("app.language");
 
-        // Table object (leave_approvals)
-        if (!isset($GLOBALS["leave_approvals"]) || $GLOBALS["leave_approvals"]::class == PROJECT_NAMESPACE . "leave_approvals") {
-            $GLOBALS["leave_approvals"] = &$this;
+        // Table object (employees_view)
+        if (!isset($GLOBALS["employees_view"]) || $GLOBALS["employees_view"]::class == PROJECT_NAMESPACE . "employees_view") {
+            $GLOBALS["employees_view"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "leaveapprovalsadd";
+        $this->AddUrl = "employeesviewadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "leaveapprovalsdelete";
-        $this->MultiUpdateUrl = "leaveapprovalsupdate";
+        $this->MultiDeleteUrl = "employeesviewdelete";
+        $this->MultiUpdateUrl = "employeesviewupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'leave_approvals');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'employees_view');
         }
 
         // Start timer
@@ -354,7 +356,7 @@ class LeaveApprovalsList extends LeaveApprovals
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "leaveapprovalsview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "employeesviewview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -547,12 +549,12 @@ class LeaveApprovalsList extends LeaveApprovals
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
-    public $DisplayRecords = 5;
+    public $DisplayRecords = 20;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -678,9 +680,6 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Set up list options
         $this->setupListOptions();
-
-        // Setup export options
-        $this->setupExportOptions();
         $this->setVisibility();
 
         // Set lookup cache
@@ -705,20 +704,12 @@ class LeaveApprovalsList extends LeaveApprovals
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->user_id);
-        $this->setupLookupOptions($this->leave_category_id);
-        $this->setupLookupOptions($this->status);
-
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fleave_approvalsgrid";
+            $this->FormName = "femployees_viewgrid";
         }
 
         // Set up page action
@@ -782,14 +773,23 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -808,11 +808,19 @@ class LeaveApprovalsList extends LeaveApprovals
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 5; // Load default
+            $this->DisplayRecords = 20; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -823,6 +831,16 @@ class LeaveApprovalsList extends LeaveApprovals
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -849,28 +867,8 @@ class LeaveApprovalsList extends LeaveApprovals
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "employees_view") {
-            $masterTbl = Container("employees_view");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("employeesviewlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1025,7 +1023,7 @@ class LeaveApprovalsList extends LeaveApprovals
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 5; // Non-numeric, load default
+                    $this->DisplayRecords = 20; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1075,15 +1073,17 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fleave_approvalssrch");
+            $savedFilterList = Profile()->getSearchFilters("femployees_viewsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->user_id->AdvancedSearch->toJson(), ","); // Field user_id
-        $filterList = Concat($filterList, $this->leave_category_id->AdvancedSearch->toJson(), ","); // Field leave_category_id
-        $filterList = Concat($filterList, $this->days_applied->AdvancedSearch->toJson(), ","); // Field days_applied
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
+        $filterList = Concat($filterList, $this->employee_name->AdvancedSearch->toJson(), ","); // Field employee_name
+        $filterList = Concat($filterList, $this->national_id->AdvancedSearch->toJson(), ","); // Field national_id
+        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
+        $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
+        $filterList = Concat($filterList, $this->_email->AdvancedSearch->toJson(), ","); // Field email
+        $filterList = Concat($filterList, $this->department_name->AdvancedSearch->toJson(), ","); // Field department_name
+        $filterList = Concat($filterList, $this->designation->AdvancedSearch->toJson(), ","); // Field designation
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1104,7 +1104,7 @@ class LeaveApprovalsList extends LeaveApprovals
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fleave_approvalssrch", $filters);
+            Profile()->setSearchFilters("femployees_viewsrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1131,37 +1131,61 @@ class LeaveApprovalsList extends LeaveApprovals
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field user_id
-        $this->user_id->AdvancedSearch->SearchValue = @$filter["x_user_id"];
-        $this->user_id->AdvancedSearch->SearchOperator = @$filter["z_user_id"];
-        $this->user_id->AdvancedSearch->SearchCondition = @$filter["v_user_id"];
-        $this->user_id->AdvancedSearch->SearchValue2 = @$filter["y_user_id"];
-        $this->user_id->AdvancedSearch->SearchOperator2 = @$filter["w_user_id"];
-        $this->user_id->AdvancedSearch->save();
+        // Field employee_name
+        $this->employee_name->AdvancedSearch->SearchValue = @$filter["x_employee_name"];
+        $this->employee_name->AdvancedSearch->SearchOperator = @$filter["z_employee_name"];
+        $this->employee_name->AdvancedSearch->SearchCondition = @$filter["v_employee_name"];
+        $this->employee_name->AdvancedSearch->SearchValue2 = @$filter["y_employee_name"];
+        $this->employee_name->AdvancedSearch->SearchOperator2 = @$filter["w_employee_name"];
+        $this->employee_name->AdvancedSearch->save();
 
-        // Field leave_category_id
-        $this->leave_category_id->AdvancedSearch->SearchValue = @$filter["x_leave_category_id"];
-        $this->leave_category_id->AdvancedSearch->SearchOperator = @$filter["z_leave_category_id"];
-        $this->leave_category_id->AdvancedSearch->SearchCondition = @$filter["v_leave_category_id"];
-        $this->leave_category_id->AdvancedSearch->SearchValue2 = @$filter["y_leave_category_id"];
-        $this->leave_category_id->AdvancedSearch->SearchOperator2 = @$filter["w_leave_category_id"];
-        $this->leave_category_id->AdvancedSearch->save();
+        // Field national_id
+        $this->national_id->AdvancedSearch->SearchValue = @$filter["x_national_id"];
+        $this->national_id->AdvancedSearch->SearchOperator = @$filter["z_national_id"];
+        $this->national_id->AdvancedSearch->SearchCondition = @$filter["v_national_id"];
+        $this->national_id->AdvancedSearch->SearchValue2 = @$filter["y_national_id"];
+        $this->national_id->AdvancedSearch->SearchOperator2 = @$filter["w_national_id"];
+        $this->national_id->AdvancedSearch->save();
 
-        // Field days_applied
-        $this->days_applied->AdvancedSearch->SearchValue = @$filter["x_days_applied"];
-        $this->days_applied->AdvancedSearch->SearchOperator = @$filter["z_days_applied"];
-        $this->days_applied->AdvancedSearch->SearchCondition = @$filter["v_days_applied"];
-        $this->days_applied->AdvancedSearch->SearchValue2 = @$filter["y_days_applied"];
-        $this->days_applied->AdvancedSearch->SearchOperator2 = @$filter["w_days_applied"];
-        $this->days_applied->AdvancedSearch->save();
+        // Field gender
+        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
+        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
+        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
+        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
+        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
+        $this->gender->AdvancedSearch->save();
 
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
+        // Field phone
+        $this->phone->AdvancedSearch->SearchValue = @$filter["x_phone"];
+        $this->phone->AdvancedSearch->SearchOperator = @$filter["z_phone"];
+        $this->phone->AdvancedSearch->SearchCondition = @$filter["v_phone"];
+        $this->phone->AdvancedSearch->SearchValue2 = @$filter["y_phone"];
+        $this->phone->AdvancedSearch->SearchOperator2 = @$filter["w_phone"];
+        $this->phone->AdvancedSearch->save();
+
+        // Field email
+        $this->_email->AdvancedSearch->SearchValue = @$filter["x__email"];
+        $this->_email->AdvancedSearch->SearchOperator = @$filter["z__email"];
+        $this->_email->AdvancedSearch->SearchCondition = @$filter["v__email"];
+        $this->_email->AdvancedSearch->SearchValue2 = @$filter["y__email"];
+        $this->_email->AdvancedSearch->SearchOperator2 = @$filter["w__email"];
+        $this->_email->AdvancedSearch->save();
+
+        // Field department_name
+        $this->department_name->AdvancedSearch->SearchValue = @$filter["x_department_name"];
+        $this->department_name->AdvancedSearch->SearchOperator = @$filter["z_department_name"];
+        $this->department_name->AdvancedSearch->SearchCondition = @$filter["v_department_name"];
+        $this->department_name->AdvancedSearch->SearchValue2 = @$filter["y_department_name"];
+        $this->department_name->AdvancedSearch->SearchOperator2 = @$filter["w_department_name"];
+        $this->department_name->AdvancedSearch->save();
+
+        // Field designation
+        $this->designation->AdvancedSearch->SearchValue = @$filter["x_designation"];
+        $this->designation->AdvancedSearch->SearchOperator = @$filter["z_designation"];
+        $this->designation->AdvancedSearch->SearchCondition = @$filter["v_designation"];
+        $this->designation->AdvancedSearch->SearchValue2 = @$filter["y_designation"];
+        $this->designation->AdvancedSearch->SearchOperator2 = @$filter["w_designation"];
+        $this->designation->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1170,16 +1194,125 @@ class LeaveApprovalsList extends LeaveApprovals
         $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
         $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->employee_name, $default, true); // employee_name
+        $this->buildSearchSql($where, $this->national_id, $default, false); // national_id
+        $this->buildSearchSql($where, $this->gender, $default, true); // gender
+        $this->buildSearchSql($where, $this->phone, $default, false); // phone
+        $this->buildSearchSql($where, $this->_email, $default, false); // email
+        $this->buildSearchSql($where, $this->department_name, $default, true); // department_name
+        $this->buildSearchSql($where, $this->designation, $default, true); // designation
+        $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->employee_name->AdvancedSearch->save(); // employee_name
+            $this->national_id->AdvancedSearch->save(); // national_id
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->phone->AdvancedSearch->save(); // phone
+            $this->_email->AdvancedSearch->save(); // email
+            $this->department_name->AdvancedSearch->save(); // department_name
+            $this->designation->AdvancedSearch->save(); // designation
+            $this->date_created->AdvancedSearch->save(); // date_created
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->employee_name->AdvancedSearch->save(); // employee_name
+            $this->national_id->AdvancedSearch->save(); // national_id
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->phone->AdvancedSearch->save(); // phone
+            $this->_email->AdvancedSearch->save(); // email
+            $this->department_name->AdvancedSearch->save(); // department_name
+            $this->designation->AdvancedSearch->save(); // designation
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
     }
 
     // Show list of filters
@@ -1191,6 +1324,78 @@ class LeaveApprovalsList extends LeaveApprovals
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field employee_name
+        $filter = $this->queryBuilderWhere("employee_name");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->employee_name, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->employee_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field national_id
+        $filter = $this->queryBuilderWhere("national_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->national_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->national_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field gender
+        $filter = $this->queryBuilderWhere("gender");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->gender, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->gender->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field phone
+        $filter = $this->queryBuilderWhere("phone");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->phone, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->phone->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field email
+        $filter = $this->queryBuilderWhere("email");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->_email, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->_email->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field department_name
+        $filter = $this->queryBuilderWhere("department_name");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->department_name, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->department_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field designation
+        $filter = $this->queryBuilderWhere("designation");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->designation, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->designation->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field date_created
+        $filter = $this->queryBuilderWhere("date_created");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->date_created, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1217,7 +1422,12 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->status;
+        $searchFlds[] = &$this->employee_name;
+        $searchFlds[] = &$this->gender;
+        $searchFlds[] = &$this->phone;
+        $searchFlds[] = &$this->_email;
+        $searchFlds[] = &$this->department_name;
+        $searchFlds[] = &$this->designation;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1246,6 +1456,33 @@ class LeaveApprovalsList extends LeaveApprovals
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->employee_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->national_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->gender->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->phone->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->_email->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->department_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->designation->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1258,6 +1495,12 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1272,6 +1515,20 @@ class LeaveApprovalsList extends LeaveApprovals
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->employee_name->AdvancedSearch->unsetSession();
+        $this->national_id->AdvancedSearch->unsetSession();
+        $this->gender->AdvancedSearch->unsetSession();
+        $this->phone->AdvancedSearch->unsetSession();
+        $this->_email->AdvancedSearch->unsetSession();
+        $this->department_name->AdvancedSearch->unsetSession();
+        $this->designation->AdvancedSearch->unsetSession();
+        $this->date_created->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1279,6 +1536,17 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->employee_name->AdvancedSearch->load();
+        $this->national_id->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->phone->AdvancedSearch->load();
+        $this->_email->AdvancedSearch->load();
+        $this->department_name->AdvancedSearch->load();
+        $this->designation->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1296,12 +1564,6 @@ class LeaveApprovalsList extends LeaveApprovals
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->user_id); // user_id
-            $this->updateSort($this->leave_category_id); // leave_category_id
-            $this->updateSort($this->days_applied); // days_applied
-            $this->updateSort($this->status); // status
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1322,25 +1584,10 @@ class LeaveApprovalsList extends LeaveApprovals
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->user_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->id->setSort("");
-                $this->user_id->setSort("");
-                $this->leave_category_id->setSort("");
-                $this->days_applied->setSort("");
-                $this->status->setSort("");
-                $this->date_created->setSort("");
-                $this->date_updated->setSort("");
             }
 
             // Reset start position
@@ -1360,11 +1607,43 @@ class LeaveApprovalsList extends LeaveApprovals
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
+        // "detail_leave_applications"
+        $item = &$this->ListOptions->add("detail_leave_applications");
         $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'leave_applications');
         $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_leave_balance"
+        $item = &$this->ListOptions->add("detail_leave_balance");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'leave_balance');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_leave_approvals"
+        $item = &$this->ListOptions->add("detail_leave_approvals");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'leave_approvals');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("leave_applications");
+        $pages->add("leave_balance");
+        $pages->add("leave_approvals");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1394,9 +1673,9 @@ class LeaveApprovalsList extends LeaveApprovals
         $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
-        $this->ListOptions->UseDropDownButton = true;
+        $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
-        $this->ListOptions->UseButtonGroup = true;
+        $this->ListOptions->UseButtonGroup = false;
         if ($this->ListOptions->UseButtonGroup && IsMobile()) {
             $this->ListOptions->UseDropDownButton = true;
         }
@@ -1435,19 +1714,7 @@ class LeaveApprovalsList extends LeaveApprovals
         $opt = $this->ListOptions["sequence"];
         $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") {
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"leave_approvals\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
 
         // Set up list action buttons
@@ -1466,12 +1733,12 @@ class LeaveApprovalsList extends LeaveApprovals
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fleave_approvalslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"femployees_viewlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fleave_approvalslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"femployees_viewlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1485,6 +1752,114 @@ class LeaveApprovalsList extends LeaveApprovals
             if (count($links) > 0) {
                 $opt->Body = $body;
             }
+        }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_leave_applications"
+        $opt = $this->ListOptions["detail_leave_applications"];
+        if ($Security->allowList(CurrentProjectID() . 'leave_applications')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("leave_applications", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("leave_applications");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("leave_applications")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("leaveapplicationslist?" . Config("TABLE_SHOW_MASTER") . "=employees_view&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("LeaveApplicationsGrid");
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_leave_balance"
+        $opt = $this->ListOptions["detail_leave_balance"];
+        if ($Security->allowList(CurrentProjectID() . 'leave_balance')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("leave_balance", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("leave_balance");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("leave_balance")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("leavebalancelist?" . Config("TABLE_SHOW_MASTER") . "=employees_view&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("LeaveBalanceGrid");
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_leave_approvals"
+        $opt = $this->ListOptions["detail_leave_approvals"];
+        if ($Security->allowList(CurrentProjectID() . 'leave_approvals')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("leave_approvals", "TblCaption");
+            if (!$this->ShowMultipleDetails) { // Skip loading record count if show multiple details
+                $detailTbl = Container("leave_approvals");
+                $detailFilter = $detailTbl->getDetailFilter($this);
+                $detailTbl->setCurrentMasterTable($this->TableVar);
+                $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+                $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+                $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("leave_approvals")->Count, "red"], $Language->phrase("DetailCount"));
+            }
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("leaveapprovalslist?" . Config("TABLE_SHOW_MASTER") . "=employees_view&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("LeaveApprovalsGrid");
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
         }
 
         // "checkbox"
@@ -1516,12 +1891,14 @@ class LeaveApprovalsList extends LeaveApprovals
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "user_id");
-            $this->createColumnOption($option, "leave_category_id");
-            $this->createColumnOption($option, "days_applied");
-            $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "employee_name");
+            $this->createColumnOption($option, "national_id");
+            $this->createColumnOption($option, "gender");
+            $this->createColumnOption($option, "phone");
+            $this->createColumnOption($option, "email");
+            $this->createColumnOption($option, "department_name");
+            $this->createColumnOption($option, "designation");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1546,10 +1923,10 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fleave_approvalssrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"femployees_viewsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fleave_approvalssrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"femployees_viewsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1609,7 +1986,7 @@ class LeaveApprovalsList extends LeaveApprovals
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fleave_approvalslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="femployees_viewlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1780,7 +2157,7 @@ class LeaveApprovalsList extends LeaveApprovals
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_leave_approvals", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_employees_view", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1841,7 +2218,7 @@ class LeaveApprovalsList extends LeaveApprovals
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_leave_approvals",
+            "id" => "r" . $this->RowCount . "_employees_view",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1865,6 +2242,93 @@ class LeaveApprovalsList extends LeaveApprovals
             $this->Command = "search";
         }
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // employee_name
+        if ($this->employee_name->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->employee_name->AdvancedSearch->SearchValue != "" || $this->employee_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // national_id
+        if ($this->national_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->national_id->AdvancedSearch->SearchValue != "" || $this->national_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // gender
+        if ($this->gender->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->gender->AdvancedSearch->SearchValue != "" || $this->gender->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // phone
+        if ($this->phone->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->phone->AdvancedSearch->SearchValue != "" || $this->phone->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // email
+        if ($this->_email->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->_email->AdvancedSearch->SearchValue != "" || $this->_email->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // department_name
+        if ($this->department_name->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->department_name->AdvancedSearch->SearchValue != "" || $this->department_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // designation
+        if ($this->designation->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->designation->AdvancedSearch->SearchValue != "" || $this->designation->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_created
+        if ($this->date_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_created->AdvancedSearch->SearchValue != "" || $this->date_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
     }
 
     /**
@@ -1961,12 +2425,14 @@ class LeaveApprovalsList extends LeaveApprovals
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->user_id->setDbValue($row['user_id']);
-        $this->leave_category_id->setDbValue($row['leave_category_id']);
-        $this->days_applied->setDbValue($row['days_applied']);
-        $this->status->setDbValue($row['status']);
+        $this->employee_name->setDbValue($row['employee_name']);
+        $this->national_id->setDbValue($row['national_id']);
+        $this->gender->setDbValue($row['gender']);
+        $this->phone->setDbValue($row['phone']);
+        $this->_email->setDbValue($row['email']);
+        $this->department_name->setDbValue($row['department_name']);
+        $this->designation->setDbValue($row['designation']);
         $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -1974,12 +2440,14 @@ class LeaveApprovalsList extends LeaveApprovals
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['user_id'] = $this->user_id->DefaultValue;
-        $row['leave_category_id'] = $this->leave_category_id->DefaultValue;
-        $row['days_applied'] = $this->days_applied->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
+        $row['employee_name'] = $this->employee_name->DefaultValue;
+        $row['national_id'] = $this->national_id->DefaultValue;
+        $row['gender'] = $this->gender->DefaultValue;
+        $row['phone'] = $this->phone->DefaultValue;
+        $row['email'] = $this->_email->DefaultValue;
+        $row['department_name'] = $this->department_name->DefaultValue;
+        $row['designation'] = $this->designation->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -2022,113 +2490,157 @@ class LeaveApprovalsList extends LeaveApprovals
 
         // id
 
-        // user_id
+        // employee_name
 
-        // leave_category_id
+        // national_id
 
-        // days_applied
+        // gender
 
-        // status
+        // phone
+
+        // email
+
+        // department_name
+
+        // designation
 
         // date_created
-
-        // date_updated
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // user_id
-            $this->user_id->ViewValue = $this->user_id->CurrentValue;
-            $curVal = strval($this->user_id->CurrentValue);
-            if ($curVal != "") {
-                $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
-                if ($this->user_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->user_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->user_id->ViewValue = $this->user_id->displayValue($arwrk);
-                    } else {
-                        $this->user_id->ViewValue = FormatNumber($this->user_id->CurrentValue, $this->user_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->user_id->ViewValue = null;
-            }
+            // employee_name
+            $this->employee_name->ViewValue = $this->employee_name->CurrentValue;
 
-            // leave_category_id
-            $this->leave_category_id->ViewValue = $this->leave_category_id->CurrentValue;
-            $curVal = strval($this->leave_category_id->CurrentValue);
-            if ($curVal != "") {
-                $this->leave_category_id->ViewValue = $this->leave_category_id->lookupCacheOption($curVal);
-                if ($this->leave_category_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->leave_category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->leave_category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->leave_category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->leave_category_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->leave_category_id->ViewValue = $this->leave_category_id->displayValue($arwrk);
-                    } else {
-                        $this->leave_category_id->ViewValue = FormatNumber($this->leave_category_id->CurrentValue, $this->leave_category_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->leave_category_id->ViewValue = null;
-            }
+            // national_id
+            $this->national_id->ViewValue = $this->national_id->CurrentValue;
 
-            // days_applied
-            $this->days_applied->ViewValue = $this->days_applied->CurrentValue;
-            $this->days_applied->ViewValue = FormatNumber($this->days_applied->ViewValue, $this->days_applied->formatPattern());
+            // gender
+            $this->gender->ViewValue = $this->gender->CurrentValue;
 
-            // status
-            if (strval($this->status->CurrentValue) != "") {
-                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-            } else {
-                $this->status->ViewValue = null;
-            }
+            // phone
+            $this->phone->ViewValue = $this->phone->CurrentValue;
+
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+
+            // department_name
+            $this->department_name->ViewValue = $this->department_name->CurrentValue;
+
+            // designation
+            $this->designation->ViewValue = $this->designation->CurrentValue;
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            // employee_name
+            $this->employee_name->HrefValue = "";
+            $this->employee_name->TooltipValue = "";
 
-            // user_id
-            $this->user_id->HrefValue = "";
-            $this->user_id->TooltipValue = "";
+            // national_id
+            $this->national_id->HrefValue = "";
+            $this->national_id->TooltipValue = "";
 
-            // leave_category_id
-            $this->leave_category_id->HrefValue = "";
-            $this->leave_category_id->TooltipValue = "";
+            // gender
+            $this->gender->HrefValue = "";
+            $this->gender->TooltipValue = "";
 
-            // days_applied
-            $this->days_applied->HrefValue = "";
-            $this->days_applied->TooltipValue = "";
+            // phone
+            if (!EmptyValue($this->_email->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
+            $this->phone->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // email
+            if (!EmptyValue($this->_email->CurrentValue)) {
+                $this->_email->HrefValue = $this->_email->getLinkPrefix() . $this->_email->CurrentValue; // Add prefix/suffix
+                $this->_email->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->_email->HrefValue = FullUrl($this->_email->HrefValue, "href");
+                }
+            } else {
+                $this->_email->HrefValue = "";
+            }
+            $this->_email->TooltipValue = "";
+
+            // department_name
+            $this->department_name->HrefValue = "";
+            $this->department_name->TooltipValue = "";
+
+            // designation
+            $this->designation->HrefValue = "";
+            $this->designation->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // employee_name
+            if ($this->employee_name->UseFilter && !EmptyValue($this->employee_name->AdvancedSearch->SearchValue)) {
+                if (is_array($this->employee_name->AdvancedSearch->SearchValue)) {
+                    $this->employee_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->employee_name->AdvancedSearch->SearchValue);
+                }
+                $this->employee_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->employee_name->AdvancedSearch->SearchValue);
+            }
 
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
+            // national_id
+            $this->national_id->setupEditAttributes();
+            $this->national_id->EditValue = $this->national_id->AdvancedSearch->SearchValue;
+            $this->national_id->PlaceHolder = RemoveHtml($this->national_id->caption());
+
+            // gender
+            if ($this->gender->UseFilter && !EmptyValue($this->gender->AdvancedSearch->SearchValue)) {
+                if (is_array($this->gender->AdvancedSearch->SearchValue)) {
+                    $this->gender->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
+                }
+                $this->gender->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
+            }
+
+            // phone
+            $this->phone->setupEditAttributes();
+            if (!$this->phone->Raw) {
+                $this->phone->AdvancedSearch->SearchValue = HtmlDecode($this->phone->AdvancedSearch->SearchValue);
+            }
+            $this->phone->EditValue = HtmlEncode($this->phone->AdvancedSearch->SearchValue);
+            $this->phone->PlaceHolder = RemoveHtml($this->phone->caption());
+
+            // email
+            $this->_email->setupEditAttributes();
+            if (!$this->_email->Raw) {
+                $this->_email->AdvancedSearch->SearchValue = HtmlDecode($this->_email->AdvancedSearch->SearchValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->AdvancedSearch->SearchValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // department_name
+            if ($this->department_name->UseFilter && !EmptyValue($this->department_name->AdvancedSearch->SearchValue)) {
+                if (is_array($this->department_name->AdvancedSearch->SearchValue)) {
+                    $this->department_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->department_name->AdvancedSearch->SearchValue);
+                }
+                $this->department_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->department_name->AdvancedSearch->SearchValue);
+            }
+
+            // designation
+            if ($this->designation->UseFilter && !EmptyValue($this->designation->AdvancedSearch->SearchValue)) {
+                if (is_array($this->designation->AdvancedSearch->SearchValue)) {
+                    $this->designation->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->designation->AdvancedSearch->SearchValue);
+                }
+                $this->designation->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->designation->AdvancedSearch->SearchValue);
+            }
+
+            // date_created
+            $this->date_created->setupEditAttributes();
+            $this->date_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_created->AdvancedSearch->SearchValue, $this->date_created->formatPattern()), $this->date_created->formatPattern()));
+            $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
         }
 
         // Call Row Rendered event
@@ -2137,108 +2649,38 @@ class LeaveApprovalsList extends LeaveApprovals
         }
     }
 
-    // Get export HTML tag
-    protected function getExportTag($type, $custom = false)
+    // Validate search
+    protected function validateSearch()
     {
-        global $Language;
-        if ($type == "print" || $custom) { // Printer friendly / custom export
-            $pageUrl = $this->pageUrl(false);
-            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
-        } else { // Export API URL
-            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
         }
-        if (SameText($type, "excel")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fleave_approvalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
-            }
-        } elseif (SameText($type, "word")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fleave_approvalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
-            }
-        } elseif (SameText($type, "pdf")) {
-            if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fleave_approvalslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
-            } else {
-                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
-            }
-        } elseif (SameText($type, "html")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
-        } elseif (SameText($type, "xml")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
-        } elseif (SameText($type, "csv")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
-        } elseif (SameText($type, "email")) {
-            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fleave_approvalslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
-        } elseif (SameText($type, "print")) {
-            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
         }
+        return $validateSearch;
     }
 
-    // Set up export options
-    protected function setupExportOptions()
+    // Load advanced search
+    public function loadAdvancedSearch()
     {
-        global $Language, $Security;
-
-        // Printer friendly
-        $item = &$this->ExportOptions->add("print");
-        $item->Body = $this->getExportTag("print");
-        $item->Visible = true;
-
-        // Export to Excel
-        $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
-        $item->Visible = true;
-
-        // Export to Word
-        $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
-        $item->Visible = true;
-
-        // Export to HTML
-        $item = &$this->ExportOptions->add("html");
-        $item->Body = $this->getExportTag("html");
-        $item->Visible = false;
-
-        // Export to XML
-        $item = &$this->ExportOptions->add("xml");
-        $item->Body = $this->getExportTag("xml");
-        $item->Visible = false;
-
-        // Export to CSV
-        $item = &$this->ExportOptions->add("csv");
-        $item->Body = $this->getExportTag("csv");
-        $item->Visible = true;
-
-        // Export to PDF
-        $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
-        $item->Visible = false;
-
-        // Export to Email
-        $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
-        $item->Visible = true;
-
-        // Drop down button for export
-        $this->ExportOptions->UseButtonGroup = true;
-        $this->ExportOptions->UseDropDownButton = false;
-        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
-            $this->ExportOptions->UseDropDownButton = true;
-        }
-        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
-
-        // Add group option item
-        $item = &$this->ExportOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        if (!$Security->canExport()) { // Export not allowed
-            $this->ExportOptions->hideAllOptions();
-        }
+        $this->id->AdvancedSearch->load();
+        $this->employee_name->AdvancedSearch->load();
+        $this->national_id->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->phone->AdvancedSearch->load();
+        $this->_email->AdvancedSearch->load();
+        $this->department_name->AdvancedSearch->load();
+        $this->designation->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
     }
 
     // Set up search options
@@ -2251,7 +2693,7 @@ class LeaveApprovalsList extends LeaveApprovals
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fleave_approvalssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"femployees_viewsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2297,167 +2739,6 @@ class LeaveApprovalsList extends LeaveApprovals
         }
     }
 
-    /**
-    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
-    *
-    * @param bool $return Return the data rather than output it
-    * @return mixed
-    */
-    public function exportData($doc)
-    {
-        global $Language;
-        $rs = null;
-        $this->TotalRecords = $this->listRecordCount();
-
-        // Export all
-        if ($this->ExportAll) {
-            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
-                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
-            }
-            $this->DisplayRecords = $this->TotalRecords;
-            $this->StopRecord = $this->TotalRecords;
-        } else { // Export one page only
-            $this->setupStartRecord(); // Set up start record position
-            // Set the last record to display
-            if ($this->DisplayRecords <= 0) {
-                $this->StopRecord = $this->TotalRecords;
-            } else {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
-            }
-        }
-        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
-        if (!$rs || !$doc) {
-            RemoveHeader("Content-Type"); // Remove header
-            RemoveHeader("Content-Disposition");
-            $this->showMessage();
-            return;
-        }
-        $this->StartRecord = 1;
-        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
-
-        // Call Page Exporting server event
-        $doc->ExportCustom = !$this->pageExporting($doc);
-
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "employees_view") {
-            $employees_view = new EmployeesViewList();
-            $rsmaster = $employees_view->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($employees_view);
-                    $employees_view->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
-        // Page header
-        $header = $this->PageHeader;
-        $this->pageDataRendering($header);
-        $doc->Text .= $header;
-        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
-        $rs->free();
-
-        // Page footer
-        $footer = $this->PageFooter;
-        $this->pageDataRendered($footer);
-        $doc->Text .= $footer;
-
-        // Export header and footer
-        $doc->exportHeaderAndFooter();
-
-        // Call Page Exported server event
-        $this->pageExported($doc);
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "employees_view") {
-                $validMaster = true;
-                $masterTbl = Container("employees_view");
-                if (($parm = Get("fk_id", Get("user_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->user_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->user_id->setSessionValue($this->user_id->QueryStringValue);
-                    $foreignKeys["user_id"] = $this->user_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "employees_view") {
-                $validMaster = true;
-                $masterTbl = Container("employees_view");
-                if (($parm = Post("fk_id", Post("user_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->user_id->FormValue = $masterTbl->id->FormValue;
-                    $this->user_id->setSessionValue($this->user_id->FormValue);
-                    $foreignKeys["user_id"] = $this->user_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "employees_view") {
-                if (!array_key_exists("user_id", $foreignKeys)) { // Not current foreign key
-                    $this->user_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -2481,12 +2762,6 @@ class LeaveApprovalsList extends LeaveApprovals
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_user_id":
-                    break;
-                case "x_leave_category_id":
-                    break;
-                case "x_status":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

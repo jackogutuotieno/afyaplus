@@ -212,6 +212,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -388,6 +389,11 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -2285,6 +2291,7 @@
                 '/doctornotesedit[/{id}]',
                 '/doctornotesdelete[/{id}]',
                 '/doctoroverview',
+                '/employeesviewlist[/{id}]',
                 '/expenseslist[/{id}]',
                 '/expensesadd[/{id}]',
                 '/expensesview[/{id}]',
@@ -2658,6 +2665,7 @@
                 'PHPMaker2024\\afyaplus\\DoctorNotesController:edit',
                 'PHPMaker2024\\afyaplus\\DoctorNotesController:delete',
                 'PHPMaker2024\\afyaplus\\DoctorOverviewController:dashboard',
+                'PHPMaker2024\\afyaplus\\EmployeesViewController:list',
                 'PHPMaker2024\\afyaplus\\ExpensesController:list',
                 'PHPMaker2024\\afyaplus\\ExpensesController:add',
                 'PHPMaker2024\\afyaplus\\ExpensesController:view',
@@ -2974,6 +2982,9 @@
                 'PHPMaker2024\\afyaplus\\WardTypeController:delete',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -4144,6 +4155,7 @@
                 'edit.doctor_notes',
                 'delete.doctor_notes',
                 'dashboard.Doctor_Overview',
+                'list.employees_view',
                 'list.expenses',
                 'add.expenses',
                 'view.expenses',
@@ -4460,6 +4472,7 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -5206,6 +5219,7 @@
         $o[368],
         $o[369],
         $o[370],
+        $o[371],
     ],
     []
 );

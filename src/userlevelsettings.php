@@ -1229,7 +1229,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patients_discharge","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}employees_view","9","0"]];
 
 /**
  * Tables
@@ -1350,4 +1361,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["item_purchases","item_purchases","Item Purchases",true,"{32536B8D-F37B-4419-80D5-260932800712}","itempurchaseslist"],
     ["receive_items","receive_items","Received Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveitemslist"],
     ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"],
-    ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"]];
+    ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"],
+    ["employees_view","employees_view","Employees Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesviewlist"]];

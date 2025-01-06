@@ -79,6 +79,7 @@ function MenuItem_Adding($item)
     if ($opd == TRUE)  {
         if ($item->Text == "Patients List") { $item->Allowed = FALSE; }
     } else if ($doctor_panel == TRUE)  {
+        if ($item->Text == "Doctor") { $item->Allowed = FALSE; }
         if ($item->Text == "Diseases") { $item->Allowed = FALSE; }
         if ($item->Text == "Charges") { $item->Allowed = FALSE; }
     } else if ($laboratory == TRUE)  {

@@ -19,6 +19,7 @@ C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorOverviewController.php
+C:\wamp64\www\afyaplus\controllers\EmployeesViewController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesController.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\ExpensesReportController.php
@@ -200,6 +201,8 @@ C:\wamp64\www\afyaplus\models\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\models\DoctorNotesList.php
 C:\wamp64\www\afyaplus\models\DoctorNotesView.php
 C:\wamp64\www\afyaplus\models\DoctorOverview.php
+C:\wamp64\www\afyaplus\models\EmployeesView.php
+C:\wamp64\www\afyaplus\models\EmployeesViewList.php
 C:\wamp64\www\afyaplus\models\Expenses.php
 C:\wamp64\www\afyaplus\models\ExpensesAdd.php
 C:\wamp64\www\afyaplus\models\ExpensesDelete.php
@@ -328,12 +331,15 @@ C:\wamp64\www\afyaplus\models\LeaveApplications.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsAdd.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsDelete.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsEdit.php
+C:\wamp64\www\afyaplus\models\LeaveApplicationsGrid.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsList.php
 C:\wamp64\www\afyaplus\models\LeaveApplicationsView.php
 C:\wamp64\www\afyaplus\models\LeaveApprovals.php
 C:\wamp64\www\afyaplus\models\LeaveApprovalsEdit.php
+C:\wamp64\www\afyaplus\models\LeaveApprovalsGrid.php
 C:\wamp64\www\afyaplus\models\LeaveApprovalsList.php
 C:\wamp64\www\afyaplus\models\LeaveBalance.php
+C:\wamp64\www\afyaplus\models\LeaveBalanceGrid.php
 C:\wamp64\www\afyaplus\models\LeaveBalanceList.php
 C:\wamp64\www\afyaplus\models\LeaveCategories.php
 C:\wamp64\www\afyaplus\models\LeaveCategoriesAdd.php
@@ -679,6 +685,7 @@ C:\wamp64\www\afyaplus\src\Entity\Diagnosis.php
 C:\wamp64\www\afyaplus\src\Entity\Disease.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorCharge.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
+C:\wamp64\www\afyaplus\src\Entity\EmployeesView.php
 C:\wamp64\www\afyaplus\src\Entity\Expense.php
 C:\wamp64\www\afyaplus\src\Entity\ExpensesReport.php
 C:\wamp64\www\afyaplus\src\Entity\Exportlog.php
@@ -907,6 +914,8 @@ C:\wamp64\www\afyaplus\views\DoctorNotesGrid.php
 C:\wamp64\www\afyaplus\views\DoctorNotesList.php
 C:\wamp64\www\afyaplus\views\DoctorNotesView.php
 C:\wamp64\www\afyaplus\views\DoctorOverview.php
+C:\wamp64\www\afyaplus\views\EmployeesViewList.php
+C:\wamp64\www\afyaplus\views\EmployeesViewMaster.php
 C:\wamp64\www\afyaplus\views\Error.php
 C:\wamp64\www\afyaplus\views\ExpensesAdd.php
 C:\wamp64\www\afyaplus\views\ExpensesDelete.php
@@ -1013,10 +1022,13 @@ C:\wamp64\www\afyaplus\views\LaboratoryReportsSummary.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsAdd.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsDelete.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsEdit.php
+C:\wamp64\www\afyaplus\views\LeaveApplicationsGrid.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsList.php
 C:\wamp64\www\afyaplus\views\LeaveApplicationsView.php
 C:\wamp64\www\afyaplus\views\LeaveApprovalsEdit.php
+C:\wamp64\www\afyaplus\views\LeaveApprovalsGrid.php
 C:\wamp64\www\afyaplus\views\LeaveApprovalsList.php
+C:\wamp64\www\afyaplus\views\LeaveBalanceGrid.php
 C:\wamp64\www\afyaplus\views\LeaveBalanceList.php
 C:\wamp64\www\afyaplus\views\LeaveCategoriesAdd.php
 C:\wamp64\www\afyaplus\views\LeaveCategoriesDelete.php

@@ -71,6 +71,10 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "employees_view") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="employees_view">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->user_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->leave_category_id->Visible) { // leave_category_id ?>
     <div id="r_leave_category_id"<?= $Page->leave_category_id->rowAttributes() ?>>
