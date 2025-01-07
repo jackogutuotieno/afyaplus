@@ -126,9 +126,9 @@ class SuppliersDelete extends Suppliers
         $this->supplier_name->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
-        $this->physical_address->setVisibility();
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->physical_address->Visible = false;
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -678,24 +678,28 @@ class SuppliersDelete extends Suppliers
             $this->supplier_name->TooltipValue = "";
 
             // phone
-            $this->phone->HrefValue = "";
+            if (!EmptyValue($this->phone->CurrentValue)) {
+                $this->phone->HrefValue = $this->phone->getLinkPrefix() . $this->phone->CurrentValue; // Add prefix/suffix
+                $this->phone->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->phone->HrefValue = FullUrl($this->phone->HrefValue, "href");
+                }
+            } else {
+                $this->phone->HrefValue = "";
+            }
             $this->phone->TooltipValue = "";
 
             // email_address
-            $this->email_address->HrefValue = "";
+            if (!EmptyValue($this->email_address->CurrentValue)) {
+                $this->email_address->HrefValue = $this->email_address->getLinkPrefix() . $this->email_address->CurrentValue; // Add prefix/suffix
+                $this->email_address->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->email_address->HrefValue = FullUrl($this->email_address->HrefValue, "href");
+                }
+            } else {
+                $this->email_address->HrefValue = "";
+            }
             $this->email_address->TooltipValue = "";
-
-            // physical_address
-            $this->physical_address->HrefValue = "";
-            $this->physical_address->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

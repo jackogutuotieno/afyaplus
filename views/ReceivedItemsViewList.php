@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$SuppliersList = &$Page;
+$ReceivedItemsViewList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { suppliers: currentTable } });
+ew.deepAssign(ew.vars, { tables: { received_items_view: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -57,20 +57,20 @@ loadjs.ready("head", function () {
 </div>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fsupplierssrch" id="fsupplierssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fsupplierssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="freceived_items_viewsrch" id="freceived_items_viewsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="freceived_items_viewsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { suppliers: currentTable } });
+ew.deepAssign(ew.vars, { tables: { received_items_view: currentTable } });
 var currentForm;
-var fsupplierssrch, currentSearchForm, currentAdvancedSearchForm;
+var freceived_items_viewsrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fsupplierssrch")
+        .setId("freceived_items_viewsrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -101,10 +101,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fsupplierssrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fsupplierssrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fsupplierssrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fsupplierssrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="freceived_items_viewsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="freceived_items_viewsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="freceived_items_viewsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="freceived_items_viewsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -144,13 +144,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="suppliers">
+<input type="hidden" name="t" value="received_items_view">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_suppliers" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<div id="gmp_received_items_view" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_supplierslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_received_items_viewlist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -163,14 +163,29 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->supplier_name->Visible) { // supplier_name ?>
-        <th data-name="supplier_name" class="<?= $Page->supplier_name->headerCellClass() ?>"><div id="elh_suppliers_supplier_name" class="suppliers_supplier_name"><?= $Page->renderFieldHeader($Page->supplier_name) ?></div></th>
+<?php if ($Page->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_received_items_view_id" class="received_items_view_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->phone->Visible) { // phone ?>
-        <th data-name="phone" class="<?= $Page->phone->headerCellClass() ?>"><div id="elh_suppliers_phone" class="suppliers_phone"><?= $Page->renderFieldHeader($Page->phone) ?></div></th>
+<?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <th data-name="batch_number" class="<?= $Page->batch_number->headerCellClass() ?>"><div id="elh_received_items_view_batch_number" class="received_items_view_batch_number"><?= $Page->renderFieldHeader($Page->batch_number) ?></div></th>
 <?php } ?>
-<?php if ($Page->email_address->Visible) { // email_address ?>
-        <th data-name="email_address" class="<?= $Page->email_address->headerCellClass() ?>"><div id="elh_suppliers_email_address" class="suppliers_email_address"><?= $Page->renderFieldHeader($Page->email_address) ?></div></th>
+<?php if ($Page->item_title->Visible) { // item_title ?>
+        <th data-name="item_title" class="<?= $Page->item_title->headerCellClass() ?>"><div id="elh_received_items_view_item_title" class="received_items_view_item_title"><?= $Page->renderFieldHeader($Page->item_title) ?></div></th>
+<?php } ?>
+<?php if ($Page->total_items_received->Visible) { // total_items_received ?>
+        <th data-name="total_items_received" class="<?= $Page->total_items_received->headerCellClass() ?>"><div id="elh_received_items_view_total_items_received" class="received_items_view_total_items_received"><?= $Page->renderFieldHeader($Page->total_items_received) ?></div></th>
+<?php } ?>
+<?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
+        <th data-name="measuring_unit" class="<?= $Page->measuring_unit->headerCellClass() ?>"><div id="elh_received_items_view_measuring_unit" class="received_items_view_measuring_unit"><?= $Page->renderFieldHeader($Page->measuring_unit) ?></div></th>
+<?php } ?>
+<?php if ($Page->qty_left->Visible) { // qty_left ?>
+        <th data-name="qty_left" class="<?= $Page->qty_left->headerCellClass() ?>"><div id="elh_received_items_view_qty_left" class="received_items_view_qty_left"><?= $Page->renderFieldHeader($Page->qty_left) ?></div></th>
+<?php } ?>
+<?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <th data-name="selling_price" class="<?= $Page->selling_price->headerCellClass() ?>"><div id="elh_received_items_view_selling_price" class="received_items_view_selling_price"><?= $Page->renderFieldHeader($Page->selling_price) ?></div></th>
+<?php } ?>
+<?php if ($Page->date_created->Visible) { // date_created ?>
+        <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_received_items_view_date_created" class="received_items_view_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -200,37 +215,67 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->supplier_name->Visible) { // supplier_name ?>
-        <td data-name="supplier_name"<?= $Page->supplier_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_suppliers_supplier_name" class="el_suppliers_supplier_name">
-<span<?= $Page->supplier_name->viewAttributes() ?>>
-<?= $Page->supplier_name->getViewValue() ?></span>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id"<?= $Page->id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_id" class="el_received_items_view_id">
+<span<?= $Page->id->viewAttributes() ?>>
+<?= $Page->id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->phone->Visible) { // phone ?>
-        <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_suppliers_phone" class="el_suppliers_phone">
-<span<?= $Page->phone->viewAttributes() ?>>
-<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
-<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->phone->getViewValue() ?>
-<?php } ?>
-</span>
+    <?php if ($Page->batch_number->Visible) { // batch_number ?>
+        <td data-name="batch_number"<?= $Page->batch_number->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_batch_number" class="el_received_items_view_batch_number">
+<span<?= $Page->batch_number->viewAttributes() ?>>
+<?= $Page->batch_number->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->email_address->Visible) { // email_address ?>
-        <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_suppliers_email_address" class="el_suppliers_email_address">
-<span<?= $Page->email_address->viewAttributes() ?>>
-<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
-<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
-<?php } else { ?>
-<?= $Page->email_address->getViewValue() ?>
-<?php } ?>
+    <?php if ($Page->item_title->Visible) { // item_title ?>
+        <td data-name="item_title"<?= $Page->item_title->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_item_title" class="el_received_items_view_item_title">
+<span<?= $Page->item_title->viewAttributes() ?>>
+<?= $Page->item_title->getViewValue() ?></span>
 </span>
+</td>
+    <?php } ?>
+    <?php if ($Page->total_items_received->Visible) { // total_items_received ?>
+        <td data-name="total_items_received"<?= $Page->total_items_received->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_total_items_received" class="el_received_items_view_total_items_received">
+<span<?= $Page->total_items_received->viewAttributes() ?>>
+<?= $Page->total_items_received->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->measuring_unit->Visible) { // measuring_unit ?>
+        <td data-name="measuring_unit"<?= $Page->measuring_unit->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_measuring_unit" class="el_received_items_view_measuring_unit">
+<span<?= $Page->measuring_unit->viewAttributes() ?>>
+<?= $Page->measuring_unit->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->qty_left->Visible) { // qty_left ?>
+        <td data-name="qty_left"<?= $Page->qty_left->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_qty_left" class="el_received_items_view_qty_left">
+<span<?= $Page->qty_left->viewAttributes() ?>>
+<?= $Page->qty_left->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->selling_price->Visible) { // selling_price ?>
+        <td data-name="selling_price"<?= $Page->selling_price->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_selling_price" class="el_received_items_view_selling_price">
+<span<?= $Page->selling_price->viewAttributes() ?>>
+<?= $Page->selling_price->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->date_created->Visible) { // date_created ?>
+        <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_received_items_view_date_created" class="el_received_items_view_date_created">
+<span<?= $Page->date_created->viewAttributes() ?>>
+<?= $Page->date_created->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -293,7 +338,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("suppliers");
+    ew.addEventHandlers("received_items_view");
 });
 </script>
 <script>

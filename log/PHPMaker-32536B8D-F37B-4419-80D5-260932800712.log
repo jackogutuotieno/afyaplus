@@ -99,6 +99,7 @@ C:\wamp64\www\afyaplus\controllers\RadiologyReportsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyRequestsDetailsController.php
 C:\wamp64\www\afyaplus\controllers\ReceiveItemsController.php
+C:\wamp64\www\afyaplus\controllers\ReceivedItemsViewController.php
 C:\wamp64\www\afyaplus\controllers\RegisteredPatientsController.php
 C:\wamp64\www\afyaplus\controllers\RegisteredPatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
@@ -558,6 +559,8 @@ C:\wamp64\www\afyaplus\models\ReceiveItemsDelete.php
 C:\wamp64\www\afyaplus\models\ReceiveItemsEdit.php
 C:\wamp64\www\afyaplus\models\ReceiveItemsList.php
 C:\wamp64\www\afyaplus\models\ReceiveItemsView.php
+C:\wamp64\www\afyaplus\models\ReceivedItemsView.php
+C:\wamp64\www\afyaplus\models\ReceivedItemsViewList.php
 C:\wamp64\www\afyaplus\models\RegisteredPatients.php
 C:\wamp64\www\afyaplus\models\RegisteredPatientsReport.php
 C:\wamp64\www\afyaplus\models\RegisteredPatientsReportList.php
@@ -754,6 +757,7 @@ C:\wamp64\www\afyaplus\src\Entity\RadiologyReport.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequest.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyRequestsDetail.php
 C:\wamp64\www\afyaplus\src\Entity\ReceiveItem.php
+C:\wamp64\www\afyaplus\src\Entity\ReceivedItemsView.php
 C:\wamp64\www\afyaplus\src\Entity\RegisteredPatientsReport.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
@@ -1217,6 +1221,7 @@ C:\wamp64\www\afyaplus\views\ReceiveItemsDelete.php
 C:\wamp64\www\afyaplus\views\ReceiveItemsEdit.php
 C:\wamp64\www\afyaplus\views\ReceiveItemsList.php
 C:\wamp64\www\afyaplus\views\ReceiveItemsView.php
+C:\wamp64\www\afyaplus\views\ReceivedItemsViewList.php
 C:\wamp64\www\afyaplus\views\RegisteredPatientsReportList.php
 C:\wamp64\www\afyaplus\views\RegisteredPatientsSummary.php
 C:\wamp64\www\afyaplus\views\ResetPassword.php

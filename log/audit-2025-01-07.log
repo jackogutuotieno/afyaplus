@@ -1,0 +1,7 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2025-01-07 07:09:39",/afyaplus/login,1,login,::1,,,,
+"2025-01-07 07:21:37",/afyaplus/itemcategoriesadd,1,A,item_categories,category_name,1,,"Medical Equipment"
+"2025-01-07 07:21:37",/afyaplus/itemcategoriesadd,1,A,item_categories,id,1,,1
+"2025-01-07 07:22:22",/afyaplus/itemsubcategoriesadd,1,A,item_subcategories,category_id,1,,1
+"2025-01-07 07:22:22",/afyaplus/itemsubcategoriesadd,1,A,item_subcategories,subcategory_name,1,,Clinicals
+"2025-01-07 07:22:22",/afyaplus/itemsubcategoriesadd,1,A,item_subcategories,id,1,,1

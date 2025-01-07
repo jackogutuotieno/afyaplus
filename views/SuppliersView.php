@@ -79,7 +79,12 @@ loadjs.ready("head", function () {
         <td data-name="phone"<?= $Page->phone->cellAttributes() ?>>
 <span id="el_suppliers_phone">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -90,7 +95,12 @@ loadjs.ready("head", function () {
         <td data-name="email_address"<?= $Page->email_address->cellAttributes() ?>>
 <span id="el_suppliers_email_address">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>

@@ -137,7 +137,7 @@ class IssueItemsGrid extends IssueItems
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->admission_id->setVisibility();
+        $this->admission_id->Visible = false;
         $this->patient_id->setVisibility();
         $this->item_id->setVisibility();
         $this->quantity->setVisibility();
@@ -625,6 +625,7 @@ class IssueItemsGrid extends IssueItems
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -1096,14 +1097,6 @@ class IssueItemsGrid extends IssueItems
     public function emptyRow()
     {
         global $CurrentForm;
-        if (
-            $CurrentForm->hasValue("x_admission_id") &&
-            $CurrentForm->hasValue("o_admission_id") &&
-            $this->admission_id->CurrentValue != $this->admission_id->DefaultValue &&
-            !($this->admission_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->admission_id->CurrentValue == $this->admission_id->getSessionValue())
-        ) {
-            return false;
-        }
         if (
             $CurrentForm->hasValue("x_patient_id") &&
             $CurrentForm->hasValue("o_patient_id") &&
@@ -1695,19 +1688,6 @@ class IssueItemsGrid extends IssueItems
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'admission_id' first before field var 'x_admission_id'
-        $val = $CurrentForm->hasValue("admission_id") ? $CurrentForm->getValue("admission_id") : $CurrentForm->getValue("x_admission_id");
-        if (!$this->admission_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->admission_id->Visible = false; // Disable update for API request
-            } else {
-                $this->admission_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_admission_id")) {
-            $this->admission_id->setOldValue($CurrentForm->getValue("o_admission_id"));
-        }
-
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1727,7 +1707,7 @@ class IssueItemsGrid extends IssueItems
             if (IsApi() && $val === null) {
                 $this->item_id->Visible = false; // Disable update for API request
             } else {
-                $this->item_id->setFormValue($val, true, $validate);
+                $this->item_id->setFormValue($val);
             }
         }
         if ($CurrentForm->hasValue("o_item_id")) {
@@ -1789,7 +1769,6 @@ class IssueItemsGrid extends IssueItems
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->admission_id->CurrentValue = $this->admission_id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->item_id->CurrentValue = $this->item_id->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
@@ -1997,8 +1976,27 @@ class IssueItemsGrid extends IssueItems
             }
 
             // item_id
-            $this->item_id->ViewValue = $this->item_id->CurrentValue;
-            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+            $curVal = strval($this->item_id->CurrentValue);
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
+                    } else {
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->item_id->ViewValue = null;
+            }
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -2011,10 +2009,6 @@ class IssueItemsGrid extends IssueItems
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-            $this->admission_id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -2036,21 +2030,6 @@ class IssueItemsGrid extends IssueItems
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // admission_id
-            $this->admission_id->setupEditAttributes();
-            if ($this->admission_id->getSessionValue() != "") {
-                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
-                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
-            } else {
-                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
-                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
-                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
-                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
-                }
-            }
-
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2106,11 +2085,30 @@ class IssueItemsGrid extends IssueItems
 
             // item_id
             $this->item_id->setupEditAttributes();
-            $this->item_id->EditValue = $this->item_id->CurrentValue;
-            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
-            if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
-                $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
+            $curVal = trim(strval($this->item_id->CurrentValue));
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+            } else {
+                $this->item_id->ViewValue = $this->item_id->Lookup !== null && is_array($this->item_id->lookupOptions()) && count($this->item_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->item_id->ViewValue !== null) { // Load from cache
+                $this->item_id->EditValue = array_values($this->item_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->item_id->CurrentValue, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->item_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->item_id->EditValue = $arwrk;
+            }
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
 
             // quantity
             $this->quantity->setupEditAttributes();
@@ -2132,9 +2130,6 @@ class IssueItemsGrid extends IssueItems
 
             // Add refer script
 
-            // admission_id
-            $this->admission_id->HrefValue = "";
-
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2150,21 +2145,6 @@ class IssueItemsGrid extends IssueItems
             // date_updated
             $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // admission_id
-            $this->admission_id->setupEditAttributes();
-            if ($this->admission_id->getSessionValue() != "") {
-                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
-                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
-            } else {
-                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
-                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
-                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
-                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
-                }
-            }
-
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2220,11 +2200,30 @@ class IssueItemsGrid extends IssueItems
 
             // item_id
             $this->item_id->setupEditAttributes();
-            $this->item_id->EditValue = $this->item_id->CurrentValue;
-            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
-            if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
-                $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
+            $curVal = trim(strval($this->item_id->CurrentValue));
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+            } else {
+                $this->item_id->ViewValue = $this->item_id->Lookup !== null && is_array($this->item_id->lookupOptions()) && count($this->item_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->item_id->ViewValue !== null) { // Load from cache
+                $this->item_id->EditValue = array_values($this->item_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->item_id->CurrentValue, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->item_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->item_id->EditValue = $arwrk;
+            }
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
 
             // quantity
             $this->quantity->setupEditAttributes();
@@ -2245,9 +2244,6 @@ class IssueItemsGrid extends IssueItems
             $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -2284,14 +2280,6 @@ class IssueItemsGrid extends IssueItems
             return true;
         }
         $validateForm = true;
-            if ($this->admission_id->Visible && $this->admission_id->Required) {
-                if (!$this->admission_id->IsDetailKey && EmptyValue($this->admission_id->FormValue)) {
-                    $this->admission_id->addErrorMessage(str_replace("%s", $this->admission_id->caption(), $this->admission_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->admission_id->FormValue)) {
-                $this->admission_id->addErrorMessage($this->admission_id->getErrorMessage(false));
-            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
@@ -2301,9 +2289,6 @@ class IssueItemsGrid extends IssueItems
                 if (!$this->item_id->IsDetailKey && EmptyValue($this->item_id->FormValue)) {
                     $this->item_id->addErrorMessage(str_replace("%s", $this->item_id->caption(), $this->item_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->item_id->FormValue)) {
-                $this->item_id->addErrorMessage($this->item_id->getErrorMessage(false));
             }
             if ($this->quantity->Visible && $this->quantity->Required) {
                 if (!$this->quantity->IsDetailKey && EmptyValue($this->quantity->FormValue)) {
@@ -2479,12 +2464,6 @@ class IssueItemsGrid extends IssueItems
         global $Security;
         $rsnew = [];
 
-        // admission_id
-        if ($this->admission_id->getSessionValue() != "") {
-            $this->admission_id->ReadOnly = true;
-        }
-        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, $this->admission_id->ReadOnly);
-
         // patient_id
         if ($this->patient_id->getSessionValue() != "") {
             $this->patient_id->ReadOnly = true;
@@ -2511,9 +2490,6 @@ class IssueItemsGrid extends IssueItems
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['admission_id'])) { // admission_id
-            $this->admission_id->CurrentValue = $row['admission_id'];
-        }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->CurrentValue = $row['patient_id'];
         }
@@ -2590,9 +2566,6 @@ class IssueItemsGrid extends IssueItems
         global $Security;
         $rsnew = [];
 
-        // admission_id
-        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, false);
-
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
 
@@ -2607,6 +2580,11 @@ class IssueItemsGrid extends IssueItems
 
         // date_updated
         $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // admission_id
+        if ($this->admission_id->getSessionValue() != "") {
+            $rsnew['admission_id'] = $this->admission_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2616,9 +2594,6 @@ class IssueItemsGrid extends IssueItems
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['admission_id'])) { // admission_id
-            $this->admission_id->setFormValue($row['admission_id']);
-        }
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
         }
@@ -2633,6 +2608,9 @@ class IssueItemsGrid extends IssueItems
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['admission_id'])) { // admission_id
+            $this->admission_id->setFormValue($row['admission_id']);
         }
     }
 
@@ -2670,6 +2648,8 @@ class IssueItemsGrid extends IssueItems
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

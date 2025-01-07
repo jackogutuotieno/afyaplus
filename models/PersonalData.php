@@ -45,7 +45,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "humanresourcesoverview";
+    public $CurrentPageName = "receiveditemsviewlist";
 
     // Page headings
     public $Heading = "";

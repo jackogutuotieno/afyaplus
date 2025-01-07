@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class BedAssignmentList extends BedAssignment
+class ReceivedItemsViewList extends ReceivedItemsView
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class BedAssignmentList extends BedAssignment
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "BedAssignmentList";
+    public $PageObjName = "ReceivedItemsViewList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class BedAssignmentList extends BedAssignment
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fbed_assignmentlist";
+    public $FormName = "freceived_items_viewlist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "bedassignmentlist";
+    public $CurrentPageName = "receiveditemsviewlist";
 
     // Page URLs
     public $AddUrl;
@@ -64,14 +64,6 @@ class BedAssignmentList extends BedAssignment
     public $MultiEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = true;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -154,16 +146,14 @@ class BedAssignmentList extends BedAssignment
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
-        $this->admission_id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->floor_id->setVisibility();
-        $this->ward_type_id->setVisibility();
-        $this->ward_id->setVisibility();
-        $this->bed_id->setVisibility();
-        $this->status->setVisibility();
+        $this->id->setVisibility();
+        $this->batch_number->setVisibility();
+        $this->item_title->setVisibility();
+        $this->total_items_received->setVisibility();
+        $this->measuring_unit->setVisibility();
+        $this->qty_left->setVisibility();
+        $this->selling_price->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
     }
 
     // Constructor
@@ -174,8 +164,8 @@ class BedAssignmentList extends BedAssignment
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'bed_assignment';
-        $this->TableName = 'bed_assignment';
+        $this->TableVar = 'received_items_view';
+        $this->TableName = 'received_items_view';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -195,26 +185,26 @@ class BedAssignmentList extends BedAssignment
         // Language object
         $Language = Container("app.language");
 
-        // Table object (bed_assignment)
-        if (!isset($GLOBALS["bed_assignment"]) || $GLOBALS["bed_assignment"]::class == PROJECT_NAMESPACE . "bed_assignment") {
-            $GLOBALS["bed_assignment"] = &$this;
+        // Table object (received_items_view)
+        if (!isset($GLOBALS["received_items_view"]) || $GLOBALS["received_items_view"]::class == PROJECT_NAMESPACE . "received_items_view") {
+            $GLOBALS["received_items_view"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "bedassignmentadd";
+        $this->AddUrl = "receiveditemsviewadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "bedassignmentdelete";
-        $this->MultiUpdateUrl = "bedassignmentupdate";
+        $this->MultiDeleteUrl = "receiveditemsviewdelete";
+        $this->MultiUpdateUrl = "receiveditemsviewupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'bed_assignment');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'received_items_view');
         }
 
         // Start timer
@@ -365,7 +355,7 @@ class BedAssignmentList extends BedAssignment
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "bedassignmentview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "receiveditemsviewview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -716,23 +706,12 @@ class BedAssignmentList extends BedAssignment
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->patient_id);
-        $this->setupLookupOptions($this->floor_id);
-        $this->setupLookupOptions($this->ward_type_id);
-        $this->setupLookupOptions($this->ward_id);
-        $this->setupLookupOptions($this->bed_id);
-        $this->setupLookupOptions($this->status);
-
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fbed_assignmentgrid";
+            $this->FormName = "freceived_items_viewgrid";
         }
 
         // Set up page action
@@ -863,28 +842,8 @@ class BedAssignmentList extends BedAssignment
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
-            $masterTbl = Container("patient_admissions");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientadmissionslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -939,13 +898,6 @@ class BedAssignmentList extends BedAssignment
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
-            }
-
-            // Audit trail on search
-            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
-                $searchParm = ServerVar("QUERY_STRING");
-                $searchSql = $this->getSessionWhere();
-                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -1096,18 +1048,16 @@ class BedAssignmentList extends BedAssignment
 
         // Load server side filters
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fbed_assignmentsrch");
+            $savedFilterList = Profile()->getSearchFilters("freceived_items_viewsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->admission_id->AdvancedSearch->toJson(), ","); // Field admission_id
-        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
-        $filterList = Concat($filterList, $this->floor_id->AdvancedSearch->toJson(), ","); // Field floor_id
-        $filterList = Concat($filterList, $this->ward_type_id->AdvancedSearch->toJson(), ","); // Field ward_type_id
-        $filterList = Concat($filterList, $this->ward_id->AdvancedSearch->toJson(), ","); // Field ward_id
-        $filterList = Concat($filterList, $this->bed_id->AdvancedSearch->toJson(), ","); // Field bed_id
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
+        $filterList = Concat($filterList, $this->batch_number->AdvancedSearch->toJson(), ","); // Field batch_number
+        $filterList = Concat($filterList, $this->item_title->AdvancedSearch->toJson(), ","); // Field item_title
+        $filterList = Concat($filterList, $this->total_items_received->AdvancedSearch->toJson(), ","); // Field total_items_received
+        $filterList = Concat($filterList, $this->measuring_unit->AdvancedSearch->toJson(), ","); // Field measuring_unit
+        $filterList = Concat($filterList, $this->qty_left->AdvancedSearch->toJson(), ","); // Field qty_left
+        $filterList = Concat($filterList, $this->selling_price->AdvancedSearch->toJson(), ","); // Field selling_price
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
-        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1128,7 +1078,7 @@ class BedAssignmentList extends BedAssignment
     {
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            Profile()->setSearchFilters("fbed_assignmentsrch", $filters);
+            Profile()->setSearchFilters("freceived_items_viewsrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1155,61 +1105,53 @@ class BedAssignmentList extends BedAssignment
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field admission_id
-        $this->admission_id->AdvancedSearch->SearchValue = @$filter["x_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchOperator = @$filter["z_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchCondition = @$filter["v_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchValue2 = @$filter["y_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchOperator2 = @$filter["w_admission_id"];
-        $this->admission_id->AdvancedSearch->save();
+        // Field batch_number
+        $this->batch_number->AdvancedSearch->SearchValue = @$filter["x_batch_number"];
+        $this->batch_number->AdvancedSearch->SearchOperator = @$filter["z_batch_number"];
+        $this->batch_number->AdvancedSearch->SearchCondition = @$filter["v_batch_number"];
+        $this->batch_number->AdvancedSearch->SearchValue2 = @$filter["y_batch_number"];
+        $this->batch_number->AdvancedSearch->SearchOperator2 = @$filter["w_batch_number"];
+        $this->batch_number->AdvancedSearch->save();
 
-        // Field patient_id
-        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
-        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
-        $this->patient_id->AdvancedSearch->save();
+        // Field item_title
+        $this->item_title->AdvancedSearch->SearchValue = @$filter["x_item_title"];
+        $this->item_title->AdvancedSearch->SearchOperator = @$filter["z_item_title"];
+        $this->item_title->AdvancedSearch->SearchCondition = @$filter["v_item_title"];
+        $this->item_title->AdvancedSearch->SearchValue2 = @$filter["y_item_title"];
+        $this->item_title->AdvancedSearch->SearchOperator2 = @$filter["w_item_title"];
+        $this->item_title->AdvancedSearch->save();
 
-        // Field floor_id
-        $this->floor_id->AdvancedSearch->SearchValue = @$filter["x_floor_id"];
-        $this->floor_id->AdvancedSearch->SearchOperator = @$filter["z_floor_id"];
-        $this->floor_id->AdvancedSearch->SearchCondition = @$filter["v_floor_id"];
-        $this->floor_id->AdvancedSearch->SearchValue2 = @$filter["y_floor_id"];
-        $this->floor_id->AdvancedSearch->SearchOperator2 = @$filter["w_floor_id"];
-        $this->floor_id->AdvancedSearch->save();
+        // Field total_items_received
+        $this->total_items_received->AdvancedSearch->SearchValue = @$filter["x_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchOperator = @$filter["z_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchCondition = @$filter["v_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchValue2 = @$filter["y_total_items_received"];
+        $this->total_items_received->AdvancedSearch->SearchOperator2 = @$filter["w_total_items_received"];
+        $this->total_items_received->AdvancedSearch->save();
 
-        // Field ward_type_id
-        $this->ward_type_id->AdvancedSearch->SearchValue = @$filter["x_ward_type_id"];
-        $this->ward_type_id->AdvancedSearch->SearchOperator = @$filter["z_ward_type_id"];
-        $this->ward_type_id->AdvancedSearch->SearchCondition = @$filter["v_ward_type_id"];
-        $this->ward_type_id->AdvancedSearch->SearchValue2 = @$filter["y_ward_type_id"];
-        $this->ward_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_ward_type_id"];
-        $this->ward_type_id->AdvancedSearch->save();
+        // Field measuring_unit
+        $this->measuring_unit->AdvancedSearch->SearchValue = @$filter["x_measuring_unit"];
+        $this->measuring_unit->AdvancedSearch->SearchOperator = @$filter["z_measuring_unit"];
+        $this->measuring_unit->AdvancedSearch->SearchCondition = @$filter["v_measuring_unit"];
+        $this->measuring_unit->AdvancedSearch->SearchValue2 = @$filter["y_measuring_unit"];
+        $this->measuring_unit->AdvancedSearch->SearchOperator2 = @$filter["w_measuring_unit"];
+        $this->measuring_unit->AdvancedSearch->save();
 
-        // Field ward_id
-        $this->ward_id->AdvancedSearch->SearchValue = @$filter["x_ward_id"];
-        $this->ward_id->AdvancedSearch->SearchOperator = @$filter["z_ward_id"];
-        $this->ward_id->AdvancedSearch->SearchCondition = @$filter["v_ward_id"];
-        $this->ward_id->AdvancedSearch->SearchValue2 = @$filter["y_ward_id"];
-        $this->ward_id->AdvancedSearch->SearchOperator2 = @$filter["w_ward_id"];
-        $this->ward_id->AdvancedSearch->save();
+        // Field qty_left
+        $this->qty_left->AdvancedSearch->SearchValue = @$filter["x_qty_left"];
+        $this->qty_left->AdvancedSearch->SearchOperator = @$filter["z_qty_left"];
+        $this->qty_left->AdvancedSearch->SearchCondition = @$filter["v_qty_left"];
+        $this->qty_left->AdvancedSearch->SearchValue2 = @$filter["y_qty_left"];
+        $this->qty_left->AdvancedSearch->SearchOperator2 = @$filter["w_qty_left"];
+        $this->qty_left->AdvancedSearch->save();
 
-        // Field bed_id
-        $this->bed_id->AdvancedSearch->SearchValue = @$filter["x_bed_id"];
-        $this->bed_id->AdvancedSearch->SearchOperator = @$filter["z_bed_id"];
-        $this->bed_id->AdvancedSearch->SearchCondition = @$filter["v_bed_id"];
-        $this->bed_id->AdvancedSearch->SearchValue2 = @$filter["y_bed_id"];
-        $this->bed_id->AdvancedSearch->SearchOperator2 = @$filter["w_bed_id"];
-        $this->bed_id->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
+        // Field selling_price
+        $this->selling_price->AdvancedSearch->SearchValue = @$filter["x_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchOperator = @$filter["z_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchCondition = @$filter["v_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchValue2 = @$filter["y_selling_price"];
+        $this->selling_price->AdvancedSearch->SearchOperator2 = @$filter["w_selling_price"];
+        $this->selling_price->AdvancedSearch->save();
 
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
@@ -1218,14 +1160,6 @@ class BedAssignmentList extends BedAssignment
         $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
         $this->date_created->AdvancedSearch->save();
-
-        // Field date_updated
-        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
-        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
-        $this->date_updated->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1265,7 +1199,9 @@ class BedAssignmentList extends BedAssignment
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->status;
+        $searchFlds[] = &$this->batch_number;
+        $searchFlds[] = &$this->item_title;
+        $searchFlds[] = &$this->measuring_unit;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1344,15 +1280,14 @@ class BedAssignmentList extends BedAssignment
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->admission_id); // admission_id
-            $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->floor_id); // floor_id
-            $this->updateSort($this->ward_type_id); // ward_type_id
-            $this->updateSort($this->ward_id); // ward_id
-            $this->updateSort($this->bed_id); // bed_id
-            $this->updateSort($this->status); // status
+            $this->updateSort($this->id); // id
+            $this->updateSort($this->batch_number); // batch_number
+            $this->updateSort($this->item_title); // item_title
+            $this->updateSort($this->total_items_received); // total_items_received
+            $this->updateSort($this->measuring_unit); // measuring_unit
+            $this->updateSort($this->qty_left); // qty_left
+            $this->updateSort($this->selling_price); // selling_price
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1373,29 +1308,18 @@ class BedAssignmentList extends BedAssignment
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->admission_id->setSessionValue("");
-                        $this->patient_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->admission_id->setSort("");
-                $this->patient_id->setSort("");
-                $this->floor_id->setSort("");
-                $this->ward_type_id->setSort("");
-                $this->ward_id->setSort("");
-                $this->bed_id->setSort("");
-                $this->status->setSort("");
+                $this->batch_number->setSort("");
+                $this->item_title->setSort("");
+                $this->total_items_received->setSort("");
+                $this->measuring_unit->setSort("");
+                $this->qty_left->setSort("");
+                $this->selling_price->setSort("");
                 $this->date_created->setSort("");
-                $this->date_updated->setSort("");
             }
 
             // Reset start position
@@ -1415,24 +1339,6 @@ class BedAssignmentList extends BedAssignment
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
-
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -1449,14 +1355,6 @@ class BedAssignmentList extends BedAssignment
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
-
-        // "sequence"
-        $item = &$this->ListOptions->add("sequence");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1497,53 +1395,8 @@ class BedAssignmentList extends BedAssignment
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
-
-        // "sequence"
-        $opt = $this->ListOptions["sequence"];
-        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"bed_assignment\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"bed_assignment\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
 
         // Set up list action buttons
@@ -1562,12 +1415,12 @@ class BedAssignmentList extends BedAssignment
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fbed_assignmentlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"freceived_items_viewlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fbed_assignmentlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"freceived_items_viewlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1604,17 +1457,6 @@ class BedAssignmentList extends BedAssignment
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["addedit"];
-
-        // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"bed_assignment\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1623,15 +1465,14 @@ class BedAssignmentList extends BedAssignment
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "admission_id");
-            $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "floor_id");
-            $this->createColumnOption($option, "ward_type_id");
-            $this->createColumnOption($option, "ward_id");
-            $this->createColumnOption($option, "bed_id");
-            $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "id");
+            $this->createColumnOption($option, "batch_number");
+            $this->createColumnOption($option, "item_title");
+            $this->createColumnOption($option, "total_items_received");
+            $this->createColumnOption($option, "measuring_unit");
+            $this->createColumnOption($option, "qty_left");
+            $this->createColumnOption($option, "selling_price");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -1656,10 +1497,10 @@ class BedAssignmentList extends BedAssignment
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fbed_assignmentsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"freceived_items_viewsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fbed_assignmentsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"freceived_items_viewsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1719,7 +1560,7 @@ class BedAssignmentList extends BedAssignment
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fbed_assignmentlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="freceived_items_viewlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -1890,7 +1731,7 @@ class BedAssignmentList extends BedAssignment
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_bed_assignment", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_received_items_view", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1951,7 +1792,7 @@ class BedAssignmentList extends BedAssignment
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_bed_assignment",
+            "id" => "r" . $this->RowCount . "_received_items_view",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2071,15 +1912,13 @@ class BedAssignmentList extends BedAssignment
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->admission_id->setDbValue($row['admission_id']);
-        $this->patient_id->setDbValue($row['patient_id']);
-        $this->floor_id->setDbValue($row['floor_id']);
-        $this->ward_type_id->setDbValue($row['ward_type_id']);
-        $this->ward_id->setDbValue($row['ward_id']);
-        $this->bed_id->setDbValue($row['bed_id']);
-        $this->status->setDbValue($row['status']);
+        $this->batch_number->setDbValue($row['batch_number']);
+        $this->item_title->setDbValue($row['item_title']);
+        $this->total_items_received->setDbValue($row['total_items_received']);
+        $this->measuring_unit->setDbValue($row['measuring_unit']);
+        $this->qty_left->setDbValue($row['qty_left']);
+        $this->selling_price->setDbValue($row['selling_price']);
         $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Return a row with default values
@@ -2087,15 +1926,13 @@ class BedAssignmentList extends BedAssignment
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['admission_id'] = $this->admission_id->DefaultValue;
-        $row['patient_id'] = $this->patient_id->DefaultValue;
-        $row['floor_id'] = $this->floor_id->DefaultValue;
-        $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
-        $row['ward_id'] = $this->ward_id->DefaultValue;
-        $row['bed_id'] = $this->bed_id->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
+        $row['batch_number'] = $this->batch_number->DefaultValue;
+        $row['item_title'] = $this->item_title->DefaultValue;
+        $row['total_items_received'] = $this->total_items_received->DefaultValue;
+        $row['measuring_unit'] = $this->measuring_unit->DefaultValue;
+        $row['qty_left'] = $this->qty_left->DefaultValue;
+        $row['selling_price'] = $this->selling_price->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
     }
 
@@ -2138,199 +1975,81 @@ class BedAssignmentList extends BedAssignment
 
         // id
 
-        // admission_id
+        // batch_number
 
-        // patient_id
+        // item_title
 
-        // floor_id
+        // total_items_received
 
-        // ward_type_id
+        // measuring_unit
 
-        // ward_id
+        // qty_left
 
-        // bed_id
-
-        // status
+        // selling_price
 
         // date_created
-
-        // date_updated
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
-            // admission_id
-            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
-            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
+            // batch_number
+            $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
 
-            // patient_id
-            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $curVal = strval($this->patient_id->CurrentValue);
-            if ($curVal != "") {
-                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                if ($this->patient_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                    } else {
-                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->patient_id->ViewValue = null;
-            }
+            // item_title
+            $this->item_title->ViewValue = $this->item_title->CurrentValue;
 
-            // floor_id
-            $curVal = strval($this->floor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
-                if ($this->floor_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
-                    } else {
-                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->floor_id->ViewValue = null;
-            }
+            // total_items_received
+            $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
+            $this->total_items_received->ViewValue = FormatNumber($this->total_items_received->ViewValue, $this->total_items_received->formatPattern());
 
-            // ward_type_id
-            $curVal = strval($this->ward_type_id->CurrentValue);
-            if ($curVal != "") {
-                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
-                if ($this->ward_type_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->ward_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->ward_type_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->ward_type_id->ViewValue = $this->ward_type_id->displayValue($arwrk);
-                    } else {
-                        $this->ward_type_id->ViewValue = FormatNumber($this->ward_type_id->CurrentValue, $this->ward_type_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->ward_type_id->ViewValue = null;
-            }
+            // measuring_unit
+            $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
-            // ward_id
-            $curVal = strval($this->ward_id->CurrentValue);
-            if ($curVal != "") {
-                $this->ward_id->ViewValue = $this->ward_id->lookupCacheOption($curVal);
-                if ($this->ward_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->ward_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->ward_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->ward_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->ward_id->ViewValue = $this->ward_id->displayValue($arwrk);
-                    } else {
-                        $this->ward_id->ViewValue = FormatNumber($this->ward_id->CurrentValue, $this->ward_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->ward_id->ViewValue = null;
-            }
+            // qty_left
+            $this->qty_left->ViewValue = $this->qty_left->CurrentValue;
+            $this->qty_left->ViewValue = FormatNumber($this->qty_left->ViewValue, $this->qty_left->formatPattern());
 
-            // bed_id
-            $curVal = strval($this->bed_id->CurrentValue);
-            if ($curVal != "") {
-                $this->bed_id->ViewValue = $this->bed_id->lookupCacheOption($curVal);
-                if ($this->bed_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->bed_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->bed_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->bed_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->bed_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->bed_id->ViewValue = $this->bed_id->displayValue($arwrk);
-                    } else {
-                        $this->bed_id->ViewValue = FormatNumber($this->bed_id->CurrentValue, $this->bed_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->bed_id->ViewValue = null;
-            }
-
-            // status
-            if (strval($this->status->CurrentValue) != "") {
-                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-            } else {
-                $this->status->ViewValue = null;
-            }
+            // selling_price
+            $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+            $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // admission_id
-            $this->admission_id->HrefValue = "";
-            $this->admission_id->TooltipValue = "";
+            // batch_number
+            $this->batch_number->HrefValue = "";
+            $this->batch_number->TooltipValue = "";
 
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
+            // item_title
+            $this->item_title->HrefValue = "";
+            $this->item_title->TooltipValue = "";
 
-            // floor_id
-            $this->floor_id->HrefValue = "";
-            $this->floor_id->TooltipValue = "";
+            // total_items_received
+            $this->total_items_received->HrefValue = "";
+            $this->total_items_received->TooltipValue = "";
 
-            // ward_type_id
-            $this->ward_type_id->HrefValue = "";
-            $this->ward_type_id->TooltipValue = "";
+            // measuring_unit
+            $this->measuring_unit->HrefValue = "";
+            $this->measuring_unit->TooltipValue = "";
 
-            // ward_id
-            $this->ward_id->HrefValue = "";
-            $this->ward_id->TooltipValue = "";
+            // qty_left
+            $this->qty_left->HrefValue = "";
+            $this->qty_left->TooltipValue = "";
 
-            // bed_id
-            $this->bed_id->HrefValue = "";
-            $this->bed_id->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // selling_price
+            $this->selling_price->HrefValue = "";
+            $this->selling_price->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2351,19 +2070,19 @@ class BedAssignmentList extends BedAssignment
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fbed_assignmentlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"freceived_items_viewlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fbed_assignmentlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"freceived_items_viewlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fbed_assignmentlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"freceived_items_viewlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2375,7 +2094,7 @@ class BedAssignmentList extends BedAssignment
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fbed_assignmentlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="freceived_items_viewlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2453,7 +2172,7 @@ class BedAssignmentList extends BedAssignment
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fbed_assignmentsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"freceived_items_viewsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
@@ -2540,23 +2259,6 @@ class BedAssignmentList extends BedAssignment
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
-            $patient_admissions = new PatientAdmissionsList();
-            $rsmaster = $patient_admissions->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($patient_admissions);
-                    $patient_admissions->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2574,115 +2276,6 @@ class BedAssignmentList extends BedAssignment
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_admissions") {
-                $validMaster = true;
-                $masterTbl = Container("patient_admissions");
-                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
-                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setQueryStringValue($parm);
-                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "patient_admissions") {
-                $validMaster = true;
-                $masterTbl = Container("patient_admissions");
-                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
-                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
-                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
-                    $masterTbl->patient_id->setFormValue($parm);
-                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
-                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
-                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
-                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "patient_admissions") {
-                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
-                    $this->admission_id->setSessionValue("");
-                }
-                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
-                    $this->patient_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb
@@ -2708,18 +2301,6 @@ class BedAssignmentList extends BedAssignment
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_patient_id":
-                    break;
-                case "x_floor_id":
-                    break;
-                case "x_ward_type_id":
-                    break;
-                case "x_ward_id":
-                    break;
-                case "x_bed_id":
-                    break;
-                case "x_status":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2892,10 +2473,7 @@ class BedAssignmentList extends BedAssignment
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "Assign Bed");
+        //Log("Page Load");
     }
 
     // Page Unload event

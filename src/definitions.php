@@ -211,6 +211,7 @@ return [
     "employees_report" => \DI\create(EmployeesReport::class),
     "Human_Resources_Overview" => \DI\create(HumanResourcesOverview::class),
     "human_resources_overview" => \DI\create(HumanResourcesOverview::class),
+    "received_items_view" => \DI\create(ReceivedItemsView::class),
 
     // User table
     "usertable" => \DI\get("users"),

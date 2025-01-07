@@ -201,14 +201,18 @@ class IssueItems extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->item_id->InputTextType = "text";
         $this->item_id->Raw = true;
         $this->item_id->Nullable = false; // NOT NULL field
         $this->item_id->Required = true; // Required field
+        $this->item_id->setSelectMultiple(false); // Select one
+        $this->item_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->item_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->item_id->Lookup = new Lookup($this->item_id, 'received_items_view', false, 'id', ["item_title","","",""], '', '', [], [], [], [], [], [], false, '', '', "`item_title`");
         $this->item_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->item_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->item_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['item_id'] = &$this->item_id;
 
         // quantity
@@ -1354,8 +1358,27 @@ class IssueItems extends DbTable
         }
 
         // item_id
-        $this->item_id->ViewValue = $this->item_id->CurrentValue;
-        $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+        $curVal = strval($this->item_id->CurrentValue);
+        if ($curVal != "") {
+            $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+            if ($this->item_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
+                } else {
+                    $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
+                }
+            }
+        } else {
+            $this->item_id->ViewValue = null;
+        }
 
         // quantity
         $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -1461,11 +1484,7 @@ class IssueItems extends DbTable
 
         // item_id
         $this->item_id->setupEditAttributes();
-        $this->item_id->EditValue = $this->item_id->CurrentValue;
         $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
-        if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
-            $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
-        }
 
         // quantity
         $this->quantity->setupEditAttributes();

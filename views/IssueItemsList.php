@@ -111,9 +111,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->admission_id->Visible) { // admission_id ?>
-        <th data-name="admission_id" class="<?= $Page->admission_id->headerCellClass() ?>"><div id="elh_issue_items_admission_id" class="issue_items_admission_id"><?= $Page->renderFieldHeader($Page->admission_id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_issue_items_patient_id" class="issue_items_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
@@ -157,14 +154,6 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->admission_id->Visible) { // admission_id ?>
-        <td data-name="admission_id"<?= $Page->admission_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<span<?= $Page->admission_id->viewAttributes() ?>>
-<?= $Page->admission_id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_issue_items_patient_id" class="el_issue_items_patient_id">

@@ -88,6 +88,7 @@ $sideMenu->addMenuItem(752, "mi_leave_approvals", $Language->menuPhrase("752", "
 $sideMenu->addMenuItem(1019, "mci_Stores", $Language->menuPhrase("1019", "MenuText"), "", -1, "", true, false, true, "fa-boxes", "", false, true);
 $sideMenu->addMenuItem(964, "mi_receive_items", $Language->menuPhrase("964", "MenuText"), "receiveitemslist", 1019, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}receive_items'), false, false, "fa-boxes", "", false, true);
 $sideMenu->addMenuItem(1020, "mi_issue_items", $Language->menuPhrase("1020", "MenuText"), "issueitemslist?cmd=resetall", 1019, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}issue_items'), false, false, "fa-boxes", "", false, true);
+$sideMenu->addMenuItem(1025, "mi_received_items_view", $Language->menuPhrase("1025", "MenuText"), "receiveditemsviewlist", 1019, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}received_items_view'), false, false, "fa-boxes", "", false, true);
 $sideMenu->addMenuItem(104, "mci_Reports", $Language->menuPhrase("104", "MenuText"), "", -1, "", true, false, true, "fa-file", "", false, true);
 $sideMenu->addMenuItem(312, "mci_Internal", $Language->menuPhrase("312", "MenuText"), "", 104, "", true, false, true, "fa-file", "", false, true);
 $sideMenu->addMenuItem(244, "mi_Registered_Patients", $Language->menuPhrase("244", "MenuText"), "registeredpatients", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Registered Patients'), false, false, "fa-file", "", false, true);

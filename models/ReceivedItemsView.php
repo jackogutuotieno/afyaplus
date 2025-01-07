@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for receive_items
+ * Table class for received_items_view
  */
-class ReceiveItems extends DbTable
+class ReceivedItemsView extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,11 +48,13 @@ class ReceiveItems extends DbTable
 
     // Fields
     public $id;
-    public $item_id;
+    public $batch_number;
+    public $item_title;
     public $total_items_received;
     public $measuring_unit;
+    public $qty_left;
+    public $selling_price;
     public $date_created;
-    public $date_updated;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -65,14 +67,14 @@ class ReceiveItems extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "receive_items";
-        $this->TableName = 'receive_items';
-        $this->TableType = "TABLE";
+        $this->TableVar = "received_items_view";
+        $this->TableName = 'received_items_view';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "receive_items";
+        $this->UpdateTable = "received_items_view";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -126,35 +128,53 @@ class ReceiveItems extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // item_id
-        $this->item_id = new DbField(
+        // batch_number
+        $this->batch_number = new DbField(
             $this, // Table
-            'x_item_id', // Variable name
-            'item_id', // Name
-            '`item_id`', // Expression
-            '`item_id`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_batch_number', // Variable name
+            'batch_number', // Name
+            '`batch_number`', // Expression
+            '`batch_number`', // Basic search expression
+            200, // Type
+            100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`item_id`', // Virtual expression
+            '`batch_number`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->item_id->InputTextType = "text";
-        $this->item_id->Raw = true;
-        $this->item_id->Nullable = false; // NOT NULL field
-        $this->item_id->Required = true; // Required field
-        $this->item_id->setSelectMultiple(false); // Select one
-        $this->item_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->item_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->item_id->Lookup = new Lookup($this->item_id, 'item_purchases', false, 'id', ["item_title","batch_number","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(COALESCE(`item_title`, ''),'" . ValueSeparator(1, $this->item_id) . "',COALESCE(`batch_number`,''))");
-        $this->item_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->item_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['item_id'] = &$this->item_id;
+        $this->batch_number->InputTextType = "text";
+        $this->batch_number->Nullable = false; // NOT NULL field
+        $this->batch_number->Required = true; // Required field
+        $this->batch_number->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['batch_number'] = &$this->batch_number;
+
+        // item_title
+        $this->item_title = new DbField(
+            $this, // Table
+            'x_item_title', // Variable name
+            'item_title', // Name
+            '`item_title`', // Expression
+            '`item_title`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`item_title`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->item_title->InputTextType = "text";
+        $this->item_title->Nullable = false; // NOT NULL field
+        $this->item_title->Required = true; // Required field
+        $this->item_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['item_title'] = &$this->item_title;
 
         // total_items_received
         $this->total_items_received = new DbField(
@@ -206,16 +226,67 @@ class ReceiveItems extends DbTable
         $this->measuring_unit->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['measuring_unit'] = &$this->measuring_unit;
 
+        // qty_left
+        $this->qty_left = new DbField(
+            $this, // Table
+            'x_qty_left', // Variable name
+            'qty_left', // Name
+            'total_items_received - (SELECT SUM(quantity) FROM issue_items WHERE item_id=id)', // Expression
+            'total_items_received - (SELECT SUM(quantity) FROM issue_items WHERE item_id=id)', // Basic search expression
+            131, // Type
+            34, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'total_items_received - (SELECT SUM(quantity) FROM issue_items WHERE item_id=id)', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->qty_left->InputTextType = "text";
+        $this->qty_left->Raw = true;
+        $this->qty_left->IsCustom = true; // Custom field
+        $this->qty_left->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->qty_left->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['qty_left'] = &$this->qty_left;
+
+        // selling_price
+        $this->selling_price = new DbField(
+            $this, // Table
+            'x_selling_price', // Variable name
+            'selling_price', // Name
+            '`selling_price`', // Expression
+            '`selling_price`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`selling_price`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->selling_price->InputTextType = "text";
+        $this->selling_price->Raw = true;
+        $this->selling_price->Nullable = false; // NOT NULL field
+        $this->selling_price->Required = true; // Required field
+        $this->selling_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->selling_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['selling_price'] = &$this->selling_price;
+
         // date_created
         $this->date_created = new DbField(
             $this, // Table
             'x_date_created', // Variable name
             'date_created', // Name
             '`date_created`', // Expression
-            CastDateFieldForLike("`date_created`", 11, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_created`", 7, "DB"), // Basic search expression
             135, // Type
-            19, // Size
-            11, // Date/Time format
+            76, // Size
+            7, // Date/Time format
             false, // Is upload field
             '`date_created`', // Virtual expression
             false, // Is virtual
@@ -228,35 +299,9 @@ class ReceiveItems extends DbTable
         $this->date_created->Raw = true;
         $this->date_created->Nullable = false; // NOT NULL field
         $this->date_created->Required = true; // Required field
-        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
+        $this->date_created->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_created->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_created'] = &$this->date_created;
-
-        // date_updated
-        $this->date_updated = new DbField(
-            $this, // Table
-            'x_date_updated', // Variable name
-            'date_updated', // Name
-            '`date_updated`', // Expression
-            CastDateFieldForLike("`date_updated`", 11, "DB"), // Basic search expression
-            135, // Type
-            19, // Size
-            11, // Date/Time format
-            false, // Is upload field
-            '`date_updated`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->date_updated->InputTextType = "text";
-        $this->date_updated->Raw = true;
-        $this->date_updated->Nullable = false; // NOT NULL field
-        $this->date_updated->Required = true; // Required field
-        $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_updated'] = &$this->date_updated;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -325,7 +370,7 @@ class ReceiveItems extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "receive_items";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "received_items_view";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -349,20 +394,7 @@ class ReceiveItems extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, total_items_received - (SELECT SUM(quantity) FROM issue_items WHERE item_id=id) AS `qty_left`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -777,11 +809,13 @@ class ReceiveItems extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->item_id->DbValue = $row['item_id'];
+        $this->batch_number->DbValue = $row['batch_number'];
+        $this->item_title->DbValue = $row['item_title'];
         $this->total_items_received->DbValue = $row['total_items_received'];
         $this->measuring_unit->DbValue = $row['measuring_unit'];
+        $this->qty_left->DbValue = $row['qty_left'];
+        $this->selling_price->DbValue = $row['selling_price'];
         $this->date_created->DbValue = $row['date_created'];
-        $this->date_updated->DbValue = $row['date_updated'];
     }
 
     // Delete uploaded files
@@ -855,7 +889,7 @@ class ReceiveItems extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("receiveitemslist");
+        return $_SESSION[$name] ?? GetUrl("receiveditemsviewlist");
     }
 
     // Set return page URL
@@ -869,9 +903,9 @@ class ReceiveItems extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "receiveitemsview" => $Language->phrase("View"),
-            "receiveitemsedit" => $Language->phrase("Edit"),
-            "receiveitemsadd" => $Language->phrase("Add"),
+            "receiveditemsviewview" => $Language->phrase("View"),
+            "receiveditemsviewedit" => $Language->phrase("Edit"),
+            "receiveditemsviewadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -879,18 +913,18 @@ class ReceiveItems extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "receiveitemslist";
+        return "receiveditemsviewlist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "ReceiveItemsView",
-            Config("API_ADD_ACTION") => "ReceiveItemsAdd",
-            Config("API_EDIT_ACTION") => "ReceiveItemsEdit",
-            Config("API_DELETE_ACTION") => "ReceiveItemsDelete",
-            Config("API_LIST_ACTION") => "ReceiveItemsList",
+            Config("API_VIEW_ACTION") => "ReceivedItemsViewView",
+            Config("API_ADD_ACTION") => "ReceivedItemsViewAdd",
+            Config("API_EDIT_ACTION") => "ReceivedItemsViewEdit",
+            Config("API_DELETE_ACTION") => "ReceivedItemsViewDelete",
+            Config("API_LIST_ACTION") => "ReceivedItemsViewList",
             default => ""
         };
     }
@@ -910,16 +944,16 @@ class ReceiveItems extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "receiveitemslist";
+        return "receiveditemsviewlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("receiveitemsview", $parm);
+            $url = $this->keyUrl("receiveditemsviewview", $parm);
         } else {
-            $url = $this->keyUrl("receiveitemsview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("receiveditemsviewview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -928,9 +962,9 @@ class ReceiveItems extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "receiveitemsadd?" . $parm;
+            $url = "receiveditemsviewadd?" . $parm;
         } else {
-            $url = "receiveitemsadd";
+            $url = "receiveditemsviewadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -938,28 +972,28 @@ class ReceiveItems extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("receiveitemsedit", $parm);
+        $url = $this->keyUrl("receiveditemsviewedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("receiveitemslist", "action=edit");
+        $url = $this->keyUrl("receiveditemsviewlist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("receiveitemsadd", $parm);
+        $url = $this->keyUrl("receiveditemsviewadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("receiveitemslist", "action=copy");
+        $url = $this->keyUrl("receiveditemsviewlist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -969,7 +1003,7 @@ class ReceiveItems extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("receiveitemsdelete", $parm);
+            return $this->keyUrl("receiveditemsviewdelete", $parm);
         }
     }
 
@@ -1135,18 +1169,20 @@ class ReceiveItems extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->item_id->setDbValue($row['item_id']);
+        $this->batch_number->setDbValue($row['batch_number']);
+        $this->item_title->setDbValue($row['item_title']);
         $this->total_items_received->setDbValue($row['total_items_received']);
         $this->measuring_unit->setDbValue($row['measuring_unit']);
+        $this->qty_left->setDbValue($row['qty_left']);
+        $this->selling_price->setDbValue($row['selling_price']);
         $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "ReceiveItemsList";
+        $listPage = "ReceivedItemsViewList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1172,41 +1208,28 @@ class ReceiveItems extends DbTable
 
         // id
 
-        // item_id
+        // batch_number
+
+        // item_title
 
         // total_items_received
 
         // measuring_unit
 
-        // date_created
+        // qty_left
 
-        // date_updated
+        // selling_price
+
+        // date_created
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
-        // item_id
-        $curVal = strval($this->item_id->CurrentValue);
-        if ($curVal != "") {
-            $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
-            if ($this->item_id->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
-                } else {
-                    $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
-                }
-            }
-        } else {
-            $this->item_id->ViewValue = null;
-        }
+        // batch_number
+        $this->batch_number->ViewValue = $this->batch_number->CurrentValue;
+
+        // item_title
+        $this->item_title->ViewValue = $this->item_title->CurrentValue;
 
         // total_items_received
         $this->total_items_received->ViewValue = $this->total_items_received->CurrentValue;
@@ -1215,21 +1238,29 @@ class ReceiveItems extends DbTable
         // measuring_unit
         $this->measuring_unit->ViewValue = $this->measuring_unit->CurrentValue;
 
+        // qty_left
+        $this->qty_left->ViewValue = $this->qty_left->CurrentValue;
+        $this->qty_left->ViewValue = FormatNumber($this->qty_left->ViewValue, $this->qty_left->formatPattern());
+
+        // selling_price
+        $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+        $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-        // date_updated
-        $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-        $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // item_id
-        $this->item_id->HrefValue = "";
-        $this->item_id->TooltipValue = "";
+        // batch_number
+        $this->batch_number->HrefValue = "";
+        $this->batch_number->TooltipValue = "";
+
+        // item_title
+        $this->item_title->HrefValue = "";
+        $this->item_title->TooltipValue = "";
 
         // total_items_received
         $this->total_items_received->HrefValue = "";
@@ -1239,13 +1270,17 @@ class ReceiveItems extends DbTable
         $this->measuring_unit->HrefValue = "";
         $this->measuring_unit->TooltipValue = "";
 
+        // qty_left
+        $this->qty_left->HrefValue = "";
+        $this->qty_left->TooltipValue = "";
+
+        // selling_price
+        $this->selling_price->HrefValue = "";
+        $this->selling_price->TooltipValue = "";
+
         // date_created
         $this->date_created->HrefValue = "";
         $this->date_created->TooltipValue = "";
-
-        // date_updated
-        $this->date_updated->HrefValue = "";
-        $this->date_updated->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1266,9 +1301,21 @@ class ReceiveItems extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
-        // item_id
-        $this->item_id->setupEditAttributes();
-        $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
+        // batch_number
+        $this->batch_number->setupEditAttributes();
+        if (!$this->batch_number->Raw) {
+            $this->batch_number->CurrentValue = HtmlDecode($this->batch_number->CurrentValue);
+        }
+        $this->batch_number->EditValue = $this->batch_number->CurrentValue;
+        $this->batch_number->PlaceHolder = RemoveHtml($this->batch_number->caption());
+
+        // item_title
+        $this->item_title->setupEditAttributes();
+        if (!$this->item_title->Raw) {
+            $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
+        }
+        $this->item_title->EditValue = $this->item_title->CurrentValue;
+        $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
 
         // total_items_received
         $this->total_items_received->setupEditAttributes();
@@ -1286,15 +1333,26 @@ class ReceiveItems extends DbTable
         $this->measuring_unit->EditValue = $this->measuring_unit->CurrentValue;
         $this->measuring_unit->PlaceHolder = RemoveHtml($this->measuring_unit->caption());
 
+        // qty_left
+        $this->qty_left->setupEditAttributes();
+        $this->qty_left->EditValue = $this->qty_left->CurrentValue;
+        $this->qty_left->PlaceHolder = RemoveHtml($this->qty_left->caption());
+        if (strval($this->qty_left->EditValue) != "" && is_numeric($this->qty_left->EditValue)) {
+            $this->qty_left->EditValue = FormatNumber($this->qty_left->EditValue, null);
+        }
+
+        // selling_price
+        $this->selling_price->setupEditAttributes();
+        $this->selling_price->EditValue = $this->selling_price->CurrentValue;
+        $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
+        if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
+            $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
+        }
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
         $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-        // date_updated
-        $this->date_updated->setupEditAttributes();
-        $this->date_updated->EditValue = FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1325,18 +1383,22 @@ class ReceiveItems extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->item_id);
+                    $doc->exportCaption($this->batch_number);
+                    $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->total_items_received);
                     $doc->exportCaption($this->measuring_unit);
+                    $doc->exportCaption($this->qty_left);
+                    $doc->exportCaption($this->selling_price);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->item_id);
+                    $doc->exportCaption($this->batch_number);
+                    $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->total_items_received);
                     $doc->exportCaption($this->measuring_unit);
+                    $doc->exportCaption($this->qty_left);
+                    $doc->exportCaption($this->selling_price);
                     $doc->exportCaption($this->date_created);
-                    $doc->exportCaption($this->date_updated);
                 }
                 $doc->endExportRow();
             }
@@ -1364,18 +1426,22 @@ class ReceiveItems extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->item_id);
+                        $doc->exportField($this->batch_number);
+                        $doc->exportField($this->item_title);
                         $doc->exportField($this->total_items_received);
                         $doc->exportField($this->measuring_unit);
+                        $doc->exportField($this->qty_left);
+                        $doc->exportField($this->selling_price);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->item_id);
+                        $doc->exportField($this->batch_number);
+                        $doc->exportField($this->item_title);
                         $doc->exportField($this->total_items_received);
                         $doc->exportField($this->measuring_unit);
+                        $doc->exportField($this->qty_left);
+                        $doc->exportField($this->selling_price);
                         $doc->exportField($this->date_created);
-                        $doc->exportField($this->date_updated);
                     }
                     $doc->endExportRow($rowCnt);
                 }

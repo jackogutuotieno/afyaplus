@@ -377,6 +377,7 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -2262,6 +2263,11 @@
                     'POST',
                     'OPTIONS',
                 ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -2578,6 +2584,7 @@
                 '/radiologyrequestsdetailsview[/{id}]',
                 '/radiologyrequestsdetailsedit[/{id}]',
                 '/radiologyrequestsdetailsdelete[/{id}]',
+                '/receiveditemsviewlist[/{id}]',
                 '/receiveitemslist[/{id}]',
                 '/receiveitemsadd[/{id}]',
                 '/receiveitemsview[/{id}]',
@@ -2957,6 +2964,7 @@
                 'PHPMaker2024\\afyaplus\\RadiologyRequestsDetailsController:view',
                 'PHPMaker2024\\afyaplus\\RadiologyRequestsDetailsController:edit',
                 'PHPMaker2024\\afyaplus\\RadiologyRequestsDetailsController:delete',
+                'PHPMaker2024\\afyaplus\\ReceivedItemsViewController:list',
                 'PHPMaker2024\\afyaplus\\ReceiveItemsController:list',
                 'PHPMaker2024\\afyaplus\\ReceiveItemsController:add',
                 'PHPMaker2024\\afyaplus\\ReceiveItemsController:view',
@@ -4151,6 +4159,9 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -4467,6 +4478,7 @@
                 'view.radiology_requests_details',
                 'edit.radiology_requests_details',
                 'delete.radiology_requests_details',
+                'list.received_items_view',
                 'list.receive_items',
                 'add.receive_items',
                 'view.receive_items',
@@ -4532,6 +4544,7 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
                 [],
                 [],
                 [],
@@ -5290,6 +5303,7 @@
         $o[374],
         $o[375],
         $o[376],
+        $o[377],
     ],
     []
 );

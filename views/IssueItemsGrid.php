@@ -23,9 +23,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["admission_id", [fields.admission_id.visible && fields.admission_id.required ? ew.Validators.required(fields.admission_id.caption) : null, ew.Validators.integer], fields.admission_id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["item_id", [fields.item_id.visible && fields.item_id.required ? ew.Validators.required(fields.item_id.caption) : null, ew.Validators.integer], fields.item_id.isInvalid],
+            ["item_id", [fields.item_id.visible && fields.item_id.required ? ew.Validators.required(fields.item_id.caption) : null], fields.item_id.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid],
             ["date_updated", [fields.date_updated.visible && fields.date_updated.required ? ew.Validators.required(fields.date_updated.caption) : null, ew.Validators.datetime(fields.date_updated.clientFormatPattern)], fields.date_updated.isInvalid]
@@ -35,7 +34,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["admission_id",false],["patient_id",false],["item_id",false],["quantity",false],["date_created",false],["date_updated",false]];
+                    fields = [["patient_id",false],["item_id",false],["quantity",false],["date_created",false],["date_updated",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -56,6 +55,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
+            "item_id": <?= $Grid->item_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -90,9 +90,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->admission_id->Visible) { // admission_id ?>
-        <th data-name="admission_id" class="<?= $Grid->admission_id->headerCellClass() ?>"><div id="elh_issue_items_admission_id" class="issue_items_admission_id"><?= $Grid->renderFieldHeader($Grid->admission_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_issue_items_patient_id" class="issue_items_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
@@ -144,49 +141,6 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->admission_id->Visible) { // admission_id ?>
-        <td data-name="admission_id"<?= $Grid->admission_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<?php if ($Grid->admission_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<span<?= $Grid->admission_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->admission_id->getDisplayValue($Grid->admission_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_admission_id" name="x<?= $Grid->RowIndex ?>_admission_id" value="<?= HtmlEncode($Grid->admission_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<input type="<?= $Grid->admission_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_admission_id" id="x<?= $Grid->RowIndex ?>_admission_id" data-table="issue_items" data-field="x_admission_id" value="<?= $Grid->admission_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->admission_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->admission_id->formatPattern()) ?>"<?= $Grid->admission_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->admission_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<input type="hidden" data-table="issue_items" data-field="x_admission_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_admission_id" id="o<?= $Grid->RowIndex ?>_admission_id" value="<?= HtmlEncode($Grid->admission_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<?php if ($Grid->admission_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<span<?= $Grid->admission_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->admission_id->getDisplayValue($Grid->admission_id->ViewValue))) ?>"></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_admission_id" name="x<?= $Grid->RowIndex ?>_admission_id" value="<?= HtmlEncode($Grid->admission_id->CurrentValue) ?>" data-hidden="1">
-</span>
-<?php } else { ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<input type="<?= $Grid->admission_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_admission_id" id="x<?= $Grid->RowIndex ?>_admission_id" data-table="issue_items" data-field="x_admission_id" value="<?= $Grid->admission_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->admission_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->admission_id->formatPattern()) ?>"<?= $Grid->admission_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->admission_id->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_admission_id" class="el_issue_items_admission_id">
-<span<?= $Grid->admission_id->viewAttributes() ?>>
-<?= $Grid->admission_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="issue_items" data-field="x_admission_id" data-hidden="1" name="fissue_itemsgrid$x<?= $Grid->RowIndex ?>_admission_id" id="fissue_itemsgrid$x<?= $Grid->RowIndex ?>_admission_id" value="<?= HtmlEncode($Grid->admission_id->FormValue) ?>">
-<input type="hidden" data-table="issue_items" data-field="x_admission_id" data-hidden="1" data-old name="fissue_itemsgrid$o<?= $Grid->RowIndex ?>_admission_id" id="fissue_itemsgrid$o<?= $Grid->RowIndex ?>_admission_id" value="<?= HtmlEncode($Grid->admission_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -302,15 +256,83 @@ loadjs.ready("fissue_itemsgrid", function() {
         <td data-name="item_id"<?= $Grid->item_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_item_id" class="el_issue_items_item_id">
-<input type="<?= $Grid->item_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_item_id" id="x<?= $Grid->RowIndex ?>_item_id" data-table="issue_items" data-field="x_item_id" value="<?= $Grid->item_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->item_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->item_id->formatPattern()) ?>"<?= $Grid->item_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->item_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_item_id"
+        name="x<?= $Grid->RowIndex ?>_item_id"
+        class="form-select ew-select<?= $Grid->item_id->isInvalidClass() ?>"
+        <?php if (!$Grid->item_id->IsNativeSelect) { ?>
+        data-select2-id="fissue_itemsgrid_x<?= $Grid->RowIndex ?>_item_id"
+        <?php } ?>
+        data-table="issue_items"
+        data-field="x_item_id"
+        data-value-separator="<?= $Grid->item_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->item_id->getPlaceHolder()) ?>"
+        <?= $Grid->item_id->editAttributes() ?>>
+        <?= $Grid->item_id->selectOptionListHtml("x{$Grid->RowIndex}_item_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->item_id->getErrorMessage() ?></div>
+<?= $Grid->item_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_item_id") ?>
+<?php if (!$Grid->item_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fissue_itemsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_item_id", selectId: "fissue_itemsgrid_x<?= $Grid->RowIndex ?>_item_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fissue_itemsgrid.lists.item_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_item_id", form: "fissue_itemsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_item_id", form: "fissue_itemsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.issue_items.fields.item_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <input type="hidden" data-table="issue_items" data-field="x_item_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_item_id" id="o<?= $Grid->RowIndex ?>_item_id" value="<?= HtmlEncode($Grid->item_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_issue_items_item_id" class="el_issue_items_item_id">
-<input type="<?= $Grid->item_id->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_item_id" id="x<?= $Grid->RowIndex ?>_item_id" data-table="issue_items" data-field="x_item_id" value="<?= $Grid->item_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->item_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->item_id->formatPattern()) ?>"<?= $Grid->item_id->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->item_id->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_item_id"
+        name="x<?= $Grid->RowIndex ?>_item_id"
+        class="form-select ew-select<?= $Grid->item_id->isInvalidClass() ?>"
+        <?php if (!$Grid->item_id->IsNativeSelect) { ?>
+        data-select2-id="fissue_itemsgrid_x<?= $Grid->RowIndex ?>_item_id"
+        <?php } ?>
+        data-table="issue_items"
+        data-field="x_item_id"
+        data-value-separator="<?= $Grid->item_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->item_id->getPlaceHolder()) ?>"
+        <?= $Grid->item_id->editAttributes() ?>>
+        <?= $Grid->item_id->selectOptionListHtml("x{$Grid->RowIndex}_item_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->item_id->getErrorMessage() ?></div>
+<?= $Grid->item_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_item_id") ?>
+<?php if (!$Grid->item_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fissue_itemsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_item_id", selectId: "fissue_itemsgrid_x<?= $Grid->RowIndex ?>_item_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fissue_itemsgrid.lists.item_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_item_id", form: "fissue_itemsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_item_id", form: "fissue_itemsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.issue_items.fields.item_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>

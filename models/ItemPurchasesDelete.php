@@ -122,7 +122,7 @@ class ItemPurchasesDelete extends ItemPurchases
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->batch_number->setVisibility();
         $this->supplier_id->Visible = false;
         $this->category_id->setVisibility();
@@ -802,10 +802,6 @@ class ItemPurchasesDelete extends ItemPurchases
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // batch_number
             $this->batch_number->HrefValue = "";

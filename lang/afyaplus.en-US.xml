@@ -287,6 +287,9 @@
     <menu id="1020">
       <phrase id="menutext" value="Issued Items" />
     </menu>
+    <menu id="1025">
+      <phrase id="menutext" value="Stock Status" />
+    </menu>
     <menu id="104">
       <phrase id="menutext" value="Reports" />
     </menu>
@@ -3580,6 +3583,33 @@
     </table>
     <table id="human_resources_overview">
       <phrase id="tblcaption" value="Human Resources Overview" />
+    </table>
+    <table id="received_items_view">
+      <phrase id="tblcaption" value="Store Status" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No." />
+      </field>
+      <field id="item_title">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="total_items_received">
+        <phrase id="fldcaption" value="Qty Received" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+      </field>
+      <field id="qty_left">
+        <phrase id="fldcaption" value="Qty Left" />
+      </field>
+      <field id="selling_price">
+        <phrase id="fldcaption" value="SP (Kshs)" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Receipt Date" />
+      </field>
     </table>
   </project>
 </ew-language>

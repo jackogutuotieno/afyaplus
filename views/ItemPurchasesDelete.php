@@ -50,9 +50,6 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_item_purchases_id" class="item_purchases_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->batch_number->Visible) { // batch_number ?>
         <th class="<?= $Page->batch_number->headerCellClass() ?>"><span id="elh_item_purchases_batch_number" class="item_purchases_batch_number"><?= $Page->batch_number->caption() ?></span></th>
 <?php } ?>
@@ -107,14 +104,6 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td<?= $Page->id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->batch_number->Visible) { // batch_number ?>
         <td<?= $Page->batch_number->cellAttributes() ?>>
 <span id="">

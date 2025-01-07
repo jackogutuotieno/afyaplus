@@ -524,6 +524,7 @@ class IssueItemsAdd extends IssueItems
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -714,7 +715,7 @@ class IssueItemsAdd extends IssueItems
             if (IsApi() && $val === null) {
                 $this->item_id->Visible = false; // Disable update for API request
             } else {
-                $this->item_id->setFormValue($val, true, $validate);
+                $this->item_id->setFormValue($val);
             }
         }
 
@@ -888,8 +889,27 @@ class IssueItemsAdd extends IssueItems
             }
 
             // item_id
-            $this->item_id->ViewValue = $this->item_id->CurrentValue;
-            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+            $curVal = strval($this->item_id->CurrentValue);
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
+                    } else {
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->item_id->ViewValue = null;
+            }
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -983,11 +1003,30 @@ class IssueItemsAdd extends IssueItems
 
             // item_id
             $this->item_id->setupEditAttributes();
-            $this->item_id->EditValue = $this->item_id->CurrentValue;
-            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
-            if (strval($this->item_id->EditValue) != "" && is_numeric($this->item_id->EditValue)) {
-                $this->item_id->EditValue = FormatNumber($this->item_id->EditValue, null);
+            $curVal = trim(strval($this->item_id->CurrentValue));
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+            } else {
+                $this->item_id->ViewValue = $this->item_id->Lookup !== null && is_array($this->item_id->lookupOptions()) && count($this->item_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->item_id->ViewValue !== null) { // Load from cache
+                $this->item_id->EditValue = array_values($this->item_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->item_id->CurrentValue, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->item_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->item_id->EditValue = $arwrk;
+            }
+            $this->item_id->PlaceHolder = RemoveHtml($this->item_id->caption());
 
             // quantity
             $this->quantity->setupEditAttributes();
@@ -1048,9 +1087,6 @@ class IssueItemsAdd extends IssueItems
                 if (!$this->item_id->IsDetailKey && EmptyValue($this->item_id->FormValue)) {
                     $this->item_id->addErrorMessage(str_replace("%s", $this->item_id->caption(), $this->item_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->item_id->FormValue)) {
-                $this->item_id->addErrorMessage($this->item_id->getErrorMessage(false));
             }
             if ($this->quantity->Visible && $this->quantity->Required) {
                 if (!$this->quantity->IsDetailKey && EmptyValue($this->quantity->FormValue)) {
@@ -1287,6 +1323,8 @@ class IssueItemsAdd extends IssueItems
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

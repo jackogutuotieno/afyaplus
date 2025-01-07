@@ -563,6 +563,7 @@ class IssueItemsView extends IssueItems
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -901,8 +902,27 @@ class IssueItemsView extends IssueItems
             }
 
             // item_id
-            $this->item_id->ViewValue = $this->item_id->CurrentValue;
-            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+            $curVal = strval($this->item_id->CurrentValue);
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
+                    } else {
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->item_id->ViewValue = null;
+            }
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -1226,6 +1246,8 @@ class IssueItemsView extends IssueItems
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

@@ -123,7 +123,7 @@ class IssueItemsDelete extends IssueItems
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->admission_id->setVisibility();
+        $this->admission_id->Visible = false;
         $this->patient_id->setVisibility();
         $this->item_id->setVisibility();
         $this->quantity->setVisibility();
@@ -419,6 +419,7 @@ class IssueItemsDelete extends IssueItems
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->item_id);
 
         // Set up master/detail parameters
         $this->setupMasterParms();
@@ -687,8 +688,27 @@ class IssueItemsDelete extends IssueItems
             }
 
             // item_id
-            $this->item_id->ViewValue = $this->item_id->CurrentValue;
-            $this->item_id->ViewValue = FormatNumber($this->item_id->ViewValue, $this->item_id->formatPattern());
+            $curVal = strval($this->item_id->CurrentValue);
+            if ($curVal != "") {
+                $this->item_id->ViewValue = $this->item_id->lookupCacheOption($curVal);
+                if ($this->item_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->item_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->item_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->item_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->item_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->item_id->ViewValue = $this->item_id->displayValue($arwrk);
+                    } else {
+                        $this->item_id->ViewValue = FormatNumber($this->item_id->CurrentValue, $this->item_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->item_id->ViewValue = null;
+            }
 
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -701,10 +721,6 @@ class IssueItemsDelete extends IssueItems
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-            $this->admission_id->TooltipValue = "";
 
             // patient_id
             $this->patient_id->HrefValue = "";
@@ -955,6 +971,8 @@ class IssueItemsDelete extends IssueItems
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_item_id":
                     break;
                 default:
                     $lookupFilter = "";

@@ -1262,7 +1262,18 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","8","1096"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","9","0"]];
 
 /**
  * Tables
@@ -1386,4 +1397,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"],
     ["employees_view","employees_view","Employees Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesviewlist"],
     ["Employees Report","Employees_Report","Employees Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesreport"],
-    ["Human Resources Overview","Human_Resources_Overview","Human Resources Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","humanresourcesoverview"]];
+    ["Human Resources Overview","Human_Resources_Overview","Human Resources Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","humanresourcesoverview"],
+    ["received_items_view","received_items_view","Store Status",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveditemsviewlist"]];

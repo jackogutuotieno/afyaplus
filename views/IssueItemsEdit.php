@@ -31,7 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["admission_id", [fields.admission_id.visible && fields.admission_id.required ? ew.Validators.required(fields.admission_id.caption) : null, ew.Validators.integer], fields.admission_id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["item_id", [fields.item_id.visible && fields.item_id.required ? ew.Validators.required(fields.item_id.caption) : null, ew.Validators.integer], fields.item_id.isInvalid],
+            ["item_id", [fields.item_id.visible && fields.item_id.required ? ew.Validators.required(fields.item_id.caption) : null], fields.item_id.isInvalid],
             ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid]
         ])
 
@@ -49,6 +49,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "item_id": <?= $Page->item_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -169,9 +170,43 @@ loadjs.ready("fissue_itemsedit", function() {
         <label id="elh_issue_items_item_id" for="x_item_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->item_id->caption() ?><?= $Page->item_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->item_id->cellAttributes() ?>>
 <span id="el_issue_items_item_id">
-<input type="<?= $Page->item_id->getInputTextType() ?>" name="x_item_id" id="x_item_id" data-table="issue_items" data-field="x_item_id" value="<?= $Page->item_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->item_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->item_id->formatPattern()) ?>"<?= $Page->item_id->editAttributes() ?> aria-describedby="x_item_id_help">
-<?= $Page->item_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->item_id->getErrorMessage() ?></div>
+    <select
+        id="x_item_id"
+        name="x_item_id"
+        class="form-select ew-select<?= $Page->item_id->isInvalidClass() ?>"
+        <?php if (!$Page->item_id->IsNativeSelect) { ?>
+        data-select2-id="fissue_itemsedit_x_item_id"
+        <?php } ?>
+        data-table="issue_items"
+        data-field="x_item_id"
+        data-value-separator="<?= $Page->item_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->item_id->getPlaceHolder()) ?>"
+        <?= $Page->item_id->editAttributes() ?>>
+        <?= $Page->item_id->selectOptionListHtml("x_item_id") ?>
+    </select>
+    <?= $Page->item_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->item_id->getErrorMessage() ?></div>
+<?= $Page->item_id->Lookup->getParamTag($Page, "p_x_item_id") ?>
+<?php if (!$Page->item_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fissue_itemsedit", function() {
+    var options = { name: "x_item_id", selectId: "fissue_itemsedit_x_item_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fissue_itemsedit.lists.item_id?.lookupOptions.length) {
+        options.data = { id: "x_item_id", form: "fissue_itemsedit" };
+    } else {
+        options.ajax = { id: "x_item_id", form: "fissue_itemsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumInputLength = ew.selectMinimumInputLength;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.issue_items.fields.item_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

@@ -59,15 +59,6 @@ $Page->showMessage();
 <?php if ($Page->email_address->Visible) { // email_address ?>
         <th class="<?= $Page->email_address->headerCellClass() ?>"><span id="elh_suppliers_email_address" class="suppliers_email_address"><?= $Page->email_address->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <th class="<?= $Page->physical_address->headerCellClass() ?>"><span id="elh_suppliers_physical_address" class="suppliers_physical_address"><?= $Page->physical_address->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_suppliers_date_created" class="suppliers_date_created"><?= $Page->date_created->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <th class="<?= $Page->date_updated->headerCellClass() ?>"><span id="elh_suppliers_date_updated" class="suppliers_date_updated"><?= $Page->date_updated->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -101,7 +92,12 @@ while ($Page->fetch()) {
         <td<?= $Page->phone->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->phone->viewAttributes() ?>>
-<?= $Page->phone->getViewValue() ?></span>
+<?php if (!EmptyString($Page->phone->getViewValue()) && $Page->phone->linkAttributes() != "") { ?>
+<a<?= $Page->phone->linkAttributes() ?>><?= $Page->phone->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->phone->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -109,31 +105,12 @@ while ($Page->fetch()) {
         <td<?= $Page->email_address->cellAttributes() ?>>
 <span id="">
 <span<?= $Page->email_address->viewAttributes() ?>>
-<?= $Page->email_address->getViewValue() ?></span>
-</span>
-</td>
+<?php if (!EmptyString($Page->email_address->getViewValue()) && $Page->email_address->linkAttributes() != "") { ?>
+<a<?= $Page->email_address->linkAttributes() ?>><?= $Page->email_address->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->email_address->getViewValue() ?>
 <?php } ?>
-<?php if ($Page->physical_address->Visible) { // physical_address ?>
-        <td<?= $Page->physical_address->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->physical_address->viewAttributes() ?>>
-<?= $Page->physical_address->getViewValue() ?></span>
 </span>
-</td>
-<?php } ?>
-<?php if ($Page->date_created->Visible) { // date_created ?>
-        <td<?= $Page->date_created->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_created->viewAttributes() ?>>
-<?= $Page->date_created->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { // date_updated ?>
-        <td<?= $Page->date_updated->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
