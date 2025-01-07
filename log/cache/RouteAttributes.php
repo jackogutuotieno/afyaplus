@@ -376,8 +376,6 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
-        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
-        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
     ],
     null,
     [
@@ -2258,16 +2256,6 @@
                     'POST',
                     'OPTIONS',
                 ],
-                [
-                    'GET',
-                    'POST',
-                    'OPTIONS',
-                ],
-                [
-                    'GET',
-                    'POST',
-                    'OPTIONS',
-                ],
             ],
             'pattern' => [
                 '/appointments',
@@ -2519,8 +2507,6 @@
                 '/patientsdischargelist[/{id}]',
                 '/patientsdischargeadd[/{id}]',
                 '/patientsdischargeview[/{id}]',
-                '/patientsdischargeedit[/{id}]',
-                '/patientsdischargedelete[/{id}]',
                 '/patientslabreportlist[/{id}]',
                 '/patientslabreportview[/{id}]',
                 '/patientsradiologyreportslist[/{id}]',
@@ -2899,8 +2885,6 @@
                 'PHPMaker2024\\afyaplus\\PatientsDischargeController:list',
                 'PHPMaker2024\\afyaplus\\PatientsDischargeController:add',
                 'PHPMaker2024\\afyaplus\\PatientsDischargeController:view',
-                'PHPMaker2024\\afyaplus\\PatientsDischargeController:edit',
-                'PHPMaker2024\\afyaplus\\PatientsDischargeController:delete',
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:list',
                 'PHPMaker2024\\afyaplus\\PatientsLabReportController:view',
                 'PHPMaker2024\\afyaplus\\PatientsRadiologyReportsController:list',
@@ -4156,12 +4140,6 @@
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
-                [
-                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
-                ],
-                [
-                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
-                ],
             ],
             'name' => [
                 'calendar.Appointments',
@@ -4413,8 +4391,6 @@
                 'list.patients_discharge',
                 'add.patients_discharge',
                 'view.patients_discharge',
-                'edit.patients_discharge',
-                'delete.patients_discharge',
                 'list.patients_lab_report',
                 'view.patients_lab_report',
                 'list.patients_radiology_reports',
@@ -4544,8 +4520,6 @@
                 'delete.ward_type',
             ],
             'options' => [
-                [],
-                [],
                 [],
                 [],
                 [],
@@ -5302,8 +5276,6 @@
         $o[373],
         $o[374],
         $o[375],
-        $o[376],
-        $o[377],
     ],
     []
 );

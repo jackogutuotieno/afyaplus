@@ -156,6 +156,7 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
     }
 
@@ -780,7 +781,11 @@ class PatientAdmissionsList extends PatientAdmissions
         }
 
         // Get default search criteria
+        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
         AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
+
+        // Get basic search values
+        $this->loadBasicSearchValues();
 
         // Get and validate search values for advanced search
         if (EmptyValue($this->UserAction)) { // Skip if user action
@@ -807,6 +812,11 @@ class PatientAdmissionsList extends PatientAdmissions
         // Set up sorting order
         $this->setupSortOrder();
 
+        // Get basic search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchBasic = $this->basicSearchWhere();
+        }
+
         // Get advanced search criteria
         if (!$this->hasInvalidFields()) {
             $srchAdvanced = $this->advancedSearchWhere();
@@ -825,6 +835,12 @@ class PatientAdmissionsList extends PatientAdmissions
 
         // Load search default if no existing search criteria
         if (!$this->checkSearchParms() && !$query) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere(); // Save to session
+            }
+
             // Load advanced search from default
             if ($this->loadAdvancedSearchDefault()) {
                 $srchAdvanced = $this->advancedSearchWhere(); // Save to session
@@ -1097,7 +1113,12 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
 
         // Return filter list in JSON
         if ($filterList != "") {
@@ -1149,6 +1170,14 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
         $this->patient_id->AdvancedSearch->save();
 
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
+
         // Field date_created
         $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
@@ -1156,6 +1185,8 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
         $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
         $this->date_created->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
     // Advanced search WHERE clause based on QueryString
@@ -1168,6 +1199,7 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         $this->buildSearchSql($where, $this->id, $default, false); // id
         $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
+        $this->buildSearchSql($where, $this->status, $default, false); // status
         $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
 
         // Set up search command
@@ -1177,6 +1209,7 @@ class PatientAdmissionsList extends PatientAdmissions
         if (!$default && $this->Command == "search") {
             $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->status->AdvancedSearch->save(); // status
             $this->date_created->AdvancedSearch->save(); // date_created
 
             // Clear rules for QueryBuilder
@@ -1210,6 +1243,7 @@ class PatientAdmissionsList extends PatientAdmissions
             $this->resetSearchParms();
             $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->status->AdvancedSearch->save(); // status
             $this->date_created->AdvancedSearch->save(); // date_created
             $this->setSessionRules($rules);
         }
@@ -1276,6 +1310,15 @@ class PatientAdmissionsList extends PatientAdmissions
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
 
+        // Field status
+        $filter = $this->queryBuilderWhere("status");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->status, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
         // Field date_created
         $filter = $this->queryBuilderWhere("date_created");
         if (!$filter) {
@@ -1283,6 +1326,9 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_created->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+        if ($this->BasicSearch->Keyword != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
 
         // Show Filters
@@ -1296,13 +1342,53 @@ class PatientAdmissionsList extends PatientAdmissions
         }
     }
 
+    // Return basic search WHERE clause based on search keyword and type
+    public function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Fields to search
+        $searchFlds = [];
+        $searchFlds[] = &$this->status;
+        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $searchStr;
+    }
+
     // Check if search parm exists
     protected function checkSearchParms()
     {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
         if ($this->id->AdvancedSearch->issetSession()) {
             return true;
         }
         if ($this->patient_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->status->AdvancedSearch->issetSession()) {
             return true;
         }
         if ($this->date_created->AdvancedSearch->issetSession()) {
@@ -1318,6 +1404,9 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->SearchWhere = "";
         $this->setSearchWhere($this->SearchWhere);
 
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+
         // Clear advanced search parameters
         $this->resetAdvancedSearchParms();
 
@@ -1331,11 +1420,18 @@ class PatientAdmissionsList extends PatientAdmissions
         return false;
     }
 
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
     // Clear all advanced search parameters
     protected function resetAdvancedSearchParms()
     {
         $this->id->AdvancedSearch->unsetSession();
         $this->patient_id->AdvancedSearch->unsetSession();
+        $this->status->AdvancedSearch->unsetSession();
         $this->date_created->AdvancedSearch->unsetSession();
     }
 
@@ -1344,9 +1440,13 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->RestoreSearch = true;
 
+        // Restore basic search values
+        $this->BasicSearch->load();
+
         // Restore advanced search values
         $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
     }
 
@@ -1856,6 +1956,7 @@ class PatientAdmissionsList extends PatientAdmissions
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_id");
+            $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -2192,6 +2293,16 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->renderListOptions();
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     // Load search values for validation
     protected function loadSearchValues()
     {
@@ -2217,6 +2328,14 @@ class PatientAdmissionsList extends PatientAdmissions
         if ($this->patient_id->AdvancedSearch->get()) {
             $hasValue = true;
             if (($this->patient_id->AdvancedSearch->SearchValue != "" || $this->patient_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // status
+        if ($this->status->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
                 $this->Command = "search";
             }
         }
@@ -2326,6 +2445,7 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
 
@@ -2335,6 +2455,7 @@ class PatientAdmissionsList extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
     }
@@ -2380,6 +2501,8 @@ class PatientAdmissionsList extends PatientAdmissions
 
         // patient_id
 
+        // status
+
         // date_created
 
         // View row
@@ -2411,6 +2534,9 @@ class PatientAdmissionsList extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -2418,6 +2544,10 @@ class PatientAdmissionsList extends PatientAdmissions
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -2430,6 +2560,14 @@ class PatientAdmissionsList extends PatientAdmissions
                 }
                 $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
             }
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -2468,6 +2606,7 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
     }
 
@@ -2477,6 +2616,12 @@ class PatientAdmissionsList extends PatientAdmissions
         global $Language, $Security;
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fpatient_admissionssrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
 
         // Show all button
         $item = &$this->SearchOptions->add("showall");
@@ -2510,7 +2655,7 @@ class PatientAdmissionsList extends PatientAdmissions
     // Check if any search fields
     public function hasSearchFields()
     {
-        return $this->patient_id->Visible;
+        return true;
     }
 
     // Render search options

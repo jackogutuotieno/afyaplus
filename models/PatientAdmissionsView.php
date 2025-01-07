@@ -150,6 +150,7 @@ class PatientAdmissionsView extends PatientAdmissions
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
     }
 
@@ -162,7 +163,10 @@ class PatientAdmissionsView extends PatientAdmissions
         $this->TableName = 'patient_admissions';
 
         // Table CSS class
-        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
+        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table d-none";
+
+        // Custom template
+        $this->UseCustomTemplate = true;
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -402,9 +406,6 @@ class PatientAdmissionsView extends PatientAdmissions
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -909,6 +910,7 @@ class PatientAdmissionsView extends PatientAdmissions
         }
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
 
@@ -918,6 +920,7 @@ class PatientAdmissionsView extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
     }
@@ -943,6 +946,8 @@ class PatientAdmissionsView extends PatientAdmissions
         // id
 
         // patient_id
+
+        // status
 
         // date_created
 
@@ -975,6 +980,9 @@ class PatientAdmissionsView extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -987,6 +995,10 @@ class PatientAdmissionsView extends PatientAdmissions
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
 
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
+
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
@@ -995,6 +1007,11 @@ class PatientAdmissionsView extends PatientAdmissions
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
+        }
+
+        // Save data for Custom Template
+        if ($this->RowType == RowType::VIEW || $this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) {
+            $this->Rows[] = $this->customTemplateFieldValues();
         }
     }
 

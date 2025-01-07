@@ -132,6 +132,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->Visible = false;
     }
 
@@ -715,6 +716,16 @@ class PatientAdmissionsAdd extends PatientAdmissions
             }
         }
 
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -724,6 +735,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         global $CurrentForm;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -766,6 +778,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
 
@@ -775,6 +788,7 @@ class PatientAdmissionsAdd extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
     }
@@ -816,6 +830,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
         // patient_id
         $this->patient_id->RowCssClass = "row";
 
+        // status
+        $this->status->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -848,12 +865,18 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
             // patient_id
             $this->patient_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // patient_id
             $this->patient_id->setupEditAttributes();
@@ -907,10 +930,21 @@ class PatientAdmissionsAdd extends PatientAdmissions
                 $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
             }
 
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Add refer script
 
             // patient_id
             $this->patient_id->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -939,6 +973,11 @@ class PatientAdmissionsAdd extends PatientAdmissions
             }
             if (!CheckInteger($this->patient_id->FormValue)) {
                 $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+                }
             }
 
         // Validate detail grid
@@ -1097,6 +1136,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
 
         // patient_id
         $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1108,6 +1150,9 @@ class PatientAdmissionsAdd extends PatientAdmissions
     {
         if (isset($row['patient_id'])) { // patient_id
             $this->patient_id->setFormValue($row['patient_id']);
+        }
+        if (isset($row['status'])) { // status
+            $this->status->setFormValue($row['status']);
         }
     }
 

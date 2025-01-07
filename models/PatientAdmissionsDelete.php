@@ -132,6 +132,7 @@ class PatientAdmissionsDelete extends PatientAdmissions
     {
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
+        $this->status->setVisibility();
         $this->date_created->setVisibility();
     }
 
@@ -611,6 +612,7 @@ class PatientAdmissionsDelete extends PatientAdmissions
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
 
@@ -620,6 +622,7 @@ class PatientAdmissionsDelete extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
     }
@@ -639,6 +642,8 @@ class PatientAdmissionsDelete extends PatientAdmissions
         // id
 
         // patient_id
+
+        // status
 
         // date_created
 
@@ -671,6 +676,9 @@ class PatientAdmissionsDelete extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -678,6 +686,10 @@ class PatientAdmissionsDelete extends PatientAdmissions
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

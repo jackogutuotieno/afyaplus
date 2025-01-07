@@ -1387,7 +1387,7 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["ward_type","ward_type","Ward Type",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardtypelist"],
     ["wards","wards","Wards",true,"{32536B8D-F37B-4419-80D5-260932800712}","wardslist"],
     ["patient_admissions","patient_admissions","Admissions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientadmissionslist"],
-    ["bed_assignment","bed_assignment","Bed Assign",true,"{32536B8D-F37B-4419-80D5-260932800712}","bedassignmentlist"],
+    ["bed_assignment","bed_assignment","Beds",true,"{32536B8D-F37B-4419-80D5-260932800712}","bedassignmentlist"],
     ["suppliers","suppliers","Suppliers",true,"{32536B8D-F37B-4419-80D5-260932800712}","supplierslist"],
     ["item_categories","item_categories","Item Categories",true,"{32536B8D-F37B-4419-80D5-260932800712}","itemcategorieslist"],
     ["item_subcategories","item_subcategories","Item Subcategories",true,"{32536B8D-F37B-4419-80D5-260932800712}","itemsubcategorieslist"],

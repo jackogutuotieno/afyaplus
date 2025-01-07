@@ -21,6 +21,17 @@ $patient_admissions->TableClass = "table table-bordered table-hover table-sm ew-
 </td>
         </tr>
 <?php } ?>
+<?php if ($patient_admissions->status->Visible) { // status ?>
+        <tr id="r_status"<?= $patient_admissions->status->rowAttributes() ?>>
+            <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->status->caption() ?></td>
+            <td<?= $patient_admissions->status->cellAttributes() ?>>
+<span id="el_patient_admissions_status">
+<span<?= $patient_admissions->status->viewAttributes() ?>>
+<?= $patient_admissions->status->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patient_admissions->date_created->Visible) { // date_created ?>
         <tr id="r_date_created"<?= $patient_admissions->date_created->rowAttributes() ?>>
             <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->date_created->caption() ?></td>

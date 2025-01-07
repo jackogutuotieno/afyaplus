@@ -53,38 +53,74 @@ loadjs.ready("head", function () {
 <table class="<?= $Page->TableClass ?>">
 <?php if ($Page->id->Visible) { // id ?>
     <tr id="r_id"<?= $Page->id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_id"><?= $Page->id->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_id"><template id="tpc_patient_admissions_id"><?= $Page->id->caption() ?></template></span></td>
         <td data-name="id"<?= $Page->id->cellAttributes() ?>>
-<span id="el_patient_admissions_id">
+<template id="tpx_patient_admissions_id"><span id="el_patient_admissions_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
+</span></template>
 </td>
     </tr>
 <?php } ?>
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
     <tr id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_patient_id"><?= $Page->patient_id->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_patient_id"><template id="tpc_patient_admissions_patient_id"><?= $Page->patient_id->caption() ?></template></span></td>
         <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
-<span id="el_patient_admissions_patient_id">
+<template id="tpx_patient_admissions_patient_id"><span id="el_patient_admissions_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
-</span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_status"><template id="tpc_patient_admissions_status"><?= $Page->status->caption() ?></template></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<template id="tpx_patient_admissions_status"><span id="el_patient_admissions_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
+</span></template>
 </td>
     </tr>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_date_created"><?= $Page->date_created->caption() ?></span></td>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_date_created"><template id="tpc_patient_admissions_date_created"><?= $Page->date_created->caption() ?></template></span></td>
         <td data-name="date_created"<?= $Page->date_created->cellAttributes() ?>>
-<span id="el_patient_admissions_date_created">
+<template id="tpx_patient_admissions_date_created"><span id="el_patient_admissions_date_created">
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</span>
+</span></template>
 </td>
     </tr>
 <?php } ?>
 </table>
+<div id="tpd_patient_admissionsview" class="ew-custom-template"></div>
+<template id="tpm_patient_admissionsview">
+<div id="ct_PatientAdmissionsView"><div class="row gridder-view">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_admissions_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_admissions_id"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_admissions_patient_id"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_admissions_patient_id"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_admissions_status"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_admissions_status"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+            <p><slot class="ew-slot" name="tpc_patient_admissions_date_created"></slot>&nbsp;<slot class="ew-slot" name="tpx_patient_admissions_date_created"></slot></p>
+        </div>
+    </div> <!-- ./col -->
+</div> <!-- ./row --></div>
+</template>
 <?php
     if (in_array("bed_assignment", explode(",", $Page->getCurrentDetailTable())) && $bed_assignment->DetailView) {
 ?>
@@ -110,6 +146,13 @@ loadjs.ready("head", function () {
 <?php include_once "PatientsDischargeGrid.php" ?>
 <?php } ?>
 </form>
+<script class="ew-apply-template">
+loadjs.ready(ew.applyTemplateId, function() {
+    ew.templateData = { rows: <?= JsonEncode($Page->Rows) ?> };
+    ew.applyTemplate("tpd_patient_admissionsview", "tpm_patient_admissionsview", "patient_admissionsview", "<?= $Page->Export ?>", "patient_admissions", ew.templateData.rows[0], <?= $Page->IsModal ? "true" : "false" ?>);
+    loadjs.done("customtemplate");
+});
+</script>
 </main>
 <?php
 $Page->showPageFooter();

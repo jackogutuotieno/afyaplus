@@ -1,4 +1,4 @@
-<ew-language date="2025/1/7" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/1/8" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
@@ -117,7 +117,7 @@
       <phrase id="menutext" value="Admissions" />
     </menu>
     <menu id="857">
-      <phrase id="menutext" value="Bed Assign" />
+      <phrase id="menutext" value="Beds" />
     </menu>
     <menu id="1021">
       <phrase id="menutext" value="Discharge" />
@@ -3271,17 +3271,20 @@
     <table id="patient_admissions">
       <phrase id="tblcaption" value="Admissions" />
       <field id="id">
-        <phrase id="fldcaption" value="S/NO" />
+        <phrase id="fldcaption" value="Admission No" />
       </field>
       <field id="patient_id">
-        <phrase id="fldcaption" value="Patient Name(UHID)" />
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Admission Date" />
       </field>
     </table>
     <table id="bed_assignment">
-      <phrase id="tblcaption" value="Bed Assign" />
+      <phrase id="tblcaption" value="Beds" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
