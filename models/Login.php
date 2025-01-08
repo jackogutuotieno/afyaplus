@@ -602,6 +602,8 @@ class Login extends Users
                 $url= "radiologyoverview";
             } else if (CurrentUserlevel() == 8) {
                 $url= "humanresourcesoverview";
+            } else if (CurrentUserlevel() == 10) {
+                $url= "procurementoverview";
             }
         }
     }

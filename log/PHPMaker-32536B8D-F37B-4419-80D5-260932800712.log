@@ -92,6 +92,9 @@ C:\wamp64\www\afyaplus\controllers\PharmacyBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PharmacyOverviewController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionDetailsController.php
 C:\wamp64\www\afyaplus\controllers\PrescriptionsController.php
+C:\wamp64\www\afyaplus\controllers\ProcurementOverviewController.php
+C:\wamp64\www\afyaplus\controllers\ProcurementReport2Controller.php
+C:\wamp64\www\afyaplus\controllers\ProcurementReportController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyBillingReportController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyBillingReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\RadiologyOverviewController.php
@@ -537,6 +540,11 @@ C:\wamp64\www\afyaplus\models\PrescriptionsEdit.php
 C:\wamp64\www\afyaplus\models\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\models\PrescriptionsList.php
 C:\wamp64\www\afyaplus\models\PrescriptionsView.php
+C:\wamp64\www\afyaplus\models\ProcurementOverview.php
+C:\wamp64\www\afyaplus\models\ProcurementReport.php
+C:\wamp64\www\afyaplus\models\ProcurementReport2.php
+C:\wamp64\www\afyaplus\models\ProcurementReport2List.php
+C:\wamp64\www\afyaplus\models\ProcurementReportSummary.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReport.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetails.php
 C:\wamp64\www\afyaplus\models\RadiologyBillingReportDetailsGrid.php
@@ -769,6 +777,7 @@ C:\wamp64\www\afyaplus\src\Entity\PharmacyBillingReport.php
 C:\wamp64\www\afyaplus\src\Entity\PharmacyBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\Prescription.php
 C:\wamp64\www\afyaplus\src\Entity\PrescriptionDetail.php
+C:\wamp64\www\afyaplus\src\Entity\ProcurementReport.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyBillingReport.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyBillingReportDetail.php
 C:\wamp64\www\afyaplus\src\Entity\RadiologyReport.php
@@ -1219,6 +1228,9 @@ C:\wamp64\www\afyaplus\views\PrescriptionsGrid.php
 C:\wamp64\www\afyaplus\views\PrescriptionsList.php
 C:\wamp64\www\afyaplus\views\PrescriptionsMaster.php
 C:\wamp64\www\afyaplus\views\PrescriptionsView.php
+C:\wamp64\www\afyaplus\views\ProcurementOverview.php
+C:\wamp64\www\afyaplus\views\ProcurementReport2List.php
+C:\wamp64\www\afyaplus\views\ProcurementReportSummary.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsGrid.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportDetailsList.php
 C:\wamp64\www\afyaplus\views\RadiologyBillingReportGrid.php

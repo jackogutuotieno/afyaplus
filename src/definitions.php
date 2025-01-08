@@ -214,6 +214,11 @@ return [
     "received_items_view" => \DI\create(ReceivedItemsView::class),
     "patient_ipd_vitals" => \DI\create(PatientIpdVitals::class),
     "patient_ipd_services" => \DI\create(PatientIpdServices::class),
+    "procurement_report2" => \DI\create(ProcurementReport2::class),
+    "Procurement_Report" => \DI\create(ProcurementReport::class),
+    "procurement_report" => \DI\create(ProcurementReport::class),
+    "Procurement_Overview" => \DI\create(ProcurementOverview::class),
+    "procurement_overview" => \DI\create(ProcurementOverview::class),
 
     // User table
     "usertable" => \DI\get("users"),

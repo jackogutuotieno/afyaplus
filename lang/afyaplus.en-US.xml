@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="1030">
+      <phrase id="menutext" value="Procurement Overview" />
+    </menu>
     <menu id="642">
       <phrase id="menutext" value="Dashboard" />
     </menu>
@@ -334,6 +337,12 @@
     </menu>
     <menu id="324">
       <phrase id="menutext" value="Expenses" />
+    </menu>
+    <menu id="1029">
+      <phrase id="menutext" value="Procurement" />
+    </menu>
+    <menu id="1028">
+      <phrase id="menutext" value="Procurement Report" />
     </menu>
     <menu id="427">
       <phrase id="menutext" value="External Reports" />
@@ -3689,6 +3698,124 @@
       <field id="date_updated">
         <phrase id="fldcaption" value="Last Udated" />
       </field>
+    </table>
+    <table id="procurement_report2">
+      <phrase id="tblcaption" value="procurement report 2" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No." />
+      </field>
+      <field id="supplier_name">
+        <phrase id="fldcaption" value="Supplier" />
+      </field>
+      <field id="category_name">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="subcategory_name">
+        <phrase id="fldcaption" value="Subcategory" />
+      </field>
+      <field id="item_title">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+      </field>
+      <field id="unit_price">
+        <phrase id="fldcaption" value="PP (Kshs)" />
+      </field>
+      <field id="selling_price">
+        <phrase id="fldcaption" value="SP (Kshs)" />
+      </field>
+      <field id="amount_paid">
+        <phrase id="fldcaption" value="Amount Paid (Kshs)" />
+      </field>
+      <field id="purchase_month">
+        <phrase id="fldcaption" value="Month" />
+      </field>
+      <field id="purchase_year">
+        <phrase id="fldcaption" value="Year" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Purchase Date" />
+      </field>
+    </table>
+    <table id="procurement_report">
+      <phrase id="tblcaption" value="Procurement Report" />
+      <chart id="procurementbymonth">
+        <phrase id="chartcaption" value="Procurement by Month" />
+        <phrase id="chartxaxisname" value="Month" />
+        <phrase id="chartyaxisname" value="Month" />
+      </chart>
+      <chart id="procurementbyyear">
+        <phrase id="chartcaption" value="Procurement by Year" />
+        <phrase id="chartxaxisname" value="Year" />
+        <phrase id="chartyaxisname" value="Year" />
+      </chart>
+      <chart id="procurementbysupplier">
+        <phrase id="chartcaption" value="Procurement by Supplier" />
+        <phrase id="chartxaxisname" value="Supplier" />
+        <phrase id="chartyaxisname" value="Supplier" />
+      </chart>
+      <chart id="procurementbycategory">
+        <phrase id="chartcaption" value="Procurement by Category" />
+        <phrase id="chartxaxisname" value="Category" />
+        <phrase id="chartyaxisname" value="Category" />
+      </chart>
+      <chart id="procurementbysubcategory">
+        <phrase id="chartcaption" value="Procurement by Subcategory" />
+        <phrase id="chartxaxisname" value="Subcategory" />
+        <phrase id="chartyaxisname" value="Subcategory" />
+      </chart>
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="batch_number">
+        <phrase id="fldcaption" value="Batch No." />
+      </field>
+      <field id="supplier_name">
+        <phrase id="fldcaption" value="Supplier" />
+      </field>
+      <field id="category_name">
+        <phrase id="fldcaption" value="Category" />
+      </field>
+      <field id="subcategory_name">
+        <phrase id="fldcaption" value="Subcategory" />
+      </field>
+      <field id="item_title">
+        <phrase id="fldcaption" value="Item" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="measuring_unit">
+        <phrase id="fldcaption" value="Measuring Unit" />
+      </field>
+      <field id="unit_price">
+        <phrase id="fldcaption" value="PP (Kshs)" />
+      </field>
+      <field id="selling_price">
+        <phrase id="fldcaption" value="SP (Kshs)" />
+      </field>
+      <field id="amount_paid">
+        <phrase id="fldcaption" value="Amount Paid (Kshs)" />
+      </field>
+      <field id="purchase_month">
+        <phrase id="fldcaption" value="Month" />
+      </field>
+      <field id="purchase_year">
+        <phrase id="fldcaption" value="Year" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Purchase Date" />
+      </field>
+    </table>
+    <table id="procurement_overview">
+      <phrase id="tblcaption" value="Procurement Overview" />
     </table>
   </project>
 </ew-language>
