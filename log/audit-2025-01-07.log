@@ -7,3 +7,4 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-07 07:22:22",/afyaplus/itemsubcategoriesadd,1,A,item_subcategories,id,1,,1
 "2025-01-07 10:25:41",/afyaplus/logout,1,logout,::1,,,,
 "2025-01-07 13:05:35",/afyaplus/login,1,login,::1,,,,
+"2025-01-07 22:03:12",/afyaplus/logout,1,logout,::1,,,,

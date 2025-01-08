@@ -144,7 +144,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
@@ -485,12 +485,12 @@ class PatientAdmissionsGrid extends PatientAdmissions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
     public $ShowOtherOptions = false;
-    public $DisplayRecords = 20;
+    public $DisplayRecords = 5;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $PageSizes = "10,20,50,-1"; // Page sizes (comma separated)
+    public $PageSizes = "5,10,20,50,-1"; // Page sizes (comma separated)
     public $DefaultSearchWhere = ""; // Default search WHERE clause
     public $SearchWhere = ""; // Search WHERE clause
     public $SearchPanelClass = "ew-search-panel collapse show"; // Search Panel class
@@ -697,7 +697,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
         } else {
-            $this->DisplayRecords = 20; // Load default
+            $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
         }
 
@@ -848,7 +848,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
                 if (SameText($wrk, "all")) { // Display all records
                     $this->DisplayRecords = -1;
                 } else {
-                    $this->DisplayRecords = 20; // Non-numeric, load default
+                    $this->DisplayRecords = 5; // Non-numeric, load default
                 }
             }
             $this->setRecordsPerPage($this->DisplayRecords); // Save to Session
@@ -1377,9 +1377,9 @@ class PatientAdmissionsGrid extends PatientAdmissions
         $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
-        $this->ListOptions->UseDropDownButton = false;
+        $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
-        $this->ListOptions->UseButtonGroup = false;
+        $this->ListOptions->UseButtonGroup = true;
         if ($this->ListOptions->UseButtonGroup && IsMobile()) {
             $this->ListOptions->UseDropDownButton = true;
         }
@@ -1739,6 +1739,12 @@ class PatientAdmissionsGrid extends PatientAdmissions
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
         // Check field name 'patient_id' first before field var 'x_patient_id'
         $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
         if (!$this->patient_id->IsDetailKey) {
@@ -1777,12 +1783,6 @@ class PatientAdmissionsGrid extends PatientAdmissions
         }
         if ($CurrentForm->hasValue("o_date_created")) {
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
-        }
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
         }
     }
 
@@ -1988,6 +1988,10 @@ class PatientAdmissionsGrid extends PatientAdmissions
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
 
+            // id
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
@@ -2000,6 +2004,8 @@ class PatientAdmissionsGrid extends PatientAdmissions
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // id
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2068,6 +2074,9 @@ class PatientAdmissionsGrid extends PatientAdmissions
 
             // Add refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2077,6 +2086,10 @@ class PatientAdmissionsGrid extends PatientAdmissions
             // date_created
             $this->date_created->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+
             // patient_id
             $this->patient_id->setupEditAttributes();
             if ($this->patient_id->getSessionValue() != "") {
@@ -2145,6 +2158,9 @@ class PatientAdmissionsGrid extends PatientAdmissions
 
             // Edit refer script
 
+            // id
+            $this->id->HrefValue = "";
+
             // patient_id
             $this->patient_id->HrefValue = "";
 
@@ -2174,6 +2190,11 @@ class PatientAdmissionsGrid extends PatientAdmissions
             return true;
         }
         $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
             if ($this->patient_id->Visible && $this->patient_id->Required) {
                 if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));

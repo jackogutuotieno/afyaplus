@@ -125,7 +125,7 @@ loadjs.ready("head", function () {
     if (in_array("bed_assignment", explode(",", $Page->getCurrentDetailTable())) && $bed_assignment->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("bed_assignment", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("bed_assignment", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("bed_assignment")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "BedAssignmentGrid.php" ?>
 <?php } ?>
@@ -133,7 +133,7 @@ loadjs.ready("head", function () {
     if (in_array("issue_items", explode(",", $Page->getCurrentDetailTable())) && $issue_items->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("issue_items", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("issue_items", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("issue_items")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "IssueItemsGrid.php" ?>
 <?php } ?>
@@ -141,9 +141,25 @@ loadjs.ready("head", function () {
     if (in_array("patients_discharge", explode(",", $Page->getCurrentDetailTable())) && $patients_discharge->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_discharge", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patients_discharge", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patients_discharge")->Count, $Language->phrase("DetailCount"))) ?></h4>
 <?php } ?>
 <?php include_once "PatientsDischargeGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_ipd_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_vitals->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_vitals", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_ipd_vitals")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdVitalsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_ipd_services", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_services->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_services", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("patient_ipd_services")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdServicesGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

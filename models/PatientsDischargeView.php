@@ -144,6 +144,9 @@ class PatientsDischargeView extends PatientsDischarge
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->discharge->setVisibility();
+        $this->admission_reason->setVisibility();
+        $this->discharge_condition->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -563,6 +566,7 @@ class PatientsDischargeView extends PatientsDischarge
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->discharge);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -691,6 +695,16 @@ class PatientsDischargeView extends PatientsDischarge
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
 
+        // Edit
+        $item = &$option->add("edit");
+        $editcaption = HtmlTitle($Language->phrase("ViewPageEditLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        }
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
+
         // Set up action default
         $option = $options["action"];
         $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
@@ -798,6 +812,9 @@ class PatientsDischargeView extends PatientsDischarge
         $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->discharge->setDbValue($row['discharge']);
+        $this->admission_reason->setDbValue($row['admission_reason']);
+        $this->discharge_condition->setDbValue($row['discharge_condition']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -810,6 +827,9 @@ class PatientsDischargeView extends PatientsDischarge
         $row['admission_id'] = $this->admission_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['discharge'] = $this->discharge->DefaultValue;
+        $row['admission_reason'] = $this->admission_reason->DefaultValue;
+        $row['discharge_condition'] = $this->discharge_condition->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -840,6 +860,12 @@ class PatientsDischargeView extends PatientsDischarge
         // patient_id
 
         // discharge
+
+        // admission_reason
+
+        // discharge_condition
+
+        // created_by_user_id
 
         // date_created
 
@@ -884,6 +910,35 @@ class PatientsDischargeView extends PatientsDischarge
                 $this->discharge->ViewValue = $this->discharge->tagCaption(2) != "" ? $this->discharge->tagCaption(2) : "No";
             }
 
+            // admission_reason
+            $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
+
+            // discharge_condition
+            $this->discharge_condition->ViewValue = $this->discharge_condition->CurrentValue;
+
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -903,6 +958,18 @@ class PatientsDischargeView extends PatientsDischarge
             // discharge
             $this->discharge->HrefValue = "";
             $this->discharge->TooltipValue = "";
+
+            // admission_reason
+            $this->admission_reason->HrefValue = "";
+            $this->admission_reason->TooltipValue = "";
+
+            // discharge_condition
+            $this->discharge_condition->HrefValue = "";
+            $this->discharge_condition->TooltipValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1200,6 +1267,8 @@ class PatientsDischargeView extends PatientsDischarge
                 case "x_patient_id":
                     break;
                 case "x_discharge":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

@@ -150,6 +150,9 @@ class PatientsDischargeList extends PatientsDischarge
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->discharge->setVisibility();
+        $this->admission_reason->setVisibility();
+        $this->discharge_condition->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->Visible = false;
     }
@@ -459,6 +462,9 @@ class PatientsDischargeList extends PatientsDischarge
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_by_user_id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -713,6 +719,7 @@ class PatientsDischargeList extends PatientsDischarge
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->discharge);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -778,8 +785,33 @@ class PatientsDischargeList extends PatientsDischarge
             $this->OtherOptions->hideAllOptions();
         }
 
+        // Get default search criteria
+        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+
+        // Get basic search values
+        $this->loadBasicSearchValues();
+
+        // Process filter list
+        if ($this->processFilterList()) {
+            $this->terminate();
+            return;
+        }
+
+        // Restore search parms from Session if not searching / reset / export
+        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+            $this->restoreSearchParms();
+        }
+
+        // Call Recordset SearchValidated event
+        $this->recordsetSearchValidated();
+
         // Set up sorting order
         $this->setupSortOrder();
+
+        // Get basic search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchBasic = $this->basicSearchWhere();
+        }
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -787,6 +819,35 @@ class PatientsDischargeList extends PatientsDischarge
         } else {
             $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms() && !$query) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere(); // Save to session
+            }
+        }
+
+        // Build search criteria
+        if ($query) {
+            AddFilter($this->SearchWhere, $query);
+        } else {
+            AddFilter($this->SearchWhere, $srchAdvanced);
+            AddFilter($this->SearchWhere, $srchBasic);
+        }
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json" && !$query) {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -1010,6 +1071,240 @@ class PatientsDischargeList extends PatientsDischarge
         return $wrkFilter;
     }
 
+    // Get list of filters
+    public function getFilterList()
+    {
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+
+        // Load server side filters
+        if (Config("SEARCH_FILTER_OPTION") == "Server") {
+            $savedFilterList = Profile()->getSearchFilters("fpatients_dischargesrch");
+        }
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->admission_id->AdvancedSearch->toJson(), ","); // Field admission_id
+        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
+        $filterList = Concat($filterList, $this->discharge->AdvancedSearch->toJson(), ","); // Field discharge
+        $filterList = Concat($filterList, $this->admission_reason->AdvancedSearch->toJson(), ","); // Field admission_reason
+        $filterList = Concat($filterList, $this->discharge_condition->AdvancedSearch->toJson(), ","); // Field discharge_condition
+        $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
+        $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
+        $filterList = Concat($filterList, $this->date_updated->AdvancedSearch->toJson(), ","); // Field date_updated
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            Profile()->setSearchFilters("fpatients_dischargesrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
+
+        // Field admission_id
+        $this->admission_id->AdvancedSearch->SearchValue = @$filter["x_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchOperator = @$filter["z_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchCondition = @$filter["v_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchValue2 = @$filter["y_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchOperator2 = @$filter["w_admission_id"];
+        $this->admission_id->AdvancedSearch->save();
+
+        // Field patient_id
+        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
+        $this->patient_id->AdvancedSearch->save();
+
+        // Field discharge
+        $this->discharge->AdvancedSearch->SearchValue = @$filter["x_discharge"];
+        $this->discharge->AdvancedSearch->SearchOperator = @$filter["z_discharge"];
+        $this->discharge->AdvancedSearch->SearchCondition = @$filter["v_discharge"];
+        $this->discharge->AdvancedSearch->SearchValue2 = @$filter["y_discharge"];
+        $this->discharge->AdvancedSearch->SearchOperator2 = @$filter["w_discharge"];
+        $this->discharge->AdvancedSearch->save();
+
+        // Field admission_reason
+        $this->admission_reason->AdvancedSearch->SearchValue = @$filter["x_admission_reason"];
+        $this->admission_reason->AdvancedSearch->SearchOperator = @$filter["z_admission_reason"];
+        $this->admission_reason->AdvancedSearch->SearchCondition = @$filter["v_admission_reason"];
+        $this->admission_reason->AdvancedSearch->SearchValue2 = @$filter["y_admission_reason"];
+        $this->admission_reason->AdvancedSearch->SearchOperator2 = @$filter["w_admission_reason"];
+        $this->admission_reason->AdvancedSearch->save();
+
+        // Field discharge_condition
+        $this->discharge_condition->AdvancedSearch->SearchValue = @$filter["x_discharge_condition"];
+        $this->discharge_condition->AdvancedSearch->SearchOperator = @$filter["z_discharge_condition"];
+        $this->discharge_condition->AdvancedSearch->SearchCondition = @$filter["v_discharge_condition"];
+        $this->discharge_condition->AdvancedSearch->SearchValue2 = @$filter["y_discharge_condition"];
+        $this->discharge_condition->AdvancedSearch->SearchOperator2 = @$filter["w_discharge_condition"];
+        $this->discharge_condition->AdvancedSearch->save();
+
+        // Field created_by_user_id
+        $this->created_by_user_id->AdvancedSearch->SearchValue = @$filter["x_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator = @$filter["z_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchCondition = @$filter["v_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchValue2 = @$filter["y_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->SearchOperator2 = @$filter["w_created_by_user_id"];
+        $this->created_by_user_id->AdvancedSearch->save();
+
+        // Field date_created
+        $this->date_created->AdvancedSearch->SearchValue = @$filter["x_date_created"];
+        $this->date_created->AdvancedSearch->SearchOperator = @$filter["z_date_created"];
+        $this->date_created->AdvancedSearch->SearchCondition = @$filter["v_date_created"];
+        $this->date_created->AdvancedSearch->SearchValue2 = @$filter["y_date_created"];
+        $this->date_created->AdvancedSearch->SearchOperator2 = @$filter["w_date_created"];
+        $this->date_created->AdvancedSearch->save();
+
+        // Field date_updated
+        $this->date_updated->AdvancedSearch->SearchValue = @$filter["x_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchOperator = @$filter["z_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchCondition = @$filter["v_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchValue2 = @$filter["y_date_updated"];
+        $this->date_updated->AdvancedSearch->SearchOperator2 = @$filter["w_date_updated"];
+        $this->date_updated->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Show list of filters
+    public function showFilterList()
+    {
+        global $Language;
+
+        // Initialize
+        $filterList = "";
+        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
+        $captionSuffix = $this->isExport("email") ? ": " : "";
+        if ($this->BasicSearch->Keyword != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
+        }
+
+        // Show Filters
+        if ($filterList != "") {
+            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
+                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
+            $this->messageShowing($message, "");
+            Write($message);
+        } else { // Output empty tag
+            Write("<div id=\"ew-filter-list\"></div>");
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    public function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Fields to search
+        $searchFlds = [];
+        $searchFlds[] = &$this->admission_reason;
+        $searchFlds[] = &$this->discharge_condition;
+        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $searchStr;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1029,6 +1324,9 @@ class PatientsDischargeList extends PatientsDischarge
             $this->updateSort($this->admission_id); // admission_id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->discharge); // discharge
+            $this->updateSort($this->admission_reason); // admission_reason
+            $this->updateSort($this->discharge_condition); // discharge_condition
+            $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1045,6 +1343,11 @@ class PatientsDischargeList extends PatientsDischarge
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
@@ -1062,6 +1365,9 @@ class PatientsDischargeList extends PatientsDischarge
                 $this->admission_id->setSort("");
                 $this->patient_id->setSort("");
                 $this->discharge->setSort("");
+                $this->admission_reason->setSort("");
+                $this->discharge_condition->setSort("");
+                $this->created_by_user_id->setSort("");
                 $this->date_created->setSort("");
                 $this->date_updated->setSort("");
             }
@@ -1087,6 +1393,12 @@ class PatientsDischargeList extends PatientsDischarge
         $item = &$this->ListOptions->add("view");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
         // List actions
@@ -1155,6 +1467,19 @@ class PatientsDischargeList extends PatientsDischarge
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patients_discharge\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit()) {
+                if ($this->ModalEdit && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patients_discharge\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 }
             } else {
                 $opt->Body = "";
@@ -1242,6 +1567,9 @@ class PatientsDischargeList extends PatientsDischarge
             $this->createColumnOption($option, "admission_id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "discharge");
+            $this->createColumnOption($option, "admission_reason");
+            $this->createColumnOption($option, "discharge_condition");
+            $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -1268,10 +1596,10 @@ class PatientsDischargeList extends PatientsDischarge
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fpatients_dischargesrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fpatients_dischargesrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1578,6 +1906,16 @@ class PatientsDischargeList extends PatientsDischarge
         $this->renderListOptions();
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     /**
      * Load result set
      *
@@ -1675,6 +2013,9 @@ class PatientsDischargeList extends PatientsDischarge
         $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->discharge->setDbValue($row['discharge']);
+        $this->admission_reason->setDbValue($row['admission_reason']);
+        $this->discharge_condition->setDbValue($row['discharge_condition']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1687,6 +2028,9 @@ class PatientsDischargeList extends PatientsDischarge
         $row['admission_id'] = $this->admission_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['discharge'] = $this->discharge->DefaultValue;
+        $row['admission_reason'] = $this->admission_reason->DefaultValue;
+        $row['discharge_condition'] = $this->discharge_condition->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -1737,6 +2081,12 @@ class PatientsDischargeList extends PatientsDischarge
 
         // discharge
 
+        // admission_reason
+
+        // discharge_condition
+
+        // created_by_user_id
+
         // date_created
 
         // date_updated
@@ -1781,6 +2131,35 @@ class PatientsDischargeList extends PatientsDischarge
                 $this->discharge->ViewValue = $this->discharge->tagCaption(2) != "" ? $this->discharge->tagCaption(2) : "No";
             }
 
+            // admission_reason
+            $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
+
+            // discharge_condition
+            $this->discharge_condition->ViewValue = $this->discharge_condition->CurrentValue;
+
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1800,6 +2179,18 @@ class PatientsDischargeList extends PatientsDischarge
             // discharge
             $this->discharge->HrefValue = "";
             $this->discharge->TooltipValue = "";
+
+            // admission_reason
+            $this->admission_reason->HrefValue = "";
+            $this->admission_reason->TooltipValue = "";
+
+            // discharge_condition
+            $this->discharge_condition->HrefValue = "";
+            $this->discharge_condition->TooltipValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
+            $this->created_by_user_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1923,6 +2314,21 @@ class PatientsDischargeList extends PatientsDischarge
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fpatients_dischargesrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        } else {
+            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        }
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
+
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -1946,7 +2352,7 @@ class PatientsDischargeList extends PatientsDischarge
     // Check if any search fields
     public function hasSearchFields()
     {
-        return false;
+        return true;
     }
 
     // Render search options
@@ -2169,6 +2575,8 @@ class PatientsDischargeList extends PatientsDischarge
                 case "x_patient_id":
                     break;
                 case "x_discharge":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

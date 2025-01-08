@@ -51,6 +51,9 @@ class PatientsDischarge extends DbTable
     public $admission_id;
     public $patient_id;
     public $discharge;
+    public $admission_reason;
+    public $discharge_condition;
+    public $created_by_user_id;
     public $date_created;
     public $date_updated;
 
@@ -212,6 +215,84 @@ class PatientsDischarge extends DbTable
         $this->discharge->DefaultErrorMessage = $Language->phrase("IncorrectField");
         $this->discharge->SearchOperators = ["=", "<>"];
         $this->Fields['discharge'] = &$this->discharge;
+
+        // admission_reason
+        $this->admission_reason = new DbField(
+            $this, // Table
+            'x_admission_reason', // Variable name
+            'admission_reason', // Name
+            '`admission_reason`', // Expression
+            '`admission_reason`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`admission_reason`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->admission_reason->InputTextType = "text";
+        $this->admission_reason->Nullable = false; // NOT NULL field
+        $this->admission_reason->Required = true; // Required field
+        $this->admission_reason->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['admission_reason'] = &$this->admission_reason;
+
+        // discharge_condition
+        $this->discharge_condition = new DbField(
+            $this, // Table
+            'x_discharge_condition', // Variable name
+            'discharge_condition', // Name
+            '`discharge_condition`', // Expression
+            '`discharge_condition`', // Basic search expression
+            200, // Type
+            65535, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`discharge_condition`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->discharge_condition->InputTextType = "text";
+        $this->discharge_condition->Nullable = false; // NOT NULL field
+        $this->discharge_condition->Required = true; // Required field
+        $this->discharge_condition->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['discharge_condition'] = &$this->discharge_condition;
+
+        // created_by_user_id
+        $this->created_by_user_id = new DbField(
+            $this, // Table
+            'x_created_by_user_id', // Variable name
+            'created_by_user_id', // Name
+            '`created_by_user_id`', // Expression
+            '`created_by_user_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`created_by_user_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->created_by_user_id->addMethod("getAutoUpdateValue", fn() => CurrentUserID());
+        $this->created_by_user_id->InputTextType = "text";
+        $this->created_by_user_id->Raw = true;
+        $this->created_by_user_id->Nullable = false; // NOT NULL field
+        $this->created_by_user_id->setSelectMultiple(false); // Select one
+        $this->created_by_user_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->created_by_user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->created_by_user_id->Lookup = new Lookup($this->created_by_user_id, 'users', false, 'id', ["full_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "CONCAT(first_name,' ',last_name)");
+        $this->created_by_user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->created_by_user_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['created_by_user_id'] = &$this->created_by_user_id;
 
         // date_created
         $this->date_created = new DbField(
@@ -889,6 +970,9 @@ class PatientsDischarge extends DbTable
         $this->admission_id->DbValue = $row['admission_id'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->discharge->DbValue = $row['discharge'];
+        $this->admission_reason->DbValue = $row['admission_reason'];
+        $this->discharge_condition->DbValue = $row['discharge_condition'];
+        $this->created_by_user_id->DbValue = $row['created_by_user_id'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1252,6 +1336,9 @@ class PatientsDischarge extends DbTable
         $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->discharge->setDbValue($row['discharge']);
+        $this->admission_reason->setDbValue($row['admission_reason']);
+        $this->discharge_condition->setDbValue($row['discharge_condition']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1291,6 +1378,12 @@ class PatientsDischarge extends DbTable
         // patient_id
 
         // discharge
+
+        // admission_reason
+
+        // discharge_condition
+
+        // created_by_user_id
 
         // date_created
 
@@ -1334,6 +1427,35 @@ class PatientsDischarge extends DbTable
             $this->discharge->ViewValue = $this->discharge->tagCaption(2) != "" ? $this->discharge->tagCaption(2) : "No";
         }
 
+        // admission_reason
+        $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
+
+        // discharge_condition
+        $this->discharge_condition->ViewValue = $this->discharge_condition->CurrentValue;
+
+        // created_by_user_id
+        $curVal = strval($this->created_by_user_id->CurrentValue);
+        if ($curVal != "") {
+            $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+            if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                } else {
+                    $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                }
+            }
+        } else {
+            $this->created_by_user_id->ViewValue = null;
+        }
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1357,6 +1479,18 @@ class PatientsDischarge extends DbTable
         // discharge
         $this->discharge->HrefValue = "";
         $this->discharge->TooltipValue = "";
+
+        // admission_reason
+        $this->admission_reason->HrefValue = "";
+        $this->admission_reason->TooltipValue = "";
+
+        // discharge_condition
+        $this->discharge_condition->HrefValue = "";
+        $this->discharge_condition->TooltipValue = "";
+
+        // created_by_user_id
+        $this->created_by_user_id->HrefValue = "";
+        $this->created_by_user_id->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1432,6 +1566,18 @@ class PatientsDischarge extends DbTable
         $this->discharge->EditValue = $this->discharge->options(false);
         $this->discharge->PlaceHolder = RemoveHtml($this->discharge->caption());
 
+        // admission_reason
+        $this->admission_reason->setupEditAttributes();
+        $this->admission_reason->EditValue = $this->admission_reason->CurrentValue;
+        $this->admission_reason->PlaceHolder = RemoveHtml($this->admission_reason->caption());
+
+        // discharge_condition
+        $this->discharge_condition->setupEditAttributes();
+        $this->discharge_condition->EditValue = $this->discharge_condition->CurrentValue;
+        $this->discharge_condition->PlaceHolder = RemoveHtml($this->discharge_condition->caption());
+
+        // created_by_user_id
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1474,12 +1620,18 @@ class PatientsDischarge extends DbTable
                     $doc->exportCaption($this->admission_id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->discharge);
+                    $doc->exportCaption($this->admission_reason);
+                    $doc->exportCaption($this->discharge_condition);
+                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->admission_id);
                     $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->discharge);
+                    $doc->exportCaption($this->admission_reason);
+                    $doc->exportCaption($this->discharge_condition);
+                    $doc->exportCaption($this->created_by_user_id);
                     $doc->exportCaption($this->date_created);
                 }
                 $doc->endExportRow();
@@ -1511,12 +1663,18 @@ class PatientsDischarge extends DbTable
                         $doc->exportField($this->admission_id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->discharge);
+                        $doc->exportField($this->admission_reason);
+                        $doc->exportField($this->discharge_condition);
+                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->admission_id);
                         $doc->exportField($this->patient_id);
                         $doc->exportField($this->discharge);
+                        $doc->exportField($this->admission_reason);
+                        $doc->exportField($this->discharge_condition);
+                        $doc->exportField($this->created_by_user_id);
                         $doc->exportField($this->date_created);
                     }
                     $doc->endExportRow($rowCnt);

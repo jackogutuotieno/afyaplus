@@ -120,7 +120,13 @@
       <phrase id="menutext" value="Beds" />
     </menu>
     <menu id="1021">
-      <phrase id="menutext" value="Discharge" />
+      <phrase id="menutext" value="Discharge Summary" />
+    </menu>
+    <menu id="1026">
+      <phrase id="menutext" value="Vitals" />
+    </menu>
+    <menu id="1027">
+      <phrase id="menutext" value="Services" />
     </menu>
     <menu id="50">
       <phrase id="menutext" value="Doctor Panel" />
@@ -3485,7 +3491,7 @@
       </field>
     </table>
     <table id="patients_discharge">
-      <phrase id="tblcaption" value="Discharge" />
+      <phrase id="tblcaption" value="Discharge Summary" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>
@@ -3501,6 +3507,15 @@
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="admission_reason">
+        <phrase id="fldcaption" value="Reason for Admission" />
+      </field>
+      <field id="discharge_condition">
+        <phrase id="fldcaption" value="Discharge Condition" />
+      </field>
+      <field id="created_by_user_id">
+        <phrase id="fldcaption" value="Discharged By" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Discharge Date" />
@@ -3612,6 +3627,63 @@
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Receipt Date" />
+      </field>
+    </table>
+    <table id="patient_ipd_vitals">
+      <phrase id="tblcaption" value="Vitals" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="admission_id">
+        <phrase id="fldcaption" value="Admission No" />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="height">
+        <phrase id="fldcaption" value="Height (m)" />
+      </field>
+      <field id="weight">
+        <phrase id="fldcaption" value="Weight (Kg)" />
+      </field>
+      <field id="temperature">
+        <phrase id="fldcaption" value="Temperature" />
+      </field>
+      <field id="pulse">
+        <phrase id="fldcaption" value="Pulse" />
+      </field>
+      <field id="blood_pressure">
+        <phrase id="fldcaption" value="BP (mmHg)" />
+      </field>
+      <field id="created_by_user_id">
+        <phrase id="fldcaption" value="Taken By" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Vitals Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+    </table>
+    <table id="patient_ipd_services">
+      <phrase id="tblcaption" value="Services" />
+      <field id="id">
+        <phrase id="fldcaption" value="S/NO" />
+      </field>
+      <field id="admission_id">
+        <phrase id="fldcaption" value="Admission No." />
+      </field>
+      <field id="patient_id">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="service_id">
+        <phrase id="fldcaption" value="Service" />
+      </field>
+      <field id="date_created">
+        <phrase id="fldcaption" value="Submission Date" />
+      </field>
+      <field id="date_updated">
+        <phrase id="fldcaption" value="Last Udated" />
       </field>
     </table>
   </project>

@@ -1769,8 +1769,13 @@ class Beds extends DbTable
     // Row Inserting event
     public function rowInserting($rsold, &$rsnew)
     {
-        // Enter your code here
-        // To cancel, set return value to false
+        /* $if_exists = ExecuteScalar("SELECT count(*) FROM beds where visit_id = '".$rsnew["visit_id"]."' and patient_id = '".$rsnew["patient_id"]."'");
+    	if($if_exists > 0) { // Check for double applications
+    		$this->CancelMessage = "Test request already submitted for the checked in patient.";
+    		return false;
+    	} else if ($if_exists < 0) { 
+            return true; 
+        } */
         return true;
     }
 

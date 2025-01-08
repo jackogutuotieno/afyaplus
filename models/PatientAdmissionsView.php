@@ -527,6 +527,20 @@ class PatientAdmissionsView extends PatientAdmissions
                 return;
             }
         }
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportType = $this->Export; // Get export parameter, used in header
+        if ($ExportType != "") {
+            global $SkipHeaderFooter;
+            $SkipHeaderFooter = true;
+        }
         $this->CurrentAction = Param("action"); // Set up current action
         $this->setVisibility();
 
@@ -603,6 +617,9 @@ class PatientAdmissionsView extends PatientAdmissions
                     }
                 break;
         }
+
+        // Setup export options
+        $this->setupExportOptions();
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
             return;
@@ -709,6 +726,14 @@ class PatientAdmissionsView extends PatientAdmissions
         // "detail_bed_assignment"
         $item = &$option->add("detail_bed_assignment");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("bed_assignment", "TblCaption");
+        $detailTbl = Container("bed_assignment");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("bed_assignment")->Count, "red"], $Language->phrase("DetailCount"));
+        }
         $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("bedassignmentlist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("BedAssignmentGrid");
@@ -748,6 +773,14 @@ class PatientAdmissionsView extends PatientAdmissions
         // "detail_issue_items"
         $item = &$option->add("detail_issue_items");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("issue_items", "TblCaption");
+        $detailTbl = Container("issue_items");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("issue_items")->Count, "red"], $Language->phrase("DetailCount"));
+        }
         $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("issueitemslist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("IssueItemsGrid");
@@ -787,6 +820,14 @@ class PatientAdmissionsView extends PatientAdmissions
         // "detail_patients_discharge"
         $item = &$option->add("detail_patients_discharge");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patients_discharge", "TblCaption");
+        $detailTbl = Container("patients_discharge");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patients_discharge")->Count, "red"], $Language->phrase("DetailCount"));
+        }
         $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("patientsdischargelist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("PatientsDischargeGrid");
@@ -818,6 +859,100 @@ class PatientAdmissionsView extends PatientAdmissions
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "patients_discharge";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_patient_ipd_vitals"
+        $item = &$option->add("detail_patient_ipd_vitals");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patient_ipd_vitals", "TblCaption");
+        $detailTbl = Container("patient_ipd_vitals");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_ipd_vitals")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("patientipdvitalslist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("PatientIpdVitalsGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_admissions')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_vitals"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "patient_ipd_vitals";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_admissions')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_vitals"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "patient_ipd_vitals";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_ipd_vitals');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "patient_ipd_vitals";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_patient_ipd_services"
+        $item = &$option->add("detail_patient_ipd_services");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("patient_ipd_services", "TblCaption");
+        $detailTbl = Container("patient_ipd_services");
+        $detailFilter = $detailTbl->getDetailFilter($this);
+        $detailTbl->setCurrentMasterTable($this->TableVar);
+        $detailFilter = $detailTbl->applyUserIDFilters($detailFilter);
+        $detailTbl->Count = $detailTbl->loadRecordCount($detailFilter);
+        if (!$this->ShowMultipleDetails) { // Skip record count if show multiple details
+            $body .= "&nbsp;" . str_replace(["%c", "%s"], [Container("patient_ipd_services")->Count, "red"], $Language->phrase("DetailCount"));
+        }
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("patientipdserviceslist?" . Config("TABLE_SHOW_MASTER") . "=patient_admissions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("PatientIpdServicesGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'patient_admissions')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_services"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "patient_ipd_services";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'patient_admissions')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_services"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "patient_ipd_services";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_ipd_services');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "patient_ipd_services";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -860,11 +995,66 @@ class PatientAdmissionsView extends PatientAdmissions
         // Set up action default
         $option = $options["action"];
         $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
-        $option->UseDropDownButton = !IsJsonResponse() && false;
+        $option->UseDropDownButton = !IsJsonResponse() && true;
         $option->UseButtonGroup = true;
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
+    }
+
+    /**
+     * Load result set
+     *
+     * @param int $offset Offset
+     * @param int $rowcnt Maximum number of rows
+     * @return Doctrine\DBAL\Result Result
+     */
+    public function loadRecordset($offset = -1, $rowcnt = -1)
+    {
+        // Load List page SQL (QueryBuilder)
+        $sql = $this->getListSql();
+
+        // Load result set
+        if ($offset > -1) {
+            $sql->setFirstResult($offset);
+        }
+        if ($rowcnt > 0) {
+            $sql->setMaxResults($rowcnt);
+        }
+        $result = $sql->executeQuery();
+        if (property_exists($this, "TotalRecords") && $rowcnt < 0) {
+            $this->TotalRecords = $result->rowCount();
+            if ($this->TotalRecords <= 0) { // Handle database drivers that does not return rowCount()
+                $this->TotalRecords = $this->getRecordCount($this->getListSql());
+            }
+        }
+
+        // Call Recordset Selected event
+        $this->recordsetSelected($result);
+        return $result;
+    }
+
+    /**
+     * Load records as associative array
+     *
+     * @param int $offset Offset
+     * @param int $rowcnt Maximum number of rows
+     * @return void
+     */
+    public function loadRows($offset = -1, $rowcnt = -1)
+    {
+        // Load List page SQL (QueryBuilder)
+        $sql = $this->getListSql();
+
+        // Load result set
+        if ($offset > -1) {
+            $sql->setFirstResult($offset);
+        }
+        if ($rowcnt > 0) {
+            $sql->setMaxResults($rowcnt);
+        }
+        $result = $sql->executeQuery();
+        return $result->fetchAllAssociative();
     }
 
     /**
@@ -1015,6 +1205,264 @@ class PatientAdmissionsView extends PatientAdmissions
         }
     }
 
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        if ($type == "print" || $custom) { // Printer friendly / custom export
+            $pageUrl = $this->pageUrl(true);
+            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
+        } else { // Export API URL
+            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
+            $exportUrl .= "/" . $this->getKey(true, "/");
+        }
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fpatient_admissionsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fpatient_admissionsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fpatient_admissionsview\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_admissionsview" data-ew-action="email" data-custom="true" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language, $Security;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel", !Config("USE_PHPEXCEL"));
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word", !Config("USE_PHPWORD"));
+        $item->Visible = true;
+
+        // Export to HTML
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = false;
+
+        // Export to XML
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to CSV
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to PDF
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf", true);
+        $item->Visible = true;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email", true);
+        $item->Visible = true;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = false;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
+
+        // Hide options for export
+        if ($this->isExport()) {
+            $this->ExportOptions->hideAllOptions();
+        }
+
+        // Hide options if json response
+        if (IsJsonResponse()) {
+            $this->ExportOptions->hideAllOptions();
+        }
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param bool $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($doc, $keys)
+    {
+        global $Language;
+        $rs = null;
+        if (count($keys) >= 1) {
+            $this->id->OldValue = $keys[0];
+            $rs = $this->loadRs($this->getRecordFilter());
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $doc->ExportCustom = !$this->pageExporting($doc);
+
+        // Page header
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "view");
+
+        // Set up detail parameters
+        $this->setupDetailParms();
+
+        // Export detail records (bed_assignment)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("bed_assignment", explode(",", $this->getCurrentDetailTable()))) {
+            $bed_assignment = new BedAssignmentList();
+            $rsdetail = $bed_assignment->loadRs($bed_assignment->getDetailFilterFromSession(), $bed_assignment->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($bed_assignment);
+                    $bed_assignment->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (issue_items)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("issue_items", explode(",", $this->getCurrentDetailTable()))) {
+            $issue_items = new IssueItemsList();
+            $rsdetail = $issue_items->loadRs($issue_items->getDetailFilterFromSession(), $issue_items->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($issue_items);
+                    $issue_items->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (patients_discharge)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("patients_discharge", explode(",", $this->getCurrentDetailTable()))) {
+            $patients_discharge = new PatientsDischargeList();
+            $rsdetail = $patients_discharge->loadRs($patients_discharge->getDetailFilterFromSession(), $patients_discharge->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($patients_discharge);
+                    $patients_discharge->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (patient_ipd_vitals)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("patient_ipd_vitals", explode(",", $this->getCurrentDetailTable()))) {
+            $patient_ipd_vitals = new PatientIpdVitalsList();
+            $rsdetail = $patient_ipd_vitals->loadRs($patient_ipd_vitals->getDetailFilterFromSession(), $patient_ipd_vitals->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($patient_ipd_vitals);
+                    $patient_ipd_vitals->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (patient_ipd_services)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("patient_ipd_services", explode(",", $this->getCurrentDetailTable()))) {
+            $patient_ipd_services = new PatientIpdServicesList();
+            $rsdetail = $patient_ipd_services->loadRs($patient_ipd_services->getDetailFilterFromSession(), $patient_ipd_services->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($patient_ipd_services);
+                    $patient_ipd_services->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+        $rs->free();
+
+        // Page footer
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Call Page Exported server event
+        $this->pageExported($doc);
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -1136,6 +1584,40 @@ class PatientAdmissionsView extends PatientAdmissions
             }
             if (in_array("patients_discharge", $detailTblVar)) {
                 $detailPageObj = Container("PatientsDischargeGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patient_ipd_vitals", $detailTblVar)) {
+                $detailPageObj = Container("PatientIpdVitalsGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patient_ipd_services", $detailTblVar)) {
+                $detailPageObj = Container("PatientIpdServicesGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";

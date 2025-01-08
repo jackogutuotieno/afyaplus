@@ -1043,6 +1043,16 @@ class PatientAdmissionsEdit extends PatientAdmissions
             $detailPage->run();
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
+        $detailPage = Container("PatientIpdVitalsGrid");
+        if (in_array("patient_ipd_vitals", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("PatientIpdServicesGrid");
+        if (in_array("patient_ipd_services", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1119,6 +1129,18 @@ class PatientAdmissionsEdit extends PatientAdmissions
             $detailPage = Container("PatientsDischargeGrid");
             if (in_array("patients_discharge", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
                 $Security->loadCurrentUserLevel($this->ProjectID . "patients_discharge"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+            $detailPage = Container("PatientIpdVitalsGrid");
+            if (in_array("patient_ipd_vitals", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_ipd_vitals"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+            $detailPage = Container("PatientIpdServicesGrid");
+            if (in_array("patient_ipd_services", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "patient_ipd_services"); // Load user level of detail table
                 $editRow = $detailPage->gridUpdate();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
             }
@@ -1328,6 +1350,42 @@ class PatientAdmissionsEdit extends PatientAdmissions
             }
             if (in_array("patients_discharge", $detailTblVar)) {
                 $detailPageObj = Container("PatientsDischargeGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patient_ipd_vitals", $detailTblVar)) {
+                $detailPageObj = Container("PatientIpdVitalsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                    $detailPageObj->patient_id->IsDetailKey = true;
+                    $detailPageObj->patient_id->CurrentValue = $this->patient_id->CurrentValue;
+                    $detailPageObj->patient_id->setSessionValue($detailPageObj->patient_id->CurrentValue);
+                }
+            }
+            if (in_array("patient_ipd_services", $detailTblVar)) {
+                $detailPageObj = Container("PatientIpdServicesGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";

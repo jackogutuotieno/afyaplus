@@ -27,6 +27,9 @@ loadjs.ready(["wrapper", "head"], function () {
             ["admission_id", [fields.admission_id.visible && fields.admission_id.required ? ew.Validators.required(fields.admission_id.caption) : null, ew.Validators.integer], fields.admission_id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["discharge", [fields.discharge.visible && fields.discharge.required ? ew.Validators.required(fields.discharge.caption) : null], fields.discharge.isInvalid],
+            ["admission_reason", [fields.admission_reason.visible && fields.admission_reason.required ? ew.Validators.required(fields.admission_reason.caption) : null], fields.admission_reason.isInvalid],
+            ["discharge_condition", [fields.discharge_condition.visible && fields.discharge_condition.required ? ew.Validators.required(fields.discharge_condition.caption) : null], fields.discharge_condition.isInvalid],
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
         ])
 
@@ -34,7 +37,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["admission_id",false],["patient_id",false],["discharge",true],["date_created",false]];
+                    fields = [["admission_id",false],["patient_id",false],["discharge",true],["admission_reason",false],["discharge_condition",false],["date_created",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -56,6 +59,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
             "discharge": <?= $Grid->discharge->toClientList($Grid) ?>,
+            "created_by_user_id": <?= $Grid->created_by_user_id->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -101,6 +105,15 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->discharge->Visible) { // discharge ?>
         <th data-name="discharge" class="<?= $Grid->discharge->headerCellClass() ?>"><div id="elh_patients_discharge_discharge" class="patients_discharge_discharge"><?= $Grid->renderFieldHeader($Grid->discharge) ?></div></th>
+<?php } ?>
+<?php if ($Grid->admission_reason->Visible) { // admission_reason ?>
+        <th data-name="admission_reason" class="<?= $Grid->admission_reason->headerCellClass() ?>"><div id="elh_patients_discharge_admission_reason" class="patients_discharge_admission_reason"><?= $Grid->renderFieldHeader($Grid->admission_reason) ?></div></th>
+<?php } ?>
+<?php if ($Grid->discharge_condition->Visible) { // discharge_condition ?>
+        <th data-name="discharge_condition" class="<?= $Grid->discharge_condition->headerCellClass() ?>"><div id="elh_patients_discharge_discharge_condition" class="patients_discharge_discharge_condition"><?= $Grid->renderFieldHeader($Grid->discharge_condition) ?></div></th>
+<?php } ?>
+<?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
+        <th data-name="created_by_user_id" class="<?= $Grid->created_by_user_id->headerCellClass() ?>"><div id="elh_patients_discharge_created_by_user_id" class="patients_discharge_created_by_user_id"><?= $Grid->renderFieldHeader($Grid->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Grid->date_created->headerCellClass() ?>"><div id="elh_patients_discharge_date_created" class="patients_discharge_date_created"><?= $Grid->renderFieldHeader($Grid->date_created) ?></div></th>
@@ -353,6 +366,103 @@ loadjs.ready("fpatients_dischargegrid", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="patients_discharge" data-field="x_discharge" data-hidden="1" name="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_discharge" id="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_discharge" value="<?= HtmlEncode($Grid->discharge->FormValue) ?>">
 <input type="hidden" data-table="patients_discharge" data-field="x_discharge" data-hidden="1" data-old name="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_discharge" id="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_discharge" value="<?= HtmlEncode($Grid->discharge->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->admission_reason->Visible) { // admission_reason ?>
+        <td data-name="admission_reason"<?= $Grid->admission_reason->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_admission_reason" class="el_patients_discharge_admission_reason">
+<?php $Grid->admission_reason->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_admission_reason" name="x<?= $Grid->RowIndex ?>_admission_reason" id="x<?= $Grid->RowIndex ?>_admission_reason" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->admission_reason->getPlaceHolder()) ?>"<?= $Grid->admission_reason->editAttributes() ?>><?= $Grid->admission_reason->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->admission_reason->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargegrid", "editor"], function() {
+    ew.createEditor("fpatients_dischargegrid", "x<?= $Grid->RowIndex ?>_admission_reason", 0, 0, <?= $Grid->admission_reason->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
+</span>
+<input type="hidden" data-table="patients_discharge" data-field="x_admission_reason" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_admission_reason" id="o<?= $Grid->RowIndex ?>_admission_reason" value="<?= HtmlEncode($Grid->admission_reason->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_admission_reason" class="el_patients_discharge_admission_reason">
+<?php $Grid->admission_reason->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_admission_reason" name="x<?= $Grid->RowIndex ?>_admission_reason" id="x<?= $Grid->RowIndex ?>_admission_reason" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->admission_reason->getPlaceHolder()) ?>"<?= $Grid->admission_reason->editAttributes() ?>><?= $Grid->admission_reason->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->admission_reason->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargegrid", "editor"], function() {
+    ew.createEditor("fpatients_dischargegrid", "x<?= $Grid->RowIndex ?>_admission_reason", 0, 0, <?= $Grid->admission_reason->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_admission_reason" class="el_patients_discharge_admission_reason">
+<span<?= $Grid->admission_reason->viewAttributes() ?>>
+<?= $Grid->admission_reason->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patients_discharge" data-field="x_admission_reason" data-hidden="1" name="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_admission_reason" id="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_admission_reason" value="<?= HtmlEncode($Grid->admission_reason->FormValue) ?>">
+<input type="hidden" data-table="patients_discharge" data-field="x_admission_reason" data-hidden="1" data-old name="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_admission_reason" id="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_admission_reason" value="<?= HtmlEncode($Grid->admission_reason->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->discharge_condition->Visible) { // discharge_condition ?>
+        <td data-name="discharge_condition"<?= $Grid->discharge_condition->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_discharge_condition" class="el_patients_discharge_discharge_condition">
+<?php $Grid->discharge_condition->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_discharge_condition" name="x<?= $Grid->RowIndex ?>_discharge_condition" id="x<?= $Grid->RowIndex ?>_discharge_condition" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->discharge_condition->getPlaceHolder()) ?>"<?= $Grid->discharge_condition->editAttributes() ?>><?= $Grid->discharge_condition->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->discharge_condition->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargegrid", "editor"], function() {
+    ew.createEditor("fpatients_dischargegrid", "x<?= $Grid->RowIndex ?>_discharge_condition", 0, 0, <?= $Grid->discharge_condition->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
+</span>
+<input type="hidden" data-table="patients_discharge" data-field="x_discharge_condition" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_discharge_condition" id="o<?= $Grid->RowIndex ?>_discharge_condition" value="<?= HtmlEncode($Grid->discharge_condition->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_discharge_condition" class="el_patients_discharge_discharge_condition">
+<?php $Grid->discharge_condition->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_discharge_condition" name="x<?= $Grid->RowIndex ?>_discharge_condition" id="x<?= $Grid->RowIndex ?>_discharge_condition" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->discharge_condition->getPlaceHolder()) ?>"<?= $Grid->discharge_condition->editAttributes() ?>><?= $Grid->discharge_condition->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->discharge_condition->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargegrid", "editor"], function() {
+    ew.createEditor("fpatients_dischargegrid", "x<?= $Grid->RowIndex ?>_discharge_condition", 0, 0, <?= $Grid->discharge_condition->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_discharge_condition" class="el_patients_discharge_discharge_condition">
+<span<?= $Grid->discharge_condition->viewAttributes() ?>>
+<?= $Grid->discharge_condition->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patients_discharge" data-field="x_discharge_condition" data-hidden="1" name="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_discharge_condition" id="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_discharge_condition" value="<?= HtmlEncode($Grid->discharge_condition->FormValue) ?>">
+<input type="hidden" data-table="patients_discharge" data-field="x_discharge_condition" data-hidden="1" data-old name="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_discharge_condition" id="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_discharge_condition" value="<?= HtmlEncode($Grid->discharge_condition->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->created_by_user_id->Visible) { // created_by_user_id ?>
+        <td data-name="created_by_user_id"<?= $Grid->created_by_user_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<input type="hidden" data-table="patients_discharge" data-field="x_created_by_user_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_created_by_user_id" id="o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patients_discharge_created_by_user_id" class="el_patients_discharge_created_by_user_id">
+<span<?= $Grid->created_by_user_id->viewAttributes() ?>>
+<?= $Grid->created_by_user_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patients_discharge" data-field="x_created_by_user_id" data-hidden="1" name="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_created_by_user_id" id="fpatients_dischargegrid$x<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->FormValue) ?>">
+<input type="hidden" data-table="patients_discharge" data-field="x_created_by_user_id" data-hidden="1" data-old name="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_created_by_user_id" id="fpatients_dischargegrid$o<?= $Grid->RowIndex ?>_created_by_user_id" value="<?= HtmlEncode($Grid->created_by_user_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

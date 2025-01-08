@@ -80,7 +80,7 @@ class PatientAdmissions extends DbTable
         // Update Table
         $this->UpdateTable = "patient_admissions";
         $this->Dbid = 'DB';
-        $this->ExportAll = false;
+        $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
 
         // PDF
@@ -237,6 +237,22 @@ class PatientAdmissions extends DbTable
         }
     }
 
+    // Single column sort
+    public function updateSort(&$fld)
+    {
+        if ($this->CurrentOrder == $fld->Name) {
+            $sortField = $fld->Expression;
+            $lastSort = $fld->getSort();
+            if (in_array($this->CurrentOrderType, ["ASC", "DESC", "NO"])) {
+                $curSort = $this->CurrentOrderType;
+            } else {
+                $curSort = $lastSort;
+            }
+            $orderBy = in_array($curSort, ["ASC", "DESC"]) ? $sortField . " " . $curSort : "";
+            $this->setSessionOrderBy($orderBy); // Save to Session
+        }
+    }
+
     // Update field sort
     public function updateFieldSort()
     {
@@ -363,6 +379,16 @@ class PatientAdmissions extends DbTable
         }
         if ($this->getCurrentDetailTable() == "patients_discharge") {
             $detailUrl = Container("patients_discharge")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "patient_ipd_vitals") {
+            $detailUrl = Container("patient_ipd_vitals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "patient_ipd_services") {
+            $detailUrl = Container("patient_ipd_services")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
             $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
         }
@@ -1077,6 +1103,13 @@ class PatientAdmissions extends DbTable
         global $Security, $Language;
         $sortUrl = "";
         $attrs = "";
+        if ($this->PageID != "grid" && $fld->Sortable) {
+            $sortUrl = $this->sortUrl($fld);
+            $attrs = ' role="button" data-ew-action="sort" data-ajax="' . ($this->UseAjaxActions ? "true" : "false") . '" data-sort-url="' . $sortUrl . '" data-sort-type="1"';
+            if ($this->ContextClass) { // Add context
+                $attrs .= ' data-context="' . HtmlEncode($this->ContextClass) . '"';
+            }
+        }
         $html = '<div class="ew-table-header-caption"' . $attrs . '>' . $fld->caption() . '</div>';
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
@@ -1099,7 +1132,20 @@ class PatientAdmissions extends DbTable
     public function sortUrl($fld)
     {
         global $DashboardReport;
-        return "";
+        if (
+            $this->CurrentAction || $this->isExport() ||
+            in_array($fld->Type, [128, 204, 205])
+        ) { // Unsortable data type
+                return "";
+        } elseif ($fld->Sortable) {
+            $urlParm = "order=" . urlencode($fld->Name) . "&amp;ordertype=" . $fld->getNextSort();
+            if ($DashboardReport) {
+                $urlParm .= "&amp;" . Config("PAGE_DASHBOARD") . "=" . $DashboardReport;
+            }
+            return $this->addMasterUrl($this->CurrentPageName . "?" . $urlParm);
+        } else {
+            return "";
+        }
     }
 
     // Get record keys from Post/Get/Session
@@ -1773,7 +1819,7 @@ class PatientAdmissions extends DbTable
             $this->status->ViewValue = "Admitted"; 
         } 
         if (CurrentUserlevel() == 1 || CurrentUserlevel() == -1 || CurrentUserlevel() == 7 && CurrentPageID() =='list') {
-            $this->patient_id->ViewValue = '<a href="patientadmissionsview/' . $this->id->ViewValue . '?showdetail=bed_assignment,issue_items" target="_blank">' . $this->patient_id->ViewValue . '</a>';
+            $this->patient_id->ViewValue = '<a href="patientadmissionsview/' . $this->id->ViewValue . '?showdetail=bed_assignment,patient_ipd_services,patient_ipd_vitals,issue_items" target="_blank">' . $this->patient_id->ViewValue . '</a>';
         }
     }
 

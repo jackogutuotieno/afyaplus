@@ -48,6 +48,12 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
+<?php } ?>
 </div>
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
@@ -60,6 +66,66 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_ad
 ?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
+<form name="fpatients_dischargesrch" id="fpatients_dischargesrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fpatients_dischargesrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<script>
+var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
+ew.deepAssign(ew.vars, { tables: { patients_discharge: currentTable } });
+var currentForm;
+var fpatients_dischargesrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready(["wrapper", "head"], function () {
+    let $ = jQuery,
+        fields = currentTable.fields;
+
+    // Form object for search
+    let form = new ew.FormBuilder()
+        .setId("fpatients_dischargesrch")
+        .setPageId("list")
+<?php if ($Page->UseAjaxActions) { ?>
+        .setSubmitWithFetch(true)
+<?php } ?>
+
+        // Dynamic selection lists
+        .setLists({
+        })
+
+        // Filters
+        .setFilterList(<?= $Page->getFilterList() ?>)
+        .build();
+    window[form.id] = form;
+    currentSearchForm = form;
+    loadjs.done(form.id);
+});
+</script>
+<input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
+<div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0">
+    <div class="col-sm-auto px-0 pe-sm-2">
+        <div class="ew-basic-search input-group">
+            <input type="search" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control ew-basic-search-keyword" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>" aria-label="<?= HtmlEncode($Language->phrase("Search")) ?>">
+            <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" class="ew-basic-search-type" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+            <button type="button" data-bs-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false">
+                <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fpatients_dischargesrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fpatients_dischargesrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fpatients_dischargesrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fpatients_dischargesrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-auto mb-3">
+        <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+    </div>
+</div>
+</div><!-- /.ew-extended-search -->
+<?php } ?>
+<?php } ?>
+</div><!-- /.ew-search-panel -->
+</form>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
@@ -122,6 +188,15 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->discharge->Visible) { // discharge ?>
         <th data-name="discharge" class="<?= $Page->discharge->headerCellClass() ?>"><div id="elh_patients_discharge_discharge" class="patients_discharge_discharge"><?= $Page->renderFieldHeader($Page->discharge) ?></div></th>
+<?php } ?>
+<?php if ($Page->admission_reason->Visible) { // admission_reason ?>
+        <th data-name="admission_reason" class="<?= $Page->admission_reason->headerCellClass() ?>"><div id="elh_patients_discharge_admission_reason" class="patients_discharge_admission_reason"><?= $Page->renderFieldHeader($Page->admission_reason) ?></div></th>
+<?php } ?>
+<?php if ($Page->discharge_condition->Visible) { // discharge_condition ?>
+        <th data-name="discharge_condition" class="<?= $Page->discharge_condition->headerCellClass() ?>"><div id="elh_patients_discharge_discharge_condition" class="patients_discharge_discharge_condition"><?= $Page->renderFieldHeader($Page->discharge_condition) ?></div></th>
+<?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <th data-name="created_by_user_id" class="<?= $Page->created_by_user_id->headerCellClass() ?>"><div id="elh_patients_discharge_created_by_user_id" class="patients_discharge_created_by_user_id"><?= $Page->renderFieldHeader($Page->created_by_user_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_discharge_date_created" class="patients_discharge_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
@@ -187,6 +262,30 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <label class="form-check-label" for="x_discharge_<?= $Page->RowCount ?>"></label>
 </div>
 </span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->admission_reason->Visible) { // admission_reason ?>
+        <td data-name="admission_reason"<?= $Page->admission_reason->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_discharge_admission_reason" class="el_patients_discharge_admission_reason">
+<span<?= $Page->admission_reason->viewAttributes() ?>>
+<?= $Page->admission_reason->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->discharge_condition->Visible) { // discharge_condition ?>
+        <td data-name="discharge_condition"<?= $Page->discharge_condition->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_discharge_discharge_condition" class="el_patients_discharge_discharge_condition">
+<span<?= $Page->discharge_condition->viewAttributes() ?>>
+<?= $Page->discharge_condition->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_discharge_created_by_user_id" class="el_patients_discharge_created_by_user_id">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

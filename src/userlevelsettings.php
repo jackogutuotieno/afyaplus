@@ -1273,7 +1273,29 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","6","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","7","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","8","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","9","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}received_items_view","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_vitals","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_services","9","0"]];
 
 /**
  * Tables
@@ -1394,8 +1416,10 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["item_purchases","item_purchases","Item Purchases",true,"{32536B8D-F37B-4419-80D5-260932800712}","itempurchaseslist"],
     ["receive_items","receive_items","Received Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveitemslist"],
     ["issue_items","issue_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","issueitemslist"],
-    ["patients_discharge","patients_discharge","Discharge",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"],
+    ["patients_discharge","patients_discharge","Discharge Summary",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientsdischargelist"],
     ["employees_view","employees_view","Employees Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesviewlist"],
     ["Employees Report","Employees_Report","Employees Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","employeesreport"],
     ["Human Resources Overview","Human_Resources_Overview","Human Resources Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","humanresourcesoverview"],
-    ["received_items_view","received_items_view","Store Status",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveditemsviewlist"]];
+    ["received_items_view","received_items_view","Store Status",true,"{32536B8D-F37B-4419-80D5-260932800712}","receiveditemsviewlist"],
+    ["patient_ipd_vitals","patient_ipd_vitals","Vitals",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdvitalslist"],
+    ["patient_ipd_services","patient_ipd_services","Services",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdserviceslist"]];

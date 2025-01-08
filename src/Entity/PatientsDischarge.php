@@ -42,6 +42,15 @@ class PatientsDischarge extends AbstractEntity
     #[Column(type: "boolean")]
     private bool $discharge;
 
+    #[Column(name: "admission_reason", type: "text")]
+    private string $admissionReason;
+
+    #[Column(name: "discharge_condition", type: "text")]
+    private string $dischargeCondition;
+
+    #[Column(name: "created_by_user_id", type: "integer")]
+    private int $createdByUserId;
+
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -89,6 +98,39 @@ class PatientsDischarge extends AbstractEntity
     public function setDischarge(bool $value): static
     {
         $this->discharge = $value;
+        return $this;
+    }
+
+    public function getAdmissionReason(): string
+    {
+        return HtmlDecode($this->admissionReason);
+    }
+
+    public function setAdmissionReason(string $value): static
+    {
+        $this->admissionReason = RemoveXss($value);
+        return $this;
+    }
+
+    public function getDischargeCondition(): string
+    {
+        return HtmlDecode($this->dischargeCondition);
+    }
+
+    public function setDischargeCondition(string $value): static
+    {
+        $this->dischargeCondition = RemoveXss($value);
+        return $this;
+    }
+
+    public function getCreatedByUserId(): int
+    {
+        return $this->createdByUserId;
+    }
+
+    public function setCreatedByUserId(int $value): static
+    {
+        $this->createdByUserId = $value;
         return $this;
     }
 

@@ -10,6 +10,17 @@ $patient_admissions->TableClass = "table table-bordered table-hover table-sm ew-
 <div class="ew-master-div">
 <table id="tbl_patient_admissionsmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
+<?php if ($patient_admissions->id->Visible) { // id ?>
+        <tr id="r_id"<?= $patient_admissions->id->rowAttributes() ?>>
+            <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->id->caption() ?></td>
+            <td<?= $patient_admissions->id->cellAttributes() ?>>
+<span id="el_patient_admissions_id">
+<span<?= $patient_admissions->id->viewAttributes() ?>>
+<?= $patient_admissions->id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patient_admissions->patient_id->Visible) { // patient_id ?>
         <tr id="r_patient_id"<?= $patient_admissions->patient_id->rowAttributes() ?>>
             <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->patient_id->caption() ?></td>

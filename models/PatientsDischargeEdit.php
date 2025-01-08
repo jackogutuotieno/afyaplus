@@ -126,6 +126,9 @@ class PatientsDischargeEdit extends PatientsDischarge
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->discharge->setVisibility();
+        $this->admission_reason->setVisibility();
+        $this->discharge_condition->setVisibility();
+        $this->created_by_user_id->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -530,6 +533,7 @@ class PatientsDischargeEdit extends PatientsDischarge
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->discharge);
+        $this->setupLookupOptions($this->created_by_user_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -750,6 +754,36 @@ class PatientsDischargeEdit extends PatientsDischarge
                 $this->discharge->setFormValue($val);
             }
         }
+
+        // Check field name 'admission_reason' first before field var 'x_admission_reason'
+        $val = $CurrentForm->hasValue("admission_reason") ? $CurrentForm->getValue("admission_reason") : $CurrentForm->getValue("x_admission_reason");
+        if (!$this->admission_reason->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->admission_reason->Visible = false; // Disable update for API request
+            } else {
+                $this->admission_reason->setFormValue($val);
+            }
+        }
+
+        // Check field name 'discharge_condition' first before field var 'x_discharge_condition'
+        $val = $CurrentForm->hasValue("discharge_condition") ? $CurrentForm->getValue("discharge_condition") : $CurrentForm->getValue("x_discharge_condition");
+        if (!$this->discharge_condition->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->discharge_condition->Visible = false; // Disable update for API request
+            } else {
+                $this->discharge_condition->setFormValue($val);
+            }
+        }
+
+        // Check field name 'created_by_user_id' first before field var 'x_created_by_user_id'
+        $val = $CurrentForm->hasValue("created_by_user_id") ? $CurrentForm->getValue("created_by_user_id") : $CurrentForm->getValue("x_created_by_user_id");
+        if (!$this->created_by_user_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_by_user_id->Visible = false; // Disable update for API request
+            } else {
+                $this->created_by_user_id->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -760,6 +794,9 @@ class PatientsDischargeEdit extends PatientsDischarge
         $this->admission_id->CurrentValue = $this->admission_id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
         $this->discharge->CurrentValue = $this->discharge->FormValue;
+        $this->admission_reason->CurrentValue = $this->admission_reason->FormValue;
+        $this->discharge_condition->CurrentValue = $this->discharge_condition->FormValue;
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
     }
 
     /**
@@ -804,6 +841,9 @@ class PatientsDischargeEdit extends PatientsDischarge
         $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->discharge->setDbValue($row['discharge']);
+        $this->admission_reason->setDbValue($row['admission_reason']);
+        $this->discharge_condition->setDbValue($row['discharge_condition']);
+        $this->created_by_user_id->setDbValue($row['created_by_user_id']);
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -816,6 +856,9 @@ class PatientsDischargeEdit extends PatientsDischarge
         $row['admission_id'] = $this->admission_id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['discharge'] = $this->discharge->DefaultValue;
+        $row['admission_reason'] = $this->admission_reason->DefaultValue;
+        $row['discharge_condition'] = $this->discharge_condition->DefaultValue;
+        $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -864,6 +907,15 @@ class PatientsDischargeEdit extends PatientsDischarge
         // discharge
         $this->discharge->RowCssClass = "row";
 
+        // admission_reason
+        $this->admission_reason->RowCssClass = "row";
+
+        // discharge_condition
+        $this->discharge_condition->RowCssClass = "row";
+
+        // created_by_user_id
+        $this->created_by_user_id->RowCssClass = "row";
+
         // date_created
         $this->date_created->RowCssClass = "row";
 
@@ -909,13 +961,38 @@ class PatientsDischargeEdit extends PatientsDischarge
                 $this->discharge->ViewValue = $this->discharge->tagCaption(2) != "" ? $this->discharge->tagCaption(2) : "No";
             }
 
+            // admission_reason
+            $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
+
+            // discharge_condition
+            $this->discharge_condition->ViewValue = $this->discharge_condition->CurrentValue;
+
+            // created_by_user_id
+            $curVal = strval($this->created_by_user_id->CurrentValue);
+            if ($curVal != "") {
+                $this->created_by_user_id->ViewValue = $this->created_by_user_id->lookupCacheOption($curVal);
+                if ($this->created_by_user_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->created_by_user_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->created_by_user_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->created_by_user_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->created_by_user_id->ViewValue = $this->created_by_user_id->displayValue($arwrk);
+                    } else {
+                        $this->created_by_user_id->ViewValue = FormatNumber($this->created_by_user_id->CurrentValue, $this->created_by_user_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->created_by_user_id->ViewValue = null;
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -928,6 +1005,15 @@ class PatientsDischargeEdit extends PatientsDischarge
 
             // discharge
             $this->discharge->HrefValue = "";
+
+            // admission_reason
+            $this->admission_reason->HrefValue = "";
+
+            // discharge_condition
+            $this->discharge_condition->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1003,6 +1089,18 @@ class PatientsDischargeEdit extends PatientsDischarge
             $this->discharge->EditValue = $this->discharge->options(false);
             $this->discharge->PlaceHolder = RemoveHtml($this->discharge->caption());
 
+            // admission_reason
+            $this->admission_reason->setupEditAttributes();
+            $this->admission_reason->EditValue = HtmlEncode($this->admission_reason->CurrentValue);
+            $this->admission_reason->PlaceHolder = RemoveHtml($this->admission_reason->caption());
+
+            // discharge_condition
+            $this->discharge_condition->setupEditAttributes();
+            $this->discharge_condition->EditValue = HtmlEncode($this->discharge_condition->CurrentValue);
+            $this->discharge_condition->PlaceHolder = RemoveHtml($this->discharge_condition->caption());
+
+            // created_by_user_id
+
             // Edit refer script
 
             // id
@@ -1016,6 +1114,15 @@ class PatientsDischargeEdit extends PatientsDischarge
 
             // discharge
             $this->discharge->HrefValue = "";
+
+            // admission_reason
+            $this->admission_reason->HrefValue = "";
+
+            // discharge_condition
+            $this->discharge_condition->HrefValue = "";
+
+            // created_by_user_id
+            $this->created_by_user_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1058,6 +1165,21 @@ class PatientsDischargeEdit extends PatientsDischarge
             if ($this->discharge->Visible && $this->discharge->Required) {
                 if ($this->discharge->FormValue == "") {
                     $this->discharge->addErrorMessage(str_replace("%s", $this->discharge->caption(), $this->discharge->RequiredErrorMessage));
+                }
+            }
+            if ($this->admission_reason->Visible && $this->admission_reason->Required) {
+                if (!$this->admission_reason->IsDetailKey && EmptyValue($this->admission_reason->FormValue)) {
+                    $this->admission_reason->addErrorMessage(str_replace("%s", $this->admission_reason->caption(), $this->admission_reason->RequiredErrorMessage));
+                }
+            }
+            if ($this->discharge_condition->Visible && $this->discharge_condition->Required) {
+                if (!$this->discharge_condition->IsDetailKey && EmptyValue($this->discharge_condition->FormValue)) {
+                    $this->discharge_condition->addErrorMessage(str_replace("%s", $this->discharge_condition->caption(), $this->discharge_condition->RequiredErrorMessage));
+                }
+            }
+            if ($this->created_by_user_id->Visible && $this->created_by_user_id->Required) {
+                if (!$this->created_by_user_id->IsDetailKey && EmptyValue($this->created_by_user_id->FormValue)) {
+                    $this->created_by_user_id->addErrorMessage(str_replace("%s", $this->created_by_user_id->caption(), $this->created_by_user_id->RequiredErrorMessage));
                 }
             }
 
@@ -1167,6 +1289,16 @@ class PatientsDischargeEdit extends PatientsDischarge
             $tmpBool = !empty($tmpBool) ? "1" : "0";
         }
         $this->discharge->setDbValueDef($rsnew, $tmpBool, $this->discharge->ReadOnly);
+
+        // admission_reason
+        $this->admission_reason->setDbValueDef($rsnew, $this->admission_reason->CurrentValue, $this->admission_reason->ReadOnly);
+
+        // discharge_condition
+        $this->discharge_condition->setDbValueDef($rsnew, $this->discharge_condition->CurrentValue, $this->discharge_condition->ReadOnly);
+
+        // created_by_user_id
+        $this->created_by_user_id->CurrentValue = $this->created_by_user_id->getAutoUpdateValue(); // PHP
+        $this->created_by_user_id->setDbValueDef($rsnew, $this->created_by_user_id->CurrentValue, $this->created_by_user_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1184,6 +1316,15 @@ class PatientsDischargeEdit extends PatientsDischarge
         }
         if (isset($row['discharge'])) { // discharge
             $this->discharge->CurrentValue = $row['discharge'];
+        }
+        if (isset($row['admission_reason'])) { // admission_reason
+            $this->admission_reason->CurrentValue = $row['admission_reason'];
+        }
+        if (isset($row['discharge_condition'])) { // discharge_condition
+            $this->discharge_condition->CurrentValue = $row['discharge_condition'];
+        }
+        if (isset($row['created_by_user_id'])) { // created_by_user_id
+            $this->created_by_user_id->CurrentValue = $row['created_by_user_id'];
         }
     }
 
@@ -1312,6 +1453,8 @@ class PatientsDischargeEdit extends PatientsDischarge
                 case "x_patient_id":
                     break;
                 case "x_discharge":
+                    break;
+                case "x_created_by_user_id":
                     break;
                 default:
                     $lookupFilter = "";

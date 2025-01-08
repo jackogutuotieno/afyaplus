@@ -99,6 +99,39 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->admission_reason->Visible) { // admission_reason ?>
+    <tr id="r_admission_reason"<?= $Page->admission_reason->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_discharge_admission_reason"><?= $Page->admission_reason->caption() ?></span></td>
+        <td data-name="admission_reason"<?= $Page->admission_reason->cellAttributes() ?>>
+<span id="el_patients_discharge_admission_reason">
+<span<?= $Page->admission_reason->viewAttributes() ?>>
+<?= $Page->admission_reason->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->discharge_condition->Visible) { // discharge_condition ?>
+    <tr id="r_discharge_condition"<?= $Page->discharge_condition->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_discharge_discharge_condition"><?= $Page->discharge_condition->caption() ?></span></td>
+        <td data-name="discharge_condition"<?= $Page->discharge_condition->cellAttributes() ?>>
+<span id="el_patients_discharge_discharge_condition">
+<span<?= $Page->discharge_condition->viewAttributes() ?>>
+<?= $Page->discharge_condition->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->created_by_user_id->Visible) { // created_by_user_id ?>
+    <tr id="r_created_by_user_id"<?= $Page->created_by_user_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_discharge_created_by_user_id"><?= $Page->created_by_user_id->caption() ?></span></td>
+        <td data-name="created_by_user_id"<?= $Page->created_by_user_id->cellAttributes() ?>>
+<span id="el_patients_discharge_created_by_user_id">
+<span<?= $Page->created_by_user_id->viewAttributes() ?>>
+<?= $Page->created_by_user_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_discharge_date_created"><?= $Page->date_created->caption() ?></span></td>

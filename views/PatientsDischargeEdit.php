@@ -31,7 +31,10 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["admission_id", [fields.admission_id.visible && fields.admission_id.required ? ew.Validators.required(fields.admission_id.caption) : null, ew.Validators.integer], fields.admission_id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
-            ["discharge", [fields.discharge.visible && fields.discharge.required ? ew.Validators.required(fields.discharge.caption) : null], fields.discharge.isInvalid]
+            ["discharge", [fields.discharge.visible && fields.discharge.required ? ew.Validators.required(fields.discharge.caption) : null], fields.discharge.isInvalid],
+            ["admission_reason", [fields.admission_reason.visible && fields.admission_reason.required ? ew.Validators.required(fields.admission_reason.caption) : null], fields.admission_reason.isInvalid],
+            ["discharge_condition", [fields.discharge_condition.visible && fields.discharge_condition.required ? ew.Validators.required(fields.discharge_condition.caption) : null], fields.discharge_condition.isInvalid],
+            ["created_by_user_id", [fields.created_by_user_id.visible && fields.created_by_user_id.required ? ew.Validators.required(fields.created_by_user_id.caption) : null], fields.created_by_user_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -49,6 +52,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
             "discharge": <?= $Page->discharge->toClientList($Page) ?>,
+            "created_by_user_id": <?= $Page->created_by_user_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -174,6 +178,42 @@ loadjs.ready("fpatients_dischargeedit", function() {
     <div class="invalid-feedback"><?= $Page->discharge->getErrorMessage() ?></div>
 </div>
 <?= $Page->discharge->getCustomMessage() ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->admission_reason->Visible) { // admission_reason ?>
+    <div id="r_admission_reason"<?= $Page->admission_reason->rowAttributes() ?>>
+        <label id="elh_patients_discharge_admission_reason" class="<?= $Page->LeftColumnClass ?>"><?= $Page->admission_reason->caption() ?><?= $Page->admission_reason->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->admission_reason->cellAttributes() ?>>
+<span id="el_patients_discharge_admission_reason">
+<?php $Page->admission_reason->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_admission_reason" name="x_admission_reason" id="x_admission_reason" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->admission_reason->getPlaceHolder()) ?>"<?= $Page->admission_reason->editAttributes() ?> aria-describedby="x_admission_reason_help"><?= $Page->admission_reason->EditValue ?></textarea>
+<?= $Page->admission_reason->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->admission_reason->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargeedit", "editor"], function() {
+    ew.createEditor("fpatients_dischargeedit", "x_admission_reason", 0, 0, <?= $Page->admission_reason->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->discharge_condition->Visible) { // discharge_condition ?>
+    <div id="r_discharge_condition"<?= $Page->discharge_condition->rowAttributes() ?>>
+        <label id="elh_patients_discharge_discharge_condition" class="<?= $Page->LeftColumnClass ?>"><?= $Page->discharge_condition->caption() ?><?= $Page->discharge_condition->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->discharge_condition->cellAttributes() ?>>
+<span id="el_patients_discharge_discharge_condition">
+<?php $Page->discharge_condition->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="patients_discharge" data-field="x_discharge_condition" name="x_discharge_condition" id="x_discharge_condition" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->discharge_condition->getPlaceHolder()) ?>"<?= $Page->discharge_condition->editAttributes() ?> aria-describedby="x_discharge_condition_help"><?= $Page->discharge_condition->EditValue ?></textarea>
+<?= $Page->discharge_condition->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->discharge_condition->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fpatients_dischargeedit", "editor"], function() {
+    ew.createEditor("fpatients_dischargeedit", "x_discharge_condition", 0, 0, <?= $Page->discharge_condition->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>

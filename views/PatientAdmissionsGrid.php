@@ -23,6 +23,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
+            ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["date_created", [fields.date_created.visible && fields.date_created.required ? ew.Validators.required(fields.date_created.caption) : null, ew.Validators.datetime(fields.date_created.clientFormatPattern)], fields.date_created.isInvalid]
@@ -67,6 +68,11 @@ loadjs.ready(["wrapper", "head"], function () {
 <div id="ew-list">
 <?php if ($Grid->TotalRecords > 0 || $Grid->CurrentAction) { ?>
 <div class="card ew-card ew-grid<?= $Grid->isAddOrEdit() ? " ew-grid-add-edit" : "" ?> <?= $Grid->TableGridClass ?>">
+<?php if ($Grid->ShowOtherOptions) { ?>
+<div class="card-header ew-grid-upper-panel">
+<?php $Grid->OtherOptions->render("body") ?>
+</div>
+<?php } ?>
 <div id="fpatient_admissionsgrid" class="ew-form ew-list-form">
 <div id="gmp_patient_admissions" class="card-body ew-grid-middle-panel <?= $Grid->TableContainerClass ?>" style="<?= $Grid->TableContainerStyle ?>">
 <table id="tbl_patient_admissionsgrid" class="<?= $Grid->TableClass ?>"><!-- .ew-table -->
@@ -82,6 +88,9 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
+<?php if ($Grid->id->Visible) { // id ?>
+        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_patient_admissions_id" class="patient_admissions_id"><?= $Grid->renderFieldHeader($Grid->id) ?></div></th>
+<?php } ?>
 <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Grid->patient_id->headerCellClass() ?>"><div id="elh_patient_admissions_patient_id" class="patient_admissions_patient_id"><?= $Grid->renderFieldHeader($Grid->patient_id) ?></div></th>
 <?php } ?>
@@ -127,6 +136,33 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
+    <?php if ($Grid->id->Visible) { // id ?>
+        <td data-name="id"<?= $Grid->id->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_admissions_id" class="el_patient_admissions_id"></span>
+<input type="hidden" data-table="patient_admissions" data-field="x_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_admissions_id" class="el_patient_admissions_id">
+<span<?= $Grid->id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
+<input type="hidden" data-table="patient_admissions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_admissions_id" class="el_patient_admissions_id">
+<span<?= $Grid->id->viewAttributes() ?>>
+<?= $Grid->id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="patient_admissions" data-field="x_id" data-hidden="1" name="fpatient_admissionsgrid$x<?= $Grid->RowIndex ?>_id" id="fpatient_admissionsgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
+<input type="hidden" data-table="patient_admissions" data-field="x_id" data-hidden="1" data-old name="fpatient_admissionsgrid$o<?= $Grid->RowIndex ?>_id" id="fpatient_admissionsgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } else { ?>
+            <input type="hidden" data-table="patient_admissions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
+    <?php } ?>
     <?php if ($Grid->patient_id->Visible) { // patient_id ?>
         <td data-name="patient_id"<?= $Grid->patient_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>

@@ -212,6 +212,8 @@ return [
     "Human_Resources_Overview" => \DI\create(HumanResourcesOverview::class),
     "human_resources_overview" => \DI\create(HumanResourcesOverview::class),
     "received_items_view" => \DI\create(ReceivedItemsView::class),
+    "patient_ipd_vitals" => \DI\create(PatientIpdVitals::class),
+    "patient_ipd_services" => \DI\create(PatientIpdServices::class),
 
     // User table
     "usertable" => \DI\get("users"),

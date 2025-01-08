@@ -35,4 +35,11 @@ class PatientsDischargeController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "PatientsDischargeView");
     }
+
+    // edit
+    #[Map(["GET","POST","OPTIONS"], "/patientsdischargeedit[/{id}]", [PermissionMiddleware::class], "edit.patients_discharge")]
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "PatientsDischargeEdit");
+    }
 }
