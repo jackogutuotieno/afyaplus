@@ -157,8 +157,8 @@ class DepartmentsList extends Departments
         $this->id->Visible = false;
         $this->department_name->setVisibility();
         $this->created_by_user_id->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -1277,8 +1277,6 @@ class DepartmentsList extends Departments
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->department_name); // department_name
-            $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1536,8 +1534,6 @@ class DepartmentsList extends Departments
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "department_name");
-            $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2061,14 +2057,6 @@ class DepartmentsList extends Departments
             // department_name
             $this->department_name->HrefValue = "";
             $this->department_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

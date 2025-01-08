@@ -886,14 +886,6 @@ class DepartmentsView extends Departments
             // department_name
             $this->department_name->HrefValue = "";
             $this->department_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

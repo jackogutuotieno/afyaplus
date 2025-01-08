@@ -148,7 +148,7 @@ class ItemPurchasesList extends ItemPurchases
     {
         $this->id->Visible = false;
         $this->batch_number->setVisibility();
-        $this->supplier_id->Visible = false;
+        $this->supplier_id->setVisibility();
         $this->category_id->setVisibility();
         $this->subcategory_id->setVisibility();
         $this->item_title->setVisibility();
@@ -1339,6 +1339,7 @@ class ItemPurchasesList extends ItemPurchases
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->batch_number); // batch_number
+            $this->updateSort($this->supplier_id); // supplier_id
             $this->updateSort($this->category_id); // category_id
             $this->updateSort($this->subcategory_id); // subcategory_id
             $this->updateSort($this->item_title); // item_title
@@ -1614,6 +1615,7 @@ class ItemPurchasesList extends ItemPurchases
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "batch_number");
+            $this->createColumnOption($option, "supplier_id");
             $this->createColumnOption($option, "category_id");
             $this->createColumnOption($option, "subcategory_id");
             $this->createColumnOption($option, "item_title");
@@ -2281,6 +2283,10 @@ class ItemPurchasesList extends ItemPurchases
             // batch_number
             $this->batch_number->HrefValue = "";
             $this->batch_number->TooltipValue = "";
+
+            // supplier_id
+            $this->supplier_id->HrefValue = "";
+            $this->supplier_id->TooltipValue = "";
 
             // category_id
             $this->category_id->HrefValue = "";

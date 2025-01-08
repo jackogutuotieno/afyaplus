@@ -133,8 +133,8 @@ class DepartmentsDelete extends Departments
         $this->id->Visible = false;
         $this->department_name->setVisibility();
         $this->created_by_user_id->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -684,14 +684,6 @@ class DepartmentsDelete extends Departments
             // department_name
             $this->department_name->HrefValue = "";
             $this->department_name->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -133,8 +133,8 @@ class DesignationsDelete extends Designations
         $this->id->Visible = false;
         $this->designation->setVisibility();
         $this->created_by_user_id->Visible = false;
-        $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_created->Visible = false;
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -663,8 +663,10 @@ class DesignationsDelete extends Designations
         $this->created_by_user_id->CellCssStyle = "white-space: nowrap;";
 
         // date_created
+        $this->date_created->CellCssStyle = "white-space: nowrap;";
 
         // date_updated
+        $this->date_updated->CellCssStyle = "white-space: nowrap;";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -685,14 +687,6 @@ class DesignationsDelete extends Designations
             // designation
             $this->designation->HrefValue = "";
             $this->designation->TooltipValue = "";
-
-            // date_created
-            $this->date_created->HrefValue = "";
-            $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event

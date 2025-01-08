@@ -1,2 +1,30 @@
 date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-08 07:39:45",/afyaplus/login,1,login,::1,,,,
+"2025-01-08 10:32:32",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-08 21:33:05",/afyaplus/login,1,login,::1,,,,
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,first_name,12,,Procument
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,last_name,12,,Officer
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,national_id,12,,8945784
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,gender,12,,Female
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,phone,12,,900213770
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,email,12,,procurement.officer@example.com
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,department_id,12,,8
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,designation_id,12,,7
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,physical_address,12,,<p>Gfghgh</p>
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,password,12,,********
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,user_role_id,12,,10
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,is_verified,12,,1
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,user_profile,12,,
+"2025-01-08 21:50:43",/afyaplus/usersadd,1,A,users,id,12,,12
+"2025-01-08 21:54:12",/afyaplus/departmentsadd,1,A,departments,department_name,9,,"Supply Chain"
+"2025-01-08 21:54:12",/afyaplus/departmentsadd,1,A,departments,created_by_user_id,9,,1
+"2025-01-08 21:54:12",/afyaplus/departmentsadd,1,A,departments,id,9,,9
+"2025-01-08 22:04:50",/afyaplus/usersedit/12,1,U,users,department_id,12,8,9
+"2025-01-08 22:04:50",/afyaplus/usersedit/12,1,U,users,password,12,********,********
+"2025-01-08 22:06:32",/afyaplus/designationsadd,1,A,designations,designation,9,,"Procurement Officer"
+"2025-01-08 22:06:32",/afyaplus/designationsadd,1,A,designations,created_by_user_id,9,,1
+"2025-01-08 22:06:32",/afyaplus/designationsadd,1,A,designations,id,9,,9
+"2025-01-08 22:10:37",/afyaplus/usersedit/12,1,U,users,designation_id,12,7,9
+"2025-01-08 22:10:37",/afyaplus/usersedit/12,1,U,users,password,12,********,********
+"2025-01-08 22:12:47",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-08 22:13:00",/afyaplus/login,12,login,::1,,,,
