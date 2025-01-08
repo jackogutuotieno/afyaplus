@@ -2,9 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="1030">
-      <phrase id="menutext" value="Procurement Overview" />
-    </menu>
     <menu id="642">
       <phrase id="menutext" value="Dashboard" />
     </menu>
@@ -34,6 +31,9 @@
     </menu>
     <menu id="1024">
       <phrase id="menutext" value="Human Resources" />
+    </menu>
+    <menu id="1030">
+      <phrase id="menutext" value="Procurement" />
     </menu>
     <menu id="103">
       <phrase id="menutext" value="Administrator" />

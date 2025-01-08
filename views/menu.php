@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(1030, "mi_Procurement_Overview", $Language->menuPhrase("1030", "MenuText"), "procurementoverview", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
@@ -19,6 +18,7 @@ $sideMenu->addMenuItem(334, "mi_Radiology_Overview", $Language->menuPhrase("334"
 $sideMenu->addMenuItem(330, "mi_Pharmacy_Overview", $Language->menuPhrase("330", "MenuText"), "pharmacyoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Pharmacy Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(331, "mi_Financials_Overview", $Language->menuPhrase("331", "MenuText"), "financialsoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Financials Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(1024, "mi_Human_Resources_Overview", $Language->menuPhrase("1024", "MenuText"), "humanresourcesoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Human Resources Overview'), false, false, "fa-tachometer", "", false, true);
+$sideMenu->addMenuItem(1030, "mi_Procurement_Overview", $Language->menuPhrase("1030", "MenuText"), "procurementoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "fa-users", "", false, true);
 $sideMenu->addMenuItem(747, "mi_modules", $Language->menuPhrase("747", "MenuText"), "moduleslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}modules'), false, false, "fa-cog", "", false, true);
