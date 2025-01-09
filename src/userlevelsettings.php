@@ -1566,7 +1566,20 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview","9","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview","10","1096"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview","11","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}Procurement Overview","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","11","0"]];
 
 /**
  * Tables
@@ -1696,4 +1709,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["patient_ipd_services","patient_ipd_services","Services",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdserviceslist"],
     ["procurement_report","procurement_report2","procurement report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementreport2list"],
     ["Procurement Report","Procurement_Report","Procurement Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementreport"],
-    ["Procurement Overview","Procurement_Overview","Procurement Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementoverview"]];
+    ["Procurement Overview","Procurement_Overview","Procurement Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementoverview"],
+    ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"]];

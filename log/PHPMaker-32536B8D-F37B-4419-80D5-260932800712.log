@@ -15,6 +15,7 @@ C:\wamp64\www\afyaplus\controllers\ControllerBase.php
 C:\wamp64\www\afyaplus\controllers\DepartmentsController.php
 C:\wamp64\www\afyaplus\controllers\DesignationsController.php
 C:\wamp64\www\afyaplus\controllers\DiagnosisController.php
+C:\wamp64\www\afyaplus\controllers\DischargeSummaryReportController.php
 C:\wamp64\www\afyaplus\controllers\DiseasesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorChargesController.php
 C:\wamp64\www\afyaplus\controllers\DoctorNotesController.php
@@ -190,6 +191,9 @@ C:\wamp64\www\afyaplus\models\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\models\DiagnosisEdit.php
 C:\wamp64\www\afyaplus\models\DiagnosisList.php
 C:\wamp64\www\afyaplus\models\DiagnosisView.php
+C:\wamp64\www\afyaplus\models\DischargeSummaryReport.php
+C:\wamp64\www\afyaplus\models\DischargeSummaryReportList.php
+C:\wamp64\www\afyaplus\models\DischargeSummaryReportView.php
 C:\wamp64\www\afyaplus\models\Diseases.php
 C:\wamp64\www\afyaplus\models\DiseasesDelete.php
 C:\wamp64\www\afyaplus\models\DiseasesEdit.php
@@ -714,6 +718,7 @@ C:\wamp64\www\afyaplus\src\Entity\CashPaymentsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Department.php
 C:\wamp64\www\afyaplus\src\Entity\Designation.php
 C:\wamp64\www\afyaplus\src\Entity\Diagnosis.php
+C:\wamp64\www\afyaplus\src\Entity\DischargeSummaryReport.php
 C:\wamp64\www\afyaplus\src\Entity\Disease.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorCharge.php
 C:\wamp64\www\afyaplus\src\Entity\DoctorNote.php
@@ -934,6 +939,8 @@ C:\wamp64\www\afyaplus\views\DiagnosisDelete.php
 C:\wamp64\www\afyaplus\views\DiagnosisEdit.php
 C:\wamp64\www\afyaplus\views\DiagnosisList.php
 C:\wamp64\www\afyaplus\views\DiagnosisView.php
+C:\wamp64\www\afyaplus\views\DischargeSummaryReportList.php
+C:\wamp64\www\afyaplus\views\DischargeSummaryReportView.php
 C:\wamp64\www\afyaplus\views\DiseasesDelete.php
 C:\wamp64\www\afyaplus\views\DiseasesEdit.php
 C:\wamp64\www\afyaplus\views\DiseasesList.php

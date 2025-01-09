@@ -2,6 +2,9 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | Health ERP platform for the modern health proffessionals" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="1031">
+      <phrase id="menutext" value="Dischage Summary Report" />
+    </menu>
     <menu id="642">
       <phrase id="menutext" value="Dashboard" />
     </menu>
@@ -3816,6 +3819,39 @@
     </table>
     <table id="procurement_overview">
       <phrase id="tblcaption" value="Procurement Overview" />
+    </table>
+    <table id="discharge_summary_report">
+      <phrase id="tblcaption" value="Dischage Summary Report" />
+      <field id="id">
+        <phrase id="fldcaption" value="Admission No" />
+      </field>
+      <field id="patient_name">
+        <phrase id="fldcaption" value="Patient Name" />
+      </field>
+      <field id="age">
+        <phrase id="fldcaption" value="Age" />
+      </field>
+      <field id="gender">
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="admission_reason">
+        <phrase id="fldcaption" value="Admission Reason" />
+      </field>
+      <field id="discharge_condition">
+        <phrase id="fldcaption" value="Discharge Condition" />
+      </field>
+      <field id="created_by_user_id">
+        <phrase id="fldcaption" value="Discharged By" />
+      </field>
+      <field id="admission_date">
+        <phrase id="fldcaption" value="Admission Date" />
+      </field>
+      <field id="discharge_date">
+        <phrase id="fldcaption" value="Discharge Date" />
+      </field>
+      <field id="total_days">
+        <phrase id="fldcaption" value="Total Days" />
+      </field>
     </table>
   </project>
 </ew-language>

@@ -219,6 +219,7 @@ return [
     "procurement_report" => \DI\create(ProcurementReport::class),
     "Procurement_Overview" => \DI\create(ProcurementOverview::class),
     "procurement_overview" => \DI\create(ProcurementOverview::class),
+    "discharge_summary_report" => \DI\create(DischargeSummaryReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

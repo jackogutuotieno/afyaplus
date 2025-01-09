@@ -218,6 +218,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -412,6 +414,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -2414,6 +2426,8 @@
                 '/diagnosisview[/{id}]',
                 '/diagnosisedit[/{id}]',
                 '/diagnosisdelete[/{id}]',
+                '/dischargesummaryreportlist[/{id}]',
+                '/dischargesummaryreportview[/{id}]',
                 '/diseaseslist[/{id}]',
                 '/diseasesview[/{id}]',
                 '/diseasesedit[/{id}]',
@@ -2811,6 +2825,8 @@
                 'PHPMaker2024\\afyaplus\\DiagnosisController:view',
                 'PHPMaker2024\\afyaplus\\DiagnosisController:edit',
                 'PHPMaker2024\\afyaplus\\DiagnosisController:delete',
+                'PHPMaker2024\\afyaplus\\DischargeSummaryReportController:list',
+                'PHPMaker2024\\afyaplus\\DischargeSummaryReportController:view',
                 'PHPMaker2024\\afyaplus\\DiseasesController:list',
                 'PHPMaker2024\\afyaplus\\DiseasesController:view',
                 'PHPMaker2024\\afyaplus\\DiseasesController:edit',
@@ -3166,6 +3182,12 @@
                 'PHPMaker2024\\afyaplus\\WardTypeController:delete',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -4393,6 +4415,8 @@
                 'view.diagnosis',
                 'edit.diagnosis',
                 'delete.diagnosis',
+                'list.discharge_summary_report',
+                'view.discharge_summary_report',
                 'list.diseases',
                 'view.diseases',
                 'edit.diseases',
@@ -4748,6 +4772,8 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5542,6 +5568,8 @@
         $o[392],
         $o[393],
         $o[394],
+        $o[395],
+        $o[396],
     ],
     []
 );
