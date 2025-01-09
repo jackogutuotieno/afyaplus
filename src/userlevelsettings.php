@@ -1579,7 +1579,33 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","9","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","10","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","11","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescription_details","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","11","0"]];
 
 /**
  * Tables
@@ -1710,4 +1736,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["procurement_report","procurement_report2","procurement report 2",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementreport2list"],
     ["Procurement Report","Procurement_Report","Procurement Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementreport"],
     ["Procurement Overview","Procurement_Overview","Procurement Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementoverview"],
-    ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"]];
+    ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"],
+    ["patient_ipd_prescription_details","patient_ipd_prescription_details","Prescription Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptiondetailslist"],
+    ["patient_ipd_prescriptions","patient_ipd_prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptionslist"]];

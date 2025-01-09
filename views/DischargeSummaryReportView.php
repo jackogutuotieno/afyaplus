@@ -62,6 +62,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->patient_id->Visible) { // patient_id ?>
+    <tr id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_discharge_summary_report_patient_id"><template id="tpc_discharge_summary_report_patient_id"><?= $Page->patient_id->caption() ?></template></span></td>
+        <td data-name="patient_id"<?= $Page->patient_id->cellAttributes() ?>>
+<template id="tpx_discharge_summary_report_patient_id"><span id="el_discharge_summary_report_patient_id">
+<span<?= $Page->patient_id->viewAttributes() ?>>
+<?= $Page->patient_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
     <tr id="r_patient_name"<?= $Page->patient_name->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_discharge_summary_report_patient_name"><template id="tpc_discharge_summary_report_patient_name"><?= $Page->patient_name->caption() ?></template></span></td>
@@ -91,6 +102,17 @@ loadjs.ready("head", function () {
 <template id="tpx_discharge_summary_report_gender"><span id="el_discharge_summary_report_gender">
 <span<?= $Page->gender->viewAttributes() ?>>
 <?= $Page->gender->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_discharge_summary_report_status"><template id="tpc_discharge_summary_report_status"><?= $Page->status->caption() ?></template></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<template id="tpx_discharge_summary_report_status"><span id="el_discharge_summary_report_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span></template>
 </td>
     </tr>
@@ -186,6 +208,38 @@ loadjs.ready("head", function () {
     </tr>
 </table></div>
 </template>
+<?php
+    if (in_array("patient_ipd_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_vitals->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_vitals", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdVitalsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("issue_items", explode(",", $Page->getCurrentDetailTable())) && $issue_items->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("issue_items", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IssueItemsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_ipd_services", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_services->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_services", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdServicesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("patient_ipd_prescriptions", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_prescriptions->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_prescriptions", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdPrescriptionsGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

@@ -8,7 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(1031, "mi_discharge_summary_report", $Language->menuPhrase("1031", "MenuText"), "dischargesummaryreportlist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
@@ -43,6 +42,7 @@ $sideMenu->addMenuItem(645, "mi_ipd_patients", $Language->menuPhrase("645", "Men
 $sideMenu->addMenuItem(856, "mi_patient_admissions", $Language->menuPhrase("856", "MenuText"), "patientadmissionslist?cmd=resetall", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patient_admissions'), false, false, "fa-bed", "", false, true);
 $sideMenu->addMenuItem(857, "mi_bed_assignment", $Language->menuPhrase("857", "MenuText"), "bedassignmentlist?cmd=resetall", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}bed_assignment'), false, false, "fa-bed", "", false, true);
 $sideMenu->addMenuItem(1021, "mi_patients_discharge", $Language->menuPhrase("1021", "MenuText"), "patientsdischargelist?cmd=resetall", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients_discharge'), false, false, "fa-check", "", false, true);
+$sideMenu->addMenuItem(1031, "mi_discharge_summary_report", $Language->menuPhrase("1031", "MenuText"), "dischargesummaryreportlist", 746, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}discharge_summary_report'), false, false, "fa-arrow-left", "", false, true);
 $sideMenu->addMenuItem(50, "mci_Doctor_Panel", $Language->menuPhrase("50", "MenuText"), "", -1, "", true, false, true, "fa-user-doctor", "", false, true);
 $sideMenu->addMenuItem(5, "mi_diseases", $Language->menuPhrase("5", "MenuText"), "diseaseslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}diseases'), false, false, "fa-viruses", "", false, true);
 $sideMenu->addMenuItem(6, "mi_doctor_charges", $Language->menuPhrase("6", "MenuText"), "doctorchargeslist", 50, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}doctor_charges'), false, false, "fa-money-bill", "", false, true);

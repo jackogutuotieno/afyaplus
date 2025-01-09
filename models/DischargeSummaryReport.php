@@ -48,9 +48,11 @@ class DischargeSummaryReport extends DbTable
 
     // Fields
     public $id;
+    public $patient_id;
     public $patient_name;
     public $age;
     public $gender;
+    public $status;
     public $admission_reason;
     public $discharge_condition;
     public $created_by_user_id;
@@ -125,10 +127,38 @@ class DischargeSummaryReport extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
+
+        // patient_id
+        $this->patient_id = new DbField(
+            $this, // Table
+            'x_patient_id', // Variable name
+            'patient_id', // Name
+            '`patient_id`', // Expression
+            '`patient_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`patient_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->patient_id->InputTextType = "text";
+        $this->patient_id->Raw = true;
+        $this->patient_id->IsForeignKey = true; // Foreign key field
+        $this->patient_id->Nullable = false; // NOT NULL field
+        $this->patient_id->Required = true; // Required field
+        $this->patient_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->patient_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['patient_id'] = &$this->patient_id;
 
         // patient_name
         $this->patient_name = new DbField(
@@ -199,6 +229,29 @@ class DischargeSummaryReport extends DbTable
         $this->gender->Required = true; // Required field
         $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['gender'] = &$this->gender;
+
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '\'\'', // Expression
+            '\'\'', // Basic search expression
+            200, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '\'\'', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->status->InputTextType = "text";
+        $this->status->IsCustom = true; // Custom field
+        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['status'] = &$this->status;
 
         // admission_reason
         $this->admission_reason = new DbField(
@@ -409,6 +462,48 @@ class DischargeSummaryReport extends DbTable
         }
     }
 
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "patient_ipd_vitals") {
+            $detailUrl = Container("patient_ipd_vitals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "issue_items") {
+            $detailUrl = Container("issue_items")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "patient_ipd_services") {
+            $detailUrl = Container("patient_ipd_services")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "patient_ipd_prescriptions") {
+            $detailUrl = Container("patient_ipd_prescriptions")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "dischargesummaryreportlist";
+        }
+        return $detailUrl;
+    }
+
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -442,20 +537,7 @@ class DischargeSummaryReport extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, '' AS `status`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -870,9 +952,11 @@ class DischargeSummaryReport extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
+        $this->patient_id->DbValue = $row['patient_id'];
         $this->patient_name->DbValue = $row['patient_name'];
         $this->age->DbValue = $row['age'];
         $this->gender->DbValue = $row['gender'];
+        $this->status->DbValue = $row['status'];
         $this->admission_reason->DbValue = $row['admission_reason'];
         $this->discharge_condition->DbValue = $row['discharge_condition'];
         $this->created_by_user_id->DbValue = $row['created_by_user_id'];
@@ -1035,7 +1119,11 @@ class DischargeSummaryReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("dischargesummaryreportedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("dischargesummaryreportedit", $parm);
+        } else {
+            $url = $this->keyUrl("dischargesummaryreportedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1049,7 +1137,11 @@ class DischargeSummaryReport extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("dischargesummaryreportadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("dischargesummaryreportadd", $parm);
+        } else {
+            $url = $this->keyUrl("dischargesummaryreportadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1232,9 +1324,11 @@ class DischargeSummaryReport extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
         $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
+        $this->status->setDbValue($row['status']);
         $this->admission_reason->setDbValue($row['admission_reason']);
         $this->discharge_condition->setDbValue($row['discharge_condition']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
@@ -1273,11 +1367,15 @@ class DischargeSummaryReport extends DbTable
 
         // id
 
+        // patient_id
+
         // patient_name
 
         // age
 
         // gender
+
+        // status
 
         // admission_reason
 
@@ -1294,6 +1392,10 @@ class DischargeSummaryReport extends DbTable
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
+        // patient_id
+        $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+        $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+
         // patient_name
         $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
@@ -1303,6 +1405,9 @@ class DischargeSummaryReport extends DbTable
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
+
+        // status
+        $this->status->ViewValue = $this->status->CurrentValue;
 
         // admission_reason
         $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
@@ -1350,6 +1455,10 @@ class DischargeSummaryReport extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
+        // patient_id
+        $this->patient_id->HrefValue = "";
+        $this->patient_id->TooltipValue = "";
+
         // patient_name
         $this->patient_name->HrefValue = "";
         $this->patient_name->TooltipValue = "";
@@ -1361,6 +1470,10 @@ class DischargeSummaryReport extends DbTable
         // gender
         $this->gender->HrefValue = "";
         $this->gender->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // admission_reason
         $this->admission_reason->HrefValue = "";
@@ -1405,6 +1518,14 @@ class DischargeSummaryReport extends DbTable
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
 
+        // patient_id
+        $this->patient_id->setupEditAttributes();
+        $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+        $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+        if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
+            $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
+        }
+
         // patient_name
         $this->patient_name->setupEditAttributes();
         if (!$this->patient_name->Raw) {
@@ -1428,6 +1549,14 @@ class DischargeSummaryReport extends DbTable
         }
         $this->gender->EditValue = $this->gender->CurrentValue;
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
+
+        // status
+        $this->status->setupEditAttributes();
+        if (!$this->status->Raw) {
+            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        }
+        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // admission_reason
         $this->admission_reason->setupEditAttributes();
@@ -1497,9 +1626,11 @@ class DischargeSummaryReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->admission_reason);
                     $doc->exportCaption($this->discharge_condition);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1508,9 +1639,11 @@ class DischargeSummaryReport extends DbTable
                     $doc->exportCaption($this->total_days);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->patient_id);
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->admission_reason);
                     $doc->exportCaption($this->discharge_condition);
                     $doc->exportCaption($this->created_by_user_id);
@@ -1544,9 +1677,11 @@ class DischargeSummaryReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->patient_id);
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->status);
                         $doc->exportField($this->admission_reason);
                         $doc->exportField($this->discharge_condition);
                         $doc->exportField($this->created_by_user_id);
@@ -1555,9 +1690,11 @@ class DischargeSummaryReport extends DbTable
                         $doc->exportField($this->total_days);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->patient_id);
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->status);
                         $doc->exportField($this->admission_reason);
                         $doc->exportField($this->discharge_condition);
                         $doc->exportField($this->created_by_user_id);
@@ -1734,8 +1871,15 @@ class DischargeSummaryReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $current_date = CurrentDate();
+        if ($this->discharge_date->CurrentValue > $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
+            $this->status->ViewValue = "New Report"; 
+        } else if ($this->discharge_date->CurrentValue < $current_date) {
+            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
+            $this->status->ViewValue = "Past Report"; 
+        } 
+        $this->patient_name->ViewValue = '<a href="dischargesummaryreportview/' . $this->id->ViewValue . '?showdetail=patient_ipd_vitals,issue_items,patient_ipd_services,patient_ipd_prescriptions" target="_blank"> ' . $this->patient_name->ViewValue . ' </a>';
     }
 
     // User ID Filtering event

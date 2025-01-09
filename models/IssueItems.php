@@ -380,6 +380,19 @@ class IssueItems extends DbTable
                 return "";
             }
         }
+        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTable = Container("discharge_summary_report");
+            if ($this->admission_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->admission_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $masterFilter .= " AND " . GetKeyFilter($masterTable->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
         return $masterFilter;
     }
 
@@ -390,6 +403,19 @@ class IssueItems extends DbTable
         $detailFilter = "";
         if ($this->getCurrentMasterTable() == "patient_admissions") {
             $masterTable = Container("patient_admissions");
+            if ($this->admission_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->admission_id, $this->admission_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+            if ($this->patient_id->getSessionValue() != "") {
+                $detailFilter .= " AND " . GetKeyFilter($this->patient_id, $this->patient_id->getSessionValue(), $masterTable->patient_id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTable = Container("discharge_summary_report");
             if ($this->admission_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetKeyFilter($this->admission_id, $this->admission_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
             } else {
@@ -438,6 +464,29 @@ class IssueItems extends DbTable
                     return GetKeyFilter($masterTable->id, $keys["admission_id"], $this->admission_id->DataType, $this->Dbid) . " AND " . GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
                 }
                 break;
+            case "discharge_summary_report":
+                $key = $keys["admission_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                $key = $keys["patient_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->patient_id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["admission_id"], $this->admission_id->DataType, $this->Dbid) . " AND " . GetKeyFilter($masterTable->patient_id, $keys["patient_id"], $this->patient_id->DataType, $this->Dbid);
+                }
+                break;
         }
         return null; // All null values and no required fields
     }
@@ -447,6 +496,8 @@ class IssueItems extends DbTable
     {
         switch ($masterTable->TableVar) {
             case "patient_admissions":
+                return GetKeyFilter($this->admission_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
+            case "discharge_summary_report":
                 return GetKeyFilter($this->admission_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid) . " AND " . GetKeyFilter($this->patient_id, $masterTable->patient_id->DbValue, $masterTable->patient_id->DataType, $masterTable->Dbid);
         }
         return "";
@@ -1114,6 +1165,11 @@ class IssueItems extends DbTable
     public function addMasterUrl($url)
     {
         if ($this->getCurrentMasterTable() == "patient_admissions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->admission_id->getSessionValue()); // Use Session Value
+            $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value
+        }
+        if ($this->getCurrentMasterTable() == "discharge_summary_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->admission_id->getSessionValue()); // Use Session Value
             $url .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->getSessionValue()); // Use Session Value

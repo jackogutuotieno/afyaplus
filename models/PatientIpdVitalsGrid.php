@@ -136,7 +136,7 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->height->setVisibility();
@@ -146,7 +146,7 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         $this->blood_pressure->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -716,6 +716,22 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_discharge") {
+            $masterTbl = Container("patients_discharge");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("patientsdischargelist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
         if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
             $masterTbl = Container("patient_admissions");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
@@ -723,6 +739,22 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
                 $this->terminate("patientadmissionslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("dischargesummaryreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1170,14 +1202,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         ) {
             return false;
         }
-        if (
-            $CurrentForm->hasValue("x_date_updated") &&
-            $CurrentForm->hasValue("o_date_updated") &&
-            $this->date_updated->CurrentValue != $this->date_updated->DefaultValue &&
-            !($this->date_updated->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->date_updated->CurrentValue == $this->date_updated->getSessionValue())
-        ) {
-            return false;
-        }
         return true;
     }
 
@@ -1307,6 +1331,10 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
                 $this->DbDetailFilter = "";
                         $this->admission_id->setSessionValue("");
                         $this->patient_id->setSessionValue("");
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1357,6 +1385,14 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
 
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
@@ -1426,6 +1462,10 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
                 }
             }
         }
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1717,12 +1757,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'admission_id' first before field var 'x_admission_id'
         $val = $CurrentForm->hasValue("admission_id") ? $CurrentForm->getValue("admission_id") : $CurrentForm->getValue("x_admission_id");
         if (!$this->admission_id->IsDetailKey) {
@@ -1841,18 +1875,10 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             $this->date_created->setOldValue($CurrentForm->getValue("o_date_created"));
         }
 
-        // Check field name 'date_updated' first before field var 'x_date_updated'
-        $val = $CurrentForm->hasValue("date_updated") ? $CurrentForm->getValue("date_updated") : $CurrentForm->getValue("x_date_updated");
-        if (!$this->date_updated->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->date_updated->Visible = false; // Disable update for API request
-            } else {
-                $this->date_updated->setFormValue($val, true, $validate);
-            }
-            $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
-        }
-        if ($CurrentForm->hasValue("o_date_updated")) {
-            $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -1873,8 +1899,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
         $this->date_created->CurrentValue = UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
-        $this->date_updated->CurrentValue = $this->date_updated->FormValue;
-        $this->date_updated->CurrentValue = UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern());
     }
 
     /**
@@ -2141,10 +2165,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // admission_id
             $this->admission_id->HrefValue = "";
             $this->admission_id->TooltipValue = "";
@@ -2180,13 +2200,7 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
             // admission_id
             $this->admission_id->setupEditAttributes();
             if ($this->admission_id->getSessionValue() != "") {
@@ -2301,17 +2315,9 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             $this->date_created->setupEditAttributes();
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
-
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
             // admission_id
             $this->admission_id->HrefValue = "";
 
@@ -2338,14 +2344,7 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
             // admission_id
             $this->admission_id->setupEditAttributes();
             if ($this->admission_id->getSessionValue() != "") {
@@ -2461,15 +2460,7 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             $this->date_created->EditValue = HtmlEncode(FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()));
             $this->date_created->PlaceHolder = RemoveHtml($this->date_created->caption());
 
-            // date_updated
-            $this->date_updated->setupEditAttributes();
-            $this->date_updated->EditValue = HtmlEncode(FormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()));
-            $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
-
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
 
             // admission_id
             $this->admission_id->HrefValue = "";
@@ -2497,9 +2488,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2521,11 +2509,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
             if ($this->admission_id->Visible && $this->admission_id->Required) {
                 if (!$this->admission_id->IsDetailKey && EmptyValue($this->admission_id->FormValue)) {
                     $this->admission_id->addErrorMessage(str_replace("%s", $this->admission_id->caption(), $this->admission_id->RequiredErrorMessage));
@@ -2588,14 +2571,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
             }
             if (!CheckDate($this->date_created->FormValue, $this->date_created->formatPattern())) {
                 $this->date_created->addErrorMessage($this->date_created->getErrorMessage(false));
-            }
-            if ($this->date_updated->Visible && $this->date_updated->Required) {
-                if (!$this->date_updated->IsDetailKey && EmptyValue($this->date_updated->FormValue)) {
-                    $this->date_updated->addErrorMessage(str_replace("%s", $this->date_updated->caption(), $this->date_updated->RequiredErrorMessage));
-                }
-            }
-            if (!CheckDate($this->date_updated->FormValue, $this->date_updated->formatPattern())) {
-                $this->date_updated->addErrorMessage($this->date_updated->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2780,9 +2755,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), $this->date_created->ReadOnly);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), $this->date_updated->ReadOnly);
         return $rsnew;
     }
 
@@ -2819,9 +2791,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         if (isset($row['date_created'])) { // date_created
             $this->date_created->CurrentValue = $row['date_created'];
         }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->CurrentValue = $row['date_updated'];
-        }
     }
 
     // Add record
@@ -2830,7 +2799,19 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         global $Language, $Security;
 
         // Set up foreign key field value from Session
+        if ($this->getCurrentMasterTable() == "patients_discharge") {
+            $this->admission_id->Visible = true; // Need to insert foreign key
+            $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+        }
         if ($this->getCurrentMasterTable() == "patient_admissions") {
+            $this->admission_id->Visible = true; // Need to insert foreign key
+            $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+        }
+        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
             $this->admission_id->Visible = true; // Need to insert foreign key
             $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
             $this->patient_id->Visible = true; // Need to insert foreign key
@@ -2910,9 +2891,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
 
         // date_created
         $this->date_created->setDbValueDef($rsnew, UnFormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern()), false);
-
-        // date_updated
-        $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
         return $rsnew;
     }
 
@@ -2949,9 +2927,6 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
         if (isset($row['date_created'])) { // date_created
             $this->date_created->setFormValue($row['date_created']);
         }
-        if (isset($row['date_updated'])) { // date_updated
-            $this->date_updated->setFormValue($row['date_updated']);
-        }
     }
 
     // Set up master/detail based on QueryString
@@ -2959,8 +2934,30 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
+        if ($masterTblVar == "patients_discharge") {
+            $masterTbl = Container("patients_discharge");
+            $this->admission_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+            $this->patient_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+        }
         if ($masterTblVar == "patient_admissions") {
             $masterTbl = Container("patient_admissions");
+            $this->admission_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+            $this->patient_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+        }
+        if ($masterTblVar == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
             $this->admission_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;

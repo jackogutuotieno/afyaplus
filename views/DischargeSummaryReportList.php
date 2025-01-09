@@ -172,6 +172,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->gender->Visible) { // gender ?>
         <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_discharge_summary_report_gender" class="discharge_summary_report_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
 <?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_discharge_summary_report_status" class="discharge_summary_report_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
+<?php } ?>
 <?php if ($Page->admission_date->Visible) { // admission_date ?>
         <th data-name="admission_date" class="<?= $Page->admission_date->headerCellClass() ?>"><div id="elh_discharge_summary_report_admission_date" class="discharge_summary_report_admission_date"><?= $Page->renderFieldHeader($Page->admission_date) ?></div></th>
 <?php } ?>
@@ -227,6 +230,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_discharge_summary_report_gender" class="el_discharge_summary_report_gender">
 <span<?= $Page->gender->viewAttributes() ?>>
 <?= $Page->gender->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->status->Visible) { // status ?>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_discharge_summary_report_status" class="el_discharge_summary_report_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

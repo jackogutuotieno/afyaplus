@@ -122,7 +122,7 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->height->setVisibility();
@@ -132,7 +132,7 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
         $this->blood_pressure->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -758,10 +758,6 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // admission_id
             $this->admission_id->HrefValue = "";
             $this->admission_id->TooltipValue = "";
@@ -797,10 +793,6 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -921,9 +913,61 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
+            if ($masterTblVar == "patients_discharge") {
+                $validMaster = true;
+                $masterTbl = Container("patients_discharge");
+                if (($parm = Get("fk_admission_id", Get("admission_id"))) !== null) {
+                    $masterTbl->admission_id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->admission_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->admission_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
             if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
                 $masterTbl = Container("patient_admissions");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
                     $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
@@ -954,9 +998,61 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
+            if ($masterTblVar == "patients_discharge") {
+                $validMaster = true;
+                $masterTbl = Container("patients_discharge");
+                if (($parm = Post("fk_admission_id", Post("admission_id"))) !== null) {
+                    $masterTbl->admission_id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->admission_id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->admission_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
             if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
                 $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->admission_id->FormValue = $masterTbl->id->FormValue;
@@ -993,7 +1089,23 @@ class PatientIpdVitalsDelete extends PatientIpdVitals
             }
 
             // Clear previous master key from Session
+            if ($masterTblVar != "patients_discharge") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
             if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "discharge_summary_report") {
                 if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
                     $this->admission_id->setSessionValue("");
                 }

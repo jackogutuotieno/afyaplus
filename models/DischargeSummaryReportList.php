@@ -147,9 +147,11 @@ class DischargeSummaryReportList extends DischargeSummaryReport
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->patient_id->Visible = false;
         $this->patient_name->setVisibility();
         $this->age->setVisibility();
         $this->gender->setVisibility();
+        $this->status->setVisibility();
         $this->admission_reason->Visible = false;
         $this->discharge_condition->Visible = false;
         $this->created_by_user_id->Visible = false;
@@ -196,7 +198,7 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "dischargesummaryreportadd";
+        $this->AddUrl = "dischargesummaryreportadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -1056,9 +1058,11 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             $savedFilterList = Profile()->getSearchFilters("fdischarge_summary_reportsrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
         $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->admission_reason->AdvancedSearch->toJson(), ","); // Field admission_reason
         $filterList = Concat($filterList, $this->discharge_condition->AdvancedSearch->toJson(), ","); // Field discharge_condition
         $filterList = Concat($filterList, $this->created_by_user_id->AdvancedSearch->toJson(), ","); // Field created_by_user_id
@@ -1112,6 +1116,14 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
+        // Field patient_id
+        $this->patient_id->AdvancedSearch->SearchValue = @$filter["x_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchOperator = @$filter["z_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchCondition = @$filter["v_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchValue2 = @$filter["y_patient_id"];
+        $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
+        $this->patient_id->AdvancedSearch->save();
+
         // Field patient_name
         $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
         $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
@@ -1135,6 +1147,14 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
         $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
         $this->gender->AdvancedSearch->save();
+
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
 
         // Field admission_reason
         $this->admission_reason->AdvancedSearch->SearchValue = @$filter["x_admission_reason"];
@@ -1224,6 +1244,7 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $searchFlds = [];
         $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
+        $searchFlds[] = &$this->status;
         $searchFlds[] = &$this->admission_reason;
         $searchFlds[] = &$this->discharge_condition;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
@@ -1307,6 +1328,7 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             $this->updateSort($this->patient_name); // patient_name
             $this->updateSort($this->age); // age
             $this->updateSort($this->gender); // gender
+            $this->updateSort($this->status); // status
             $this->updateSort($this->admission_date); // admission_date
             $this->updateSort($this->discharge_date); // discharge_date
             $this->setStartRecordNumber(1); // Reset start position
@@ -1334,9 +1356,11 @@ class DischargeSummaryReportList extends DischargeSummaryReport
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
+                $this->patient_id->setSort("");
                 $this->patient_name->setSort("");
                 $this->age->setSort("");
                 $this->gender->setSort("");
+                $this->status->setSort("");
                 $this->admission_reason->setSort("");
                 $this->discharge_condition->setSort("");
                 $this->created_by_user_id->setSort("");
@@ -1368,6 +1392,52 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
+        // "detail_patient_ipd_vitals"
+        $item = &$this->ListOptions->add("detail_patient_ipd_vitals");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_ipd_vitals');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_issue_items"
+        $item = &$this->ListOptions->add("detail_issue_items");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'issue_items');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_patient_ipd_services"
+        $item = &$this->ListOptions->add("detail_patient_ipd_services");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_ipd_services');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_patient_ipd_prescriptions"
+        $item = &$this->ListOptions->add("detail_patient_ipd_prescriptions");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'patient_ipd_prescriptions');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("patient_ipd_vitals");
+        $pages->add("issue_items");
+        $pages->add("patient_ipd_services");
+        $pages->add("patient_ipd_prescriptions");
+        $this->DetailPages = $pages;
+
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -1384,6 +1454,14 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1424,6 +1502,10 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1476,6 +1558,146 @@ class DischargeSummaryReportList extends DischargeSummaryReport
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_patient_ipd_vitals"
+        $opt = $this->ListOptions["detail_patient_ipd_vitals"];
+        if ($Security->allowList(CurrentProjectID() . 'patient_ipd_vitals')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_ipd_vitals", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientipdvitalslist?" . Config("TABLE_SHOW_MASTER") . "=discharge_summary_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientIpdVitalsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'discharge_summary_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_vitals");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patient_ipd_vitals";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_issue_items"
+        $opt = $this->ListOptions["detail_issue_items"];
+        if ($Security->allowList(CurrentProjectID() . 'issue_items')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("issue_items", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("issueitemslist?" . Config("TABLE_SHOW_MASTER") . "=discharge_summary_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("IssueItemsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'discharge_summary_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=issue_items");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "issue_items";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_patient_ipd_services"
+        $opt = $this->ListOptions["detail_patient_ipd_services"];
+        if ($Security->allowList(CurrentProjectID() . 'patient_ipd_services')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_ipd_services", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientipdserviceslist?" . Config("TABLE_SHOW_MASTER") . "=discharge_summary_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientIpdServicesGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'discharge_summary_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_services");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patient_ipd_services";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_patient_ipd_prescriptions"
+        $opt = $this->ListOptions["detail_patient_ipd_prescriptions"];
+        if ($Security->allowList(CurrentProjectID() . 'patient_ipd_prescriptions')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("patient_ipd_prescriptions", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("patientipdprescriptionslist?" . Config("TABLE_SHOW_MASTER") . "=discharge_summary_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("PatientIpdPrescriptionsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'discharge_summary_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_prescriptions");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "patient_ipd_prescriptions";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1509,6 +1731,7 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             $this->createColumnOption($option, "patient_name");
             $this->createColumnOption($option, "age");
             $this->createColumnOption($option, "gender");
+            $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "admission_date");
             $this->createColumnOption($option, "discharge_date");
         }
@@ -1950,9 +2173,11 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->patient_id->setDbValue($row['patient_id']);
         $this->patient_name->setDbValue($row['patient_name']);
         $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
+        $this->status->setDbValue($row['status']);
         $this->admission_reason->setDbValue($row['admission_reason']);
         $this->discharge_condition->setDbValue($row['discharge_condition']);
         $this->created_by_user_id->setDbValue($row['created_by_user_id']);
@@ -1966,9 +2191,11 @@ class DischargeSummaryReportList extends DischargeSummaryReport
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['admission_reason'] = $this->admission_reason->DefaultValue;
         $row['discharge_condition'] = $this->discharge_condition->DefaultValue;
         $row['created_by_user_id'] = $this->created_by_user_id->DefaultValue;
@@ -2017,11 +2244,15 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
         // id
 
+        // patient_id
+
         // patient_name
 
         // age
 
         // gender
+
+        // status
 
         // admission_reason
 
@@ -2040,6 +2271,10 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
 
+            // patient_id
+            $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
+            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
 
@@ -2049,6 +2284,9 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
 
             // admission_reason
             $this->admission_reason->ViewValue = $this->admission_reason->CurrentValue;
@@ -2103,6 +2341,10 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             // gender
             $this->gender->HrefValue = "";
             $this->gender->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // admission_date
             $this->admission_date->HrefValue = "";

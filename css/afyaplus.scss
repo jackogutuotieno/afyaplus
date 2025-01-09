@@ -3315,5 +3315,12 @@ input[type="search"] {
 .ew-extended-search .ew-filter-field {
 	display: none !important;
 }
+#fdischarge_summary_reportview .ew-add,
+#fdischarge_summary_reportview .dropdown-toggle {
+	display: none;
+}
+span span p {
+	font-weight: 400 !important;
+}
 
 /*END_USER_STYLES*/

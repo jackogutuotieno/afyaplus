@@ -1150,6 +1150,32 @@ class PatientIpdServicesView extends PatientIpdServices
                     $validMaster = false;
                 }
             }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
             $masterTblVar = $master;
             if ($masterTblVar == "") {
@@ -1160,6 +1186,32 @@ class PatientIpdServicesView extends PatientIpdServices
             if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
                 $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->admission_id->FormValue = $masterTbl->id->FormValue;
@@ -1197,6 +1249,14 @@ class PatientIpdServicesView extends PatientIpdServices
 
             // Clear previous master key from Session
             if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "discharge_summary_report") {
                 if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
                     $this->admission_id->setSessionValue("");
                 }

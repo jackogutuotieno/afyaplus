@@ -724,6 +724,22 @@ class IssueItemsGrid extends IssueItems
             }
         }
 
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("dischargesummaryreportlist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
         // Set up filter
         if ($this->Command == "json") {
             $this->UseSessionForListSql = false; // Do not use session for ListSQL
@@ -1264,6 +1280,8 @@ class IssueItemsGrid extends IssueItems
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
                         $this->admission_id->setSessionValue("");
                         $this->patient_id->setSessionValue("");
             }
@@ -2519,6 +2537,12 @@ class IssueItemsGrid extends IssueItems
             $this->patient_id->Visible = true; // Need to insert foreign key
             $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
         }
+        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
+            $this->admission_id->Visible = true; // Need to insert foreign key
+            $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
+            $this->patient_id->Visible = true; // Need to insert foreign key
+            $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
+        }
 
         // Get new row
         $rsnew = $this->getAddRow();
@@ -2621,6 +2645,17 @@ class IssueItemsGrid extends IssueItems
         $masterTblVar = $this->getCurrentMasterTable();
         if ($masterTblVar == "patient_admissions") {
             $masterTbl = Container("patient_admissions");
+            $this->admission_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+            $this->patient_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
+            }
+        }
+        if ($masterTblVar == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
             $this->admission_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;

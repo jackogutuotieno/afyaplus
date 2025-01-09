@@ -58,6 +58,13 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_ad
     }
 }
 ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "discharge_summary_report") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/DischargeSummaryReportMaster.php";
+    }
+}
+?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <?php } ?>
@@ -93,6 +100,11 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "patient_admissions" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_admissions">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->admission_id->getSessionValue()) ?>">
+<input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "discharge_summary_report" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="discharge_summary_report">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->admission_id->getSessionValue()) ?>">
 <input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
 <?php } ?>

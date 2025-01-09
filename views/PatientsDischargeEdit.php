@@ -219,6 +219,14 @@ loadjs.ready(["fpatients_dischargeedit", "editor"], function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("patient_ipd_vitals", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_vitals->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_vitals", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdVitalsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatients_dischargeedit"><?= $Language->phrase("SaveBtn") ?></button>

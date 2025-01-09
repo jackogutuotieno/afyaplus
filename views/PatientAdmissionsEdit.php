@@ -174,6 +174,14 @@ loadjs.ready("fpatient_admissionsedit", function() {
 <?php } ?>
 <?php include_once "PatientIpdServicesGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("patient_ipd_prescriptions", explode(",", $Page->getCurrentDetailTable())) && $patient_ipd_prescriptions->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("patient_ipd_prescriptions", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PatientIpdPrescriptionsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fpatient_admissionsedit"><?= $Language->phrase("SaveBtn") ?></button>

@@ -146,7 +146,7 @@ class PatientIpdVitalsList extends PatientIpdVitals
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->admission_id->setVisibility();
         $this->patient_id->setVisibility();
         $this->height->setVisibility();
@@ -156,7 +156,7 @@ class PatientIpdVitalsList extends PatientIpdVitals
         $this->blood_pressure->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
+        $this->date_updated->Visible = false;
     }
 
     // Constructor
@@ -863,6 +863,22 @@ class PatientIpdVitalsList extends PatientIpdVitals
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_discharge") {
+            $masterTbl = Container("patients_discharge");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("patientsdischargelist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
         if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
             $masterTbl = Container("patient_admissions");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
@@ -870,6 +886,22 @@ class PatientIpdVitalsList extends PatientIpdVitals
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
                 $this->terminate("patientadmissionslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("dischargesummaryreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1338,7 +1370,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->admission_id); // admission_id
             $this->updateSort($this->patient_id); // patient_id
             $this->updateSort($this->height); // height
@@ -1348,7 +1379,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
             $this->updateSort($this->blood_pressure); // blood_pressure
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1374,6 +1404,10 @@ class PatientIpdVitalsList extends PatientIpdVitals
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
+                        $this->admission_id->setSessionValue("");
+                        $this->patient_id->setSessionValue("");
                         $this->admission_id->setSessionValue("");
                         $this->patient_id->setSessionValue("");
             }
@@ -1449,6 +1483,14 @@ class PatientIpdVitalsList extends PatientIpdVitals
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = true;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1486,6 +1528,10 @@ class PatientIpdVitalsList extends PatientIpdVitals
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
             // "view"
@@ -1608,7 +1654,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "admission_id");
             $this->createColumnOption($option, "patient_id");
             $this->createColumnOption($option, "height");
@@ -1618,7 +1663,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
             $this->createColumnOption($option, "blood_pressure");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
-            $this->createColumnOption($option, "date_updated");
         }
 
         // Set up custom actions
@@ -2230,10 +2274,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // admission_id
             $this->admission_id->HrefValue = "";
             $this->admission_id->TooltipValue = "";
@@ -2269,10 +2309,6 @@ class PatientIpdVitalsList extends PatientIpdVitals
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2483,6 +2519,23 @@ class PatientIpdVitalsList extends PatientIpdVitals
         $doc->ExportCustom = !$this->pageExporting($doc);
 
         // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patients_discharge") {
+            $patients_discharge = new PatientsDischargeList();
+            $rsmaster = $patients_discharge->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($patients_discharge);
+                    $patients_discharge->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export master record
         if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
             $patient_admissions = new PatientAdmissionsList();
             $rsmaster = $patient_admissions->loadRs($this->DbMasterFilter); // Load master record
@@ -2492,6 +2545,23 @@ class PatientIpdVitalsList extends PatientIpdVitals
                 if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
                     $doc->setTable($patient_admissions);
                     $patient_admissions->exportDocument($doc, $rsmaster);
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
+            $discharge_summary_report = new DischargeSummaryReportList();
+            $rsmaster = $discharge_summary_report->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($discharge_summary_report);
+                    $discharge_summary_report->exportDocument($doc, $rsmaster);
                     $doc->exportEmptyRow();
                     $doc->setTable($this);
                 }
@@ -2531,9 +2601,61 @@ class PatientIpdVitalsList extends PatientIpdVitals
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
+            if ($masterTblVar == "patients_discharge") {
+                $validMaster = true;
+                $masterTbl = Container("patients_discharge");
+                if (($parm = Get("fk_admission_id", Get("admission_id"))) !== null) {
+                    $masterTbl->admission_id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->admission_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->admission_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
             if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
                 $masterTbl = Container("patient_admissions");
+                if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->admission_id->setSessionValue($this->admission_id->QueryStringValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Get("fk_patient_id", Get("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setQueryStringValue($parm);
+                    $this->patient_id->QueryStringValue = $masterTbl->patient_id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->patient_id->setSessionValue($this->patient_id->QueryStringValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->patient_id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
                     $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
@@ -2564,9 +2686,61 @@ class PatientIpdVitalsList extends PatientIpdVitals
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
+            if ($masterTblVar == "patients_discharge") {
+                $validMaster = true;
+                $masterTbl = Container("patients_discharge");
+                if (($parm = Post("fk_admission_id", Post("admission_id"))) !== null) {
+                    $masterTbl->admission_id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->admission_id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->admission_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
             if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
                 $masterTbl = Container("patient_admissions");
+                if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->admission_id->FormValue = $masterTbl->id->FormValue;
+                    $this->admission_id->setSessionValue($this->admission_id->FormValue);
+                    $foreignKeys["admission_id"] = $this->admission_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+                if (($parm = Post("fk_patient_id", Post("patient_id"))) !== null) {
+                    $masterTbl->patient_id->setFormValue($parm);
+                    $this->patient_id->FormValue = $masterTbl->patient_id->FormValue;
+                    $this->patient_id->setSessionValue($this->patient_id->FormValue);
+                    $foreignKeys["patient_id"] = $this->patient_id->FormValue;
+                    if (!is_numeric($masterTbl->patient_id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "discharge_summary_report") {
+                $validMaster = true;
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->admission_id->FormValue = $masterTbl->id->FormValue;
@@ -2614,7 +2788,23 @@ class PatientIpdVitalsList extends PatientIpdVitals
             }
 
             // Clear previous master key from Session
+            if ($masterTblVar != "patients_discharge") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
             if ($masterTblVar != "patient_admissions") {
+                if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
+                    $this->admission_id->setSessionValue("");
+                }
+                if (!array_key_exists("patient_id", $foreignKeys)) { // Not current foreign key
+                    $this->patient_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "discharge_summary_report") {
                 if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
                     $this->admission_id->setSessionValue("");
                 }

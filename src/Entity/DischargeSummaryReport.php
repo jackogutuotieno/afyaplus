@@ -33,6 +33,9 @@ class DischargeSummaryReport extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "patient_id", type: "integer")]
+    private int $patientId;
+
     #[Column(name: "patient_name", type: "string", nullable: true)]
     private ?string $patientName;
 
@@ -68,6 +71,17 @@ class DischargeSummaryReport extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
+        return $this;
+    }
+
+    public function getPatientId(): int
+    {
+        return $this->patientId;
+    }
+
+    public function setPatientId(int $value): static
+    {
+        $this->patientId = $value;
         return $this;
     }
 

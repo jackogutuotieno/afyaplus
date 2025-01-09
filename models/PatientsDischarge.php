@@ -506,6 +506,33 @@ class PatientsDischarge extends DbTable
         return "";
     }
 
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "patient_ipd_vitals") {
+            $detailUrl = Container("patient_ipd_vitals")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_patient_id", $this->patient_id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "patientsdischargelist";
+        }
+        return $detailUrl;
+    }
+
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -1131,7 +1158,11 @@ class PatientsDischarge extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("patientsdischargeedit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientsdischargeedit", $parm);
+        } else {
+            $url = $this->keyUrl("patientsdischargeedit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1145,7 +1176,11 @@ class PatientsDischarge extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("patientsdischargeadd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("patientsdischargeadd", $parm);
+        } else {
+            $url = $this->keyUrl("patientsdischargeadd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
