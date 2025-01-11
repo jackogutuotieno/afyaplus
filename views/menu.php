@@ -8,6 +8,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(1173, "mi_opd_consultation", $Language->menuPhrase("1173", "MenuText"), "opdconsultationlist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}opd_consultation'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
@@ -66,6 +67,7 @@ $sideMenu->addMenuItem(1166, "mci_OPD", $Language->menuPhrase("1166", "MenuText"
 $sideMenu->addMenuItem(174, "mi_laboratory_billing_report", $Language->menuPhrase("174", "MenuText"), "laboratorybillingreportlist?cmd=resetall", 1166, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}laboratory_billing_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(237, "mi_radiology_billing_report", $Language->menuPhrase("237", "MenuText"), "radiologybillingreportlist?cmd=resetall", 1166, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}radiology_billing_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(239, "mi_pharmacy_billing_report", $Language->menuPhrase("239", "MenuText"), "pharmacybillingreportlist?cmd=resetall", 1166, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}pharmacy_billing_report'), false, false, "fa-money-bill", "", false, true);
+$sideMenu->addMenuItem(1168, "mi_opd_bill_master_report", $Language->menuPhrase("1168", "MenuText"), "opdbillmasterreportlist", 1166, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}opd_bill_master_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(1167, "mci_IPD", $Language->menuPhrase("1167", "MenuText"), "", 236, "", true, false, true, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(1034, "mi_ipd_billing_report", $Language->menuPhrase("1034", "MenuText"), "ipdbillingreportlist", 1167, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report'), false, false, "fa-money-bill", "", false, true);
 $sideMenu->addMenuItem(959, "mci_Procurement", $Language->menuPhrase("959", "MenuText"), "", -1, "", true, false, true, "fa-boxes", "", false, true);

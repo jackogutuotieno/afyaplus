@@ -229,6 +229,12 @@ return [
     "medicine_ipd_dispensation_details" => \DI\create(MedicineIpdDispensationDetails::class),
     "ipd_bill_medicines" => \DI\create(IpdBillMedicines::class),
     "ipd_total_bill" => \DI\create(IpdTotalBill::class),
+    "opd_bill_master_report" => \DI\create(OpdBillMasterReport::class),
+    "opd_lab_master_bill" => \DI\create(OpdLabMasterBill::class),
+    "opd_radiology_master_bill" => \DI\create(OpdRadiologyMasterBill::class),
+    "opd_pharmacy_master_bill" => \DI\create(OpdPharmacyMasterBill::class),
+    "opd_bill_total" => \DI\create(OpdBillTotal::class),
+    "opd_consultation" => \DI\create(OpdConsultation::class),
 
     // User table
     "usertable" => \DI\get("users"),
