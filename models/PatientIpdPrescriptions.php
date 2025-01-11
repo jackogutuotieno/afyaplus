@@ -1795,8 +1795,7 @@ class PatientIpdPrescriptions extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
-        //var_dump($this-><FieldName>);
+        $this->created_by_user_id->ViewValue = '<a href="patientipdprescriptionsview/' . $this->id->ViewValue . '?showdetail=patient_ipd_prescription_details" target="_blank"> ' . $this->created_by_user_id->ViewValue . ' </a>';
     }
 
     // User ID Filtering event

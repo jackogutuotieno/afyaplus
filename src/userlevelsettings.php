@@ -1605,7 +1605,20 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","9","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","10","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","11","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}patient_ipd_prescriptions","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","11","0"]];
 
 /**
  * Tables
@@ -1738,4 +1751,5 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["Procurement Overview","Procurement_Overview","Procurement Overview",true,"{32536B8D-F37B-4419-80D5-260932800712}","procurementoverview"],
     ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"],
     ["patient_ipd_prescription_details","patient_ipd_prescription_details","Prescription Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptiondetailslist"],
-    ["patient_ipd_prescriptions","patient_ipd_prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptionslist"]];
+    ["patient_ipd_prescriptions","patient_ipd_prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptionslist"],
+    ["ipd_billing_report","ipd_billing_report","ipd billing report",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillingreportlist"]];

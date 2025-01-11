@@ -150,6 +150,8 @@ class PatientAdmissionsView extends PatientAdmissions
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->payment_method_id->setVisibility();
+        $this->medical_scheme_id->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
     }
@@ -568,6 +570,8 @@ class PatientAdmissionsView extends PatientAdmissions
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->payment_method_id);
+        $this->setupLookupOptions($this->medical_scheme_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -1147,6 +1151,8 @@ class PatientAdmissionsView extends PatientAdmissions
         }
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->payment_method_id->setDbValue($row['payment_method_id']);
+        $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
@@ -1157,6 +1163,8 @@ class PatientAdmissionsView extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
+        $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
@@ -1183,6 +1191,10 @@ class PatientAdmissionsView extends PatientAdmissions
         // id
 
         // patient_id
+
+        // payment_method_id
+
+        // medical_scheme_id
 
         // status
 
@@ -1217,6 +1229,52 @@ class PatientAdmissionsView extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // payment_method_id
+            $curVal = strval($this->payment_method_id->CurrentValue);
+            if ($curVal != "") {
+                $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
+                if ($this->payment_method_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
+                    } else {
+                        $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->payment_method_id->ViewValue = null;
+            }
+
+            // medical_scheme_id
+            $curVal = strval($this->medical_scheme_id->CurrentValue);
+            if ($curVal != "") {
+                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
+                if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
+                    } else {
+                        $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->medical_scheme_id->ViewValue = null;
+            }
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -1231,6 +1289,14 @@ class PatientAdmissionsView extends PatientAdmissions
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // payment_method_id
+            $this->payment_method_id->HrefValue = "";
+            $this->payment_method_id->TooltipValue = "";
+
+            // medical_scheme_id
+            $this->medical_scheme_id->HrefValue = "";
+            $this->medical_scheme_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -1744,6 +1810,10 @@ class PatientAdmissionsView extends PatientAdmissions
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_payment_method_id":
+                    break;
+                case "x_medical_scheme_id":
                     break;
                 default:
                     $lookupFilter = "";

@@ -157,7 +157,10 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
         $this->TableName = 'patient_ipd_prescriptions';
 
         // Table CSS class
-        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table";
+        $this->TableClass = "table table-striped table-bordered table-hover table-sm ew-view-table d-none";
+
+        // Custom template
+        $this->UseCustomTemplate = true;
 
         // Initialize
         $GLOBALS["Page"] = &$this;
@@ -397,9 +400,6 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -704,16 +704,6 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
         }
         $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "" && $Security->canAdd();
-
         // Delete
         $item = &$option->add("delete");
         $url = GetUrl($this->DeleteUrl);
@@ -755,13 +745,6 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
                 $detailEditTblVar .= ",";
             }
             $detailEditTblVar .= "patient_ipd_prescription_details";
-        }
-        if ($detailPageObj->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'patient_ipd_prescriptions')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailCopyLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=patient_ipd_prescription_details"))) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
-            if ($detailCopyTblVar != "") {
-                $detailCopyTblVar .= ",";
-            }
-            $detailCopyTblVar .= "patient_ipd_prescription_details";
         }
         if ($links != "") {
             $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
@@ -1063,6 +1046,11 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+
+        // Save data for Custom Template
+        if ($this->RowType == RowType::VIEW || $this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) {
+            $this->Rows[] = $this->customTemplateFieldValues();
+        }
     }
 
     // Get export HTML tag
@@ -1102,7 +1090,7 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_ipd_prescriptionsview" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fpatient_ipd_prescriptionsview" data-ew-action="email" data-custom="true" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-key="' . ArrayToJsonAttribute($this->RecKey) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -1120,12 +1108,12 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
 
         // Export to Excel
         $item = &$this->ExportOptions->add("excel");
-        $item->Body = $this->getExportTag("excel");
+        $item->Body = $this->getExportTag("excel", !Config("USE_PHPEXCEL"));
         $item->Visible = true;
 
         // Export to Word
         $item = &$this->ExportOptions->add("word");
-        $item->Body = $this->getExportTag("word");
+        $item->Body = $this->getExportTag("word", !Config("USE_PHPWORD"));
         $item->Visible = true;
 
         // Export to HTML
@@ -1145,12 +1133,12 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
 
         // Export to PDF
         $item = &$this->ExportOptions->add("pdf");
-        $item->Body = $this->getExportTag("pdf");
+        $item->Body = $this->getExportTag("pdf", true);
         $item->Visible = true;
 
         // Export to Email
         $item = &$this->ExportOptions->add("email");
-        $item->Body = $this->getExportTag("email");
+        $item->Body = $this->getExportTag("email", true);
         $item->Visible = true;
 
         // Drop down button for export
@@ -1568,8 +1556,7 @@ class PatientIpdPrescriptionsView extends PatientIpdPrescriptions
     // Page Data Rendering event
     public function pageDataRendering(&$header)
     {
-        // Example:
-        //$header = "your header";
+        $header = '<img src="http://' . $_SERVER['HTTP_HOST'] . '/afyaplus/images/header.jpg" style="width:100%" />';
     }
 
     // Page Data Rendered event

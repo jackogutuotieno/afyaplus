@@ -90,6 +90,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "visit_type": <?= $Page->visit_type->toClientList($Page) ?>,
             "payment_method": <?= $Page->payment_method->toClientList($Page) ?>,
             "company": <?= $Page->company->toClientList($Page) ?>,
         })
@@ -112,6 +113,44 @@ $Page->RowType = RowType::SEARCH;
 $Page->resetAttributes();
 $Page->renderRow();
 ?>
+<?php if ($Page->visit_type->Visible) { // visit_type ?>
+<?php
+if (!$Page->visit_type->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_visit_type" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->visit_type->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_visit_type"
+            name="x_visit_type[]"
+            class="form-control ew-select<?= $Page->visit_type->isInvalidClass() ?>"
+            data-select2-id="fVisits_Report1srch_x_visit_type"
+            data-table="Visits_Report1"
+            data-field="x_visit_type"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->visit_type->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->visit_type->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->visit_type->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->visit_type->editAttributes() ?>>
+            <?= $Page->visit_type->selectOptionListHtml("x_visit_type", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->visit_type->getErrorMessage() ?></div>
+        <script>
+        loadjs.ready("fVisits_Report1srch", function() {
+            var options = {
+                name: "x_visit_type",
+                selectId: "fVisits_Report1srch_x_visit_type",
+                ajax: { id: "x_visit_type", form: "fVisits_Report1srch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.Visits_Report1.fields.visit_type.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
 <?php if ($Page->payment_method->Visible) { // payment_method ?>
 <?php
 if (!$Page->payment_method->UseFilter) {
@@ -235,9 +274,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <thead>
 	<!-- Table header -->
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { ?>
-    <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div class="Visits_Report1_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->patient_name_visits->Visible) { ?>
     <th data-name="patient_name_visits" class="<?= $Page->patient_name_visits->headerCellClass() ?>"><div class="Visits_Report1_patient_name_visits"><?= $Page->renderFieldHeader($Page->patient_name_visits) ?></div></th>
 <?php } ?>
@@ -252,9 +288,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
 <?php } ?>
 <?php if ($Page->date_created->Visible) { ?>
     <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div class="Visits_Report1_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { ?>
-    <th data-name="date_updated" class="<?= $Page->date_updated->headerCellClass() ?>"><div class="Visits_Report1_date_updated"><?= $Page->renderFieldHeader($Page->date_updated) ?></div></th>
 <?php } ?>
     </tr>
 </thead>
@@ -278,12 +311,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         $Page->renderRow();
 ?>
     <tr<?= $Page->rowAttributes(); ?>>
-<?php if ($Page->id->Visible) { ?>
-        <td data-field="id"<?= $Page->id->cellAttributes() ?>>
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</td>
-<?php } ?>
 <?php if ($Page->patient_name_visits->Visible) { ?>
         <td data-field="patient_name_visits"<?= $Page->patient_name_visits->cellAttributes() ?>>
 <span<?= $Page->patient_name_visits->viewAttributes() ?>>
@@ -312,12 +339,6 @@ while ($Page->RecordCount < count($Page->DetailRecords) && $Page->RecordCount < 
         <td data-field="date_created"<?= $Page->date_created->cellAttributes() ?>>
 <span<?= $Page->date_created->viewAttributes() ?>>
 <?= $Page->date_created->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->date_updated->Visible) { ?>
-        <td data-field="date_updated"<?= $Page->date_updated->cellAttributes() ?>>
-<span<?= $Page->date_updated->viewAttributes() ?>>
-<?= $Page->date_updated->getViewValue() ?></span>
 </td>
 <?php } ?>
     </tr>

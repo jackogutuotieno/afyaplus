@@ -32,6 +32,28 @@ $patient_admissions->TableClass = "table table-bordered table-hover table-sm ew-
 </td>
         </tr>
 <?php } ?>
+<?php if ($patient_admissions->payment_method_id->Visible) { // payment_method_id ?>
+        <tr id="r_payment_method_id"<?= $patient_admissions->payment_method_id->rowAttributes() ?>>
+            <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->payment_method_id->caption() ?></td>
+            <td<?= $patient_admissions->payment_method_id->cellAttributes() ?>>
+<span id="el_patient_admissions_payment_method_id">
+<span<?= $patient_admissions->payment_method_id->viewAttributes() ?>>
+<?= $patient_admissions->payment_method_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patient_admissions->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <tr id="r_medical_scheme_id"<?= $patient_admissions->medical_scheme_id->rowAttributes() ?>>
+            <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->medical_scheme_id->caption() ?></td>
+            <td<?= $patient_admissions->medical_scheme_id->cellAttributes() ?>>
+<span id="el_patient_admissions_medical_scheme_id">
+<span<?= $patient_admissions->medical_scheme_id->viewAttributes() ?>>
+<?= $patient_admissions->medical_scheme_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patient_admissions->status->Visible) { // status ?>
         <tr id="r_status"<?= $patient_admissions->status->rowAttributes() ?>>
             <td class="<?= $patient_admissions->TableLeftColumnClass ?>"><?= $patient_admissions->status->caption() ?></td>

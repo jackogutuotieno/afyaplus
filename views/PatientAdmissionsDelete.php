@@ -56,6 +56,12 @@ $Page->showMessage();
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th class="<?= $Page->patient_id->headerCellClass() ?>"><span id="elh_patient_admissions_patient_id" class="patient_admissions_patient_id"><?= $Page->patient_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <th class="<?= $Page->payment_method_id->headerCellClass() ?>"><span id="elh_patient_admissions_payment_method_id" class="patient_admissions_payment_method_id"><?= $Page->payment_method_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <th class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><span id="elh_patient_admissions_medical_scheme_id" class="patient_admissions_medical_scheme_id"><?= $Page->medical_scheme_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_patient_admissions_status" class="patient_admissions_status"><?= $Page->status->caption() ?></span></th>
 <?php } ?>
@@ -96,6 +102,22 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <td<?= $Page->payment_method_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->payment_method_id->viewAttributes() ?>>
+<?= $Page->payment_method_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <td<?= $Page->medical_scheme_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->medical_scheme_id->viewAttributes() ?>>
+<?= $Page->medical_scheme_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

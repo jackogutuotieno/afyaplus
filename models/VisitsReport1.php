@@ -218,8 +218,11 @@ class VisitsReport1 extends ReportTable
         $this->visit_type->InputTextType = "text";
         $this->visit_type->Nullable = false; // NOT NULL field
         $this->visit_type->Required = true; // Required field
+        $this->visit_type->UseFilter = true; // Table header filter
+        $this->visit_type->Lookup = new Lookup($this->visit_type, 'Visits_Report1', true, 'visit_type', ["visit_type","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->visit_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->visit_type->SourceTableVar = 'visits_report';
+        $this->visit_type->SearchType = "dropdown";
         $this->Fields['visit_type'] = &$this->visit_type;
 
         // payment_method
@@ -327,6 +330,7 @@ class VisitsReport1 extends ReportTable
         $this->date_updated->Raw = true;
         $this->date_updated->Nullable = false; // NOT NULL field
         $this->date_updated->Required = true; // Required field
+        $this->date_updated->Sortable = false; // Allow sort
         $this->date_updated->DefaultErrorMessage = str_replace("%s", DateFormat(7), $Language->phrase("IncorrectDate"));
         $this->date_updated->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->date_updated->SourceTableVar = 'visits_report';
@@ -351,6 +355,7 @@ class VisitsReport1 extends ReportTable
             'TEXT' // Edit Tag
         );
         $this->visit_month->InputTextType = "text";
+        $this->visit_month->Sortable = false; // Allow sort
         $this->visit_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->visit_month->SourceTableVar = 'visits_report';
         $this->Fields['visit_month'] = &$this->visit_month;

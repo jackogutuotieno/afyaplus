@@ -455,13 +455,11 @@ class VisitsReport1Summary extends VisitsReport1
         }
 
         // Set field visibility for detail fields
-        $this->id->setVisibility();
         $this->patient_name_visits->setVisibility();
         $this->visit_type->setVisibility();
         $this->payment_method->setVisibility();
         $this->company->setVisibility();
         $this->date_created->setVisibility();
-        $this->date_updated->setVisibility();
 
         // Set up groups per page dynamically
         $this->setupDisplayGroups();
@@ -666,8 +664,6 @@ class VisitsReport1Summary extends VisitsReport1
         // Call Row_Rendering event
         $this->rowRendering();
 
-        // id
-
         // patient_name_visits
 
         // visit_type
@@ -677,9 +673,15 @@ class VisitsReport1Summary extends VisitsReport1
         // company
 
         // date_created
-
-        // date_updated
         if ($this->RowType == RowType::SEARCH) {
+            // visit_type
+            if ($this->visit_type->UseFilter && !EmptyValue($this->visit_type->AdvancedSearch->SearchValue)) {
+                if (is_array($this->visit_type->AdvancedSearch->SearchValue)) {
+                    $this->visit_type->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->visit_type->AdvancedSearch->SearchValue);
+                }
+                $this->visit_type->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->visit_type->AdvancedSearch->SearchValue);
+            }
+
             // payment_method
             if ($this->payment_method->UseFilter && !EmptyValue($this->payment_method->AdvancedSearch->SearchValue)) {
                 if (is_array($this->payment_method->AdvancedSearch->SearchValue)) {
@@ -698,9 +700,6 @@ class VisitsReport1Summary extends VisitsReport1
         } elseif ($this->RowType == RowType::TOTAL && !($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER)) { // Summary row
             $this->RowAttrs->prependClass(($this->RowTotalType == RowSummary::PAGE || $this->RowTotalType == RowSummary::GRAND) ? "ew-rpt-grp-aggregate" : ""); // Set up row class
 
-            // id
-            $this->id->HrefValue = "";
-
             // patient_name_visits
             $this->patient_name_visits->HrefValue = "";
 
@@ -715,9 +714,6 @@ class VisitsReport1Summary extends VisitsReport1
 
             // date_created
             $this->date_created->HrefValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
         } else {
             if ($this->RowTotalType == RowSummary::GROUP && $this->RowTotalSubType == RowTotal::HEADER) {
             } else {
@@ -727,11 +723,6 @@ class VisitsReport1Summary extends VisitsReport1
             if ($this->RowType == RowType::DETAIL) {
                 $this->RowCount++;
             }
-
-            // id
-            $this->id->ViewValue = $this->id->CurrentValue;
-            $this->id->CssClass = "fw-bold";
-            $this->id->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
             // patient_name_visits
             $this->patient_name_visits->ViewValue = $this->patient_name_visits->CurrentValue;
@@ -754,15 +745,6 @@ class VisitsReport1Summary extends VisitsReport1
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
             $this->date_created->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
 
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-            $this->date_updated->CellCssClass = ($this->RecordCount % 2 != 1 ? "ew-table-alt-row" : "");
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // patient_name_visits
             $this->patient_name_visits->HrefValue = "";
             $this->patient_name_visits->TooltipValue = "";
@@ -782,24 +764,11 @@ class VisitsReport1Summary extends VisitsReport1
             // date_created
             $this->date_created->HrefValue = "";
             $this->date_created->TooltipValue = "";
-
-            // date_updated
-            $this->date_updated->HrefValue = "";
-            $this->date_updated->TooltipValue = "";
         }
 
         // Call Cell_Rendered event
         if ($this->RowType == RowType::TOTAL) { // Summary row
         } else {
-            // id
-            $currentValue = $this->id->CurrentValue;
-            $viewValue = &$this->id->ViewValue;
-            $viewAttrs = &$this->id->ViewAttrs;
-            $cellAttrs = &$this->id->CellAttrs;
-            $hrefValue = &$this->id->HrefValue;
-            $linkAttrs = &$this->id->LinkAttrs;
-            $this->cellRendered($this->id, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
             // patient_name_visits
             $currentValue = $this->patient_name_visits->CurrentValue;
             $viewValue = &$this->patient_name_visits->ViewValue;
@@ -844,15 +813,6 @@ class VisitsReport1Summary extends VisitsReport1
             $hrefValue = &$this->date_created->HrefValue;
             $linkAttrs = &$this->date_created->LinkAttrs;
             $this->cellRendered($this->date_created, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
-
-            // date_updated
-            $currentValue = $this->date_updated->CurrentValue;
-            $viewValue = &$this->date_updated->ViewValue;
-            $viewAttrs = &$this->date_updated->ViewAttrs;
-            $cellAttrs = &$this->date_updated->CellAttrs;
-            $hrefValue = &$this->date_updated->HrefValue;
-            $linkAttrs = &$this->date_updated->LinkAttrs;
-            $this->cellRendered($this->date_updated, $currentValue, $viewValue, $viewAttrs, $cellAttrs, $hrefValue, $linkAttrs);
         }
 
         // Call Row_Rendered event
@@ -893,9 +853,6 @@ class VisitsReport1Summary extends VisitsReport1
         $this->GroupColumnCount = 0;
         $this->SubGroupColumnCount = 0;
         $this->DetailColumnCount = 0;
-        if ($this->id->Visible) {
-            $this->DetailColumnCount += 1;
-        }
         if ($this->patient_name_visits->Visible) {
             $this->DetailColumnCount += 1;
         }
@@ -909,9 +866,6 @@ class VisitsReport1Summary extends VisitsReport1
             $this->DetailColumnCount += 1;
         }
         if ($this->date_created->Visible) {
-            $this->DetailColumnCount += 1;
-        }
-        if ($this->date_updated->Visible) {
             $this->DetailColumnCount += 1;
         }
     }
@@ -1037,7 +991,7 @@ class VisitsReport1Summary extends VisitsReport1
     // Check if any search fields
     public function hasSearchFields()
     {
-        return $this->payment_method->Visible || $this->company->Visible;
+        return $this->visit_type->Visible || $this->payment_method->Visible || $this->company->Visible;
     }
 
     // Render search options
@@ -1216,25 +1170,21 @@ class VisitsReport1Summary extends VisitsReport1
         if ($resetSort) {
             $this->setOrderBy("");
             $this->setStartGroup(1);
-            $this->id->setSort("");
             $this->patient_name_visits->setSort("");
             $this->visit_type->setSort("");
             $this->payment_method->setSort("");
             $this->company->setSort("");
             $this->date_created->setSort("");
-            $this->date_updated->setSort("");
 
         // Check for an Order parameter
         } elseif ($orderBy != "") {
             $this->CurrentOrder = $orderBy;
             $this->CurrentOrderType = $orderType;
-            $this->updateSort($this->id); // id
             $this->updateSort($this->patient_name_visits); // patient_name_visits
             $this->updateSort($this->visit_type); // visit_type
             $this->updateSort($this->payment_method); // payment_method
             $this->updateSort($this->company); // company
             $this->updateSort($this->date_created); // date_created
-            $this->updateSort($this->date_updated); // date_updated
             $sortSql = $this->sortSql();
             $this->setOrderBy($sortSql);
             $this->setStartGroup(1);
@@ -1254,11 +1204,15 @@ class VisitsReport1Summary extends VisitsReport1
         // Reset search command
         if (Get("cmd") == "reset") {
             // Set default values
+            $this->visit_type->AdvancedSearch->unsetSession();
             $this->payment_method->AdvancedSearch->unsetSession();
             $this->company->AdvancedSearch->unsetSession();
             $restoreDefault = true;
         } else {
             $restoreSession = !$this->SearchCommand;
+
+            // Field visit_type
+            $this->getDropDownValue($this->visit_type);
 
             // Field payment_method
             $this->getDropDownValue($this->payment_method);
@@ -1273,6 +1227,10 @@ class VisitsReport1Summary extends VisitsReport1
         // Restore session
         if ($restoreSession) {
             $restoreDefault = true;
+            if ($this->visit_type->AdvancedSearch->issetSession()) { // Field visit_type
+                $this->visit_type->AdvancedSearch->load();
+                $restoreDefault = false;
+            }
             if ($this->payment_method->AdvancedSearch->issetSession()) { // Field payment_method
                 $this->payment_method->AdvancedSearch->load();
                 $restoreDefault = false;
@@ -1292,6 +1250,8 @@ class VisitsReport1Summary extends VisitsReport1
         $this->pageFilterValidated();
 
         // Build SQL and save to session
+        $this->buildDropDownFilter($this->visit_type, $filter, false, true); // Field visit_type
+        $this->visit_type->AdvancedSearch->save();
         $this->buildDropDownFilter($this->payment_method, $filter, false, true); // Field payment_method
         $this->payment_method->AdvancedSearch->save();
         $this->buildDropDownFilter($this->company, $filter, false, true); // Field company
@@ -1432,6 +1392,9 @@ class VisitsReport1Summary extends VisitsReport1
     // Load default value for filters
     protected function loadDefaultFilters()
     {
+        // Field visit_type
+        $this->visit_type->AdvancedSearch->loadDefault();
+
         // Field payment_method
         $this->payment_method->AdvancedSearch->loadDefault();
 

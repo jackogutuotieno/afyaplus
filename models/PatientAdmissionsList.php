@@ -156,6 +156,8 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
+        $this->payment_method_id->setVisibility();
+        $this->medical_scheme_id->setVisibility();
         $this->status->setVisibility();
         $this->date_created->setVisibility();
     }
@@ -718,6 +720,8 @@ class PatientAdmissionsList extends PatientAdmissions
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->payment_method_id);
+        $this->setupLookupOptions($this->medical_scheme_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1116,6 +1120,8 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->patient_id->AdvancedSearch->toJson(), ","); // Field patient_id
+        $filterList = Concat($filterList, $this->payment_method_id->AdvancedSearch->toJson(), ","); // Field payment_method_id
+        $filterList = Concat($filterList, $this->medical_scheme_id->AdvancedSearch->toJson(), ","); // Field medical_scheme_id
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->date_created->AdvancedSearch->toJson(), ","); // Field date_created
         if ($this->BasicSearch->Keyword != "") {
@@ -1173,6 +1179,22 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->patient_id->AdvancedSearch->SearchOperator2 = @$filter["w_patient_id"];
         $this->patient_id->AdvancedSearch->save();
 
+        // Field payment_method_id
+        $this->payment_method_id->AdvancedSearch->SearchValue = @$filter["x_payment_method_id"];
+        $this->payment_method_id->AdvancedSearch->SearchOperator = @$filter["z_payment_method_id"];
+        $this->payment_method_id->AdvancedSearch->SearchCondition = @$filter["v_payment_method_id"];
+        $this->payment_method_id->AdvancedSearch->SearchValue2 = @$filter["y_payment_method_id"];
+        $this->payment_method_id->AdvancedSearch->SearchOperator2 = @$filter["w_payment_method_id"];
+        $this->payment_method_id->AdvancedSearch->save();
+
+        // Field medical_scheme_id
+        $this->medical_scheme_id->AdvancedSearch->SearchValue = @$filter["x_medical_scheme_id"];
+        $this->medical_scheme_id->AdvancedSearch->SearchOperator = @$filter["z_medical_scheme_id"];
+        $this->medical_scheme_id->AdvancedSearch->SearchCondition = @$filter["v_medical_scheme_id"];
+        $this->medical_scheme_id->AdvancedSearch->SearchValue2 = @$filter["y_medical_scheme_id"];
+        $this->medical_scheme_id->AdvancedSearch->SearchOperator2 = @$filter["w_medical_scheme_id"];
+        $this->medical_scheme_id->AdvancedSearch->save();
+
         // Field status
         $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
         $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
@@ -1202,6 +1224,8 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         $this->buildSearchSql($where, $this->id, $default, false); // id
         $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
+        $this->buildSearchSql($where, $this->payment_method_id, $default, false); // payment_method_id
+        $this->buildSearchSql($where, $this->medical_scheme_id, $default, false); // medical_scheme_id
         $this->buildSearchSql($where, $this->status, $default, false); // status
         $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
 
@@ -1212,6 +1236,8 @@ class PatientAdmissionsList extends PatientAdmissions
         if (!$default && $this->Command == "search") {
             $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->payment_method_id->AdvancedSearch->save(); // payment_method_id
+            $this->medical_scheme_id->AdvancedSearch->save(); // medical_scheme_id
             $this->status->AdvancedSearch->save(); // status
             $this->date_created->AdvancedSearch->save(); // date_created
 
@@ -1246,6 +1272,8 @@ class PatientAdmissionsList extends PatientAdmissions
             $this->resetSearchParms();
             $this->id->AdvancedSearch->save(); // id
             $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->payment_method_id->AdvancedSearch->save(); // payment_method_id
+            $this->medical_scheme_id->AdvancedSearch->save(); // medical_scheme_id
             $this->status->AdvancedSearch->save(); // status
             $this->date_created->AdvancedSearch->save(); // date_created
             $this->setSessionRules($rules);
@@ -1320,6 +1348,24 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field payment_method_id
+        $filter = $this->queryBuilderWhere("payment_method_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->payment_method_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->payment_method_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field medical_scheme_id
+        $filter = $this->queryBuilderWhere("medical_scheme_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->medical_scheme_id, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->medical_scheme_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
 
         // Field status
@@ -1400,6 +1446,12 @@ class PatientAdmissionsList extends PatientAdmissions
         if ($this->patient_id->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->payment_method_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->medical_scheme_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
         if ($this->status->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1443,6 +1495,8 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->id->AdvancedSearch->unsetSession();
         $this->patient_id->AdvancedSearch->unsetSession();
+        $this->payment_method_id->AdvancedSearch->unsetSession();
+        $this->medical_scheme_id->AdvancedSearch->unsetSession();
         $this->status->AdvancedSearch->unsetSession();
         $this->date_created->AdvancedSearch->unsetSession();
     }
@@ -1458,6 +1512,8 @@ class PatientAdmissionsList extends PatientAdmissions
         // Restore advanced search values
         $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
+        $this->payment_method_id->AdvancedSearch->load();
+        $this->medical_scheme_id->AdvancedSearch->load();
         $this->status->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
     }
@@ -1479,6 +1535,8 @@ class PatientAdmissionsList extends PatientAdmissions
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->patient_id); // patient_id
+            $this->updateSort($this->payment_method_id); // payment_method_id
+            $this->updateSort($this->medical_scheme_id); // medical_scheme_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
@@ -1515,6 +1573,8 @@ class PatientAdmissionsList extends PatientAdmissions
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->patient_id->setSort("");
+                $this->payment_method_id->setSort("");
+                $this->medical_scheme_id->setSort("");
                 $this->status->setSort("");
                 $this->date_created->setSort("");
             }
@@ -2199,6 +2259,8 @@ class PatientAdmissionsList extends PatientAdmissions
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "patient_id");
+            $this->createColumnOption($option, "payment_method_id");
+            $this->createColumnOption($option, "medical_scheme_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_created");
         }
@@ -2575,6 +2637,22 @@ class PatientAdmissionsList extends PatientAdmissions
             }
         }
 
+        // payment_method_id
+        if ($this->payment_method_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->payment_method_id->AdvancedSearch->SearchValue != "" || $this->payment_method_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // medical_scheme_id
+        if ($this->medical_scheme_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->medical_scheme_id->AdvancedSearch->SearchValue != "" || $this->medical_scheme_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
         // status
         if ($this->status->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2688,6 +2766,8 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->payment_method_id->setDbValue($row['payment_method_id']);
+        $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
@@ -2698,6 +2778,8 @@ class PatientAdmissionsList extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
+        $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
@@ -2744,6 +2826,10 @@ class PatientAdmissionsList extends PatientAdmissions
 
         // patient_id
 
+        // payment_method_id
+
+        // medical_scheme_id
+
         // status
 
         // date_created
@@ -2777,6 +2863,52 @@ class PatientAdmissionsList extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // payment_method_id
+            $curVal = strval($this->payment_method_id->CurrentValue);
+            if ($curVal != "") {
+                $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
+                if ($this->payment_method_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
+                    } else {
+                        $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->payment_method_id->ViewValue = null;
+            }
+
+            // medical_scheme_id
+            $curVal = strval($this->medical_scheme_id->CurrentValue);
+            if ($curVal != "") {
+                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
+                if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
+                    } else {
+                        $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->medical_scheme_id->ViewValue = null;
+            }
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -2791,6 +2923,14 @@ class PatientAdmissionsList extends PatientAdmissions
             // patient_id
             $this->patient_id->HrefValue = "";
             $this->patient_id->TooltipValue = "";
+
+            // payment_method_id
+            $this->payment_method_id->HrefValue = "";
+            $this->payment_method_id->TooltipValue = "";
+
+            // medical_scheme_id
+            $this->medical_scheme_id->HrefValue = "";
+            $this->medical_scheme_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -2812,6 +2952,14 @@ class PatientAdmissionsList extends PatientAdmissions
                 }
                 $this->patient_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_id->AdvancedSearch->SearchValue);
             }
+
+            // payment_method_id
+            $this->payment_method_id->setupEditAttributes();
+            $this->payment_method_id->PlaceHolder = RemoveHtml($this->payment_method_id->caption());
+
+            // medical_scheme_id
+            $this->medical_scheme_id->setupEditAttributes();
+            $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
             // status
             $this->status->setupEditAttributes();
@@ -2858,6 +3006,8 @@ class PatientAdmissionsList extends PatientAdmissions
     {
         $this->id->AdvancedSearch->load();
         $this->patient_id->AdvancedSearch->load();
+        $this->payment_method_id->AdvancedSearch->load();
+        $this->medical_scheme_id->AdvancedSearch->load();
         $this->status->AdvancedSearch->load();
         $this->date_created->AdvancedSearch->load();
     }
@@ -3207,6 +3357,10 @@ class PatientAdmissionsList extends PatientAdmissions
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_payment_method_id":
+                    break;
+                case "x_medical_scheme_id":
                     break;
                 default:
                     $lookupFilter = "";

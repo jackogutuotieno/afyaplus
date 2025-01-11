@@ -73,6 +73,28 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+    <tr id="r_payment_method_id"<?= $Page->payment_method_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_payment_method_id"><template id="tpc_patient_admissions_payment_method_id"><?= $Page->payment_method_id->caption() ?></template></span></td>
+        <td data-name="payment_method_id"<?= $Page->payment_method_id->cellAttributes() ?>>
+<template id="tpx_patient_admissions_payment_method_id"><span id="el_patient_admissions_payment_method_id">
+<span<?= $Page->payment_method_id->viewAttributes() ?>>
+<?= $Page->payment_method_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+    <tr id="r_medical_scheme_id"<?= $Page->medical_scheme_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_medical_scheme_id"><template id="tpc_patient_admissions_medical_scheme_id"><?= $Page->medical_scheme_id->caption() ?></template></span></td>
+        <td data-name="medical_scheme_id"<?= $Page->medical_scheme_id->cellAttributes() ?>>
+<template id="tpx_patient_admissions_medical_scheme_id"><span id="el_patient_admissions_medical_scheme_id">
+<span<?= $Page->medical_scheme_id->viewAttributes() ?>>
+<?= $Page->medical_scheme_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
     <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patient_admissions_status"><template id="tpc_patient_admissions_status"><?= $Page->status->caption() ?></template></span></td>

@@ -29,8 +29,9 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null, ew.Validators.integer], fields.patient_id.isInvalid],
-            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
+            ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
+            ["payment_method_id", [fields.payment_method_id.visible && fields.payment_method_id.required ? ew.Validators.required(fields.payment_method_id.caption) : null], fields.payment_method_id.isInvalid],
+            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -46,7 +47,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
-            "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
+            "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -91,44 +93,102 @@ loadjs.ready("head", function () {
     <div id="r_patient_id"<?= $Page->patient_id->rowAttributes() ?>>
         <label id="elh_patient_admissions_patient_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->patient_id->caption() ?><?= $Page->patient_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->patient_id->cellAttributes() ?>>
-<?php if ($Page->patient_id->getSessionValue() != "") { ?>
 <span id="el_patient_admissions_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->ViewValue) ?></span></span>
-<input type="hidden" id="x_patient_id" name="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>" data-hidden="1">
+<span class="form-control-plaintext"><?= $Page->patient_id->getDisplayValue($Page->patient_id->EditValue) ?></span></span>
+<input type="hidden" data-table="patient_admissions" data-field="x_patient_id" data-hidden="1" name="x_patient_id" id="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>">
 </span>
-<?php } else { ?>
-<span id="el_patient_admissions_patient_id">
-<?php
-if (IsRTL()) {
-    $Page->patient_id->EditAttrs["dir"] = "rtl";
-}
-?>
-<span id="as_x_patient_id" class="ew-auto-suggest">
-    <input type="<?= $Page->patient_id->getInputTextType() ?>" class="form-control" name="sv_x_patient_id" id="sv_x_patient_id" value="<?= RemoveHtml($Page->patient_id->EditValue) ?>" autocomplete="off" size="30" placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->patient_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->patient_id->formatPattern()) ?>"<?= $Page->patient_id->editAttributes() ?> aria-describedby="x_patient_id_help">
-</span>
-<selection-list hidden class="form-control" data-table="patient_admissions" data-field="x_patient_id" data-input="sv_x_patient_id" data-value-separator="<?= $Page->patient_id->displayValueSeparatorAttribute() ?>" name="x_patient_id" id="x_patient_id" value="<?= HtmlEncode($Page->patient_id->CurrentValue) ?>"></selection-list>
-<?= $Page->patient_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->patient_id->getErrorMessage() ?></div>
-<script>
-loadjs.ready("fpatient_admissionsedit", function() {
-    fpatient_admissionsedit.createAutoSuggest(Object.assign({"id":"x_patient_id","forceSelect":false}, { lookupAllDisplayFields: <?= $Page->patient_id->Lookup->LookupAllDisplayFields ? "true" : "false" ?> }, ew.vars.tables.patient_admissions.fields.patient_id.autoSuggestOptions));
-});
-</script>
-<?= $Page->patient_id->Lookup->getParamTag($Page, "p_x_patient_id") ?>
-</span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <label id="elh_patient_admissions_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
-<span id="el_patient_admissions_status">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="patient_admissions" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
-<?= $Page->status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+    <div id="r_payment_method_id"<?= $Page->payment_method_id->rowAttributes() ?>>
+        <label id="elh_patient_admissions_payment_method_id" for="x_payment_method_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->payment_method_id->caption() ?><?= $Page->payment_method_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->payment_method_id->cellAttributes() ?>>
+<span id="el_patient_admissions_payment_method_id">
+    <select
+        id="x_payment_method_id"
+        name="x_payment_method_id"
+        class="form-select ew-select<?= $Page->payment_method_id->isInvalidClass() ?>"
+        <?php if (!$Page->payment_method_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_admissionsedit_x_payment_method_id"
+        <?php } ?>
+        data-table="patient_admissions"
+        data-field="x_payment_method_id"
+        data-value-separator="<?= $Page->payment_method_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->payment_method_id->getPlaceHolder()) ?>"
+        <?= $Page->payment_method_id->editAttributes() ?>>
+        <?= $Page->payment_method_id->selectOptionListHtml("x_payment_method_id") ?>
+    </select>
+    <?= $Page->payment_method_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->payment_method_id->getErrorMessage() ?></div>
+<?= $Page->payment_method_id->Lookup->getParamTag($Page, "p_x_payment_method_id") ?>
+<?php if (!$Page->payment_method_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_admissionsedit", function() {
+    var options = { name: "x_payment_method_id", selectId: "fpatient_admissionsedit_x_payment_method_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_admissionsedit.lists.payment_method_id?.lookupOptions.length) {
+        options.data = { id: "x_payment_method_id", form: "fpatient_admissionsedit" };
+    } else {
+        options.ajax = { id: "x_payment_method_id", form: "fpatient_admissionsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.payment_method_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+    <div id="r_medical_scheme_id"<?= $Page->medical_scheme_id->rowAttributes() ?>>
+        <label id="elh_patient_admissions_medical_scheme_id" for="x_medical_scheme_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->medical_scheme_id->caption() ?><?= $Page->medical_scheme_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->medical_scheme_id->cellAttributes() ?>>
+<span id="el_patient_admissions_medical_scheme_id">
+    <select
+        id="x_medical_scheme_id"
+        name="x_medical_scheme_id"
+        class="form-select ew-select<?= $Page->medical_scheme_id->isInvalidClass() ?>"
+        <?php if (!$Page->medical_scheme_id->IsNativeSelect) { ?>
+        data-select2-id="fpatient_admissionsedit_x_medical_scheme_id"
+        <?php } ?>
+        data-table="patient_admissions"
+        data-field="x_medical_scheme_id"
+        data-value-separator="<?= $Page->medical_scheme_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->medical_scheme_id->getPlaceHolder()) ?>"
+        <?= $Page->medical_scheme_id->editAttributes() ?>>
+        <?= $Page->medical_scheme_id->selectOptionListHtml("x_medical_scheme_id") ?>
+    </select>
+    <?= $Page->medical_scheme_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->medical_scheme_id->getErrorMessage() ?></div>
+<?= $Page->medical_scheme_id->Lookup->getParamTag($Page, "p_x_medical_scheme_id") ?>
+<?php if (!$Page->medical_scheme_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_admissionsedit", function() {
+    var options = { name: "x_medical_scheme_id", selectId: "fpatient_admissionsedit_x_medical_scheme_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_admissionsedit.lists.medical_scheme_id?.lookupOptions.length) {
+        options.data = { id: "x_medical_scheme_id", form: "fpatient_admissionsedit" };
+    } else {
+        options.ajax = { id: "x_medical_scheme_id", form: "fpatient_admissionsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.medical_scheme_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

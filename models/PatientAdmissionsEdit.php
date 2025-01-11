@@ -132,7 +132,9 @@ class PatientAdmissionsEdit extends PatientAdmissions
     {
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
-        $this->status->setVisibility();
+        $this->payment_method_id->setVisibility();
+        $this->medical_scheme_id->setVisibility();
+        $this->status->Visible = false;
         $this->date_created->Visible = false;
     }
 
@@ -510,6 +512,7 @@ class PatientAdmissionsEdit extends PatientAdmissions
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
         $this->setVisibility();
+        $this->patient_id->Required = false;
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -535,6 +538,8 @@ class PatientAdmissionsEdit extends PatientAdmissions
 
         // Set up lookup cache
         $this->setupLookupOptions($this->patient_id);
+        $this->setupLookupOptions($this->payment_method_id);
+        $this->setupLookupOptions($this->medical_scheme_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -745,17 +750,27 @@ class PatientAdmissionsEdit extends PatientAdmissions
             if (IsApi() && $val === null) {
                 $this->patient_id->Visible = false; // Disable update for API request
             } else {
-                $this->patient_id->setFormValue($val, true, $validate);
+                $this->patient_id->setFormValue($val);
             }
         }
 
-        // Check field name 'status' first before field var 'x_status'
-        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
-        if (!$this->status->IsDetailKey) {
+        // Check field name 'payment_method_id' first before field var 'x_payment_method_id'
+        $val = $CurrentForm->hasValue("payment_method_id") ? $CurrentForm->getValue("payment_method_id") : $CurrentForm->getValue("x_payment_method_id");
+        if (!$this->payment_method_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->status->Visible = false; // Disable update for API request
+                $this->payment_method_id->Visible = false; // Disable update for API request
             } else {
-                $this->status->setFormValue($val);
+                $this->payment_method_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'medical_scheme_id' first before field var 'x_medical_scheme_id'
+        $val = $CurrentForm->hasValue("medical_scheme_id") ? $CurrentForm->getValue("medical_scheme_id") : $CurrentForm->getValue("x_medical_scheme_id");
+        if (!$this->medical_scheme_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->medical_scheme_id->Visible = false; // Disable update for API request
+            } else {
+                $this->medical_scheme_id->setFormValue($val);
             }
         }
     }
@@ -766,7 +781,8 @@ class PatientAdmissionsEdit extends PatientAdmissions
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->status->CurrentValue = $this->status->FormValue;
+        $this->payment_method_id->CurrentValue = $this->payment_method_id->FormValue;
+        $this->medical_scheme_id->CurrentValue = $this->medical_scheme_id->FormValue;
     }
 
     /**
@@ -809,6 +825,8 @@ class PatientAdmissionsEdit extends PatientAdmissions
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
+        $this->payment_method_id->setDbValue($row['payment_method_id']);
+        $this->medical_scheme_id->setDbValue($row['medical_scheme_id']);
         $this->status->setDbValue($row['status']);
         $this->date_created->setDbValue($row['date_created']);
     }
@@ -819,6 +837,8 @@ class PatientAdmissionsEdit extends PatientAdmissions
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
+        $row['payment_method_id'] = $this->payment_method_id->DefaultValue;
+        $row['medical_scheme_id'] = $this->medical_scheme_id->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         return $row;
@@ -861,6 +881,12 @@ class PatientAdmissionsEdit extends PatientAdmissions
         // patient_id
         $this->patient_id->RowCssClass = "row";
 
+        // payment_method_id
+        $this->payment_method_id->RowCssClass = "row";
+
+        // medical_scheme_id
+        $this->medical_scheme_id->RowCssClass = "row";
+
         // status
         $this->status->RowCssClass = "row";
 
@@ -896,6 +922,52 @@ class PatientAdmissionsEdit extends PatientAdmissions
                 $this->patient_id->ViewValue = null;
             }
 
+            // payment_method_id
+            $curVal = strval($this->payment_method_id->CurrentValue);
+            if ($curVal != "") {
+                $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
+                if ($this->payment_method_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->payment_method_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->payment_method_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->payment_method_id->ViewValue = $this->payment_method_id->displayValue($arwrk);
+                    } else {
+                        $this->payment_method_id->ViewValue = FormatNumber($this->payment_method_id->CurrentValue, $this->payment_method_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->payment_method_id->ViewValue = null;
+            }
+
+            // medical_scheme_id
+            $curVal = strval($this->medical_scheme_id->CurrentValue);
+            if ($curVal != "") {
+                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
+                if ($this->medical_scheme_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->medical_scheme_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->medical_scheme_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->displayValue($arwrk);
+                    } else {
+                        $this->medical_scheme_id->ViewValue = FormatNumber($this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->medical_scheme_id->ViewValue = null;
+            }
+
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
@@ -908,9 +980,13 @@ class PatientAdmissionsEdit extends PatientAdmissions
 
             // patient_id
             $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
+            // payment_method_id
+            $this->payment_method_id->HrefValue = "";
+
+            // medical_scheme_id
+            $this->medical_scheme_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -918,63 +994,82 @@ class PatientAdmissionsEdit extends PatientAdmissions
 
             // patient_id
             $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
-                        }
+            $this->patient_id->EditValue = $this->patient_id->CurrentValue;
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->EditValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->EditValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->EditValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->EditValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
                     }
-                } else {
-                    $this->patient_id->ViewValue = null;
                 }
             } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $curVal = strval($this->patient_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->patient_id->EditValue = $this->patient_id->lookupCacheOption($curVal);
-                    if ($this->patient_id->EditValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                        $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCache($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->patient_id->EditValue = $this->patient_id->displayValue($arwrk);
-                        } else {
-                            $this->patient_id->EditValue = HtmlEncode(FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern()));
-                        }
-                    }
-                } else {
-                    $this->patient_id->EditValue = null;
-                }
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
+                $this->patient_id->EditValue = null;
             }
 
-            // status
-            $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            // payment_method_id
+            $this->payment_method_id->setupEditAttributes();
+            $curVal = trim(strval($this->payment_method_id->CurrentValue));
+            if ($curVal != "") {
+                $this->payment_method_id->ViewValue = $this->payment_method_id->lookupCacheOption($curVal);
+            } else {
+                $this->payment_method_id->ViewValue = $this->payment_method_id->Lookup !== null && is_array($this->payment_method_id->lookupOptions()) && count($this->payment_method_id->lookupOptions()) > 0 ? $curVal : null;
             }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+            if ($this->payment_method_id->ViewValue !== null) { // Load from cache
+                $this->payment_method_id->EditValue = array_values($this->payment_method_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->payment_method_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->payment_method_id->CurrentValue, $this->payment_method_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->payment_method_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->payment_method_id->EditValue = $arwrk;
+            }
+            $this->payment_method_id->PlaceHolder = RemoveHtml($this->payment_method_id->caption());
+
+            // medical_scheme_id
+            $this->medical_scheme_id->setupEditAttributes();
+            $curVal = trim(strval($this->medical_scheme_id->CurrentValue));
+            if ($curVal != "") {
+                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->lookupCacheOption($curVal);
+            } else {
+                $this->medical_scheme_id->ViewValue = $this->medical_scheme_id->Lookup !== null && is_array($this->medical_scheme_id->lookupOptions()) && count($this->medical_scheme_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->medical_scheme_id->ViewValue !== null) { // Load from cache
+                $this->medical_scheme_id->EditValue = array_values($this->medical_scheme_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->medical_scheme_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->medical_scheme_id->EditValue = $arwrk;
+            }
+            $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
 
             // Edit refer script
 
@@ -983,9 +1078,13 @@ class PatientAdmissionsEdit extends PatientAdmissions
 
             // patient_id
             $this->patient_id->HrefValue = "";
+            $this->patient_id->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
+            // payment_method_id
+            $this->payment_method_id->HrefValue = "";
+
+            // medical_scheme_id
+            $this->medical_scheme_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1017,12 +1116,14 @@ class PatientAdmissionsEdit extends PatientAdmissions
                     $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
+            if ($this->payment_method_id->Visible && $this->payment_method_id->Required) {
+                if (!$this->payment_method_id->IsDetailKey && EmptyValue($this->payment_method_id->FormValue)) {
+                    $this->payment_method_id->addErrorMessage(str_replace("%s", $this->payment_method_id->caption(), $this->payment_method_id->RequiredErrorMessage));
+                }
             }
-            if ($this->status->Visible && $this->status->Required) {
-                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
-                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+            if ($this->medical_scheme_id->Visible && $this->medical_scheme_id->Required) {
+                if (!$this->medical_scheme_id->IsDetailKey && EmptyValue($this->medical_scheme_id->FormValue)) {
+                    $this->medical_scheme_id->addErrorMessage(str_replace("%s", $this->medical_scheme_id->caption(), $this->medical_scheme_id->RequiredErrorMessage));
                 }
             }
 
@@ -1213,14 +1314,11 @@ class PatientAdmissionsEdit extends PatientAdmissions
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->ReadOnly = true;
-        }
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
+        // payment_method_id
+        $this->payment_method_id->setDbValueDef($rsnew, $this->payment_method_id->CurrentValue, $this->payment_method_id->ReadOnly);
 
-        // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
+        // medical_scheme_id
+        $this->medical_scheme_id->setDbValueDef($rsnew, $this->medical_scheme_id->CurrentValue, $this->medical_scheme_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1230,11 +1328,11 @@ class PatientAdmissionsEdit extends PatientAdmissions
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->CurrentValue = $row['patient_id'];
+        if (isset($row['payment_method_id'])) { // payment_method_id
+            $this->payment_method_id->CurrentValue = $row['payment_method_id'];
         }
-        if (isset($row['status'])) { // status
-            $this->status->CurrentValue = $row['status'];
+        if (isset($row['medical_scheme_id'])) { // medical_scheme_id
+            $this->medical_scheme_id->CurrentValue = $row['medical_scheme_id'];
         }
     }
 
@@ -1459,6 +1557,10 @@ class PatientAdmissionsEdit extends PatientAdmissions
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_patient_id":
+                    break;
+                case "x_payment_method_id":
+                    break;
+                case "x_medical_scheme_id":
                     break;
                 default:
                     $lookupFilter = "";

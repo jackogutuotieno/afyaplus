@@ -26,6 +26,8 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
+            "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -271,6 +273,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_id->Visible) { // patient_id ?>
         <th data-name="patient_id" class="<?= $Page->patient_id->headerCellClass() ?>"><div id="elh_patient_admissions_patient_id" class="patient_admissions_patient_id"><?= $Page->renderFieldHeader($Page->patient_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <th data-name="payment_method_id" class="<?= $Page->payment_method_id->headerCellClass() ?>"><div id="elh_patient_admissions_payment_method_id" class="patient_admissions_payment_method_id"><?= $Page->renderFieldHeader($Page->payment_method_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <th data-name="medical_scheme_id" class="<?= $Page->medical_scheme_id->headerCellClass() ?>"><div id="elh_patient_admissions_medical_scheme_id" class="patient_admissions_medical_scheme_id"><?= $Page->renderFieldHeader($Page->medical_scheme_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_patient_admissions_status" class="patient_admissions_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
@@ -318,6 +326,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_admissions_patient_id" class="el_patient_admissions_patient_id">
 <span<?= $Page->patient_id->viewAttributes() ?>>
 <?= $Page->patient_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+        <td data-name="payment_method_id"<?= $Page->payment_method_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_admissions_payment_method_id" class="el_patient_admissions_payment_method_id">
+<span<?= $Page->payment_method_id->viewAttributes() ?>>
+<?= $Page->payment_method_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+        <td data-name="medical_scheme_id"<?= $Page->medical_scheme_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patient_admissions_medical_scheme_id" class="el_patient_admissions_medical_scheme_id">
+<span<?= $Page->medical_scheme_id->viewAttributes() ?>>
+<?= $Page->medical_scheme_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -222,6 +222,7 @@ return [
     "discharge_summary_report" => \DI\create(DischargeSummaryReport::class),
     "patient_ipd_prescription_details" => \DI\create(PatientIpdPrescriptionDetails::class),
     "patient_ipd_prescriptions" => \DI\create(PatientIpdPrescriptions::class),
+    "ipd_billing_report" => \DI\create(IpdBillingReport::class),
 
     // User table
     "usertable" => \DI\get("users"),
