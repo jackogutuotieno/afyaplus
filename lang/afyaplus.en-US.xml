@@ -69,7 +69,7 @@
       <phrase id="menutext" value="Notifications" />
     </menu>
     <menu id="51">
-      <phrase id="menutext" value="Outpatient Services" />
+      <phrase id="menutext" value="OPD Services" />
     </menu>
     <menu id="48">
       <phrase id="menutext" value="Patients List" />
@@ -111,7 +111,7 @@
       <phrase id="menutext" value="Cash Payments" />
     </menu>
     <menu id="746">
-      <phrase id="menutext" value="Inpatient Services" />
+      <phrase id="menutext" value="IPD Services" />
     </menu>
     <menu id="645">
       <phrase id="menutext" value="Patients List" />
@@ -126,13 +126,13 @@
       <phrase id="menutext" value="Discharge Patient" />
     </menu>
     <menu id="1031">
-      <phrase id="menutext" value="Discharge Sheets" />
+      <phrase id="menutext" value="Discharge Summary" />
     </menu>
     <menu id="1033">
       <phrase id="menutext" value="Prescriptions" />
     </menu>
     <menu id="1037">
-      <phrase id="menutext" value="Disensation" />
+      <phrase id="menutext" value="Dispensation" />
     </menu>
     <menu id="1038">
       <phrase id="menutext" value="Disensation Details" />
@@ -215,23 +215,29 @@
     <menu id="236">
       <phrase id="menutext" value="Billing" />
     </menu>
+    <menu id="1166">
+      <phrase id="menutext" value="OPD" />
+    </menu>
     <menu id="174">
       <phrase id="menutext" value="Laboratory" />
-    </menu>
-    <menu id="175">
-      <phrase id="menutext" value="Laboratory Bill" />
     </menu>
     <menu id="237">
       <phrase id="menutext" value="Radiology" />
     </menu>
-    <menu id="238">
-      <phrase id="menutext" value="Radiology Bill" />
-    </menu>
     <menu id="239">
       <phrase id="menutext" value="Pharmacy" />
     </menu>
+    <menu id="1167">
+      <phrase id="menutext" value="IPD" />
+    </menu>
     <menu id="1034">
-      <phrase id="menutext" value="IPD Billing" />
+      <phrase id="menutext" value="Master Bill" />
+    </menu>
+    <menu id="175">
+      <phrase id="menutext" value="Laboratory Bill" />
+    </menu>
+    <menu id="238">
+      <phrase id="menutext" value="Radiology Bill" />
     </menu>
     <menu id="1035">
       <phrase id="menutext" value="Issued Items" />
@@ -3860,7 +3866,7 @@
       <phrase id="tblcaption" value="Procurement Overview" />
     </table>
     <table id="discharge_summary_report">
-      <phrase id="tblcaption" value="Dischage Summary Report" />
+      <phrase id="tblcaption" value="Dischage Summary" />
       <field id="id">
         <phrase id="fldcaption" value="Admission No" />
       </field>
@@ -4057,7 +4063,7 @@
       </field>
     </table>
     <table id="medicine_ipd_dispensation">
-      <phrase id="tblcaption" value="Disensation" />
+      <phrase id="tblcaption" value="Dispensation" />
       <field id="id">
         <phrase id="fldcaption" value="S/NO" />
       </field>

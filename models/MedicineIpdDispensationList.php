@@ -146,10 +146,10 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->admission_id->setVisibility();
-        $this->prescription_id->setVisibility();
+        $this->id->Visible = false;
+        $this->patient_id->Visible = false;
+        $this->admission_id->Visible = false;
+        $this->prescription_id->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -716,6 +716,7 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->status);
         $this->setupLookupOptions($this->created_by_user_id);
 
@@ -1308,10 +1309,6 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->patient_id); // patient_id
-            $this->updateSort($this->admission_id); // admission_id
-            $this->updateSort($this->prescription_id); // prescription_id
             $this->updateSort($this->status); // status
             $this->updateSort($this->created_by_user_id); // created_by_user_id
             $this->updateSort($this->date_created); // date_created
@@ -1707,10 +1704,6 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "patient_id");
-            $this->createColumnOption($option, "admission_id");
-            $this->createColumnOption($option, "prescription_id");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "created_by_user_id");
             $this->createColumnOption($option, "date_created");
@@ -2238,7 +2231,27 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
 
             // patient_id
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // admission_id
             $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
@@ -2285,22 +2298,6 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-            $this->admission_id->TooltipValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -2694,6 +2691,8 @@ class MedicineIpdDispensationList extends MedicineIpdDispensation
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 case "x_status":
                     break;
                 case "x_created_by_user_id":

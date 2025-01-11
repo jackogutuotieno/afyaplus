@@ -153,6 +153,8 @@ class IpdBillingReport extends DbTable
         $this->patient_uhid->Raw = true;
         $this->patient_uhid->IsAutoIncrement = true; // Autoincrement field
         $this->patient_uhid->Nullable = false; // NOT NULL field
+        $this->patient_uhid->UseFilter = true; // Table header filter
+        $this->patient_uhid->Lookup = new Lookup($this->patient_uhid, 'ipd_billing_report', true, 'patient_uhid', ["patient_uhid","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->patient_uhid->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->patient_uhid->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['patient_uhid'] = &$this->patient_uhid;
@@ -176,6 +178,8 @@ class IpdBillingReport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->patient_name->InputTextType = "text";
+        $this->patient_name->UseFilter = true; // Table header filter
+        $this->patient_name->Lookup = new Lookup($this->patient_name, 'ipd_billing_report', true, 'patient_name', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['patient_name'] = &$this->patient_name;
 

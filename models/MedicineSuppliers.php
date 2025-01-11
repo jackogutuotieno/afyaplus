@@ -156,6 +156,8 @@ class MedicineSuppliers extends DbTable
         $this->supplier_name->InputTextType = "text";
         $this->supplier_name->Nullable = false; // NOT NULL field
         $this->supplier_name->Required = true; // Required field
+        $this->supplier_name->UseFilter = true; // Table header filter
+        $this->supplier_name->Lookup = new Lookup($this->supplier_name, 'medicine_suppliers', true, 'supplier_name', ["supplier_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->supplier_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['supplier_name'] = &$this->supplier_name;
 

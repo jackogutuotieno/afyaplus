@@ -20725,4 +20725,8 @@ span span p {
   display: none;
 }
 
+.medicine-ipd-dispensation .ew-list-options .ew-add {
+  display: none;
+}
+
 /*END_USER_STYLES*/

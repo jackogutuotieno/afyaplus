@@ -136,10 +136,10 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->setVisibility();
-        $this->patient_id->setVisibility();
-        $this->admission_id->setVisibility();
-        $this->prescription_id->setVisibility();
+        $this->id->Visible = false;
+        $this->patient_id->Visible = false;
+        $this->admission_id->Visible = false;
+        $this->prescription_id->Visible = false;
         $this->status->setVisibility();
         $this->created_by_user_id->setVisibility();
         $this->date_created->setVisibility();
@@ -628,6 +628,7 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->status);
         $this->setupLookupOptions($this->created_by_user_id);
 
@@ -1101,30 +1102,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
     public function emptyRow()
     {
         global $CurrentForm;
-        if (
-            $CurrentForm->hasValue("x_patient_id") &&
-            $CurrentForm->hasValue("o_patient_id") &&
-            $this->patient_id->CurrentValue != $this->patient_id->DefaultValue &&
-            !($this->patient_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->patient_id->CurrentValue == $this->patient_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_admission_id") &&
-            $CurrentForm->hasValue("o_admission_id") &&
-            $this->admission_id->CurrentValue != $this->admission_id->DefaultValue &&
-            !($this->admission_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->admission_id->CurrentValue == $this->admission_id->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_prescription_id") &&
-            $CurrentForm->hasValue("o_prescription_id") &&
-            $this->prescription_id->CurrentValue != $this->prescription_id->DefaultValue &&
-            !($this->prescription_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->prescription_id->CurrentValue == $this->prescription_id->getSessionValue())
-        ) {
-            return false;
-        }
         if (
             $CurrentForm->hasValue("x_status") &&
             $CurrentForm->hasValue("o_status") &&
@@ -1700,51 +1677,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
-        }
-
-        // Check field name 'patient_id' first before field var 'x_patient_id'
-        $val = $CurrentForm->hasValue("patient_id") ? $CurrentForm->getValue("patient_id") : $CurrentForm->getValue("x_patient_id");
-        if (!$this->patient_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->patient_id->Visible = false; // Disable update for API request
-            } else {
-                $this->patient_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_patient_id")) {
-            $this->patient_id->setOldValue($CurrentForm->getValue("o_patient_id"));
-        }
-
-        // Check field name 'admission_id' first before field var 'x_admission_id'
-        $val = $CurrentForm->hasValue("admission_id") ? $CurrentForm->getValue("admission_id") : $CurrentForm->getValue("x_admission_id");
-        if (!$this->admission_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->admission_id->Visible = false; // Disable update for API request
-            } else {
-                $this->admission_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_admission_id")) {
-            $this->admission_id->setOldValue($CurrentForm->getValue("o_admission_id"));
-        }
-
-        // Check field name 'prescription_id' first before field var 'x_prescription_id'
-        $val = $CurrentForm->hasValue("prescription_id") ? $CurrentForm->getValue("prescription_id") : $CurrentForm->getValue("x_prescription_id");
-        if (!$this->prescription_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->prescription_id->Visible = false; // Disable update for API request
-            } else {
-                $this->prescription_id->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_prescription_id")) {
-            $this->prescription_id->setOldValue($CurrentForm->getValue("o_prescription_id"));
-        }
-
         // Check field name 'status' first before field var 'x_status'
         $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
         if (!$this->status->IsDetailKey) {
@@ -1798,6 +1730,12 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         if ($CurrentForm->hasValue("o_date_updated")) {
             $this->date_updated->setOldValue($CurrentForm->getValue("o_date_updated"));
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
     }
 
     // Restore form values
@@ -1807,9 +1745,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
-        $this->patient_id->CurrentValue = $this->patient_id->FormValue;
-        $this->admission_id->CurrentValue = $this->admission_id->FormValue;
-        $this->prescription_id->CurrentValue = $this->prescription_id->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
         $this->created_by_user_id->CurrentValue = $this->created_by_user_id->FormValue;
         $this->date_created->CurrentValue = $this->date_created->FormValue;
@@ -1994,7 +1929,27 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
 
             // patient_id
             $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-            $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
+            $curVal = strval($this->patient_id->CurrentValue);
+            if ($curVal != "") {
+                $this->patient_id->ViewValue = $this->patient_id->lookupCacheOption($curVal);
+                if ($this->patient_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->patient_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->patient_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->patient_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->patient_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->patient_id->ViewValue = $this->patient_id->displayValue($arwrk);
+                    } else {
+                        $this->patient_id->ViewValue = FormatNumber($this->patient_id->CurrentValue, $this->patient_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->patient_id->ViewValue = null;
+            }
 
             // admission_id
             $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
@@ -2042,22 +1997,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
-            // id
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // patient_id
-            $this->patient_id->HrefValue = "";
-            $this->patient_id->TooltipValue = "";
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-            $this->admission_id->TooltipValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
-
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
@@ -2074,46 +2013,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
             $this->date_updated->HrefValue = "";
             $this->date_updated->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // id
-
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-            } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-                }
-            }
-
-            // admission_id
-            $this->admission_id->setupEditAttributes();
-            if ($this->admission_id->getSessionValue() != "") {
-                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
-                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
-            } else {
-                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
-                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
-                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
-                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
-                }
-            }
-
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
-            }
-
             // status
             $this->status->setupEditAttributes();
             $this->status->EditValue = $this->status->options(true);
@@ -2133,18 +2032,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
 
             // Add refer script
 
-            // id
-            $this->id->HrefValue = "";
-
-            // patient_id
-            $this->patient_id->HrefValue = "";
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-
             // status
             $this->status->HrefValue = "";
 
@@ -2157,48 +2044,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
             // date_updated
             $this->date_updated->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // id
-            $this->id->setupEditAttributes();
-            $this->id->EditValue = $this->id->CurrentValue;
-
-            // patient_id
-            $this->patient_id->setupEditAttributes();
-            if ($this->patient_id->getSessionValue() != "") {
-                $this->patient_id->CurrentValue = GetForeignKeyValue($this->patient_id->getSessionValue());
-                $this->patient_id->OldValue = $this->patient_id->CurrentValue;
-                $this->patient_id->ViewValue = $this->patient_id->CurrentValue;
-                $this->patient_id->ViewValue = FormatNumber($this->patient_id->ViewValue, $this->patient_id->formatPattern());
-            } else {
-                $this->patient_id->EditValue = $this->patient_id->CurrentValue;
-                $this->patient_id->PlaceHolder = RemoveHtml($this->patient_id->caption());
-                if (strval($this->patient_id->EditValue) != "" && is_numeric($this->patient_id->EditValue)) {
-                    $this->patient_id->EditValue = FormatNumber($this->patient_id->EditValue, null);
-                }
-            }
-
-            // admission_id
-            $this->admission_id->setupEditAttributes();
-            if ($this->admission_id->getSessionValue() != "") {
-                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
-                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
-                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
-            } else {
-                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
-                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
-                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
-                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
-                }
-            }
-
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-            $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-            if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
-            }
-
             // status
             $this->status->setupEditAttributes();
             $this->status->EditValue = $this->status->options(true);
@@ -2217,18 +2062,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
             $this->date_updated->PlaceHolder = RemoveHtml($this->date_updated->caption());
 
             // Edit refer script
-
-            // id
-            $this->id->HrefValue = "";
-
-            // patient_id
-            $this->patient_id->HrefValue = "";
-
-            // admission_id
-            $this->admission_id->HrefValue = "";
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
 
             // status
             $this->status->HrefValue = "";
@@ -2262,35 +2095,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
             return true;
         }
         $validateForm = true;
-            if ($this->id->Visible && $this->id->Required) {
-                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->patient_id->Visible && $this->patient_id->Required) {
-                if (!$this->patient_id->IsDetailKey && EmptyValue($this->patient_id->FormValue)) {
-                    $this->patient_id->addErrorMessage(str_replace("%s", $this->patient_id->caption(), $this->patient_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->patient_id->FormValue)) {
-                $this->patient_id->addErrorMessage($this->patient_id->getErrorMessage(false));
-            }
-            if ($this->admission_id->Visible && $this->admission_id->Required) {
-                if (!$this->admission_id->IsDetailKey && EmptyValue($this->admission_id->FormValue)) {
-                    $this->admission_id->addErrorMessage(str_replace("%s", $this->admission_id->caption(), $this->admission_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->admission_id->FormValue)) {
-                $this->admission_id->addErrorMessage($this->admission_id->getErrorMessage(false));
-            }
-            if ($this->prescription_id->Visible && $this->prescription_id->Required) {
-                if (!$this->prescription_id->IsDetailKey && EmptyValue($this->prescription_id->FormValue)) {
-                    $this->prescription_id->addErrorMessage(str_replace("%s", $this->prescription_id->caption(), $this->prescription_id->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->prescription_id->FormValue)) {
-                $this->prescription_id->addErrorMessage($this->prescription_id->getErrorMessage(false));
-            }
             if ($this->status->Visible && $this->status->Required) {
                 if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
                     $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
@@ -2467,21 +2271,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        if ($this->patient_id->getSessionValue() != "") {
-            $this->patient_id->ReadOnly = true;
-        }
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, $this->patient_id->ReadOnly);
-
-        // admission_id
-        if ($this->admission_id->getSessionValue() != "") {
-            $this->admission_id->ReadOnly = true;
-        }
-        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, $this->admission_id->ReadOnly);
-
-        // prescription_id
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, $this->prescription_id->ReadOnly);
-
         // status
         $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
 
@@ -2503,15 +2292,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->CurrentValue = $row['patient_id'];
-        }
-        if (isset($row['admission_id'])) { // admission_id
-            $this->admission_id->CurrentValue = $row['admission_id'];
-        }
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->CurrentValue = $row['prescription_id'];
-        }
         if (isset($row['status'])) { // status
             $this->status->CurrentValue = $row['status'];
         }
@@ -2585,15 +2365,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         global $Security;
         $rsnew = [];
 
-        // patient_id
-        $this->patient_id->setDbValueDef($rsnew, $this->patient_id->CurrentValue, false);
-
-        // admission_id
-        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, false);
-
-        // prescription_id
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, false);
-
         // status
         $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, false);
 
@@ -2606,6 +2377,16 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
 
         // date_updated
         $this->date_updated->setDbValueDef($rsnew, UnFormatDateTime($this->date_updated->CurrentValue, $this->date_updated->formatPattern()), false);
+
+        // patient_id
+        if ($this->patient_id->getSessionValue() != "") {
+            $rsnew['patient_id'] = $this->patient_id->getSessionValue();
+        }
+
+        // admission_id
+        if ($this->admission_id->getSessionValue() != "") {
+            $rsnew['admission_id'] = $this->admission_id->getSessionValue();
+        }
         return $rsnew;
     }
 
@@ -2615,15 +2396,6 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['patient_id'])) { // patient_id
-            $this->patient_id->setFormValue($row['patient_id']);
-        }
-        if (isset($row['admission_id'])) { // admission_id
-            $this->admission_id->setFormValue($row['admission_id']);
-        }
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->setFormValue($row['prescription_id']);
-        }
         if (isset($row['status'])) { // status
             $this->status->setFormValue($row['status']);
         }
@@ -2635,6 +2407,12 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
         }
         if (isset($row['date_updated'])) { // date_updated
             $this->date_updated->setFormValue($row['date_updated']);
+        }
+        if (isset($row['patient_id'])) { // patient_id
+            $this->patient_id->setFormValue($row['patient_id']);
+        }
+        if (isset($row['admission_id'])) { // admission_id
+            $this->admission_id->setFormValue($row['admission_id']);
         }
     }
 
@@ -2671,6 +2449,8 @@ class MedicineIpdDispensationGrid extends MedicineIpdDispensation
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_patient_id":
+                    break;
                 case "x_status":
                     break;
                 case "x_created_by_user_id":

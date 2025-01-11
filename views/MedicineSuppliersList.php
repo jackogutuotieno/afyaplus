@@ -22,6 +22,11 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "supplier_name": <?= $Page->supplier_name->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -56,6 +61,9 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fmedicine_supplierssrch" id="fmedicine_supplierssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fmedicine_supplierssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -76,8 +84,43 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "supplier_name": <?= $Page->supplier_name->toClientList($Page) ?>,
         })
 
         // Filters
@@ -92,6 +135,52 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->supplier_name->Visible) { // supplier_name ?>
+<?php
+if (!$Page->supplier_name->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_supplier_name" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->supplier_name->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_supplier_name"
+            name="x_supplier_name[]"
+            class="form-control ew-select<?= $Page->supplier_name->isInvalidClass() ?>"
+            data-select2-id="fmedicine_supplierssrch_x_supplier_name"
+            data-table="medicine_suppliers"
+            data-field="x_supplier_name"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->supplier_name->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->supplier_name->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->supplier_name->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->supplier_name->editAttributes() ?>>
+            <?= $Page->supplier_name->selectOptionListHtml("x_supplier_name", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->supplier_name->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fmedicine_supplierssrch", function() {
+            var options = {
+                name: "x_supplier_name",
+                selectId: "fmedicine_supplierssrch_x_supplier_name",
+                ajax: { id: "x_supplier_name", form: "fmedicine_supplierssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.medicine_suppliers.fields.supplier_name.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">

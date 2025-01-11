@@ -782,14 +782,23 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -808,6 +817,14 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
@@ -823,6 +840,16 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1207,6 +1234,132 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->patient_id, $default, false); // patient_id
+        $this->buildSearchSql($where, $this->patient_name, $default, true); // patient_name
+        $this->buildSearchSql($where, $this->age, $default, false); // age
+        $this->buildSearchSql($where, $this->gender, $default, true); // gender
+        $this->buildSearchSql($where, $this->status, $default, false); // status
+        $this->buildSearchSql($where, $this->admission_reason, $default, false); // admission_reason
+        $this->buildSearchSql($where, $this->discharge_condition, $default, false); // discharge_condition
+        $this->buildSearchSql($where, $this->created_by_user_id, $default, false); // created_by_user_id
+        $this->buildSearchSql($where, $this->admission_date, $default, false); // admission_date
+        $this->buildSearchSql($where, $this->discharge_date, $default, false); // discharge_date
+        $this->buildSearchSql($where, $this->total_days, $default, false); // total_days
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->patient_name->AdvancedSearch->save(); // patient_name
+            $this->age->AdvancedSearch->save(); // age
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->status->AdvancedSearch->save(); // status
+            $this->admission_reason->AdvancedSearch->save(); // admission_reason
+            $this->discharge_condition->AdvancedSearch->save(); // discharge_condition
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->admission_date->AdvancedSearch->save(); // admission_date
+            $this->discharge_date->AdvancedSearch->save(); // discharge_date
+            $this->total_days->AdvancedSearch->save(); // total_days
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->patient_id->AdvancedSearch->save(); // patient_id
+            $this->patient_name->AdvancedSearch->save(); // patient_name
+            $this->age->AdvancedSearch->save(); // age
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->status->AdvancedSearch->save(); // status
+            $this->admission_reason->AdvancedSearch->save(); // admission_reason
+            $this->discharge_condition->AdvancedSearch->save(); // discharge_condition
+            $this->created_by_user_id->AdvancedSearch->save(); // created_by_user_id
+            $this->admission_date->AdvancedSearch->save(); // admission_date
+            $this->discharge_date->AdvancedSearch->save(); // discharge_date
+            $this->total_days->AdvancedSearch->save(); // total_days
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
     // Show list of filters
     public function showFilterList()
     {
@@ -1216,6 +1369,60 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field patient_name
+        $filter = $this->queryBuilderWhere("patient_name");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->patient_name, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field age
+        $filter = $this->queryBuilderWhere("age");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->age, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->age->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field gender
+        $filter = $this->queryBuilderWhere("gender");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->gender, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->gender->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field status
+        $filter = $this->queryBuilderWhere("status");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->status, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field admission_date
+        $filter = $this->queryBuilderWhere("admission_date");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->admission_date, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->admission_date->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field discharge_date
+        $filter = $this->queryBuilderWhere("discharge_date");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->discharge_date, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->discharge_date->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1275,6 +1482,42 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->patient_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->patient_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->age->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->gender->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->status->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->admission_reason->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->discharge_condition->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->created_by_user_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->admission_date->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->discharge_date->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->total_days->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1287,6 +1530,12 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1301,6 +1550,23 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->patient_id->AdvancedSearch->unsetSession();
+        $this->patient_name->AdvancedSearch->unsetSession();
+        $this->age->AdvancedSearch->unsetSession();
+        $this->gender->AdvancedSearch->unsetSession();
+        $this->status->AdvancedSearch->unsetSession();
+        $this->admission_reason->AdvancedSearch->unsetSession();
+        $this->discharge_condition->AdvancedSearch->unsetSession();
+        $this->created_by_user_id->AdvancedSearch->unsetSession();
+        $this->admission_date->AdvancedSearch->unsetSession();
+        $this->discharge_date->AdvancedSearch->unsetSession();
+        $this->total_days->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1308,6 +1574,20 @@ class DischargeSummaryReportList extends DischargeSummaryReport
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->patient_name->AdvancedSearch->load();
+        $this->age->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
+        $this->admission_reason->AdvancedSearch->load();
+        $this->discharge_condition->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->admission_date->AdvancedSearch->load();
+        $this->discharge_date->AdvancedSearch->load();
+        $this->total_days->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -2079,6 +2359,117 @@ class DischargeSummaryReportList extends DischargeSummaryReport
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // patient_id
+        if ($this->patient_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->patient_id->AdvancedSearch->SearchValue != "" || $this->patient_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // patient_name
+        if ($this->patient_name->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->patient_name->AdvancedSearch->SearchValue != "" || $this->patient_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // age
+        if ($this->age->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->age->AdvancedSearch->SearchValue != "" || $this->age->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // gender
+        if ($this->gender->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->gender->AdvancedSearch->SearchValue != "" || $this->gender->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // status
+        if ($this->status->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // admission_reason
+        if ($this->admission_reason->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->admission_reason->AdvancedSearch->SearchValue != "" || $this->admission_reason->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // discharge_condition
+        if ($this->discharge_condition->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->discharge_condition->AdvancedSearch->SearchValue != "" || $this->discharge_condition->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // created_by_user_id
+        if ($this->created_by_user_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->created_by_user_id->AdvancedSearch->SearchValue != "" || $this->created_by_user_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // admission_date
+        if ($this->admission_date->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->admission_date->AdvancedSearch->SearchValue != "" || $this->admission_date->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // discharge_date
+        if ($this->discharge_date->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->discharge_date->AdvancedSearch->SearchValue != "" || $this->discharge_date->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // total_days
+        if ($this->total_days->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->total_days->AdvancedSearch->SearchValue != "" || $this->total_days->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -2353,12 +2744,88 @@ class DischargeSummaryReportList extends DischargeSummaryReport
             // discharge_date
             $this->discharge_date->HrefValue = "";
             $this->discharge_date->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_name
+            if ($this->patient_name->UseFilter && !EmptyValue($this->patient_name->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_name->AdvancedSearch->SearchValue)) {
+                    $this->patient_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
+                }
+                $this->patient_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
+            }
+
+            // age
+            $this->age->setupEditAttributes();
+            $this->age->EditValue = $this->age->AdvancedSearch->SearchValue;
+            $this->age->PlaceHolder = RemoveHtml($this->age->caption());
+
+            // gender
+            if ($this->gender->UseFilter && !EmptyValue($this->gender->AdvancedSearch->SearchValue)) {
+                if (is_array($this->gender->AdvancedSearch->SearchValue)) {
+                    $this->gender->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
+                }
+                $this->gender->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->gender->AdvancedSearch->SearchValue);
+            }
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // admission_date
+            $this->admission_date->setupEditAttributes();
+            $this->admission_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->admission_date->AdvancedSearch->SearchValue, $this->admission_date->formatPattern()), $this->admission_date->formatPattern()));
+            $this->admission_date->PlaceHolder = RemoveHtml($this->admission_date->caption());
+
+            // discharge_date
+            $this->discharge_date->setupEditAttributes();
+            $this->discharge_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->discharge_date->AdvancedSearch->SearchValue, $this->discharge_date->formatPattern()), $this->discharge_date->formatPattern()));
+            $this->discharge_date->PlaceHolder = RemoveHtml($this->discharge_date->caption());
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->patient_id->AdvancedSearch->load();
+        $this->patient_name->AdvancedSearch->load();
+        $this->age->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
+        $this->admission_reason->AdvancedSearch->load();
+        $this->discharge_condition->AdvancedSearch->load();
+        $this->created_by_user_id->AdvancedSearch->load();
+        $this->admission_date->AdvancedSearch->load();
+        $this->discharge_date->AdvancedSearch->load();
+        $this->total_days->AdvancedSearch->load();
     }
 
     // Get export HTML tag

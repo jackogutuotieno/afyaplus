@@ -22,6 +22,12 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "patient_uhid": <?= $Page->patient_uhid->toClientList($Page) ?>,
+            "patient_name": <?= $Page->patient_name->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -56,6 +62,9 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fipd_billing_reportsrch" id="fipd_billing_reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fipd_billing_reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -76,8 +85,44 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "patient_uhid": <?= $Page->patient_uhid->toClientList($Page) ?>,
+            "patient_name": <?= $Page->patient_name->toClientList($Page) ?>,
         })
 
         // Filters
@@ -92,6 +137,90 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->patient_uhid->Visible) { // patient_uhid ?>
+<?php
+if (!$Page->patient_uhid->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_patient_uhid" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_uhid->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_patient_uhid"
+            name="x_patient_uhid[]"
+            class="form-control ew-select<?= $Page->patient_uhid->isInvalidClass() ?>"
+            data-select2-id="fipd_billing_reportsrch_x_patient_uhid"
+            data-table="ipd_billing_report"
+            data-field="x_patient_uhid"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_uhid->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->patient_uhid->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->patient_uhid->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->patient_uhid->editAttributes() ?>>
+            <?= $Page->patient_uhid->selectOptionListHtml("x_patient_uhid", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->patient_uhid->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fipd_billing_reportsrch", function() {
+            var options = {
+                name: "x_patient_uhid",
+                selectId: "fipd_billing_reportsrch_x_patient_uhid",
+                ajax: { id: "x_patient_uhid", form: "fipd_billing_reportsrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.ipd_billing_report.fields.patient_uhid.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->patient_name->Visible) { // patient_name ?>
+<?php
+if (!$Page->patient_name->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_patient_name" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->patient_name->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_patient_name"
+            name="x_patient_name[]"
+            class="form-control ew-select<?= $Page->patient_name->isInvalidClass() ?>"
+            data-select2-id="fipd_billing_reportsrch_x_patient_name"
+            data-table="ipd_billing_report"
+            data-field="x_patient_name"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->patient_name->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->patient_name->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->patient_name->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->patient_name->editAttributes() ?>>
+            <?= $Page->patient_name->selectOptionListHtml("x_patient_name", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->patient_name->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fipd_billing_reportsrch", function() {
+            var options = {
+                name: "x_patient_name",
+                selectId: "fipd_billing_reportsrch_x_patient_name",
+                ajax: { id: "x_patient_name", form: "fipd_billing_reportsrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.ipd_billing_report.fields.patient_name.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">

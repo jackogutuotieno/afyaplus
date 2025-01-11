@@ -10,50 +10,6 @@ $medicine_ipd_dispensation->TableClass = "table table-bordered table-hover table
 <div class="ew-master-div">
 <table id="tbl_medicine_ipd_dispensationmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($medicine_ipd_dispensation->id->Visible) { // id ?>
-        <tr id="r_id"<?= $medicine_ipd_dispensation->id->rowAttributes() ?>>
-            <td class="<?= $medicine_ipd_dispensation->TableLeftColumnClass ?>"><?= $medicine_ipd_dispensation->id->caption() ?></td>
-            <td<?= $medicine_ipd_dispensation->id->cellAttributes() ?>>
-<span id="el_medicine_ipd_dispensation_id">
-<span<?= $medicine_ipd_dispensation->id->viewAttributes() ?>>
-<?= $medicine_ipd_dispensation->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($medicine_ipd_dispensation->patient_id->Visible) { // patient_id ?>
-        <tr id="r_patient_id"<?= $medicine_ipd_dispensation->patient_id->rowAttributes() ?>>
-            <td class="<?= $medicine_ipd_dispensation->TableLeftColumnClass ?>"><?= $medicine_ipd_dispensation->patient_id->caption() ?></td>
-            <td<?= $medicine_ipd_dispensation->patient_id->cellAttributes() ?>>
-<span id="el_medicine_ipd_dispensation_patient_id">
-<span<?= $medicine_ipd_dispensation->patient_id->viewAttributes() ?>>
-<?= $medicine_ipd_dispensation->patient_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($medicine_ipd_dispensation->admission_id->Visible) { // admission_id ?>
-        <tr id="r_admission_id"<?= $medicine_ipd_dispensation->admission_id->rowAttributes() ?>>
-            <td class="<?= $medicine_ipd_dispensation->TableLeftColumnClass ?>"><?= $medicine_ipd_dispensation->admission_id->caption() ?></td>
-            <td<?= $medicine_ipd_dispensation->admission_id->cellAttributes() ?>>
-<span id="el_medicine_ipd_dispensation_admission_id">
-<span<?= $medicine_ipd_dispensation->admission_id->viewAttributes() ?>>
-<?= $medicine_ipd_dispensation->admission_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($medicine_ipd_dispensation->prescription_id->Visible) { // prescription_id ?>
-        <tr id="r_prescription_id"<?= $medicine_ipd_dispensation->prescription_id->rowAttributes() ?>>
-            <td class="<?= $medicine_ipd_dispensation->TableLeftColumnClass ?>"><?= $medicine_ipd_dispensation->prescription_id->caption() ?></td>
-            <td<?= $medicine_ipd_dispensation->prescription_id->cellAttributes() ?>>
-<span id="el_medicine_ipd_dispensation_prescription_id">
-<span<?= $medicine_ipd_dispensation->prescription_id->viewAttributes() ?>>
-<?= $medicine_ipd_dispensation->prescription_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($medicine_ipd_dispensation->status->Visible) { // status ?>
         <tr id="r_status"<?= $medicine_ipd_dispensation->status->rowAttributes() ?>>
             <td class="<?= $medicine_ipd_dispensation->TableLeftColumnClass ?>"><?= $medicine_ipd_dispensation->status->caption() ?></td>
