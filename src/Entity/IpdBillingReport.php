@@ -29,6 +29,10 @@ use function PHPMaker2024\afyaplus\EncryptPassword;
 class IpdBillingReport extends AbstractEntity
 {
     #[Id]
+    #[Column(name: "admission_id", type: "integer")]
+    #[GeneratedValue]
+    private int $admissionId;
+
     #[Column(name: "patient_uhid", type: "integer")]
     #[GeneratedValue]
     private int $patientUhid;
@@ -53,6 +57,17 @@ class IpdBillingReport extends AbstractEntity
 
     #[Column(name: "date_discharged", type: "datetime")]
     private DateTime $dateDischarged;
+
+    public function getAdmissionId(): int
+    {
+        return $this->admissionId;
+    }
+
+    public function setAdmissionId(int $value): static
+    {
+        $this->admissionId = $value;
+        return $this;
+    }
 
     public function getPatientUhid(): int
     {

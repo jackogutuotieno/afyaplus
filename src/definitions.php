@@ -223,6 +223,8 @@ return [
     "patient_ipd_prescription_details" => \DI\create(PatientIpdPrescriptionDetails::class),
     "patient_ipd_prescriptions" => \DI\create(PatientIpdPrescriptions::class),
     "ipd_billing_report" => \DI\create(IpdBillingReport::class),
+    "ipd_bill_issued_items" => \DI\create(IpdBillIssuedItems::class),
+    "ipd_bill_services" => \DI\create(IpdBillServices::class),
 
     // User table
     "usertable" => \DI\get("users"),

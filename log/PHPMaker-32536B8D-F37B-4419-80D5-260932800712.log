@@ -40,6 +40,8 @@ C:\wamp64\www\afyaplus\controllers\InvoiceReportController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceReportDetailsController.php
 C:\wamp64\www\afyaplus\controllers\InvoiceReportsController.php
 C:\wamp64\www\afyaplus\controllers\InvoicesController.php
+C:\wamp64\www\afyaplus\controllers\IpdBillIssuedItemsController.php
+C:\wamp64\www\afyaplus\controllers\IpdBillServicesController.php
 C:\wamp64\www\afyaplus\controllers\IpdBillingReportController.php
 C:\wamp64\www\afyaplus\controllers\IpdPatientsController.php
 C:\wamp64\www\afyaplus\controllers\IssueItemsController.php
@@ -282,6 +284,12 @@ C:\wamp64\www\afyaplus\models\InvoicesEdit.php
 C:\wamp64\www\afyaplus\models\InvoicesGrid.php
 C:\wamp64\www\afyaplus\models\InvoicesList.php
 C:\wamp64\www\afyaplus\models\InvoicesView.php
+C:\wamp64\www\afyaplus\models\IpdBillIssuedItems.php
+C:\wamp64\www\afyaplus\models\IpdBillIssuedItemsGrid.php
+C:\wamp64\www\afyaplus\models\IpdBillIssuedItemsList.php
+C:\wamp64\www\afyaplus\models\IpdBillServices.php
+C:\wamp64\www\afyaplus\models\IpdBillServicesGrid.php
+C:\wamp64\www\afyaplus\models\IpdBillServicesList.php
 C:\wamp64\www\afyaplus\models\IpdBillingReport.php
 C:\wamp64\www\afyaplus\models\IpdBillingReportList.php
 C:\wamp64\www\afyaplus\models\IpdBillingReportView.php
@@ -754,6 +762,8 @@ C:\wamp64\www\afyaplus\src\Entity\Invoice.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceDetail.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceReport.php
 C:\wamp64\www\afyaplus\src\Entity\InvoiceReportDetail.php
+C:\wamp64\www\afyaplus\src\Entity\IpdBillIssuedItem.php
+C:\wamp64\www\afyaplus\src\Entity\IpdBillService.php
 C:\wamp64\www\afyaplus\src\Entity\IpdBillingReport.php
 C:\wamp64\www\afyaplus\src\Entity\IpdPatient.php
 C:\wamp64\www\afyaplus\src\Entity\IssueItem.php
@@ -1035,7 +1045,12 @@ C:\wamp64\www\afyaplus\views\InvoicesGrid.php
 C:\wamp64\www\afyaplus\views\InvoicesList.php
 C:\wamp64\www\afyaplus\views\InvoicesMaster.php
 C:\wamp64\www\afyaplus\views\InvoicesView.php
+C:\wamp64\www\afyaplus\views\IpdBillIssuedItemsGrid.php
+C:\wamp64\www\afyaplus\views\IpdBillIssuedItemsList.php
+C:\wamp64\www\afyaplus\views\IpdBillServicesGrid.php
+C:\wamp64\www\afyaplus\views\IpdBillServicesList.php
 C:\wamp64\www\afyaplus\views\IpdBillingReportList.php
+C:\wamp64\www\afyaplus\views\IpdBillingReportMaster.php
 C:\wamp64\www\afyaplus\views\IpdBillingReportView.php
 C:\wamp64\www\afyaplus\views\IpdPatientsEdit.php
 C:\wamp64\www\afyaplus\views\IpdPatientsList.php

@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Closure;
 
 /**
- * Table class for ipd_billing_report
+ * Table class for ipd_bill_issued_items
  */
-class IpdBillingReport extends DbTable
+class IpdBillIssuedItems extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -48,15 +48,10 @@ class IpdBillingReport extends DbTable
 
     // Fields
     public $admission_id;
-    public $patient_uhid;
-    public $patient_name;
-    public $status;
-    public $age;
-    public $gender;
-    public $payment_method;
-    public $company;
-    public $date_admitted;
-    public $date_discharged;
+    public $item_title;
+    public $quantity;
+    public $selling_price;
+    public $line_total;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -69,14 +64,14 @@ class IpdBillingReport extends DbTable
 
         // Language object
         $Language = Container("app.language");
-        $this->TableVar = "ipd_billing_report";
-        $this->TableName = 'ipd_billing_report';
+        $this->TableVar = "ipd_bill_issued_items";
+        $this->TableName = 'ipd_bill_issued_items';
         $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "ipd_billing_report";
+        $this->UpdateTable = "ipd_bill_issued_items";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -95,7 +90,7 @@ class IpdBillingReport extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -131,224 +126,106 @@ class IpdBillingReport extends DbTable
         $this->admission_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['admission_id'] = &$this->admission_id;
 
-        // patient_uhid
-        $this->patient_uhid = new DbField(
+        // item_title
+        $this->item_title = new DbField(
             $this, // Table
-            'x_patient_uhid', // Variable name
-            'patient_uhid', // Name
-            '`patient_uhid`', // Expression
-            '`patient_uhid`', // Basic search expression
-            3, // Type
-            11, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`patient_uhid`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'NO' // Edit Tag
-        );
-        $this->patient_uhid->InputTextType = "text";
-        $this->patient_uhid->Raw = true;
-        $this->patient_uhid->IsAutoIncrement = true; // Autoincrement field
-        $this->patient_uhid->Nullable = false; // NOT NULL field
-        $this->patient_uhid->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->patient_uhid->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['patient_uhid'] = &$this->patient_uhid;
-
-        // patient_name
-        $this->patient_name = new DbField(
-            $this, // Table
-            'x_patient_name', // Variable name
-            'patient_name', // Name
-            '`patient_name`', // Expression
-            '`patient_name`', // Basic search expression
-            200, // Type
-            101, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`patient_name`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->patient_name->InputTextType = "text";
-        $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['patient_name'] = &$this->patient_name;
-
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '\'\'', // Expression
-            '\'\'', // Basic search expression
-            200, // Type
-            0, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '\'\'', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->status->InputTextType = "text";
-        $this->status->IsCustom = true; // Custom field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['status'] = &$this->status;
-
-        // age
-        $this->age = new DbField(
-            $this, // Table
-            'x_age', // Variable name
-            'age', // Name
-            '`age`', // Expression
-            '`age`', // Basic search expression
-            20, // Type
-            21, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`age`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->age->InputTextType = "text";
-        $this->age->Raw = true;
-        $this->age->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->age->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['age'] = &$this->age;
-
-        // gender
-        $this->gender = new DbField(
-            $this, // Table
-            'x_gender', // Variable name
-            'gender', // Name
-            '`gender`', // Expression
-            '`gender`', // Basic search expression
-            200, // Type
-            15, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`gender`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->gender->InputTextType = "text";
-        $this->gender->Nullable = false; // NOT NULL field
-        $this->gender->Required = true; // Required field
-        $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['gender'] = &$this->gender;
-
-        // payment_method
-        $this->payment_method = new DbField(
-            $this, // Table
-            'x_payment_method', // Variable name
-            'payment_method', // Name
-            '`payment_method`', // Expression
-            '`payment_method`', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`payment_method`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->payment_method->InputTextType = "text";
-        $this->payment_method->Nullable = false; // NOT NULL field
-        $this->payment_method->Required = true; // Required field
-        $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['payment_method'] = &$this->payment_method;
-
-        // company
-        $this->company = new DbField(
-            $this, // Table
-            'x_company', // Variable name
-            'company', // Name
-            '`company`', // Expression
-            '`company`', // Basic search expression
+            'x_item_title', // Variable name
+            'item_title', // Name
+            '`item_title`', // Expression
+            '`item_title`', // Basic search expression
             200, // Type
             100, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`company`', // Virtual expression
+            '`item_title`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->company->InputTextType = "text";
-        $this->company->Nullable = false; // NOT NULL field
-        $this->company->Required = true; // Required field
-        $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['company'] = &$this->company;
+        $this->item_title->InputTextType = "text";
+        $this->item_title->Nullable = false; // NOT NULL field
+        $this->item_title->Required = true; // Required field
+        $this->item_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['item_title'] = &$this->item_title;
 
-        // date_admitted
-        $this->date_admitted = new DbField(
+        // quantity
+        $this->quantity = new DbField(
             $this, // Table
-            'x_date_admitted', // Variable name
-            'date_admitted', // Name
-            '`date_admitted`', // Expression
-            CastDateFieldForLike("`date_admitted`", 11, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            11, // Date/Time format
+            'x_quantity', // Variable name
+            'quantity', // Name
+            '`quantity`', // Expression
+            '`quantity`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`date_admitted`', // Virtual expression
+            '`quantity`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_admitted->InputTextType = "text";
-        $this->date_admitted->Raw = true;
-        $this->date_admitted->Nullable = false; // NOT NULL field
-        $this->date_admitted->Required = true; // Required field
-        $this->date_admitted->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_admitted->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_admitted'] = &$this->date_admitted;
+        $this->quantity->InputTextType = "text";
+        $this->quantity->Raw = true;
+        $this->quantity->Nullable = false; // NOT NULL field
+        $this->quantity->Required = true; // Required field
+        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['quantity'] = &$this->quantity;
 
-        // date_discharged
-        $this->date_discharged = new DbField(
+        // selling_price
+        $this->selling_price = new DbField(
             $this, // Table
-            'x_date_discharged', // Variable name
-            'date_discharged', // Name
-            '`date_discharged`', // Expression
-            CastDateFieldForLike("`date_discharged`", 11, "DB"), // Basic search expression
-            135, // Type
-            76, // Size
-            11, // Date/Time format
+            'x_selling_price', // Variable name
+            'selling_price', // Name
+            '`selling_price`', // Expression
+            '`selling_price`', // Basic search expression
+            5, // Type
+            22, // Size
+            -1, // Date/Time format
             false, // Is upload field
-            '`date_discharged`', // Virtual expression
+            '`selling_price`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->date_discharged->InputTextType = "text";
-        $this->date_discharged->Raw = true;
-        $this->date_discharged->Nullable = false; // NOT NULL field
-        $this->date_discharged->Required = true; // Required field
-        $this->date_discharged->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
-        $this->date_discharged->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['date_discharged'] = &$this->date_discharged;
+        $this->selling_price->InputTextType = "text";
+        $this->selling_price->Raw = true;
+        $this->selling_price->Nullable = false; // NOT NULL field
+        $this->selling_price->Required = true; // Required field
+        $this->selling_price->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->selling_price->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['selling_price'] = &$this->selling_price;
+
+        // line_total
+        $this->line_total = new DbField(
+            $this, // Table
+            'x_line_total', // Variable name
+            'line_total', // Name
+            'quantity * selling_price', // Expression
+            'quantity * selling_price', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'quantity * selling_price', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->line_total->InputTextType = "text";
+        $this->line_total->Raw = true;
+        $this->line_total->IsCustom = true; // Custom field
+        $this->line_total->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->line_total->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['line_total'] = &$this->line_total;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -408,34 +285,86 @@ class IpdBillingReport extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
+    // Current master table name
+    public function getCurrentMasterTable()
     {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
-    public function setCurrentDetailTable($v)
+    public function setCurrentMasterTable($v)
     {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
     }
 
-    // Get detail url
-    public function getDetailUrl()
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
     {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "ipd_bill_issued_items") {
-            $detailUrl = Container("ipd_bill_issued_items")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "ipd_billing_report") {
+            $masterTable = Container("ipd_billing_report");
+            if ($this->admission_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->admission_id, $this->admission_id->getSessionValue(), $masterTable->admission_id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
         }
-        if ($this->getCurrentDetailTable() == "ipd_bill_services") {
-            $detailUrl = Container("ipd_bill_services")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "ipd_billing_report") {
+            $masterTable = Container("ipd_billing_report");
+            if ($this->admission_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->admission_id, $this->admission_id->getSessionValue(), $masterTable->admission_id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
         }
-        if ($detailUrl == "") {
-            $detailUrl = "ipdbillingreportlist";
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "ipd_billing_report":
+                $key = $keys["admission_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->admission_id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->admission_id, $keys["admission_id"], $this->admission_id->DataType, $this->Dbid);
+                }
+                break;
         }
-        return $detailUrl;
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "ipd_billing_report":
+                return GetKeyFilter($this->admission_id, $masterTable->admission_id->DbValue, $masterTable->admission_id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -447,7 +376,7 @@ class IpdBillingReport extends DbTable
     // Get FROM clause
     public function getSqlFrom()
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "ipd_billing_report";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "ipd_bill_issued_items";
     }
 
     // Get FROM clause (for backward compatibility)
@@ -471,7 +400,7 @@ class IpdBillingReport extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        return "*, '' AS `status`";
+        return "*, quantity * selling_price AS `line_total`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -779,8 +708,6 @@ class IpdBillingReport extends DbTable
         if ($result) {
             $this->admission_id->setDbValue($conn->lastInsertId());
             $rs['admission_id'] = $this->admission_id->DbValue;
-            $this->patient_uhid->setDbValue($conn->lastInsertId());
-            $rs['patient_uhid'] = $this->patient_uhid->DbValue;
         }
         return $result;
     }
@@ -837,13 +764,6 @@ class IpdBillingReport extends DbTable
                 $rs['admission_id'] = $this->admission_id->CurrentValue;
             }
         }
-
-        // Return auto increment field
-        if ($success) {
-            if (!isset($rs['patient_uhid']) && !EmptyValue($this->patient_uhid->CurrentValue)) {
-                $rs['patient_uhid'] = $this->patient_uhid->CurrentValue;
-            }
-        }
         return $success;
     }
 
@@ -895,15 +815,10 @@ class IpdBillingReport extends DbTable
             return;
         }
         $this->admission_id->DbValue = $row['admission_id'];
-        $this->patient_uhid->DbValue = $row['patient_uhid'];
-        $this->patient_name->DbValue = $row['patient_name'];
-        $this->status->DbValue = $row['status'];
-        $this->age->DbValue = $row['age'];
-        $this->gender->DbValue = $row['gender'];
-        $this->payment_method->DbValue = $row['payment_method'];
-        $this->company->DbValue = $row['company'];
-        $this->date_admitted->DbValue = $row['date_admitted'];
-        $this->date_discharged->DbValue = $row['date_discharged'];
+        $this->item_title->DbValue = $row['item_title'];
+        $this->quantity->DbValue = $row['quantity'];
+        $this->selling_price->DbValue = $row['selling_price'];
+        $this->line_total->DbValue = $row['line_total'];
     }
 
     // Delete uploaded files
@@ -977,7 +892,7 @@ class IpdBillingReport extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("ipdbillingreportlist");
+        return $_SESSION[$name] ?? GetUrl("ipdbillissueditemslist");
     }
 
     // Set return page URL
@@ -991,9 +906,9 @@ class IpdBillingReport extends DbTable
     {
         global $Language;
         return match ($pageName) {
-            "ipdbillingreportview" => $Language->phrase("View"),
-            "ipdbillingreportedit" => $Language->phrase("Edit"),
-            "ipdbillingreportadd" => $Language->phrase("Add"),
+            "ipdbillissueditemsview" => $Language->phrase("View"),
+            "ipdbillissueditemsedit" => $Language->phrase("Edit"),
+            "ipdbillissueditemsadd" => $Language->phrase("Add"),
             default => ""
         };
     }
@@ -1001,18 +916,18 @@ class IpdBillingReport extends DbTable
     // Default route URL
     public function getDefaultRouteUrl()
     {
-        return "ipdbillingreportlist";
+        return "ipdbillissueditemslist";
     }
 
     // API page name
     public function getApiPageName($action)
     {
         return match (strtolower($action)) {
-            Config("API_VIEW_ACTION") => "IpdBillingReportView",
-            Config("API_ADD_ACTION") => "IpdBillingReportAdd",
-            Config("API_EDIT_ACTION") => "IpdBillingReportEdit",
-            Config("API_DELETE_ACTION") => "IpdBillingReportDelete",
-            Config("API_LIST_ACTION") => "IpdBillingReportList",
+            Config("API_VIEW_ACTION") => "IpdBillIssuedItemsView",
+            Config("API_ADD_ACTION") => "IpdBillIssuedItemsAdd",
+            Config("API_EDIT_ACTION") => "IpdBillIssuedItemsEdit",
+            Config("API_DELETE_ACTION") => "IpdBillIssuedItemsDelete",
+            Config("API_LIST_ACTION") => "IpdBillIssuedItemsList",
             default => ""
         };
     }
@@ -1032,16 +947,16 @@ class IpdBillingReport extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "ipdbillingreportlist";
+        return "ipdbillissueditemslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("ipdbillingreportview", $parm);
+            $url = $this->keyUrl("ipdbillissueditemsview", $parm);
         } else {
-            $url = $this->keyUrl("ipdbillingreportview", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("ipdbillissueditemsview", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -1050,9 +965,9 @@ class IpdBillingReport extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "ipdbillingreportadd?" . $parm;
+            $url = "ipdbillissueditemsadd?" . $parm;
         } else {
-            $url = "ipdbillingreportadd";
+            $url = "ipdbillissueditemsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1060,36 +975,28 @@ class IpdBillingReport extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("ipdbillingreportedit", $parm);
-        } else {
-            $url = $this->keyUrl("ipdbillingreportedit", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("ipdbillissueditemsedit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("ipdbillingreportlist", "action=edit");
+        $url = $this->keyUrl("ipdbillissueditemslist", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("ipdbillingreportadd", $parm);
-        } else {
-            $url = $this->keyUrl("ipdbillingreportadd", Config("TABLE_SHOW_DETAIL") . "=");
-        }
+        $url = $this->keyUrl("ipdbillissueditemsadd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("ipdbillingreportlist", "action=copy");
+        $url = $this->keyUrl("ipdbillissueditemslist", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -1099,13 +1006,17 @@ class IpdBillingReport extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("ipdbillingreportdelete", $parm);
+            return $this->keyUrl("ipdbillissueditemsdelete", $parm);
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "ipd_billing_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1265,22 +1176,17 @@ class IpdBillingReport extends DbTable
             return;
         }
         $this->admission_id->setDbValue($row['admission_id']);
-        $this->patient_uhid->setDbValue($row['patient_uhid']);
-        $this->patient_name->setDbValue($row['patient_name']);
-        $this->status->setDbValue($row['status']);
-        $this->age->setDbValue($row['age']);
-        $this->gender->setDbValue($row['gender']);
-        $this->payment_method->setDbValue($row['payment_method']);
-        $this->company->setDbValue($row['company']);
-        $this->date_admitted->setDbValue($row['date_admitted']);
-        $this->date_discharged->setDbValue($row['date_discharged']);
+        $this->item_title->setDbValue($row['item_title']);
+        $this->quantity->setDbValue($row['quantity']);
+        $this->selling_price->setDbValue($row['selling_price']);
+        $this->line_total->setDbValue($row['line_total']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "IpdBillingReportList";
+        $listPage = "IpdBillIssuedItemsList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1306,96 +1212,51 @@ class IpdBillingReport extends DbTable
 
         // admission_id
 
-        // patient_uhid
+        // item_title
 
-        // patient_name
+        // quantity
 
-        // status
+        // selling_price
 
-        // age
-
-        // gender
-
-        // payment_method
-
-        // company
-
-        // date_admitted
-
-        // date_discharged
+        // line_total
 
         // admission_id
         $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
 
-        // patient_uhid
-        $this->patient_uhid->ViewValue = $this->patient_uhid->CurrentValue;
+        // item_title
+        $this->item_title->ViewValue = $this->item_title->CurrentValue;
 
-        // patient_name
-        $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+        // quantity
+        $this->quantity->ViewValue = $this->quantity->CurrentValue;
+        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, $this->quantity->formatPattern());
 
-        // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        // selling_price
+        $this->selling_price->ViewValue = $this->selling_price->CurrentValue;
+        $this->selling_price->ViewValue = FormatNumber($this->selling_price->ViewValue, $this->selling_price->formatPattern());
 
-        // age
-        $this->age->ViewValue = $this->age->CurrentValue;
-        $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
-
-        // gender
-        $this->gender->ViewValue = $this->gender->CurrentValue;
-
-        // payment_method
-        $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
-
-        // company
-        $this->company->ViewValue = $this->company->CurrentValue;
-
-        // date_admitted
-        $this->date_admitted->ViewValue = $this->date_admitted->CurrentValue;
-        $this->date_admitted->ViewValue = FormatDateTime($this->date_admitted->ViewValue, $this->date_admitted->formatPattern());
-
-        // date_discharged
-        $this->date_discharged->ViewValue = $this->date_discharged->CurrentValue;
-        $this->date_discharged->ViewValue = FormatDateTime($this->date_discharged->ViewValue, $this->date_discharged->formatPattern());
+        // line_total
+        $this->line_total->ViewValue = $this->line_total->CurrentValue;
+        $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
 
         // admission_id
         $this->admission_id->HrefValue = "";
         $this->admission_id->TooltipValue = "";
 
-        // patient_uhid
-        $this->patient_uhid->HrefValue = "";
-        $this->patient_uhid->TooltipValue = "";
+        // item_title
+        $this->item_title->HrefValue = "";
+        $this->item_title->TooltipValue = "";
 
-        // patient_name
-        $this->patient_name->HrefValue = "";
-        $this->patient_name->TooltipValue = "";
+        // quantity
+        $this->quantity->HrefValue = "";
+        $this->quantity->TooltipValue = "";
 
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
+        // selling_price
+        $this->selling_price->HrefValue = "";
+        $this->selling_price->TooltipValue = "";
 
-        // age
-        $this->age->HrefValue = "";
-        $this->age->TooltipValue = "";
-
-        // gender
-        $this->gender->HrefValue = "";
-        $this->gender->TooltipValue = "";
-
-        // payment_method
-        $this->payment_method->HrefValue = "";
-        $this->payment_method->TooltipValue = "";
-
-        // company
-        $this->company->HrefValue = "";
-        $this->company->TooltipValue = "";
-
-        // date_admitted
-        $this->date_admitted->HrefValue = "";
-        $this->date_admitted->TooltipValue = "";
-
-        // date_discharged
-        $this->date_discharged->HrefValue = "";
-        $this->date_discharged->TooltipValue = "";
+        // line_total
+        $this->line_total->HrefValue = "";
+        $this->line_total->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1416,71 +1277,37 @@ class IpdBillingReport extends DbTable
         $this->admission_id->setupEditAttributes();
         $this->admission_id->EditValue = $this->admission_id->CurrentValue;
 
-        // patient_uhid
-        $this->patient_uhid->setupEditAttributes();
-        $this->patient_uhid->EditValue = $this->patient_uhid->CurrentValue;
-        $this->patient_uhid->PlaceHolder = RemoveHtml($this->patient_uhid->caption());
-        if (strval($this->patient_uhid->EditValue) != "" && is_numeric($this->patient_uhid->EditValue)) {
-            $this->patient_uhid->EditValue = $this->patient_uhid->EditValue;
+        // item_title
+        $this->item_title->setupEditAttributes();
+        if (!$this->item_title->Raw) {
+            $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
+        }
+        $this->item_title->EditValue = $this->item_title->CurrentValue;
+        $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
+
+        // quantity
+        $this->quantity->setupEditAttributes();
+        $this->quantity->EditValue = $this->quantity->CurrentValue;
+        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+        if (strval($this->quantity->EditValue) != "" && is_numeric($this->quantity->EditValue)) {
+            $this->quantity->EditValue = FormatNumber($this->quantity->EditValue, null);
         }
 
-        // patient_name
-        $this->patient_name->setupEditAttributes();
-        if (!$this->patient_name->Raw) {
-            $this->patient_name->CurrentValue = HtmlDecode($this->patient_name->CurrentValue);
-        }
-        $this->patient_name->EditValue = $this->patient_name->CurrentValue;
-        $this->patient_name->PlaceHolder = RemoveHtml($this->patient_name->caption());
-
-        // status
-        $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
-        // age
-        $this->age->setupEditAttributes();
-        $this->age->EditValue = $this->age->CurrentValue;
-        $this->age->PlaceHolder = RemoveHtml($this->age->caption());
-        if (strval($this->age->EditValue) != "" && is_numeric($this->age->EditValue)) {
-            $this->age->EditValue = FormatNumber($this->age->EditValue, null);
+        // selling_price
+        $this->selling_price->setupEditAttributes();
+        $this->selling_price->EditValue = $this->selling_price->CurrentValue;
+        $this->selling_price->PlaceHolder = RemoveHtml($this->selling_price->caption());
+        if (strval($this->selling_price->EditValue) != "" && is_numeric($this->selling_price->EditValue)) {
+            $this->selling_price->EditValue = FormatNumber($this->selling_price->EditValue, null);
         }
 
-        // gender
-        $this->gender->setupEditAttributes();
-        if (!$this->gender->Raw) {
-            $this->gender->CurrentValue = HtmlDecode($this->gender->CurrentValue);
+        // line_total
+        $this->line_total->setupEditAttributes();
+        $this->line_total->EditValue = $this->line_total->CurrentValue;
+        $this->line_total->PlaceHolder = RemoveHtml($this->line_total->caption());
+        if (strval($this->line_total->EditValue) != "" && is_numeric($this->line_total->EditValue)) {
+            $this->line_total->EditValue = FormatNumber($this->line_total->EditValue, null);
         }
-        $this->gender->EditValue = $this->gender->CurrentValue;
-        $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
-
-        // payment_method
-        $this->payment_method->setupEditAttributes();
-        if (!$this->payment_method->Raw) {
-            $this->payment_method->CurrentValue = HtmlDecode($this->payment_method->CurrentValue);
-        }
-        $this->payment_method->EditValue = $this->payment_method->CurrentValue;
-        $this->payment_method->PlaceHolder = RemoveHtml($this->payment_method->caption());
-
-        // company
-        $this->company->setupEditAttributes();
-        if (!$this->company->Raw) {
-            $this->company->CurrentValue = HtmlDecode($this->company->CurrentValue);
-        }
-        $this->company->EditValue = $this->company->CurrentValue;
-        $this->company->PlaceHolder = RemoveHtml($this->company->caption());
-
-        // date_admitted
-        $this->date_admitted->setupEditAttributes();
-        $this->date_admitted->EditValue = FormatDateTime($this->date_admitted->CurrentValue, $this->date_admitted->formatPattern());
-        $this->date_admitted->PlaceHolder = RemoveHtml($this->date_admitted->caption());
-
-        // date_discharged
-        $this->date_discharged->setupEditAttributes();
-        $this->date_discharged->EditValue = FormatDateTime($this->date_discharged->CurrentValue, $this->date_discharged->formatPattern());
-        $this->date_discharged->PlaceHolder = RemoveHtml($this->date_discharged->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1489,11 +1316,19 @@ class IpdBillingReport extends DbTable
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->line_total->CurrentValue)) {
+                $this->line_total->Total += $this->line_total->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->line_total->CurrentValue = $this->line_total->Total;
+            $this->line_total->ViewValue = $this->line_total->CurrentValue;
+            $this->line_total->ViewValue = FormatNumber($this->line_total->ViewValue, $this->line_total->formatPattern());
+            $this->line_total->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1511,26 +1346,16 @@ class IpdBillingReport extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->admission_id);
-                    $doc->exportCaption($this->patient_uhid);
-                    $doc->exportCaption($this->patient_name);
-                    $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->age);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->payment_method);
-                    $doc->exportCaption($this->company);
-                    $doc->exportCaption($this->date_admitted);
-                    $doc->exportCaption($this->date_discharged);
+                    $doc->exportCaption($this->item_title);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->selling_price);
+                    $doc->exportCaption($this->line_total);
                 } else {
                     $doc->exportCaption($this->admission_id);
-                    $doc->exportCaption($this->patient_uhid);
-                    $doc->exportCaption($this->patient_name);
-                    $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->age);
-                    $doc->exportCaption($this->gender);
-                    $doc->exportCaption($this->payment_method);
-                    $doc->exportCaption($this->company);
-                    $doc->exportCaption($this->date_admitted);
-                    $doc->exportCaption($this->date_discharged);
+                    $doc->exportCaption($this->item_title);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->selling_price);
+                    $doc->exportCaption($this->line_total);
                 }
                 $doc->endExportRow();
             }
@@ -1549,6 +1374,7 @@ class IpdBillingReport extends DbTable
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = RowType::VIEW; // Render view
@@ -1558,26 +1384,16 @@ class IpdBillingReport extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->admission_id);
-                        $doc->exportField($this->patient_uhid);
-                        $doc->exportField($this->patient_name);
-                        $doc->exportField($this->status);
-                        $doc->exportField($this->age);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->payment_method);
-                        $doc->exportField($this->company);
-                        $doc->exportField($this->date_admitted);
-                        $doc->exportField($this->date_discharged);
+                        $doc->exportField($this->item_title);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->selling_price);
+                        $doc->exportField($this->line_total);
                     } else {
                         $doc->exportField($this->admission_id);
-                        $doc->exportField($this->patient_uhid);
-                        $doc->exportField($this->patient_name);
-                        $doc->exportField($this->status);
-                        $doc->exportField($this->age);
-                        $doc->exportField($this->gender);
-                        $doc->exportField($this->payment_method);
-                        $doc->exportField($this->company);
-                        $doc->exportField($this->date_admitted);
-                        $doc->exportField($this->date_discharged);
+                        $doc->exportField($this->item_title);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->selling_price);
+                        $doc->exportField($this->line_total);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1586,6 +1402,22 @@ class IpdBillingReport extends DbTable
             // Call Row Export server event
             if ($doc->ExportCustom) {
                 $this->rowExport($doc, $row);
+            }
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = RowType::AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->admission_id, '');
+                $doc->exportAggregate($this->item_title, '');
+                $doc->exportAggregate($this->quantity, '');
+                $doc->exportAggregate($this->selling_price, '');
+                $doc->exportAggregate($this->line_total, 'TOTAL');
+                $doc->endExportRow();
             }
         }
         if (!$doc->ExportCustom) {
@@ -1748,15 +1580,8 @@ class IpdBillingReport extends DbTable
     // Row Rendered event
     public function rowRendered()
     {
-        $current_date = CurrentDate();
-        if ($this->date_discharged->CurrentValue > $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #15b20b; color: white";
-            $this->status->ViewValue = "New Bill"; 
-        } else if ($this->date_discharged->CurrentValue < $current_date) {
-            $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
-            $this->status->ViewValue = "Billed"; 
-        } 
-        $this->patient_name->ViewValue = '<a href="ipdbillingreportview/' . $this->admission_id->ViewValue . '?showdetail=ipd_bill_issued_items,ipd_bill_services" target="_blank">' . $this->patient_name->ViewValue . '</a>';
+        // To view properties of field class, use:
+        //var_dump($this-><FieldName>);
     }
 
     // User ID Filtering event

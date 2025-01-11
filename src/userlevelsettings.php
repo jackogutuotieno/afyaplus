@@ -1618,7 +1618,33 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","9","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","10","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","11","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_billing_report","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_issued_items","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bill_services","11","0"]];
 
 /**
  * Tables
@@ -1752,4 +1778,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"],
     ["patient_ipd_prescription_details","patient_ipd_prescription_details","Prescription Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptiondetailslist"],
     ["patient_ipd_prescriptions","patient_ipd_prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptionslist"],
-    ["ipd_billing_report","ipd_billing_report","IPD Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillingreportlist"]];
+    ["ipd_billing_report","ipd_billing_report","IPD Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillingreportlist"],
+    ["ipd_bill_issued_items","ipd_bill_issued_items","Issued Items",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillissueditemslist"],
+    ["ipd_bill_services","ipd_bill_services","Services Offered",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillserviceslist"]];

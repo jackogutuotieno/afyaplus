@@ -146,12 +146,14 @@ class IpdBillingReportList extends IpdBillingReport
     // Set field visibility
     public function setVisibility()
     {
+        $this->admission_id->Visible = false;
         $this->patient_uhid->setVisibility();
         $this->patient_name->setVisibility();
+        $this->status->setVisibility();
         $this->age->Visible = false;
         $this->gender->Visible = false;
         $this->payment_method->Visible = false;
-        $this->company->setVisibility();
+        $this->company->Visible = false;
         $this->date_admitted->setVisibility();
         $this->date_discharged->setVisibility();
     }
@@ -194,7 +196,7 @@ class IpdBillingReportList extends IpdBillingReport
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "ipdbillingreportadd";
+        $this->AddUrl = "ipdbillingreportadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -446,7 +448,7 @@ class IpdBillingReportList extends IpdBillingReport
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['patient_uhid'];
+            $key .= @$ar['admission_id'];
         }
         return $key;
     }
@@ -459,6 +461,9 @@ class IpdBillingReportList extends IpdBillingReport
     protected function hideFieldsForAddEdit()
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->admission_id->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
             $this->patient_uhid->Visible = false;
         }
     }
@@ -1050,8 +1055,10 @@ class IpdBillingReportList extends IpdBillingReport
         if (Config("SEARCH_FILTER_OPTION") == "Server") {
             $savedFilterList = Profile()->getSearchFilters("fipd_billing_reportsrch");
         }
+        $filterList = Concat($filterList, $this->admission_id->AdvancedSearch->toJson(), ","); // Field admission_id
         $filterList = Concat($filterList, $this->patient_uhid->AdvancedSearch->toJson(), ","); // Field patient_uhid
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->payment_method->AdvancedSearch->toJson(), ","); // Field payment_method
@@ -1097,6 +1104,14 @@ class IpdBillingReportList extends IpdBillingReport
         $filter = json_decode(Post("filter"), true);
         $this->Command = "search";
 
+        // Field admission_id
+        $this->admission_id->AdvancedSearch->SearchValue = @$filter["x_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchOperator = @$filter["z_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchCondition = @$filter["v_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchValue2 = @$filter["y_admission_id"];
+        $this->admission_id->AdvancedSearch->SearchOperator2 = @$filter["w_admission_id"];
+        $this->admission_id->AdvancedSearch->save();
+
         // Field patient_uhid
         $this->patient_uhid->AdvancedSearch->SearchValue = @$filter["x_patient_uhid"];
         $this->patient_uhid->AdvancedSearch->SearchOperator = @$filter["z_patient_uhid"];
@@ -1112,6 +1127,14 @@ class IpdBillingReportList extends IpdBillingReport
         $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
         $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
         $this->patient_name->AdvancedSearch->save();
+
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
 
         // Field age
         $this->age->AdvancedSearch->SearchValue = @$filter["x_age"];
@@ -1200,6 +1223,7 @@ class IpdBillingReportList extends IpdBillingReport
         // Fields to search
         $searchFlds = [];
         $searchFlds[] = &$this->patient_name;
+        $searchFlds[] = &$this->status;
         $searchFlds[] = &$this->gender;
         $searchFlds[] = &$this->payment_method;
         $searchFlds[] = &$this->company;
@@ -1283,7 +1307,7 @@ class IpdBillingReportList extends IpdBillingReport
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_uhid); // patient_uhid
             $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->company); // company
+            $this->updateSort($this->status); // status
             $this->updateSort($this->date_admitted); // date_admitted
             $this->updateSort($this->date_discharged); // date_discharged
             $this->setStartRecordNumber(1); // Reset start position
@@ -1310,8 +1334,10 @@ class IpdBillingReportList extends IpdBillingReport
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
+                $this->admission_id->setSort("");
                 $this->patient_uhid->setSort("");
                 $this->patient_name->setSort("");
+                $this->status->setSort("");
                 $this->age->setSort("");
                 $this->gender->setSort("");
                 $this->payment_method->setSort("");
@@ -1342,6 +1368,36 @@ class IpdBillingReportList extends IpdBillingReport
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
+
+        // "detail_ipd_bill_issued_items"
+        $item = &$this->ListOptions->add("detail_ipd_bill_issued_items");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_issued_items');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_ipd_bill_services"
+        $item = &$this->ListOptions->add("detail_ipd_bill_services");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_services');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("ipd_bill_issued_items");
+        $pages->add("ipd_bill_services");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1463,10 +1519,92 @@ class IpdBillingReportList extends IpdBillingReport
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_ipd_bill_issued_items"
+        $opt = $this->ListOptions["detail_ipd_bill_issued_items"];
+        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_issued_items')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_issued_items", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillissueditemslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("IpdBillIssuedItemsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_issued_items");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "ipd_bill_issued_items";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_ipd_bill_services"
+        $opt = $this->ListOptions["detail_ipd_bill_services"];
+        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_services')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_services", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillserviceslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("IpdBillServicesGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_services");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "ipd_bill_services";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->patient_uhid->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
+        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->admission_id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1495,7 +1633,7 @@ class IpdBillingReportList extends IpdBillingReport
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_uhid");
             $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "company");
+            $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_admitted");
             $this->createColumnOption($option, "date_discharged");
         }
@@ -1936,8 +2074,10 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Call Row Selected event
         $this->rowSelected($row);
+        $this->admission_id->setDbValue($row['admission_id']);
         $this->patient_uhid->setDbValue($row['patient_uhid']);
         $this->patient_name->setDbValue($row['patient_name']);
+        $this->status->setDbValue($row['status']);
         $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
         $this->payment_method->setDbValue($row['payment_method']);
@@ -1950,8 +2090,10 @@ class IpdBillingReportList extends IpdBillingReport
     protected function newRow()
     {
         $row = [];
+        $row['admission_id'] = $this->admission_id->DefaultValue;
         $row['patient_uhid'] = $this->patient_uhid->DefaultValue;
         $row['patient_name'] = $this->patient_name->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
         $row['payment_method'] = $this->payment_method->DefaultValue;
@@ -1998,9 +2140,13 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Common render codes for all row types
 
+        // admission_id
+
         // patient_uhid
 
         // patient_name
+
+        // status
 
         // age
 
@@ -2016,11 +2162,17 @@ class IpdBillingReportList extends IpdBillingReport
 
         // View row
         if ($this->RowType == RowType::VIEW) {
+            // admission_id
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+
             // patient_uhid
             $this->patient_uhid->ViewValue = $this->patient_uhid->CurrentValue;
 
             // patient_name
             $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
 
             // age
             $this->age->ViewValue = $this->age->CurrentValue;
@@ -2051,9 +2203,9 @@ class IpdBillingReportList extends IpdBillingReport
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
 
-            // company
-            $this->company->HrefValue = "";
-            $this->company->TooltipValue = "";
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
 
             // date_admitted
             $this->date_admitted->HrefValue = "";

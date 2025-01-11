@@ -3020,7 +3020,10 @@ class PatientIpdVitalsGrid extends PatientIpdVitals
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add vitals");
     }
 
     // Page Unload event

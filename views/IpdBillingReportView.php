@@ -51,6 +51,17 @@ loadjs.ready("head", function () {
 <input type="hidden" name="t" value="ipd_billing_report">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <table class="<?= $Page->TableClass ?>">
+<?php if ($Page->admission_id->Visible) { // admission_id ?>
+    <tr id="r_admission_id"<?= $Page->admission_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_ipd_billing_report_admission_id"><template id="tpc_ipd_billing_report_admission_id"><?= $Page->admission_id->caption() ?></template></span></td>
+        <td data-name="admission_id"<?= $Page->admission_id->cellAttributes() ?>>
+<template id="tpx_ipd_billing_report_admission_id"><span id="el_ipd_billing_report_admission_id">
+<span<?= $Page->admission_id->viewAttributes() ?>>
+<?= $Page->admission_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->patient_uhid->Visible) { // patient_uhid ?>
     <tr id="r_patient_uhid"<?= $Page->patient_uhid->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_ipd_billing_report_patient_uhid"><template id="tpc_ipd_billing_report_patient_uhid"><?= $Page->patient_uhid->caption() ?></template></span></td>
@@ -69,6 +80,17 @@ loadjs.ready("head", function () {
 <template id="tpx_ipd_billing_report_patient_name"><span id="el_ipd_billing_report_patient_name">
 <span<?= $Page->patient_name->viewAttributes() ?>>
 <?= $Page->patient_name->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_ipd_billing_report_status"><template id="tpc_ipd_billing_report_status"><?= $Page->status->caption() ?></template></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<template id="tpx_ipd_billing_report_status"><span id="el_ipd_billing_report_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span></template>
 </td>
     </tr>
@@ -160,6 +182,22 @@ loadjs.ready("head", function () {
     </tr>
 </table></div>
 </template>
+<?php
+    if (in_array("ipd_bill_issued_items", explode(",", $Page->getCurrentDetailTable())) && $ipd_bill_issued_items->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("ipd_bill_issued_items", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IpdBillIssuedItemsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("ipd_bill_services", explode(",", $Page->getCurrentDetailTable())) && $ipd_bill_services->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("ipd_bill_services", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IpdBillServicesGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

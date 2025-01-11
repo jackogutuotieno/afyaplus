@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
+class IpdBillServicesGrid extends IpdBillServices
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "PatientIpdPrescriptionDetailsGrid";
+    public $PageObjName = "IpdBillServicesGrid";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fpatient_ipd_prescription_detailsgrid";
+    public $FormName = "fipd_bill_servicesgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "patientipdprescriptiondetailsgrid";
+    public $CurrentPageName = "ipdbillservicesgrid";
 
     // Page URLs
     public $AddUrl;
@@ -136,17 +136,9 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     // Set field visibility
     public function setVisibility()
     {
-        $this->id->Visible = false;
-        $this->prescription_id->setVisibility();
-        $this->medicine_stock_id->setVisibility();
-        $this->method->setVisibility();
-        $this->dose_quantity->setVisibility();
-        $this->dose_type->setVisibility();
-        $this->formulation->setVisibility();
-        $this->dose_interval->setVisibility();
-        $this->number_of_days->setVisibility();
-        $this->date_created->Visible = false;
-        $this->date_updated->Visible = false;
+        $this->admission_id->setVisibility();
+        $this->service_name->setVisibility();
+        $this->cost->setVisibility();
     }
 
     // Constructor
@@ -157,8 +149,8 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'patient_ipd_prescription_details';
-        $this->TableName = 'patient_ipd_prescription_details';
+        $this->TableVar = 'ipd_bill_services';
+        $this->TableName = 'ipd_bill_services';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -182,15 +174,15 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         // Language object
         $Language = Container("app.language");
 
-        // Table object (patient_ipd_prescription_details)
-        if (!isset($GLOBALS["patient_ipd_prescription_details"]) || $GLOBALS["patient_ipd_prescription_details"]::class == PROJECT_NAMESPACE . "patient_ipd_prescription_details") {
-            $GLOBALS["patient_ipd_prescription_details"] = &$this;
+        // Table object (ipd_bill_services)
+        if (!isset($GLOBALS["ipd_bill_services"]) || $GLOBALS["ipd_bill_services"]::class == PROJECT_NAMESPACE . "ipd_bill_services") {
+            $GLOBALS["ipd_bill_services"] = &$this;
         }
-        $this->AddUrl = "patientipdprescriptiondetailsadd";
+        $this->AddUrl = "ipdbillservicesadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'patient_ipd_prescription_details');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'ipd_bill_services');
         }
 
         // Start timer
@@ -381,7 +373,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -393,9 +384,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id->Visible = false;
-        }
     }
 
     // Lookup data
@@ -627,19 +615,12 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         // Setup other options
         $this->setupOtherOptions();
 
-        // Set up lookup cache
-        $this->setupLookupOptions($this->medicine_stock_id);
-        $this->setupLookupOptions($this->method);
-        $this->setupLookupOptions($this->dose_type);
-        $this->setupLookupOptions($this->formulation);
-        $this->setupLookupOptions($this->dose_interval);
-
         // Load default values for add
         $this->loadDefaultValues();
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fpatient_ipd_prescription_detailsgrid";
+            $this->FormName = "fipd_bill_servicesgrid";
         }
 
         // Set up page action
@@ -688,7 +669,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
             if ($this->isGridAdd() || $this->isGridEdit()) {
                 $item = $this->ListOptions["griddelete"];
                 if ($item) {
-                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                    $item->Visible = false;
                 }
             }
         }
@@ -716,13 +697,13 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_ipd_prescriptions") {
-            $masterTbl = Container("patient_ipd_prescriptions");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "ipd_billing_report") {
+            $masterTbl = Container("ipd_billing_report");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientipdprescriptionslist"); // Return to master page
+                $this->terminate("ipdbillingreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -864,6 +845,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     // Exit inline mode
     protected function clearInlineMode()
     {
+        $this->cost->FormValue = ""; // Clear form value
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1065,11 +1047,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
                 $this->SendEmail = false; // Do not send email on insert success
                 $gridInsert = $this->addRow($rsold); // Insert row (already validated by validateGridForm())
                 if ($gridInsert) {
-                    if ($key != "") {
-                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
-                    }
-                    $key .= $this->id->CurrentValue;
-
                     // Add filter for this record
                     AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
                 } else {
@@ -1105,66 +1082,26 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_prescription_id") &&
-            $CurrentForm->hasValue("o_prescription_id") &&
-            $this->prescription_id->CurrentValue != $this->prescription_id->DefaultValue &&
-            !($this->prescription_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->prescription_id->CurrentValue == $this->prescription_id->getSessionValue())
+            $CurrentForm->hasValue("x_admission_id") &&
+            $CurrentForm->hasValue("o_admission_id") &&
+            $this->admission_id->CurrentValue != $this->admission_id->DefaultValue &&
+            !($this->admission_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->admission_id->CurrentValue == $this->admission_id->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_medicine_stock_id") &&
-            $CurrentForm->hasValue("o_medicine_stock_id") &&
-            $this->medicine_stock_id->CurrentValue != $this->medicine_stock_id->DefaultValue &&
-            !($this->medicine_stock_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->medicine_stock_id->CurrentValue == $this->medicine_stock_id->getSessionValue())
+            $CurrentForm->hasValue("x_service_name") &&
+            $CurrentForm->hasValue("o_service_name") &&
+            $this->service_name->CurrentValue != $this->service_name->DefaultValue &&
+            !($this->service_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->service_name->CurrentValue == $this->service_name->getSessionValue())
         ) {
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_method") &&
-            $CurrentForm->hasValue("o_method") &&
-            $this->method->CurrentValue != $this->method->DefaultValue &&
-            !($this->method->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->method->CurrentValue == $this->method->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_dose_quantity") &&
-            $CurrentForm->hasValue("o_dose_quantity") &&
-            $this->dose_quantity->CurrentValue != $this->dose_quantity->DefaultValue &&
-            !($this->dose_quantity->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->dose_quantity->CurrentValue == $this->dose_quantity->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_dose_type") &&
-            $CurrentForm->hasValue("o_dose_type") &&
-            $this->dose_type->CurrentValue != $this->dose_type->DefaultValue &&
-            !($this->dose_type->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->dose_type->CurrentValue == $this->dose_type->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_formulation") &&
-            $CurrentForm->hasValue("o_formulation") &&
-            $this->formulation->CurrentValue != $this->formulation->DefaultValue &&
-            !($this->formulation->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->formulation->CurrentValue == $this->formulation->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_dose_interval") &&
-            $CurrentForm->hasValue("o_dose_interval") &&
-            $this->dose_interval->CurrentValue != $this->dose_interval->DefaultValue &&
-            !($this->dose_interval->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->dose_interval->CurrentValue == $this->dose_interval->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
-            $CurrentForm->hasValue("x_number_of_days") &&
-            $CurrentForm->hasValue("o_number_of_days") &&
-            $this->number_of_days->CurrentValue != $this->number_of_days->DefaultValue &&
-            !($this->number_of_days->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->number_of_days->CurrentValue == $this->number_of_days->getSessionValue())
+            $CurrentForm->hasValue("x_cost") &&
+            $CurrentForm->hasValue("o_cost") &&
+            $this->cost->CurrentValue != $this->cost->DefaultValue &&
+            !($this->cost->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->cost->CurrentValue == $this->cost->getSessionValue())
         ) {
             return false;
         }
@@ -1295,7 +1232,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->prescription_id->setSessionValue("");
+                        $this->admission_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -1328,30 +1265,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
-
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
-        $item->OnLeft = false;
 
         // "sequence"
         $item = &$this->ListOptions->add("sequence");
@@ -1422,7 +1335,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
                 $options = &$this->ListOptions;
                 $options->UseButtonGroup = true; // Use button group for grid delete button
                 $opt = $options["griddelete"];
-                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
                     $opt->Body = "&nbsp;";
                 } else {
                     $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
@@ -1433,61 +1346,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         // "sequence"
         $opt = $this->ListOptions["sequence"];
         $opt->Body = FormatSequenceNumber($this->RecordCount);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"patient_ipd_prescription_details\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"patient_ipd_prescription_details\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"patient_ipd_prescription_details\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-                $deleteCaption = $Language->phrase("DeleteLink");
-                $deleteTitle = HtmlTitle($deleteCaption);
-                if ($this->UseAjaxActions) {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\" data-ew-action=\"inline\" data-action=\"delete\" title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" data-key= \"" . HtmlEncode($this->getKey(true)) . "\" data-url=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-delete\"" .
-                        ($this->InlineDelete ? " data-ew-action=\"inline-delete\"" : "") .
-                        " title=\"" . $deleteTitle . "\" data-caption=\"" . $deleteTitle . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $deleteCaption . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
         $this->renderListOptionsExt();
 
@@ -1510,19 +1369,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $item = &$option->addGroupOption();
         $item->Body = "";
         $item->Visible = false;
-
-        // Add
-        if ($this->CurrentMode == "view") { // Check view mode
-            $item = &$option->add("add");
-            $addcaption = HtmlTitle($Language->phrase("AddLink"));
-            $this->AddUrl = $this->getAddUrl();
-            if ($this->ModalAdd && !IsMobile()) {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"patient_ipd_prescription_details\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-            } else {
-                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-            }
-            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        }
     }
 
     // Active user filter
@@ -1560,7 +1406,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
                     $option->UseDropDownButton = false;
                     $item = &$option->add("addblankrow");
                     $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = $Security->canAdd();
+                    $item->Visible = false;
                     $this->ShowOtherOptions = $item->Visible;
                 }
             }
@@ -1614,7 +1460,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_patient_ipd_prescription_details", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_ipd_bill_services", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -1702,7 +1548,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_patient_ipd_prescription_details",
+            "id" => "r" . $this->RowCount . "_ipd_bill_services",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -1737,114 +1583,43 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'prescription_id' first before field var 'x_prescription_id'
-        $val = $CurrentForm->hasValue("prescription_id") ? $CurrentForm->getValue("prescription_id") : $CurrentForm->getValue("x_prescription_id");
-        if (!$this->prescription_id->IsDetailKey) {
+        // Check field name 'admission_id' first before field var 'x_admission_id'
+        $val = $CurrentForm->hasValue("admission_id") ? $CurrentForm->getValue("admission_id") : $CurrentForm->getValue("x_admission_id");
+        if (!$this->admission_id->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->prescription_id->Visible = false; // Disable update for API request
+                $this->admission_id->Visible = false; // Disable update for API request
             } else {
-                $this->prescription_id->setFormValue($val, true, $validate);
+                $this->admission_id->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_prescription_id")) {
-            $this->prescription_id->setOldValue($CurrentForm->getValue("o_prescription_id"));
+        if ($CurrentForm->hasValue("o_admission_id")) {
+            $this->admission_id->setOldValue($CurrentForm->getValue("o_admission_id"));
         }
 
-        // Check field name 'medicine_stock_id' first before field var 'x_medicine_stock_id'
-        $val = $CurrentForm->hasValue("medicine_stock_id") ? $CurrentForm->getValue("medicine_stock_id") : $CurrentForm->getValue("x_medicine_stock_id");
-        if (!$this->medicine_stock_id->IsDetailKey) {
+        // Check field name 'service_name' first before field var 'x_service_name'
+        $val = $CurrentForm->hasValue("service_name") ? $CurrentForm->getValue("service_name") : $CurrentForm->getValue("x_service_name");
+        if (!$this->service_name->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->medicine_stock_id->Visible = false; // Disable update for API request
+                $this->service_name->Visible = false; // Disable update for API request
             } else {
-                $this->medicine_stock_id->setFormValue($val);
+                $this->service_name->setFormValue($val);
             }
         }
-        if ($CurrentForm->hasValue("o_medicine_stock_id")) {
-            $this->medicine_stock_id->setOldValue($CurrentForm->getValue("o_medicine_stock_id"));
+        if ($CurrentForm->hasValue("o_service_name")) {
+            $this->service_name->setOldValue($CurrentForm->getValue("o_service_name"));
         }
 
-        // Check field name 'method' first before field var 'x_method'
-        $val = $CurrentForm->hasValue("method") ? $CurrentForm->getValue("method") : $CurrentForm->getValue("x_method");
-        if (!$this->method->IsDetailKey) {
+        // Check field name 'cost' first before field var 'x_cost'
+        $val = $CurrentForm->hasValue("cost") ? $CurrentForm->getValue("cost") : $CurrentForm->getValue("x_cost");
+        if (!$this->cost->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->method->Visible = false; // Disable update for API request
+                $this->cost->Visible = false; // Disable update for API request
             } else {
-                $this->method->setFormValue($val);
+                $this->cost->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_method")) {
-            $this->method->setOldValue($CurrentForm->getValue("o_method"));
-        }
-
-        // Check field name 'dose_quantity' first before field var 'x_dose_quantity'
-        $val = $CurrentForm->hasValue("dose_quantity") ? $CurrentForm->getValue("dose_quantity") : $CurrentForm->getValue("x_dose_quantity");
-        if (!$this->dose_quantity->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->dose_quantity->Visible = false; // Disable update for API request
-            } else {
-                $this->dose_quantity->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_dose_quantity")) {
-            $this->dose_quantity->setOldValue($CurrentForm->getValue("o_dose_quantity"));
-        }
-
-        // Check field name 'dose_type' first before field var 'x_dose_type'
-        $val = $CurrentForm->hasValue("dose_type") ? $CurrentForm->getValue("dose_type") : $CurrentForm->getValue("x_dose_type");
-        if (!$this->dose_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->dose_type->Visible = false; // Disable update for API request
-            } else {
-                $this->dose_type->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_dose_type")) {
-            $this->dose_type->setOldValue($CurrentForm->getValue("o_dose_type"));
-        }
-
-        // Check field name 'formulation' first before field var 'x_formulation'
-        $val = $CurrentForm->hasValue("formulation") ? $CurrentForm->getValue("formulation") : $CurrentForm->getValue("x_formulation");
-        if (!$this->formulation->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->formulation->Visible = false; // Disable update for API request
-            } else {
-                $this->formulation->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_formulation")) {
-            $this->formulation->setOldValue($CurrentForm->getValue("o_formulation"));
-        }
-
-        // Check field name 'dose_interval' first before field var 'x_dose_interval'
-        $val = $CurrentForm->hasValue("dose_interval") ? $CurrentForm->getValue("dose_interval") : $CurrentForm->getValue("x_dose_interval");
-        if (!$this->dose_interval->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->dose_interval->Visible = false; // Disable update for API request
-            } else {
-                $this->dose_interval->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_dose_interval")) {
-            $this->dose_interval->setOldValue($CurrentForm->getValue("o_dose_interval"));
-        }
-
-        // Check field name 'number_of_days' first before field var 'x_number_of_days'
-        $val = $CurrentForm->hasValue("number_of_days") ? $CurrentForm->getValue("number_of_days") : $CurrentForm->getValue("x_number_of_days");
-        if (!$this->number_of_days->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->number_of_days->Visible = false; // Disable update for API request
-            } else {
-                $this->number_of_days->setFormValue($val, true, $validate);
-            }
-        }
-        if ($CurrentForm->hasValue("o_number_of_days")) {
-            $this->number_of_days->setOldValue($CurrentForm->getValue("o_number_of_days"));
-        }
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
+        if ($CurrentForm->hasValue("o_cost")) {
+            $this->cost->setOldValue($CurrentForm->getValue("o_cost"));
         }
     }
 
@@ -1852,17 +1627,9 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     public function restoreFormValues()
     {
         global $CurrentForm;
-        if (!$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->CurrentValue = $this->id->FormValue;
-        }
-        $this->prescription_id->CurrentValue = $this->prescription_id->FormValue;
-        $this->medicine_stock_id->CurrentValue = $this->medicine_stock_id->FormValue;
-        $this->method->CurrentValue = $this->method->FormValue;
-        $this->dose_quantity->CurrentValue = $this->dose_quantity->FormValue;
-        $this->dose_type->CurrentValue = $this->dose_type->FormValue;
-        $this->formulation->CurrentValue = $this->formulation->FormValue;
-        $this->dose_interval->CurrentValue = $this->dose_interval->FormValue;
-        $this->number_of_days->CurrentValue = $this->number_of_days->FormValue;
+        $this->admission_id->CurrentValue = $this->admission_id->FormValue;
+        $this->service_name->CurrentValue = $this->service_name->FormValue;
+        $this->cost->CurrentValue = $this->cost->FormValue;
     }
 
     /**
@@ -1958,52 +1725,24 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
 
         // Call Row Selected event
         $this->rowSelected($row);
-        $this->id->setDbValue($row['id']);
-        $this->prescription_id->setDbValue($row['prescription_id']);
-        $this->medicine_stock_id->setDbValue($row['medicine_stock_id']);
-        $this->method->setDbValue($row['method']);
-        $this->dose_quantity->setDbValue($row['dose_quantity']);
-        $this->dose_type->setDbValue($row['dose_type']);
-        $this->formulation->setDbValue($row['formulation']);
-        $this->dose_interval->setDbValue($row['dose_interval']);
-        $this->number_of_days->setDbValue($row['number_of_days']);
-        $this->date_created->setDbValue($row['date_created']);
-        $this->date_updated->setDbValue($row['date_updated']);
+        $this->admission_id->setDbValue($row['admission_id']);
+        $this->service_name->setDbValue($row['service_name']);
+        $this->cost->setDbValue($row['cost']);
     }
 
     // Return a row with default values
     protected function newRow()
     {
         $row = [];
-        $row['id'] = $this->id->DefaultValue;
-        $row['prescription_id'] = $this->prescription_id->DefaultValue;
-        $row['medicine_stock_id'] = $this->medicine_stock_id->DefaultValue;
-        $row['method'] = $this->method->DefaultValue;
-        $row['dose_quantity'] = $this->dose_quantity->DefaultValue;
-        $row['dose_type'] = $this->dose_type->DefaultValue;
-        $row['formulation'] = $this->formulation->DefaultValue;
-        $row['dose_interval'] = $this->dose_interval->DefaultValue;
-        $row['number_of_days'] = $this->number_of_days->DefaultValue;
-        $row['date_created'] = $this->date_created->DefaultValue;
-        $row['date_updated'] = $this->date_updated->DefaultValue;
+        $row['admission_id'] = $this->admission_id->DefaultValue;
+        $row['service_name'] = $this->service_name->DefaultValue;
+        $row['cost'] = $this->cost->DefaultValue;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        // Load old record
-        if ($this->OldKey != "") {
-            $this->setKey($this->OldKey);
-            $this->CurrentFilter = $this->getRecordFilter();
-            $sql = $this->getCurrentSql();
-            $conn = $this->getConnection();
-            $rs = ExecuteQuery($sql, $conn);
-            if ($row = $rs->fetch()) {
-                $this->loadRowValues($row); // Load row values
-                return $row;
-            }
-        }
         $this->loadRowValues(); // Load default row values
         return null;
     }
@@ -2024,343 +1763,134 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
 
         // Common render codes for all row types
 
-        // id
+        // admission_id
 
-        // prescription_id
+        // service_name
 
-        // medicine_stock_id
+        // cost
 
-        // method
-
-        // dose_quantity
-
-        // dose_type
-
-        // formulation
-
-        // dose_interval
-
-        // number_of_days
-
-        // date_created
-
-        // date_updated
+        // Accumulate aggregate value
+        if ($this->RowType != RowType::AGGREGATEINIT && $this->RowType != RowType::AGGREGATE && $this->RowType != RowType::PREVIEWFIELD) {
+            if (is_numeric($this->cost->CurrentValue)) {
+                $this->cost->Total += $this->cost->CurrentValue; // Accumulate total
+            }
+        }
 
         // View row
         if ($this->RowType == RowType::VIEW) {
-            // id
-            $this->id->ViewValue = $this->id->CurrentValue;
+            // admission_id
+            $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
 
-            // prescription_id
-            $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-            $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+            // service_name
+            $this->service_name->ViewValue = $this->service_name->CurrentValue;
 
-            // medicine_stock_id
-            $curVal = strval($this->medicine_stock_id->CurrentValue);
-            if ($curVal != "") {
-                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
-                if ($this->medicine_stock_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->medicine_stock_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->medicine_stock_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->displayValue($arwrk);
-                    } else {
-                        $this->medicine_stock_id->ViewValue = FormatNumber($this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->medicine_stock_id->ViewValue = null;
-            }
+            // cost
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
 
-            // method
-            if (strval($this->method->CurrentValue) != "") {
-                $this->method->ViewValue = $this->method->optionCaption($this->method->CurrentValue);
-            } else {
-                $this->method->ViewValue = null;
-            }
+            // admission_id
+            $this->admission_id->HrefValue = "";
+            $this->admission_id->TooltipValue = "";
 
-            // dose_quantity
-            $this->dose_quantity->ViewValue = $this->dose_quantity->CurrentValue;
-            $this->dose_quantity->ViewValue = FormatNumber($this->dose_quantity->ViewValue, $this->dose_quantity->formatPattern());
+            // service_name
+            $this->service_name->HrefValue = "";
+            $this->service_name->TooltipValue = "";
 
-            // dose_type
-            if (strval($this->dose_type->CurrentValue) != "") {
-                $this->dose_type->ViewValue = $this->dose_type->optionCaption($this->dose_type->CurrentValue);
-            } else {
-                $this->dose_type->ViewValue = null;
-            }
-
-            // formulation
-            if (strval($this->formulation->CurrentValue) != "") {
-                $this->formulation->ViewValue = $this->formulation->optionCaption($this->formulation->CurrentValue);
-            } else {
-                $this->formulation->ViewValue = null;
-            }
-
-            // dose_interval
-            if (strval($this->dose_interval->CurrentValue) != "") {
-                $this->dose_interval->ViewValue = $this->dose_interval->optionCaption($this->dose_interval->CurrentValue);
-            } else {
-                $this->dose_interval->ViewValue = null;
-            }
-
-            // number_of_days
-            $this->number_of_days->ViewValue = $this->number_of_days->CurrentValue;
-            $this->number_of_days->ViewValue = FormatNumber($this->number_of_days->ViewValue, $this->number_of_days->formatPattern());
-
-            // date_created
-            $this->date_created->ViewValue = $this->date_created->CurrentValue;
-            $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
-
-            // date_updated
-            $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
-            $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
-
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
-            $this->prescription_id->TooltipValue = "";
-
-            // medicine_stock_id
-            $this->medicine_stock_id->HrefValue = "";
-            $this->medicine_stock_id->TooltipValue = "";
-
-            // method
-            $this->method->HrefValue = "";
-            $this->method->TooltipValue = "";
-
-            // dose_quantity
-            $this->dose_quantity->HrefValue = "";
-            $this->dose_quantity->TooltipValue = "";
-
-            // dose_type
-            $this->dose_type->HrefValue = "";
-            $this->dose_type->TooltipValue = "";
-
-            // formulation
-            $this->formulation->HrefValue = "";
-            $this->formulation->TooltipValue = "";
-
-            // dose_interval
-            $this->dose_interval->HrefValue = "";
-            $this->dose_interval->TooltipValue = "";
-
-            // number_of_days
-            $this->number_of_days->HrefValue = "";
-            $this->number_of_days->TooltipValue = "";
+            // cost
+            $this->cost->HrefValue = "";
+            $this->cost->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            if ($this->prescription_id->getSessionValue() != "") {
-                $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
-                $this->prescription_id->OldValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+            // admission_id
+            $this->admission_id->setupEditAttributes();
+            if ($this->admission_id->getSessionValue() != "") {
+                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
+                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
+                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
             } else {
-                $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-                if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                    $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
+                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
+                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
+                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
                 }
             }
 
-            // medicine_stock_id
-            $this->medicine_stock_id->setupEditAttributes();
-            $curVal = trim(strval($this->medicine_stock_id->CurrentValue));
-            if ($curVal != "") {
-                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
-            } else {
-                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->Lookup !== null && is_array($this->medicine_stock_id->lookupOptions()) && count($this->medicine_stock_id->lookupOptions()) > 0 ? $curVal : null;
+            // service_name
+            $this->service_name->setupEditAttributes();
+            if (!$this->service_name->Raw) {
+                $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
             }
-            if ($this->medicine_stock_id->ViewValue !== null) { // Load from cache
-                $this->medicine_stock_id->EditValue = array_values($this->medicine_stock_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->medicine_stock_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->medicine_stock_id->EditValue = $arwrk;
-            }
-            $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
+            $this->service_name->EditValue = HtmlEncode($this->service_name->CurrentValue);
+            $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
 
-            // method
-            $this->method->setupEditAttributes();
-            $this->method->EditValue = $this->method->options(true);
-            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
-
-            // dose_quantity
-            $this->dose_quantity->setupEditAttributes();
-            $this->dose_quantity->EditValue = $this->dose_quantity->CurrentValue;
-            $this->dose_quantity->PlaceHolder = RemoveHtml($this->dose_quantity->caption());
-            if (strval($this->dose_quantity->EditValue) != "" && is_numeric($this->dose_quantity->EditValue)) {
-                $this->dose_quantity->EditValue = FormatNumber($this->dose_quantity->EditValue, null);
-            }
-
-            // dose_type
-            $this->dose_type->setupEditAttributes();
-            $this->dose_type->EditValue = $this->dose_type->options(true);
-            $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
-
-            // formulation
-            $this->formulation->setupEditAttributes();
-            $this->formulation->EditValue = $this->formulation->options(true);
-            $this->formulation->PlaceHolder = RemoveHtml($this->formulation->caption());
-
-            // dose_interval
-            $this->dose_interval->setupEditAttributes();
-            $this->dose_interval->EditValue = $this->dose_interval->options(true);
-            $this->dose_interval->PlaceHolder = RemoveHtml($this->dose_interval->caption());
-
-            // number_of_days
-            $this->number_of_days->setupEditAttributes();
-            $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
-            $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-            if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
-                $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
+            // cost
+            $this->cost->setupEditAttributes();
+            $this->cost->EditValue = $this->cost->CurrentValue;
+            $this->cost->PlaceHolder = RemoveHtml($this->cost->caption());
+            if (strval($this->cost->EditValue) != "" && is_numeric($this->cost->EditValue)) {
+                $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
             // Add refer script
 
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
+            // admission_id
+            $this->admission_id->HrefValue = "";
 
-            // medicine_stock_id
-            $this->medicine_stock_id->HrefValue = "";
+            // service_name
+            $this->service_name->HrefValue = "";
 
-            // method
-            $this->method->HrefValue = "";
-
-            // dose_quantity
-            $this->dose_quantity->HrefValue = "";
-
-            // dose_type
-            $this->dose_type->HrefValue = "";
-
-            // formulation
-            $this->formulation->HrefValue = "";
-
-            // dose_interval
-            $this->dose_interval->HrefValue = "";
-
-            // number_of_days
-            $this->number_of_days->HrefValue = "";
+            // cost
+            $this->cost->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // prescription_id
-            $this->prescription_id->setupEditAttributes();
-            if ($this->prescription_id->getSessionValue() != "") {
-                $this->prescription_id->CurrentValue = GetForeignKeyValue($this->prescription_id->getSessionValue());
-                $this->prescription_id->OldValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->ViewValue = FormatNumber($this->prescription_id->ViewValue, $this->prescription_id->formatPattern());
+            // admission_id
+            $this->admission_id->setupEditAttributes();
+            if ($this->admission_id->getSessionValue() != "") {
+                $this->admission_id->CurrentValue = GetForeignKeyValue($this->admission_id->getSessionValue());
+                $this->admission_id->OldValue = $this->admission_id->CurrentValue;
+                $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+                $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
             } else {
-                $this->prescription_id->EditValue = $this->prescription_id->CurrentValue;
-                $this->prescription_id->PlaceHolder = RemoveHtml($this->prescription_id->caption());
-                if (strval($this->prescription_id->EditValue) != "" && is_numeric($this->prescription_id->EditValue)) {
-                    $this->prescription_id->EditValue = FormatNumber($this->prescription_id->EditValue, null);
+                $this->admission_id->EditValue = $this->admission_id->CurrentValue;
+                $this->admission_id->PlaceHolder = RemoveHtml($this->admission_id->caption());
+                if (strval($this->admission_id->EditValue) != "" && is_numeric($this->admission_id->EditValue)) {
+                    $this->admission_id->EditValue = FormatNumber($this->admission_id->EditValue, null);
                 }
             }
 
-            // medicine_stock_id
-            $this->medicine_stock_id->setupEditAttributes();
-            $curVal = trim(strval($this->medicine_stock_id->CurrentValue));
-            if ($curVal != "") {
-                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->lookupCacheOption($curVal);
-            } else {
-                $this->medicine_stock_id->ViewValue = $this->medicine_stock_id->Lookup !== null && is_array($this->medicine_stock_id->lookupOptions()) && count($this->medicine_stock_id->lookupOptions()) > 0 ? $curVal : null;
+            // service_name
+            $this->service_name->setupEditAttributes();
+            if (!$this->service_name->Raw) {
+                $this->service_name->CurrentValue = HtmlDecode($this->service_name->CurrentValue);
             }
-            if ($this->medicine_stock_id->ViewValue !== null) { // Load from cache
-                $this->medicine_stock_id->EditValue = array_values($this->medicine_stock_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->medicine_stock_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->medicine_stock_id->EditValue = $arwrk;
-            }
-            $this->medicine_stock_id->PlaceHolder = RemoveHtml($this->medicine_stock_id->caption());
+            $this->service_name->EditValue = HtmlEncode($this->service_name->CurrentValue);
+            $this->service_name->PlaceHolder = RemoveHtml($this->service_name->caption());
 
-            // method
-            $this->method->setupEditAttributes();
-            $this->method->EditValue = $this->method->options(true);
-            $this->method->PlaceHolder = RemoveHtml($this->method->caption());
-
-            // dose_quantity
-            $this->dose_quantity->setupEditAttributes();
-            $this->dose_quantity->EditValue = $this->dose_quantity->CurrentValue;
-            $this->dose_quantity->PlaceHolder = RemoveHtml($this->dose_quantity->caption());
-            if (strval($this->dose_quantity->EditValue) != "" && is_numeric($this->dose_quantity->EditValue)) {
-                $this->dose_quantity->EditValue = FormatNumber($this->dose_quantity->EditValue, null);
-            }
-
-            // dose_type
-            $this->dose_type->setupEditAttributes();
-            $this->dose_type->EditValue = $this->dose_type->options(true);
-            $this->dose_type->PlaceHolder = RemoveHtml($this->dose_type->caption());
-
-            // formulation
-            $this->formulation->setupEditAttributes();
-            $this->formulation->EditValue = $this->formulation->options(true);
-            $this->formulation->PlaceHolder = RemoveHtml($this->formulation->caption());
-
-            // dose_interval
-            $this->dose_interval->setupEditAttributes();
-            $this->dose_interval->EditValue = $this->dose_interval->options(true);
-            $this->dose_interval->PlaceHolder = RemoveHtml($this->dose_interval->caption());
-
-            // number_of_days
-            $this->number_of_days->setupEditAttributes();
-            $this->number_of_days->EditValue = $this->number_of_days->CurrentValue;
-            $this->number_of_days->PlaceHolder = RemoveHtml($this->number_of_days->caption());
-            if (strval($this->number_of_days->EditValue) != "" && is_numeric($this->number_of_days->EditValue)) {
-                $this->number_of_days->EditValue = FormatNumber($this->number_of_days->EditValue, null);
+            // cost
+            $this->cost->setupEditAttributes();
+            $this->cost->EditValue = $this->cost->CurrentValue;
+            $this->cost->PlaceHolder = RemoveHtml($this->cost->caption());
+            if (strval($this->cost->EditValue) != "" && is_numeric($this->cost->EditValue)) {
+                $this->cost->EditValue = FormatNumber($this->cost->EditValue, null);
             }
 
             // Edit refer script
 
-            // prescription_id
-            $this->prescription_id->HrefValue = "";
+            // admission_id
+            $this->admission_id->HrefValue = "";
 
-            // medicine_stock_id
-            $this->medicine_stock_id->HrefValue = "";
+            // service_name
+            $this->service_name->HrefValue = "";
 
-            // method
-            $this->method->HrefValue = "";
-
-            // dose_quantity
-            $this->dose_quantity->HrefValue = "";
-
-            // dose_type
-            $this->dose_type->HrefValue = "";
-
-            // formulation
-            $this->formulation->HrefValue = "";
-
-            // dose_interval
-            $this->dose_interval->HrefValue = "";
-
-            // number_of_days
-            $this->number_of_days->HrefValue = "";
+            // cost
+            $this->cost->HrefValue = "";
+        } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
+                    $this->cost->Total = 0; // Initialize total
+        } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
+            $this->cost->CurrentValue = $this->cost->Total;
+            $this->cost->ViewValue = $this->cost->CurrentValue;
+            $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
+            $this->cost->HrefValue = ""; // Clear href value
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2382,54 +1912,26 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
             return true;
         }
         $validateForm = true;
-            if ($this->prescription_id->Visible && $this->prescription_id->Required) {
-                if (!$this->prescription_id->IsDetailKey && EmptyValue($this->prescription_id->FormValue)) {
-                    $this->prescription_id->addErrorMessage(str_replace("%s", $this->prescription_id->caption(), $this->prescription_id->RequiredErrorMessage));
+            if ($this->admission_id->Visible && $this->admission_id->Required) {
+                if (!$this->admission_id->IsDetailKey && EmptyValue($this->admission_id->FormValue)) {
+                    $this->admission_id->addErrorMessage(str_replace("%s", $this->admission_id->caption(), $this->admission_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->prescription_id->FormValue)) {
-                $this->prescription_id->addErrorMessage($this->prescription_id->getErrorMessage(false));
+            if (!CheckInteger($this->admission_id->FormValue)) {
+                $this->admission_id->addErrorMessage($this->admission_id->getErrorMessage(false));
             }
-            if ($this->medicine_stock_id->Visible && $this->medicine_stock_id->Required) {
-                if (!$this->medicine_stock_id->IsDetailKey && EmptyValue($this->medicine_stock_id->FormValue)) {
-                    $this->medicine_stock_id->addErrorMessage(str_replace("%s", $this->medicine_stock_id->caption(), $this->medicine_stock_id->RequiredErrorMessage));
+            if ($this->service_name->Visible && $this->service_name->Required) {
+                if (!$this->service_name->IsDetailKey && EmptyValue($this->service_name->FormValue)) {
+                    $this->service_name->addErrorMessage(str_replace("%s", $this->service_name->caption(), $this->service_name->RequiredErrorMessage));
                 }
             }
-            if ($this->method->Visible && $this->method->Required) {
-                if (!$this->method->IsDetailKey && EmptyValue($this->method->FormValue)) {
-                    $this->method->addErrorMessage(str_replace("%s", $this->method->caption(), $this->method->RequiredErrorMessage));
+            if ($this->cost->Visible && $this->cost->Required) {
+                if (!$this->cost->IsDetailKey && EmptyValue($this->cost->FormValue)) {
+                    $this->cost->addErrorMessage(str_replace("%s", $this->cost->caption(), $this->cost->RequiredErrorMessage));
                 }
             }
-            if ($this->dose_quantity->Visible && $this->dose_quantity->Required) {
-                if (!$this->dose_quantity->IsDetailKey && EmptyValue($this->dose_quantity->FormValue)) {
-                    $this->dose_quantity->addErrorMessage(str_replace("%s", $this->dose_quantity->caption(), $this->dose_quantity->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->dose_quantity->FormValue)) {
-                $this->dose_quantity->addErrorMessage($this->dose_quantity->getErrorMessage(false));
-            }
-            if ($this->dose_type->Visible && $this->dose_type->Required) {
-                if (!$this->dose_type->IsDetailKey && EmptyValue($this->dose_type->FormValue)) {
-                    $this->dose_type->addErrorMessage(str_replace("%s", $this->dose_type->caption(), $this->dose_type->RequiredErrorMessage));
-                }
-            }
-            if ($this->formulation->Visible && $this->formulation->Required) {
-                if (!$this->formulation->IsDetailKey && EmptyValue($this->formulation->FormValue)) {
-                    $this->formulation->addErrorMessage(str_replace("%s", $this->formulation->caption(), $this->formulation->RequiredErrorMessage));
-                }
-            }
-            if ($this->dose_interval->Visible && $this->dose_interval->Required) {
-                if (!$this->dose_interval->IsDetailKey && EmptyValue($this->dose_interval->FormValue)) {
-                    $this->dose_interval->addErrorMessage(str_replace("%s", $this->dose_interval->caption(), $this->dose_interval->RequiredErrorMessage));
-                }
-            }
-            if ($this->number_of_days->Visible && $this->number_of_days->Required) {
-                if (!$this->number_of_days->IsDetailKey && EmptyValue($this->number_of_days->FormValue)) {
-                    $this->number_of_days->addErrorMessage(str_replace("%s", $this->number_of_days->caption(), $this->number_of_days->RequiredErrorMessage));
-                }
-            }
-            if (!CheckInteger($this->number_of_days->FormValue)) {
-                $this->number_of_days->addErrorMessage($this->number_of_days->getErrorMessage(false));
+            if (!CheckNumber($this->cost->FormValue)) {
+                $this->cost->addErrorMessage($this->cost->getErrorMessage(false));
             }
 
         // Return validate result
@@ -2466,10 +1968,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         $failKeys = [];
         foreach ($rsold as $row) {
             $thisKey = "";
-            if ($thisKey != "") {
-                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
-            }
-            $thisKey .= $row['id'];
 
             // Call row deleting event
             $deleteRow = $this->rowDeleting($row);
@@ -2581,32 +2079,17 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         global $Security;
         $rsnew = [];
 
-        // prescription_id
-        if ($this->prescription_id->getSessionValue() != "") {
-            $this->prescription_id->ReadOnly = true;
+        // admission_id
+        if ($this->admission_id->getSessionValue() != "") {
+            $this->admission_id->ReadOnly = true;
         }
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, $this->prescription_id->ReadOnly);
+        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, $this->admission_id->ReadOnly);
 
-        // medicine_stock_id
-        $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, $this->medicine_stock_id->ReadOnly);
+        // service_name
+        $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, $this->service_name->ReadOnly);
 
-        // method
-        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, $this->method->ReadOnly);
-
-        // dose_quantity
-        $this->dose_quantity->setDbValueDef($rsnew, $this->dose_quantity->CurrentValue, $this->dose_quantity->ReadOnly);
-
-        // dose_type
-        $this->dose_type->setDbValueDef($rsnew, $this->dose_type->CurrentValue, $this->dose_type->ReadOnly);
-
-        // formulation
-        $this->formulation->setDbValueDef($rsnew, $this->formulation->CurrentValue, $this->formulation->ReadOnly);
-
-        // dose_interval
-        $this->dose_interval->setDbValueDef($rsnew, $this->dose_interval->CurrentValue, $this->dose_interval->ReadOnly);
-
-        // number_of_days
-        $this->number_of_days->setDbValueDef($rsnew, $this->number_of_days->CurrentValue, $this->number_of_days->ReadOnly);
+        // cost
+        $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
         return $rsnew;
     }
 
@@ -2616,29 +2099,14 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->CurrentValue = $row['prescription_id'];
+        if (isset($row['admission_id'])) { // admission_id
+            $this->admission_id->CurrentValue = $row['admission_id'];
         }
-        if (isset($row['medicine_stock_id'])) { // medicine_stock_id
-            $this->medicine_stock_id->CurrentValue = $row['medicine_stock_id'];
+        if (isset($row['service_name'])) { // service_name
+            $this->service_name->CurrentValue = $row['service_name'];
         }
-        if (isset($row['method'])) { // method
-            $this->method->CurrentValue = $row['method'];
-        }
-        if (isset($row['dose_quantity'])) { // dose_quantity
-            $this->dose_quantity->CurrentValue = $row['dose_quantity'];
-        }
-        if (isset($row['dose_type'])) { // dose_type
-            $this->dose_type->CurrentValue = $row['dose_type'];
-        }
-        if (isset($row['formulation'])) { // formulation
-            $this->formulation->CurrentValue = $row['formulation'];
-        }
-        if (isset($row['dose_interval'])) { // dose_interval
-            $this->dose_interval->CurrentValue = $row['dose_interval'];
-        }
-        if (isset($row['number_of_days'])) { // number_of_days
-            $this->number_of_days->CurrentValue = $row['number_of_days'];
+        if (isset($row['cost'])) { // cost
+            $this->cost->CurrentValue = $row['cost'];
         }
     }
 
@@ -2648,9 +2116,9 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "patient_ipd_prescriptions") {
-            $this->prescription_id->Visible = true; // Need to insert foreign key
-            $this->prescription_id->CurrentValue = $this->prescription_id->getSessionValue();
+        if ($this->getCurrentMasterTable() == "ipd_billing_report") {
+            $this->admission_id->Visible = true; // Need to insert foreign key
+            $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
         }
 
         // Get new row
@@ -2699,29 +2167,14 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
         global $Security;
         $rsnew = [];
 
-        // prescription_id
-        $this->prescription_id->setDbValueDef($rsnew, $this->prescription_id->CurrentValue, false);
+        // admission_id
+        $this->admission_id->setDbValueDef($rsnew, $this->admission_id->CurrentValue, false);
 
-        // medicine_stock_id
-        $this->medicine_stock_id->setDbValueDef($rsnew, $this->medicine_stock_id->CurrentValue, false);
+        // service_name
+        $this->service_name->setDbValueDef($rsnew, $this->service_name->CurrentValue, false);
 
-        // method
-        $this->method->setDbValueDef($rsnew, $this->method->CurrentValue, false);
-
-        // dose_quantity
-        $this->dose_quantity->setDbValueDef($rsnew, $this->dose_quantity->CurrentValue, false);
-
-        // dose_type
-        $this->dose_type->setDbValueDef($rsnew, $this->dose_type->CurrentValue, false);
-
-        // formulation
-        $this->formulation->setDbValueDef($rsnew, $this->formulation->CurrentValue, false);
-
-        // dose_interval
-        $this->dose_interval->setDbValueDef($rsnew, $this->dose_interval->CurrentValue, false);
-
-        // number_of_days
-        $this->number_of_days->setDbValueDef($rsnew, $this->number_of_days->CurrentValue, false);
+        // cost
+        $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
         return $rsnew;
     }
 
@@ -2731,29 +2184,14 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['prescription_id'])) { // prescription_id
-            $this->prescription_id->setFormValue($row['prescription_id']);
+        if (isset($row['admission_id'])) { // admission_id
+            $this->admission_id->setFormValue($row['admission_id']);
         }
-        if (isset($row['medicine_stock_id'])) { // medicine_stock_id
-            $this->medicine_stock_id->setFormValue($row['medicine_stock_id']);
+        if (isset($row['service_name'])) { // service_name
+            $this->service_name->setFormValue($row['service_name']);
         }
-        if (isset($row['method'])) { // method
-            $this->method->setFormValue($row['method']);
-        }
-        if (isset($row['dose_quantity'])) { // dose_quantity
-            $this->dose_quantity->setFormValue($row['dose_quantity']);
-        }
-        if (isset($row['dose_type'])) { // dose_type
-            $this->dose_type->setFormValue($row['dose_type']);
-        }
-        if (isset($row['formulation'])) { // formulation
-            $this->formulation->setFormValue($row['formulation']);
-        }
-        if (isset($row['dose_interval'])) { // dose_interval
-            $this->dose_interval->setFormValue($row['dose_interval']);
-        }
-        if (isset($row['number_of_days'])) { // number_of_days
-            $this->number_of_days->setFormValue($row['number_of_days']);
+        if (isset($row['cost'])) { // cost
+            $this->cost->setFormValue($row['cost']);
         }
     }
 
@@ -2762,9 +2200,9 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "patient_ipd_prescriptions") {
-            $masterTbl = Container("patient_ipd_prescriptions");
-            $this->prescription_id->Visible = false;
+        if ($masterTblVar == "ipd_billing_report") {
+            $masterTbl = Container("ipd_billing_report");
+            $this->admission_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
@@ -2786,16 +2224,6 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_medicine_stock_id":
-                    break;
-                case "x_method":
-                    break;
-                case "x_dose_type":
-                    break;
-                case "x_formulation":
-                    break;
-                case "x_dose_interval":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2828,10 +2256,7 @@ class PatientIpdPrescriptionDetailsGrid extends PatientIpdPrescriptionDetails
     // Page Load event
     public function pageLoad()
     {
-        global $Language;
-        $var = $Language->PhraseClass("addlink");
-        $Language->setPhraseClass("addlink", "");
-        $Language->setPhrase("addlink", "add medicine");
+        //Log("Page Load");
     }
 
     // Page Unload event

@@ -2636,7 +2636,10 @@ class PatientIpdPrescriptionsList extends PatientIpdPrescriptions
     // Page Load event
     public function pageLoad()
     {
-        //Log("Page Load");
+        global $Language;
+        $var = $Language->PhraseClass("addlink");
+        $Language->setPhraseClass("addlink", "");
+        $Language->setPhrase("addlink", "add prescription");
     }
 
     // Page Unload event

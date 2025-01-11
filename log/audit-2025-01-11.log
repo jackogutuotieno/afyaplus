@@ -5,3 +5,5 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-11 07:29:58",/afyaplus/login,1,login,::1,,,,
 "2025-01-11 10:04:01",/afyaplus/patientadmissionsedit/1,1,U,patient_admissions,payment_method_id,1,0,1
 "2025-01-11 10:04:01",/afyaplus/patientadmissionsedit/1,1,U,patient_admissions,medical_scheme_id,1,0,3
+"2025-01-11 11:55:32",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-11 11:55:52",/afyaplus/login,1,login,::1,,,,

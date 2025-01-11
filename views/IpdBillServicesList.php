@@ -3,12 +3,12 @@
 namespace PHPMaker2024\afyaplus;
 
 // Page object
-$IpdBillingReportList = &$Page;
+$IpdBillServicesList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { ipd_billing_report: currentTable } });
+ew.deepAssign(ew.vars, { tables: { ipd_bill_services: currentTable } });
 var currentPageID = ew.PAGE_ID = "list";
 var currentForm;
 var <?= $Page->FormName ?>;
@@ -56,21 +56,30 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "ipd_billing_report") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/IpdBillingReportMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
-<form name="fipd_billing_reportsrch" id="fipd_billing_reportsrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
-<div id="fipd_billing_reportsrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
+<form name="fipd_bill_servicessrch" id="fipd_bill_servicessrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
+<div id="fipd_bill_servicessrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
 <script>
 var currentTable = <?= JsonEncode($Page->toClientVar()) ?>;
-ew.deepAssign(ew.vars, { tables: { ipd_billing_report: currentTable } });
+ew.deepAssign(ew.vars, { tables: { ipd_bill_services: currentTable } });
 var currentForm;
-var fipd_billing_reportsrch, currentSearchForm, currentAdvancedSearchForm;
+var fipd_bill_servicessrch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready(["wrapper", "head"], function () {
     let $ = jQuery,
         fields = currentTable.fields;
 
     // Form object for search
     let form = new ew.FormBuilder()
-        .setId("fipd_billing_reportsrch")
+        .setId("fipd_bill_servicessrch")
         .setPageId("list")
 <?php if ($Page->UseAjaxActions) { ?>
         .setSubmitWithFetch(true)
@@ -101,10 +110,10 @@ loadjs.ready(["wrapper", "head"], function () {
                 <span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fipd_billing_reportsrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fipd_billing_reportsrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fipd_billing_reportsrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
-                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fipd_billing_reportsrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "" ? " active" : "" ?>" form="fipd_bill_servicessrch" data-ew-action="search-type"><?= $Language->phrase("QuickSearchAuto") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "=" ? " active" : "" ?>" form="fipd_bill_servicessrch" data-ew-action="search-type" data-search-type="="><?= $Language->phrase("QuickSearchExact") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "AND" ? " active" : "" ?>" form="fipd_bill_servicessrch" data-ew-action="search-type" data-search-type="AND"><?= $Language->phrase("QuickSearchAll") ?></button>
+                <button type="button" class="dropdown-item<?= $Page->BasicSearch->getType() == "OR" ? " active" : "" ?>" form="fipd_bill_servicessrch" data-ew-action="search-type" data-search-type="OR"><?= $Language->phrase("QuickSearchAny") ?></button>
             </div>
         </div>
     </div>
@@ -144,13 +153,17 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
-<input type="hidden" name="t" value="ipd_billing_report">
+<input type="hidden" name="t" value="ipd_bill_services">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<div id="gmp_ipd_billing_report" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
+<?php if ($Page->getCurrentMasterTable() == "ipd_billing_report" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="ipd_billing_report">
+<input type="hidden" name="fk_admission_id" value="<?= HtmlEncode($Page->admission_id->getSessionValue()) ?>">
+<?php } ?>
+<div id="gmp_ipd_bill_services" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
-<table id="tbl_ipd_billing_reportlist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
+<table id="tbl_ipd_bill_serviceslist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
 <?php
@@ -163,20 +176,14 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->patient_uhid->Visible) { // patient_uhid ?>
-        <th data-name="patient_uhid" class="<?= $Page->patient_uhid->headerCellClass() ?>"><div id="elh_ipd_billing_report_patient_uhid" class="ipd_billing_report_patient_uhid"><?= $Page->renderFieldHeader($Page->patient_uhid) ?></div></th>
+<?php if ($Page->admission_id->Visible) { // admission_id ?>
+        <th data-name="admission_id" class="<?= $Page->admission_id->headerCellClass() ?>"><div id="elh_ipd_bill_services_admission_id" class="ipd_bill_services_admission_id"><?= $Page->renderFieldHeader($Page->admission_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_ipd_billing_report_patient_name" class="ipd_billing_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
+<?php if ($Page->service_name->Visible) { // service_name ?>
+        <th data-name="service_name" class="<?= $Page->service_name->headerCellClass() ?>"><div id="elh_ipd_bill_services_service_name" class="ipd_bill_services_service_name"><?= $Page->renderFieldHeader($Page->service_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_ipd_billing_report_status" class="ipd_billing_report_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_admitted->Visible) { // date_admitted ?>
-        <th data-name="date_admitted" class="<?= $Page->date_admitted->headerCellClass() ?>"><div id="elh_ipd_billing_report_date_admitted" class="ipd_billing_report_date_admitted"><?= $Page->renderFieldHeader($Page->date_admitted) ?></div></th>
-<?php } ?>
-<?php if ($Page->date_discharged->Visible) { // date_discharged ?>
-        <th data-name="date_discharged" class="<?= $Page->date_discharged->headerCellClass() ?>"><div id="elh_ipd_billing_report_date_discharged" class="ipd_billing_report_date_discharged"><?= $Page->renderFieldHeader($Page->date_discharged) ?></div></th>
+<?php if ($Page->cost->Visible) { // cost ?>
+        <th data-name="cost" class="<?= $Page->cost->headerCellClass() ?>"><div id="elh_ipd_bill_services_cost" class="ipd_bill_services_cost"><?= $Page->renderFieldHeader($Page->cost) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -206,43 +213,27 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->patient_uhid->Visible) { // patient_uhid ?>
-        <td data-name="patient_uhid"<?= $Page->patient_uhid->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_patient_uhid" class="el_ipd_billing_report_patient_uhid">
-<span<?= $Page->patient_uhid->viewAttributes() ?>>
-<?= $Page->patient_uhid->getViewValue() ?></span>
+    <?php if ($Page->admission_id->Visible) { // admission_id ?>
+        <td data-name="admission_id"<?= $Page->admission_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_bill_services_admission_id" class="el_ipd_bill_services_admission_id">
+<span<?= $Page->admission_id->viewAttributes() ?>>
+<?= $Page->admission_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->patient_name->Visible) { // patient_name ?>
-        <td data-name="patient_name"<?= $Page->patient_name->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_patient_name" class="el_ipd_billing_report_patient_name">
-<span<?= $Page->patient_name->viewAttributes() ?>>
-<?= $Page->patient_name->getViewValue() ?></span>
+    <?php if ($Page->service_name->Visible) { // service_name ?>
+        <td data-name="service_name"<?= $Page->service_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_bill_services_service_name" class="el_ipd_bill_services_service_name">
+<span<?= $Page->service_name->viewAttributes() ?>>
+<?= $Page->service_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->status->Visible) { // status ?>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_status" class="el_ipd_billing_report_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_admitted->Visible) { // date_admitted ?>
-        <td data-name="date_admitted"<?= $Page->date_admitted->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_date_admitted" class="el_ipd_billing_report_date_admitted">
-<span<?= $Page->date_admitted->viewAttributes() ?>>
-<?= $Page->date_admitted->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->date_discharged->Visible) { // date_discharged ?>
-        <td data-name="date_discharged"<?= $Page->date_discharged->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_date_discharged" class="el_ipd_billing_report_date_discharged">
-<span<?= $Page->date_discharged->viewAttributes() ?>>
-<?= $Page->date_discharged->getViewValue() ?></span>
+    <?php if ($Page->cost->Visible) { // cost ?>
+        <td data-name="cost"<?= $Page->cost->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_bill_services_cost" class="el_ipd_bill_services_cost">
+<span<?= $Page->cost->viewAttributes() ?>>
+<?= $Page->cost->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -265,6 +256,43 @@ $Page->ListOptions->render("body", "right", $Page->RowCount);
 }
 ?>
 </tbody>
+<?php
+// Render aggregate row
+$Page->RowType = RowType::AGGREGATE;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->TotalRecords > 0 && !$Page->isGridAdd() && !$Page->isGridEdit() && !$Page->isMultiEdit()) { ?>
+<tfoot><!-- Table footer -->
+    <tr class="ew-table-footer">
+<?php
+// Render list options
+$Page->renderListOptions();
+
+// Render list options (footer, left)
+$Page->ListOptions->render("footer", "left");
+?>
+    <?php if ($Page->admission_id->Visible) { // admission_id ?>
+        <td data-name="admission_id" class="<?= $Page->admission_id->footerCellClass() ?>"><span id="elf_ipd_bill_services_admission_id" class="ipd_bill_services_admission_id">
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->service_name->Visible) { // service_name ?>
+        <td data-name="service_name" class="<?= $Page->service_name->footerCellClass() ?>"><span id="elf_ipd_bill_services_service_name" class="ipd_bill_services_service_name">
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->cost->Visible) { // cost ?>
+        <td data-name="cost" class="<?= $Page->cost->footerCellClass() ?>"><span id="elf_ipd_bill_services_cost" class="ipd_bill_services_cost">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->cost->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+<?php
+// Render list options (footer, right)
+$Page->ListOptions->render("footer", "right");
+?>
+    </tr>
+</tfoot>
+<?php } ?>
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->
@@ -305,7 +333,7 @@ echo GetDebugMessage();
 <script>
 // Field event handlers
 loadjs.ready("head", function() {
-    ew.addEventHandlers("ipd_billing_report");
+    ew.addEventHandlers("ipd_bill_services");
 });
 </script>
 <script>
