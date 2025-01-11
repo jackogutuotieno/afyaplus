@@ -20721,4 +20721,8 @@ span span p {
   font-weight: 700;
 }
 
+#gmp_ipd_billing_report .dropdown-toggle {
+  display: none;
+}
+
 /*END_USER_STYLES*/
