@@ -198,6 +198,22 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "IpdBillServicesGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("ipd_bill_medicines", explode(",", $Page->getCurrentDetailTable())) && $ipd_bill_medicines->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("ipd_bill_medicines", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IpdBillMedicinesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("ipd_total_bill", explode(",", $Page->getCurrentDetailTable())) && $ipd_total_bill->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("ipd_total_bill", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IpdTotalBillGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

@@ -711,13 +711,13 @@ class PatientIpdPrescriptionsGrid extends PatientIpdPrescriptions
         AddFilter($this->Filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
-            $masterTbl = Container("patient_admissions");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("patientadmissionslist"); // Return to master page
+                $this->terminate("dischargesummaryreportlist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -727,13 +727,13 @@ class PatientIpdPrescriptionsGrid extends PatientIpdPrescriptions
         }
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "discharge_summary_report") {
-            $masterTbl = Container("discharge_summary_report");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "patient_admissions") {
+            $masterTbl = Container("patient_admissions");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("dischargesummaryreportlist"); // Return to master page
+                $this->terminate("patientadmissionslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -2486,13 +2486,13 @@ class PatientIpdPrescriptionsGrid extends PatientIpdPrescriptions
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "patient_admissions") {
+        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
             $this->admission_id->Visible = true; // Need to insert foreign key
             $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
             $this->patient_id->Visible = true; // Need to insert foreign key
             $this->patient_id->CurrentValue = $this->patient_id->getSessionValue();
         }
-        if ($this->getCurrentMasterTable() == "discharge_summary_report") {
+        if ($this->getCurrentMasterTable() == "patient_admissions") {
             $this->admission_id->Visible = true; // Need to insert foreign key
             $this->admission_id->CurrentValue = $this->admission_id->getSessionValue();
             $this->patient_id->Visible = true; // Need to insert foreign key
@@ -2591,8 +2591,8 @@ class PatientIpdPrescriptionsGrid extends PatientIpdPrescriptions
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "patient_admissions") {
-            $masterTbl = Container("patient_admissions");
+        if ($masterTblVar == "discharge_summary_report") {
+            $masterTbl = Container("discharge_summary_report");
             $this->admission_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
@@ -2602,8 +2602,8 @@ class PatientIpdPrescriptionsGrid extends PatientIpdPrescriptions
                 $this->EventCancelled = true;
             }
         }
-        if ($masterTblVar == "discharge_summary_report") {
-            $masterTbl = Container("discharge_summary_report");
+        if ($masterTblVar == "patient_admissions") {
+            $masterTbl = Container("patient_admissions");
             $this->admission_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;

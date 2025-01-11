@@ -1383,6 +1383,20 @@ class IpdBillingReportList extends IpdBillingReport
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
+        // "detail_ipd_bill_medicines"
+        $item = &$this->ListOptions->add("detail_ipd_bill_medicines");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_medicines');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_ipd_total_bill"
+        $item = &$this->ListOptions->add("detail_ipd_total_bill");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_total_bill');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $item = &$this->ListOptions->add("details");
@@ -1397,6 +1411,8 @@ class IpdBillingReportList extends IpdBillingReport
         $pages = new SubPages();
         $pages->add("ipd_bill_issued_items");
         $pages->add("ipd_bill_services");
+        $pages->add("ipd_bill_medicines");
+        $pages->add("ipd_total_bill");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1567,6 +1583,64 @@ class IpdBillingReportList extends IpdBillingReport
                     $detailViewTblVar .= ",";
                 }
                 $detailViewTblVar .= "ipd_bill_services";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_ipd_bill_medicines"
+        $opt = $this->ListOptions["detail_ipd_bill_medicines"];
+        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_medicines')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_medicines", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillmedicineslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("IpdBillMedicinesGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_medicines");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "ipd_bill_medicines";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_ipd_total_bill"
+        $opt = $this->ListOptions["detail_ipd_total_bill"];
+        if ($Security->allowList(CurrentProjectID() . 'ipd_total_bill')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_total_bill", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdtotalbilllist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("IpdTotalBillGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_total_bill");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "ipd_total_bill";
             }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";

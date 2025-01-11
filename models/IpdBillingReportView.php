@@ -750,6 +750,70 @@ class IpdBillingReportView extends IpdBillingReport
             $item->Visible = false;
         }
 
+        // "detail_ipd_bill_medicines"
+        $item = &$option->add("detail_ipd_bill_medicines");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("ipd_bill_medicines", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("ipdbillmedicineslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("IpdBillMedicinesGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_medicines"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "ipd_bill_medicines";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_medicines');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "ipd_bill_medicines";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_ipd_total_bill"
+        $item = &$option->add("detail_ipd_total_bill");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("ipd_total_bill", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("ipdtotalbilllist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("IpdTotalBillGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_total_bill"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "ipd_total_bill";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_total_bill');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "ipd_total_bill";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
         // Multiple details
         if ($this->ShowMultipleDetails) {
             $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
@@ -1228,6 +1292,44 @@ class IpdBillingReportView extends IpdBillingReport
                 $doc->setStyle($exportStyle); // Restore
             }
         }
+
+        // Export detail records (ipd_bill_medicines)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("ipd_bill_medicines", explode(",", $this->getCurrentDetailTable()))) {
+            $ipd_bill_medicines = new IpdBillMedicinesList();
+            $rsdetail = $ipd_bill_medicines->loadRs($ipd_bill_medicines->getDetailFilterFromSession(), $ipd_bill_medicines->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($ipd_bill_medicines);
+                    $ipd_bill_medicines->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (ipd_total_bill)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("ipd_total_bill", explode(",", $this->getCurrentDetailTable()))) {
+            $ipd_total_bill = new IpdTotalBillList();
+            $rsdetail = $ipd_total_bill->loadRs($ipd_total_bill->getDetailFilterFromSession(), $ipd_total_bill->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($ipd_total_bill);
+                    $ipd_total_bill->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
         $rs->free();
 
         // Page footer
@@ -1280,6 +1382,34 @@ class IpdBillingReportView extends IpdBillingReport
                     $detailPageObj->admission_id->IsDetailKey = true;
                     $detailPageObj->admission_id->CurrentValue = $this->admission_id->CurrentValue;
                     $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                }
+            }
+            if (in_array("ipd_bill_medicines", $detailTblVar)) {
+                $detailPageObj = Container("IpdBillMedicinesGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->admission_id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                }
+            }
+            if (in_array("ipd_total_bill", $detailTblVar)) {
+                $detailPageObj = Container("IpdTotalBillGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->id->IsDetailKey = true;
+                    $detailPageObj->id->CurrentValue = $this->admission_id->CurrentValue;
+                    $detailPageObj->id->setSessionValue($detailPageObj->id->CurrentValue);
                 }
             }
         }

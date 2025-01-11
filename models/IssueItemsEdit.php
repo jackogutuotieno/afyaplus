@@ -1284,9 +1284,9 @@ class IssueItemsEdit extends IssueItems
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "patient_admissions") {
+            if ($masterTblVar == "discharge_summary_report") {
                 $validMaster = true;
-                $masterTbl = Container("patient_admissions");
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
                     $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
@@ -1310,9 +1310,9 @@ class IssueItemsEdit extends IssueItems
                     $validMaster = false;
                 }
             }
-            if ($masterTblVar == "discharge_summary_report") {
+            if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
-                $masterTbl = Container("discharge_summary_report");
+                $masterTbl = Container("patient_admissions");
                 if (($parm = Get("fk_id", Get("admission_id"))) !== null) {
                     $masterTbl->id->setQueryStringValue($parm);
                     $this->admission_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
@@ -1343,9 +1343,9 @@ class IssueItemsEdit extends IssueItems
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "patient_admissions") {
+            if ($masterTblVar == "discharge_summary_report") {
                 $validMaster = true;
-                $masterTbl = Container("patient_admissions");
+                $masterTbl = Container("discharge_summary_report");
                 if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->admission_id->FormValue = $masterTbl->id->FormValue;
@@ -1369,9 +1369,9 @@ class IssueItemsEdit extends IssueItems
                     $validMaster = false;
                 }
             }
-            if ($masterTblVar == "discharge_summary_report") {
+            if ($masterTblVar == "patient_admissions") {
                 $validMaster = true;
-                $masterTbl = Container("discharge_summary_report");
+                $masterTbl = Container("patient_admissions");
                 if (($parm = Post("fk_id", Post("admission_id"))) !== null) {
                     $masterTbl->id->setFormValue($parm);
                     $this->admission_id->FormValue = $masterTbl->id->FormValue;
@@ -1408,7 +1408,7 @@ class IssueItemsEdit extends IssueItems
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "patient_admissions") {
+            if ($masterTblVar != "discharge_summary_report") {
                 if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
                     $this->admission_id->setSessionValue("");
                 }
@@ -1416,7 +1416,7 @@ class IssueItemsEdit extends IssueItems
                     $this->patient_id->setSessionValue("");
                 }
             }
-            if ($masterTblVar != "discharge_summary_report") {
+            if ($masterTblVar != "patient_admissions") {
                 if (!array_key_exists("admission_id", $foreignKeys)) { // Not current foreign key
                     $this->admission_id->setSessionValue("");
                 }

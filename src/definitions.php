@@ -225,6 +225,10 @@ return [
     "ipd_billing_report" => \DI\create(IpdBillingReport::class),
     "ipd_bill_issued_items" => \DI\create(IpdBillIssuedItems::class),
     "ipd_bill_services" => \DI\create(IpdBillServices::class),
+    "medicine_ipd_dispensation" => \DI\create(MedicineIpdDispensation::class),
+    "medicine_ipd_dispensation_details" => \DI\create(MedicineIpdDispensationDetails::class),
+    "ipd_bill_medicines" => \DI\create(IpdBillMedicines::class),
+    "ipd_total_bill" => \DI\create(IpdTotalBill::class),
 
     // User table
     "usertable" => \DI\get("users"),

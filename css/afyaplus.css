@@ -20711,4 +20711,14 @@ span span p {
   font-weight: 400 !important;
 }
 
+.ew-aggregate-value,
+.ew-aggregate {
+  font-weight: 700;
+}
+
+.el_ipd_total_bill_total_bill span {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
 /*END_USER_STYLES*/

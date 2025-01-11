@@ -191,6 +191,14 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php include_once "PatientIpdPrescriptionsGrid.php" ?>
 <?php } ?>
+<?php
+    if (in_array("medicine_ipd_dispensation", explode(",", $Page->getCurrentDetailTable())) && $medicine_ipd_dispensation->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("medicine_ipd_dispensation", "TblCaption") ?>&nbsp;<?= str_replace("%s", "red", str_replace("%c", Container("medicine_ipd_dispensation")->Count, $Language->phrase("DetailCount"))) ?></h4>
+<?php } ?>
+<?php include_once "MedicineIpdDispensationGrid.php" ?>
+<?php } ?>
 </form>
 <script class="ew-apply-template">
 loadjs.ready(ew.applyTemplateId, function() {

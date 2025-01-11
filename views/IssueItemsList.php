@@ -52,16 +52,16 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_admissions") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "discharge_summary_report") {
     if ($Page->MasterRecordExists) {
-        include_once "views/PatientAdmissionsMaster.php";
+        include_once "views/DischargeSummaryReportMaster.php";
     }
 }
 ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "discharge_summary_report") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "patient_admissions") {
     if ($Page->MasterRecordExists) {
-        include_once "views/DischargeSummaryReportMaster.php";
+        include_once "views/PatientAdmissionsMaster.php";
     }
 }
 ?>
@@ -98,13 +98,13 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "patient_admissions" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_admissions">
+<?php if ($Page->getCurrentMasterTable() == "discharge_summary_report" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="discharge_summary_report">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->admission_id->getSessionValue()) ?>">
 <input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "discharge_summary_report" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="discharge_summary_report">
+<?php if ($Page->getCurrentMasterTable() == "patient_admissions" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="patient_admissions">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->admission_id->getSessionValue()) ?>">
 <input type="hidden" name="fk_patient_id" value="<?= HtmlEncode($Page->patient_id->getSessionValue()) ?>">
 <?php } ?>

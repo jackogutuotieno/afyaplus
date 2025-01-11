@@ -432,6 +432,14 @@ class IpdBillingReport extends DbTable
             $detailUrl = Container("ipd_bill_services")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
         }
+        if ($this->getCurrentDetailTable() == "ipd_bill_medicines") {
+            $detailUrl = Container("ipd_bill_medicines")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "ipd_total_bill") {
+            $detailUrl = Container("ipd_total_bill")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue);
+        }
         if ($detailUrl == "") {
             $detailUrl = "ipdbillingreportlist";
         }
@@ -1756,7 +1764,7 @@ class IpdBillingReport extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Billed"; 
         } 
-        $this->patient_name->ViewValue = '<a href="ipdbillingreportview/' . $this->admission_id->ViewValue . '?showdetail=ipd_bill_issued_items,ipd_bill_services" target="_blank">' . $this->patient_name->ViewValue . '</a>';
+        $this->patient_name->ViewValue = '<a href="ipdbillingreportview/' . $this->admission_id->ViewValue . '?showdetail=ipd_bill_issued_items,ipd_bill_services,ipd_bill_medicines,ipd_total_bill" target="_blank">' . $this->patient_name->ViewValue . '</a>';
     }
 
     // User ID Filtering event
