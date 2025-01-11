@@ -39,8 +39,8 @@ class PatientAdmission extends AbstractEntity
     #[Column(name: "payment_method_id", type: "integer")]
     private int $paymentMethodId;
 
-    #[Column(name: "medical_scheme_id", type: "integer")]
-    private int $medicalSchemeId;
+    #[Column(name: "medical_scheme_id", type: "integer", nullable: true)]
+    private ?int $medicalSchemeId;
 
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
@@ -78,12 +78,12 @@ class PatientAdmission extends AbstractEntity
         return $this;
     }
 
-    public function getMedicalSchemeId(): int
+    public function getMedicalSchemeId(): ?int
     {
         return $this->medicalSchemeId;
     }
 
-    public function setMedicalSchemeId(int $value): static
+    public function setMedicalSchemeId(?int $value): static
     {
         $this->medicalSchemeId = $value;
         return $this;

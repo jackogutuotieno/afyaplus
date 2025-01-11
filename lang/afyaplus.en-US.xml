@@ -2,9 +2,6 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | The platform for modern health facilities" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
-    <menu id="1034">
-      <phrase id="menutext" value="ipd billing report" />
-    </menu>
     <menu id="642">
       <phrase id="menutext" value="Dashboard" />
     </menu>
@@ -223,6 +220,9 @@
     </menu>
     <menu id="239">
       <phrase id="menutext" value="Pharmacy" />
+    </menu>
+    <menu id="1034">
+      <phrase id="menutext" value="IPD Billing" />
     </menu>
     <menu id="959">
       <phrase id="menutext" value="Procurement" />
@@ -3315,6 +3315,12 @@
       </field>
       <field id="status">
         <phrase id="fldcaption" value="Status" />
+        <phrase id="fldtagvalue1" value="Discharged" />
+        <phrase id="fldtagcaption1" value="Discharged" />
+        <phrase id="fldtagvalue2" value="Moved to another facility" />
+        <phrase id="fldtagcaption2" value="Moved to another facility" />
+        <phrase id="fldtagvalue3" value="Deceased" />
+        <phrase id="fldtagcaption3" value="Deceased" />
       </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Admission Date" />
@@ -3970,24 +3976,30 @@
       </field>
     </table>
     <table id="ipd_billing_report">
-      <phrase id="tblcaption" value="ipd billing report" />
+      <phrase id="tblcaption" value="IPD Billing" />
       <field id="patient_uhid">
-        <phrase id="fldcaption" value="patient uhid" />
+        <phrase id="fldcaption" value="Patient UHID" />
       </field>
       <field id="patient_name">
-        <phrase id="fldcaption" value="patient name" />
+        <phrase id="fldcaption" value="Patient Name" />
       </field>
       <field id="age">
-        <phrase id="fldcaption" value="age" />
+        <phrase id="fldcaption" value="Age" />
       </field>
       <field id="gender">
-        <phrase id="fldcaption" value="gender" />
+        <phrase id="fldcaption" value="Gender" />
+      </field>
+      <field id="payment_method">
+        <phrase id="fldcaption" value="Payment Method" />
+      </field>
+      <field id="company">
+        <phrase id="fldcaption" value="Medical Scheme" />
       </field>
       <field id="date_admitted">
-        <phrase id="fldcaption" value="date admitted" />
+        <phrase id="fldcaption" value="Admission Date" />
       </field>
       <field id="date_discharged">
-        <phrase id="fldcaption" value="date discharged" />
+        <phrase id="fldcaption" value="Discharge Date" />
       </field>
     </table>
   </project>

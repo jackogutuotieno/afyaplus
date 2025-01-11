@@ -21,4 +21,11 @@ class IpdBillingReportController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "IpdBillingReportList");
     }
+
+    // view
+    #[Map(["GET","POST","OPTIONS"], "/ipdbillingreportview[/{patient_uhid}]", [PermissionMiddleware::class], "view.ipd_billing_report")]
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "IpdBillingReportView");
+    }
 }

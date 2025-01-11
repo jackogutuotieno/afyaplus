@@ -58,6 +58,7 @@ loadjs.ready(["wrapper", "head"], function () {
             "patient_id": <?= $Grid->patient_id->toClientList($Grid) ?>,
             "payment_method_id": <?= $Grid->payment_method_id->toClientList($Grid) ?>,
             "medical_scheme_id": <?= $Grid->medical_scheme_id->toClientList($Grid) ?>,
+            "status": <?= $Grid->status->toClientList($Grid) ?>,
         })
         .build();
     window[form.id] = form;
@@ -417,15 +418,81 @@ loadjs.ready("fpatient_admissionsgrid", function() {
         <td data-name="status"<?= $Grid->status->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_admissions_status" class="el_patient_admissions_status">
-<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="patient_admissions" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_admissionsgrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_admissions"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_admissionsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_admissionsgrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_admissionsgrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_admissionsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_admissionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <input type="hidden" data-table="patient_admissions" data-field="x_status" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_status" id="o<?= $Grid->RowIndex ?>_status" value="<?= HtmlEncode($Grid->status->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_patient_admissions_status" class="el_patient_admissions_status">
-<input type="<?= $Grid->status->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_status" id="x<?= $Grid->RowIndex ?>_status" data-table="patient_admissions" data-field="x_status" value="<?= $Grid->status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->status->formatPattern()) ?>"<?= $Grid->status->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_status"
+        name="x<?= $Grid->RowIndex ?>_status"
+        class="form-select ew-select<?= $Grid->status->isInvalidClass() ?>"
+        <?php if (!$Grid->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_admissionsgrid_x<?= $Grid->RowIndex ?>_status"
+        <?php } ?>
+        data-table="patient_admissions"
+        data-field="x_status"
+        data-value-separator="<?= $Grid->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->status->getPlaceHolder()) ?>"
+        <?= $Grid->status->editAttributes() ?>>
+        <?= $Grid->status->selectOptionListHtml("x{$Grid->RowIndex}_status") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->status->getErrorMessage() ?></div>
+<?php if (!$Grid->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_admissionsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_status", selectId: "fpatient_admissionsgrid_x<?= $Grid->RowIndex ?>_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_admissionsgrid.lists.status?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_admissionsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_status", form: "fpatient_admissionsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>

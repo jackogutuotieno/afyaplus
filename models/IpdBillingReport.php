@@ -51,6 +51,8 @@ class IpdBillingReport extends DbTable
     public $patient_name;
     public $age;
     public $gender;
+    public $payment_method;
+    public $company;
     public $date_admitted;
     public $date_discharged;
 
@@ -196,16 +198,64 @@ class IpdBillingReport extends DbTable
         $this->gender->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['gender'] = &$this->gender;
 
+        // payment_method
+        $this->payment_method = new DbField(
+            $this, // Table
+            'x_payment_method', // Variable name
+            'payment_method', // Name
+            '`payment_method`', // Expression
+            '`payment_method`', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`payment_method`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->payment_method->InputTextType = "text";
+        $this->payment_method->Nullable = false; // NOT NULL field
+        $this->payment_method->Required = true; // Required field
+        $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['payment_method'] = &$this->payment_method;
+
+        // company
+        $this->company = new DbField(
+            $this, // Table
+            'x_company', // Variable name
+            'company', // Name
+            '`company`', // Expression
+            '`company`', // Basic search expression
+            200, // Type
+            100, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`company`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->company->InputTextType = "text";
+        $this->company->Nullable = false; // NOT NULL field
+        $this->company->Required = true; // Required field
+        $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['company'] = &$this->company;
+
         // date_admitted
         $this->date_admitted = new DbField(
             $this, // Table
             'x_date_admitted', // Variable name
             'date_admitted', // Name
             '`date_admitted`', // Expression
-            CastDateFieldForLike("`date_admitted`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_admitted`", 11, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_admitted`', // Virtual expression
             false, // Is virtual
@@ -218,7 +268,7 @@ class IpdBillingReport extends DbTable
         $this->date_admitted->Raw = true;
         $this->date_admitted->Nullable = false; // NOT NULL field
         $this->date_admitted->Required = true; // Required field
-        $this->date_admitted->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_admitted->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_admitted->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_admitted'] = &$this->date_admitted;
 
@@ -228,10 +278,10 @@ class IpdBillingReport extends DbTable
             'x_date_discharged', // Variable name
             'date_discharged', // Name
             '`date_discharged`', // Expression
-            CastDateFieldForLike("`date_discharged`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`date_discharged`", 11, "DB"), // Basic search expression
             135, // Type
             76, // Size
-            0, // Date/Time format
+            11, // Date/Time format
             false, // Is upload field
             '`date_discharged`', // Virtual expression
             false, // Is virtual
@@ -244,7 +294,7 @@ class IpdBillingReport extends DbTable
         $this->date_discharged->Raw = true;
         $this->date_discharged->Nullable = false; // NOT NULL field
         $this->date_discharged->Required = true; // Required field
-        $this->date_discharged->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date_discharged->DefaultErrorMessage = str_replace("%s", DateFormat(11), $Language->phrase("IncorrectDate"));
         $this->date_discharged->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['date_discharged'] = &$this->date_discharged;
 
@@ -770,6 +820,8 @@ class IpdBillingReport extends DbTable
         $this->patient_name->DbValue = $row['patient_name'];
         $this->age->DbValue = $row['age'];
         $this->gender->DbValue = $row['gender'];
+        $this->payment_method->DbValue = $row['payment_method'];
+        $this->company->DbValue = $row['company'];
         $this->date_admitted->DbValue = $row['date_admitted'];
         $this->date_discharged->DbValue = $row['date_discharged'];
     }
@@ -1128,6 +1180,8 @@ class IpdBillingReport extends DbTable
         $this->patient_name->setDbValue($row['patient_name']);
         $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
+        $this->payment_method->setDbValue($row['payment_method']);
+        $this->company->setDbValue($row['company']);
         $this->date_admitted->setDbValue($row['date_admitted']);
         $this->date_discharged->setDbValue($row['date_discharged']);
     }
@@ -1168,6 +1222,10 @@ class IpdBillingReport extends DbTable
 
         // gender
 
+        // payment_method
+
+        // company
+
         // date_admitted
 
         // date_discharged
@@ -1184,6 +1242,12 @@ class IpdBillingReport extends DbTable
 
         // gender
         $this->gender->ViewValue = $this->gender->CurrentValue;
+
+        // payment_method
+        $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
+
+        // company
+        $this->company->ViewValue = $this->company->CurrentValue;
 
         // date_admitted
         $this->date_admitted->ViewValue = $this->date_admitted->CurrentValue;
@@ -1208,6 +1272,14 @@ class IpdBillingReport extends DbTable
         // gender
         $this->gender->HrefValue = "";
         $this->gender->TooltipValue = "";
+
+        // payment_method
+        $this->payment_method->HrefValue = "";
+        $this->payment_method->TooltipValue = "";
+
+        // company
+        $this->company->HrefValue = "";
+        $this->company->TooltipValue = "";
 
         // date_admitted
         $this->date_admitted->HrefValue = "";
@@ -1260,6 +1332,22 @@ class IpdBillingReport extends DbTable
         $this->gender->EditValue = $this->gender->CurrentValue;
         $this->gender->PlaceHolder = RemoveHtml($this->gender->caption());
 
+        // payment_method
+        $this->payment_method->setupEditAttributes();
+        if (!$this->payment_method->Raw) {
+            $this->payment_method->CurrentValue = HtmlDecode($this->payment_method->CurrentValue);
+        }
+        $this->payment_method->EditValue = $this->payment_method->CurrentValue;
+        $this->payment_method->PlaceHolder = RemoveHtml($this->payment_method->caption());
+
+        // company
+        $this->company->setupEditAttributes();
+        if (!$this->company->Raw) {
+            $this->company->CurrentValue = HtmlDecode($this->company->CurrentValue);
+        }
+        $this->company->EditValue = $this->company->CurrentValue;
+        $this->company->PlaceHolder = RemoveHtml($this->company->caption());
+
         // date_admitted
         $this->date_admitted->setupEditAttributes();
         $this->date_admitted->EditValue = FormatDateTime($this->date_admitted->CurrentValue, $this->date_admitted->formatPattern());
@@ -1302,6 +1390,8 @@ class IpdBillingReport extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->payment_method);
+                    $doc->exportCaption($this->company);
                     $doc->exportCaption($this->date_admitted);
                     $doc->exportCaption($this->date_discharged);
                 } else {
@@ -1309,6 +1399,8 @@ class IpdBillingReport extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->payment_method);
+                    $doc->exportCaption($this->company);
                     $doc->exportCaption($this->date_admitted);
                     $doc->exportCaption($this->date_discharged);
                 }
@@ -1341,6 +1433,8 @@ class IpdBillingReport extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->payment_method);
+                        $doc->exportField($this->company);
                         $doc->exportField($this->date_admitted);
                         $doc->exportField($this->date_discharged);
                     } else {
@@ -1348,6 +1442,8 @@ class IpdBillingReport extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->payment_method);
+                        $doc->exportField($this->company);
                         $doc->exportField($this->date_admitted);
                         $doc->exportField($this->date_discharged);
                     }

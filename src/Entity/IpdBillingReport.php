@@ -42,6 +42,12 @@ class IpdBillingReport extends AbstractEntity
     #[Column(type: "string")]
     private string $gender;
 
+    #[Column(name: "payment_method", type: "string")]
+    private string $paymentMethod;
+
+    #[Column(type: "string")]
+    private string $company;
+
     #[Column(name: "date_admitted", type: "datetime")]
     private DateTime $dateAdmitted;
 
@@ -89,6 +95,28 @@ class IpdBillingReport extends AbstractEntity
     public function setGender(string $value): static
     {
         $this->gender = RemoveXss($value);
+        return $this;
+    }
+
+    public function getPaymentMethod(): string
+    {
+        return HtmlDecode($this->paymentMethod);
+    }
+
+    public function setPaymentMethod(string $value): static
+    {
+        $this->paymentMethod = RemoveXss($value);
+        return $this;
+    }
+
+    public function getCompany(): string
+    {
+        return HtmlDecode($this->company);
+    }
+
+    public function setCompany(string $value): static
+    {
+        $this->company = RemoveXss($value);
         return $this;
     }
 

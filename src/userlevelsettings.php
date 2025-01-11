@@ -1752,4 +1752,4 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["discharge_summary_report","discharge_summary_report","Dischage Summary Report",true,"{32536B8D-F37B-4419-80D5-260932800712}","dischargesummaryreportlist"],
     ["patient_ipd_prescription_details","patient_ipd_prescription_details","Prescription Details",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptiondetailslist"],
     ["patient_ipd_prescriptions","patient_ipd_prescriptions","Prescriptions",true,"{32536B8D-F37B-4419-80D5-260932800712}","patientipdprescriptionslist"],
-    ["ipd_billing_report","ipd_billing_report","ipd billing report",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillingreportlist"]];
+    ["ipd_billing_report","ipd_billing_report","IPD Billing",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbillingreportlist"]];

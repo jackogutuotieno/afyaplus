@@ -634,6 +634,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->payment_method_id);
         $this->setupLookupOptions($this->medical_scheme_id);
+        $this->setupLookupOptions($this->status);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -2084,7 +2085,11 @@ class PatientAdmissionsGrid extends PatientAdmissions
             }
 
             // status
-            $this->status->ViewValue = $this->status->CurrentValue;
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2225,10 +2230,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
 
             // status
             $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->EditValue = $this->status->options(true);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // date_created
@@ -2341,10 +2343,7 @@ class PatientAdmissionsGrid extends PatientAdmissions
 
             // status
             $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->EditValue = $this->status->options(true);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // date_created
@@ -2744,6 +2743,8 @@ class PatientAdmissionsGrid extends PatientAdmissions
                 case "x_payment_method_id":
                     break;
                 case "x_medical_scheme_id":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";

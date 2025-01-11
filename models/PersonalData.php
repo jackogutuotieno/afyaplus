@@ -45,7 +45,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "ipdbillingreportlist";
+    public $CurrentPageName = "ipdbillingreportview";
 
     // Page headings
     public $Heading = "";

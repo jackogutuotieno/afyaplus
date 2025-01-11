@@ -189,7 +189,8 @@ class PatientAdmissions extends DbTable
         $this->payment_method_id->setSelectMultiple(false); // Select one
         $this->payment_method_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->payment_method_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', false, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
+        $this->payment_method_id->UseFilter = true; // Table header filter
+        $this->payment_method_id->Lookup = new Lookup($this->payment_method_id, 'payment_methods', true, 'id', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "`payment_method`");
         $this->payment_method_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->payment_method_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['payment_method_id'] = &$this->payment_method_id;
@@ -214,14 +215,13 @@ class PatientAdmissions extends DbTable
         );
         $this->medical_scheme_id->InputTextType = "text";
         $this->medical_scheme_id->Raw = true;
-        $this->medical_scheme_id->Nullable = false; // NOT NULL field
-        $this->medical_scheme_id->Required = true; // Required field
         $this->medical_scheme_id->setSelectMultiple(false); // Select one
         $this->medical_scheme_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->medical_scheme_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', false, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
+        $this->medical_scheme_id->UseFilter = true; // Table header filter
+        $this->medical_scheme_id->Lookup = new Lookup($this->medical_scheme_id, 'medical_schemes', true, 'id', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "`company`");
         $this->medical_scheme_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->medical_scheme_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->medical_scheme_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['medical_scheme_id'] = &$this->medical_scheme_id;
 
         // status
@@ -240,11 +240,17 @@ class PatientAdmissions extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->status->InputTextType = "text";
         $this->status->IsCustom = true; // Custom field
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->status->setSelectMultiple(false); // Select one
+        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status->UseFilter = true; // Table header filter
+        $this->status->Lookup = new Lookup($this->status, 'patient_admissions', true, 'status', ["status","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->status->OptionCount = 3;
+        $this->status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['status'] = &$this->status;
 
         // date_created
@@ -1418,7 +1424,11 @@ class PatientAdmissions extends DbTable
         }
 
         // status
-        $this->status->ViewValue = $this->status->CurrentValue;
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
 
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -1502,10 +1512,7 @@ class PatientAdmissions extends DbTable
 
         // status
         $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->EditValue = $this->status->options(true);
         $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
         // date_created

@@ -28,6 +28,7 @@ loadjs.ready(["wrapper", "head"], function () {
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
             "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
             "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -132,6 +133,9 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "patient_id": <?= $Page->patient_id->toClientList($Page) ?>,
+            "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
+            "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
         })
 
         // Filters
@@ -186,6 +190,120 @@ if (!$Page->patient_id->UseFilter) {
                 ajax: { id: "x_patient_id", form: "fpatient_admissionssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
             };
             options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_admissions.fields.patient_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->payment_method_id->Visible) { // payment_method_id ?>
+<?php
+if (!$Page->payment_method_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_payment_method_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->payment_method_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_payment_method_id"
+            name="x_payment_method_id[]"
+            class="form-control ew-select<?= $Page->payment_method_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_admissionssrch_x_payment_method_id"
+            data-table="patient_admissions"
+            data-field="x_payment_method_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->payment_method_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->payment_method_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->payment_method_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->payment_method_id->editAttributes() ?>>
+            <?= $Page->payment_method_id->selectOptionListHtml("x_payment_method_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->payment_method_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_admissionssrch", function() {
+            var options = {
+                name: "x_payment_method_id",
+                selectId: "fpatient_admissionssrch_x_payment_method_id",
+                ajax: { id: "x_payment_method_id", form: "fpatient_admissionssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_admissions.fields.payment_method_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->medical_scheme_id->Visible) { // medical_scheme_id ?>
+<?php
+if (!$Page->medical_scheme_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_medical_scheme_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->medical_scheme_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_medical_scheme_id"
+            name="x_medical_scheme_id[]"
+            class="form-control ew-select<?= $Page->medical_scheme_id->isInvalidClass() ?>"
+            data-select2-id="fpatient_admissionssrch_x_medical_scheme_id"
+            data-table="patient_admissions"
+            data-field="x_medical_scheme_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->medical_scheme_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->medical_scheme_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->medical_scheme_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->medical_scheme_id->editAttributes() ?>>
+            <?= $Page->medical_scheme_id->selectOptionListHtml("x_medical_scheme_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->medical_scheme_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_admissionssrch", function() {
+            var options = {
+                name: "x_medical_scheme_id",
+                selectId: "fpatient_admissionssrch_x_medical_scheme_id",
+                ajax: { id: "x_medical_scheme_id", form: "fpatient_admissionssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_admissions.fields.medical_scheme_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+<?php
+if (!$Page->status->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_status" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->status->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_status"
+            name="x_status[]"
+            class="form-control ew-select<?= $Page->status->isInvalidClass() ?>"
+            data-select2-id="fpatient_admissionssrch_x_status"
+            data-table="patient_admissions"
+            data-field="x_status"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->status->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->status->editAttributes() ?>>
+            <?= $Page->status->selectOptionListHtml("x_status", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->status->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fpatient_admissionssrch", function() {
+            var options = {
+                name: "x_status",
+                selectId: "fpatient_admissionssrch_x_status",
+                ajax: { id: "x_status", form: "fpatient_admissionssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.patient_admissions.fields.status.filterOptions);
             ew.createFilter(options);
         });
         </script>

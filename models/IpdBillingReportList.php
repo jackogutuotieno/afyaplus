@@ -148,8 +148,10 @@ class IpdBillingReportList extends IpdBillingReport
     {
         $this->patient_uhid->setVisibility();
         $this->patient_name->setVisibility();
-        $this->age->setVisibility();
-        $this->gender->setVisibility();
+        $this->age->Visible = false;
+        $this->gender->Visible = false;
+        $this->payment_method->Visible = false;
+        $this->company->setVisibility();
         $this->date_admitted->setVisibility();
         $this->date_discharged->setVisibility();
     }
@@ -1052,6 +1054,8 @@ class IpdBillingReportList extends IpdBillingReport
         $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
         $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
+        $filterList = Concat($filterList, $this->payment_method->AdvancedSearch->toJson(), ","); // Field payment_method
+        $filterList = Concat($filterList, $this->company->AdvancedSearch->toJson(), ","); // Field company
         $filterList = Concat($filterList, $this->date_admitted->AdvancedSearch->toJson(), ","); // Field date_admitted
         $filterList = Concat($filterList, $this->date_discharged->AdvancedSearch->toJson(), ","); // Field date_discharged
         if ($this->BasicSearch->Keyword != "") {
@@ -1125,6 +1129,22 @@ class IpdBillingReportList extends IpdBillingReport
         $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
         $this->gender->AdvancedSearch->save();
 
+        // Field payment_method
+        $this->payment_method->AdvancedSearch->SearchValue = @$filter["x_payment_method"];
+        $this->payment_method->AdvancedSearch->SearchOperator = @$filter["z_payment_method"];
+        $this->payment_method->AdvancedSearch->SearchCondition = @$filter["v_payment_method"];
+        $this->payment_method->AdvancedSearch->SearchValue2 = @$filter["y_payment_method"];
+        $this->payment_method->AdvancedSearch->SearchOperator2 = @$filter["w_payment_method"];
+        $this->payment_method->AdvancedSearch->save();
+
+        // Field company
+        $this->company->AdvancedSearch->SearchValue = @$filter["x_company"];
+        $this->company->AdvancedSearch->SearchOperator = @$filter["z_company"];
+        $this->company->AdvancedSearch->SearchCondition = @$filter["v_company"];
+        $this->company->AdvancedSearch->SearchValue2 = @$filter["y_company"];
+        $this->company->AdvancedSearch->SearchOperator2 = @$filter["w_company"];
+        $this->company->AdvancedSearch->save();
+
         // Field date_admitted
         $this->date_admitted->AdvancedSearch->SearchValue = @$filter["x_date_admitted"];
         $this->date_admitted->AdvancedSearch->SearchOperator = @$filter["z_date_admitted"];
@@ -1181,6 +1201,8 @@ class IpdBillingReportList extends IpdBillingReport
         $searchFlds = [];
         $searchFlds[] = &$this->patient_name;
         $searchFlds[] = &$this->gender;
+        $searchFlds[] = &$this->payment_method;
+        $searchFlds[] = &$this->company;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1261,8 +1283,7 @@ class IpdBillingReportList extends IpdBillingReport
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->patient_uhid); // patient_uhid
             $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->age); // age
-            $this->updateSort($this->gender); // gender
+            $this->updateSort($this->company); // company
             $this->updateSort($this->date_admitted); // date_admitted
             $this->updateSort($this->date_discharged); // date_discharged
             $this->setStartRecordNumber(1); // Reset start position
@@ -1293,6 +1314,8 @@ class IpdBillingReportList extends IpdBillingReport
                 $this->patient_name->setSort("");
                 $this->age->setSort("");
                 $this->gender->setSort("");
+                $this->payment_method->setSort("");
+                $this->company->setSort("");
                 $this->date_admitted->setSort("");
                 $this->date_discharged->setSort("");
             }
@@ -1314,6 +1337,12 @@ class IpdBillingReportList extends IpdBillingReport
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -1330,6 +1359,14 @@ class IpdBillingReportList extends IpdBillingReport
         if ($item->OnLeft) {
             $item->moveTo(0);
         }
+        $item->ShowInDropDown = false;
+        $item->ShowInButtonGroup = false;
+
+        // "sequence"
+        $item = &$this->ListOptions->add("sequence");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = true;
+        $item->OnLeft = true; // Always on left
         $item->ShowInDropDown = false;
         $item->ShowInButtonGroup = false;
 
@@ -1370,8 +1407,24 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // "sequence"
+        $opt = $this->ListOptions["sequence"];
+        $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") { // Check view mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if ($this->ModalView && !IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"ipd_billing_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
 
         // Set up list action buttons
@@ -1442,8 +1495,7 @@ class IpdBillingReportList extends IpdBillingReport
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "patient_uhid");
             $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "age");
-            $this->createColumnOption($option, "gender");
+            $this->createColumnOption($option, "company");
             $this->createColumnOption($option, "date_admitted");
             $this->createColumnOption($option, "date_discharged");
         }
@@ -1888,6 +1940,8 @@ class IpdBillingReportList extends IpdBillingReport
         $this->patient_name->setDbValue($row['patient_name']);
         $this->age->setDbValue($row['age']);
         $this->gender->setDbValue($row['gender']);
+        $this->payment_method->setDbValue($row['payment_method']);
+        $this->company->setDbValue($row['company']);
         $this->date_admitted->setDbValue($row['date_admitted']);
         $this->date_discharged->setDbValue($row['date_discharged']);
     }
@@ -1900,6 +1954,8 @@ class IpdBillingReportList extends IpdBillingReport
         $row['patient_name'] = $this->patient_name->DefaultValue;
         $row['age'] = $this->age->DefaultValue;
         $row['gender'] = $this->gender->DefaultValue;
+        $row['payment_method'] = $this->payment_method->DefaultValue;
+        $row['company'] = $this->company->DefaultValue;
         $row['date_admitted'] = $this->date_admitted->DefaultValue;
         $row['date_discharged'] = $this->date_discharged->DefaultValue;
         return $row;
@@ -1950,6 +2006,10 @@ class IpdBillingReportList extends IpdBillingReport
 
         // gender
 
+        // payment_method
+
+        // company
+
         // date_admitted
 
         // date_discharged
@@ -1969,6 +2029,12 @@ class IpdBillingReportList extends IpdBillingReport
             // gender
             $this->gender->ViewValue = $this->gender->CurrentValue;
 
+            // payment_method
+            $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
+
+            // company
+            $this->company->ViewValue = $this->company->CurrentValue;
+
             // date_admitted
             $this->date_admitted->ViewValue = $this->date_admitted->CurrentValue;
             $this->date_admitted->ViewValue = FormatDateTime($this->date_admitted->ViewValue, $this->date_admitted->formatPattern());
@@ -1985,13 +2051,9 @@ class IpdBillingReportList extends IpdBillingReport
             $this->patient_name->HrefValue = "";
             $this->patient_name->TooltipValue = "";
 
-            // age
-            $this->age->HrefValue = "";
-            $this->age->TooltipValue = "";
-
-            // gender
-            $this->gender->HrefValue = "";
-            $this->gender->TooltipValue = "";
+            // company
+            $this->company->HrefValue = "";
+            $this->company->TooltipValue = "";
 
             // date_admitted
             $this->date_admitted->HrefValue = "";

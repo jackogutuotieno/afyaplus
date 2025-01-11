@@ -284,6 +284,7 @@ C:\wamp64\www\afyaplus\models\InvoicesList.php
 C:\wamp64\www\afyaplus\models\InvoicesView.php
 C:\wamp64\www\afyaplus\models\IpdBillingReport.php
 C:\wamp64\www\afyaplus\models\IpdBillingReportList.php
+C:\wamp64\www\afyaplus\models\IpdBillingReportView.php
 C:\wamp64\www\afyaplus\models\IpdPatients.php
 C:\wamp64\www\afyaplus\models\IpdPatientsEdit.php
 C:\wamp64\www\afyaplus\models\IpdPatientsList.php
@@ -1035,6 +1036,7 @@ C:\wamp64\www\afyaplus\views\InvoicesList.php
 C:\wamp64\www\afyaplus\views\InvoicesMaster.php
 C:\wamp64\www\afyaplus\views\InvoicesView.php
 C:\wamp64\www\afyaplus\views\IpdBillingReportList.php
+C:\wamp64\www\afyaplus\views\IpdBillingReportView.php
 C:\wamp64\www\afyaplus\views\IpdPatientsEdit.php
 C:\wamp64\www\afyaplus\views\IpdPatientsList.php
 C:\wamp64\www\afyaplus\views\IpdPatientsMaster.php

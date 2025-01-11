@@ -31,7 +31,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
             ["patient_id", [fields.patient_id.visible && fields.patient_id.required ? ew.Validators.required(fields.patient_id.caption) : null], fields.patient_id.isInvalid],
             ["payment_method_id", [fields.payment_method_id.visible && fields.payment_method_id.required ? ew.Validators.required(fields.payment_method_id.caption) : null], fields.payment_method_id.isInvalid],
-            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid]
+            ["medical_scheme_id", [fields.medical_scheme_id.visible && fields.medical_scheme_id.required ? ew.Validators.required(fields.medical_scheme_id.caption) : null], fields.medical_scheme_id.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -49,6 +50,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "payment_method_id": <?= $Page->payment_method_id->toClientList($Page) ?>,
             "medical_scheme_id": <?= $Page->medical_scheme_id->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -185,6 +187,51 @@ loadjs.ready("fpatient_admissionsedit", function() {
     }
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.medical_scheme_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_patient_admissions_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_patient_admissions_status">
+    <select
+        id="x_status"
+        name="x_status"
+        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
+        <?php if (!$Page->status->IsNativeSelect) { ?>
+        data-select2-id="fpatient_admissionsedit_x_status"
+        <?php } ?>
+        data-table="patient_admissions"
+        data-field="x_status"
+        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+        <?= $Page->status->editAttributes() ?>>
+        <?= $Page->status->selectOptionListHtml("x_status") ?>
+    </select>
+    <?= $Page->status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if (!$Page->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatient_admissionsedit", function() {
+    var options = { name: "x_status", selectId: "fpatient_admissionsedit_x_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatient_admissionsedit.lists.status?.lookupOptions.length) {
+        options.data = { id: "x_status", form: "fpatient_admissionsedit" };
+    } else {
+        options.ajax = { id: "x_status", form: "fpatient_admissionsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patient_admissions.fields.status.selectOptions);
     ew.createSelect(options);
 });
 </script>

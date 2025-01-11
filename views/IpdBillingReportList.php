@@ -169,11 +169,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->patient_name->Visible) { // patient_name ?>
         <th data-name="patient_name" class="<?= $Page->patient_name->headerCellClass() ?>"><div id="elh_ipd_billing_report_patient_name" class="ipd_billing_report_patient_name"><?= $Page->renderFieldHeader($Page->patient_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->age->Visible) { // age ?>
-        <th data-name="age" class="<?= $Page->age->headerCellClass() ?>"><div id="elh_ipd_billing_report_age" class="ipd_billing_report_age"><?= $Page->renderFieldHeader($Page->age) ?></div></th>
-<?php } ?>
-<?php if ($Page->gender->Visible) { // gender ?>
-        <th data-name="gender" class="<?= $Page->gender->headerCellClass() ?>"><div id="elh_ipd_billing_report_gender" class="ipd_billing_report_gender"><?= $Page->renderFieldHeader($Page->gender) ?></div></th>
+<?php if ($Page->company->Visible) { // company ?>
+        <th data-name="company" class="<?= $Page->company->headerCellClass() ?>"><div id="elh_ipd_billing_report_company" class="ipd_billing_report_company"><?= $Page->renderFieldHeader($Page->company) ?></div></th>
 <?php } ?>
 <?php if ($Page->date_admitted->Visible) { // date_admitted ?>
         <th data-name="date_admitted" class="<?= $Page->date_admitted->headerCellClass() ?>"><div id="elh_ipd_billing_report_date_admitted" class="ipd_billing_report_date_admitted"><?= $Page->renderFieldHeader($Page->date_admitted) ?></div></th>
@@ -225,19 +222,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->age->Visible) { // age ?>
-        <td data-name="age"<?= $Page->age->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_age" class="el_ipd_billing_report_age">
-<span<?= $Page->age->viewAttributes() ?>>
-<?= $Page->age->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->gender->Visible) { // gender ?>
-        <td data-name="gender"<?= $Page->gender->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_gender" class="el_ipd_billing_report_gender">
-<span<?= $Page->gender->viewAttributes() ?>>
-<?= $Page->gender->getViewValue() ?></span>
+    <?php if ($Page->company->Visible) { // company ?>
+        <td data-name="company"<?= $Page->company->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_company" class="el_ipd_billing_report_company">
+<span<?= $Page->company->viewAttributes() ?>>
+<?= $Page->company->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

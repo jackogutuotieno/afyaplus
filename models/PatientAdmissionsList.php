@@ -722,6 +722,7 @@ class PatientAdmissionsList extends PatientAdmissions
         $this->setupLookupOptions($this->patient_id);
         $this->setupLookupOptions($this->payment_method_id);
         $this->setupLookupOptions($this->medical_scheme_id);
+        $this->setupLookupOptions($this->status);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1224,9 +1225,9 @@ class PatientAdmissionsList extends PatientAdmissions
         }
         $this->buildSearchSql($where, $this->id, $default, false); // id
         $this->buildSearchSql($where, $this->patient_id, $default, true); // patient_id
-        $this->buildSearchSql($where, $this->payment_method_id, $default, false); // payment_method_id
-        $this->buildSearchSql($where, $this->medical_scheme_id, $default, false); // medical_scheme_id
-        $this->buildSearchSql($where, $this->status, $default, false); // status
+        $this->buildSearchSql($where, $this->payment_method_id, $default, true); // payment_method_id
+        $this->buildSearchSql($where, $this->medical_scheme_id, $default, true); // medical_scheme_id
+        $this->buildSearchSql($where, $this->status, $default, true); // status
         $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
 
         // Set up search command
@@ -1353,7 +1354,7 @@ class PatientAdmissionsList extends PatientAdmissions
         // Field payment_method_id
         $filter = $this->queryBuilderWhere("payment_method_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->payment_method_id, false, false);
+            $this->buildSearchSql($filter, $this->payment_method_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->payment_method_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -1362,7 +1363,7 @@ class PatientAdmissionsList extends PatientAdmissions
         // Field medical_scheme_id
         $filter = $this->queryBuilderWhere("medical_scheme_id");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->medical_scheme_id, false, false);
+            $this->buildSearchSql($filter, $this->medical_scheme_id, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->medical_scheme_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -1371,7 +1372,7 @@ class PatientAdmissionsList extends PatientAdmissions
         // Field status
         $filter = $this->queryBuilderWhere("status");
         if (!$filter) {
-            $this->buildSearchSql($filter, $this->status, false, false);
+            $this->buildSearchSql($filter, $this->status, false, true);
         }
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
@@ -2910,7 +2911,11 @@ class PatientAdmissionsList extends PatientAdmissions
             }
 
             // status
-            $this->status->ViewValue = $this->status->CurrentValue;
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
 
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
@@ -2954,20 +2959,28 @@ class PatientAdmissionsList extends PatientAdmissions
             }
 
             // payment_method_id
-            $this->payment_method_id->setupEditAttributes();
-            $this->payment_method_id->PlaceHolder = RemoveHtml($this->payment_method_id->caption());
+            if ($this->payment_method_id->UseFilter && !EmptyValue($this->payment_method_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->payment_method_id->AdvancedSearch->SearchValue)) {
+                    $this->payment_method_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method_id->AdvancedSearch->SearchValue);
+                }
+                $this->payment_method_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method_id->AdvancedSearch->SearchValue);
+            }
 
             // medical_scheme_id
-            $this->medical_scheme_id->setupEditAttributes();
-            $this->medical_scheme_id->PlaceHolder = RemoveHtml($this->medical_scheme_id->caption());
+            if ($this->medical_scheme_id->UseFilter && !EmptyValue($this->medical_scheme_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->medical_scheme_id->AdvancedSearch->SearchValue)) {
+                    $this->medical_scheme_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->medical_scheme_id->AdvancedSearch->SearchValue);
+                }
+                $this->medical_scheme_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->medical_scheme_id->AdvancedSearch->SearchValue);
+            }
 
             // status
-            $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            if ($this->status->UseFilter && !EmptyValue($this->status->AdvancedSearch->SearchValue)) {
+                if (is_array($this->status->AdvancedSearch->SearchValue)) {
+                    $this->status->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->status->AdvancedSearch->SearchValue);
+                }
+                $this->status->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->status->AdvancedSearch->SearchValue);
             }
-            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
             // date_created
             $this->date_created->setupEditAttributes();
@@ -3361,6 +3374,8 @@ class PatientAdmissionsList extends PatientAdmissions
                 case "x_payment_method_id":
                     break;
                 case "x_medical_scheme_id":
+                    break;
+                case "x_status":
                     break;
                 default:
                     $lookupFilter = "";
