@@ -218,14 +218,14 @@
     <menu id="21">
       <phrase id="menutext" value="Medicine Suppliers" />
     </menu>
+    <menu id="18">
+      <phrase id="menutext" value="Medicine Categories" />
+    </menu>
     <menu id="17">
       <phrase id="menutext" value="Medicine Brands" />
     </menu>
     <menu id="47">
       <phrase id="menutext" value="Medicine Stock" />
-    </menu>
-    <menu id="18">
-      <phrase id="menutext" value="Medicine Categories" />
     </menu>
     <menu id="19">
       <phrase id="menutext" value="Dispense Medicine" />

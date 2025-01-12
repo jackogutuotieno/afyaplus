@@ -120,7 +120,7 @@ $Page->showMessage();
                     Laboratorists
                 </div>
                 <div class="card-body d-flex align-items-center pt-0 pb-0">
-                    <p class="card-text"><i class="fas fa-microscoe"></i></p>
+                    <p class="card-text"><i class="fas fa-microscope"></i></p>
                     <p class="record-count">
                         <?php
                             $sql = "SELECT COUNT(*) FROM users WHERE user_role_id=4";
