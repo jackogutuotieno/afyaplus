@@ -243,6 +243,8 @@
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
+        clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
         clone ($p['PHPMaker2024\\afyaplus\\Attributes\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('PHPMaker2024\\afyaplus\\Attributes\\Get')),
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Get'],
         clone $p['PHPMaker2024\\afyaplus\\Attributes\\Map'],
@@ -447,6 +449,16 @@
                 ],
                 [
                     'GET',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
+                    'OPTIONS',
+                ],
+                [
+                    'GET',
+                    'POST',
                     'OPTIONS',
                 ],
                 [
@@ -2692,6 +2704,7 @@
                 '/invoicesview[/{id}]',
                 '/invoicesedit[/{id}]',
                 '/invoicesdelete[/{id}]',
+                '/ipdbedchargeslist',
                 '/ipdbillingreportlist[/{admission_id}]',
                 '/ipdbillingreportview[/{admission_id}]',
                 '/ipdbillissueditemslist[/{admission_id}]',
@@ -2699,6 +2712,7 @@
                 '/ipdbillserviceslist',
                 '/ipdpatientslist[/{id}]',
                 '/ipdpatientsedit[/{id}]',
+                '/ipdtotalbedchargeslist',
                 '/ipdtotalbilllist',
                 '/issueitemslist[/{id}]',
                 '/issueitemsadd[/{id}]',
@@ -3124,6 +3138,7 @@
                 'PHPMaker2024\\afyaplus\\InvoicesController:view',
                 'PHPMaker2024\\afyaplus\\InvoicesController:edit',
                 'PHPMaker2024\\afyaplus\\InvoicesController:delete',
+                'PHPMaker2024\\afyaplus\\IpdBedChargesController:list',
                 'PHPMaker2024\\afyaplus\\IpdBillingReportController:list',
                 'PHPMaker2024\\afyaplus\\IpdBillingReportController:view',
                 'PHPMaker2024\\afyaplus\\IpdBillIssuedItemsController:list',
@@ -3131,6 +3146,7 @@
                 'PHPMaker2024\\afyaplus\\IpdBillServicesController:list',
                 'PHPMaker2024\\afyaplus\\IpdPatientsController:list',
                 'PHPMaker2024\\afyaplus\\IpdPatientsController:edit',
+                'PHPMaker2024\\afyaplus\\IpdTotalBedChargesController:list',
                 'PHPMaker2024\\afyaplus\\IpdTotalBillController:list',
                 'PHPMaker2024\\afyaplus\\IssueItemsController:list',
                 'PHPMaker2024\\afyaplus\\IssueItemsController:add',
@@ -3446,6 +3462,12 @@
                 'PHPMaker2024\\afyaplus\\WardTypeController:delete',
             ],
             'middleware' => [
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
+                [
+                    'PHPMaker2024\\afyaplus\\PermissionMiddleware',
+                ],
                 [
                     'PHPMaker2024\\afyaplus\\PermissionMiddleware',
                 ],
@@ -4846,6 +4868,7 @@
                 'view.invoices',
                 'edit.invoices',
                 'delete.invoices',
+                'list.ipd_bed_charges',
                 'list.ipd_billing_report',
                 'view.ipd_billing_report',
                 'list.ipd_bill_issued_items',
@@ -4853,6 +4876,7 @@
                 'list.ipd_bill_services',
                 'list.ipd_patients',
                 'edit.ipd_patients',
+                'list.ipd_total_bed_charges',
                 'list.ipd_total_bill',
                 'list.issue_items',
                 'add.issue_items',
@@ -5168,6 +5192,8 @@
                 'delete.ward_type',
             ],
             'options' => [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6032,6 +6058,8 @@
         $o[427],
         $o[428],
         $o[429],
+        $o[430],
+        $o[431],
     ],
     []
 );

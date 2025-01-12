@@ -307,6 +307,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->date_discharged->Visible) { // date_discharged ?>
         <th data-name="date_discharged" class="<?= $Page->date_discharged->headerCellClass() ?>"><div id="elh_ipd_billing_report_date_discharged" class="ipd_billing_report_date_discharged"><?= $Page->renderFieldHeader($Page->date_discharged) ?></div></th>
 <?php } ?>
+<?php if ($Page->total_days->Visible) { // total_days ?>
+        <th data-name="total_days" class="<?= $Page->total_days->headerCellClass() ?>"><div id="elh_ipd_billing_report_total_days" class="ipd_billing_report_total_days"><?= $Page->renderFieldHeader($Page->total_days) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -372,6 +375,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_date_discharged" class="el_ipd_billing_report_date_discharged">
 <span<?= $Page->date_discharged->viewAttributes() ?>>
 <?= $Page->date_discharged->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->total_days->Visible) { // total_days ?>
+        <td data-name="total_days"<?= $Page->total_days->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_ipd_billing_report_total_days" class="el_ipd_billing_report_total_days">
+<span<?= $Page->total_days->viewAttributes() ?>>
+<?= $Page->total_days->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

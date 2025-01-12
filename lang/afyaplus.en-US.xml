@@ -2,6 +2,12 @@
   <project>
     <phrase id="bodytitle" value="AfyaPlus | The platform for modern health facilities" />
     <phrase id="footertext" value="&amp;copy;2024 AfyaPlus. All rights reserved." />
+    <menu id="1174">
+      <phrase id="menutext" value="ipd bed charges" />
+    </menu>
+    <menu id="1175">
+      <phrase id="menutext" value="Bed Charges" />
+    </menu>
     <menu id="1173">
       <phrase id="menutext" value="Consultation" />
     </menu>
@@ -4049,6 +4055,9 @@
       <field id="date_discharged">
         <phrase id="fldcaption" value="Discharge Date" />
       </field>
+      <field id="total_days">
+        <phrase id="fldcaption" value="No of Days" />
+      </field>
     </table>
     <table id="ipd_bill_issued_items">
       <phrase id="tblcaption" value="Issued Items" />
@@ -4256,6 +4265,24 @@
       </field>
       <field id="cost">
         <phrase id="fldcaption" value="Cost (Kshs)" />
+      </field>
+    </table>
+    <table id="ipd_bed_charges">
+      <phrase id="tblcaption" value="ipd bed charges" />
+      <field id="admission_id">
+        <phrase id="fldcaption" value="Admission No." />
+      </field>
+      <field id="bed_charges">
+        <phrase id="fldcaption" value="Bed Charges (Kshs)" />
+      </field>
+    </table>
+    <table id="ipd_total_bed_charges">
+      <phrase id="tblcaption" value="Bed Charges" />
+      <field id="admission_id">
+        <phrase id="fldcaption" value="admission id" />
+      </field>
+      <field id="total_bed_charges">
+        <phrase id="fldcaption" value="Bed Charges (Kshs)" />
       </field>
     </table>
   </project>

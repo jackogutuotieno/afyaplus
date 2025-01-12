@@ -58,6 +58,9 @@ class IpdBillingReport extends AbstractEntity
     #[Column(name: "date_discharged", type: "datetime")]
     private DateTime $dateDischarged;
 
+    #[Column(name: "total_days", type: "integer", nullable: true)]
+    private ?int $totalDays;
+
     public function getAdmissionId(): int
     {
         return $this->admissionId;
@@ -154,6 +157,17 @@ class IpdBillingReport extends AbstractEntity
     public function setDateDischarged(DateTime $value): static
     {
         $this->dateDischarged = $value;
+        return $this;
+    }
+
+    public function getTotalDays(): ?int
+    {
+        return $this->totalDays;
+    }
+
+    public function setTotalDays(?int $value): static
+    {
+        $this->totalDays = $value;
         return $this;
     }
 }

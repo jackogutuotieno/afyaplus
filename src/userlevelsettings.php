@@ -1774,7 +1774,33 @@ $USER_LEVEL_PRIVS = [["{32536B8D-F37B-4419-80D5-260932800712}appointments_report
     ["{32536B8D-F37B-4419-80D5-260932800712}opd_consultation","8","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}opd_consultation","9","0"],
     ["{32536B8D-F37B-4419-80D5-260932800712}opd_consultation","10","0"],
-    ["{32536B8D-F37B-4419-80D5-260932800712}opd_consultation","11","0"]];
+    ["{32536B8D-F37B-4419-80D5-260932800712}opd_consultation","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges","11","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","-2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","0","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","1","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","2","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","3","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","4","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","5","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","6","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","7","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","8","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","9","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","10","0"],
+    ["{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges","11","0"]];
 
 /**
  * Tables
@@ -1920,4 +1946,6 @@ $USER_LEVEL_TABLES = [["appointments_report","appointments_report2","Appointment
     ["opd_radiology_master_bill","opd_radiology_master_bill","Radiology Tests",true,"{32536B8D-F37B-4419-80D5-260932800712}","opdradiologymasterbilllist"],
     ["opd_pharmacy_master_bill","opd_pharmacy_master_bill","Medicines Issued",true,"{32536B8D-F37B-4419-80D5-260932800712}","opdpharmacymasterbilllist"],
     ["opd_bill_total","opd_bill_total","Total Bill (Kshs)",true,"{32536B8D-F37B-4419-80D5-260932800712}","opdbilltotallist"],
-    ["opd_consultation","opd_consultation","Consultation",true,"{32536B8D-F37B-4419-80D5-260932800712}","opdconsultationlist"]];
+    ["opd_consultation","opd_consultation","Consultation",true,"{32536B8D-F37B-4419-80D5-260932800712}","opdconsultationlist"],
+    ["ipd_bed_charges","ipd_bed_charges","ipd bed charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdbedchargeslist"],
+    ["ipd_total_bed_charges","ipd_total_bed_charges","Bed Charges",true,"{32536B8D-F37B-4419-80D5-260932800712}","ipdtotalbedchargeslist"]];

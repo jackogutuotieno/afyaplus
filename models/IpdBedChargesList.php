@@ -16,7 +16,7 @@ use Closure;
 /**
  * Page class
  */
-class IpdBillingReportList extends IpdBillingReport
+class IpdBedChargesList extends IpdBedCharges
 {
     use MessagesTrait;
 
@@ -27,7 +27,7 @@ class IpdBillingReportList extends IpdBillingReport
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "IpdBillingReportList";
+    public $PageObjName = "IpdBedChargesList";
 
     // View file path
     public $View = null;
@@ -39,13 +39,13 @@ class IpdBillingReportList extends IpdBillingReport
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fipd_billing_reportlist";
+    public $FormName = "fipd_bed_chargeslist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "ipdbillingreportlist";
+    public $CurrentPageName = "ipdbedchargeslist";
 
     // Page URLs
     public $AddUrl;
@@ -146,17 +146,8 @@ class IpdBillingReportList extends IpdBillingReport
     // Set field visibility
     public function setVisibility()
     {
-        $this->admission_id->Visible = false;
-        $this->patient_uhid->setVisibility();
-        $this->patient_name->setVisibility();
-        $this->status->setVisibility();
-        $this->age->Visible = false;
-        $this->gender->Visible = false;
-        $this->payment_method->Visible = false;
-        $this->company->Visible = false;
-        $this->date_admitted->setVisibility();
-        $this->date_discharged->setVisibility();
-        $this->total_days->setVisibility();
+        $this->admission_id->setVisibility();
+        $this->bed_charges->setVisibility();
     }
 
     // Constructor
@@ -167,8 +158,8 @@ class IpdBillingReportList extends IpdBillingReport
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'ipd_billing_report';
-        $this->TableName = 'ipd_billing_report';
+        $this->TableVar = 'ipd_bed_charges';
+        $this->TableName = 'ipd_bed_charges';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -188,26 +179,26 @@ class IpdBillingReportList extends IpdBillingReport
         // Language object
         $Language = Container("app.language");
 
-        // Table object (ipd_billing_report)
-        if (!isset($GLOBALS["ipd_billing_report"]) || $GLOBALS["ipd_billing_report"]::class == PROJECT_NAMESPACE . "ipd_billing_report") {
-            $GLOBALS["ipd_billing_report"] = &$this;
+        // Table object (ipd_bed_charges)
+        if (!isset($GLOBALS["ipd_bed_charges"]) || $GLOBALS["ipd_bed_charges"]::class == PROJECT_NAMESPACE . "ipd_bed_charges") {
+            $GLOBALS["ipd_bed_charges"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "ipdbillingreportadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "ipdbedchargesadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "ipdbillingreportdelete";
-        $this->MultiUpdateUrl = "ipdbillingreportupdate";
+        $this->MultiDeleteUrl = "ipdbedchargesdelete";
+        $this->MultiUpdateUrl = "ipdbedchargesupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'ipd_billing_report');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'ipd_bed_charges');
         }
 
         // Start timer
@@ -358,7 +349,7 @@ class IpdBillingReportList extends IpdBillingReport
                 $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
                 if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "ipdbillingreportview"); // If View page, no primary button
+                    $result["view"] = SameString($pageName, "ipdbedchargesview"); // If View page, no primary button
                 } else { // List page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
                     $this->clearFailureMessage();
@@ -449,7 +440,6 @@ class IpdBillingReportList extends IpdBillingReport
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['admission_id'];
         }
         return $key;
     }
@@ -461,12 +451,6 @@ class IpdBillingReportList extends IpdBillingReport
      */
     protected function hideFieldsForAddEdit()
     {
-        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->admission_id->Visible = false;
-        }
-        if ($this->isAddOrEdit()) {
-            $this->patient_uhid->Visible = false;
-        }
     }
 
     // Lookup data
@@ -717,7 +701,7 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "fipd_billing_reportgrid";
+            $this->FormName = "fipd_bed_chargesgrid";
         }
 
         // Set up page action
@@ -779,50 +763,8 @@ class IpdBillingReportList extends IpdBillingReport
             $this->OtherOptions->hideAllOptions();
         }
 
-        // Get default search criteria
-        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
-        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
-
-        // Get basic search values
-        $this->loadBasicSearchValues();
-
-        // Get and validate search values for advanced search
-        if (EmptyValue($this->UserAction)) { // Skip if user action
-            $this->loadSearchValues();
-        }
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
-        if (!$this->validateSearch()) {
-            // Nothing to do
-        }
-
-        // Restore search parms from Session if not searching / reset / export
-        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-            $this->restoreSearchParms();
-        }
-
-        // Call Recordset SearchValidated event
-        $this->recordsetSearchValidated();
-
         // Set up sorting order
         $this->setupSortOrder();
-
-        // Get basic search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchBasic = $this->basicSearchWhere();
-        }
-
-        // Get advanced search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchAdvanced = $this->advancedSearchWhere();
-        }
-
-        // Get query builder criteria
-        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -830,45 +772,6 @@ class IpdBillingReportList extends IpdBillingReport
         } else {
             $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
-        }
-
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms() && !$query) {
-            // Load basic search from default
-            $this->BasicSearch->loadDefault();
-            if ($this->BasicSearch->Keyword != "") {
-                $srchBasic = $this->basicSearchWhere(); // Save to session
-            }
-
-            // Load advanced search from default
-            if ($this->loadAdvancedSearchDefault()) {
-                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
-            }
-        }
-
-        // Restore search settings from Session
-        if (!$this->hasInvalidFields()) {
-            $this->loadAdvancedSearch();
-        }
-
-        // Build search criteria
-        if ($query) {
-            AddFilter($this->SearchWhere, $query);
-        } else {
-            AddFilter($this->SearchWhere, $srchAdvanced);
-            AddFilter($this->SearchWhere, $srchBasic);
-        }
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json" && !$query) {
-            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -1072,506 +975,6 @@ class IpdBillingReportList extends IpdBillingReport
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fipd_billing_reportsrch");
-        }
-        $filterList = Concat($filterList, $this->admission_id->AdvancedSearch->toJson(), ","); // Field admission_id
-        $filterList = Concat($filterList, $this->patient_uhid->AdvancedSearch->toJson(), ","); // Field patient_uhid
-        $filterList = Concat($filterList, $this->patient_name->AdvancedSearch->toJson(), ","); // Field patient_name
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
-        $filterList = Concat($filterList, $this->age->AdvancedSearch->toJson(), ","); // Field age
-        $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
-        $filterList = Concat($filterList, $this->payment_method->AdvancedSearch->toJson(), ","); // Field payment_method
-        $filterList = Concat($filterList, $this->company->AdvancedSearch->toJson(), ","); // Field company
-        $filterList = Concat($filterList, $this->date_admitted->AdvancedSearch->toJson(), ","); // Field date_admitted
-        $filterList = Concat($filterList, $this->date_discharged->AdvancedSearch->toJson(), ","); // Field date_discharged
-        $filterList = Concat($filterList, $this->total_days->AdvancedSearch->toJson(), ","); // Field total_days
-        if ($this->BasicSearch->Keyword != "") {
-            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
-            $filterList = Concat($filterList, $wrk, ",");
-        }
-
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("fipd_billing_reportsrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
-
-        // Field admission_id
-        $this->admission_id->AdvancedSearch->SearchValue = @$filter["x_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchOperator = @$filter["z_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchCondition = @$filter["v_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchValue2 = @$filter["y_admission_id"];
-        $this->admission_id->AdvancedSearch->SearchOperator2 = @$filter["w_admission_id"];
-        $this->admission_id->AdvancedSearch->save();
-
-        // Field patient_uhid
-        $this->patient_uhid->AdvancedSearch->SearchValue = @$filter["x_patient_uhid"];
-        $this->patient_uhid->AdvancedSearch->SearchOperator = @$filter["z_patient_uhid"];
-        $this->patient_uhid->AdvancedSearch->SearchCondition = @$filter["v_patient_uhid"];
-        $this->patient_uhid->AdvancedSearch->SearchValue2 = @$filter["y_patient_uhid"];
-        $this->patient_uhid->AdvancedSearch->SearchOperator2 = @$filter["w_patient_uhid"];
-        $this->patient_uhid->AdvancedSearch->save();
-
-        // Field patient_name
-        $this->patient_name->AdvancedSearch->SearchValue = @$filter["x_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchOperator = @$filter["z_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchCondition = @$filter["v_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchValue2 = @$filter["y_patient_name"];
-        $this->patient_name->AdvancedSearch->SearchOperator2 = @$filter["w_patient_name"];
-        $this->patient_name->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
-
-        // Field age
-        $this->age->AdvancedSearch->SearchValue = @$filter["x_age"];
-        $this->age->AdvancedSearch->SearchOperator = @$filter["z_age"];
-        $this->age->AdvancedSearch->SearchCondition = @$filter["v_age"];
-        $this->age->AdvancedSearch->SearchValue2 = @$filter["y_age"];
-        $this->age->AdvancedSearch->SearchOperator2 = @$filter["w_age"];
-        $this->age->AdvancedSearch->save();
-
-        // Field gender
-        $this->gender->AdvancedSearch->SearchValue = @$filter["x_gender"];
-        $this->gender->AdvancedSearch->SearchOperator = @$filter["z_gender"];
-        $this->gender->AdvancedSearch->SearchCondition = @$filter["v_gender"];
-        $this->gender->AdvancedSearch->SearchValue2 = @$filter["y_gender"];
-        $this->gender->AdvancedSearch->SearchOperator2 = @$filter["w_gender"];
-        $this->gender->AdvancedSearch->save();
-
-        // Field payment_method
-        $this->payment_method->AdvancedSearch->SearchValue = @$filter["x_payment_method"];
-        $this->payment_method->AdvancedSearch->SearchOperator = @$filter["z_payment_method"];
-        $this->payment_method->AdvancedSearch->SearchCondition = @$filter["v_payment_method"];
-        $this->payment_method->AdvancedSearch->SearchValue2 = @$filter["y_payment_method"];
-        $this->payment_method->AdvancedSearch->SearchOperator2 = @$filter["w_payment_method"];
-        $this->payment_method->AdvancedSearch->save();
-
-        // Field company
-        $this->company->AdvancedSearch->SearchValue = @$filter["x_company"];
-        $this->company->AdvancedSearch->SearchOperator = @$filter["z_company"];
-        $this->company->AdvancedSearch->SearchCondition = @$filter["v_company"];
-        $this->company->AdvancedSearch->SearchValue2 = @$filter["y_company"];
-        $this->company->AdvancedSearch->SearchOperator2 = @$filter["w_company"];
-        $this->company->AdvancedSearch->save();
-
-        // Field date_admitted
-        $this->date_admitted->AdvancedSearch->SearchValue = @$filter["x_date_admitted"];
-        $this->date_admitted->AdvancedSearch->SearchOperator = @$filter["z_date_admitted"];
-        $this->date_admitted->AdvancedSearch->SearchCondition = @$filter["v_date_admitted"];
-        $this->date_admitted->AdvancedSearch->SearchValue2 = @$filter["y_date_admitted"];
-        $this->date_admitted->AdvancedSearch->SearchOperator2 = @$filter["w_date_admitted"];
-        $this->date_admitted->AdvancedSearch->save();
-
-        // Field date_discharged
-        $this->date_discharged->AdvancedSearch->SearchValue = @$filter["x_date_discharged"];
-        $this->date_discharged->AdvancedSearch->SearchOperator = @$filter["z_date_discharged"];
-        $this->date_discharged->AdvancedSearch->SearchCondition = @$filter["v_date_discharged"];
-        $this->date_discharged->AdvancedSearch->SearchValue2 = @$filter["y_date_discharged"];
-        $this->date_discharged->AdvancedSearch->SearchOperator2 = @$filter["w_date_discharged"];
-        $this->date_discharged->AdvancedSearch->save();
-
-        // Field total_days
-        $this->total_days->AdvancedSearch->SearchValue = @$filter["x_total_days"];
-        $this->total_days->AdvancedSearch->SearchOperator = @$filter["z_total_days"];
-        $this->total_days->AdvancedSearch->SearchCondition = @$filter["v_total_days"];
-        $this->total_days->AdvancedSearch->SearchValue2 = @$filter["y_total_days"];
-        $this->total_days->AdvancedSearch->SearchOperator2 = @$filter["w_total_days"];
-        $this->total_days->AdvancedSearch->save();
-        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
-        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
-    }
-
-    // Advanced search WHERE clause based on QueryString
-    public function advancedSearchWhere($default = false)
-    {
-        global $Security;
-        $where = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-        $this->buildSearchSql($where, $this->admission_id, $default, false); // admission_id
-        $this->buildSearchSql($where, $this->patient_uhid, $default, true); // patient_uhid
-        $this->buildSearchSql($where, $this->patient_name, $default, true); // patient_name
-        $this->buildSearchSql($where, $this->status, $default, false); // status
-        $this->buildSearchSql($where, $this->age, $default, false); // age
-        $this->buildSearchSql($where, $this->gender, $default, false); // gender
-        $this->buildSearchSql($where, $this->payment_method, $default, false); // payment_method
-        $this->buildSearchSql($where, $this->company, $default, false); // company
-        $this->buildSearchSql($where, $this->date_admitted, $default, false); // date_admitted
-        $this->buildSearchSql($where, $this->date_discharged, $default, false); // date_discharged
-        $this->buildSearchSql($where, $this->total_days, $default, false); // total_days
-
-        // Set up search command
-        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
-            $this->Command = "search";
-        }
-        if (!$default && $this->Command == "search") {
-            $this->admission_id->AdvancedSearch->save(); // admission_id
-            $this->patient_uhid->AdvancedSearch->save(); // patient_uhid
-            $this->patient_name->AdvancedSearch->save(); // patient_name
-            $this->status->AdvancedSearch->save(); // status
-            $this->age->AdvancedSearch->save(); // age
-            $this->gender->AdvancedSearch->save(); // gender
-            $this->payment_method->AdvancedSearch->save(); // payment_method
-            $this->company->AdvancedSearch->save(); // company
-            $this->date_admitted->AdvancedSearch->save(); // date_admitted
-            $this->date_discharged->AdvancedSearch->save(); // date_discharged
-            $this->total_days->AdvancedSearch->save(); // total_days
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $where;
-    }
-
-    // Query builder rules
-    public function queryBuilderRules()
-    {
-        return Post("rules") ?? $this->getSessionRules();
-    }
-
-    // Quey builder WHERE clause
-    public function queryBuilderWhere($fieldName = "")
-    {
-        global $Security;
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Get rules by query builder
-        $rules = $this->queryBuilderRules();
-
-        // Decode and parse rules
-        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
-
-        // Clear other search and save rules to session
-        if ($where && $fieldName == "") { // Skip if get query for specific field
-            $this->resetSearchParms();
-            $this->admission_id->AdvancedSearch->save(); // admission_id
-            $this->patient_uhid->AdvancedSearch->save(); // patient_uhid
-            $this->patient_name->AdvancedSearch->save(); // patient_name
-            $this->status->AdvancedSearch->save(); // status
-            $this->age->AdvancedSearch->save(); // age
-            $this->gender->AdvancedSearch->save(); // gender
-            $this->payment_method->AdvancedSearch->save(); // payment_method
-            $this->company->AdvancedSearch->save(); // company
-            $this->date_admitted->AdvancedSearch->save(); // date_admitted
-            $this->date_discharged->AdvancedSearch->save(); // date_discharged
-            $this->total_days->AdvancedSearch->save(); // total_days
-            $this->setSessionRules($rules);
-        }
-
-        // Return query
-        return $where;
-    }
-
-    // Build search SQL
-    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
-    {
-        $fldParm = $fld->Param;
-        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
-        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
-        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
-        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
-        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
-        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
-        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
-        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
-        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
-        $wrk = "";
-        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
-        if (is_array($fldVal)) {
-            $fldVal = implode($sep, $fldVal);
-        }
-        if (is_array($fldVal2)) {
-            $fldVal2 = implode($sep, $fldVal2);
-        }
-        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
-            $multiValue = false;
-        }
-        if ($multiValue) {
-            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
-            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
-            AddFilter($wrk, $wrk2, $fldCond);
-        } else {
-            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
-        }
-        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
-            $cond = $this->BasicSearch->getType();
-        } else {
-            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
-        }
-        AddFilter($where, $wrk, $cond);
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-
-        // Field patient_uhid
-        $filter = $this->queryBuilderWhere("patient_uhid");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->patient_uhid, false, true);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_uhid->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field patient_name
-        $filter = $this->queryBuilderWhere("patient_name");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->patient_name, false, true);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field status
-        $filter = $this->queryBuilderWhere("status");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->status, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field date_admitted
-        $filter = $this->queryBuilderWhere("date_admitted");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->date_admitted, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_admitted->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field date_discharged
-        $filter = $this->queryBuilderWhere("date_discharged");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->date_discharged, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_discharged->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-
-        // Field total_days
-        $filter = $this->queryBuilderWhere("total_days");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->total_days, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->total_days->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
-        if ($this->BasicSearch->Keyword != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
-        }
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Return basic search WHERE clause based on search keyword and type
-    public function basicSearchWhere($default = false)
-    {
-        global $Security;
-        $searchStr = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Fields to search
-        $searchFlds = [];
-        $searchFlds[] = &$this->patient_name;
-        $searchFlds[] = &$this->status;
-        $searchFlds[] = &$this->gender;
-        $searchFlds[] = &$this->payment_method;
-        $searchFlds[] = &$this->company;
-        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-        // Get search SQL
-        if ($searchKeyword != "") {
-            $ar = $this->BasicSearch->keywordList($default);
-            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
-            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
-                $this->Command = "search";
-            }
-        }
-        if (!$default && $this->Command == "search") {
-            $this->BasicSearch->setKeyword($searchKeyword);
-            $this->BasicSearch->setType($searchType);
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $searchStr;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        // Check basic search
-        if ($this->BasicSearch->issetSession()) {
-            return true;
-        }
-        if ($this->admission_id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->patient_uhid->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->patient_name->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->status->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->age->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->gender->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->payment_method->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->company->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->date_admitted->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->date_discharged->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->total_days->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Clear all search parameters
-    protected function resetSearchParms()
-    {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear basic search parameters
-        $this->resetBasicSearchParms();
-
-        // Clear advanced search parameters
-        $this->resetAdvancedSearchParms();
-
-        // Clear queryBuilder
-        $this->setSessionRules("");
-    }
-
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
-    {
-        return false;
-    }
-
-    // Clear all basic search parameters
-    protected function resetBasicSearchParms()
-    {
-        $this->BasicSearch->unsetSession();
-    }
-
-    // Clear all advanced search parameters
-    protected function resetAdvancedSearchParms()
-    {
-        $this->admission_id->AdvancedSearch->unsetSession();
-        $this->patient_uhid->AdvancedSearch->unsetSession();
-        $this->patient_name->AdvancedSearch->unsetSession();
-        $this->status->AdvancedSearch->unsetSession();
-        $this->age->AdvancedSearch->unsetSession();
-        $this->gender->AdvancedSearch->unsetSession();
-        $this->payment_method->AdvancedSearch->unsetSession();
-        $this->company->AdvancedSearch->unsetSession();
-        $this->date_admitted->AdvancedSearch->unsetSession();
-        $this->date_discharged->AdvancedSearch->unsetSession();
-        $this->total_days->AdvancedSearch->unsetSession();
-    }
-
-    // Restore all search parameters
-    protected function restoreSearchParms()
-    {
-        $this->RestoreSearch = true;
-
-        // Restore basic search values
-        $this->BasicSearch->load();
-
-        // Restore advanced search values
-        $this->admission_id->AdvancedSearch->load();
-        $this->patient_uhid->AdvancedSearch->load();
-        $this->patient_name->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
-        $this->age->AdvancedSearch->load();
-        $this->gender->AdvancedSearch->load();
-        $this->payment_method->AdvancedSearch->load();
-        $this->company->AdvancedSearch->load();
-        $this->date_admitted->AdvancedSearch->load();
-        $this->date_discharged->AdvancedSearch->load();
-        $this->total_days->AdvancedSearch->load();
-    }
-
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1587,12 +990,8 @@ class IpdBillingReportList extends IpdBillingReport
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->patient_uhid); // patient_uhid
-            $this->updateSort($this->patient_name); // patient_name
-            $this->updateSort($this->status); // status
-            $this->updateSort($this->date_admitted); // date_admitted
-            $this->updateSort($this->date_discharged); // date_discharged
-            $this->updateSort($this->total_days); // total_days
+            $this->updateSort($this->admission_id); // admission_id
+            $this->updateSort($this->bed_charges); // bed_charges
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1608,26 +1007,12 @@ class IpdBillingReportList extends IpdBillingReport
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->admission_id->setSort("");
-                $this->patient_uhid->setSort("");
-                $this->patient_name->setSort("");
-                $this->status->setSort("");
-                $this->age->setSort("");
-                $this->gender->setSort("");
-                $this->payment_method->setSort("");
-                $this->company->setSort("");
-                $this->date_admitted->setSort("");
-                $this->date_discharged->setSort("");
-                $this->total_days->setSort("");
+                $this->bed_charges->setSort("");
             }
 
             // Reset start position
@@ -1646,66 +1031,6 @@ class IpdBillingReportList extends IpdBillingReport
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
-
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "detail_ipd_total_bed_charges"
-        $item = &$this->ListOptions->add("detail_ipd_total_bed_charges");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_total_bed_charges');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_ipd_bill_issued_items"
-        $item = &$this->ListOptions->add("detail_ipd_bill_issued_items");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_issued_items');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_ipd_bill_services"
-        $item = &$this->ListOptions->add("detail_ipd_bill_services");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_services');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_ipd_bill_medicines"
-        $item = &$this->ListOptions->add("detail_ipd_bill_medicines");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_bill_medicines');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // "detail_ipd_total_bill"
-        $item = &$this->ListOptions->add("detail_ipd_total_bill");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_total_bill');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
-        // Multiple details
-        if ($this->ShowMultipleDetails) {
-            $item = &$this->ListOptions->add("details");
-            $item->CssClass = "text-nowrap";
-            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
-            $item->OnLeft = false;
-            $item->ShowInButtonGroup = false;
-            $this->ListOptions->hideDetailItems();
-        }
-
-        // Set up detail pages
-        $pages = new SubPages();
-        $pages->add("ipd_total_bed_charges");
-        $pages->add("ipd_bill_issued_items");
-        $pages->add("ipd_bill_services");
-        $pages->add("ipd_bill_medicines");
-        $pages->add("ipd_total_bill");
-        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1776,19 +1101,7 @@ class IpdBillingReportList extends IpdBillingReport
         $opt = $this->ListOptions["sequence"];
         $opt->Body = FormatSequenceNumber($this->RecordCount);
         $pageUrl = $this->pageUrl(false);
-        if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"ipd_billing_report\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
+        if ($this->CurrentMode == "view") { // Check view mode
         } // End View mode
 
         // Set up list action buttons
@@ -1807,12 +1120,12 @@ class IpdBillingReportList extends IpdBillingReport
                         $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
                         $link = $disabled
                             ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_billing_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
+                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_bed_chargeslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
                         $links[] = $link;
                         if ($body == "") { // Setup first button
                             $body = $disabled
                             ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_billing_reportlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
+                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"fipd_bed_chargeslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
                         }
                     }
                 }
@@ -1827,179 +1140,9 @@ class IpdBillingReportList extends IpdBillingReport
                 $opt->Body = $body;
             }
         }
-        $detailViewTblVar = "";
-        $detailCopyTblVar = "";
-        $detailEditTblVar = "";
-
-        // "detail_ipd_total_bed_charges"
-        $opt = $this->ListOptions["detail_ipd_total_bed_charges"];
-        if ($Security->allowList(CurrentProjectID() . 'ipd_total_bed_charges')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_total_bed_charges", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdtotalbedchargeslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("IpdTotalBedChargesGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_total_bed_charges");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "ipd_total_bed_charges";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_ipd_bill_issued_items"
-        $opt = $this->ListOptions["detail_ipd_bill_issued_items"];
-        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_issued_items')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_issued_items", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillissueditemslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("IpdBillIssuedItemsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_issued_items");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "ipd_bill_issued_items";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_ipd_bill_services"
-        $opt = $this->ListOptions["detail_ipd_bill_services"];
-        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_services')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_services", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillserviceslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("IpdBillServicesGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_services");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "ipd_bill_services";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_ipd_bill_medicines"
-        $opt = $this->ListOptions["detail_ipd_bill_medicines"];
-        if ($Security->allowList(CurrentProjectID() . 'ipd_bill_medicines')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_bill_medicines", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdbillmedicineslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("IpdBillMedicinesGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_bill_medicines");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "ipd_bill_medicines";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
-        // "detail_ipd_total_bill"
-        $opt = $this->ListOptions["detail_ipd_total_bill"];
-        if ($Security->allowList(CurrentProjectID() . 'ipd_total_bill')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("ipd_total_bill", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ipdtotalbilllist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("IpdTotalBillGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_total_bill");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "ipd_total_bill";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-        if ($this->ShowMultipleDetails) {
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
-            $links = "";
-            if ($detailViewTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            }
-            if ($detailEditTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
-            }
-            if ($detailCopyTblVar != "") {
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
-                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
-            }
-            $body .= "</div>";
-            // Multiple details
-            $opt = $this->ListOptions["details"];
-            $opt->Body = $body;
-        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->admission_id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -2026,12 +1169,8 @@ class IpdBillingReportList extends IpdBillingReport
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "patient_uhid");
-            $this->createColumnOption($option, "patient_name");
-            $this->createColumnOption($option, "status");
-            $this->createColumnOption($option, "date_admitted");
-            $this->createColumnOption($option, "date_discharged");
-            $this->createColumnOption($option, "total_days");
+            $this->createColumnOption($option, "admission_id");
+            $this->createColumnOption($option, "bed_charges");
         }
 
         // Set up custom actions
@@ -2056,11 +1195,11 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fipd_billing_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fipd_bed_chargessrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fipd_billing_reportsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fipd_bed_chargessrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -2119,7 +1258,7 @@ class IpdBillingReportList extends IpdBillingReport
                 $item = &$option->add("custom_" . $listAction->Action);
                 $caption = $listAction->Caption;
                 $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fipd_billing_reportlist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fipd_bed_chargeslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
                 $item->Visible = $listAction->Allowed;
             }
         }
@@ -2290,7 +1429,7 @@ class IpdBillingReportList extends IpdBillingReport
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_ipd_billing_report", "data-rowtype" => RowType::ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_ipd_bed_charges", "data-rowtype" => RowType::ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = RowType::ADD;
@@ -2351,7 +1490,7 @@ class IpdBillingReportList extends IpdBillingReport
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_ipd_billing_report",
+            "id" => "r" . $this->RowCount . "_ipd_bed_charges",
             "data-rowtype" => $this->RowType,
             "data-inline" => ($this->isAdd() || $this->isCopy() || $this->isEdit()) ? "true" : "false", // Inline-Add/Copy/Edit
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
@@ -2365,119 +1504,6 @@ class IpdBillingReportList extends IpdBillingReport
 
         // Render list options
         $this->renderListOptions();
-    }
-
-    // Load basic search values
-    protected function loadBasicSearchValues()
-    {
-        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
-        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
-            $this->Command = "search";
-        }
-        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
-    }
-
-    // Load search values for validation
-    protected function loadSearchValues()
-    {
-        // Load search values
-        $hasValue = false;
-
-        // Load query builder rules
-        $rules = Post("rules");
-        if ($rules && $this->Command == "") {
-            $this->QueryRules = $rules;
-            $this->Command = "search";
-        }
-
-        // admission_id
-        if ($this->admission_id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->admission_id->AdvancedSearch->SearchValue != "" || $this->admission_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // patient_uhid
-        if ($this->patient_uhid->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->patient_uhid->AdvancedSearch->SearchValue != "" || $this->patient_uhid->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // patient_name
-        if ($this->patient_name->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->patient_name->AdvancedSearch->SearchValue != "" || $this->patient_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // status
-        if ($this->status->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // age
-        if ($this->age->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->age->AdvancedSearch->SearchValue != "" || $this->age->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // gender
-        if ($this->gender->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->gender->AdvancedSearch->SearchValue != "" || $this->gender->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // payment_method
-        if ($this->payment_method->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->payment_method->AdvancedSearch->SearchValue != "" || $this->payment_method->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // company
-        if ($this->company->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->company->AdvancedSearch->SearchValue != "" || $this->company->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // date_admitted
-        if ($this->date_admitted->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->date_admitted->AdvancedSearch->SearchValue != "" || $this->date_admitted->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // date_discharged
-        if ($this->date_discharged->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->date_discharged->AdvancedSearch->SearchValue != "" || $this->date_discharged->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // total_days
-        if ($this->total_days->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->total_days->AdvancedSearch->SearchValue != "" || $this->total_days->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-        return $hasValue;
     }
 
     /**
@@ -2574,16 +1600,7 @@ class IpdBillingReportList extends IpdBillingReport
         // Call Row Selected event
         $this->rowSelected($row);
         $this->admission_id->setDbValue($row['admission_id']);
-        $this->patient_uhid->setDbValue($row['patient_uhid']);
-        $this->patient_name->setDbValue($row['patient_name']);
-        $this->status->setDbValue($row['status']);
-        $this->age->setDbValue($row['age']);
-        $this->gender->setDbValue($row['gender']);
-        $this->payment_method->setDbValue($row['payment_method']);
-        $this->company->setDbValue($row['company']);
-        $this->date_admitted->setDbValue($row['date_admitted']);
-        $this->date_discharged->setDbValue($row['date_discharged']);
-        $this->total_days->setDbValue($row['total_days']);
+        $this->bed_charges->setDbValue($row['bed_charges']);
     }
 
     // Return a row with default values
@@ -2591,34 +1608,13 @@ class IpdBillingReportList extends IpdBillingReport
     {
         $row = [];
         $row['admission_id'] = $this->admission_id->DefaultValue;
-        $row['patient_uhid'] = $this->patient_uhid->DefaultValue;
-        $row['patient_name'] = $this->patient_name->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
-        $row['age'] = $this->age->DefaultValue;
-        $row['gender'] = $this->gender->DefaultValue;
-        $row['payment_method'] = $this->payment_method->DefaultValue;
-        $row['company'] = $this->company->DefaultValue;
-        $row['date_admitted'] = $this->date_admitted->DefaultValue;
-        $row['date_discharged'] = $this->date_discharged->DefaultValue;
-        $row['total_days'] = $this->total_days->DefaultValue;
+        $row['bed_charges'] = $this->bed_charges->DefaultValue;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        // Load old record
-        if ($this->OldKey != "") {
-            $this->setKey($this->OldKey);
-            $this->CurrentFilter = $this->getRecordFilter();
-            $sql = $this->getCurrentSql();
-            $conn = $this->getConnection();
-            $rs = ExecuteQuery($sql, $conn);
-            if ($row = $rs->fetch()) {
-                $this->loadRowValues($row); // Load row values
-                return $row;
-            }
-        }
         $this->loadRowValues(); // Load default row values
         return null;
     }
@@ -2643,169 +1639,45 @@ class IpdBillingReportList extends IpdBillingReport
 
         // admission_id
 
-        // patient_uhid
+        // bed_charges
 
-        // patient_name
-
-        // status
-
-        // age
-
-        // gender
-
-        // payment_method
-
-        // company
-
-        // date_admitted
-
-        // date_discharged
-
-        // total_days
+        // Accumulate aggregate value
+        if ($this->RowType != RowType::AGGREGATEINIT && $this->RowType != RowType::AGGREGATE && $this->RowType != RowType::PREVIEWFIELD) {
+            if (is_numeric($this->bed_charges->CurrentValue)) {
+                $this->bed_charges->Total += $this->bed_charges->CurrentValue; // Accumulate total
+            }
+        }
 
         // View row
         if ($this->RowType == RowType::VIEW) {
             // admission_id
             $this->admission_id->ViewValue = $this->admission_id->CurrentValue;
+            $this->admission_id->ViewValue = FormatNumber($this->admission_id->ViewValue, $this->admission_id->formatPattern());
 
-            // patient_uhid
-            $this->patient_uhid->ViewValue = $this->patient_uhid->CurrentValue;
+            // bed_charges
+            $this->bed_charges->ViewValue = $this->bed_charges->CurrentValue;
+            $this->bed_charges->ViewValue = FormatNumber($this->bed_charges->ViewValue, $this->bed_charges->formatPattern());
 
-            // patient_name
-            $this->patient_name->ViewValue = $this->patient_name->CurrentValue;
+            // admission_id
+            $this->admission_id->HrefValue = "";
+            $this->admission_id->TooltipValue = "";
 
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
-            // age
-            $this->age->ViewValue = $this->age->CurrentValue;
-            $this->age->ViewValue = FormatNumber($this->age->ViewValue, $this->age->formatPattern());
-
-            // gender
-            $this->gender->ViewValue = $this->gender->CurrentValue;
-
-            // payment_method
-            $this->payment_method->ViewValue = $this->payment_method->CurrentValue;
-
-            // company
-            $this->company->ViewValue = $this->company->CurrentValue;
-
-            // date_admitted
-            $this->date_admitted->ViewValue = $this->date_admitted->CurrentValue;
-            $this->date_admitted->ViewValue = FormatDateTime($this->date_admitted->ViewValue, $this->date_admitted->formatPattern());
-
-            // date_discharged
-            $this->date_discharged->ViewValue = $this->date_discharged->CurrentValue;
-            $this->date_discharged->ViewValue = FormatDateTime($this->date_discharged->ViewValue, $this->date_discharged->formatPattern());
-
-            // total_days
-            $this->total_days->ViewValue = $this->total_days->CurrentValue;
-            $this->total_days->ViewValue = FormatNumber($this->total_days->ViewValue, $this->total_days->formatPattern());
-
-            // patient_uhid
-            $this->patient_uhid->HrefValue = "";
-            $this->patient_uhid->TooltipValue = "";
-
-            // patient_name
-            $this->patient_name->HrefValue = "";
-            $this->patient_name->TooltipValue = "";
-
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
-
-            // date_admitted
-            $this->date_admitted->HrefValue = "";
-            $this->date_admitted->TooltipValue = "";
-
-            // date_discharged
-            $this->date_discharged->HrefValue = "";
-            $this->date_discharged->TooltipValue = "";
-
-            // total_days
-            $this->total_days->HrefValue = "";
-            $this->total_days->TooltipValue = "";
-        } elseif ($this->RowType == RowType::SEARCH) {
-            // patient_uhid
-            if ($this->patient_uhid->UseFilter && !EmptyValue($this->patient_uhid->AdvancedSearch->SearchValue)) {
-                if (is_array($this->patient_uhid->AdvancedSearch->SearchValue)) {
-                    $this->patient_uhid->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_uhid->AdvancedSearch->SearchValue);
-                }
-                $this->patient_uhid->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_uhid->AdvancedSearch->SearchValue);
-            }
-
-            // patient_name
-            if ($this->patient_name->UseFilter && !EmptyValue($this->patient_name->AdvancedSearch->SearchValue)) {
-                if (is_array($this->patient_name->AdvancedSearch->SearchValue)) {
-                    $this->patient_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
-                }
-                $this->patient_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
-            }
-
-            // status
-            $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
-            // date_admitted
-            $this->date_admitted->setupEditAttributes();
-            $this->date_admitted->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_admitted->AdvancedSearch->SearchValue, $this->date_admitted->formatPattern()), $this->date_admitted->formatPattern()));
-            $this->date_admitted->PlaceHolder = RemoveHtml($this->date_admitted->caption());
-
-            // date_discharged
-            $this->date_discharged->setupEditAttributes();
-            $this->date_discharged->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_discharged->AdvancedSearch->SearchValue, $this->date_discharged->formatPattern()), $this->date_discharged->formatPattern()));
-            $this->date_discharged->PlaceHolder = RemoveHtml($this->date_discharged->caption());
-
-            // total_days
-            $this->total_days->setupEditAttributes();
-            $this->total_days->EditValue = $this->total_days->AdvancedSearch->SearchValue;
-            $this->total_days->PlaceHolder = RemoveHtml($this->total_days->caption());
+            // bed_charges
+            $this->bed_charges->HrefValue = "";
+            $this->bed_charges->TooltipValue = "";
+        } elseif ($this->RowType == RowType::AGGREGATEINIT) { // Initialize aggregate row
+                    $this->bed_charges->Total = 0; // Initialize total
+        } elseif ($this->RowType == RowType::AGGREGATE) { // Aggregate row
+            $this->bed_charges->CurrentValue = $this->bed_charges->Total;
+            $this->bed_charges->ViewValue = $this->bed_charges->CurrentValue;
+            $this->bed_charges->ViewValue = FormatNumber($this->bed_charges->ViewValue, $this->bed_charges->formatPattern());
+            $this->bed_charges->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    // Validate search
-    protected function validateSearch()
-    {
-        // Check if validation required
-        if (!Config("SERVER_VALIDATE")) {
-            return true;
-        }
-
-        // Return validate result
-        $validateSearch = !$this->hasInvalidFields();
-
-        // Call Form_CustomValidate event
-        $formCustomError = "";
-        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
-        if ($formCustomError != "") {
-            $this->setFailureMessage($formCustomError);
-        }
-        return $validateSearch;
-    }
-
-    // Load advanced search
-    public function loadAdvancedSearch()
-    {
-        $this->admission_id->AdvancedSearch->load();
-        $this->patient_uhid->AdvancedSearch->load();
-        $this->patient_name->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
-        $this->age->AdvancedSearch->load();
-        $this->gender->AdvancedSearch->load();
-        $this->payment_method->AdvancedSearch->load();
-        $this->company->AdvancedSearch->load();
-        $this->date_admitted->AdvancedSearch->load();
-        $this->date_discharged->AdvancedSearch->load();
-        $this->total_days->AdvancedSearch->load();
     }
 
     // Get export HTML tag
@@ -2820,19 +1692,19 @@ class IpdBillingReportList extends IpdBillingReport
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fipd_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fipd_bed_chargeslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fipd_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fipd_bed_chargeslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fipd_billing_reportlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fipd_bed_chargeslist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -2844,7 +1716,7 @@ class IpdBillingReportList extends IpdBillingReport
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fipd_billing_reportlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fipd_bed_chargeslist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -2919,21 +1791,6 @@ class IpdBillingReportList extends IpdBillingReport
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fipd_billing_reportsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
-
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -2957,7 +1814,7 @@ class IpdBillingReportList extends IpdBillingReport
     // Check if any search fields
     public function hasSearchFields()
     {
-        return true;
+        return false;
     }
 
     // Render search options

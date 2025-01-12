@@ -161,6 +161,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->total_days->Visible) { // total_days ?>
+    <tr id="r_total_days"<?= $Page->total_days->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_ipd_billing_report_total_days"><template id="tpc_ipd_billing_report_total_days"><?= $Page->total_days->caption() ?></template></span></td>
+        <td data-name="total_days"<?= $Page->total_days->cellAttributes() ?>>
+<template id="tpx_ipd_billing_report_total_days"><span id="el_ipd_billing_report_total_days">
+<span<?= $Page->total_days->viewAttributes() ?>>
+<?= $Page->total_days->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <div id="tpd_ipd_billing_reportview" class="ew-custom-template"></div>
 <template id="tpm_ipd_billing_reportview">
@@ -179,9 +190,18 @@ loadjs.ready("head", function () {
     <tr style="border-top:1px solid #000;border-bottom:1px solid #000;border-right: 1px solid #000">
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_ipd_billing_report_date_admitted"></slot>&nbsp;<slot class="ew-slot" name="tpx_ipd_billing_report_date_admitted"></slot></p></td>
         <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_ipd_billing_report_date_discharged"></slot>&nbsp;<slot class="ew-slot" name="tpx_ipd_billing_report_date_discharged"></slot></p></td>
+        <td style="border-left: 1px solid #000;border-right: 1px solid #000"><p><slot class="ew-slot" name="tpc_ipd_billing_report_total_days"></slot>&nbsp;<slot class="ew-slot" name="tpx_ipd_billing_report_total_days"></slot></p></td>
     </tr>
 </table></div>
 </template>
+<?php
+    if (in_array("ipd_total_bed_charges", explode(",", $Page->getCurrentDetailTable())) && $ipd_total_bed_charges->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("ipd_total_bed_charges", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "IpdTotalBedChargesGrid.php" ?>
+<?php } ?>
 <?php
     if (in_array("ipd_bill_issued_items", explode(",", $Page->getCurrentDetailTable())) && $ipd_bill_issued_items->DetailView) {
 ?>

@@ -235,6 +235,8 @@ return [
     "opd_pharmacy_master_bill" => \DI\create(OpdPharmacyMasterBill::class),
     "opd_bill_total" => \DI\create(OpdBillTotal::class),
     "opd_consultation" => \DI\create(OpdConsultation::class),
+    "ipd_bed_charges" => \DI\create(IpdBedCharges::class),
+    "ipd_total_bed_charges" => \DI\create(IpdTotalBedCharges::class),
 
     // User table
     "usertable" => \DI\get("users"),

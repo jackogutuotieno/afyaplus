@@ -150,6 +150,7 @@ class IpdBillingReportView extends IpdBillingReport
         $this->company->setVisibility();
         $this->date_admitted->setVisibility();
         $this->date_discharged->setVisibility();
+        $this->total_days->setVisibility();
     }
 
     // Constructor
@@ -686,6 +687,38 @@ class IpdBillingReportView extends IpdBillingReport
         $detailCopyTblVar = "";
         $detailEditTblVar = "";
 
+        // "detail_ipd_total_bed_charges"
+        $item = &$option->add("detail_ipd_total_bed_charges");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("ipd_total_bed_charges", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("ipdtotalbedchargeslist?" . Config("TABLE_SHOW_MASTER") . "=ipd_billing_report&" . GetForeignKeyUrl("fk_admission_id", $this->admission_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("IpdTotalBedChargesGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'ipd_billing_report')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=ipd_total_bed_charges"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "ipd_total_bed_charges";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'ipd_total_bed_charges');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "ipd_total_bed_charges";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
         // "detail_ipd_bill_issued_items"
         $item = &$option->add("detail_ipd_bill_issued_items");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("ipd_bill_issued_items", "TblCaption");
@@ -961,6 +994,7 @@ class IpdBillingReportView extends IpdBillingReport
         $this->company->setDbValue($row['company']);
         $this->date_admitted->setDbValue($row['date_admitted']);
         $this->date_discharged->setDbValue($row['date_discharged']);
+        $this->total_days->setDbValue($row['total_days']);
     }
 
     // Return a row with default values
@@ -977,6 +1011,7 @@ class IpdBillingReportView extends IpdBillingReport
         $row['company'] = $this->company->DefaultValue;
         $row['date_admitted'] = $this->date_admitted->DefaultValue;
         $row['date_discharged'] = $this->date_discharged->DefaultValue;
+        $row['total_days'] = $this->total_days->DefaultValue;
         return $row;
     }
 
@@ -1018,6 +1053,8 @@ class IpdBillingReportView extends IpdBillingReport
 
         // date_discharged
 
+        // total_days
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // admission_id
@@ -1052,6 +1089,10 @@ class IpdBillingReportView extends IpdBillingReport
             // date_discharged
             $this->date_discharged->ViewValue = $this->date_discharged->CurrentValue;
             $this->date_discharged->ViewValue = FormatDateTime($this->date_discharged->ViewValue, $this->date_discharged->formatPattern());
+
+            // total_days
+            $this->total_days->ViewValue = $this->total_days->CurrentValue;
+            $this->total_days->ViewValue = FormatNumber($this->total_days->ViewValue, $this->total_days->formatPattern());
 
             // admission_id
             $this->admission_id->HrefValue = "";
@@ -1092,6 +1133,10 @@ class IpdBillingReportView extends IpdBillingReport
             // date_discharged
             $this->date_discharged->HrefValue = "";
             $this->date_discharged->TooltipValue = "";
+
+            // total_days
+            $this->total_days->HrefValue = "";
+            $this->total_days->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1255,6 +1300,25 @@ class IpdBillingReportView extends IpdBillingReport
         // Set up detail parameters
         $this->setupDetailParms();
 
+        // Export detail records (ipd_total_bed_charges)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("ipd_total_bed_charges", explode(",", $this->getCurrentDetailTable()))) {
+            $ipd_total_bed_charges = new IpdTotalBedChargesList();
+            $rsdetail = $ipd_total_bed_charges->loadRs($ipd_total_bed_charges->getDetailFilterFromSession(), $ipd_total_bed_charges->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($ipd_total_bed_charges);
+                    $ipd_total_bed_charges->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
         // Export detail records (ipd_bill_issued_items)
         if (Config("EXPORT_DETAIL_RECORDS") && in_array("ipd_bill_issued_items", explode(",", $this->getCurrentDetailTable()))) {
             $ipd_bill_issued_items = new IpdBillIssuedItemsList();
@@ -1356,6 +1420,20 @@ class IpdBillingReportView extends IpdBillingReport
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("ipd_total_bed_charges", $detailTblVar)) {
+                $detailPageObj = Container("IpdTotalBedChargesGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->admission_id->IsDetailKey = true;
+                    $detailPageObj->admission_id->CurrentValue = $this->admission_id->CurrentValue;
+                    $detailPageObj->admission_id->setSessionValue($detailPageObj->admission_id->CurrentValue);
+                }
+            }
             if (in_array("ipd_bill_issued_items", $detailTblVar)) {
                 $detailPageObj = Container("IpdBillIssuedItemsGrid");
                 if ($detailPageObj->DetailView) {
