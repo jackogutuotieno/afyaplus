@@ -67,6 +67,7 @@ class MedicineStock extends DbTable
     public $expiry_date;
     public $stock_status;
     public $expiry_status;
+    public $invoice_attachment;
     public $date_created;
     public $date_updated;
 
@@ -431,6 +432,34 @@ class MedicineStock extends DbTable
         $this->expiry_status->IsCustom = true; // Custom field
         $this->expiry_status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['expiry_status'] = &$this->expiry_status;
+
+        // invoice_attachment
+        $this->invoice_attachment = new DbField(
+            $this, // Table
+            'x_invoice_attachment', // Variable name
+            'invoice_attachment', // Name
+            '`invoice_attachment`', // Expression
+            '`invoice_attachment`', // Basic search expression
+            205, // Type
+            2147483647, // Size
+            -1, // Date/Time format
+            true, // Is upload field
+            '`invoice_attachment`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'FILE' // Edit Tag
+        );
+        $this->invoice_attachment->InputTextType = "text";
+        $this->invoice_attachment->Raw = true;
+        $this->invoice_attachment->Nullable = false; // NOT NULL field
+        $this->invoice_attachment->Required = true; // Required field
+        $this->invoice_attachment->Sortable = false; // Allow sort
+        $this->invoice_attachment->UploadAllowedFileExt = "pdf,jpg";
+        $this->invoice_attachment->SearchOperators = ["=", "<>"];
+        $this->invoice_attachment->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->invoice_attachment->Param, "CustomMsg");
+        $this->Fields['invoice_attachment'] = &$this->invoice_attachment;
 
         // date_created
         $this->date_created = new DbField(
@@ -1015,6 +1044,7 @@ class MedicineStock extends DbTable
         $this->expiry_date->DbValue = $row['expiry_date'];
         $this->stock_status->DbValue = $row['stock_status'];
         $this->expiry_status->DbValue = $row['expiry_status'];
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->DbValue = $row['date_created'];
         $this->date_updated->DbValue = $row['date_updated'];
     }
@@ -1381,6 +1411,7 @@ class MedicineStock extends DbTable
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->stock_status->setDbValue($row['stock_status']);
         $this->expiry_status->setDbValue($row['expiry_status']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -1436,6 +1467,8 @@ class MedicineStock extends DbTable
         // stock_status
 
         // expiry_status
+
+        // invoice_attachment
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";
@@ -1523,6 +1556,14 @@ class MedicineStock extends DbTable
         // expiry_status
         $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
+        // invoice_attachment
+        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+        } else {
+            $this->invoice_attachment->ViewValue = "";
+        }
+
         // date_created
         $this->date_created->ViewValue = $this->date_created->CurrentValue;
         $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1578,6 +1619,22 @@ class MedicineStock extends DbTable
         // expiry_status
         $this->expiry_status->HrefValue = "";
         $this->expiry_status->TooltipValue = "";
+
+        // invoice_attachment
+        if (!empty($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->LinkAttrs["target"] = "";
+            if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+            }
+            if ($this->isExport()) {
+                $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+            }
+        } else {
+            $this->invoice_attachment->HrefValue = "";
+        }
+        $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+        $this->invoice_attachment->TooltipValue = "";
 
         // date_created
         $this->date_created->HrefValue = "";
@@ -1682,6 +1739,15 @@ class MedicineStock extends DbTable
         $this->expiry_status->EditValue = $this->expiry_status->CurrentValue;
         $this->expiry_status->PlaceHolder = RemoveHtml($this->expiry_status->caption());
 
+        // invoice_attachment
+        $this->invoice_attachment->setupEditAttributes();
+        if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+            $this->invoice_attachment->EditValue = $this->id->CurrentValue;
+            $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+        } else {
+            $this->invoice_attachment->EditValue = "";
+        }
+
         // date_created
         $this->date_created->setupEditAttributes();
         $this->date_created->EditValue = FormatDateTime($this->date_created->CurrentValue, $this->date_created->formatPattern());
@@ -1732,6 +1798,7 @@ class MedicineStock extends DbTable
                     $doc->exportCaption($this->expiry_date);
                     $doc->exportCaption($this->stock_status);
                     $doc->exportCaption($this->expiry_status);
+                    $doc->exportCaption($this->invoice_attachment);
                     $doc->exportCaption($this->date_created);
                     $doc->exportCaption($this->date_updated);
                 } else {
@@ -1787,6 +1854,7 @@ class MedicineStock extends DbTable
                         $doc->exportField($this->expiry_date);
                         $doc->exportField($this->stock_status);
                         $doc->exportField($this->expiry_status);
+                        $doc->exportField($this->invoice_attachment);
                         $doc->exportField($this->date_created);
                         $doc->exportField($this->date_updated);
                     } else {
@@ -1823,8 +1891,122 @@ class MedicineStock extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'invoice_attachment') {
+            $fldName = "invoice_attachment";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

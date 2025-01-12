@@ -57,6 +57,9 @@ class MedicineStock extends AbstractEntity
     #[Column(name: "expiry_date", type: "date")]
     private DateTime $expiryDate;
 
+    #[Column(name: "invoice_attachment", type: "blob")]
+    private mixed $invoiceAttachment;
+
     #[Column(name: "date_created", type: "datetime")]
     private DateTime $dateCreated;
 
@@ -159,6 +162,17 @@ class MedicineStock extends AbstractEntity
     public function setExpiryDate(DateTime $value): static
     {
         $this->expiryDate = $value;
+        return $this;
+    }
+
+    public function getInvoiceAttachment(): mixed
+    {
+        return $this->invoiceAttachment;
+    }
+
+    public function setInvoiceAttachment(mixed $value): static
+    {
+        $this->invoiceAttachment = $value;
         return $this;
     }
 

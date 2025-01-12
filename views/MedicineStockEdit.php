@@ -36,7 +36,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["measuring_unit", [fields.measuring_unit.visible && fields.measuring_unit.required ? ew.Validators.required(fields.measuring_unit.caption) : null], fields.measuring_unit.isInvalid],
             ["buying_price_per_unit", [fields.buying_price_per_unit.visible && fields.buying_price_per_unit.required ? ew.Validators.required(fields.buying_price_per_unit.caption) : null, ew.Validators.float], fields.buying_price_per_unit.isInvalid],
             ["selling_price_per_unit", [fields.selling_price_per_unit.visible && fields.selling_price_per_unit.required ? ew.Validators.required(fields.selling_price_per_unit.caption) : null, ew.Validators.float], fields.selling_price_per_unit.isInvalid],
-            ["stock_status", [fields.stock_status.visible && fields.stock_status.required ? ew.Validators.required(fields.stock_status.caption) : null], fields.stock_status.isInvalid]
+            ["invoice_attachment", [fields.invoice_attachment.visible && fields.invoice_attachment.required ? ew.Validators.fileRequired(fields.invoice_attachment.caption) : null], fields.invoice_attachment.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -256,14 +256,37 @@ loadjs.ready("fmedicine_stockedit", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->stock_status->Visible) { // stock_status ?>
-    <div id="r_stock_status"<?= $Page->stock_status->rowAttributes() ?>>
-        <label id="elh_medicine_stock_stock_status" for="x_stock_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->stock_status->caption() ?><?= $Page->stock_status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->stock_status->cellAttributes() ?>>
-<span id="el_medicine_stock_stock_status">
-<input type="<?= $Page->stock_status->getInputTextType() ?>" name="x_stock_status" id="x_stock_status" data-table="medicine_stock" data-field="x_stock_status" value="<?= $Page->stock_status->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->stock_status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->stock_status->formatPattern()) ?>"<?= $Page->stock_status->editAttributes() ?> aria-describedby="x_stock_status_help">
-<?= $Page->stock_status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->stock_status->getErrorMessage() ?></div>
+<?php if ($Page->invoice_attachment->Visible) { // invoice_attachment ?>
+    <div id="r_invoice_attachment"<?= $Page->invoice_attachment->rowAttributes() ?>>
+        <label id="elh_medicine_stock_invoice_attachment" class="<?= $Page->LeftColumnClass ?>"><?= $Page->invoice_attachment->caption() ?><?= $Page->invoice_attachment->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->invoice_attachment->cellAttributes() ?>>
+<span id="el_medicine_stock_invoice_attachment">
+<div id="fd_x_invoice_attachment" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_invoice_attachment"
+        name="x_invoice_attachment"
+        class="form-control ew-file-input"
+        title="<?= $Page->invoice_attachment->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="medicine_stock"
+        data-field="x_invoice_attachment"
+        data-size="2147483647"
+        data-accept-file-types="<?= $Page->invoice_attachment->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->invoice_attachment->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->invoice_attachment->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_invoice_attachment_help"
+        <?= ($Page->invoice_attachment->ReadOnly || $Page->invoice_attachment->Disabled) ? " disabled" : "" ?>
+        <?= $Page->invoice_attachment->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->invoice_attachment->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->invoice_attachment->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_invoice_attachment" id= "fn_x_invoice_attachment" value="<?= $Page->invoice_attachment->Upload->FileName ?>">
+<input type="hidden" name="fa_x_invoice_attachment" id= "fa_x_invoice_attachment" value="<?= (Post("fa_x_invoice_attachment") == "0") ? "0" : "1" ?>">
+<table id="ft_x_invoice_attachment" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>

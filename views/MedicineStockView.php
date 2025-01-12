@@ -183,6 +183,18 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->invoice_attachment->Visible) { // invoice_attachment ?>
+    <tr id="r_invoice_attachment"<?= $Page->invoice_attachment->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_invoice_attachment"><?= $Page->invoice_attachment->caption() ?></span></td>
+        <td data-name="invoice_attachment"<?= $Page->invoice_attachment->cellAttributes() ?>>
+<span id="el_medicine_stock_invoice_attachment">
+<span<?= $Page->invoice_attachment->viewAttributes() ?>>
+<?= GetFileViewTag($Page->invoice_attachment, $Page->invoice_attachment->getViewValue(), false) ?>
+</span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
     <tr id="r_date_created"<?= $Page->date_created->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_medicine_stock_date_created"><?= $Page->date_created->caption() ?></span></td>

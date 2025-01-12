@@ -140,8 +140,9 @@ class MedicineStockEdit extends MedicineStock
         $this->buying_price_per_unit->setVisibility();
         $this->selling_price_per_unit->setVisibility();
         $this->expiry_date->Visible = false;
-        $this->stock_status->setVisibility();
+        $this->stock_status->Visible = false;
         $this->expiry_status->Visible = false;
+        $this->invoice_attachment->setVisibility();
         $this->date_created->Visible = false;
         $this->date_updated->Visible = false;
     }
@@ -720,6 +721,8 @@ class MedicineStockEdit extends MedicineStock
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->invoice_attachment->Upload->Index = $CurrentForm->Index;
+        $this->invoice_attachment->Upload->uploadFile();
     }
 
     // Load form values
@@ -804,16 +807,7 @@ class MedicineStockEdit extends MedicineStock
                 $this->selling_price_per_unit->setFormValue($val, true, $validate);
             }
         }
-
-        // Check field name 'stock_status' first before field var 'x_stock_status'
-        $val = $CurrentForm->hasValue("stock_status") ? $CurrentForm->getValue("stock_status") : $CurrentForm->getValue("x_stock_status");
-        if (!$this->stock_status->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->stock_status->Visible = false; // Disable update for API request
-            } else {
-                $this->stock_status->setFormValue($val);
-            }
-        }
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -828,7 +822,6 @@ class MedicineStockEdit extends MedicineStock
         $this->measuring_unit->CurrentValue = $this->measuring_unit->FormValue;
         $this->buying_price_per_unit->CurrentValue = $this->buying_price_per_unit->FormValue;
         $this->selling_price_per_unit->CurrentValue = $this->selling_price_per_unit->FormValue;
-        $this->stock_status->CurrentValue = $this->stock_status->FormValue;
     }
 
     /**
@@ -881,6 +874,10 @@ class MedicineStockEdit extends MedicineStock
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->stock_status->setDbValue($row['stock_status']);
         $this->expiry_status->setDbValue($row['expiry_status']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
+        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -901,6 +898,7 @@ class MedicineStockEdit extends MedicineStock
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
         $row['stock_status'] = $this->stock_status->DefaultValue;
         $row['expiry_status'] = $this->expiry_status->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -972,6 +970,9 @@ class MedicineStockEdit extends MedicineStock
 
         // expiry_status
         $this->expiry_status->RowCssClass = "row";
+
+        // invoice_attachment
+        $this->invoice_attachment->RowCssClass = "row";
 
         // date_created
         $this->date_created->RowCssClass = "row";
@@ -1062,6 +1063,14 @@ class MedicineStockEdit extends MedicineStock
             // expiry_status
             $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
+            // invoice_attachment
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+            } else {
+                $this->invoice_attachment->ViewValue = "";
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1094,8 +1103,20 @@ class MedicineStockEdit extends MedicineStock
             // selling_price_per_unit
             $this->selling_price_per_unit->HrefValue = "";
 
-            // stock_status
-            $this->stock_status->HrefValue = "";
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+                }
+            } else {
+                $this->invoice_attachment->HrefValue = "";
+            }
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1195,13 +1216,17 @@ class MedicineStockEdit extends MedicineStock
                 $this->selling_price_per_unit->EditValue = FormatNumber($this->selling_price_per_unit->EditValue, null);
             }
 
-            // stock_status
-            $this->stock_status->setupEditAttributes();
-            if (!$this->stock_status->Raw) {
-                $this->stock_status->CurrentValue = HtmlDecode($this->stock_status->CurrentValue);
+            // invoice_attachment
+            $this->invoice_attachment->setupEditAttributes();
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->EditValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+            } else {
+                $this->invoice_attachment->EditValue = "";
             }
-            $this->stock_status->EditValue = HtmlEncode($this->stock_status->CurrentValue);
-            $this->stock_status->PlaceHolder = RemoveHtml($this->stock_status->caption());
+            if ($this->isShow()) {
+                RenderUploadField($this->invoice_attachment);
+            }
 
             // Edit refer script
 
@@ -1229,8 +1254,20 @@ class MedicineStockEdit extends MedicineStock
             // selling_price_per_unit
             $this->selling_price_per_unit->HrefValue = "";
 
-            // stock_status
-            $this->stock_status->HrefValue = "";
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+                }
+            } else {
+                $this->invoice_attachment->HrefValue = "";
+            }
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1301,9 +1338,9 @@ class MedicineStockEdit extends MedicineStock
             if (!CheckNumber($this->selling_price_per_unit->FormValue)) {
                 $this->selling_price_per_unit->addErrorMessage($this->selling_price_per_unit->getErrorMessage(false));
             }
-            if ($this->stock_status->Visible && $this->stock_status->Required) {
-                if (!$this->stock_status->IsDetailKey && EmptyValue($this->stock_status->FormValue)) {
-                    $this->stock_status->addErrorMessage(str_replace("%s", $this->stock_status->caption(), $this->stock_status->RequiredErrorMessage));
+            if ($this->invoice_attachment->Visible && $this->invoice_attachment->Required) {
+                if ($this->invoice_attachment->Upload->FileName == "" && !$this->invoice_attachment->Upload->KeepFile) {
+                    $this->invoice_attachment->addErrorMessage(str_replace("%s", $this->invoice_attachment->caption(), $this->invoice_attachment->RequiredErrorMessage));
                 }
             }
 
@@ -1421,8 +1458,14 @@ class MedicineStockEdit extends MedicineStock
         // selling_price_per_unit
         $this->selling_price_per_unit->setDbValueDef($rsnew, $this->selling_price_per_unit->CurrentValue, $this->selling_price_per_unit->ReadOnly);
 
-        // stock_status
-        $this->stock_status->setDbValueDef($rsnew, $this->stock_status->CurrentValue, $this->stock_status->ReadOnly);
+        // invoice_attachment
+        if ($this->invoice_attachment->Visible && !$this->invoice_attachment->ReadOnly && !$this->invoice_attachment->Upload->KeepFile) {
+            if ($this->invoice_attachment->Upload->Value === null) {
+                $rsnew['invoice_attachment'] = null;
+            } else {
+                $rsnew['invoice_attachment'] = $this->invoice_attachment->Upload->Value;
+            }
+        }
         return $rsnew;
     }
 
@@ -1453,8 +1496,8 @@ class MedicineStockEdit extends MedicineStock
         if (isset($row['selling_price_per_unit'])) { // selling_price_per_unit
             $this->selling_price_per_unit->CurrentValue = $row['selling_price_per_unit'];
         }
-        if (isset($row['stock_status'])) { // stock_status
-            $this->stock_status->CurrentValue = $row['stock_status'];
+        if (isset($row['invoice_attachment'])) { // invoice_attachment
+            $this->invoice_attachment->CurrentValue = $row['invoice_attachment'];
         }
     }
 

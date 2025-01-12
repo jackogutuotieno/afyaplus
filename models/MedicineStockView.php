@@ -160,6 +160,7 @@ class MedicineStockView extends MedicineStock
         $this->expiry_date->setVisibility();
         $this->stock_status->setVisibility();
         $this->expiry_status->setVisibility();
+        $this->invoice_attachment->setVisibility();
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -842,6 +843,10 @@ class MedicineStockView extends MedicineStock
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->stock_status->setDbValue($row['stock_status']);
         $this->expiry_status->setDbValue($row['expiry_status']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
+        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -862,6 +867,7 @@ class MedicineStockView extends MedicineStock
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
         $row['stock_status'] = $this->stock_status->DefaultValue;
         $row['expiry_status'] = $this->expiry_status->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -908,6 +914,8 @@ class MedicineStockView extends MedicineStock
         // stock_status
 
         // expiry_status
+
+        // invoice_attachment
 
         // date_created
 
@@ -996,6 +1004,14 @@ class MedicineStockView extends MedicineStock
             // expiry_status
             $this->expiry_status->ViewValue = $this->expiry_status->CurrentValue;
 
+            // invoice_attachment
+            if (!EmptyValue($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->ViewValue = $this->id->CurrentValue;
+                $this->invoice_attachment->IsBlobImage = IsImageFile(ContentExtension($this->invoice_attachment->Upload->DbValue));
+            } else {
+                $this->invoice_attachment->ViewValue = "";
+            }
+
             // date_created
             $this->date_created->ViewValue = $this->date_created->CurrentValue;
             $this->date_created->ViewValue = FormatDateTime($this->date_created->ViewValue, $this->date_created->formatPattern());
@@ -1051,6 +1067,22 @@ class MedicineStockView extends MedicineStock
             // expiry_status
             $this->expiry_status->HrefValue = "";
             $this->expiry_status->TooltipValue = "";
+
+            // invoice_attachment
+            if (!empty($this->invoice_attachment->Upload->DbValue)) {
+                $this->invoice_attachment->HrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+                $this->invoice_attachment->LinkAttrs["target"] = "";
+                if ($this->invoice_attachment->IsBlobImage && empty($this->invoice_attachment->LinkAttrs["target"])) {
+                    $this->invoice_attachment->LinkAttrs["target"] = "_blank";
+                }
+                if ($this->isExport()) {
+                    $this->invoice_attachment->HrefValue = FullUrl($this->invoice_attachment->HrefValue, "href");
+                }
+            } else {
+                $this->invoice_attachment->HrefValue = "";
+            }
+            $this->invoice_attachment->ExportHrefValue = GetFileUploadUrl($this->invoice_attachment, $this->id->CurrentValue);
+            $this->invoice_attachment->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";

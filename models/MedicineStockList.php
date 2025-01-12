@@ -166,6 +166,7 @@ class MedicineStockList extends MedicineStock
         $this->expiry_date->setVisibility();
         $this->stock_status->setVisibility();
         $this->expiry_status->setVisibility();
+        $this->invoice_attachment->Visible = false;
         $this->date_created->setVisibility();
         $this->date_updated->setVisibility();
     }
@@ -1289,6 +1290,7 @@ class MedicineStockList extends MedicineStock
 
         // Fields to search
         $searchFlds = [];
+        $searchFlds[] = &$this->id;
         $searchFlds[] = &$this->batch_number;
         $searchFlds[] = &$this->measuring_unit;
         $searchFlds[] = &$this->stock_status;
@@ -2113,6 +2115,10 @@ class MedicineStockList extends MedicineStock
         $this->expiry_date->setDbValue($row['expiry_date']);
         $this->stock_status->setDbValue($row['stock_status']);
         $this->expiry_status->setDbValue($row['expiry_status']);
+        $this->invoice_attachment->Upload->DbValue = $row['invoice_attachment'];
+        if (is_resource($this->invoice_attachment->Upload->DbValue) && get_resource_type($this->invoice_attachment->Upload->DbValue) == "stream") { // Byte array
+            $this->invoice_attachment->Upload->DbValue = stream_get_contents($this->invoice_attachment->Upload->DbValue);
+        }
         $this->date_created->setDbValue($row['date_created']);
         $this->date_updated->setDbValue($row['date_updated']);
     }
@@ -2133,6 +2139,7 @@ class MedicineStockList extends MedicineStock
         $row['expiry_date'] = $this->expiry_date->DefaultValue;
         $row['stock_status'] = $this->stock_status->DefaultValue;
         $row['expiry_status'] = $this->expiry_status->DefaultValue;
+        $row['invoice_attachment'] = $this->invoice_attachment->DefaultValue;
         $row['date_created'] = $this->date_created->DefaultValue;
         $row['date_updated'] = $this->date_updated->DefaultValue;
         return $row;
@@ -2198,6 +2205,8 @@ class MedicineStockList extends MedicineStock
         // stock_status
 
         // expiry_status
+
+        // invoice_attachment
 
         // date_created
         $this->date_created->CellCssStyle = "white-space: nowrap;";

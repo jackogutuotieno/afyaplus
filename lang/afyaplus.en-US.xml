@@ -972,6 +972,10 @@
       <field id="expiry_status">
         <phrase id="fldcaption" value="Expiry Status" />
       </field>
+      <field id="invoice_attachment">
+        <phrase id="fldcaption" value="Invoice Attachment" />
+        <phrase id="custommsg" value="Attach invoice in pdf/jpg format" />
+      </field>
       <field id="date_created">
         <phrase id="fldcaption" value="Date Added" />
       </field>
